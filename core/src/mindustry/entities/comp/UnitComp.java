@@ -3,8 +3,9 @@ package mindustry.entities.comp;
 import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
+import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -13,13 +14,14 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
 @Component
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable{
 
     @Import float x, y, rotation, elevation, maxHealth, drag, armor;
 
@@ -185,6 +187,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             Fx.unitDespawn.at(x, y, 0, this);
             remove();
         }
+    }
+
+    @Override
+    public void display(Table table){
+        type.display(this, table);
     }
 
     @Override

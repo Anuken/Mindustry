@@ -1,6 +1,5 @@
 package mindustry.world.blocks.liquid;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -25,8 +24,8 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region};
     }
 
     public class LiquidJunctionEntity extends TileEntity{

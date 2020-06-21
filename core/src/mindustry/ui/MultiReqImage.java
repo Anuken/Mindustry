@@ -1,11 +1,11 @@
 package mindustry.ui;
 
-import arc.struct.Array;
+import arc.struct.Seq;
 import arc.scene.ui.layout.Stack;
 import arc.util.Time;
 
 public class MultiReqImage extends Stack{
-    private Array<ReqImage> displays = new Array<>();
+    private Seq<ReqImage> displays = new Seq<>();
     private float time;
 
     public void add(ReqImage display){

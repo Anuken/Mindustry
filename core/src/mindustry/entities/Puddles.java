@@ -39,7 +39,7 @@ public class Puddles{
             Puddlec p = map.get(tile.pos());
 
             if(generation == 0 && p != null && p.lastRipple() <= Time.time() - 40f){
-                Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, tile.floor().liquidDrop.color);
+                Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, 1f, tile.floor().liquidDrop.color);
                 p.lastRipple(Time.time());
             }
             return;
@@ -59,7 +59,7 @@ public class Puddles{
             p.accepting(Math.max(amount, p.accepting()));
 
             if(generation == 0 && p.lastRipple() <= Time.time() - 40f && p.amount() >= maxLiquid / 2f){
-                Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, p.liquid().color);
+                Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, 1f, p.liquid().color);
                 p.lastRipple(Time.time());
             }
         }else{

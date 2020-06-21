@@ -23,8 +23,8 @@ public class BuilderAI extends AIController{
         }
 
         //approach request if building
-        if(builder.buildRequest() != null){
-            BuildRequest req = builder.buildRequest();
+        if(builder.buildPlan() != null){
+            BuildPlan req = builder.buildPlan();
 
             boolean valid =
                 (req.tile().entity instanceof BuildEntity && req.tile().<BuildEntity>ent().cblock == req.block) ||
@@ -37,7 +37,7 @@ public class BuilderAI extends AIController{
                 moveTo(req.tile(), buildingRange - 20f);
             }else{
                 //discard invalid request
-                builder.requests().removeFirst();
+                builder.plans().removeFirst();
             }
         }else{
             //find new request
@@ -50,7 +50,7 @@ public class BuilderAI extends AIController{
                     blocks.removeFirst();
                 }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid.
                     //add build request.
-                    BuildRequest req = new BuildRequest(block.x, block.y, block.rotation, content.block(block.block));
+                    BuildPlan req = new BuildPlan(block.x, block.y, block.rotation, content.block(block.block));
                     if(block.config != null){
                         req.configure(block.config);
                     }

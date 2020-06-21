@@ -28,6 +28,9 @@ public class ContinuousLaserBulletType extends BulletType{
         pierce = true;
         hittable = false;
         hitColor = colors[2];
+        incendAmount = 1;
+        incendSpread = 5;
+        incendChance = 0.4f;
     }
 
     protected ContinuousLaserBulletType(){
@@ -53,15 +56,6 @@ public class ContinuousLaserBulletType extends BulletType{
         }
     }
 
-    /*
-    @Override
-    public void hit(Bulletc b, float hitx, float hity){
-        hitEffect.at(hitx, hity, colors[2]);
-        if(Mathf.chance(0.4)){
-            Fires.create(world.tileWorld(hitx + Mathf.range(5f), hity + Mathf.range(5f)));
-        }
-    }*/
-
     @Override
     public void draw(Bulletc b){
         float baseLen = length * b.fout();
@@ -78,8 +72,13 @@ public class ContinuousLaserBulletType extends BulletType{
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
 
-        Drawf.light(b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 40, Color.orange, 0.7f);
+        Drawf.light(b.team(), b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 40, Color.orange, 0.7f);
         Draw.reset();
+    }
+
+    @Override
+    public void drawLight(Bulletc b){
+        //no light drawn here
     }
 
 }

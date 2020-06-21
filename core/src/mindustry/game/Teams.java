@@ -16,7 +16,7 @@ public class Teams{
     /** Maps team IDs to team data. */
     private TeamData[] map = new TeamData[256];
     /** Active teams. */
-    private Array<TeamData> active = new Array<>();
+    private Seq<TeamData> active = new Seq<>();
 
     public Teams(){
         active.add(get(Team.crux));
@@ -38,7 +38,7 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
-    public Array<Team> enemiesOf(Team team){
+    public Seq<Team> enemiesOf(Team team){
         return get(team).enemies;
     }
 
@@ -73,12 +73,12 @@ public class Teams{
         return map[Pack.u(team.id)];
     }
 
-    public Array<CoreEntity> playerCores(){
+    public Seq<CoreEntity> playerCores(){
         return get(state.rules.defaultTeam).cores;
     }
 
     /** Do not modify! */
-    public Array<CoreEntity> cores(Team team){
+    public Seq<CoreEntity> cores(Team team){
         return get(team).cores;
     }
 
@@ -98,7 +98,7 @@ public class Teams{
     }
 
     /** Do not modify. */
-    public Array<TeamData> getActive(){
+    public Seq<TeamData> getActive(){
         active.removeAll(t -> !t.active());
         return active;
     }
@@ -145,8 +145,8 @@ public class Teams{
     }
 
     public class TeamData{
-        public final Array<CoreEntity> cores = new Array<>();
-        public final Array<Team> enemies = new Array<>();
+        public final Seq<CoreEntity> cores = new Seq<>();
+        public final Seq<Team> enemies = new Seq<>();
         public final Team team;
         public final BaseAI ai;
         public Queue<BlockPlan> blocks = new Queue<>();
@@ -174,7 +174,7 @@ public class Teams{
 
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
-            return state.rules.attackMode && team == state.rules.waveTeam && state.rules.buildAI;
+            return state.rules.attackMode && team.rules().ai;
         }
 
         @Override

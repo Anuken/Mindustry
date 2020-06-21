@@ -21,9 +21,9 @@ import static mindustry.Vars.*;
 public class SWorkshop implements SteamUGCCallback{
     public final SteamUGC ugc = new SteamUGC(this);
 
-    private ObjectMap<Class<? extends Publishable>, Array<Fi>> workshopFiles = new ObjectMap<>();
-    private ObjectMap<SteamUGCQuery, Cons2<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
-    private Array<Cons<SteamPublishedFileID>> itemHandlers = new Array<>();
+    private ObjectMap<Class<? extends Publishable>, Seq<Fi>> workshopFiles = new ObjectMap<>();
+    private ObjectMap<SteamUGCQuery, Cons2<Seq<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
+    private Seq<Cons<SteamPublishedFileID>> itemHandlers = new Seq<>();
     private ObjectMap<SteamPublishedFileID, Runnable> updatedHandlers = new ObjectMap<>();
 
     public SWorkshop(){
@@ -32,7 +32,7 @@ public class SWorkshop implements SteamUGCCallback{
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getSubscribedItems(ids);
 
-        Array<Fi> folders = Array.with(ids).map(f -> {
+        Seq<Fi> folders = Seq.with(ids).map(f -> {
             ugc.getItemInstallInfo(f, info);
             return new Fi(info.getFolder());
         }).select(f -> f != null && f.list().length > 0);
@@ -50,8 +50,8 @@ public class SWorkshop implements SteamUGCCallback{
         });
     }
 
-    public Array<Fi> getWorkshopFiles(Class<? extends Publishable> type){
-        return workshopFiles.get(type, () -> new Array<>(0));
+    public Seq<Fi> getWorkshopFiles(Class<? extends Publishable> type){
+        return workshopFiles.get(type, () -> new Seq<>(0));
     }
 
     /** Publish a new item and submit an update for it.
@@ -158,7 +158,7 @@ public class SWorkshop implements SteamUGCCallback{
                 ugc.setItemDescription(h, p.steamDescription());
             }
 
-            Array<String> tags = p.extraTags();
+            Seq<String> tags = p.extraTags();
             tags.add(p.steamTag());
 
             ugc.setItemTitle(h, p.steamTitle());
@@ -195,7 +195,7 @@ public class SWorkshop implements SteamUGCCallback{
         dialog.show();
     }
 
-    void query(SteamUGCQuery query, Cons2<Array<SteamUGCDetails>, SteamResult> handler){
+    void query(SteamUGCQuery query, Cons2<Seq<SteamUGCDetails>, SteamResult> handler){
         Log.info("POST QUERY " + query);
         detailHandlers.put(query, handler);
         ugc.sendQueryUGCRequest(query);
@@ -241,7 +241,7 @@ public class SWorkshop implements SteamUGCCallback{
             Log.info("Query being handled...");
             if(numResultsReturned > 0){
                 Log.info("@ q results", numResultsReturned);
-                Array<SteamUGCDetails> details = new Array<>();
+                Seq<SteamUGCDetails> details = new Seq<>();
                 for(int i = 0; i < numResultsReturned; i++){
                     details.add(new SteamUGCDetails());
                     ugc.getQueryUGCResult(query, i, details.get(i));
@@ -249,7 +249,7 @@ public class SWorkshop implements SteamUGCCallback{
                 detailHandlers.get(query).get(details, result);
             }else{
                 Log.info("Nothing found.");
-                detailHandlers.get(query).get(new Array<>(), SteamResult.FileNotFound);
+                detailHandlers.get(query).get(new Seq<>(), SteamResult.FileNotFound);
             }
 
             detailHandlers.remove(query);

@@ -81,8 +81,8 @@ public class Weathers implements ContentList{
                 Core.camera.bounds(Tmp.r2);
                 int total = (int)(Tmp.r1.area() / density * state.intensity());
                 Lines.stroke(0.75f);
-                Draw.color(Color.royal, Color.white, 0.3f);
                 float alpha = Draw.getColor().a;
+                Draw.color(Color.royal, Color.white, 0.3f);
 
                 for(int i = 0; i < total; i++){
                     float scl = rand.random(0.5f, 1f);
@@ -112,6 +112,7 @@ public class Weathers implements ContentList{
                 Tmp.r1.grow(padding);
                 Core.camera.bounds(Tmp.r2);
                 int total = (int)(Tmp.r1.area() / density * state.intensity()) / 2;
+                Lines.stroke(0.75f);
 
                 float t = Time.time() / 22f;
 
@@ -133,11 +134,19 @@ public class Weathers implements ContentList{
 
                     if(Tmp.r3.setCentered(x, y, life * 4f).overlaps(Tmp.r2)){
                         Tile tile = world.tileWorld(x, y);
+
                         if(tile != null && tile.floor().liquidDrop == Liquids.water){
-                            Draw.tint(Tmp.c1.set(tile.floor().mapColor).mul(1.5f));
+                            Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(1.5f).a(state.opacity()));
                             Draw.rect(splashes[(int)(life * (splashes.length - 1))], x, y);
-                            //Lines.stroke((1f - life) * 2f);
-                            //Lines.circle(x, y, life * 4f);
+                        }else{
+                            Draw.color(Color.royal, Color.white, 0.3f);
+                            Draw.alpha(Mathf.slope(life) * state.opacity());
+
+                            float space = 45f;
+                            for(int j : new int[]{-1, 1}){
+                                Tmp.v1.trns(90f + j*space, 1f + 5f * life);
+                                Lines.lineAngle(x + Tmp.v1.x, y + Tmp.v1.y, 90f + j*space, 3f * (1f - life));
+                            }
                         }
                     }
                 }

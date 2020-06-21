@@ -38,7 +38,7 @@ public class ContentDisplay{
         BlockStats stats = block.stats;
 
         for(StatCategory cat : stats.toMap().keys()){
-            OrderedMap<BlockStat, Array<StatValue>> map = stats.toMap().get(cat);
+            OrderedMap<BlockStat, Seq<StatValue>> map = stats.toMap().get(cat);
 
             if(map.size == 0) continue;
 
@@ -49,7 +49,7 @@ public class ContentDisplay{
                 table.table(inset -> {
                     inset.left();
                     inset.add("[lightgray]" + stat.localized() + ":[] ").left();
-                    Array<StatValue> arr = map.get(stat);
+                    Seq<StatValue> arr = map.get(stat);
                     for(StatValue value : arr){
                         value.display(inset);
                         inset.add().size(10f);

@@ -32,11 +32,11 @@ public class PowerGenerator extends PowerDistributor{
         super.setBars();
 
         if(hasPower && outputsPower && !consumes.hasPower()){
-            bars.add("power", entity -> new Bar(() ->
+            bars.add("power", (GeneratorEntity entity) -> new Bar(() ->
             Core.bundle.format("bar.poweroutput",
             Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
             () -> Pal.powerBar,
-            () -> ((GeneratorEntity)entity).productionEfficiency));
+            () -> entity.productionEfficiency));
         }
     }
 

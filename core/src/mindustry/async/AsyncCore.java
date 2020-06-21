@@ -11,13 +11,13 @@ import static mindustry.Vars.state;
 
 public class AsyncCore{
     //all processes to be executed each frame
-    private final Array<AsyncProcess> processes = Array.with(
+    private final Seq<AsyncProcess> processes = Seq.with(
         new PhysicsProcess(),
         Vars.teamIndex = new TeamIndexProcess()
     );
 
     //futures to be awaited
-    private final Array<Future<?>> futures = new Array<>();
+    private final Seq<Future<?>> futures = new Seq<>();
 
     private final ExecutorService executor = Executors.newFixedThreadPool(processes.size, r -> {
         Thread thread = new Thread(r, "AsyncLogic-Thread");

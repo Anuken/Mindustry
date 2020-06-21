@@ -1,6 +1,6 @@
 package mindustry.world.modules;
 
-import arc.struct.IntArray;
+import arc.struct.IntSeq;
 import arc.util.io.*;
 import mindustry.world.blocks.power.PowerGraph;
 
@@ -12,7 +12,7 @@ public class PowerModule extends BlockModule{
      */
     public float status = 0.0f;
     public PowerGraph graph = new PowerGraph();
-    public IntArray links = new IntArray();
+    public IntSeq links = new IntSeq();
 
     @Override
     public void write(Writes write){

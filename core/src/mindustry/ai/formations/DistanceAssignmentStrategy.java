@@ -13,8 +13,8 @@ public class DistanceAssignmentStrategy implements SlotAssignmentStrategy{
     }
 
     @Override
-    public void updateSlotAssignments(Array<SlotAssignment> assignments){
-        IntArray slots = IntArray.range(0, assignments.size);
+    public void updateSlotAssignments(Seq<SlotAssignment> assignments){
+        IntSeq slots = IntSeq.range(0, assignments.size);
 
         for(SlotAssignment slot : assignments){
             int mindex = 0;
@@ -35,12 +35,12 @@ public class DistanceAssignmentStrategy implements SlotAssignmentStrategy{
     }
 
     @Override
-    public int calculateNumberOfSlots(Array<SlotAssignment> assignments){
+    public int calculateNumberOfSlots(Seq<SlotAssignment> assignments){
         return assignments.size;
     }
 
     @Override
-    public void removeSlotAssignment(Array<SlotAssignment> assignments, int index){
+    public void removeSlotAssignment(Seq<SlotAssignment> assignments, int index){
         assignments.remove(index);
     }
 

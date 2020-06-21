@@ -8,13 +8,14 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.world;
-import static mindustry.entities.Puddles.maxLiquid;
+import static mindustry.Vars.*;
+import static mindustry.entities.Puddles.*;
 
 @EntityDef(value = {Puddlec.class}, pooled = true)
 @Component
@@ -73,7 +74,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
                         unit.apply(liquid.effect, 60 * 2);
 
                         if(unit.vel().len() > 0.1){
-                            Fx.ripple.at(unit.x(), unit.y(), liquid.color);
+                            Fx.ripple.at(unit.x(), unit.y(), unit.type().rippleScale, liquid.color);
                         }
                     }
                 }
@@ -111,7 +112,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         if(liquid.lightColor.a > 0.001f && f > 0){
             Color color = liquid.lightColor;
             float opacity = color.a * f;
-            Drawf.light(tile.drawx(), tile.drawy(),  30f * f, color, opacity * 0.8f);
+            Drawf.light(Team.derelict, tile.drawx(), tile.drawy(),  30f * f, color, opacity * 0.8f);
         }
     }
 

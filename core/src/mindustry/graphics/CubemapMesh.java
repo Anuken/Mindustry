@@ -59,7 +59,7 @@ public class CubemapMesh implements Disposable{
 
     public CubemapMesh(Cubemap map){
         this.map = map;
-        this.map.setFilter(TextureFilter.Linear);
+        this.map.setFilter(TextureFilter.linear);
         this.mesh = new Mesh(true, vertices.length, 0,
             new VertexAttribute(Usage.position, 3, "a_position")
         );

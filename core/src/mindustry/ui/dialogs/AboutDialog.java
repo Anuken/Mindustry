@@ -15,14 +15,14 @@ import mindustry.ui.Links.*;
 import static mindustry.Vars.*;
 
 public class AboutDialog extends BaseDialog{
-    private Array<String> contributors = new Array<>();
+    private Seq<String> contributors = new Seq<>();
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
 
     public AboutDialog(){
         super("$about.button");
 
         shown(() -> {
-            contributors = Array.with(Core.files.internal("contributors").readString("UTF-8").split("\n"));
+            contributors = Seq.with(Core.files.internal("contributors").readString("UTF-8").split("\n"));
             Core.app.post(this::setup);
         });
 

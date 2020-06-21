@@ -67,7 +67,7 @@ public class Fonts{
     }
 
     public static void loadContentIcons(){
-        Array<BitmapFont> fonts = Array.with(Fonts.chat, Fonts.def, Fonts.outline);
+        Seq<BitmapFont> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
         Texture uitex = Core.atlas.find("logo").getTexture();
         int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
@@ -110,7 +110,7 @@ public class Fonts{
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
-        UI.packer = new PixmapPacker(2048, 2048, Format.RGBA8888, 2, true);
+        UI.packer = new PixmapPacker(2048, 2048, Format.rgba8888, 2, true);
         FileHandleResolver resolver = new InternalFileHandleResolver();
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
@@ -127,8 +127,8 @@ public class Fonts{
                     scaled.add(parameter.fontParameters);
                 }
 
-                parameter.fontParameters.magFilter = TextureFilter.Linear;
-                parameter.fontParameters.minFilter = TextureFilter.Linear;
+                parameter.fontParameters.magFilter = TextureFilter.linear;
+                parameter.fontParameters.minFilter = TextureFilter.linear;
                 parameter.fontParameters.packer = UI.packer;
                 return super.loadSync(manager, fileName, file, parameter);
             }
@@ -156,7 +156,7 @@ public class Fonts{
 
         Page page = UI.packer.getPages().first();
 
-        Array<AtlasRegion> regions = atlas.getRegions().select(t -> t.getTexture() == texture);
+        Seq<AtlasRegion> regions = atlas.getRegions().select(t -> t.getTexture() == texture);
         for(AtlasRegion region : regions){
             //get new pack rect
             page.setDirty(false);
@@ -175,7 +175,7 @@ public class Fonts{
         atlas.disposePixmap(texture);
 
         page.setDirty(true);
-        page.updateTexture(TextureFilter.Linear, TextureFilter.Linear, false);
+        page.updateTexture(TextureFilter.linear, TextureFilter.linear, false);
     }
 
     public static TextureRegionDrawable getGlyph(BitmapFont font, char glyph){

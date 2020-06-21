@@ -1,7 +1,7 @@
 package mindustry.tools;
 
 import arc.*;
-import arc.struct.Array;
+import arc.struct.Seq;
 import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
@@ -23,13 +23,13 @@ public class ScriptStubGenerator{
 
     public static void main(String[] args) throws Exception{
         String base = "mindustry";
-        Array<String> blacklist = Array.with("plugin", "mod", "net", "io", "tools");
-        Array<String> nameBlacklist = Array.with("ClassAccess");
-        Array<Class<?>> whitelist = Array.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
+        Seq<String> blacklist = Seq.with("plugin", "mod", "net", "io", "tools");
+        Seq<String> nameBlacklist = Seq.with("ClassAccess");
+        Seq<Class<?>> whitelist = Seq.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
             AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class,
             Sounds.class, Musics.class, Call.class, Texture.class, TextureData.class, Pixmap.class, I18NBundle.class, Interval.class, DataInput.class, DataOutput.class,
             DataInputStream.class, DataOutputStream.class, Integer.class, Float.class, Double.class, Long.class, Boolean.class, Short.class, Byte.class, Character.class);
-        Array<String> nopackage = Array.with("java.lang", "java");
+        Seq<String> nopackage = Seq.with("java.lang", "java");
 
         List<ClassLoader> classLoadersList = new LinkedList<>();
         classLoadersList.add(ClasspathHelper.contextClassLoader());
@@ -46,7 +46,7 @@ public class ScriptStubGenerator{
         .include(FilterBuilder.prefix("arc.math"))
         ));
 
-        Array<Class<?>> classes = Array.with(reflections.getSubTypesOf(Object.class));
+        Seq<Class<?>> classes = Seq.with(reflections.getSubTypesOf(Object.class));
         classes.addAll(reflections.getSubTypesOf(Enum.class));
         classes.addAll(whitelist);
         classes.sort(Structs.comparing(Class::getName));

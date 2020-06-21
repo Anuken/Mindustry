@@ -26,8 +26,8 @@ public class ConsumeModule extends BlockModule{
     }
 
     public void update(){
-        //everything is valid here
-        if(entity.tile().isEnemyCheat()){
+        //everything is valid when cheating
+        if(entity.cheating()){
             valid = optionalValid = true;
             return;
         }

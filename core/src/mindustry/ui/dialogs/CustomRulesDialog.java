@@ -59,7 +59,7 @@ public class CustomRulesDialog extends BaseDialog{
                 t.add("$empty");
             }
 
-            Array<Block> array = Array.with(rules.bannedBlocks);
+            Seq<Block> array = Seq.with(rules.bannedBlocks);
             array.sort();
 
             int cols = mobile && Core.graphics.isPortrait() ? 1 : mobile ? 2 : 3;
@@ -140,13 +140,12 @@ public class CustomRulesDialog extends BaseDialog{
         number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
         number("$rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("$rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
+        number("$rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
         main.button("$configure",
             () -> loadoutDialog.show(Blocks.coreShard.itemCapacity, rules.loadout,
-                () -> {
-                    rules.loadout.clear();
-                    rules.loadout.add(new ItemStack(Items.copper, 100));
-                }, () -> {}, () -> {}
+                () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
+                () -> {}, () -> {}
         )).left().width(300f);
         main.row();
 
@@ -154,13 +153,13 @@ public class CustomRulesDialog extends BaseDialog{
         main.row();
 
         title("$rules.title.unit");
+        check("$rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
         number("$rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
 
         title("$rules.title.enemy");
         check("$rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
-        check("$rules.enemyCheat", b -> rules.enemyCheat = b, () -> rules.enemyCheat);
         number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("$rules.title.environment");

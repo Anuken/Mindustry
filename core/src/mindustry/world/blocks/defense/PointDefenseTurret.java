@@ -1,6 +1,5 @@
 package mindustry.world.blocks.defense;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -15,7 +14,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class PointDefenseTurret extends Block{
     public final int timerTarget = timers++;
@@ -48,8 +47,8 @@ public class PointDefenseTurret extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find("block-" + size), Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{baseRegion, region};
     }
 
     public class PointDefenseEntity extends TileEntity{

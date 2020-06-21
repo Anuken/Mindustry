@@ -69,7 +69,7 @@ public class AssetsProcess extends BaseProcessor{
         });
 
         for(Element elem : elements){
-            Array.with(((TypeElement)elem).getEnclosedElements()).each(e -> e.getKind() == ElementKind.FIELD, field -> {
+            Seq.with(((TypeElement)elem).getEnclosedElements()).each(e -> e.getKind() == ElementKind.FIELD, field -> {
                 String fname = field.getSimpleName().toString();
                 if(fname.startsWith("default")){
                     loadStyles.addStatement("arc.Core.scene.addStyle(" + field.asType().toString() + ".class, mindustry.ui.Styles." + fname + ")");

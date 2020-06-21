@@ -7,7 +7,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
 public class RandomItemFilter extends GenerateFilter{
-    public Array<ItemStack> drops = new Array<>();
+    public Seq<ItemStack> drops = new Seq<>();
     public float chance = 0.3f;
 
     @Override

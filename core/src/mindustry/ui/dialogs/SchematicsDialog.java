@@ -29,7 +29,7 @@ public class SchematicsDialog extends BaseDialog{
     public SchematicsDialog(){
         super("$schematics");
         Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> {
-            ((Texture)t).setWrap(TextureWrap.Repeat);
+            ((Texture)t).setWrap(TextureWrap.repeat);
         };
 
         shouldPause = true;
@@ -332,13 +332,13 @@ public class SchematicsDialog extends BaseDialog{
             cont.add(new SchematicImage(schem)).maxSize(800f);
             cont.row();
 
-            Array<ItemStack> arr = schem.requirements();
+            Seq<ItemStack> arr = schem.requirements();
             cont.table(r -> {
                 int i = 0;
                 for(ItemStack s : arr){
                     r.image(s.item.icon(Cicon.small)).left();
                     r.label(() -> {
-                        Tilec core = player.closestCore();
+                        Tilec core = player.core();
                         if(core == null || state.rules.infiniteResources || core.items().has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
                         return (core.items().has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items().get(s.item), s.amount) + "[lightgray]/" + s.amount;
                     }).padLeft(2).left().padRight(4);

@@ -1,6 +1,6 @@
 package mindustry.world.meta.values;
 
-import arc.struct.Array;
+import arc.struct.Seq;
 import arc.func.Boolf;
 import arc.scene.ui.layout.Table;
 import mindustry.type.Item;
@@ -18,7 +18,7 @@ public class ItemFilterValue implements StatValue{
 
     @Override
     public void display(Table table){
-        Array<Item> list = content.items().select(filter);
+        Seq<Item> list = content.items().select(filter);
 
         for(int i = 0; i < list.size; i++){
             Item item = list.get(i);

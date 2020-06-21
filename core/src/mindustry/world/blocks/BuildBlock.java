@@ -154,7 +154,7 @@ public class BuildBlock extends Block{
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.builder().addBuild(new BuildRequest(tile.x, tile.y, tile.rotation(), cblock), false);
+                player.builder().addBuild(new BuildPlan(tile.x, tile.y, tile.rotation(), cblock), false);
             }
         }
 
@@ -200,7 +200,7 @@ public class BuildBlock extends Block{
                 setConstruct(previous, cblock);
             }
 
-            float maxProgress = core == null ? amount : checkRequired(core.items(), amount, false);
+            float maxProgress = core == null || team.rules().infiniteResources ? amount : checkRequired(core.items(), amount, false);
 
             for(int i = 0; i < cblock.requirements.length; i++){
                 int reqamount = Math.round(state.rules.buildCostMultiplier * cblock.requirements[i].amount);
@@ -208,7 +208,7 @@ public class BuildBlock extends Block{
                 totalAccumulator[i] = Math.min(totalAccumulator[i] + reqamount * maxProgress, reqamount);
             }
 
-            maxProgress = core == null ? maxProgress : checkRequired(core.items(), maxProgress, true);
+            maxProgress = core == null || team.rules().infiniteResources ? maxProgress : checkRequired(core.items(), maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
             builderID = builder.id();

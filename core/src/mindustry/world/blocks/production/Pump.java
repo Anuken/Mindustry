@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -12,8 +13,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Pump extends LiquidBlock{
-    public final int timerContentCheck = timers++;
-
     /** Pump amount, total. */
     protected float pumpAmount = 1f;
 
@@ -55,12 +54,12 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region};
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile){
+    public boolean canPlaceOn(Tile tile, Team team){
         if(isMultiblock()){
             Liquid last = null;
             for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
@@ -112,10 +111,6 @@ public class Pump extends LiquidBlock{
             if(cons.valid() && liquidDrop != null){
                 float maxPump = Math.min(liquidCapacity - liquids.total(), tiles * pumpAmount * delta() / size / size) * efficiency();
                 liquids.add(liquidDrop, maxPump);
-            }
-
-            if(liquids.currentAmount() > 0f && timer(timerContentCheck, 10)){
-                useContent(liquids.current());
             }
 
             dumpLiquid(liquids.current());

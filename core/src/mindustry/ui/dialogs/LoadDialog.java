@@ -50,7 +50,7 @@ public class LoadDialog extends BaseDialog{
 
         Time.runTask(2f, () -> Core.scene.setScrollFocus(pane));
 
-        Array<SaveSlot> array = control.saves.getSaveSlots();
+        Seq<SaveSlot> array = control.saves.getSaveSlots();
         array.sort((slot, other) -> -Long.compare(slot.getTimestamp(), other.getTimestamp()));
 
         int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(470)), 1);

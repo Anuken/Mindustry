@@ -9,6 +9,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -17,7 +18,6 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -37,12 +37,12 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Tilec.class}, isFinal = false, genio = false, serialize = false)
 @Component
-abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTreeObject{
+abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTreeObject, Displayable{
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Tilec> tmpTiles = new ObjectSet<>();
-    static final Array<Tilec> tempTileEnts = new Array<>();
-    static final Array<Tile> tempTiles = new Array<>();
+    static final Seq<Tilec> tempTileEnts = new Seq<>();
+    static final Seq<Tile> tempTiles = new Seq<>();
     static int sleepingEntities = 0;
     
     @Import float x, y, health;
@@ -50,8 +50,9 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     transient Tile tile;
     transient Block block;
-    transient Array<Tilec> proximity = new Array<>(8);
+    transient Seq<Tilec> proximity = new Seq<>(8);
     transient boolean updateFlow;
+    transient byte dump;
 
     PowerModule power;
     ItemModule items;
@@ -413,9 +414,9 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      * @return whether the payload was moved successfully
      */
     public boolean dumpPayload(@NonNull Payload todump){
-        int dump = tile.data;
-
         if(proximity.size == 0) return false;
+
+        int dump = this.dump;
 
         for(int i = 0; i < proximity.size; i++){
             Tilec other = proximity.get((i + dump) % proximity.size);
@@ -449,7 +450,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void dumpLiquid(Liquid liquid){
-        int dump = tile.data;
+        int dump = this.dump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -548,9 +549,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      * containers, it gets added to the block's inventory.
      */
     public void offload(Item item){
-        Array<Tilec> proximity = proximity();
-        int dump = tile.data;
-        useContent(item);
+        int dump = this.dump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -568,9 +567,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
      * Tries to put this item into a nearby container. Returns success. Unlike #offload(), this method does not change the block inventory.
      */
     public boolean put(Item item){
-        Array<Tilec> proximity = proximity();
-        int dump = tile.data;
-        useContent(item);
+        int dump = this.dump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -596,8 +593,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     public boolean dump(Item todump){
         if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
-        Array<Tilec> proximity = proximity();
-        int dump = tile.data;
+        int dump = this.dump;
 
         if(proximity.size == 0) return false;
 
@@ -632,7 +628,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
     }
 
     public void incrementDump(int prox){
-        tile.data = (byte)((tile.data + 1) % prox);
+        dump = (byte)((dump + 1) % prox);
     }
 
     /** Used for dumping items. */
@@ -683,11 +679,11 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         }
     }
 
-    public Array<Tilec> getPowerConnections(Array<Tilec> out){
+    public Seq<Tilec> getPowerConnections(Seq<Tilec> out){
         out.clear();
         if(power == null) return out;
 
-        for(Tilec other : proximity()){
+        for(Tilec other : proximity){
             if(other != null && other.power() != null
             && !(block.consumesPower && other.block().consumesPower && !block.outputsPower && !other.block().outputsPower)
             && !power.links.contains(other.pos())){
@@ -745,6 +741,16 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     public void draw(){
         Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
+
+        drawTeamTop();
+    }
+
+    public void drawTeamTop(){
+        if(block.teamRegion.found()){
+            if(block.teamRegions[team.uid] == block.teamRegion) Draw.color(team.color);
+            Draw.rect(block.teamRegions[team.uid], x, y);
+            Draw.color();
+        }
     }
 
     public void drawLight(){
@@ -759,13 +765,13 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             float fract = 1f;
             float opacity = color.a * fract;
             if(opacity > 0.001f){
-                Drawf.light(x, y, block.size * 30f * fract, color, opacity);
+                Drawf.light(team, x, y, block.size * 30f * fract, color, opacity);
             }
         }
     }
 
     public void drawTeam(){
-        Draw.color(team().color);
+        Draw.color(team.color);
         Draw.rect("block-border", x - block.size * tilesize / 2f + 4, y - block.size * tilesize / 2f + 4);
         Draw.color();
     }
@@ -789,7 +795,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
             Geometry.circle(tileX(), tileY(), range, (x, y) -> {
                 Tilec other = world.ent(x, y);
                 if(other != null && other.block() instanceof PowerNode && ((PowerNode)other.block()).linkValid(other, this) && !PowerNode.insulated(other, this) && !other.proximity().contains(this) &&
-                !(block.outputsPower && proximity().contains(p -> p.power() != null && p.power().graph == other.power().graph))){
+                !(block.outputsPower && proximity.contains(p -> p.power() != null && p.power().graph == other.power().graph))){
                     tempTiles.add(other.tile());
                 }
             });
@@ -812,14 +818,6 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     /** Called when a unit that spawned at this tile is removed. */
     public void unitRemoved(Unitc unit){
-    }
-
-    /** Call when some content is produced. This unlocks the content if it is applicable. */
-    public void useContent(UnlockableContent content){
-        //only unlocks content in zones
-        if(!headless && team() == player.team() && state.isCampaign()){
-            logic.handleContent(content);
-        }
     }
 
     /** Called when arbitrary configuration is applied to a tile. */
@@ -911,7 +909,18 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return block.icon(Cicon.medium);
     }
 
+    @Override
     public void display(Table table){
+        //display the block stuff
+        //TODO duplicated code?
+        table.table(t -> {
+            t.left();
+            t.add(new Image(block.getDisplayIcon(tile))).size(8 * 4);
+            t.labelWrap(block.getDisplayName(tile)).left().width(190f).padLeft(5);
+        }).growX().left();
+
+        table.row();
+
         table.table(bars -> {
             bars.defaults().growX().height(18f).pad(4);
 
@@ -927,12 +936,13 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
             if(items != null){
                 table.row();
+                table.left();
                 table.table(l -> {
                     Bits current = new Bits();
-                    l.left();
 
                     Runnable rebuild = () -> {
                         l.clearChildren();
+                        l.left();
                         for(Item item : content.items()){
                             if(items.hasFlowItem(item)){
                                 l.image(item.icon(Cicon.small)).padRight(3f);
@@ -951,7 +961,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
                             }
                         }
                     });
-                });
+                }).left();
             }
 
             if(liquids != null){
@@ -995,7 +1005,7 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public Cursor getCursor(){
-        return block.configurable && tile.team() == player.team() ? SystemCursor.hand : SystemCursor.arrow;
+        return block.configurable ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**

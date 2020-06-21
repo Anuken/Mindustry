@@ -11,6 +11,7 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -22,7 +23,7 @@ import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
     protected static boolean returnValue = false;
-    protected static BuildRequest otherReq;
+    protected static BuildPlan otherReq;
 
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
     protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
@@ -131,7 +132,7 @@ public class PowerNode extends PowerBlock{
         Draw.reset();
     }
 
-    protected void drawLaser(float x1, float y1, float x2, float y2, float satisfaction, int size1, int size2){
+    protected void drawLaser(Team team, float x1, float y1, float x2, float y2, float satisfaction, int size1, int size2){
         float opacity = Core.settings.getInt("lasersopacity") / 100f;
         if(Mathf.zero(opacity)) return;
 
@@ -148,7 +149,7 @@ public class PowerNode extends PowerBlock{
 
         Draw.color(Color.white, Pal.powerLight, fract * 0.86f + Mathf.absin(3f, 0.1f));
         Draw.alpha(opacity);
-        Drawf.laser(laser, laserEnd, x1, y1, x2, y2, 0.25f);
+        Drawf.laser(team, laser, laserEnd, x1, y1, x2, y2, 0.25f);
         Draw.color();
     }
 
@@ -201,7 +202,7 @@ public class PowerNode extends PowerBlock{
     }
 
     @Override
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         if(req.config instanceof Point2[]){
             for(Point2 point : (Point2[])req.config){
                 otherReq = null;
@@ -213,7 +214,7 @@ public class PowerNode extends PowerBlock{
 
                 if(otherReq == null || otherReq.block == null) return;
 
-                drawLaser(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), 1f, size, otherReq.block.size);
+                drawLaser(player.team(), req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy(), 1f, size, otherReq.block.size);
             }
         }
     }
@@ -386,7 +387,7 @@ public class PowerNode extends PowerBlock{
         }
 
         protected void drawLaserTo(Tilec target){
-            drawLaser(x, y, target.x(), target.y(), power.graph.getSatisfaction(), size, target.block().size);
+            drawLaser(team, x, y, target.x(), target.y(), power.graph.getSatisfaction(), size, target.block().size);
         }
 
         @Override

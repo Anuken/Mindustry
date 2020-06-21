@@ -17,6 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
@@ -24,6 +25,13 @@ import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
     public UnitType unitType = UnitTypes.alpha;
+
+    public final int timerResupply = timers++;
+
+    public int ammoAmount = 5;
+    public float resupplyRate = 10f;
+    public float resupplyRange = 60f;
+    public Item resupplyItem = Items.copper;
 
     public CoreBlock(String name){
         super(name);
@@ -61,11 +69,11 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
-        bars.add("capacity", e ->
+        bars.add("capacity", (CoreEntity e) ->
             new Bar(
-                () -> Core.bundle.format("bar.capacity", ui.formatAmount(((CoreEntity)e).storageCapacity)),
+                () -> Core.bundle.format("bar.capacity", ui.formatAmount(e.storageCapacity)),
                 () -> Pal.items,
-                () -> e.items().total() / (float)(((CoreEntity)e).storageCapacity * content.items().count(i -> i.type == ItemType.material))
+                () -> e.items().total() / ((float)e.storageCapacity * content.items().count(i -> i.type == ItemType.material))
             ));
 
         bars.add("units", e ->
@@ -102,8 +110,17 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void updateTile(){
+
+            //resupply nearby units
+            if(items.has(resupplyItem) && timer(timerResupply, resupplyRate) && ResupplyPoint.resupply(this, resupplyRange, ammoAmount, resupplyItem.color)){
+                items.remove(resupplyItem, 1);
+            }
+        }
+
+        @Override
         public void drawLight(){
-            Drawf.light(x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
+            Drawf.light(team, x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
         }
 
         @Override

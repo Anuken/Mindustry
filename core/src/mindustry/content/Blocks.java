@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -28,6 +27,7 @@ import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class Blocks implements ContentList{
@@ -77,7 +77,9 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment,
 
     //units
-    groundFactory, airFactory, navalFactory, basicReconstructor, repairPoint,
+    groundFactory, airFactory, navalFactory,
+    additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
+    repairPoint, resupplyPoint,
 
     //campaign
     launchPad, launchPadLarge, coreSilo, dataProcessor,
@@ -525,19 +527,11 @@ public class Blocks implements ContentList{
             hasPower = hasLiquids = true;
             craftEffect = Fx.formsmoke;
             updateEffect = Fx.plasticburn;
+            drawer = new DrawGlow();
 
             consumes.liquid(Liquids.oil, 0.25f);
             consumes.power(3f);
             consumes.item(Items.titanium, 2);
-
-            int topRegion = re("-top");
-
-            drawer = entity -> {
-                Draw.rect(region, entity.x(), entity.y());
-                Draw.alpha(Mathf.absin(entity.totalProgress, 3f, 0.9f) * entity.warmup);
-                Draw.rect(re(topRegion), entity.x(), entity.y());
-                Draw.reset();
-            };
         }};
 
         phaseWeaver = new GenericCrafter("phase-weaver"){{
@@ -547,32 +541,11 @@ public class Blocks implements ContentList{
             craftTime = 120f;
             size = 2;
             hasPower = true;
+            drawer = new DrawWeave();
 
             consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
             consumes.power(5f);
             itemCapacity = 20;
-
-            int bottomRegion = re("-bottom"), weaveRegion = re("-weave");
-
-            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name), Core.atlas.find(name + "-weave")};
-
-            drawer = entity -> {
-                Draw.rect(re(bottomRegion), entity.x(), entity.y());
-                Draw.rect(re(weaveRegion), entity.x(), entity.y(), entity.totalProgress);
-
-                Draw.color(Pal.accent);
-                Draw.alpha(entity.warmup);
-
-                Lines.lineAngleCenter(
-                entity.x() + Mathf.sin(entity.totalProgress, 6f, Vars.tilesize / 3f * size),
-                entity.y(),
-                90,
-                size * Vars.tilesize / 2f);
-
-                Draw.reset();
-
-                Draw.rect(region, entity.x(), entity.y());
-            };
         }};
 
         surgeSmelter = new GenericSmelter("alloy-smelter"){{
@@ -598,29 +571,11 @@ public class Blocks implements ContentList{
             rotate = false;
             solid = true;
             outputsLiquid = true;
+            drawer = new DrawMixer();
 
             consumes.power(1f);
             consumes.item(Items.titanium);
             consumes.liquid(Liquids.water, 0.2f);
-
-            int liquidRegion = re("-liquid"), topRegion = re("-top"), bottomRegion = re("-bottom");
-
-            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name + "-bottom"), Core.atlas.find(name + "-top")};
-
-            drawer = entity -> {
-                float rotation = rotate ? entity.rotdeg() : 0;
-
-                Draw.rect(re(bottomRegion), entity.x(), entity.y(), rotation);
-
-                if(entity.liquids().total() > 0.001f){
-                    Draw.color(outputLiquid.liquid.color);
-                    Draw.alpha(entity.liquids().get(outputLiquid.liquid) / liquidCapacity);
-                    Draw.rect(re(liquidRegion), entity.x(), entity.y(), rotation);
-                    Draw.color();
-                }
-
-                Draw.rect(re(topRegion), entity.x(), entity.y(), rotation);
-            };
         }};
 
         blastMixer = new GenericCrafter("blast-mixer"){{
@@ -702,27 +657,10 @@ public class Blocks implements ContentList{
             hasLiquids = true;
             hasPower = true;
             craftEffect = Fx.none;
+            drawer = new DrawAnimation();
 
             consumes.item(Items.sporePod, 1);
             consumes.power(0.60f);
-
-            int[] frameRegions = new int[3];
-            for(int i = 0; i < 3; i++){
-                frameRegions[i] = re("-frame" + i);
-            }
-
-            int liquidRegion = re("-liquid");
-            int topRegion = re("-top");
-
-            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top")};
-            drawer = entity -> {
-                Draw.rect(region, entity.x(), entity.y());
-                Draw.rect(re(frameRegions[(int)Mathf.absin(entity.totalProgress, 5f, 2.999f)]), entity.x(), entity.y());
-                Draw.color(Color.clear, entity.liquids().current().color, entity.liquids().total() / liquidCapacity);
-                Draw.rect(re(liquidRegion), entity.x(), entity.y());
-                Draw.color();
-                Draw.rect(re(topRegion), entity.x(), entity.y());
-            };
         }};
 
         pulverizer = new GenericCrafter("pulverizer"){{
@@ -732,18 +670,10 @@ public class Blocks implements ContentList{
             craftTime = 40f;
             updateEffect = Fx.pulverizeSmall;
             hasItems = hasPower = true;
+            drawer = new DrawRotator();
 
             consumes.item(Items.scrap, 1);
             consumes.power(0.50f);
-
-            int rotatorRegion = re("-rotator");
-
-            drawIcons = () -> new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator")};
-
-            drawer = entity -> {
-                Draw.rect(region, entity.x(), entity.y());
-                Draw.rect(re(rotatorRegion), entity.x(), entity.y(), entity.totalProgress * 2f);
-            };
         }};
 
         coalCentrifuge = new GenericCrafter("coal-centrifuge"){{
@@ -1572,7 +1502,7 @@ public class Blocks implements ContentList{
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
 
-            ammo(Items.graphite, new BulletType(0.01f, 105){
+            ammo(Items.thorium, new BulletType(0.01f, 105){
                 int rays = 1;
                 float rayLength = range + 10f;
 
@@ -1581,6 +1511,7 @@ public class Blocks implements ContentList{
                     shootEffect = smokeEffect = Fx.lightningShoot;
                     lifetime = 10f;
                     despawnEffect = Fx.none;
+                    ammoMultiplier = 6f;
                     pierce = true;
                 }
 
@@ -1721,8 +1652,6 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
-        //for testing only.
-
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, ItemStack.with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
@@ -1756,20 +1685,65 @@ public class Blocks implements ContentList{
             consumes.power(1.2f);
         }};
 
-        basicReconstructor = new Reconstructor("basic-reconstructor"){{
+        additiveReconstructor = new Reconstructor("additive-reconstructor"){{
             requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
             size = 3;
             consumes.power(3f);
-            consumes.items(ItemStack.with(Items.silicon, 30, Items.graphite, 30));
-            itemCapacity = 30;
+            consumes.items(ItemStack.with(Items.silicon, 40, Items.graphite, 30));
 
             constructTime = 60f * 5f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.dagger, UnitTypes.titan},
+                {UnitTypes.tau, UnitTypes.oculon},
+                {UnitTypes.dagger, UnitTypes.mace},
                 {UnitTypes.crawler, UnitTypes.eruptor},
                 {UnitTypes.wraith, UnitTypes.ghoul},
+            };
+        }};
+
+        multiplicativeReconstructor = new Reconstructor("multiplicative-reconstructor"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+
+            size = 5;
+            consumes.power(6f);
+            consumes.items(ItemStack.with(Items.silicon, 120, Items.titanium, 80));
+
+            constructTime = 60f * 15f;
+
+            upgrades = new UnitType[][]{
+                {UnitTypes.ghoul, UnitTypes.revenant},
+                {UnitTypes.mace, UnitTypes.fortress},
+            };
+        }};
+
+        exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+
+            size = 7;
+            consumes.power(12f);
+            consumes.items(ItemStack.with(Items.silicon, 200, Items.titanium, 200, Items.surgealloy, 200));
+            consumes.liquid(Liquids.cryofluid, 1f);
+
+            constructTime = 60f * 60f;
+
+            upgrades = new UnitType[][]{
+                {UnitTypes.revenant, UnitTypes.lich},
+            };
+        }};
+
+        tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+
+            size = 9;
+            consumes.power(25f);
+            consumes.items(ItemStack.with(Items.silicon, 300, Items.plastanium, 300, Items.surgealloy, 300, Items.phasefabric, 250));
+            consumes.liquid(Liquids.cryofluid, 3f);
+
+            constructTime = 60f * 60f * 3;
+
+            upgrades = new UnitType[][]{
+                {UnitTypes.lich, UnitTypes.reaper},
             };
         }};
 
@@ -1778,6 +1752,15 @@ public class Blocks implements ContentList{
             repairSpeed = 0.5f;
             repairRadius = 65f;
             powerUse = 1f;
+        }};
+
+        resupplyPoint = new ResupplyPoint("resupply-point"){{
+            requirements(Category.units, BuildVisibility.ammoOnly, ItemStack.with(Items.lead, 20, Items.copper, 15, Items.silicon, 15));
+
+            size = 2;
+            range = 80f;
+
+            consumes.item(Items.copper, 1);
         }};
 
         //endregion
@@ -1853,18 +1836,21 @@ public class Blocks implements ContentList{
             consumes.power(6f);
         }};
 
+        //TODO remove later
+        /*
         coreSilo = new CoreLauncher("core-silo"){{
             requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
             size = 5;
             itemCapacity = 500;
 
             consumes.items(ItemStack.with(Items.copper, 500));
-        }};
+        }};*/
 
         dataProcessor = new ResearchBlock("data-processor"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 350, Items.silicon, 140, Items.lead, 200, Items.titanium, 150));
+            requirements(Category.effect, BuildVisibility.campaignOnly, ItemStack.with(Items.copper, 200, Items.lead, 100));
 
             size = 3;
+            alwaysUnlocked = true;
         }};
 
         //endregion campaign

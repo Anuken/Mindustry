@@ -10,7 +10,7 @@ import mindustry.gen.*;
 
 public class PhysicsProcess implements AsyncProcess{
     private Physics physics;
-    private Array<PhysicRef> refs = new Array<>(false);
+    private Seq<PhysicRef> refs = new Seq<>(false);
     private BodyDef def;
 
     private EntityGroup<? extends Physicsc> group;
@@ -22,7 +22,7 @@ public class PhysicsProcess implements AsyncProcess{
 
     public PhysicsProcess(){
         def = new BodyDef();
-        def.type = BodyType.DynamicBody;
+        def.type = BodyType.dynamicBody;
 
         //currently only enabled for units
         group = Groups.unit;

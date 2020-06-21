@@ -48,8 +48,6 @@ public abstract class BulletType extends Content{
     public float splashDamage = 0f;
     /** Knockback in velocity. */
     public float knockback;
-    /** Whether this bullet hits tiles. */
-    public boolean hitTiles = true;
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
@@ -95,6 +93,10 @@ public abstract class BulletType extends Content{
     public float weaveMag = -1f;
     public float hitShake = 0f;
 
+    public float lightRadius = 16f;
+    public float lightOpacity = 0.3f;
+    public Color lightColor = Pal.powerLight;
+
     public BulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
@@ -139,7 +141,11 @@ public abstract class BulletType extends Content{
         }
 
         if(splashDamageRadius > 0){
-            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier());
+            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+
+            if(status != StatusEffects.none){
+                Damage.status(b.team(), x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+            }
         }
 
         for(int i = 0; i < lightning; i++){
@@ -157,6 +163,10 @@ public abstract class BulletType extends Content{
     }
 
     public void draw(Bulletc b){
+    }
+
+    public void drawLight(Bulletc b){
+        Drawf.light(b.team(), b, lightRadius, lightColor, lightOpacity);
     }
 
     public void init(Bulletc b){

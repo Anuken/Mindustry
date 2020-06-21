@@ -1,6 +1,7 @@
 package mindustry.world.consumers;
 
 import arc.func.*;
+import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -12,8 +13,8 @@ import mindustry.world.meta.*;
 public class ConsumeItemDynamic extends Consume{
     public final @NonNull Func<Tilec, ItemStack[]> items;
 
-    public ConsumeItemDynamic(Func<Tilec, ItemStack[]> items){
-        this.items = items;
+    public <T extends Tilec> ConsumeItemDynamic(Func<T, ItemStack[]> items){
+        this.items = (Func<Tilec, ItemStack[]>)items;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class ConsumeItemDynamic extends Consume{
     private void rebuild(Tilec tile, Table table){
         for(ItemStack stack : items.get(tile)){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
-            () -> tile.items() != null && tile.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
+            () -> tile.items() != null && tile.items().has(stack.item, stack.amount))).size(8 * 4).padRight(6 * Mathf.digits(stack.amount));
         }
     }
 

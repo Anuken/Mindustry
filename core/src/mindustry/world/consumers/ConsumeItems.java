@@ -1,5 +1,6 @@
 package mindustry.world.consumers;
 
+import arc.math.*;
 import arc.struct.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
@@ -37,7 +38,7 @@ public class ConsumeItems extends Consume{
     public void build(Tilec tile, Table table){
         for(ItemStack stack : items){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
-                () -> tile.items() != null && tile.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
+                () -> tile.items() != null && tile.items().has(stack.item, stack.amount))).size(8 * 4).padRight(Mathf.digits(stack.amount) * 6);
         }
     }
 

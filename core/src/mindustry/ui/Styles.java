@@ -30,7 +30,7 @@ public class Styles{
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
     public static SliderStyle defaultSlider, vSlider;
-    public static LabelStyle defaultLabel, outlineLabel;
+    public static LabelStyle defaultLabel, outlineLabel, techLabel;
     public static TextFieldStyle defaultField, areaField;
     public static CheckBoxStyle defaultCheck;
     public static DialogStyle defaultDialog, fullDialog;
@@ -266,6 +266,10 @@ public class Styles{
         }};
         outlineLabel = new LabelStyle(){{
             font = Fonts.outline;
+            fontColor = Color.white;
+        }};
+        techLabel = new LabelStyle(){{
+            font = Fonts.tech;
             fontColor = Color.white;
         }};
 

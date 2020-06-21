@@ -4,6 +4,8 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
@@ -11,11 +13,12 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
-public class Tile implements Position, QuadTreeObject{
+public class Tile implements Position, QuadTreeObject, Displayable{
     static final ObjectSet<Tilec> tileSet = new ObjectSet<>();
 
     /** Tile traversal cost. */
@@ -23,8 +26,6 @@ public class Tile implements Position, QuadTreeObject{
     /** Tile entity, usually null. */
     public @Nullable Tilec entity;
     public short x, y;
-    /** Extra data. Used for dumping. */
-    public byte data;
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;
@@ -348,10 +349,6 @@ public class Tile implements Position, QuadTreeObject{
         return block.destructible || block.breakable || block.update;
     }
 
-    public boolean isEnemyCheat(){
-        return team() == state.rules.waveTeam && state.rules.enemyCheat;
-    }
-
     /**
      * Returns the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
      * This array contains all linked tiles, including this tile itself.
@@ -376,7 +373,7 @@ public class Tile implements Position, QuadTreeObject{
      * Returns the list of all tiles linked to this multiblock.
      * This array contains all linked tiles, including this tile itself.
      */
-    public Array<Tile> getLinkedTiles(Array<Tile> tmpArray){
+    public Seq<Tile> getLinkedTiles(Seq<Tile> tmpArray){
         tmpArray.clear();
         getLinkedTiles(tmpArray::add);
         return tmpArray;
@@ -386,7 +383,7 @@ public class Tile implements Position, QuadTreeObject{
      * Returns the list of all tiles linked to this multiblock if it were this block.
      * This array contains all linked tiles, including this tile itself.
      */
-    public Array<Tile> getLinkedTilesAs(Block block, Array<Tile> tmpArray){
+    public Seq<Tile> getLinkedTilesAs(Block block, Seq<Tile> tmpArray){
         tmpArray.clear();
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
@@ -587,6 +584,17 @@ public class Tile implements Position, QuadTreeObject{
         if(block.isStatic()){
             recache();
         }
+    }
+
+    @Override
+    public void display(Table table){
+        Block toDisplay = overlay.itemDrop != null ? overlay : floor;
+
+        table.table(t -> {
+            t.left();
+            t.add(new Image(toDisplay.getDisplayIcon(this))).size(8 * 4);
+            t.labelWrap(toDisplay.getDisplayName(this)).left().width(190f).padLeft(5);
+        }).growX().left();
     }
 
     @Override

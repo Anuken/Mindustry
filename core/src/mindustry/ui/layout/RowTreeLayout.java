@@ -6,7 +6,7 @@ public class RowTreeLayout implements TreeLayout{
 
     @Override
     public void layout(TreeNode root){
-       layout(root, 0, new IntArray());
+       layout(root, 0, new IntSeq());
 
         /*
         def minimum_ws(tree, depth=0):
@@ -18,7 +18,7 @@ public class RowTreeLayout implements TreeLayout{
          */
     }
 
-    void layout(TreeNode node, int depth, IntArray nexts){
+    void layout(TreeNode node, int depth, IntSeq nexts){
         float size = node.height * 5f;
 
         if(nexts.size < depth + 1){

@@ -72,8 +72,8 @@ public class MapIO{
             SaveVersion ver = SaveIO.getSaveWriter(version);
             ver.region("meta", stream, counter, ver::readStringMap);
 
-            Pixmap floors = new Pixmap(map.width, map.height, Format.RGBA8888);
-            Pixmap walls = new Pixmap(map.width, map.height, Format.RGBA8888);
+            Pixmap floors = new Pixmap(map.width, map.height);
+            Pixmap walls = new Pixmap(map.width, map.height);
             int black = 255;
             int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
             CachedTile tile = new CachedTile(){
@@ -137,7 +137,7 @@ public class MapIO{
     }
 
     public static Pixmap generatePreview(Tiles tiles){
-        Pixmap pixmap = new Pixmap(tiles.width, tiles.height, Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(tiles.width, tiles.height, Format.rgba8888);
         for(int x = 0; x < pixmap.getWidth(); x++){
             for(int y = 0; y < pixmap.getHeight(); y++){
                 Tile tile = tiles.getn(x, y);

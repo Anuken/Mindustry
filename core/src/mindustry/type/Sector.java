@@ -94,8 +94,10 @@ public class Sector{
         return (normal.dot(light) + 1f) / 2f;
     }
 
+    /** @return the sector size, in tiles */
     public int getSize(){
-        return (int)(rect.radius * 3200);
+        int res = (int)(rect.radius * 3200);
+        return res % 2 == 0 ? res : res + 1;
     }
 
     //TODO implement

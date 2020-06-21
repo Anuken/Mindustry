@@ -113,7 +113,7 @@ public class LaunchPad extends Block{
     static abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
         @Import float x,y;
 
-        Array<ItemStack> stacks = new Array<>();
+        Seq<ItemStack> stacks = new Seq<>();
         transient Interval in = new Interval();
 
         @Override
@@ -177,7 +177,8 @@ public class LaunchPad extends Block{
             //actually launch the items upon removal
             if(team() == Vars.state.rules.defaultTeam){
                 for(ItemStack stack : stacks){
-                    Vars.data.addItem(stack.item, stack.amount);
+                    //TODO where do the items go?
+                    //Vars.data.addItem(stack.item, stack.amount);
                     Events.fire(new LaunchItemEvent(stack));
                 }
             }

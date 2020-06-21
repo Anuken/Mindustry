@@ -101,7 +101,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public BulletType useAmmo(){
-            if(tile.isEnemyCheat()) return ammoTypes.get(liquids.current());
+            if(cheating()) return ammoTypes.get(liquids.current());
             BulletType type = ammoTypes.get(liquids.current());
             liquids.remove(liquids.current(), type.ammoMultiplier);
             return type;

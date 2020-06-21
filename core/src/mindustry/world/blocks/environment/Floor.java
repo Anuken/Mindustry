@@ -64,7 +64,7 @@ public class Floor extends Block{
     public Block decoration = Blocks.air;
 
     protected TextureRegion[][] edges;
-    protected Array<Block> blenders = new Array<>();
+    protected Seq<Block> blenders = new Seq<>();
     protected IntSet blended = new IntSet();
     protected TextureRegion edgeRegion;
 
@@ -132,7 +132,7 @@ public class Floor extends Block{
 
         Color color = new Color();
         Color color2 = new Color();
-        PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)generateIcons()[0]);
+        PixmapRegion image = Core.atlas.getPixmap((AtlasRegion)icons()[0]);
         PixmapRegion edge = Core.atlas.getPixmap("edge-stencil");
         Pixmap result = new Pixmap(edge.width, edge.height);
 
@@ -147,11 +147,6 @@ public class Floor extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
-    }
-
-    @Override
     public void drawBase(Tile tile){
         Mathf.random.setSeed(tile.pos());
 
@@ -163,6 +158,11 @@ public class Floor extends Block{
         if(floor != Blocks.air && floor != this){ //ore should never have itself on top, but it's possible, so prevent a crash in that case
             floor.drawBase(tile);
         }
+    }
+
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
     public boolean isDeep(){

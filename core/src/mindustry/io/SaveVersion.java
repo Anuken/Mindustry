@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -73,6 +74,11 @@ public abstract class SaveVersion extends SaveFileReader{
         //prepare campaign data for writing
         if(state.isCampaign()){
             state.secinfo.prepare();
+        }
+
+        //flush tech node progress
+        for(TechNode node : TechTree.all){
+            node.save();
         }
 
         writeStringMap(stream, StringMap.of(
@@ -270,7 +276,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void writeEntities(DataOutput stream) throws IOException{
         //write team data with entities.
-        Array<TeamData> data = state.teams.getActive();
+        Seq<TeamData> data = state.teams.getActive();
         stream.writeInt(data.size);
         for(TeamData team : data){
             stream.writeInt(team.team.id);
@@ -337,17 +343,17 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeContentHeader(DataOutput stream) throws IOException{
-        Array<Content>[] map = content.getContentMap();
+        Seq<Content>[] map = content.getContentMap();
 
         int mappable = 0;
-        for(Array<Content> arr : map){
+        for(Seq<Content> arr : map){
             if(arr.size > 0 && arr.first() instanceof MappableContent){
                 mappable++;
             }
         }
 
         stream.writeByte(mappable);
-        for(Array<Content> arr : map){
+        for(Seq<Content> arr : map){
             if(arr.size > 0 && arr.first() instanceof MappableContent){
                 stream.writeByte(arr.first().getContentType().ordinal());
                 stream.writeShort(arr.size);

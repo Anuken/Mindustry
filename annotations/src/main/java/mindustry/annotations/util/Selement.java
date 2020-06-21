@@ -1,6 +1,6 @@
 package mindustry.annotations.util;
 
-import arc.struct.Array;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import com.squareup.javapoet.*;
 import com.sun.tools.javac.code.Attribute.*;
@@ -23,8 +23,8 @@ public class Selement<T extends Element>{
         return BaseProcessor.elementu.getDocComment(e);
     }
 
-    public Array<Selement<?>> enclosed(){
-        return Array.with(e.getEnclosedElements()).map(Selement::new);
+    public Seq<Selement<?>> enclosed(){
+        return Seq.with(e.getEnclosedElements()).map(Selement::new);
     }
 
     public String fullName(){
@@ -55,8 +55,8 @@ public class Selement<T extends Element>{
         return e instanceof ExecutableElement;
     }
 
-    public Array<? extends AnnotationMirror> annotations(){
-        return Array.with(e.getAnnotationMirrors());
+    public Seq<? extends AnnotationMirror> annotations(){
+        return Seq.with(e.getAnnotationMirrors());
     }
 
     public <A extends Annotation> A annotation(Class<A> annotation){
@@ -106,6 +106,6 @@ public class Selement<T extends Element>{
 
     @Override
     public boolean equals(Object o){
-        return o != null && o.getClass() == getClass() && e == ((Selement)o).e;
+        return o != null && o.getClass() == getClass() && e.equals(((Selement)o).e);
     }
 }
