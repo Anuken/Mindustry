@@ -179,6 +179,7 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
+        //TODO awful UI state checking code
         if((player.dead() || state.isPaused()) && !ui.chatfrag.shown()){
             if(!(scene.getKeyboardFocus() instanceof TextField) && !scene.hasDialog()){
                 //move camera around
@@ -191,7 +192,7 @@ public class DesktopInput extends InputHandler{
                 }
             }
         }else if(!player.dead()){
-            Core.camera.position.lerpDelta(player, 0.08f);
+            Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
         }
 
         shouldShoot = true;

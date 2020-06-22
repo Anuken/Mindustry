@@ -63,6 +63,7 @@ public class Weathers implements ContentList{
             }
         };
 
+        //TODO should apply wet effect
         rain = new Weather("rain"){
             float yspeed = 5f, xspeed = 1.5f, padding = 16f, size = 40f, density = 1200f;
             TextureRegion[] splashes = new TextureRegion[12];
@@ -158,7 +159,7 @@ public class Weathers implements ContentList{
         sandstorm = new Weather("sandstorm"){
             TextureRegion region;
             float yspeed = 0.3f, xspeed = 6f, padding = 110f, size = 110f, invDensity = 800f;
-            Vec2 force = new Vec2(0.35f, 0.01f);
+            Vec2 force = new Vec2(0.4f, 0.01f);
             Color color = Color.valueOf("f7cba4");
 
             @Override

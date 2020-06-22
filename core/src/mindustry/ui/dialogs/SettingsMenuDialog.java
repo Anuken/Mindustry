@@ -326,6 +326,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
         graphics.checkPref("minimap", !mobile);
+        graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
         if(!mobile){
@@ -342,6 +343,8 @@ public class SettingsMenuDialog extends SettingsDialog{
         }else{
             Core.settings.put("bloom", false);
         }
+
+
 
         graphics.checkPref("pixelate", false, val -> {
             if(val){
