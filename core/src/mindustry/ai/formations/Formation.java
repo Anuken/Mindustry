@@ -19,7 +19,7 @@ import arc.struct.*;
 public class Formation{
 
     /** A list of slots assignments. */
-    public Array<SlotAssignment> slotAssignments;
+    public Seq<SlotAssignment> slotAssignments;
 
     /** The anchor point of this formation. */
     public Vec3 anchor;
@@ -74,7 +74,7 @@ public class Formation{
         this.slotAssignmentStrategy = slotAssignmentStrategy;
         this.motionModerator = motionModerator;
 
-        this.slotAssignments = new Array<>();
+        this.slotAssignments = new Seq<>();
         this.driftOffset = new Vec3();
         this.positionOffset = new Vec2(anchor.x, anchor.y).cpy();
     }

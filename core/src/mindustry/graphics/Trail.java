@@ -9,7 +9,7 @@ import arc.util.pooling.*;
 
 public class Trail{
     private static final int length = 20;
-    private Array<Vec3> points = new Array<>();
+    private Seq<Vec3> points = new Seq<>();
     private float lastX = -1, lastY = -1;
 
     public void draw(Color color, float width){

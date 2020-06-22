@@ -22,7 +22,7 @@ public class EntityCollisions{
     private Rect r2 = new Rect();
 
     //entity collisions
-    private Array<Hitboxc> arrOut = new Array<>();
+    private Seq<Hitboxc> arrOut = new Seq<>();
 
     public void move(Hitboxc entity, float deltax, float deltay){
         move(entity, deltax, deltay, EntityCollisions::solid);

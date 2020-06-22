@@ -1,5 +1,6 @@
 package mindustry.annotations.util;
 
+import arc.func.*;
 import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Attribute.Array;
 import com.sun.tools.javac.code.Attribute.Enum;
@@ -10,16 +11,17 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Symbol.*;
 import com.sun.tools.javac.code.Type.ArrayType;
 import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.*;
 import sun.reflect.annotation.*;
 
+import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-import java.io.*;
+import java.lang.Class;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.*;
-import java.lang.Class;
 
 //replaces the standard Java AnnotationProxyMaker with one that doesn't crash
 //thanks, oracle.
@@ -59,96 +61,63 @@ public class AnnotationProxyMaker{
     }
 
     private Map<MethodSymbol, Attribute> getAllValues(){
-        LinkedHashMap var1 = new LinkedHashMap();
-        ClassSymbol var2 = (ClassSymbol)this.anno.type.tsym;
+        LinkedHashMap map = new LinkedHashMap();
+        ClassSymbol cl = (ClassSymbol)this.anno.type.tsym;
 
-        for(com.sun.tools.javac.code.Scope.Entry var3 = var2.members().elems; var3 != null; var3 = var3.sibling){
-            if(var3.sym.kind == 16){
-                MethodSymbol var4 = (MethodSymbol)var3.sym;
-                Attribute var5 = var4.getDefaultValue();
-                if(var5 != null){
-                    var1.put(var4, var5);
+        //try to use Java 8 API for this if possible
+        try{
+            Class entryClass = Class.forName("com.sun.tools.javac.code.Scope$Entry");
+            Object members = cl.members();
+            Field field = members.getClass().getField("elems");
+            Object elems = field.get(members);
+            Field siblingField = entryClass.getField("sibling");
+            Field symField = entryClass.getField("sym");
+            for(Object currEntry = elems; currEntry != null; currEntry = siblingField.get(currEntry)){
+                handleSymbol((Symbol)symField.get(currEntry), map);
+            }
+
+        }catch(Throwable e){
+            //otherwise try other API
+
+            try{
+                Class lookupClass = Class.forName("com.sun.tools.javac.code.Scope$LookupKind");
+                Field nonRecField = lookupClass.getField("NON_RECURSIVE");
+                Object nonRec = nonRecField.get(null);
+                Scope scope = cl.members();
+                Method getSyms = scope.getClass().getMethod("getSymbols", lookupClass);
+                Iterable<Symbol> it = (Iterable<Symbol>)getSyms.invoke(scope, nonRec);
+                Iterator<Symbol> i = it.iterator();
+                while(i.hasNext()){
+                    handleSymbol(i.next(), map);
                 }
+
+            }catch(Throwable death){
+                //I tried
+                throw new RuntimeException(death);
             }
         }
 
-        Iterator var6 = this.anno.values.iterator();
-
-        while(var6.hasNext()){
-            Pair var7 = (Pair)var6.next();
-            var1.put(var7.fst, var7.snd);
+        for(Pair var7 : this.anno.values){
+            map.put(var7.fst, var7.snd);
         }
 
-        return var1;
+        return map;
+    }
+
+    private void handleSymbol(Symbol sym, LinkedHashMap map){
+
+        if(sym.getKind() == ElementKind.METHOD){
+            MethodSymbol var4 = (MethodSymbol)sym;
+            Attribute var5 = var4.getDefaultValue();
+            if(var5 != null){
+                map.put(var4, var5);
+            }
+        }
     }
 
     private Object generateValue(MethodSymbol var1, Attribute var2){
         AnnotationProxyMaker.ValueVisitor var3 = new AnnotationProxyMaker.ValueVisitor(var1);
         return var3.getValue(var2);
-    }
-
-    private static final class MirroredTypesExceptionProxy extends ExceptionProxy{
-        static final long serialVersionUID = 269L;
-        private transient List<TypeMirror> types;
-        private final String typeStrings;
-
-        MirroredTypesExceptionProxy(List<TypeMirror> var1){
-            this.types = var1;
-            this.typeStrings = var1.toString();
-        }
-
-        public String toString(){
-            return this.typeStrings;
-        }
-
-        public int hashCode(){
-            return (this.types != null ? this.types : this.typeStrings).hashCode();
-        }
-
-        public boolean equals(Object var1){
-            return this.types != null && var1 instanceof AnnotationProxyMaker.MirroredTypesExceptionProxy && this.types.equals(((AnnotationProxyMaker.MirroredTypesExceptionProxy)var1).types);
-        }
-
-        protected RuntimeException generateException(){
-            return new MirroredTypesException(this.types);
-        }
-
-        private void readObject(ObjectInputStream var1) throws IOException, ClassNotFoundException{
-            var1.defaultReadObject();
-            this.types = null;
-        }
-    }
-
-    private static final class MirroredTypeExceptionProxy extends ExceptionProxy{
-        static final long serialVersionUID = 269L;
-        private transient TypeMirror type;
-        private final String typeString;
-
-        MirroredTypeExceptionProxy(TypeMirror var1){
-            this.type = var1;
-            this.typeString = var1.toString();
-        }
-
-        public String toString(){
-            return this.typeString;
-        }
-
-        public int hashCode(){
-            return (this.type != null ? this.type : this.typeString).hashCode();
-        }
-
-        public boolean equals(Object var1){
-            return this.type != null && var1 instanceof AnnotationProxyMaker.MirroredTypeExceptionProxy && this.type.equals(((AnnotationProxyMaker.MirroredTypeExceptionProxy)var1).type);
-        }
-
-        protected RuntimeException generateException(){
-            return new MirroredTypeException(this.type);
-        }
-
-        private void readObject(ObjectInputStream var1) throws IOException, ClassNotFoundException{
-            var1.defaultReadObject();
-            this.type = null;
-        }
     }
 
     private class ValueVisitor implements Visitor{
@@ -182,7 +151,7 @@ public class AnnotationProxyMaker{
         }
 
         public void visitClass(com.sun.tools.javac.code.Attribute.Class var1){
-            this.value = new AnnotationProxyMaker.MirroredTypeExceptionProxy(var1.classType);
+            this.value = mirrorProxy(var1.classType);
         }
 
         public void visitArray(Array var1){
@@ -199,7 +168,7 @@ public class AnnotationProxyMaker{
                     var14.append(var8);
                 }
 
-                this.value = new AnnotationProxyMaker.MirroredTypesExceptionProxy(var14.toList());
+                this.value = mirrorProxy(var14.toList());
             }else{
                 int var3 = var1.values.length;
                 Class var4 = this.returnClass;
@@ -236,7 +205,7 @@ public class AnnotationProxyMaker{
                 try{
                     this.value = java.lang.Enum.valueOf((Class)this.returnClass, var2);
                 }catch(IllegalArgumentException var4){
-                    this.value = new EnumConstantNotPresentExceptionProxy((Class)this.returnClass, var2);
+                    this.value = proxify(() -> new EnumConstantNotPresentException((Class)this.returnClass, var2));
                 }
             }else{
                 this.value = null;
@@ -256,7 +225,7 @@ public class AnnotationProxyMaker{
 
         public void visitError(Error var1){
             if(var1 instanceof UnresolvedClass){
-                this.value = new AnnotationProxyMaker.MirroredTypeExceptionProxy(((UnresolvedClass)var1).classType);
+                this.value = mirrorProxy(((UnresolvedClass)var1).classType);
             }else{
                 this.value = null;
             }
@@ -264,24 +233,30 @@ public class AnnotationProxyMaker{
         }
 
         private void typeMismatch(Method var1, final Attribute var2){
-            class AnnotationTypeMismatchExceptionProxy extends ExceptionProxy{
-                static final long serialVersionUID = 269L;
-                final transient Method method;
-
-                AnnotationTypeMismatchExceptionProxy(Method var2x){
-                    this.method = var2x;
-                }
-
-                public String toString(){
-                    return "<error>";
-                }
-
-                protected RuntimeException generateException(){
-                    return new AnnotationTypeMismatchException(this.method, var2.type.toString());
-                }
-            }
-
-            this.value = new AnnotationTypeMismatchExceptionProxy(var1);
+            this.value = proxify(() -> new AnnotationTypeMismatchException(var1, var2.type.toString()));
         }
+    }
+
+    private static Object mirrorProxy(Type t){
+        return proxify(() -> new MirroredTypeException(t));
+    }
+
+    private static Object mirrorProxy(List<Type> t){
+        return proxify(() -> new MirroredTypesException(t));
+    }
+
+    private static <T extends Throwable> Object proxify(Prov<T> prov){
+        try{
+
+            return new ExceptionProxy(){
+                @Override
+                protected RuntimeException generateException(){
+                    return (RuntimeException)prov.get();
+                }
+            };
+        }catch(Throwable t){
+            throw new RuntimeException(t);
+        }
+
     }
 }

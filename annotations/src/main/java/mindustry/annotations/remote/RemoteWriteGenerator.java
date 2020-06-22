@@ -139,7 +139,7 @@ public class RemoteWriteGenerator{
         //reset stream
         method.addStatement("OUT.reset()");
 
-        method.addTypeVariables(Array.with(elem.getTypeParameters()).map(BaseProcessor::getTVN));
+        method.addTypeVariables(Seq.with(elem.getTypeParameters()).map(BaseProcessor::getTVN));
 
         for(int i = 0; i < elem.getParameters().size(); i++){
             //first argument is skipped as it is always the player caller
@@ -174,7 +174,7 @@ public class RemoteWriteGenerator{
                 method.addStatement("WRITE.$L($L)", typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "", varName);
             }else{
                 //else, try and find a serializer
-                String ser = serializers.writers.get(typeName, SerializerResolver.locate(elem, var.asType(), true));
+                String ser = serializers.writers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(elem, var.asType(), true));
 
                 if(ser == null){ //make sure a serializer exists!
                     BaseProcessor.err("No @WriteClass method to write class type: '" + typeName + "'", var);

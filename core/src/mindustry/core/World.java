@@ -230,9 +230,12 @@ public class World{
         loadGenerator(size, size, tiles -> {
             if(sector.preset != null){
                 sector.preset.generator.generate(tiles);
+                sector.preset.rules.get(state.rules); //apply extra rules
             }else{
                 sector.planet.generator.generate(tiles, sector);
             }
+            //just in case
+            state.rules.sector = sector;
         });
 
         //postgenerate for bases
@@ -254,13 +257,10 @@ public class World{
 
         state.rules.weather.clear();
 
-        if(sector.is(SectorAttribute.rainy)){
-            state.rules.weather.add(new WeatherEntry(Weathers.rain));
-        }
+        if(sector.is(SectorAttribute.rainy)) state.rules.weather.add(new WeatherEntry(Weathers.rain));
+        if(sector.is(SectorAttribute.snowy)) state.rules.weather.add(new WeatherEntry(Weathers.snow));
+        if(sector.is(SectorAttribute.desert)) state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
 
-        if(sector.is(SectorAttribute.snowy)){
-            state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        }
     }
 
     public Context filterContext(Map map){
@@ -458,13 +458,13 @@ public class World{
             float prev = Mathf.round(angle, step);
             float next = prev + step;
             //raw line length to be translated
-            float length = tiles.width/2f;
+            float length = state.getSector().getSize()/2f;
             float rawDst = Intersector.distanceLinePoint(Tmp.v1.trns(prev, length), Tmp.v2.trns(next, length), Tmp.v3.set(x - tiles.width/2, y - tiles.height/2).rotate(offset)) / Mathf.sqrt3 - 1;
 
             //noise
             rawDst += Noise.noise(x, y, 11f, 7f) + Noise.noise(x, y, 22f, 15f);
 
-            int circleDst = (int)(rawDst - (tiles.width / 2 - circleBlend));
+            int circleDst = (int)(rawDst - (length - circleBlend));
             if(circleDst > 0){
                 dark = Math.max(circleDst / 1f, dark);
             }
@@ -527,7 +527,7 @@ public class World{
 
         @Override
         public void end(){
-            Array<GenerateFilter> filters = map.filters();
+            Seq<GenerateFilter> filters = map.filters();
 
             if(!filters.isEmpty()){
                 //input for filter queries

@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -57,7 +58,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
-                for(Sound sound : assets.getAll(Sound.class, new Array<>())){
+                for(Sound sound : assets.getAll(Sound.class, new Seq<>())){
                     sound.stop();
                 }
             }
@@ -183,8 +184,6 @@ public class Control implements ApplicationListener, Loadable{
 
         Core.input.setCatch(KeyCode.back, true);
 
-        data.load();
-
         Core.settings.defaults(
         "ip", "localhost",
         "color-0", playerColors[8].rgba(),
@@ -241,6 +240,15 @@ public class Control implements ApplicationListener, Loadable{
         });
     }
 
+    //TODO move
+    public void handleLaunch(Tilec tile){
+        LaunchCorec ent = LaunchCoreEntity.create();
+        ent.set(tile);
+        ent.block(Blocks.coreShard);
+        ent.lifetime(Vars.launchDuration);
+        ent.add();
+    }
+
     public void playSector(Sector sector){
         ui.loadAnd(() -> {
             ui.planet.hide();
@@ -278,7 +286,7 @@ public class Control implements ApplicationListener, Loadable{
                 }catch(SaveException e){
                     Log.err(e);
                     sector.save = null;
-                    ui.showErrorMessage("$save.corrupted");
+                    Time.runTask(10f, () -> ui.showErrorMessage("$save.corrupted"));
                     slot.delete();
                     playSector(sector);
                 }
@@ -459,9 +467,6 @@ public class Control implements ApplicationListener, Loadable{
 
         input.updateState();
 
-        //autosave global data if it's modified
-        data.checkSave();
-
         music.update();
         loops.update();
         Time.updateGlobal();
@@ -478,16 +483,6 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
-
-            if(state.isCampaign()){
-                for(Tilec tile : state.teams.cores(player.team())){
-                    for(Item item : content.items()){
-                        if(tile.items().has(item)){
-                            data.unlockContent(item);
-                        }
-                    }
-                }
-            }
 
             if(state.rules.tutorial){
                 tutorial.update();

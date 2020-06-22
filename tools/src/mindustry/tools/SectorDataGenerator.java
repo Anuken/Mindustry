@@ -1,9 +1,11 @@
 package mindustry.tools;
 
 import arc.*;
+import arc.backend.headless.mock.*;
 import arc.files.*;
 import arc.mock.*;
 import arc.struct.*;
+import arc.struct.ObjectIntMap.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -26,6 +28,7 @@ public class SectorDataGenerator{
         Core.files = new MockFiles();
         Core.app = new MockApplication();
         Core.settings = new MockSettings();
+        Core.graphics = new MockGraphics();
 
         headless = true;
         net = new Net(null);
@@ -45,7 +48,7 @@ public class SectorDataGenerator{
 
             Fi fi = Fi.get("planets").child(planet.name + ".dat");
 
-            Array<SectorData> list = planet.sectors.map(sector -> {
+            Seq<SectorData> list = planet.sectors.map(sector -> {
                 SectorData data = new SectorData();
 
                 ObjectIntMap<Block> floors = new ObjectIntMap<>();
@@ -105,7 +108,7 @@ public class SectorDataGenerator{
                 }
 
                 //sort counts in descending order
-                Array<ObjectIntMap.Entry<Block>> entries = floors.entries().toArray();
+                Seq<Entry<Block>> entries = floors.entries().toArray();
                 entries.sort(e -> -e.value);
                 //remove all blocks occuring < 30 times - unimportant
                 entries.removeAll(e -> e.value < 30);
@@ -120,6 +123,7 @@ public class SectorDataGenerator{
                 //TODO bad code
                 boolean hasSnow = data.floors[0].name.contains("ice") || data.floors[0].name.contains("snow");
                 boolean hasRain = !hasSnow && data.floors[0].name.contains("water");
+                boolean hasDesert = !hasSnow && !hasRain && data.floors[0].name.contains("sand");
 
                 if(hasSnow){
                     data.attributes |= (1 << SectorAttribute.snowy.ordinal());
@@ -127,6 +131,10 @@ public class SectorDataGenerator{
 
                 if(hasRain){
                     data.attributes |= (1 << SectorAttribute.rainy.ordinal());
+                }
+
+                if(hasDesert){
+                    data.attributes |= (1 << SectorAttribute.desert.ordinal());
                 }
 
                 data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(UnlockableContent.class);

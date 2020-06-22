@@ -20,11 +20,11 @@ import static mindustry.game.EventType.*;
 public class Administration{
     /** All player info. Maps UUIDs to info. This persists throughout restarts. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    private Array<String> bannedIPs = new Array<>();
-    private Array<String> whitelist = new Array<>();
-    private Array<ChatFilter> chatFilters = new Array<>();
-    private Array<ActionFilter> actionFilters = new Array<>();
-    private Array<String> subnetBans = new Array<>();
+    private Seq<String> bannedIPs = new Seq<>();
+    private Seq<String> whitelist = new Seq<>();
+    private Seq<ChatFilter> chatFilters = new Seq<>();
+    private Seq<ActionFilter> actionFilters = new Seq<>();
+    private Seq<String> subnetBans = new Seq<>();
     private IntIntMap lastPlaced = new IntIntMap();
 
     public Administration(){
@@ -97,7 +97,7 @@ public class Administration{
         });
     }
 
-    public Array<String> getSubnetBans(){
+    public Seq<String> getSubnetBans(){
         return subnetBans;
     }
 
@@ -256,8 +256,8 @@ public class Administration{
     /**
      * Returns list of all players with admin status
      */
-    public Array<PlayerInfo> getAdmins(){
-        Array<PlayerInfo> result = new Array<>();
+    public Seq<PlayerInfo> getAdmins(){
+        Seq<PlayerInfo> result = new Seq<>();
         for(PlayerInfo info : playerInfo.values()){
             if(info.admin){
                 result.add(info);
@@ -269,8 +269,8 @@ public class Administration{
     /**
      * Returns list of all players which are banned
      */
-    public Array<PlayerInfo> getBanned(){
-        Array<PlayerInfo> result = new Array<>();
+    public Seq<PlayerInfo> getBanned(){
+        Seq<PlayerInfo> result = new Seq<>();
         for(PlayerInfo info : playerInfo.values()){
             if(info.banned){
                 result.add(info);
@@ -282,18 +282,18 @@ public class Administration{
     /**
      * Returns all banned IPs. This does not include the IPs of ID-banned players.
      */
-    public Array<String> getBannedIPs(){
+    public Seq<String> getBannedIPs(){
         return bannedIPs;
     }
 
     /**
-     * Makes a player an admin. Returns whether this player was already an admin.
+     * Makes a player an admin.
+     * @return whether this player was already an admin.
      */
     public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
 
-        if(info.admin && info.adminUsid != null && info.adminUsid.equals(usid))
-            return false;
+        if(info.admin && info.adminUsid != null && info.adminUsid.equals(usid)) return false;
 
         info.adminUsid = usid;
         info.admin = true;
@@ -303,13 +303,13 @@ public class Administration{
     }
 
     /**
-     * Makes a player no longer an admin. Returns whether this player was an admin in the first place.
+     * Makes a player no longer an admin.
+     * @return whether this player was an admin in the first place.
      */
     public boolean unAdminPlayer(String id){
         PlayerInfo info = getCreateInfo(id);
 
-        if(!info.admin)
-            return false;
+        if(!info.admin) return false;
 
         info.admin = false;
         save();
@@ -384,8 +384,8 @@ public class Administration{
         return result;
     }
 
-    public Array<PlayerInfo> findByIPs(String ip){
-        Array<PlayerInfo> result = new Array<>();
+    public Seq<PlayerInfo> findByIPs(String ip){
+        Seq<PlayerInfo> result = new Seq<>();
 
         for(PlayerInfo info : playerInfo.values()){
             if(info.ips.contains(ip, false)){
@@ -413,8 +413,8 @@ public class Administration{
         return null;
     }
 
-    public Array<PlayerInfo> getWhitelisted(){
-        return playerInfo.values().toArray().select(p -> isWhitelisted(p.id, p.adminUsid));
+    public Seq<PlayerInfo> getWhitelisted(){
+        return playerInfo.values().toSeq().select(p -> isWhitelisted(p.id, p.adminUsid));
     }
 
     private PlayerInfo getCreateInfo(String id){
@@ -440,9 +440,9 @@ public class Administration{
         if(!loadLegacy()){
             //load default data
             playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
-            bannedIPs = Core.settings.getJson("ip-bans", Array.class, Array::new);
-            whitelist = Core.settings.getJson("whitelist-ids", Array.class, Array::new);
-            subnetBans = Core.settings.getJson("banned-subnets", Array.class, Array::new);
+            bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
+            whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
+            subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
         }else{
             //save over loaded legacy data
             save();
@@ -631,8 +631,8 @@ public class Administration{
     public static class PlayerInfo{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
-        public Array<String> ips = new Array<>();
-        public Array<String> names = new Array<>();
+        public Seq<String> ips = new Seq<>();
+        public Seq<String> names = new Seq<>();
         public String adminUsid;
         public int timesKicked;
         public int timesJoined;

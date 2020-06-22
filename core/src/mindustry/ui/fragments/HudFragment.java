@@ -24,6 +24,7 @@ import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -56,6 +57,7 @@ public class HudFragment extends Fragment{
             showToast("Sector[accent] captured[]!");
         });
 
+        //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
         });
@@ -119,7 +121,7 @@ public class HudFragment extends Fragment{
                     select.image().color(Pal.gray).width(4f).fillY();
 
                     float size = Scl.scl(dsize);
-                    Array<Element> children = new Array<>(select.getChildren());
+                    Seq<Element> children = new Seq<>(select.getChildren());
 
                     //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
                     int index = 0;
@@ -145,7 +147,7 @@ public class HudFragment extends Fragment{
                 cont.row();
             }
 
-            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH
+            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH/MAP/ETC
             /*
             cont.table(t -> {
 
@@ -207,6 +209,7 @@ public class HudFragment extends Fragment{
 
             //fps display
             cont.table(info -> {
+                info.touchable(Touchable.disabled);
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
                 info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
@@ -217,7 +220,7 @@ public class HudFragment extends Fragment{
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
             }).top().left();
         });
-        
+
         parent.fill(t -> {
             t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
             //minimap
@@ -225,7 +228,8 @@ public class HudFragment extends Fragment{
             t.row();
             //position
             t.label(() -> player.tileX() + "," + player.tileY())
-                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial);
+                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
+                .touchable(Touchable.disabled);
             t.top().right();
         });
 
@@ -306,7 +310,7 @@ public class HudFragment extends Fragment{
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> control.saves.isSaving());
-            t.add("$saveload").style(Styles.outlineLabel);
+            t.add("$saving").style(Styles.outlineLabel);
         });
 
         parent.fill(p -> {
@@ -322,7 +326,7 @@ public class HudFragment extends Fragment{
             p.touchable(Touchable.disabled);
         });
 
-        //DEBUG: rate table
+        //TODO DEBUG: rate table
         parent.fill(t -> {
             t.bottom().left();
             t.table(Styles.black6, c -> {
@@ -353,8 +357,16 @@ public class HudFragment extends Fragment{
                         rebuild.run();
                     }
                 });
-            });
+            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
+        });
 
+        //TODO move, select loadout, consume resources
+        parent.fill(t -> {
+            t.bottom().visible(() -> state.isCampaign() && player.team().core() != null);
+
+            t.button("test launch", Icon.warning, () -> {
+                ui.planet.show(state.getSector(), ((CoreBlock)player.team().core().block).launchRange, player.team().core());
+            }).width(150f);
         });
 
         blockfrag.build(parent);
@@ -474,7 +486,7 @@ public class HudFragment extends Fragment{
             int cap = col * col - 1;
 
             //get old elements
-            Array<Element> elements = new Array<>(lastUnlockLayout.getChildren());
+            Seq<Element> elements = new Seq<>(lastUnlockLayout.getChildren());
             int esize = elements.size;
 
             //...if it's already reached the cap, ignore everything
@@ -642,7 +654,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((state.rules.waitEnemies && state.enemies > 0 ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
+                builder.append((logic.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

@@ -9,7 +9,6 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.Array;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
@@ -19,6 +18,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
@@ -35,7 +35,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
-    public static final int crackRegions = 8, maxCrackSize = 5;
+    public static final int crackRegions = 8, maxCrackSize = 9;
 
     public boolean hasItems;
     public boolean hasLiquids;
@@ -173,22 +173,20 @@ public class Block extends UnlockableContent{
     public boolean instantTransfer = false;
 
     protected Prov<Tilec> entityType = null; //initialized later
-    //TODO move
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     //TODO move
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
-    public TextureRegion region, editorIcon;
 
-    //TODO remove completely
-    protected TextureRegion[] cacheRegions = {};
-    protected Array<String> cacheRegionStrings = new Array<>();
+    public TextureRegion region, editorIcon;
+    public @Load("@-team") TextureRegion teamRegion;
+    public TextureRegion[] teamRegions;
 
     //TODO move
     public static TextureRegion[][] cracks;
-    protected static final Array<Tile> tempTiles = new Array<>();
-    protected static final Array<Tilec> tempTileEnts = new Array<>();
+    protected static final Seq<Tile> tempTiles = new Seq<>();
+    protected static final Seq<Tilec> tempTileEnts = new Seq<>();
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -200,7 +198,6 @@ public class Block extends UnlockableContent{
         initEntity();
     }
 
-    //TODO rename to draw() once class refactoring is done.
     public void drawBase(Tile tile){
         //delegates to entity unless it is null
         if(tile.entity != null){
@@ -283,7 +280,7 @@ public class Block extends UnlockableContent{
     }
 
     /** Returns whether ot not this block can be place on the specified  */
-    public boolean canPlaceOn(Tile tile){
+    public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
 
@@ -348,11 +345,11 @@ public class Block extends UnlockableContent{
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
-    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         return this;
     }
 
-    public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
+    public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
         Draw.alpha(1f);
@@ -363,7 +360,7 @@ public class Block extends UnlockableContent{
         Draw.reset();
     }
 
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
@@ -372,15 +369,15 @@ public class Block extends UnlockableContent{
         }
     }
 
-    public TextureRegion getRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         return icon(Cicon.full);
     }
 
-    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
 
     }
 
-    public void drawRequestConfigCenter(BuildRequest req, Object content, String region){
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 
@@ -389,17 +386,17 @@ public class Block extends UnlockableContent{
         Draw.color();
     }
 
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
 
     }
 
     /** Configure when a null value is passed.*/
-    public void configClear(Cons<Tilec> cons){
-        configurations.put(void.class, (tile, value) -> cons.get((Tilec)tile));
+    public <E extends Tilec> void configClear(Cons<E> cons){
+        configurations.put(void.class, (tile, value) -> cons.get((E)tile));
     }
 
     /** Listen for a config by class type. */
-    public <T> void config(Class<T> type, Cons2<Tilec, T> config){
+    public <T, E extends Tilec> void config(Class<T> type, Cons2<E, T> config){
         configurations.put(type, config);
     }
 
@@ -443,13 +440,13 @@ public class Block extends UnlockableContent{
         return editorVariantRegions;
     }
 
-    protected TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name)};
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{region};
     }
 
     public TextureRegion[] getGeneratedIcons(){
         if(generatedIcons == null){
-            generatedIcons = generateIcons();
+            generatedIcons = icons();
         }
         return generatedIcons;
     }
@@ -574,19 +571,6 @@ public class Block extends UnlockableContent{
         }
     }
 
-    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #re(int)}.
-     * DO NOT USE. This will eventually be removed. */
-    protected int re(String suffix){
-        cacheRegionStrings.add(name + suffix);
-        return cacheRegionStrings.size - 1;
-    }
-
-    /** Returns an internally cached region by ID.
-     * DO NOT USE. This will eventually be removed*/
-    protected TextureRegion re(int id){
-        return cacheRegions[id];
-    }
-
     @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
@@ -631,11 +615,6 @@ public class Block extends UnlockableContent{
     public void load(){
         region = Core.atlas.find(name);
 
-        cacheRegions = new TextureRegion[cacheRegionStrings.size];
-        for(int i = 0; i < cacheRegions.length; i++){
-            cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
-        }
-
         if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];
             for(int size = 1; size <= maxCrackSize; size++){
@@ -646,6 +625,16 @@ public class Block extends UnlockableContent{
         }
 
         ContentRegions.loadRegions(this);
+
+        //load specific team regions
+        teamRegions = new TextureRegion[Team.all.length];
+        for(Team team : Team.all){
+            if(team.hasPalette){
+                teamRegions[team.uid] = Core.atlas.find(name + "-team-" + team.name);
+            }else{
+                teamRegions[team.uid] = teamRegion;
+            }
+        }
     }
 
     @Override

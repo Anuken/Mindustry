@@ -20,19 +20,19 @@ public class Stype extends Selement<TypeElement>{
         return mirror().toString();
     }
 
-    public Array<Stype> interfaces(){
-        return Array.with(e.getInterfaces()).map(Stype::of);
+    public Seq<Stype> interfaces(){
+        return Seq.with(e.getInterfaces()).map(Stype::of);
     }
 
-    public Array<Stype> allInterfaces(){
+    public Seq<Stype> allInterfaces(){
         return interfaces().flatMap(s -> s.allInterfaces().and(s)).distinct();
     }
 
-    public Array<Stype> superclasses(){
-        return Array.with(BaseProcessor.typeu.directSupertypes(mirror())).map(Stype::of);
+    public Seq<Stype> superclasses(){
+        return Seq.with(BaseProcessor.typeu.directSupertypes(mirror())).map(Stype::of);
     }
 
-    public Array<Stype> allSuperclasses(){
+    public Seq<Stype> allSuperclasses(){
         return superclasses().flatMap(s -> s.allSuperclasses().and(s)).distinct();
     }
 
@@ -40,17 +40,17 @@ public class Stype extends Selement<TypeElement>{
         return new Stype((TypeElement)BaseProcessor.typeu.asElement(BaseProcessor.typeu.directSupertypes(mirror()).get(0)));
     }
 
-    public Array<Svar> fields(){
-        return Array.with(e.getEnclosedElements()).select(e -> e instanceof VariableElement).map(e -> new Svar((VariableElement)e));
+    public Seq<Svar> fields(){
+        return Seq.with(e.getEnclosedElements()).select(e -> e instanceof VariableElement).map(e -> new Svar((VariableElement)e));
     }
 
-    public Array<Smethod> methods(){
-        return Array.with(e.getEnclosedElements()).select(e -> e instanceof ExecutableElement
+    public Seq<Smethod> methods(){
+        return Seq.with(e.getEnclosedElements()).select(e -> e instanceof ExecutableElement
         && !e.getSimpleName().toString().contains("<")).map(e -> new Smethod((ExecutableElement)e));
     }
 
-    public Array<Smethod> constructors(){
-        return Array.with(e.getEnclosedElements()).select(e -> e instanceof ExecutableElement
+    public Seq<Smethod> constructors(){
+        return Seq.with(e.getEnclosedElements()).select(e -> e instanceof ExecutableElement
         && e.getSimpleName().toString().contains("<")).map(e -> new Smethod((ExecutableElement)e));
     }
 

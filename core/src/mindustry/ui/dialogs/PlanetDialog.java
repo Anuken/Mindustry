@@ -22,7 +22,6 @@ import mindustry.graphics.g3d.PlanetRenderer.*;
 import mindustry.type.*;
 import mindustry.type.Sector.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.campaign.CoreLauncher.*;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.g3d.PlanetRenderer.*;
@@ -36,7 +35,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private int launchRange;
     private float zoom = 1f, selectAlpha = 1f;
     private @Nullable Sector selected, hovered, launchSector;
-    private CoreLauncherEntity launcher;
+    private Tilec launcher;
     private Mode mode = look;
 
     public PlanetDialog(){
@@ -98,7 +97,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         return super.show();
     }
 
-    public void show(Sector sector, int range, CoreLauncherEntity launcher){
+    public void show(Sector sector, int range, Tilec launcher){
         this.launcher = launcher;
         selected = null;
         hovered = null;
@@ -218,9 +217,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(doBuffer){
             buffer.end();
-            Draw.color(color);
-            Draw.rect(Draw.wrap(buffer.getTexture()), Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Core.graphics.getWidth(), -Core.graphics.getHeight());
-            Draw.color();
+
+            buffer.blit(Shaders.screenspace);
         }
     }
 
@@ -344,7 +342,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
 
                 if(mode == launch){
-                    launcher.launch();
+                    control.handleLaunch(launcher);
                     zoom = 0.5f;
 
                     ui.hudfrag.showLaunchDirect();

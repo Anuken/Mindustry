@@ -26,14 +26,16 @@ public class BlockRenderer implements Disposable{
 
     public final FloorRenderer floor = new FloorRenderer();
 
-    private Array<Tile> requests = new Array<>(false, initialRequests, Tile.class);
+    private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
+    private Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
 
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
     private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer();
-    private FrameBuffer fog = new FrameBuffer();
-    private Array<Tilec> outArray2 = new Array<>();
-    private Array<Tile> shadowEvents = new Array<>();
+    private FrameBuffer dark = new FrameBuffer();
+    private Seq<Tilec> outArray2 = new Seq<>();
+    private Seq<Tile> shadowEvents = new Seq<>();
+    private IntSet processedEntities = new IntSet();
     private boolean displayStatus = false;
 
     public BlockRenderer(){
@@ -42,7 +44,7 @@ public class BlockRenderer implements Disposable{
             shadowEvents.clear();
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
 
-            shadows.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
             shadows.resize(world.width(), world.height());
             shadows.begin();
             Core.graphics.clear(Color.white);
@@ -60,11 +62,11 @@ public class BlockRenderer implements Disposable{
             Draw.color();
             shadows.end();
 
-            fog.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-            fog.resize(world.width(), world.height());
-            fog.begin();
+            dark.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
+            dark.resize(world.width(), world.height());
+            dark.begin();
             Core.graphics.clear(Color.white);
-            Draw.proj().setOrtho(0, 0, fog.getWidth(), fog.getHeight());
+            Draw.proj().setOrtho(0, 0, dark.getWidth(), dark.getHeight());
 
             for(Tile tile : world.tiles){
                 float darkness = world.getDarkness(tile.x, tile.y);
@@ -77,7 +79,7 @@ public class BlockRenderer implements Disposable{
 
             Draw.flush();
             Draw.color();
-            fog.end();
+            dark.end();
         });
 
         Events.on(TileChangeEvent.class, event -> {
@@ -95,18 +97,8 @@ public class BlockRenderer implements Disposable{
     }
 
     public void drawDarkness(){
-        float ww = world.width() * tilesize, wh = world.height() * tilesize;
-        float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
-        float u = (x - camera.width / 2f) / ww,
-        v = (y - camera.height / 2f) / wh,
-        u2 = (x + camera.width / 2f) / ww,
-        v2 = (y + camera.height / 2f) / wh;
-
-        Tmp.tr1.set(fog.getTexture());
-        Tmp.tr1.set(u, v2, u2, v);
-
-        Draw.shader(Shaders.fog);
-        Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
+        Draw.shader(Shaders.darkness);
+        Draw.fbo(dark, world.width(), world.height(), tilesize);
         Draw.shader();
     }
 
@@ -166,7 +158,7 @@ public class BlockRenderer implements Disposable{
         Tmp.tr1.set(shadows.getTexture());
         Tmp.tr1.set(u, v2, u2, v);
 
-        Draw.shader(Shaders.fog);
+        Draw.shader(Shaders.darkness);
         Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
         Draw.shader();
     }
@@ -185,7 +177,9 @@ public class BlockRenderer implements Disposable{
             return;
         }
 
-        requests.clear();
+        tileview.clear();
+        lightview.clear();
+        processedEntities.clear();
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -197,16 +191,24 @@ public class BlockRenderer implements Disposable{
                 boolean expanded = (Math.abs(x - avgx) > rangex || Math.abs(y - avgy) > rangey);
                 Tile tile = world.rawTile(x, y);
                 Block block = tile.block();
+                //link to center
+                if(tile.entity != null) tile = tile.entity.tile();
 
-                if(block != Blocks.air && tile.isCenter() && block.cacheLayer == CacheLayer.normal){
+                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal && (tile.entity == null || !processedEntities.contains(tile.entity.id()))){
                     if(block.expanded || !expanded){
-                        requests.add(tile);
+                        tileview.add(tile);
+                        if(tile.entity != null) processedEntities.add(tile.entity.id());
+                    }
+
+                    //lights are drawn even in the expanded range
+                    if(tile.entity != null){
+                        lightview.add(tile);
                     }
 
                     if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
                         for(Tilec other : tile.entity.getPowerConnections(outArray2)){
                             if(other.block() instanceof PowerNode){ //TODO need a generic way to render connections!
-                                requests.add(other.tile());
+                                tileview.add(other.tile());
                             }
                         }
                     }
@@ -223,8 +225,9 @@ public class BlockRenderer implements Disposable{
     public void drawBlocks(){
         drawDestroyed();
 
-        for(int i = 0; i < requests.size; i++){
-            Tile tile = requests.items[i];
+        //draw most tile stuff
+        for(int i = 0; i < tileview.size; i++){
+            Tile tile = tileview.items[i];
             Block block = tile.block();
             Tilec entity = tile.entity;
 
@@ -232,6 +235,7 @@ public class BlockRenderer implements Disposable{
 
             if(block != Blocks.air){
                 block.drawBase(tile);
+                Draw.reset();
                 Draw.z(Layer.block);
 
                 if(entity != null){
@@ -245,8 +249,6 @@ public class BlockRenderer implements Disposable{
                         Draw.z(Layer.block);
                     }
 
-                    entity.drawLight();
-
                     if(displayStatus && block.consumes.any()){
                         entity.drawStatus();
                     }
@@ -254,13 +256,23 @@ public class BlockRenderer implements Disposable{
                 Draw.reset();
             }
         }
+
+        //draw lights
+        for(int i = 0; i < lightview.size; i++){
+            Tile tile = lightview.items[i];
+            Tilec entity = tile.entity;
+
+            if(entity != null){
+                entity.drawLight();
+            }
+        }
     }
 
     @Override
     public void dispose(){
         shadows.dispose();
-        fog.dispose();
-        shadows = fog = null;
+        dark.dispose();
+        shadows = dark = null;
         floor.dispose();
     }
 }

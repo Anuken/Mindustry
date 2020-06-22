@@ -8,6 +8,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -120,8 +121,8 @@ public class Fx{
     }),
 
     lightning = new Effect(10f, 500f, e -> {
-        if(!(e.data instanceof Array)) return;
-        Array<Vec2> lines = e.data();
+        if(!(e.data instanceof Seq)) return;
+        Seq<Vec2> lines = e.data();
 
         stroke(3f * e.fout());
         color(e.color, Color.white, e.fin());
@@ -228,7 +229,7 @@ public class Fx{
 
     unitLandSmall = new Effect(30, e -> {
         color(Tmp.c1.set(e.color).mul(1.1f));
-        randLenVectors(e.id, 6, 12f * e.finpow(), (x, y) -> {
+        randLenVectors(e.id, (int)(6 * e.rotation), 12f * e.finpow() * e.rotation, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 3f + 0.1f);
         });
     }).ground(),
@@ -526,7 +527,7 @@ public class Fx{
 
         color();
 
-        Drawf.light(e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
+        Drawf.light(Team.derelict, e.x, e.y, 20f * e.fslope(), Pal.lightFlame, 0.5f);
     }),
 
     fireSmoke = new Effect(35f, e -> {
@@ -1183,7 +1184,7 @@ public class Fx{
     ripple = new Effect(30, e -> {
         color(Tmp.c1.set(e.color).mul(1.5f));
         stroke(e.fout() + 0.4f);
-        Lines.circle(e.x, e.y, 2f + e.fin() * 4f);
+        Lines.circle(e.x, e.y, (2f + e.fin() * 4f) * e.rotation);
     }).ground(),
 
     bubble = new Effect(20, e -> {

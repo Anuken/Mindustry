@@ -46,7 +46,7 @@ public class LiquidModule extends BlockModule{
         return smoothLiquid;
     }
 
-    /** Returns total amount of liquids. */
+    /** @return total amount of liquids. */
     public float total(){
         return total;
     }

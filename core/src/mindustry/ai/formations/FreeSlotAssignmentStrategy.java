@@ -13,7 +13,7 @@ import arc.struct.*;
 public class FreeSlotAssignmentStrategy implements SlotAssignmentStrategy{
 
     @Override
-    public void updateSlotAssignments(Array<SlotAssignment> assignments){
+    public void updateSlotAssignments(Seq<SlotAssignment> assignments){
         // A very simple assignment algorithm: we simply go through
         // each assignment in the list and assign sequential slot numbers
         for(int i = 0; i < assignments.size; i++)
@@ -21,12 +21,12 @@ public class FreeSlotAssignmentStrategy implements SlotAssignmentStrategy{
     }
 
     @Override
-    public int calculateNumberOfSlots(Array<SlotAssignment> assignments){
+    public int calculateNumberOfSlots(Seq<SlotAssignment> assignments){
         return assignments.size;
     }
 
     @Override
-    public void removeSlotAssignment(Array<SlotAssignment> assignments, int index){
+    public void removeSlotAssignment(Seq<SlotAssignment> assignments, int index){
         assignments.remove(index);
     }
 

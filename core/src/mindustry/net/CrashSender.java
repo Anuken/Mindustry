@@ -24,7 +24,7 @@ public class CrashSender{
 
     public static void log(Throwable exception){
         try{
-            Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt").writeString(Strings.parseException(exception, true));
+            Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt").writeString(Strings.neatError(exception));
         }catch(Throwable ignored){
         }
 

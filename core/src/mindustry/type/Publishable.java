@@ -24,8 +24,8 @@ public interface Publishable{
     /** @return a preview file PNG. */
     Fi createSteamPreview(String id);
     /** @return any extra tags to add to this item.*/
-    default Array<String> extraTags(){
-        return new Array<>(0);
+    default Seq<String> extraTags(){
+        return new Seq<>(0);
     }
     /** @return whether this item is or was once on the workshop.*/
     default boolean hasSteamID(){

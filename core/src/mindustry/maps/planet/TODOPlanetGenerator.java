@@ -143,7 +143,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         float constraint = 1.3f;
         float radius = width / 2f / Mathf.sqrt3;
         int rooms = rand.random(2, 5);
-        Array<Room> array = new Array<>();
+        Seq<Room> array = new Seq<>();
 
         for(int i = 0; i < rooms; i++){
             Tmp.v1.trns(rand.random(360f), rand.random(radius / constraint));
@@ -156,7 +156,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
         Room spawn = null;
-        Array<Room> enemies = new Array<>();
+        Seq<Room> enemies = new Seq<>();
         int enemySpawns = rand.chance(0.3) ? 2 : 1;
         int offset = rand.nextInt(360);
         float length = width/2.55f - rand.random(13, 23);
@@ -212,7 +212,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         inverseFloodFill(tiles.getn(spawn.x, spawn.y));
 
-        Array<Block> ores = Array.with(Blocks.oreCopper, Blocks.oreLead);
+        Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead);
         float poles = Math.abs(sector.tile.v.y);
         float nmag = 0.5f;
         float scl = 1f;
@@ -230,7 +230,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
             ores.add(Blocks.oreThorium);
         }
 
-        FloatArray frequencies = new FloatArray();
+        FloatSeq frequencies = new FloatSeq();
         for(int i = 0; i < ores.size; i++){
             frequencies.add(rand.random(-0.09f, 0.01f) - i * 0.01f);
         }

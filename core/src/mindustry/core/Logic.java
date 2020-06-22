@@ -6,7 +6,6 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -98,6 +97,9 @@ public class Logic implements ApplicationListener{
                 SectorDamage.apply(state.rules.sector.getTurnsPassed());
                 state.rules.sector.setTurnsPassed(0);
             }
+
+            //enable infinite ammo for wave team by default
+            state.rules.waveTeam.rules().infiniteAmmo = true;
         });
 
         //TODO dying takes up a turn (?)
@@ -109,21 +111,6 @@ public class Logic implements ApplicationListener{
             }
         });*/
 
-        //disable new waves after the boss spawns
-        Events.on(WaveEvent.class, e -> {
-            //only works for non-attack sectors
-            if(state.isCampaign() && state.boss() != null && !state.rules.attackMode){
-                state.rules.waitEnemies = true;
-            }
-        });
-
-    }
-
-    /** Handles the event of content being used by either the player or some block. */
-    public void handleContent(UnlockableContent content){
-        if(!headless){
-            data.unlockContent(content);
-        }
     }
 
     /** Adds starting items, resets wave time, and sets state to playing. */
@@ -137,10 +124,10 @@ public class Logic implements ApplicationListener{
         if(!state.isCampaign()){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
-                    Tilec entity = team.core();
-                    entity.items().clear();
+                    TileEntity entity = team.core();
+                    entity.items.clear();
                     for(ItemStack stack : state.rules.loadout){
-                        entity.items().add(stack.item, stack.amount);
+                        entity.items.add(stack.item, stack.amount);
                     }
                 }
             }
@@ -182,10 +169,8 @@ public class Logic implements ApplicationListener{
                 state.rules.waves = false;
             }
 
-            //check if there is a boss present
-            Unitc boss = state.boss();
-            //if this was a boss wave and there is no boss anymore, then it's a victory
-            if(boss == null && state.rules.waves && state.rules.waitEnemies){
+            //if there's a "win" wave and no enemies are present, win automatically
+            if(state.rules.waves && state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()){
                 //the sector has been conquered - waves get disabled
                 state.rules.waves = false;
 
@@ -219,8 +204,6 @@ public class Logic implements ApplicationListener{
                 }
             }
         }
-
-
     }
 
     private void updateWeather(){
@@ -260,8 +243,9 @@ public class Logic implements ApplicationListener{
         Time.runTask(30f, () -> {
             for(Tilec entity : state.teams.playerCores()){
                 for(Item item : content.items()){
-                    data.addItem(item, entity.items().get(item));
-                    Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items().get(item))));
+                    //TODO where do the items go?
+                    //data.addItem(item, entity.items().get(item));
+                    //Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items().get(item))));
                 }
                 entity.tile().remove();
             }
@@ -311,22 +295,14 @@ public class Logic implements ApplicationListener{
                     updateWeather();
 
                     for(TeamData data : state.teams.getActive()){
-                        if(data.hasAI() && data.hasCore()){
+                        if(data.hasAI()){
                             data.ai.update();
-                        }
-
-                        //TODO this is terrible
-                        //fills enemy core with resources
-                        if(state.rules.enemyInfiniteResources && state.rules.waves && data.team == state.rules.waveTeam && data.hasCore()){
-                            for(Item item : content.items()){
-                                data.core().items.set(item, data.core().block.itemCapacity);
-                            }
                         }
                     }
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    if(!state.rules.waitEnemies || state.enemies == 0){
+                    if(!isWaitingWave()){
                         state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
                     }
                 }
@@ -342,6 +318,11 @@ public class Logic implements ApplicationListener{
                 checkGameState();
             }
         }
+    }
+
+    /** @return whether the wave timer is paused due to enemies */
+    public boolean isWaitingWave(){
+        return (state.rules.waitEnemies || (state.wave >= state.rules.winWave && state.rules.winWave > 0)) && state.enemies > 0;
     }
 
 }

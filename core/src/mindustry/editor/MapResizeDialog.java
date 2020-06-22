@@ -2,8 +2,10 @@ package mindustry.editor;
 
 import arc.func.*;
 import arc.math.*;
+import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
-import mindustry.gen.*;
+import arc.util.*;
+import mindustry.*;
 import mindustry.ui.dialogs.*;
 
 public class MapResizeDialog extends BaseDialog{
@@ -22,21 +24,12 @@ public class MapResizeDialog extends BaseDialog{
             for(boolean w : Mathf.booleans){
                 table.add(w ? "$width" : "$height").padRight(8f);
                 table.defaults().height(60f).padTop(8);
-                table.button("<", () -> {
-                    if(w)
-                        width = move(width, -1);
-                    else
-                        height = move(height, -1);
-                }).size(60f);
 
-                table.table(Tex.button, t -> t.label(() -> (w ? width : height) + "")).width(200);
+                Vars.platform.addDialog(table.field((w ? width : height) + "", TextFieldFilter.digitsOnly, value -> {
+                    int val = Integer.parseInt(value);
+                    if(w) width = val; else height = val;
+                }).valid(value -> Strings.canParsePostiveInt(value) && Integer.parseInt(value) <= maxSize && Integer.parseInt(value) >= minSize).get());
 
-                table.button(">", () -> {
-                    if(w)
-                        width = move(width, 1);
-                    else
-                        height = move(height, 1);
-                }).size(60f);
                 table.row();
             }
             cont.row();
@@ -50,9 +43,5 @@ public class MapResizeDialog extends BaseDialog{
             cons.get(width, height);
             hide();
         });
-    }
-
-    static int move(int value, int direction){
-        return Mathf.clamp((value / increment + direction) * increment, minSize, maxSize);
     }
 }

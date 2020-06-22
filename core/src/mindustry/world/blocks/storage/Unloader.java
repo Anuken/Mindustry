@@ -27,16 +27,12 @@ public class Unloader extends Block{
         saveConfig = true;
         itemCapacity = 0;
 
-        config(Item.class, (tile, item) -> {
-            tile.items().clear();
-            ((UnloaderEntity)tile).sortItem = item;
-        });
-
-        configClear(tile -> ((UnloaderEntity)tile).sortItem = null);
+        config(Item.class, (UnloaderEntity tile, Item item) -> tile.sortItem = item);
+        configClear((UnloaderEntity tile) -> tile.sortItem = null);
     }
 
     @Override
-    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
         drawRequestConfigCenter(req, req.config, "unloader-center");
     }
 

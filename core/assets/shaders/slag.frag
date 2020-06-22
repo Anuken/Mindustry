@@ -1,7 +1,4 @@
-#ifdef GL_ES
-precision highp float;
-precision mediump int;
-#endif
+#define HIGHP
 
 //shades of slag
 #define S2 vec3(100.0, 93.0, 49.0) / 100.0
@@ -15,11 +12,10 @@ uniform vec2 u_campos;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-varying vec4 v_color;
-varying vec2 v_texCoord;
+varying vec2 v_texCoords;
 
 void main(){
-    vec2 c = v_texCoord.xy;
+    vec2 c = v_texCoords.xy;
     vec2 coords = vec2(c.x * u_resolution.x + u_campos.x, c.y * u_resolution.y + u_campos.y);
 
     float btime = u_time / 4000.0;

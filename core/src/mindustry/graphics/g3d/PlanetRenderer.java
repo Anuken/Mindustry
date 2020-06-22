@@ -22,7 +22,7 @@ public class PlanetRenderer implements Disposable{
         borderColor = Pal.accent.cpy().a(0.3f),
         shadowColor = new Color(0, 0, 0, 0.7f);
 
-    private static final Array<Vec3> points = new Array<>();
+    private static final Seq<Vec3> points = new Seq<>();
     private static final PlanetInterfaceRenderer emptyRenderer = new PlanetInterfaceRenderer(){
         @Override public void renderSectors(Planet planet){}
         @Override public void renderProjections(){}

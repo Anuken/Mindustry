@@ -198,7 +198,7 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void discoverServers(Cons<Host> callback, Runnable done){
-        Array<InetAddress> foundAddresses = new Array<>();
+        Seq<InetAddress> foundAddresses = new Seq<>();
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
             Core.app.post(() -> {
                 try{

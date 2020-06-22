@@ -369,7 +369,7 @@ public class ApplicationTests{
         world.tile(0, 0).setBlock(Blocks.itemSource);
         world.tile(0, 0).entity.configureAny(Items.copper);
 
-        Array<Tilec> entities = Array.with(world.tile(0, 0).entity);
+        Seq<Tilec> entities = Seq.with(world.tile(0, 0).entity);
 
         for(int i = 0; i < length; i++){
             world.tile(i + 1, 0).setBlock(Blocks.conveyor);
@@ -429,13 +429,13 @@ public class ApplicationTests{
 
     @Test
     void arrayIterators(){
-        Array<String> arr = Array.with("a", "b" , "c", "d", "e", "f");
-        Array<String> results = new Array<>();
+        Seq<String> arr = Seq.with("a", "b" , "c", "d", "e", "f");
+        Seq<String> results = new Seq<>();
 
         for(String s : arr);
         for(String s : results);
 
-        Array.iteratorsAllocated = 0;
+        Seq.iteratorsAllocated = 0;
 
         //simulate non-enhanced for loops, which should be correct
 
@@ -455,7 +455,7 @@ public class ApplicationTests{
         }
 
         assertEquals(results.size, index);
-        assertEquals(0, Array.iteratorsAllocated, "No new iterators must have been allocated.");
+        assertEquals(0, Seq.iteratorsAllocated, "No new iterators must have been allocated.");
     }
 
     @Test
@@ -492,8 +492,8 @@ public class ApplicationTests{
         d1.set(0f, 0f);
         d2.set(20f, 20f);
 
-        d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
-        d2.addBuild(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
+        d1.addBuild(new BuildPlan(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuild(new BuildPlan(1, 1, 0, Blocks.copperWallLarge));
 
         d1.update();
         d2.update();
@@ -514,8 +514,8 @@ public class ApplicationTests{
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
-        d2.addBuild(new BuildRequest(1, 1));
+        d1.addBuild(new BuildPlan(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuild(new BuildPlan(1, 1));
 
         Time.setDeltaProvider(() -> 3f);
         d1.update();
@@ -532,7 +532,7 @@ public class ApplicationTests{
         assertEquals(Blocks.copperWallLarge, world.tile(1, 1).block());
 
         d2.clearBuilding();
-        d2.addBuild(new BuildRequest(1, 1));
+        d2.addBuild(new BuildPlan(1, 1));
         d2.update();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
@@ -542,7 +542,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tiles tiles = world.resize(256*2 + 20, 10);
+        Tiles tiles = world.resize(256*3 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.width; x++){

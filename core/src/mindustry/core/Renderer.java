@@ -222,7 +222,7 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.light, lights::draw);
         }
 
-        if(state.rules.drawDarkness){
+        if(enableDarkness){
             Draw.draw(Layer.darkness, blocks::drawDarkness);
         }
 
@@ -231,18 +231,12 @@ public class Renderer implements ApplicationListener{
             Draw.draw(Layer.effect + 0.01f, bloom::render);
         }
 
-        Draw.z(Layer.plans);
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(settings.getBool("animatedshields")){
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
-
-                Draw.shader(Shaders.shield);
-                Draw.color(Pal.accent);
-                Draw.rect(effectBuffer);
-                Draw.color();
-                Draw.shader();
+                effectBuffer.blit(Shaders.shield);
             });
         }
 
@@ -345,7 +339,7 @@ public class Renderer implements ApplicationListener{
             lines[i + 3] = (byte)255;
         }
         buffer.end();
-        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.rgba8888);
         Buffers.copy(lines, 0, fullPixmap.getPixels(), lines.length);
         Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
         PixmapIO.writePNG(file, fullPixmap);

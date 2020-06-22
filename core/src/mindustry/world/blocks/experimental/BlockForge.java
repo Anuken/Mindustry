@@ -8,7 +8,6 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -22,7 +21,6 @@ import mindustry.world.consumers.*;
 
 public class BlockForge extends PayloadAcceptor{
     public float buildSpeed = 0.4f;
-    public @Load(value = "@-out", fallback = "factory-out") TextureRegion outRegion;
 
     public BlockForge(String name){
         super(name);
@@ -35,17 +33,9 @@ public class BlockForge extends PayloadAcceptor{
         hasPower = true;
         rotate = true;
 
-        config(Block.class, (tile, block) -> ((BlockForgeEntity)tile).recipe = block);
+        config(Block.class, (BlockForgeEntity tile, Block block) -> tile.recipe = block);
 
-        consumes.add(new ConsumeItemDynamic(e -> {
-            BlockForgeEntity entity = (BlockForgeEntity)e;
-
-            if(entity.recipe != null){
-                return entity.recipe.requirements;
-            }
-
-            return ItemStack.empty;
-        }));
+        consumes.add(new ConsumeItemDynamic((BlockForgeEntity e) -> e.recipe != null ? e.recipe.requirements : ItemStack.empty));
     }
 
     @Override
@@ -56,7 +46,7 @@ public class BlockForge extends PayloadAcceptor{
     }
 
     @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
     }
@@ -108,7 +98,7 @@ public class BlockForge extends PayloadAcceptor{
 
         @Override
         public void buildConfiguration(Table table){
-            Array<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size <= 2);
+            Seq<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size <= 2);
 
             ItemSelection.buildTable(table, blocks, () -> recipe, block -> recipe = block);
         }

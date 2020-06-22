@@ -11,20 +11,20 @@ import static mindustry.Vars.world;
 public class Astar{
     public static final DistanceHeuristic manhattan = (x1, y1, x2, y2) -> Math.abs(x1 - x2) + Math.abs(y1 - y2);
 
-    private static final Array<Tile> out = new Array<>();
+    private static final Seq<Tile> out = new Seq<>();
     private static final PQueue<Tile> queue = new PQueue<>(200 * 200 / 4, (a, b) -> 0);
     private static final IntFloatMap costs = new IntFloatMap();
     private static byte[][] rotations;
 
-    public static Array<Tile> pathfind(Tile from, Tile to, TileHueristic th, Boolf<Tile> passable){
+    public static Seq<Tile> pathfind(Tile from, Tile to, TileHueristic th, Boolf<Tile> passable){
         return pathfind(from.x, from.y, to.x, to.y, th, manhattan, passable);
     }
 
-    public static Array<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, Boolf<Tile> passable){
+    public static Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, Boolf<Tile> passable){
         return pathfind(startX, startY, endX, endY, th, manhattan, passable);
     }
 
-    public static Array<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh, Boolf<Tile> passable){
+    public static Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHueristic th, DistanceHeuristic dh, Boolf<Tile> passable){
         Tiles tiles = world.tiles;
 
         Tile start = tiles.getn(startX, startY);

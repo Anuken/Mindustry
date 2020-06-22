@@ -1,15 +1,15 @@
 package mindustry.game;
 
-import arc.struct.Array;
+import arc.struct.Seq;
 import mindustry.content.*;
 import mindustry.type.ItemStack;
 
 public class DefaultWaves{
-    private Array<SpawnGroup> spawns;
+    private Seq<SpawnGroup> spawns;
 
-    public Array<SpawnGroup> get(){
+    public Seq<SpawnGroup> get(){
         if(spawns == null && UnitTypes.dagger != null){
-            spawns = Array.with(
+            spawns = Seq.with(
             new SpawnGroup(UnitTypes.dagger){{
                 end = 10;
                 unitScaling = 2f;
@@ -35,7 +35,7 @@ public class DefaultWaves{
                 max = 4;
             }},
 
-            new SpawnGroup(UnitTypes.titan){{
+            new SpawnGroup(UnitTypes.mace){{
                 begin = 7;
                 spacing = 3;
                 unitScaling = 2;
@@ -50,21 +50,21 @@ public class DefaultWaves{
                 spacing = 2;
             }},
 
-            new SpawnGroup(UnitTypes.titan){{
+            new SpawnGroup(UnitTypes.mace){{
                 begin = 28;
                 spacing = 3;
                 unitScaling = 1;
                 end = 40;
             }},
 
-            new SpawnGroup(UnitTypes.titan){{
+            new SpawnGroup(UnitTypes.mace){{
                 begin = 45;
                 spacing = 3;
                 unitScaling = 2;
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.titan){{
+            new SpawnGroup(UnitTypes.mace){{
                 begin = 120;
                 spacing = 2;
                 unitScaling = 3;
@@ -186,6 +186,6 @@ public class DefaultWaves{
             }}
             );
         }
-        return spawns == null ? new Array<>() : spawns;
+        return spawns == null ? new Seq<>() : spawns;
     }
 }

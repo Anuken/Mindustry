@@ -31,6 +31,7 @@ public class LaserBulletType extends BulletType{
         despawnEffect = Fx.none;
         shootEffect = Fx.hitLancer;
         smokeEffect = Fx.none;
+        collides = false;
         hitSize = 4;
         lifetime = 16f;
         pierce = true;
@@ -92,6 +93,11 @@ public class LaserBulletType extends BulletType{
         Draw.reset();
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
-        Drawf.light(b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
+        Drawf.light(b.team(), b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
+    }
+
+    @Override
+    public void drawLight(Bulletc b){
+        //no light drawn here
     }
 }

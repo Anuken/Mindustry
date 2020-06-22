@@ -20,7 +20,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemBridge extends Block{
-    private static BuildRequest otherReq;
+    private static BuildPlan otherReq;
 
     public final int timerTransport = timers++;
     public int range;
@@ -44,13 +44,13 @@ public class ItemBridge extends Block{
         canOverdrive = false;
 
         //point2 config is relative
-        config(Point2.class, (tile, i) -> ((ItemBridgeEntity)tile).link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
+        config(Point2.class, (ItemBridgeEntity tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
         //integer is not
-        config(Integer.class, (tile, i) -> ((ItemBridgeEntity)tile).link = i);
+        config(Integer.class, (ItemBridgeEntity tile, Integer i) -> tile.link = i);
     }
 
     @Override
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
         otherReq = null;
         list.each(other -> {
             if(other.block == this && req != other && req.config instanceof Point2 && ((Point2)req.config).equals(other.x - req.x, other.y - req.y)){
@@ -112,7 +112,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return other.block() == this && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
+        return (other.block() == tile.block() || (!(tile.block() instanceof ItemBridge) && other.block() == this)) && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
     }
 
     public Tile findLink(int x, int y){
@@ -138,6 +138,51 @@ public class ItemBridge extends Block{
             }
 
             lastPlaced = tile.pos();
+        }
+
+        @Override
+        public void drawSelect(){
+            if(linkValid(tile, world.tile(link))){
+                drawInput(world.tile(link));
+            }else{
+                incoming.each(pos -> drawInput(world.tile(pos)));
+            }
+
+            Draw.reset();
+        }
+
+        private void drawInput(Tile other){
+            if(!linkValid(tile, other, false)) return;
+            boolean linked = other.pos() == link;
+            if(!linked && !(other.<ItemBridgeEntity>ent().link == tile.pos())) return;
+
+            Tmp.v2.trns(tile.angleTo(other), 2f);
+            float tx = tile.drawx(), ty = tile.drawy();
+            float ox = other.drawx(), oy = other.drawy();
+            float alpha = Math.abs((linked ? 100 : 0)-(Time.time() * 2f) % 100f) / 100f;
+            float x = Mathf.lerp(ox, tx, alpha);
+            float y = Mathf.lerp(oy, ty, alpha);
+
+            Tile otherLink = linked ? other : tile;
+            int rel = (linked ? tile : other).absoluteRelativeTo(otherLink.x, otherLink.y);
+
+            //draw "background"
+            Draw.color(Pal.gray);
+            Lines.stroke(2.5f);
+            Lines.square(ox, oy, 2f, 45f);
+            Lines.stroke(2.5f);
+            Lines.line(tx + Tmp.v2.x, ty + Tmp.v2.y, ox - Tmp.v2.x, oy - Tmp.v2.y);
+
+            //draw foreground colors
+            Draw.color(linked ? Pal.place : Pal.accent);
+            Lines.stroke(1f);
+            Lines.line(tx + Tmp.v2.x, ty + Tmp.v2.y, ox - Tmp.v2.x, oy - Tmp.v2.y);
+
+            Lines.square(ox, oy, 2f, 45f);
+            Draw.mixcol(Draw.getColor(), 1f);
+            Draw.color();
+            Draw.rect(arrowRegion, x, y, rel * 90);
+            Draw.mixcol();
         }
 
         @Override
@@ -280,35 +325,15 @@ public class ItemBridge extends Block{
 
                 if(rel == rel2) return false;
             }else{
-                return source.block() instanceof ItemBridge && ((ItemBridgeEntity)source).link == tile.pos() && items.total() < itemCapacity;
+                return source.block() instanceof ItemBridge && linkValid(source.tile(), tile) && items.total() < itemCapacity;
             }
 
             return items.total() < itemCapacity;
         }
 
-
         @Override
         public boolean canDumpLiquid(Tilec to, Liquid liquid){
-            Tile other = world.tile(link);
-            if(!linkValid(tile, other)){
-                Tile edge = Edges.getFacingEdge(to.tile(), tile);
-                int i = relativeTo(edge.x, edge.y);
-
-                IntSetIterator it = incoming.iterator();
-
-                while(it.hasNext){
-                    int v = it.next();
-                    if(relativeTo(Point2.x(v), Point2.y(v)) == i){
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            int rel = relativeTo(other.x, other.y);
-            int rel2 = relativeTo(to.tileX(), to.tileY());
-
-            return rel != rel2;
+            return checkDump(to);
         }
 
         @Override
@@ -322,7 +347,7 @@ public class ItemBridge extends Block{
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
                 if(rel == rel2) return false;
-            }else if(!(source.block() instanceof ItemBridge && ((ItemBridgeEntity)source).link == tile.pos())){
+            }else if(!(source.block() instanceof ItemBridge && linkValid(source.tile(), tile))){
                 return false;
             }
 
@@ -331,6 +356,10 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean canDump(Tilec to, Item item){
+            return checkDump(to);
+        }
+
+        protected boolean checkDump(Tilec to){
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
                 Tile edge = Edges.getFacingEdge(to.tile(), tile);

@@ -26,7 +26,7 @@ import static mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends BaseDialog{
     private final static int displayed = 20;
-    private Array<SpawnGroup> groups = new Array<>();
+    private Seq<SpawnGroup> groups = new Seq<>();
 
     private Table table, preview;
     private int start = 0;
@@ -87,7 +87,7 @@ public class WaveInfoDialog extends BaseDialog{
             main.pane(t -> table = t).growX().growY().padRight(8f).get().setScrollingDisabled(true, false);
             main.row();
             main.button("$add", () -> {
-                if(groups == null) groups = new Array<>();
+                if(groups == null) groups = new Seq<>();
                 groups.add(new SpawnGroup(lastType));
                 buildGroups();
             }).growX().height(70f);

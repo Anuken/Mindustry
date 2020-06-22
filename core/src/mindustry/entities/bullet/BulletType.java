@@ -93,6 +93,10 @@ public abstract class BulletType extends Content{
     public float weaveMag = -1f;
     public float hitShake = 0f;
 
+    public float lightRadius = 16f;
+    public float lightOpacity = 0.3f;
+    public Color lightColor = Pal.powerLight;
+
     public BulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
@@ -159,6 +163,10 @@ public abstract class BulletType extends Content{
     }
 
     public void draw(Bulletc b){
+    }
+
+    public void drawLight(Bulletc b){
+        Drawf.light(b.team(), b, lightRadius, lightColor, lightOpacity);
     }
 
     public void init(Bulletc b){

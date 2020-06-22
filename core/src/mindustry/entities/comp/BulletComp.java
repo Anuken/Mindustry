@@ -18,8 +18,9 @@ import static mindustry.Vars.*;
 @Component
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
+    @Import Entityc owner;
 
-    IntArray collided = new IntArray(6);
+    IntSeq collided = new IntSeq(6);
     Object data;
     BulletType type;
     float damage;
@@ -49,15 +50,14 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public float damageMultiplier(){
-        if(owner() instanceof Unitc){
-            return ((Unitc)owner()).damageMultiplier();
-        }
+        if(owner instanceof Unitc) return ((Unitc)owner).damageMultiplier() * state.rules.unitDamageMultiplier;
+        if(owner instanceof Tilec) return state.rules.blockDamageMultiplier;
+
         return 1f;
     }
 
     @Override
     public void absorb(){
-        //TODO
         remove();
     }
 
@@ -107,7 +107,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public void update(){
         type.update(this);
 
-        if(type.collidesTiles){
+        if(type.collidesTiles && type.collides){
             world.raycastEach(world.toTile(lastX()), world.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
                 Tilec tile = world.ent(x, y);
@@ -133,8 +133,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         Draw.z(Layer.bullet);
 
         type.draw(this);
-        //TODO refactor
-        Drawf.light(x(), y(), 16f, Pal.powerLight, 0.3f);
+        type.drawLight(this);
     }
 
     /** Sets the bullet's rotation in degrees. */

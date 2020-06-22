@@ -45,7 +45,6 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
     public ItemLiquidGenerator(String name){
         super(name);
-        this.entityType = ItemLiquidGeneratorEntity::new;
     }
 
     protected void setDefaults(){
@@ -86,8 +85,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
     }
 
     public class ItemLiquidGeneratorEntity extends GeneratorEntity{
-        public float explosiveness;
-        public float heat;
+        public float explosiveness, heat, totalTime;
 
         @Override
         public boolean productionValid(){
@@ -99,6 +97,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
             //Note: Do not use this delta when calculating the amount of power or the power efficiency, but use it for resource consumption if necessary.
             //Power amount is delta'd by PowerGraph class already.
             float calculationDelta = delta();
+
+            heat = Mathf.lerpDelta(heat, generateTime >= 0.001f ? 1f : 0f, 0.05f);
 
             if(!consValid()){
                 productionEfficiency = 0.0f;
@@ -113,7 +113,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 }
             }
 
-            heat = Mathf.lerpDelta(heat, generateTime >= 0.001f ? 1f : 0f, 0.05f);
+            totalTime += heat;
 
             //liquid takes priority over solids
             if(hasLiquids && liquid != null && liquids.get(liquid) >= 0.001f){
@@ -174,7 +174,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, (60f + Mathf.absin(10f, 5f)) * productionEfficiency * size, Color.orange, 0.5f);
+            Drawf.light(team, x, y, (60f + Mathf.absin(10f, 5f)) * size, Color.orange, 0.5f * heat);
         }
     }
 }

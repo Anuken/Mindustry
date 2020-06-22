@@ -13,7 +13,7 @@ import com.android.dx.dex.cf.*;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.merge.*;
 import dalvik.system.*;
-import org.mozilla.javascript.*;
+import rhino.*;
 
 import java.io.*;
 import java.nio.*;

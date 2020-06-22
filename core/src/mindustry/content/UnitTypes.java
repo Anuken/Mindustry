@@ -14,7 +14,7 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
 
     //ground
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType titan, dagger, crawler, fortress, chaosArray, eradicator;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, chaosArray, eradicator;
 
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType tau;
@@ -76,7 +76,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        titan = new UnitType("titan"){{
+        mace = new UnitType("mace"){{
             speed = 0.4f;
             hitsize = 9f;
             range = 10f;
@@ -96,26 +96,26 @@ public class UnitTypes implements ContentList{
         }};
 
         tau = new UnitType("tau"){{
-                itemCapacity = 60;
-                canBoost = true;
-                boostMultiplier = 1.5f;
-                speed = 0.5f;
-                hitsize = 8f;
-                health = 100f;
-                buildSpeed = 0.8f;
+            itemCapacity = 60;
+            canBoost = true;
+            boostMultiplier = 1.5f;
+            speed = 0.5f;
+            hitsize = 8f;
+            health = 100f;
+            buildSpeed = 0.8f;
 
-                weapons.add(new Weapon("heal-weapon"){{
-                    shootY = 1.5f;
-                    reload = 24f;
-                    x = 1f;
-                    shootX = 3.5f;
-                    alternate = false;
-                    ejectEffect = Fx.none;
-                    recoil = 2f;
-                    bullet = Bullets.healBullet;
-                    shootSound = Sounds.pew;
-                }});
-            }
+            weapons.add(new Weapon("heal-weapon"){{
+                shootY = 1.5f;
+                reload = 24f;
+                x = 1f;
+                shootX = 3.5f;
+                alternate = false;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                bullet = Bullets.healBullet;
+                shootSound = Sounds.pew;
+            }});
+        }
 
             /*
 
@@ -145,6 +145,39 @@ public class UnitTypes implements ContentList{
             }*/
         };
 
+        oculon = new UnitType("oculon"){{
+            drillTier = 1;
+            hitsize = 9f;
+            boostMultiplier = 2f;
+            itemCapacity = 20;
+            health = 230f;
+            buildSpeed = 1.5f;
+            canBoost = true;
+
+            speed = 0.4f;
+            hitsize = 10f;
+
+            weapons.add(new Weapon("beam-weapon"){{
+                shake = 2f;
+                shootY = 4f;
+                shootX = 6f;
+                x = 0.25f;
+                reload = 50f;
+                alternate = true;
+                recoil = 4f;
+                shootSound = Sounds.laser;
+
+                bullet = new LaserBulletType(){{
+                    damage = 20f;
+                    recoil = 1f;
+                    sideAngle = 45f;
+                    sideWidth = 1f;
+                    sideLength = 70f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
+            }});
+        }};
+
         fortress = new UnitType("fortress"){{
             speed = 0.38f;
             hitsize = 13f;
@@ -164,7 +197,7 @@ public class UnitTypes implements ContentList{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
                     lifetime = 110f;
-                    bulletWidth = bulletHeight = 14f;
+                    width = height = 14f;
                     collides = true;
                     collidesTiles = true;
                     splashDamageRadius = 20f;
@@ -212,7 +245,7 @@ public class UnitTypes implements ContentList{
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 4;
             legLength = 9f;
-            legTrns = 2f;
+            legTrns = 0.6f;
             legMoveSpace = 1.4f;
 
             weapons.add(new Weapon("eruption"){{
@@ -235,19 +268,25 @@ public class UnitTypes implements ContentList{
 
         cix = new UnitType("cix"){{
             drag = 0.1f;
-            speed = 0.4f;
+            speed = 0.5f;
             hitsize = 9f;
             health = 140;
             baseElevation = 0.51f;
 
             legCount = 6;
-            legMoveSpace = 0.9f;
+            legMoveSpace = 1f;
+            legPairOffset = 3;
             legLength = 34f;
             rotateShooting = false;
             legExtension = -15;
-            legBaseOffset = 8f;
+            legBaseOffset = 10f;
             landShake = 2f;
             legSpeed = 0.1f;
+            legLengthScl = 1f;
+            rippleScale = 2f;
+            legSpeed = 0.2f;
+            legSplashDamage = 32;
+            legSplashRange = 30;
 
             for(boolean b : Mathf.booleans){
                 weapons.add(
@@ -332,9 +371,9 @@ public class UnitTypes implements ContentList{
                     shake = 1f;
 
                     bullet = new MissileBulletType(2.7f, 12, "missile"){{
-                        bulletWidth = 8f;
-                        bulletHeight = 8f;
-                        bulletShrink = 0f;
+                        width = 8f;
+                        height = 8f;
+                        shrinkY = 0f;
                         drag = -0.003f;
                         homingRange = 60f;
                         keepVelocity = false;
@@ -357,7 +396,7 @@ public class UnitTypes implements ContentList{
             speed = 1.1f;
             accel = 0.02f;
             drag = 0.05f;
-            rotateSpeed = 0.5f;
+            rotateSpeed = 2.5f;
             flying = true;
             lowAltitude = true;
             health = 75000;
@@ -375,6 +414,27 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        lich = new UnitType("lich"){{
+            speed = 1.1f;
+            accel = 0.02f;
+            drag = 0.05f;
+            rotateSpeed = 2.5f;
+            flying = true;
+            lowAltitude = true;
+            health = 75000;
+            engineOffset = 38;
+            engineSize = 7.3f;
+            hitsize = 58f;
+
+            weapons.add(new Weapon(){{
+                y = 1.5f;
+                reload = 28f;
+                alternate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+                shootSound = Sounds.shoot;
+            }});
+        }};
 
         vanguard = new UnitType("vanguard"){{
             speed = 1.3f;
@@ -427,6 +487,10 @@ public class UnitTypes implements ContentList{
         }};
 
         alpha = new UnitType("alpha"){{
+            //TODO maybe these should be changed
+            defaultController = BuilderAI::new;
+            isCounted = false;
+
             flying = true;
             mineSpeed = 2f;
             buildSpeed = 0.5f;
@@ -448,13 +512,12 @@ public class UnitTypes implements ContentList{
                 alternate = true;
 
                 bullet = new BasicBulletType(2.5f, 9){{
-                    bulletWidth = 7f;
-                    bulletHeight = 9f;
+                    width = 7f;
+                    height = 9f;
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.15f;
-                    ammoMultiplier = 2;
+                    tileDamageMultiplier = 0.1f;
                 }};
             }});
         }};
@@ -470,40 +533,9 @@ public class UnitTypes implements ContentList{
             range = 70f;
             itemCapacity = 70;
             health = 400;
-            buildSpeed = 0.6f;
+            buildSpeed = 0.5f;
             engineOffset = 6.5f;
             hitsize = 8f;
-        }};
-
-        oculon = new UnitType("oculon"){{
-            drillTier = -1;
-            speed = 0.6f;
-            hitsize = 9f;
-            boostMultiplier = 2f;
-            itemCapacity = 15;
-            health = 160f;
-            buildSpeed = 0.9f;
-            canBoost = true;
-
-            weapons.add(new Weapon("beam-weapon"){{
-                shake = 2f;
-                shootY = 1f;
-                x = 1f;
-                shootX = 3f;
-                reload = 50f;
-                alternate = true;
-                recoil = 4f;
-                shootSound = Sounds.laser;
-
-                bullet = new LaserBulletType(){{
-                    damage = 20f;
-                    recoil = 1f;
-                    sideAngle = 45f;
-                    sideWidth = 1f;
-                    sideLength = 70f;
-                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
-                }};
-            }});
         }};
 
         trident = new UnitType("trident"){{
