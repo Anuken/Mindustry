@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -237,6 +238,15 @@ public class Control implements ApplicationListener, Loadable{
             }
             Events.fire(Trigger.newGame);
         });
+    }
+
+    //TODO move
+    public void handleLaunch(Tilec tile){
+        LaunchCorec ent = LaunchCoreEntity.create();
+        ent.set(tile);
+        ent.block(Blocks.coreShard);
+        ent.lifetime(Vars.launchDuration);
+        ent.add();
     }
 
     public void playSector(Sector sector){

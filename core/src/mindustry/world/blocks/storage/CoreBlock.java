@@ -28,6 +28,8 @@ public class CoreBlock extends StorageBlock{
 
     public final int timerResupply = timers++;
 
+    public int launchRange = 1;
+
     public int ammoAmount = 5;
     public float resupplyRate = 10f;
     public float resupplyRange = 60f;

@@ -24,6 +24,7 @@ import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -56,6 +57,7 @@ public class HudFragment extends Fragment{
             showToast("Sector[accent] captured[]!");
         });
 
+        //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
         });
@@ -145,7 +147,7 @@ public class HudFragment extends Fragment{
                 cont.row();
             }
 
-            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH
+            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH/MAP/ETC
             /*
             cont.table(t -> {
 
@@ -324,7 +326,7 @@ public class HudFragment extends Fragment{
             p.touchable(Touchable.disabled);
         });
 
-        //DEBUG: rate table
+        //TODO DEBUG: rate table
         parent.fill(t -> {
             t.bottom().left();
             t.table(Styles.black6, c -> {
@@ -355,8 +357,16 @@ public class HudFragment extends Fragment{
                         rebuild.run();
                     }
                 });
-            });
+            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
+        });
 
+        //TODO move, select loadout, consume resources
+        parent.fill(t -> {
+            t.bottom().visible(() -> state.isCampaign() && player.team().core() != null);
+
+            t.button("test launch", Icon.warning, () -> {
+                ui.planet.show(state.getSector(), ((CoreBlock)player.team().core().block).launchRange, player.team().core());
+            }).width(150f);
         });
 
         blockfrag.build(parent);
