@@ -359,35 +359,23 @@ public class UnitTypes implements ContentList{
 
             engineOffset = 12f;
             engineSize = 3f;
-
+            
             for(boolean b : Mathf.booleans){
                 weapons.add(
                 new Weapon("revenant-missiles"){{
                     reload = 70f;
-                    x = 7f * Mathf.sign(b);
-                    rotate = true;
+                    x = 10f * Mathf.sign(b);
                     mirror = false;
                     flipSprite = !b;
-                    shake = 1f;
-
-                    bullet = new MissileBulletType(2.7f, 12, "missile"){{
-                        width = 8f;
-                        height = 8f;
-                        shrinkY = 0f;
-                        drag = -0.003f;
-                        homingRange = 60f;
-                        keepVelocity = false;
-                        splashDamageRadius = 25f;
-                        splashDamage = 10f;
-                        lifetime = 60f;
-                        trailColor = Pal.unitBack;
-                        backColor = Pal.unitBack;
-                        frontColor = Pal.unitFront;
-                        hitEffect = Fx.blastExplosion;
-                        despawnEffect = Fx.blastExplosion;
-                        weaveScale = 6f;
-                        weaveMag = 1f;
-                    }};
+                    shots = 2;
+                    inaccuracy = 2f;
+                    alternate = true;
+                    rotate = true;
+                    ejectEffect = Fx.none;
+                    velocityRnd = 0.2f;
+                    spacing = 1f;
+                    shootSound = Sounds.missile;
+                    bullet = Bullets.missileRevenant;
                 }});
             }
         }};
@@ -403,15 +391,26 @@ public class UnitTypes implements ContentList{
             engineOffset = 38;
             engineSize = 7.3f;
             hitsize = 58f;
-
-            weapons.add(new Weapon(){{
-                y = 1.5f;
-                reload = 28f;
-                alternate = true;
-                ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
-                shootSound = Sounds.shoot;
-            }});
+            
+            for(boolean b : Mathf.booleans){
+                weapons.add(
+                new Weapon("reaper-weapon"){{
+                    y = 3f;
+                    shootY = 5f;
+                    reload = 10f;
+                    x = 32f * Mathf.sign(b);
+                    mirror = false;
+                    flipSprite = !b;
+                    shots = 1;
+                    shake = 1f;
+                    inaccuracy = 3f;
+                    alternate = true;
+                    rotate = true;
+                    ejectEffect = Fx.none;
+                    bullet = Bullets.standardThoriumBig;
+                    shootSound = Sounds.shootBig;
+                }});
+            }
         }};
 
         lich = new UnitType("lich"){{
@@ -422,18 +421,30 @@ public class UnitTypes implements ContentList{
             flying = true;
             lowAltitude = true;
             health = 75000;
-            engineOffset = 38;
+            engineOffset = 21;
             engineSize = 7.3f;
             hitsize = 58f;
-
-            weapons.add(new Weapon(){{
-                y = 1.5f;
-                reload = 28f;
-                alternate = true;
-                ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
-                shootSound = Sounds.shoot;
-            }});
+            
+            for(boolean b : Mathf.booleans){
+                weapons.add(
+                new Weapon("lich-missiles"){{
+                    y = 4f;
+                    reload = 160f;
+                    x = 22f * Mathf.sign(b);
+                    mirror = false;
+                    flipSprite = !b;
+                    shots = 16;
+                    shotDelay = 2;
+                    inaccuracy = 10f;
+                    alternate = true;
+                    rotate = true;
+                    ejectEffect = Fx.none;
+                    velocityRnd = 0.2f;
+                    spacing = 1f;
+                    bullet = Bullets.missileRevenant;
+                    shootSound = Sounds.artillery;
+                }});
+            }
         }};
 
         vanguard = new UnitType("vanguard"){{
