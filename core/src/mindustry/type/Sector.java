@@ -241,6 +241,8 @@ public class Sector{
         /** Has rain. */
         rainy,
         /** Has snow. */
-        snowy
+        snowy,
+        /** Has sandstorms. */
+        desert
     }
 }

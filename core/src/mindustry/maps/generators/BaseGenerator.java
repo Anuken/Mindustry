@@ -32,6 +32,10 @@ public class BaseGenerator{
         this.tiles = tiles;
         this.team = team;
         this.cores = cores;
+
+        //don't generate bases when there are no loaded schematics
+        if(bases.cores.isEmpty()) return;
+
         Mathf.random.setSeed(sector.id);
 
         for(Block block : content.blocks()){

@@ -257,13 +257,10 @@ public class World{
 
         state.rules.weather.clear();
 
-        if(sector.is(SectorAttribute.rainy)){
-            state.rules.weather.add(new WeatherEntry(Weathers.rain));
-        }
+        if(sector.is(SectorAttribute.rainy)) state.rules.weather.add(new WeatherEntry(Weathers.rain));
+        if(sector.is(SectorAttribute.snowy)) state.rules.weather.add(new WeatherEntry(Weathers.snow));
+        if(sector.is(SectorAttribute.desert)) state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
 
-        if(sector.is(SectorAttribute.snowy)){
-            state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        }
     }
 
     public Context filterContext(Map map){
