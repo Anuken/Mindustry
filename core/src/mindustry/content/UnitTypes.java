@@ -395,10 +395,10 @@ public class UnitTypes implements ContentList{
             for(boolean b : Mathf.booleans){
                 weapons.add(
                 new Weapon("reaper-weapon"){{
-                    y = 3f;
-                    shootY = 5f;
+                    y = 0f;
+                    shootY = 8f;
                     reload = 10f;
-                    x = 32f * Mathf.sign(b);
+                    x = 29f * Mathf.sign(b);
                     mirror = false;
                     flipSprite = !b;
                     shots = 1;
