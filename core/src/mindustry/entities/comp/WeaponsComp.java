@@ -103,8 +103,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 //shoot if applicable
                 if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
                     for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
-                        i *= Mathf.sign(weapon.flipped) * (mount.weapon.mirror ? Mathf.sign(mount.side) : 1);
-
+                        i *= (mount.weapon.mirror ? Mathf.sign(mount.side) : 1) * (!weapon.mirror ? -Mathf.sign(weapon.flipped) : -Mathf.sign(weapon.flipped));
+                        
                         //m a t h
                         float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
                         float mountX = this.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
@@ -135,7 +135,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
         sequenceNum = 0;
         if(weapon.shotDelay > 0.01f){
-            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
+            Angles.shotgun(weapon.shots, weapon.spacing * Mathf.sign(side) * Mathf.sign(weapon.sweepIn), rotation, f -> {
                 Time.run(sequenceNum * weapon.shotDelay, () -> {
                     bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
                     weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
