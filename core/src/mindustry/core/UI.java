@@ -64,7 +64,6 @@ public class UI implements ApplicationListener, Loadable{
     public ContentInfoDialog content;
     public PlanetDialog planet;
     public TechTreeDialog tech;
-    //public MinimapDialog minimap;
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
