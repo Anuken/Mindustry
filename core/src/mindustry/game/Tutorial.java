@@ -31,7 +31,7 @@ public class Tutorial{
     public Tutorial(){
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
-                blocksPlaced.getAndIncrement(event.tile.block(), 0, 1);
+                blocksPlaced.increment(event.tile.block(), 1);
             }
         });
 

@@ -24,7 +24,6 @@ import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
-import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -365,9 +364,9 @@ public class HudFragment extends Fragment{
             t.bottom().visible(() -> state.isCampaign() && player.team().core() != null);
 
             t.button("test launch", Icon.warning, () -> {
-                ui.planet.show(state.getSector(), ((CoreBlock)player.team().core().block).launchRange, player.team().core());
+                ui.planet.show(state.getSector(), player.team().core());
             }).width(150f)
-            .disabled(!player.team().core().items.has(player.team().core().block.requirements)); //disable core when missing resources for launch
+            .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)); //disable core when missing resources for launch
         });
 
         blockfrag.build(parent);

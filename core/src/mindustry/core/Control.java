@@ -25,6 +25,7 @@ import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.text.*;
@@ -241,7 +242,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     //TODO move
-    public void handleLaunch(Tilec tile){
+    public void handleLaunch(CoreEntity tile){
         LaunchCorec ent = LaunchCoreEntity.create();
         ent.set(tile);
         ent.block(Blocks.coreShard);
@@ -249,7 +250,7 @@ public class Control implements ApplicationListener, Loadable{
         ent.add();
 
         //remove launch requirements from core
-        player.team().core().items.remove(player.team().core().block.requirements);
+        tile.items.remove(tile.block.requirements);
     }
 
     public void playSector(Sector sector){

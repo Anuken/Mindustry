@@ -36,7 +36,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
             if(t.block.buildVisibility == BuildVisibility.hidden) return;
 
             for(ItemStack stack : t.block.requirements){
-                amounts.inc(stack.item.id, stack.amount);
+                amounts.increment(stack.item.id, stack.amount);
             }
         });
         Seq<ItemStack> stacks = new Seq<>();
