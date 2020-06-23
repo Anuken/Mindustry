@@ -98,7 +98,6 @@ public class PlayerListFragment extends Fragment{
                 }
             };
             table.margin(8);
-            //TODO dead players should have no region
             table.add(new Image(user.icon()).setScaling(Scaling.none)).grow();
 
             button.add(table).size(h);

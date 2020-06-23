@@ -170,6 +170,14 @@ public class Weathers implements ContentList{
             }
 
             @Override
+            public void update(Weatherc state){
+
+                for(Unitc unit : Groups.unit){
+                    unit.impulse(force.x * state.intensity(), force.y * state.intensity());
+                }
+            }
+
+            @Override
             public void drawOver(Weatherc state){
                 rand.setSeed(0);
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
@@ -178,10 +186,6 @@ public class Weathers implements ContentList{
                 int total = (int)(Tmp.r1.area() / invDensity * state.intensity());
                 Draw.tint(color);
                 float baseAlpha = Draw.getColor().a;
-
-                for(Unitc unit : Groups.unit){
-                    unit.impulse(force.x * state.intensity(), force.y * state.intensity());
-                }
 
                 for(int i = 0; i < total; i++){
                     float scl = rand.random(0.5f, 1f);

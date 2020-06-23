@@ -40,23 +40,16 @@ public class DeflectorWall extends Wall{
         }
 
         @Override
-        public void collision(Bulletc bullet){
+        public boolean collision(Bulletc bullet){
             super.collision(bullet);
 
-            //TODO fix and test
             //doesn't reflect powerful bullets
-            if(bullet.damage() > maxDamageDeflect) return;
+            if(bullet.damage() > maxDamageDeflect) return true;
 
-            float penX = Math.abs(getX() - bullet.x()), penY = Math.abs(getY() - bullet.y());
+            //translate bullet back to where it was upon collision
+            bullet.trns(-bullet.vel().x, -bullet.vel().y);
 
-            bullet.hitbox(rect2);
-
-            Vec2 position = Geometry.raycastRect(bullet.x() - bullet.vel().x*Time.delta(), bullet.y() - bullet.vel().y*Time.delta(), bullet.x() + bullet.vel().x*Time.delta(), bullet.y() + bullet.vel().y*Time.delta(),
-            rect.setSize(size * tilesize + rect2.width*2 + rect2.height*2).setCenter(getX(), getY()));
-
-            if(position != null){
-                bullet.set(position.x, position.y);
-            }
+            float penX = Math.abs(x - bullet.x()), penY = Math.abs(y - bullet.y());
 
             if(penX > penY){
                 bullet.vel().x *= -1;
@@ -64,14 +57,13 @@ public class DeflectorWall extends Wall{
                 bullet.vel().y *= -1;
             }
 
-            //bullet.updateVelocity();
             bullet.owner(this);
-            bullet.team(team());
+            bullet.team(team);
             bullet.time(bullet.time() + 1f);
-            //TODO deflect
-            //bullet.deflect();
 
             hit = 1f;
+
+            return false;
         }
     }
 }

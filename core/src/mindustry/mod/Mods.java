@@ -335,7 +335,6 @@ public class Mods implements Loadable{
             for(Fi file : mod.root.list()){
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
-                    //TODO calling child/parent on these files will give you gibberish; create wrapper class.
                     file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) :
                         zipFolder ? f.path().substring(parentName.length() + 1) : f.path(), f));
                 }

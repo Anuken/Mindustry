@@ -114,12 +114,16 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                 if(tile == null) return false;
 
                 if(tile.collide(this) && type.collides(this, tile) && !tile.dead() && (type.collidesTeam || tile.team() != team())){
+                    boolean remove = false;
+
                     if(tile.team() != team()){
-                        tile.collision(this);
+                        remove = tile.collision(this);
                     }
 
-                    type.hitTile(this, tile);
-                    remove();
+                    if(remove){
+                        type.hitTile(this, tile);
+                        remove();
+                    }
                     return true;
                 }
 

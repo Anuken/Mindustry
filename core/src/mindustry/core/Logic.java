@@ -33,13 +33,6 @@ public class Logic implements ApplicationListener{
 
     public Logic(){
 
-        Events.on(WaveEvent.class, event -> {
-            if(state.isCampaign()){
-                //TODO implement
-                //state.getSector().updateWave(state.wave);
-            }
-        });
-
         Events.on(BlockDestroyEvent.class, event -> {
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;

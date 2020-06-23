@@ -1046,8 +1046,12 @@ abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTree
         return true;
     }
 
-    public void collision(Bulletc other){
+    /** Handle a bullet collision.
+     * @return whether the bullet should be removed. */
+    public boolean collision(Bulletc other){
         damage(other.damage() * other.type().tileDamageMultiplier);
+
+        return true;
     }
 
     public void removeFromProximity(){

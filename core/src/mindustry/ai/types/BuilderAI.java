@@ -60,8 +60,6 @@ public class BuilderAI extends AIController{
                     blocks.removeFirst();
                     blocks.addLast(block);
                 }
-            }else{
-                //TODO implement AI base building
             }
         }
     }
