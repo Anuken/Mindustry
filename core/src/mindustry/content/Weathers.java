@@ -159,7 +159,7 @@ public class Weathers implements ContentList{
         sandstorm = new Weather("sandstorm"){
             TextureRegion region;
             float yspeed = 0.3f, xspeed = 6f, padding = 110f, size = 110f, invDensity = 800f;
-            Vec2 force = new Vec2(0.4f, 0.01f);
+            Vec2 force = new Vec2(0.45f, 0.01f);
             Color color = Color.valueOf("f7cba4");
 
             @Override

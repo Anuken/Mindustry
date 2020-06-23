@@ -44,6 +44,7 @@ public class BaseGenerator{
             }
         }
 
+        //TODO limit base size
         float costBudget = 1000;
 
         Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1);

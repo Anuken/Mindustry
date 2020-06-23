@@ -247,6 +247,9 @@ public class Control implements ApplicationListener, Loadable{
         ent.block(Blocks.coreShard);
         ent.lifetime(Vars.launchDuration);
         ent.add();
+
+        //remove launch requirements from core
+        player.team().core().items.remove(player.team().core().block.requirements);
     }
 
     public void playSector(Sector sector){
