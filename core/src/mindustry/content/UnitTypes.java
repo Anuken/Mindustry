@@ -356,6 +356,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             hitsize = 18f;
             lowAltitude = true;
+            faceTarget = false;
 
             engineOffset = 12f;
             engineSize = 3f;
@@ -383,6 +384,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 2.5f;
             flying = true;
             lowAltitude = true;
+            faceTarget = false;
             health = 75000;
             engineOffset = 38;
             engineSize = 7.3f;
@@ -412,6 +414,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 2.5f;
             flying = true;
             lowAltitude = true;
+            faceTarget = false;
             health = 75000;
             engineOffset = 21;
             engineSize = 7.3f;
