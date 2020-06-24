@@ -245,8 +245,8 @@ public class TypeIO{
         if(type == 0){ //is player
             int id = read.i();
             Playerc player = Groups.player.getByID(id);
-            //local players will cause problems if assigned, since they may not know they are controlling the unit
-            if(player == null || player.isLocal()) return prev;
+            //make sure player exists
+            if(player == null) return prev;
             return player;
         }else if(type == 1){
             int id = read.i();

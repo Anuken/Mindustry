@@ -113,6 +113,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             //(this is not for balance)
             deathTimer += Time.delta();
             if(deathTimer >= deathDelay){
+                //request spawn - this happens serverside only
                 core.requestSpawn((Playerc)this);
                 deathTimer = 0;
             }

@@ -208,11 +208,8 @@ public class Block extends UnlockableContent{
     public float percentSolid(int x, int y){
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
-        float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            sum += !other.floor().isLiquid ? 1f : 0f;
-        }
-        return sum / size / size;
+        return tile.getLinkedTilesAs(this, tempTiles)
+            .sumf(other -> !other.floor().isLiquid ? 1f : 0f) / size / size;
     }
 
     /** Drawn when you are placing a block. */
@@ -253,11 +250,8 @@ public class Block extends UnlockableContent{
     public float sumAttribute(Attribute attr, int x, int y){
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
-        float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            sum += other.floor().attributes.get(attr);
-        }
-        return sum;
+        return tile.getLinkedTilesAs(this, tempTiles)
+            .sumf(other -> other.floor().attributes.get(attr));
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
@@ -666,7 +660,7 @@ public class Block extends UnlockableContent{
                         outer:
                         for(int rx = -radius; rx <= radius; rx++){
                             for(int ry = -radius; ry <= radius; ry++){
-                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.dst2(rx, ry) <= radius*radius && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
+                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.within(rx, ry, radius) && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
                                     found = true;
                                     break outer;
                                 }

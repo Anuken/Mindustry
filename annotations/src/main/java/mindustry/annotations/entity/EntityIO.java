@@ -142,7 +142,13 @@ public class EntityIO{
 
                 io(field.type, "this." + (sf ? field.name + targetSuf : field.name) + " = ");
 
-                if(sl) econt();
+                if(sl){
+                    ncont("else" );
+
+                    st("read.f()");
+
+                    econt();
+                }
             }
 
             st("afterSync()");

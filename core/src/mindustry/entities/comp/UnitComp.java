@@ -23,7 +23,7 @@ import static mindustry.Vars.*;
 @Component
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable{
 
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize;
 
     private UnitController controller;
     private UnitType type;
@@ -85,16 +85,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void type(UnitType type){
-        this.type = type;
-        this.maxHealth = type.health;
-        this.drag = type.drag;
-        this.elevation = type.flying ? 1f : type.baseElevation;
-        this.armor = type.armor;
+        if(this.type == type) return;
 
-        heal();
-        hitSize(type.hitsize);
-        controller(type.createController());
-        setupWeapons(type);
+        setStats(type);
     }
 
     @Override
@@ -118,10 +111,28 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof AIController;
     }
 
+    private void setStats(UnitType type){
+        this.type = type;
+        this.maxHealth = type.health;
+        this.drag = type.drag;
+        this.elevation = type.flying ? 1f : type.baseElevation;
+        this.armor = type.armor;
+        this.hitSize = type.hitsize;
+
+        if(controller == null) controller(type.createController());
+        if(mounts().length != type.weapons.size) setupWeapons(type);
+    }
+
+    @Override
+    public void afterSync(){
+        //set up type info after reading
+        setStats(this.type);
+    }
+
     @Override
     public void afterRead(){
         //set up type info after reading
-        type(this.type);
+        setStats(this.type);
     }
 
     @Override

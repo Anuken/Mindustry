@@ -89,6 +89,7 @@ public class UnitType extends UnlockableContent{
         unit.team(team);
         unit.type(this);
         unit.ammo(ammoCapacity); //fill up on ammo upon creation
+        unit.heal();
         return unit;
     }
 
