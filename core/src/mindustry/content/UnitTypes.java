@@ -364,7 +364,6 @@ public class UnitTypes implements ContentList{
             new Weapon("revenant-missiles"){{
                 reload = 70f;
                 x = 10f;
-                flipSprite = !b;
                 shots = 2;
                 inaccuracy = 2f;
                 alternate = true;
@@ -395,7 +394,6 @@ public class UnitTypes implements ContentList{
                 shootY = 8f;
                 reload = 10f;
                 x = 29f;
-                flipSprite = !b;
                 shots = 1;
                 shake = 1f;
                 inaccuracy = 3f;
@@ -424,7 +422,6 @@ public class UnitTypes implements ContentList{
                 y = 4f;
                 reload = 160f;
                 x = 22f;
-                flipSprite = !b;
                 shots = 16;
                 shotDelay = 2;
                 inaccuracy = 10f;
