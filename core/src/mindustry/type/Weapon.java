@@ -55,7 +55,7 @@ public class Weapon{
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
     /** sound used when trying to shoot with no ammo */
-    public Sound noAmmoSound = Sounds.door;
+    public Sound noAmmoSound = Sounds.click;
     /** displayed region (autoloaded) */
     public TextureRegion region;
 
