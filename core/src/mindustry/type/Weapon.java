@@ -28,6 +28,8 @@ public class Weapon{
     public float rotateSpeed = 20f;
     /** weapon reload in frames */
     public float reload;
+    /** offset first shot. */
+    public float reloadOffset = 0f;
     /** amount of shots per fire */
     public int shots = 1;
     /** spacing in degrees between multiple shots, if applicable */
