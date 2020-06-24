@@ -19,8 +19,6 @@ public class WeaponMount{
     public boolean shoot = false;
     /** whether to rotate to face the target right now */
     public boolean rotate = false;
-    /** is this the first shot? */
-    public boolean isFirstShot = true;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

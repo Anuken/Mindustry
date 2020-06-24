@@ -82,18 +82,11 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     public void update(){
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
-            if(mount.isFirstShot && mount.reload <= weapon.reloadOffset){
-              mount.reload = weapon.reload + weapon.reloadOffset;
-            }
-            if(!mount.isFirstShot){
-              mount.reload = Math.max(mount.reload - Time.delta(), 0);
-            }
-            
-            if(isShooting){
-              mount.isFirstShot = false;
-            }
             if(!isShooting){
-              mount.isFirstShot = true;
+              mount.reload = weapon.reloadOffset;
+            }
+            if(isShooting){
+              mount.reload = Math.max(mount.reload - Time.delta(), 0);
             }
             
             //rotate if applicable
