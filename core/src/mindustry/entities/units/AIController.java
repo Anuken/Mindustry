@@ -49,6 +49,8 @@ public class AIController implements UnitController{
 
     @Override
     public void unit(Unitc unit){
+        if(this.unit == unit) return;
+
         this.unit = unit;
         init();
     }

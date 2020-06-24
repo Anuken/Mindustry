@@ -127,12 +127,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void afterSync(){
         //set up type info after reading
         setStats(this.type);
+        controller.unit(this);
     }
 
     @Override
     public void afterRead(){
-        //set up type info after reading
-        setStats(this.type);
+        afterSync();
     }
 
     @Override

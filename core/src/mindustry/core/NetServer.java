@@ -633,7 +633,10 @@ public class NetServer implements ApplicationListener{
             }
 
             //reset player to previous synced position so it gets interpolated
-            unit.set(prevx, prevy);
+            //the server does not interpolate
+            if(!headless){
+                unit.set(prevx, prevy);
+            }
 
             //write sync data to the buffer
             fbuffer.limit(20);
