@@ -12,8 +12,8 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
 
     @Override
     public void update(){
-        float len = vel().len();
-        baseRotation = Angles.moveToward(baseRotation, vel().angle(), type().baseRotateSpeed * Mathf.clamp(len / type().speed));
+        float len = deltaLen();
+        baseRotation = Angles.moveToward(baseRotation, deltaAngle(), type().baseRotateSpeed * Mathf.clamp(len / type().speed));
         walkTime += Time.delta()*len;
     }
 }

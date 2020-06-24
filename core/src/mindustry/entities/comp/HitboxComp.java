@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.func.*;
+import arc.math.*;
 import arc.math.geom.QuadTree.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
@@ -46,6 +47,14 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
 
     float deltaY(){
         return y - lastY;
+    }
+
+    float deltaLen(){
+        return Mathf.len(deltaX(), deltaY());
+    }
+
+    float deltaAngle(){
+        return Mathf.angle(deltaX(), deltaY());
     }
 
     boolean collides(Hitboxc other){

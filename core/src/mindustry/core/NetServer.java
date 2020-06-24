@@ -600,6 +600,8 @@ public class NetServer implements ApplicationListener{
 
         if(!player.dead()){
             Unitc unit = player.unit();
+
+            unit.vel().set(xVelocity, yVelocity).limit(unit.type().speed);
             long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
             float maxSpeed = player.dead() ? Float.MAX_VALUE : player.unit().type().speed;
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
@@ -652,10 +654,6 @@ public class NetServer implements ApplicationListener{
 
             //read sync data so it can be used for interpolation for the server
             unit.readSyncManual(fbuffer);
-
-            //TODO clients shouldn't care about velocities, so should it always just get set to 0? why even save it?
-            //[[ignore sent velocity values, set it to the delta movement vector instead]]
-            //unit.vel().set(vector);
         }else{
             player.x(x);
             player.y(y);
