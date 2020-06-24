@@ -375,6 +375,7 @@ public class UnitTypes implements ContentList{
                     ejectEffect = Fx.none;
                     velocityRnd = 0.2f;
                     spacing = 1f;
+                    shootCone = 180;
                     shootSound = Sounds.missile;
                     bullet = Bullets.missileRevenant;
                 }});
@@ -398,8 +399,8 @@ public class UnitTypes implements ContentList{
                 new Weapon("reaper-weapon"){{
                     y = 0f;
                     shootY = 8f;
-                    reload = 10f;
-                    reloadOffset = !b ? 5f : 0f;
+                    reload = 16f;
+                    reloadOffset = !b ? 8f : 0f;
                     x = 29f * Mathf.sign(b);
                     mirror = false;
                     flipSprite = !b;
@@ -408,6 +409,7 @@ public class UnitTypes implements ContentList{
                     inaccuracy = 3f;
                     alternate = true;
                     rotate = true;
+                    shootCone = 180;
                     ejectEffect = Fx.none;
                     bullet = Bullets.standardThoriumBig;
                     shootSound = Sounds.shootBig;
@@ -444,6 +446,7 @@ public class UnitTypes implements ContentList{
                     ejectEffect = Fx.none;
                     velocityRnd = 0.2f;
                     spacing = 1f;
+                    shootCone = 180;
                     bullet = Bullets.missileRevenant;
                     shootSound = Sounds.artillery;
                 }});
