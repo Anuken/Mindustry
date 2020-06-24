@@ -29,8 +29,8 @@ abstract class BlockUnitComp implements Unitc{
         }
     }
 
-    @Replace
-    public void kill(){
+    @Override
+    public void killed(){
         tile.kill();
     }
 

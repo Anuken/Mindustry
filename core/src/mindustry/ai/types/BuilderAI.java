@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 public class BuilderAI extends AIController{
 
     @Override
-    public void update(){
+    public void updateUnit(){
         Builderc builder = (Builderc)unit;
 
         if(builder.moving()){

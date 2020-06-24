@@ -104,7 +104,42 @@ public class TypeIO{
         return Payload.read(read);
     }
 
-    //only for players!
+    public static void writeMounts(Writes writes, WeaponMount[] mounts){
+        writes.b(mounts.length);
+        for(WeaponMount m : mounts){
+            writes.b((m.shoot ? 1 : 0) | (m.rotate ? 2 : 0));
+            writes.f(m.aimX);
+            writes.f(m.aimY);
+        }
+    }
+
+    public static WeaponMount[] readMounts(Reads read, WeaponMount[] mounts){
+        byte len = read.b();
+        for(int i = 0; i < len; i++){
+            byte state = read.b();
+            float ax = read.f(), ay = read.f();
+
+            if(i <= mounts.length - 1){
+                WeaponMount m = mounts[i];
+                m.aimX = ax;
+                m.aimY = ay;
+                m.shoot = (state & 1) != 0;
+                m.rotate = (state & 2) != 0;
+            }
+        }
+
+        return mounts;
+    }
+
+    //this is irrelevant.
+    static final WeaponMount[] noMounts = {};
+    
+    public static WeaponMount[] readMounts(Reads read){
+        read.skip(read.b() * (1 + 4 + 4));
+
+        return noMounts;
+    }
+
     public static void writeUnit(Writes write, Unitc unit){
         write.b(unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
         //block units are special
@@ -255,7 +290,7 @@ public class TypeIO{
             //there are two cases here:
             //1: prev controller was not a player, carry on
             //2: prev controller was a player, so replace this controller with *anything else*
-            //...since AI doesn't update clientside it doesn't matter what
+            //...since AI doesn't update clientside it doesn't matter
             return (!(prev instanceof AIController) || (prev instanceof FormationAI)) ? new GroundAI() : prev;
         }
     }

@@ -22,7 +22,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     static int sequenceNum = 0;
 
     /** weapon mount array, never null */
-    @ReadOnly transient WeaponMount[] mounts = {};
+    @ReadOnly @SyncLocal WeaponMount[] mounts = {};
     @ReadOnly transient float range, aimX, aimY;
     @ReadOnly transient boolean isRotate;
     boolean isShooting;

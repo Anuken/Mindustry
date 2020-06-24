@@ -27,7 +27,7 @@ public class Annotations{
         boolean clamped() default false;
     }
 
-    /** Indicates that a field will not be read from the server when syncing. */
+    /** Indicates that a field will not be read from the server when syncing the local player state. */
     @Target({ElementType.FIELD})
     @Retention(RetentionPolicy.SOURCE)
     public @interface SyncLocal{

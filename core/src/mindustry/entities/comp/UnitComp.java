@@ -23,7 +23,8 @@ import static mindustry.Vars.*;
 @Component
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable{
 
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
+    @Import boolean dead;
 
     private UnitController controller;
     private UnitType type;
@@ -191,7 +192,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
         }
 
-        controller.update();
+        //AI only updates on the server
+        if(!net.client()){
+            controller.updateUnit();
+        }
 
         //remove units spawned by the core
         if(spawnedByCore && !isPlayer()){
@@ -227,6 +231,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void killed(){
+        health = 0;
+        dead = true;
+
         float explosiveness = 2f + item().explosiveness * stack().amount;
         float flammability = item().flammability * stack().amount;
         Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
@@ -241,6 +248,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(explosiveness > 7f && isLocal()){
             Events.fire(Trigger.suicideBomb);
         }
+
+        remove();
+    }
+
+    @Override
+    @Replace
+    public void kill(){
+        if(dead || net.client()) return;
+
+        //deaths are synced; this calls killed()
+        Call.onUnitDeath(this);
     }
 
     @Override

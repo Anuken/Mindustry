@@ -10,7 +10,7 @@ public interface UnitController{
 
     }
 
-    default void update(){
+    default void updateUnit(){
 
     }
 

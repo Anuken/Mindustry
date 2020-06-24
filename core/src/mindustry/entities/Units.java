@@ -2,6 +2,7 @@ package mindustry.entities;
 
 import arc.func.*;
 import arc.math.geom.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -14,6 +15,11 @@ public class Units{
     private static Unitc result;
     private static float cdist;
     private static boolean boolResult;
+
+    @Remote(called = Loc.server)
+    public static void onUnitDeath(Unitc unit){
+        unit.killed();
+    }
 
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team){

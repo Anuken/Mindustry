@@ -24,7 +24,7 @@ public class FormationAI extends AIController implements FormationMember{
     }
 
     @Override
-    public void update(){
+    public void updateUnit(){
         if(leader.dead()){
             unit.resetController();
             return;

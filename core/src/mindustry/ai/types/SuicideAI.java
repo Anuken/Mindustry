@@ -10,7 +10,7 @@ public class SuicideAI extends GroundAI{
     static boolean blockedByBlock;
 
     @Override
-    public void update(){
+    public void updateUnit(){
 
         if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
             target = null;

@@ -145,7 +145,7 @@ public class EntityIO{
                 if(sl){
                     ncont("else" );
 
-                    st("read.f()");
+                    io(field.type, "");
 
                     econt();
                 }
