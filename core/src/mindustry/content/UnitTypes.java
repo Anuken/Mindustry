@@ -364,7 +364,6 @@ public class UnitTypes implements ContentList{
                 weapons.add(
                 new Weapon("revenant-missiles"){{
                     reload = 70f;
-                    reloadOffset = !b ? 35f : 0f;
                     x = 10f * Mathf.sign(b);
                     mirror = false;
                     flipSprite = !b;
@@ -399,7 +398,6 @@ public class UnitTypes implements ContentList{
                     y = 0f;
                     shootY = 8f;
                     reload = 10f;
-                    reloadOffset = !b ? 5f : 0f;
                     x = 29f * Mathf.sign(b);
                     mirror = false;
                     flipSprite = !b;
@@ -432,7 +430,6 @@ public class UnitTypes implements ContentList{
                 new Weapon("lich-missiles"){{
                     y = 4f;
                     reload = 160f;
-                    reloadOffset = !b ? 80f : 0f;
                     x = 22f * Mathf.sign(b);
                     mirror = false;
                     flipSprite = !b;
