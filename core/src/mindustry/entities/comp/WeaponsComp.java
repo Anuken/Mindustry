@@ -45,9 +45,6 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             mounts[i] = new WeaponMount(def.weapons.get(i));
             range = Math.max(range, def.weapons.get(i).bullet.range());
         }
-        for(WeaponMount mount : mounts){
-            mount.reload = mount.weapon.reload + mount.weapon.reloadOffset;
-        }
     }
 
     void controlWeapons(boolean rotate, boolean shoot){
@@ -85,7 +82,11 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     public void update(){
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
-            if(isShooting && (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
+            if(mount.isFirstShot){
+              mount.reload = weapon.reload + weapon.reloadOffset;
+              mount.isFirstShot = false;
+            }
+            if(isShooting){
               mount.reload = Math.max(mount.reload - Time.delta(), 0);
             }
             
