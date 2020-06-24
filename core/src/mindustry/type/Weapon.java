@@ -54,6 +54,8 @@ public class Weapon{
     public boolean ignoreRotation = false;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
+    /** sound used when trying to shoot with no ammo */
+    public Sound noAmmoSound = Sounds.door;
     /** displayed region (autoloaded) */
     public TextureRegion region;
 
