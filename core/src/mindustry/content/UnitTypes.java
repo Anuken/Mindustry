@@ -166,6 +166,7 @@ public class UnitTypes implements ContentList{
                 alternate = true;
                 recoil = 4f;
                 shootSound = Sounds.laser;
+                noAmmoSound = Sounds.windowHide;
 
                 bullet = new LaserBulletType(){{
                     damage = 20f;
@@ -256,6 +257,7 @@ public class UnitTypes implements ContentList{
                 recoil = 1f;
                 x = 7f;
                 shootSound = Sounds.flame;
+                noAmmoSound = Sounds.splash;
 
                 bullet = new LiquidBulletType(Liquids.slag){{
                     damage = 11;
@@ -404,6 +406,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 bullet = Bullets.standardThoriumBig;
                 shootSound = Sounds.shootBig;
+                noAmmoSound = Sounds.door;
             }});
         }};
 
@@ -435,6 +438,7 @@ public class UnitTypes implements ContentList{
                 shootCone = 180f;
                 bullet = Bullets.missileRevenant;
                 shootSound = Sounds.artillery;
+                noAmmoSound = Sounds.door;
             }});
         }};
 
@@ -595,6 +599,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.flakSurge;
                 shootSound = Sounds.shootBig;
+                noAmmoSound = Sounds.door;
             }}
             );
         }};
@@ -618,6 +623,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.standardThoriumBig;
                 shootSound = Sounds.shootBig;
+                noAmmoSound = Sounds.door;
             }}
             );
         }};
