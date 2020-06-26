@@ -69,12 +69,6 @@ public class Schematics implements Loadable{
             }
         });
 
-        Events.on(ContentReloadEvent.class, event -> {
-            previews.each((schem, m) -> m.dispose());
-            previews.clear();
-            load();
-        });
-
         Events.on(ClientLoadEvent.class, event -> {
             Pixmap pixmap = Core.atlas.getPixmap("error").crop();
             errorTexture = new Texture(pixmap);
