@@ -12,7 +12,6 @@ uniform vec2 u_invsize;
 uniform float u_time;
 uniform float u_dp;
 uniform vec2 u_offset;
-uniform vec4 u_shieldcolor;
 
 varying vec2 v_texCoords;
 
