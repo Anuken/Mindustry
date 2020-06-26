@@ -158,19 +158,12 @@ public class ForceProjector extends Block{
 
                 Draw.z(Layer.shields);
 
-                Draw.color(Pal.accent);
+                Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(x, y, 6, radius);
 
                     Draw.z(Layer.shields + 0.01f);
-
-                    if(hit > 0){
-                        Draw.color(Color.white);
-                        Draw.alpha(1f);
-                        Fill.poly(x, y, 6, radius);
-                        Draw.color();
-                    }
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));

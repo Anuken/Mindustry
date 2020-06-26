@@ -192,8 +192,8 @@ public class Shaders{
             setUniformf("u_offset",
             Core.camera.position.x - Core.camera.width / 2,
             Core.camera.position.y - Core.camera.height / 2);
-            setUniformf("u_texsize", Core.camera.width,
-            Core.camera.height);
+            setUniformf("u_texsize", Core.camera.width, Core.camera.height);
+            setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
         }
     }
 

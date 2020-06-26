@@ -349,11 +349,11 @@ public class Control implements ApplicationListener, Loadable{
             //state.rules.zone = zone;
             for(Building core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.items().add(stack.item, stack.amount);
+                    core.items.add(stack.item, stack.amount);
                 }
             }
             Building core = state.teams.playerCores().first();
-            core.items().clear();
+            core.items.clear();
 
             logic.play();
             state.rules.waveTimer = false;

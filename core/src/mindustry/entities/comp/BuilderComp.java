@@ -82,9 +82,9 @@ abstract class BuilderComp implements Unitc{
 
         if(!(tile.block() instanceof BuildBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
-                boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item));
+                boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
-                if(hasAll || infinite){
+                if(hasAll){
                     Build.beginPlace(current.block, team(), current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
@@ -151,7 +151,7 @@ abstract class BuilderComp implements Unitc{
         //requests that you have at least *started* are considered
         if(state.rules.infiniteResources || team().rules().infiniteResources || request.breaking || core == null) return false;
         //TODO these are bad criteria
-        return (request.stuck && !core.items().has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items().has(i.item)) && !request.initialized);
+        return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item)) && !request.initialized);
     }
 
     void removeBuild(int x, int y, boolean breaking){
