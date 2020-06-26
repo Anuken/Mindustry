@@ -45,7 +45,6 @@ public class Mods implements Loadable{
 
     public Mods(){
         Events.on(ClientLoadEvent.class, e -> Core.app.post(this::checkWarnings));
-        Events.on(ContentReloadEvent.class, e -> Core.app.post(this::checkWarnings));
     }
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
@@ -421,42 +420,6 @@ public class Mods implements Loadable{
 
     public boolean hasContentErrors(){
         return mods.contains(LoadedMod::hasContentErrors) || (scripts != null && scripts.hasErrored());
-    }
-
-    /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
-    public void reloadContent(){
-        //epic memory leak
-        //TODO make it less epic
-        Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
-        createdAtlas = true;
-
-        mods.each(LoadedMod::dispose);
-        mods.clear();
-        Core.bundle =  I18NBundle.createBundle(Core.files.internal("bundles/bundle"), Core.bundle.getLocale());
-        load();
-        Sounds.dispose();
-        Sounds.load();
-        Core.assets.finishLoading();
-        if(scripts != null){
-            scripts.dispose();
-            scripts = null;
-        }
-        content.clear();
-        content.createBaseContent();
-        content.loadColors();
-        loadScripts();
-        content.createModContent();
-        loadAsync();
-        loadSync();
-        content.init();
-        content.load();
-        content.loadColors();
-        Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest));
-        requiresReload = false;
-
-        loadIcons();
-
-        Events.fire(new ContentReloadEvent());
     }
 
     /** This must be run on the main thread! */

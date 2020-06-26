@@ -42,7 +42,6 @@ public class EventType{
     public static class SaveLoadEvent{}
     public static class ClientCreateEvent{}
     public static class ServerLoadEvent{}
-    public static class ContentReloadEvent{}
     public static class DisposeEvent{}
     public static class PlayEvent{}
     public static class ResetEvent{}

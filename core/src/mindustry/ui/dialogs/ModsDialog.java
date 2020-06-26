@@ -110,7 +110,6 @@ public class ModsDialog extends BaseDialog{
                                             file.delete();
                                             Core.app.post(() -> {
                                                 try{
-                                                    mods.reloadContent();
                                                     setup();
                                                     ui.loadfrag.hide();
                                                 }catch(Throwable e){
@@ -131,8 +130,6 @@ public class ModsDialog extends BaseDialog{
 
                 dialog.show();
             }).margin(margin);
-
-            buttons.button("$mods.reload", Icon.refresh, style, this::reload).margin(margin);
 
             if(!mobile){
                 buttons.button("$mods.openfolder", Icon.link, style, () -> Core.app.openFolder(modDirectory.absolutePath())).margin(margin);
@@ -234,15 +231,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void reload(){
-        ui.loadAnd("$reloading", () -> {
-            mods.eachEnabled(mod -> {
-                if(mod.hasUnmetDependencies()){
-                    ui.showErrorMessage(Core.bundle.format("mod.nowdisabled", mod.name, mod.missingDependencies.toString(", ")));
-                }
-            });
-            mods.reloadContent();
-            setup();
-        });
+        ui.showInfo("$mods.reloadexit", () -> Core.app.exit());
     }
 
     private void showMod(LoadedMod mod){

@@ -333,10 +333,17 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showInfo(String info){
+        showInfo(info, () -> {});
+    }
+
+    public void showInfo(String info, Runnable listener){
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.button("$ok", this::hide).size(110, 50).pad(4);
+            buttons.button("$ok", () -> {
+                hide();
+                listener.run();
+            }).size(110, 50).pad(4);
         }}.show();
     }
 
