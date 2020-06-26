@@ -110,7 +110,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Fx.dropItem.at(player.x(), player.y(), angle, Color.white, player.unit().item());
+        Fx.dropItem.at(player.x, player.y, angle, Color.white, player.unit().item());
         player.unit().clearItem();
     }
 
@@ -149,7 +149,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         createItemTransfer(
             item,
             amount,
-            player.x() + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation + 180f, backTrns),
+            player.x + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y + Angles.trnsy(player.unit().rotation + 180f, backTrns),
             new Vec2(tile.x() + stackTrns.x, tile.y() + stackTrns.y),
             () -> tile.handleStack(item, accepted, player.unit())
         );
@@ -187,7 +187,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.unit(unit);
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
-                Fx.unitSpirit.at(player.x(), player.y(), 0f, unit);
+                Fx.unitSpirit.at(player.x, player.y, 0f, unit);
             }
         }
     }
@@ -212,13 +212,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             commander.clearCommand();
         }else{
             FormationPattern pattern = new SquareFormation();
-            Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation), pattern);
+            Formation formation = new Formation(new Vec3(player.x, player.y, player.unit().rotation), pattern);
             formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
 
             units.clear();
 
             Fx.commandSend.at(player);
-            Units.nearby(player.team(), player.x(), player.y(), 200f, u -> {
+            Units.nearby(player.team(), player.x, player.y, 200f, u -> {
                 if(u.isAI()){
                     units.add(u);
                 }
@@ -260,7 +260,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead()){
-            Unit unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType);
 
             if(unit != null){
                 Call.onUnitControl(player, unit);
@@ -270,9 +270,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void checkUnit(){
         if(controlledType != null){
-            Unit unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType);
             if(unit == null && controlledType == UnitTypes.block){
-                unit = world.entWorld(player.x(), player.y()) instanceof ControlBlock ? ((ControlBlock)world.entWorld(player.x(), player.y())).unit() : null;
+                unit = world.entWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.entWorld(player.x, player.y)).unit() : null;
             }
 
             if(unit != null){

@@ -73,7 +73,7 @@ public class NetClient implements ApplicationListener{
             });
 
             ConnectPacket c = new ConnectPacket();
-            c.name = player.name();
+            c.name = player.name;
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
@@ -192,18 +192,18 @@ public class NetClient implements ApplicationListener{
 
             //special case; graphical server needs to see its message
             if(!headless){
-                sendMessage(message, colorizeName(player.id(), player.name()), player);
+                sendMessage(message, colorizeName(player.id(), player.name), player);
             }
 
             //server console logging
-            Log.info("&y@: &lb@", player.name(), message);
+            Log.info("&y@: &lb@", player.name, message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
+            Call.sendMessage(message, colorizeName(player.id(), player.name), player);
         }else{
             //log command to console but with brackets
-            Log.info("<&y@: &lm@&lg>", player.name(), message);
+            Log.info("<&y@: &lm@&lg>", player.name, message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
@@ -239,7 +239,7 @@ public class NetClient implements ApplicationListener{
     
     @Remote(targets = Loc.client)
     public static void onPing(Player player, long time){
-        Call.onPingResponse(player.con(), time);
+        Call.onPingResponse(player.con, time);
     }
 
     @Remote(variants = Variant.one)

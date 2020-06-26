@@ -250,7 +250,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     void sendMessage(String text, Player from){
-        sendMessage(text, from, NetClient.colorizeName(from.id(), from.name()));
+        sendMessage(text, from, NetClient.colorizeName(from.id(), from.name));
     }
 
      void sendMessage(String text, Player from, String fromName){

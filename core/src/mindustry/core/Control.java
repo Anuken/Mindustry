@@ -73,7 +73,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            if(Mathf.zero(player.x()) && Mathf.zero(player.y())){
+            if(Mathf.zero(player.x) && Mathf.zero(player.y)){
                 Building core = state.teams.closestCore(0, 0, player.team());
                 if(core != null){
                     player.set(core);

@@ -609,8 +609,8 @@ public class ServerControl implements ApplicationListener{
 
             for(Player player : Groups.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
-                    Call.sendMessage("[scarlet] " + player.name() + " has been banned.");
-                    player.con().kick(KickReason.banned);
+                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
+                    player.con.kick(KickReason.banned);
                 }
             }
         });
@@ -893,7 +893,7 @@ public class ServerControl implements ApplicationListener{
             logic.play();
 
             for(Player p : players){
-                if(p.con() == null) continue;
+                if(p.con == null) continue;
 
                 p.reset();
                 if(state.rules.pvp){

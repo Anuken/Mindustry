@@ -43,7 +43,7 @@ public class Administration{
         //anti-spam
         addChatFilter((player, message) -> {
             long resetTime = Config.messageRateLimit.num() * 1000;
-            if(Config.antiSpam.bool() && !player.isLocal() && !player.admin()){
+            if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
                 //prevent people from spamming messages quickly
                 if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
                     //supress message
@@ -51,7 +51,7 @@ public class Administration{
                     player.getInfo().messageInfractions ++;
                     //kick player for spamming and prevent connection if they've done this several times
                     if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
-                        player.con().kick("You have been kicked for spamming.", 1000 * 60 * 2);
+                        player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
                     }
                     return null;
                 }else{

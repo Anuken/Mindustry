@@ -39,9 +39,9 @@ public class OverlayRenderer{
             for(Player player : Groups.player){
                 if(Vars.player != player && Vars.player.team() == player.team()){
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
-                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x(), player.y())){
+                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
 
-                        Tmp.v1.set(player.x(), player.y()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+                        Tmp.v1.set(player.x, player.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
                         Lines.stroke(2f, player.team().color);
                         Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
@@ -118,7 +118,7 @@ public class OverlayRenderer{
         Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time(), 8f, 1f));
 
         for(Tile tile : spawner.getSpawns()){
-            if(tile.within(player.x(), player.y(), state.rules.dropZoneRadius + spawnerMargin)){
+            if(tile.within(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
                 Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
                 Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
             }
