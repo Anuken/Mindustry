@@ -27,7 +27,7 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import static mindustry.Vars.*;
 
 @EntityDef(value = {Playerc.class}, serialize = false)
-@Component
+@Component(base = true)
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
     static final float deathDelay = 30f;
 

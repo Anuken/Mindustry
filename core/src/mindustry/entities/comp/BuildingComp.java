@@ -35,9 +35,9 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-@EntityDef(value = {Tilec.class}, isFinal = false, genio = false, serialize = false)
-@Component
-abstract class TileComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTreeObject, Displayable{
+@EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
+@Component(base = true)
+abstract class BuildingComp implements Posc, Teamc, Healthc, Tilec, Timerc, QuadTreeObject, Displayable{
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Tilec> tmpTiles = new ObjectSet<>();

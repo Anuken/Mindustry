@@ -20,7 +20,7 @@ import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
-@Component
+@Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable{
 
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
