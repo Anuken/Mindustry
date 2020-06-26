@@ -11,7 +11,6 @@ uniform vec2 u_texsize;
 uniform float u_time;
 uniform float u_dp;
 uniform vec2 u_offset;
-uniform vec4 u_shieldcolor;
 
 varying vec2 v_texCoords;
 
@@ -28,8 +27,23 @@ void main(){
 	if(texture2D(u_texture, T).a < 0.9 &&
        		(texture2D(u_texture, T + vec2(0, step) * v).a > 0.0 || texture2D(u_texture, T + vec2(0, -step) * v).a > 0.0 ||
        		texture2D(u_texture, T + vec2(step, 0) * v).a > 0.0 || texture2D(u_texture, T + vec2(-step, 0) * v).a > 0.0)){
+                
+		vec4 bordercolor = vec4(0.0, 0.0, 0.0, 0.0);
 
-		gl_FragColor = mix(u_shieldcolor, vec4(1.0), si);
+		if(texture2D(u_texture, T + vec2(0, step) * v).a > 0.9){
+		    bordercolor = texture2D(u_texture, T + vec2(0, step) * v); bordercolor.a = 1.0;
+		}
+		if(texture2D(u_texture, T + vec2(0, -step) * v).a > 0.9){
+			bordercolor = texture2D(u_texture, T + vec2(0, -step) * v); bordercolor.a = 1.0;
+		}
+		if(texture2D(u_texture, T + vec2(step, 0) * v).a > 0.9){
+			bordercolor = texture2D(u_texture, T + vec2(step, 0) * v); bordercolor.a = 1.0;
+		}
+		if(texture2D(u_texture, T + vec2(-step, 0) * v).a > 0.9){
+			bordercolor = texture2D(u_texture, T + vec2(-step, 0) * v); bordercolor.a = 1.0;
+		}
+		
+		gl_FragColor = mix(bordercolor, vec4(1.0), si);
 	}else{
 
 	    if(color.a > 0.0){
