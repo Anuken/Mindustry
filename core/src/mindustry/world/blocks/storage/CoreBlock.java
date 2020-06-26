@@ -49,7 +49,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Remote(called = Loc.server)
-    public static void onPlayerSpawn(Tile tile, Playerc player){
+    public static void onPlayerSpawn(Tile tile, Player player){
         if(player == null || tile == null) return;
 
         CoreEntity entity = tile.ent();
@@ -57,7 +57,7 @@ public class CoreBlock extends StorageBlock{
         Fx.spawn.at(entity);
 
         if(!net.client()){
-            Unitc unit = block.unitType.create(tile.team());
+            Unit unit = block.unitType.create(tile.team());
             unit.set(entity);
             unit.rotation(90f);
             unit.impulse(0f, 3f);
@@ -91,7 +91,7 @@ public class CoreBlock extends StorageBlock{
         return false;
     }
 
-    public class CoreEntity extends TileEntity implements ControlBlock{
+    public class CoreEntity extends Building implements ControlBlock{
         public int storageCapacity;
         //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
         public @NonNull BlockUnitc unit = Nulls.blockUnit;
@@ -103,11 +103,11 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public Unitc unit(){
-            return unit;
+        public Unit unit(){
+            return (Unit)unit;
         }
 
-        public void requestSpawn(Playerc player){
+        public void requestSpawn(Player player){
             Call.onPlayerSpawn(tile, player);
         }
 
@@ -126,7 +126,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return items.get(item) < getMaximumAccepted(item);
         }
 
@@ -137,7 +137,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void onProximityUpdate(){
-            for(Tilec other : state.teams.cores(team)){
+            for(Building other : state.teams.cores(team)){
                 if(other.tile() != tile){
                     items(other.items());
                 }
@@ -150,7 +150,7 @@ public class CoreBlock extends StorageBlock{
                 ((StorageBlockEntity)t).linkedCore = this;
             });
 
-            for(Tilec other : state.teams.cores(team)){
+            for(Building other : state.teams.cores(team)){
                 if(other.tile() == tile) continue;
                 storageCapacity += other.block().itemCapacity + other.proximity().sum(e -> isContainer(e) && owns(other, e) ? e.block().itemCapacity : 0);
             }
@@ -169,7 +169,7 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void drawSelect(){
             Lines.stroke(1f, Pal.accent);
-            Cons<Tilec> outline = t -> {
+            Cons<Building> outline = t -> {
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
                     float offset = -Math.max(t.block().size - 1, 0) / 2f * tilesize;
@@ -184,15 +184,15 @@ public class CoreBlock extends StorageBlock{
         }
 
 
-        public boolean isContainer(Tilec tile){
+        public boolean isContainer(Building tile){
             return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == this || ((StorageBlockEntity)tile).linkedCore == null);
         }
 
-        public boolean owns(Tilec tile){
+        public boolean owns(Building tile){
             return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == this || ((StorageBlockEntity)tile).linkedCore == null);
         }
 
-        public boolean owns(Tilec core, Tilec tile){
+        public boolean owns(Building core, Building tile){
             return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == core || ((StorageBlockEntity)tile).linkedCore == null);
         }
 
@@ -237,7 +237,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
+        public void handleItem(Building source, Item item){
             if(net.server() || !net.active()){
                 super.handleItem(source, item);
                 if(state.rules.tutorial){

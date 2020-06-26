@@ -79,7 +79,7 @@ public class GenericCrafter extends Block{
         return outputItem != null;
     }
 
-    public class GenericCrafterEntity extends TileEntity{
+    public class GenericCrafterEntity extends Building{
         public float progress;
         public float totalProgress;
         public float warmup;

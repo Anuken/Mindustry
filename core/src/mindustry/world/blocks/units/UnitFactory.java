@@ -117,7 +117,7 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
-        public boolean acceptPayload(Tilec source, Payload payload){
+        public boolean acceptPayload(Building source, Payload payload){
             return false;
         }
 
@@ -202,7 +202,7 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return currentPlan != -1 && items.get(item) < getMaximumAccepted(item) &&
                 Structs.contains(plans[currentPlan].requirements, stack -> stack.item == item);
         }

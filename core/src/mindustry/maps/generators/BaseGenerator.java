@@ -63,9 +63,9 @@ public class BaseGenerator{
             Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? ores.get((Item)coreschem.required) : Blocks.oreCopper);
 
             //fill core with every type of item (even non-material)
-            Tilec entity = tile.entity;
+            Building entity = tile.entity;
             for(Item item : content.items()){
-                entity.items().add(item, entity.block().itemCapacity);
+                entity.items.add(item, entity.block().itemCapacity);
             }
         }
 

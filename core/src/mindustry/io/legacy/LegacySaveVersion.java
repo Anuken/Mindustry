@@ -65,7 +65,7 @@ public abstract class LegacySaveVersion extends SaveVersion{
                     try{
                         readChunk(stream, true, in -> {
                             byte version = in.readByte();
-                            //legacy impl of TileEntity#read()
+                            //legacy impl of Building#read()
                             tile.entity.health(stream.readUnsignedShort());
                             byte packedrot = stream.readByte();
                             byte team = Pack.leftByte(packedrot) == 8 ? stream.readByte() : Pack.leftByte(packedrot);
@@ -74,9 +74,9 @@ public abstract class LegacySaveVersion extends SaveVersion{
                             tile.setTeam(Team.get(team));
                             tile.rotation(rotation);
 
-                            if(tile.entity.items() != null) tile.entity.items().read(Reads.get(stream));
-                            if(tile.entity.power() != null) tile.entity.power().read(Reads.get(stream));
-                            if(tile.entity.liquids() != null) tile.entity.liquids().read(Reads.get(stream));
+                            if(tile.entity.items != null) tile.entity.items.read(Reads.get(stream));
+                            if(tile.entity.power != null) tile.entity.power.read(Reads.get(stream));
+                            if(tile.entity.liquids != null) tile.entity.liquids.read(Reads.get(stream));
                             if(tile.entity.cons() != null) tile.entity.cons().read(Reads.get(stream));
 
                             //read only from subclasses!

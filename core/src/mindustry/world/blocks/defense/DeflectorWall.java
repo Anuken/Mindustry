@@ -20,7 +20,7 @@ public class DeflectorWall extends Wall{
         super(name);
     }
 
-    public class DeflectorEntity extends TileEntity{
+    public class DeflectorEntity extends Building{
         public float hit;
 
         @Override
@@ -40,7 +40,7 @@ public class DeflectorWall extends Wall{
         }
 
         @Override
-        public boolean collision(Bulletc bullet){
+        public boolean collision(Bullet bullet){
             super.collision(bullet);
 
             //doesn't reflect powerful bullets

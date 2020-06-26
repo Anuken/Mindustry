@@ -63,7 +63,7 @@ public class Pathfinder implements Runnable{
 
         Events.on(ResetEvent.class, event -> stop());
 
-        Events.on(TileChangeEvent.class, event -> updateTile(event.tile));
+        Events.on(BuildinghangeEvent.class, event -> updateTile(event.tile));
     }
 
     /** Packs a tile into its internal representation. */

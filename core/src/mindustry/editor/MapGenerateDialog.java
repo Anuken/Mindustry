@@ -51,7 +51,7 @@ public class MapGenerateDialog extends BaseDialog{
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
-        protected void changeEntity(Team team, Prov<Tilec> entityprov){
+        protected void changeEntity(Team team, Prov<Building> entityprov){
 
         }
     };

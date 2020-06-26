@@ -33,7 +33,7 @@ public class BlockRenderer implements Disposable{
     private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer();
     private FrameBuffer dark = new FrameBuffer();
-    private Seq<Tilec> outArray2 = new Seq<>();
+    private Seq<Building> outArray2 = new Seq<>();
     private Seq<Tile> shadowEvents = new Seq<>();
     private IntSet processedEntities = new IntSet();
     private boolean displayStatus = false;
@@ -82,7 +82,7 @@ public class BlockRenderer implements Disposable{
             dark.end();
         });
 
-        Events.on(TileChangeEvent.class, event -> {
+        Events.on(BuildinghangeEvent.class, event -> {
             shadowEvents.add(event.tile);
 
             int avgx = (int)(camera.position.x / tilesize);
@@ -205,8 +205,8 @@ public class BlockRenderer implements Disposable{
                         lightview.add(tile);
                     }
 
-                    if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
-                        for(Tilec other : tile.entity.getPowerConnections(outArray2)){
+                    if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
+                        for(Building other : tile.entity.getPowerConnections(outArray2)){
                             if(other.block() instanceof PowerNode){ //TODO need a generic way to render connections!
                                 tileview.add(other.tile());
                             }
@@ -229,7 +229,7 @@ public class BlockRenderer implements Disposable{
         for(int i = 0; i < tileview.size; i++){
             Tile tile = tileview.items[i];
             Block block = tile.block();
-            Tilec entity = tile.entity;
+            Building entity = tile.entity;
 
             Draw.z(Layer.block);
 
@@ -260,7 +260,7 @@ public class BlockRenderer implements Disposable{
         //draw lights
         for(int i = 0; i < lightview.size; i++){
             Tile tile = lightview.items[i];
-            Tilec entity = tile.entity;
+            Building entity = tile.entity;
 
             if(entity != null){
                 entity.drawLight();

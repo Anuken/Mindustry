@@ -74,7 +74,7 @@ public class PlayerListFragment extends Fragment{
         float h = 74f;
         found = false;
 
-        Groups.player.sort(Structs.comparing(Playerc::team));
+        Groups.player.sort(Structs.comparing(Player::team));
         Groups.player.each(user -> {
             found = true;
             NetConnection connection = user.con();

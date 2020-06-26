@@ -30,7 +30,7 @@ public class PlanetGrid{
     PlanetGrid(int size){
         this.size = size;
 
-        tiles = new Ptile[tileCount(size)];
+        tiles = new Ptile[Buildingount(size)];
         for(int i = 0; i < tiles.length; i++){
             tiles[i] = new Ptile(i, i < 12 ? 5 : 6);
         }
@@ -207,7 +207,7 @@ public class PlanetGrid{
         return -1;
     }
 
-    static int tileCount(int size){
+    static int Buildingount(int size){
         return 10 * Mathf.pow(3, size) + 2;
     }
 

@@ -136,6 +136,7 @@ public class EntityProcess extends BaseProcessor{
                     if(!signatures.contains(cname + "()")){
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
                         .addAnnotations(Seq.with(field.annotations()).select(a -> a.toString().contains("Null")).map(AnnotationSpec::get))
+                        //.addAnnotation(Deprecated.class) //TODO undeprecate
                         .addJavadoc(field.doc() == null ? "" : field.doc())
                         .returns(field.tname()).build());
                     }
@@ -146,6 +147,7 @@ public class EntityProcess extends BaseProcessor{
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
                         .addJavadoc(field.doc() == null ? "" : field.doc())
                         .addParameter(ParameterSpec.builder(field.tname(), field.name())
+                        //.addAnnotation(Deprecated.class) //TODO undeprecate
                         .addAnnotations(Seq.with(field.annotations())
                         .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
                     }
@@ -185,7 +187,7 @@ public class EntityProcess extends BaseProcessor{
                         }
 
                         //add interfaces
-                        for(Stype type : depends){
+                        for(Stype type : deps){
                             base.addSuperinterface(tname(packageName, interfaceName(type)));
                         }
 
@@ -222,9 +224,13 @@ public class EntityProcess extends BaseProcessor{
                     return result;
                 });
 
+                //representative component type
+                Stype repr = types.first();
+                String groupType = repr.annotation(Component.class).base() ? baseName(repr) : interfaceName(repr);
+
                 boolean collides = an.collide();
                 groupDefs.add(new GroupDefinition(group.name().startsWith("g") ? group.name().substring(1) : group.name(),
-                    ClassName.bestGuess(packageName + "." + interfaceName(types.first())), types, an.spatial(), an.mapping(), collides));
+                    ClassName.bestGuess(packageName + "." + groupType), types, an.spatial(), an.mapping(), collides));
             }
 
             ObjectMap<String, Selement> usedNames = new ObjectMap<>();
@@ -232,32 +238,8 @@ public class EntityProcess extends BaseProcessor{
 
             //look at each definition
             for(Selement<?> type : allDefs){
-
                 EntityDef ann = type.annotation(EntityDef.class);
                 boolean isFinal = ann.isFinal();
-
-                if(type.isType() && (!type.name().endsWith("Def") && !type.name().endsWith("Comp"))){
-                    err("All entity def names must end with 'Def'/'Comp'", type.e);
-                }
-
-                String name = type.isType() ?
-                    type.name().replace("Def", "Entity").replace("Comp", "Entity") :
-                    createName(type);
-
-                //skip double classes
-                if(usedNames.containsKey(name)){
-                    extraNames.get(usedNames.get(name), ObjectSet::new).add(type.name());
-                    continue;
-                }
-
-                usedNames.put(name, type);
-                extraNames.get(type, ObjectSet::new).add(name);
-                if(!type.isType()){
-                    extraNames.get(type, ObjectSet::new).add(type.name());
-                }
-
-                TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
-                if(isFinal) builder.addModifiers(Modifier.FINAL);
 
                 //all component classes (not interfaces)
                 Seq<Stype> components = allComponents(type);
@@ -278,8 +260,37 @@ public class EntityProcess extends BaseProcessor{
                 //whether the main class is the base itself
                 boolean typeIsBase = baseClassType != null && type.has(Component.class) && type.annotation(Component.class).base();
 
+                if(type.isType() && (!type.name().endsWith("Def") && !type.name().endsWith("Comp"))){
+                    err("All entity def names must end with 'Def'/'Comp'", type.e);
+                }
+
+                String name = type.isType() ?
+                    type.name().replace("Def", "").replace("Comp", "") :
+                    createName(type);
+
+                //check for type name conflicts
+                if(!typeIsBase && baseClass != null && name.equals(baseName(baseClassType))){
+                    name += "Entity";
+                }
+
+                //skip double classes
+                if(usedNames.containsKey(name)){
+                    extraNames.get(usedNames.get(name), ObjectSet::new).add(type.name());
+                    continue;
+                }
+
+                usedNames.put(name, type);
+                extraNames.get(type, ObjectSet::new).add(name);
+                if(!type.isType()){
+                    extraNames.get(type, ObjectSet::new).add(type.name());
+                }
+
+                TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
+
+                if(isFinal && !typeIsBase) builder.addModifiers(Modifier.FINAL);
+
                 //add serialize() boolean
-                builder.addMethod(MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC, Modifier.FINAL).returns(boolean.class).addStatement("return " + ann.serialize()).build());
+                builder.addMethod(MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC).returns(boolean.class).addStatement("return " + ann.serialize()).build());
 
                 //all SyncField fields
                 Seq<Svar> syncedFields = new Seq<>();
@@ -401,7 +412,7 @@ public class EntityProcess extends BaseProcessor{
 
                     //build method using same params/returns
                     MethodSpec.Builder mbuilder = MethodSpec.methodBuilder(first.name()).addModifiers(first.is(Modifier.PRIVATE) ? Modifier.PRIVATE : Modifier.PUBLIC);
-                    if(isFinal || entry.value.contains(s -> s.has(Final.class))) mbuilder.addModifiers(Modifier.FINAL);
+                    //if(isFinal || entry.value.contains(s -> s.has(Final.class))) mbuilder.addModifiers(Modifier.FINAL);
                     if(entry.value.contains(s -> s.has(CallSuper.class))) mbuilder.addAnnotation(CallSuper.class); //add callSuper here if necessary
                     if(first.is(Modifier.STATIC)) mbuilder.addModifiers(Modifier.STATIC);
                     mbuilder.addTypeVariables(first.typeVariables().map(TypeVariableName::get));
@@ -536,7 +547,7 @@ public class EntityProcess extends BaseProcessor{
                 .returns(tname(packageName + "." + name))
                 .addStatement(ann.pooled() ? "return Pools.obtain($L.class, " +name +"::new)" : "return new $L()", name).build());
 
-                definitions.add(new EntityDefinition(packageName + "." + name, builder, type, baseClass, components, groups, allFieldSpecs));
+                definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs));
             }
 
             //generate groups
@@ -686,12 +697,12 @@ public class EntityProcess extends BaseProcessor{
 
                         //getter
                         if(!method.isVoid()){
-                            def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).addModifiers(Modifier.FINAL).build());
+                            def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("return " + var).build());
                         }
 
                         //setter
                         if(method.isVoid() && !Seq.with(field.annotations).contains(f -> f.type.toString().equals("@mindustry.annotations.Annotations.ReadOnly"))){
-                            def.builder.addMethod(MethodSpec.overriding(method.e).addModifiers(Modifier.FINAL).addStatement("this." + var + " = " + var).build());
+                            def.builder.addMethod(MethodSpec.overriding(method.e).addStatement("this." + var + " = " + var).build());
                         }
                     }
                 }
@@ -709,6 +720,11 @@ public class EntityProcess extends BaseProcessor{
                 Seq<Smethod> methods = dependencies.flatMap(Stype::methods);
                 methods.sortComparing(Object::toString);
 
+                //optionally add superclass
+                Stype superclass = dependencies.map(this::interfaceToComp).find(s -> s != null && s.annotation(Component.class).base());
+                //use the base type when the interface being emulated has a base
+                TypeName type = superclass != null && interfaceToComp(interf).annotation(Component.class).base() ? tname(baseName(superclass)) : interf.tname();
+
                 //used method signatures
                 ObjectSet<String> signatures = new ObjectSet<>();
 
@@ -719,6 +735,7 @@ public class EntityProcess extends BaseProcessor{
                 .addModifiers(Modifier.FINAL);
 
                 nullBuilder.addSuperinterface(interf.tname());
+                if(superclass != null) nullBuilder.superclass(tname(baseName(superclass)));
 
                 for(Smethod method : methods){
                     String signature = method.toString();
@@ -726,6 +743,7 @@ public class EntityProcess extends BaseProcessor{
 
                     Stype compType = interfaceToComp(method.type());
                     MethodSpec.Builder builder = MethodSpec.overriding(method.e).addModifiers(Modifier.PUBLIC, Modifier.FINAL);
+                    builder.addAnnotation(OverrideCallSuper.class); //just in case
 
                     if(!method.isVoid()){
                         if(method.name().equals("isNull")){
@@ -749,7 +767,7 @@ public class EntityProcess extends BaseProcessor{
                     signatures.add(signature);
                 }
 
-                nullsBuilder.addField(FieldSpec.builder(interf.cname(), Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());
+                nullsBuilder.addField(FieldSpec.builder(type, Strings.camelize(baseName)).initializer("new " + className + "()").addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC).build());
 
                 write(nullBuilder);
             }
@@ -775,9 +793,8 @@ public class EntityProcess extends BaseProcessor{
     String baseName(Stype comp){
         String suffix = "Comp";
         if(!comp.name().endsWith(suffix)) err("All components must have names that end with 'Comp'", comp.e);
-        boolean isConcrete = comp.has(EntityDef.class); //concrete base implementations have no "Base" suffix
 
-        return comp.name().substring(0, comp.name().length() - suffix.length()) + (isConcrete ? "" : "Base");
+        return comp.name().substring(0, comp.name().length() - suffix.length());
     }
 
     @Nullable Stype interfaceToComp(Stype type){

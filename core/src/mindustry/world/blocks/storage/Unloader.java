@@ -42,14 +42,14 @@ public class Unloader extends Block{
         bars.remove("items");
     }
 
-    public class UnloaderEntity extends TileEntity{
+    public class UnloaderEntity extends Building{
         public Item sortItem = null;
-        public Tilec dumpingTo;
+        public Building dumpingTo;
 
         @Override
         public void updateTile(){
             if(timer(timerUnload, speed / timeScale())){
-                for(Tilec other : proximity){
+                for(Building other : proximity){
                     if(other.interactable(team) && other.block().unloadable && other.block().hasItems
                         && ((sortItem == null && other.items().total() > 0) || (sortItem != null && other.items().has(sortItem)))){
                         //make sure the item can't be dumped back into this block
@@ -86,7 +86,7 @@ public class Unloader extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             if(this == other){
                 deselect();
                 configure(null);
@@ -97,7 +97,7 @@ public class Unloader extends Block{
         }
 
         @Override
-        public boolean canDump(Tilec to, Item item){
+        public boolean canDump(Building to, Item item){
             return !(to.block() instanceof StorageBlock) && to != dumpingTo;
         }
 

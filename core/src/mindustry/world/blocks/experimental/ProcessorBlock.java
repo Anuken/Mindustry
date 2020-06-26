@@ -12,12 +12,12 @@ public class ProcessorBlock extends Block{
         configurable = true;
     }
 
-    public class ProcessorEntity extends TileEntity{
+    public class ProcessorEntity extends Building{
         //all tiles in the block network - does not include itself
-        Seq<Tilec> network = new Seq<>();
+        Seq<Building> network = new Seq<>();
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             if(other == this) return true;
 
             if(!network.contains(other)){

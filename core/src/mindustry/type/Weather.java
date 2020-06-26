@@ -17,9 +17,9 @@ public abstract class Weather extends MappableContent{
 
     //internals
     public Rand rand = new Rand();
-    public Prov<Weatherc> type = WeatherEntity::create;
+    public Prov<WeatherState> type = WeatherState::create;
 
-    public Weather(String name, Prov<Weatherc> type){
+    public Weather(String name, Prov<WeatherState> type){
         super(name);
         this.type = type;
     }
@@ -28,16 +28,16 @@ public abstract class Weather extends MappableContent{
         super(name);
     }
 
-    public Weatherc create(){
+    public WeatherState create(){
         return create(1f);
     }
 
-    public Weatherc create(float intensity){
+    public WeatherState create(float intensity){
         return create(intensity, duration);
     }
 
-    public Weatherc create(float intensity, float duration){
-        Weatherc entity = type.get();
+    public WeatherState create(float intensity, float duration){
+        WeatherState entity = type.get();
         entity.intensity(intensity);
         entity.init(this);
         entity.life(duration);
@@ -54,15 +54,15 @@ public abstract class Weather extends MappableContent{
         if(e != null) e.remove();
     }
 
-    public void update(Weatherc state){
+    public void update(WeatherState state){
 
     }
 
-    public void drawOver(Weatherc state){
+    public void drawOver(WeatherState state){
 
     }
 
-    public void drawUnder(Weatherc state){
+    public void drawUnder(WeatherState state){
 
     }
 
@@ -107,9 +107,9 @@ public abstract class Weather extends MappableContent{
         }
     }
 
-    @EntityDef(value = {Weatherc.class}, pooled = true, isFinal = false)
-    @Component
-    abstract static class WeatherComp implements Drawc{
+    @EntityDef(value = {WeatherStatec.class}, pooled = true, isFinal = false)
+    @Component(base = true)
+    abstract static class WeatherStateComp implements Drawc{
         private static final float fadeTime = 60 * 4;
 
         Weather weather;
@@ -129,7 +129,7 @@ public abstract class Weather extends MappableContent{
 
             life -= Time.delta();
 
-            weather.update((Weatherc)this);
+            weather.update(base());
 
             if(life < 0){
                 remove();
@@ -142,14 +142,14 @@ public abstract class Weather extends MappableContent{
                 Draw.draw(Layer.weather, () -> {
                     weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity);
-                    weather.drawOver((Weatherc)this);
+                    weather.drawOver(base());
                     Draw.reset();
                 });
 
                 Draw.draw(Layer.debris, () -> {
                     weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity);
-                    weather.drawUnder((Weatherc)this);
+                    weather.drawUnder(base());
                     Draw.reset();
                 });
             }

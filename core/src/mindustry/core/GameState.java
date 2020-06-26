@@ -33,8 +33,8 @@ public class GameState{
     private State state = State.menu;
 
     //TODO optimize
-    public Unitc boss(){
-        return Groups.unit.find(u -> u.isBoss() && u.team() == rules.waveTeam);
+    public Unit boss(){
+        return Groups.unit.find(u -> u.isBoss() && u.team == rules.waveTeam);
     }
 
     public void set(State astate){

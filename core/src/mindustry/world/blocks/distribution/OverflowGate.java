@@ -30,7 +30,7 @@ public class OverflowGate extends Block{
         return true;
     }
 
-    public class OverflowGateEntity extends TileEntity{
+    public class OverflowGateEntity extends Building{
         Item lastItem;
         Tile lastInput;
         float time;
@@ -62,7 +62,7 @@ public class OverflowGate extends Block{
                 }
 
                 time += 1f / speed * Time.delta();
-                Tilec target = getTileTarget(lastItem, lastInput, false);
+                Building target = getTileTarget(lastItem, lastInput, false);
 
                 if(target != null && (time >= 1f)){
                     getTileTarget(lastItem, lastInput, true);
@@ -74,28 +74,28 @@ public class OverflowGate extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return team == source.team() && lastItem == null && items.total() == 0;
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
+        public void handleItem(Building source, Item item){
             items.add(item, 1);
             lastItem = item;
             time = 0f;
             lastInput = source.tile();
         }
 
-        public @Nullable Tilec getTileTarget(Item item, Tile src, boolean flip){
+        public @Nullable Building getTileTarget(Item item, Tile src, boolean flip){
             int from = relativeToEdge(src);
             if(from == -1) return null;
-            Tilec to = nearby((from + 2) % 4);
+            Building to = nearby((from + 2) % 4);
             boolean canForward = to != null && to.acceptItem(this, item) && to.team() == team && !(to.block() instanceof OverflowGate);
 
 
             if(!canForward || invert){
-                Tilec a = nearby(Mathf.mod(from - 1, 4));
-                Tilec b = nearby(Mathf.mod(from + 1, 4));
+                Building a = nearby(Mathf.mod(from - 1, 4));
+                Building b = nearby(Mathf.mod(from + 1, 4));
                 boolean ac = a != null && a.acceptItem(this, item) && !(a.block() instanceof OverflowGate) && a.team() == team;
                 boolean bc = b != null && b.acceptItem(this, item) && !(b.block() instanceof OverflowGate) && b.team() == team;
 

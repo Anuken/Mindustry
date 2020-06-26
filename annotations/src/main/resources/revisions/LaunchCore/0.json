@@ -1,0 +1,1 @@
+{fields:[{name:block,type:mindustry.world.Block,size:-1},{name:lifetime,type:float,size:4},{name:time,type:float,size:4},{name:x,type:float,size:4},{name:y,type:float,size:4}]}

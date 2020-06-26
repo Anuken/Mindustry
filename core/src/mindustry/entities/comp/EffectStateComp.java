@@ -5,9 +5,9 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-@EntityDef(value = {Effectc.class, Childc.class}, pooled = true, serialize = false)
-@Component
-abstract class EffectComp implements Posc, Drawc, Timedc, Rotc, Childc{
+@EntityDef(value = {EffectStatec.class, Childc.class}, pooled = true, serialize = false)
+@Component(base = true)
+abstract class EffectStateComp implements Posc, Drawc, Timedc, Rotc, Childc{
     Color color = new Color(Color.white);
     Effect effect;
     Object data;

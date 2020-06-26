@@ -11,5 +11,5 @@ class GroupDefs<G>{
     @GroupDef(value = Buildingc.class) G tile;
     @GroupDef(value = Syncc.class, mapping = true) G sync;
     @GroupDef(value = Drawc.class) G draw;
-    @GroupDef(value = Weatherc.class) G weather;
+    @GroupDef(value = WeatherStatec.class) G weather;
 }

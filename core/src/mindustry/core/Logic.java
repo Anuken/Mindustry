@@ -117,7 +117,7 @@ public class Logic implements ApplicationListener{
         if(!state.isCampaign()){
             for(TeamData team : state.teams.getActive()){
                 if(team.hasCore()){
-                    TileEntity entity = team.core();
+                    Building entity = team.core();
                     entity.items.clear();
                     for(ItemStack stack : state.rules.loadout){
                         entity.items.add(stack.item, stack.amount);
@@ -221,7 +221,7 @@ public class Logic implements ApplicationListener{
         }
 
         //TODO core launch effect
-        for(Tilec tile : state.teams.playerCores()){
+        for(Building tile : state.teams.playerCores()){
             Fx.launch.at(tile);
         }
 
@@ -234,11 +234,11 @@ public class Logic implements ApplicationListener{
 
         //TODO containers must be launched too
         Time.runTask(30f, () -> {
-            for(Tilec entity : state.teams.playerCores()){
+            for(Building entity : state.teams.playerCores()){
                 for(Item item : content.items()){
                     //TODO where do the items go?
-                    //data.addItem(item, entity.items().get(item));
-                    //Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items().get(item))));
+                    //data.addItem(item, entity.items.get(item));
+                    //Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items.get(item))));
                 }
                 entity.tile().remove();
             }

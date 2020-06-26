@@ -68,13 +68,13 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
-        Unitc unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead());
+        Unit unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead);
 
         if(unit != null){
             player.miner().mineTile(null);
             target = unit;
         }else{
-            Tilec tile = world.entWorld(x, y);
+            Building tile = world.entWorld(x, y);
 
             if(tile != null && player.team().isEnemy(tile.team())){
                 player.miner().mineTile(null);

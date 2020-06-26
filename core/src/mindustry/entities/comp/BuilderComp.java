@@ -54,7 +54,7 @@ abstract class BuilderComp implements Unitc{
             }
         }
 
-        Tilec core = core();
+        Building core = core();
 
         //nothing to build.
         if(buildPlan() == null) return;
@@ -114,9 +114,9 @@ abstract class BuilderComp implements Unitc{
         BuildEntity entity = tile.ent();
 
         if(current.breaking){
-            entity.deconstruct(this, core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            if(entity.construct(this, core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
+            if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
                     Call.onTileConfig(null, tile.entity, current.config);
                 }
@@ -147,7 +147,7 @@ abstract class BuilderComp implements Unitc{
     }
 
     /** @return whether this request should be skipped, in favor of the next one. */
-    boolean shouldSkip(BuildPlan request, @Nullable Tilec core){
+    boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
         if(state.rules.infiniteResources || team().rules().infiniteResources || request.breaking || core == null) return false;
         //TODO these are bad criteria

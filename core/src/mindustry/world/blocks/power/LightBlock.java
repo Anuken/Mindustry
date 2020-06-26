@@ -27,7 +27,7 @@ public class LightBlock extends Block{
         config(Integer.class, (LightEntity tile, Integer value) -> tile.color = value);
     }
 
-    public class LightEntity extends TileEntity{
+    public class LightEntity extends Building{
         public int color = Pal.accent.rgba();
 
         @Override

@@ -42,7 +42,7 @@ public class Wall extends Block{
         return super.canReplace(other) && health > other.health;
     }
 
-    public class WallEntity extends TileEntity{
+    public class WallEntity extends Building{
 
         @Override
         public void draw(){

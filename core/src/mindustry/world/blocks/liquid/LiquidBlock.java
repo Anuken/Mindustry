@@ -25,7 +25,7 @@ public class LiquidBlock extends Block{
         return new TextureRegion[]{bottomRegion, topRegion};
     }
 
-    public class LiquidBlockEntity extends TileEntity{
+    public class LiquidBlockEntity extends Building{
         @Override
         public void draw(){
             float rotation = rotate ? rotdeg() : 0;

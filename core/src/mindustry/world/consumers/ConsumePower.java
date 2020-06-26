@@ -30,7 +30,7 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void build(Tilec tile, Table table){
+    public void build(Building tile, Table table){
         //No tooltip for power, for now
     }
 
@@ -40,16 +40,16 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void update(Tilec entity){
-        // Nothing to do since PowerGraph directly updates entity.power().status
+    public void update(Building entity){
+        // Nothing to do since PowerGraph directly updates entity.power.status
     }
 
     @Override
-    public boolean valid(Tilec entity){
+    public boolean valid(Building entity){
         if(buffered){
             return true;
         }else{
-            return entity.power().status > 0f;
+            return entity.power.status > 0f;
         }
     }
 
@@ -67,10 +67,10 @@ public class ConsumePower extends Consume{
      * @param entity The entity which contains the power module.
      * @return The amount of power which is requested per tick.
      */
-    public float requestedPower(Tilec entity){
+    public float requestedPower(Building entity){
         if(entity.tile().entity == null) return 0f;
         if(buffered){
-            return (1f-entity.power().status)*capacity;
+            return (1f-entity.power.status)*capacity;
         }else{
             try{
                 return usage * Mathf.num(entity.shouldConsume());

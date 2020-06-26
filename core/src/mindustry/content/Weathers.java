@@ -33,7 +33,7 @@ public class Weathers implements ContentList{
             }
 
             @Override
-            public void drawOver(Weatherc state){
+            public void drawOver(WeatherState state){
                 rand.setSeed(0);
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
                 Tmp.r1.grow(padding);
@@ -78,7 +78,7 @@ public class Weathers implements ContentList{
             }
 
             @Override
-            public void drawOver(Weatherc state){
+            public void drawOver(WeatherState state){
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
                 Tmp.r1.grow(padding);
                 Core.camera.bounds(Tmp.r2);
@@ -110,7 +110,7 @@ public class Weathers implements ContentList{
             }
 
             @Override
-            public void drawUnder(Weatherc state){
+            public void drawUnder(WeatherState state){
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
                 Tmp.r1.grow(padding);
                 Core.camera.bounds(Tmp.r2);
@@ -170,15 +170,15 @@ public class Weathers implements ContentList{
             }
 
             @Override
-            public void update(Weatherc state){
+            public void update(WeatherState state){
 
-                for(Unitc unit : Groups.unit){
+                for(Unit unit : Groups.unit){
                     unit.impulse(force.x * state.intensity(), force.y * state.intensity());
                 }
             }
 
             @Override
-            public void drawOver(Weatherc state){
+            public void drawOver(WeatherState state){
                 rand.setSeed(0);
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
                 Tmp.r1.grow(padding);

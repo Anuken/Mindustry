@@ -109,7 +109,7 @@ public class EditorTile extends Tile{
     }
     
     @Override
-    protected void changeEntity(Team team, Prov<Tilec> entityprov){
+    protected void changeEntity(Team team, Prov<Building> entityprov){
         if(state.isGame()){
             super.changeEntity(team, entityprov);
             return;

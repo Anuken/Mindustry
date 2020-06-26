@@ -290,7 +290,7 @@ public class ServerControl implements ApplicationListener{
 
                 if(Groups.player.size() > 0){
                     info("  &lyPlayers: @", Groups.player.size());
-                    for(Playerc p : Groups.player){
+                    for(Player p : Groups.player){
                         info("    &y@ / @", p.name(), p.uuid());
                     }
                 }else{
@@ -577,7 +577,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Playerc target = Groups.player.find(p -> p.name().equals(arg[0]));
+            Player target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
                 Call.sendMessage("[scarlet] " + target.name() + "[scarlet] has been kicked by the server.");
@@ -593,7 +593,7 @@ public class ServerControl implements ApplicationListener{
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
             }else if(arg[0].equals("name")){
-                Playerc target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+                Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
                 if(target != null){
                     netServer.admins.banPlayer(target.uuid());
                     info("Banned.");
@@ -607,7 +607,7 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid type.");
             }
 
-            for(Playerc player : Groups.player){
+            for(Player player : Groups.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
                     Call.sendMessage("[scarlet] " + player.name() + " has been banned.");
                     player.con().kick(KickReason.banned);
@@ -677,7 +677,7 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Playerc playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+            Player playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
             if(playert != null){
                 target = playert.getInfo();
             }else{
@@ -716,7 +716,7 @@ public class ServerControl implements ApplicationListener{
                 info("No players are currently in the server.");
             }else{
                 info("&lyPlayers: @", Groups.player.size());
-                for(Playerc user : Groups.player){
+                for(Player user : Groups.player){
                     PlayerInfo userInfo = user.getInfo();
                     info(" &lm @ /  ID: '@' / IP: '@' / Admin: '@'", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
@@ -879,8 +879,8 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-            Seq<Playerc> players = new Seq<>();
-            for(Playerc p : Groups.player){
+            Seq<Player> players = new Seq<>();
+            for(Player p : Groups.player){
                 players.add(p);
                 p.clearUnit();
             }
@@ -892,7 +892,7 @@ public class ServerControl implements ApplicationListener{
             state.rules = state.map.applyRules(lastMode);
             logic.play();
 
-            for(Playerc p : players){
+            for(Player p : players){
                 if(p.con() == null) continue;
 
                 p.reset();

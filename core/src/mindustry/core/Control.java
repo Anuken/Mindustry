@@ -74,7 +74,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(WorldLoadEvent.class, event -> {
             if(Mathf.zero(player.x()) && Mathf.zero(player.y())){
-                Tilec core = state.teams.closestCore(0, 0, player.team());
+                Building core = state.teams.closestCore(0, 0, player.team());
                 if(core != null){
                     player.set(core);
                     camera.position.set(core);
@@ -158,7 +158,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(Trigger.newGame, () -> {
-            Tilec core = player.closestCore();
+            Building core = player.closestCore();
 
             if(core == null) return;
 
@@ -198,9 +198,9 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     void createPlayer(){
-        player = PlayerEntity.create();
-        player.name(Core.settings.getString("name"));
-        player.color().set(Core.settings.getInt("color-0"));
+        player = Player.create();
+        player.name = Core.settings.getString("name");
+        player.color.set(Core.settings.getInt("color-0"));
 
         if(mobile){
             input = new MobileInput();
@@ -243,7 +243,7 @@ public class Control implements ApplicationListener, Loadable{
 
     //TODO move
     public void handleLaunch(CoreEntity tile){
-        LaunchCorec ent = LaunchCoreEntity.create();
+        LaunchCorec ent = LaunchCore.create();
         ent.set(tile);
         ent.block(Blocks.coreShard);
         ent.lifetime(Vars.launchDuration);
@@ -268,7 +268,7 @@ public class Control implements ApplicationListener, Loadable{
                     if(state.rules.defaultTeam.cores().isEmpty()){
 
                         //kill all friendly units, since they should be dead anwyay
-                        for(Unitc unit : Groups.unit){
+                        for(Unit unit : Groups.unit){
                             if(unit.team() == state.rules.defaultTeam){
                                 unit.remove();
                             }
@@ -347,12 +347,12 @@ public class Control implements ApplicationListener, Loadable{
             zone.rules.get(state.rules);
             //TODO assign zone!!
             //state.rules.zone = zone;
-            for(Tilec core : state.teams.playerCores()){
+            for(Building core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
                     core.items().add(stack.item, stack.amount);
                 }
             }
-            Tilec core = state.teams.playerCores().first();
+            Building core = state.teams.playerCores().first();
             core.items().clear();
 
             logic.play();

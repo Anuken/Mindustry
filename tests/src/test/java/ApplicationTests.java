@@ -143,12 +143,12 @@ public class ApplicationTests{
     void blockInventories(){
         multiblock();
         Tile tile = world.tile(4, 4);
-        tile.entity.items().add(Items.coal, 5);
-        tile.entity.items().add(Items.titanium, 50);
-        assertEquals(tile.entity.items().total(), 55);
-        tile.entity.items().remove(Items.phasefabric, 10);
-        tile.entity.items().remove(Items.titanium, 10);
-        assertEquals(tile.entity.items().total(), 45);
+        tile.entity.items.add(Items.coal, 5);
+        tile.entity.items.add(Items.titanium, 50);
+        assertEquals(tile.entity.items.total(), 55);
+        tile.entity.items.remove(Items.phasefabric, 10);
+        tile.entity.items.remove(Items.titanium, 10);
+        assertEquals(tile.entity.items.total(), 45);
     }
 
     @Test
@@ -243,8 +243,8 @@ public class ApplicationTests{
 
         updateBlocks(10);
 
-        assertTrue(world.tile(2, 1).entity.liquids().currentAmount() >= 1);
-        assertTrue(world.tile(2, 1).entity.liquids().current() == Liquids.water);
+        assertTrue(world.tile(2, 1).entity.liquids.currentAmount() >= 1);
+        assertTrue(world.tile(2, 1).entity.liquids.current() == Liquids.water);
     }
 
     @Test
@@ -265,8 +265,8 @@ public class ApplicationTests{
 
         updateBlocks(10);
 
-        assertTrue(tank.entity.liquids().currentAmount() >= 1, "Liquid not moved through junction");
-        assertTrue(tank.entity.liquids().current() == Liquids.water, "Tank has no water");
+        assertTrue(tank.entity.liquids.currentAmount() >= 1, "Liquid not moved through junction");
+        assertTrue(tank.entity.liquids.current() == Liquids.water, "Tank has no water");
     }
 
     @Test
@@ -300,9 +300,9 @@ public class ApplicationTests{
 
         //test basic method.
         Rand r = new Rand(0);
-        Tilec[] res = {null};
+        Building[] res = {null};
 
-        Cons<Tilec> assigner = t -> res[0] = t;
+        Cons<Building> assigner = t -> res[0] = t;
 
         int iterations = 100;
 
@@ -369,7 +369,7 @@ public class ApplicationTests{
         world.tile(0, 0).setBlock(Blocks.itemSource);
         world.tile(0, 0).entity.configureAny(Items.copper);
 
-        Seq<Tilec> entities = Seq.with(world.tile(0, 0).entity);
+        Seq<Building> entities = Seq.with(world.tile(0, 0).entity);
 
         for(int i = 0; i < length; i++){
             world.tile(i + 1, 0).setBlock(Blocks.conveyor);
@@ -380,29 +380,29 @@ public class ApplicationTests{
         world.tile(length + 1, 0).setBlock(new Block("___"){{
             hasItems = true;
             destructible = true;
-            entityType = () -> new TileEntity(){
+            entityType = () -> new Building(){
                 @Override
-                public void handleItem(Tilec source, Item item){
+                public void handleItem(Building source, Item item){
                     itemsa[0] ++;
                 }
 
                 @Override
-                public boolean acceptItem(Tilec source, Item item){
+                public boolean acceptItem(Building source, Item item){
                     return true;
                 }
             };
         }});
 
-        entities.each(Tilec::updateProximity);
+        entities.each(Building::updateProximity);
 
         //warmup
         for(int i = 0; i < 100000; i++){
-            entities.each(Tilec::update);
+            entities.each(Building::update);
         }
 
         Time.mark();
         for(int i = 0; i < 200000; i++){
-            entities.each(Tilec::update);
+            entities.each(Building::update);
         }
         Log.info(Time.elapsed() + "ms to process " + itemsa[0] + " items");
         assertNotEquals(0, itemsa[0]);
@@ -584,14 +584,14 @@ public class ApplicationTests{
         Tile core = world.tile(5, 5);
         core.setBlock(Blocks.coreShard, Team.sharded, 0);
         for(Item item : content.items()){
-            core.entity.items().set(item, 3000);
+            core.entity.items.set(item, 3000);
         }
 
         assertEquals(core.entity, state.teams.get(Team.sharded).core());
     }
 
     void depositTest(Block block, Item item){
-        Unitc unit = UnitTypes.spirit.create(Team.derelict);
+        Unit unit = UnitTypes.spirit.create(Team.derelict);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
         int capacity = tile.block().itemCapacity;
 
@@ -601,12 +601,12 @@ public class ApplicationTests{
         assertEquals(capacity - 1, deposited);
 
         tile.entity.handleStack(item, capacity - 1, unit);
-        assertEquals(tile.entity.items().get(item), capacity - 1);
+        assertEquals(tile.entity.items.get(item), capacity - 1);
 
         int overflow = tile.entity.acceptStack(item, 10, unit);
         assertEquals(1, overflow);
 
         tile.entity.handleStack(item, 1, unit);
-        assertEquals(capacity, tile.entity.items().get(item));
+        assertEquals(capacity, tile.entity.items.get(item));
     }
 }

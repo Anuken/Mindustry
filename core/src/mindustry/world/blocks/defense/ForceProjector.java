@@ -78,7 +78,7 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceProjectorEntity extends TileEntity{
+    public class ForceProjectorEntity extends Building{
         boolean broken = true;
         float buildup = 0f;
         float radscl = 0f;

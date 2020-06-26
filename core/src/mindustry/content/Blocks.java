@@ -1518,14 +1518,14 @@ public class Blocks implements ContentList{
                 }
 
                 @Override
-                public void init(Bulletc b){
+                public void init(Bullet b){
                     for(int i = 0; i < rays; i++){
                         Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
                 }
 
                 @Override
-                public void draw(Bulletc b){
+                public void draw(Bullet b){
                     super.draw(b);
                     Draw.color(Color.white, Pal.lancerLaser, b.fin());
                     //Draw.alpha(b.fout());

@@ -373,7 +373,7 @@ public class HudFragment extends Fragment{
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
-    public static void setPlayerTeamEditor(Playerc player, Team team){
+    public static void setPlayerTeamEditor(Player player, Team team){
         if(state.isEditor() && player != null){
             player.team(team);
         }

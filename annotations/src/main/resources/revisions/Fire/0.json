@@ -1,0 +1,1 @@
+{fields:[{name:baseFlammability,type:float,size:4},{name:block,type:mindustry.world.Block,size:-1},{name:lifetime,type:float,size:4},{name:puddleFlammability,type:float,size:4},{name:tile,type:mindustry.world.Tile,size:-1},{name:time,type:float,size:4},{name:x,type:float,size:4},{name:y,type:float,size:4}]}

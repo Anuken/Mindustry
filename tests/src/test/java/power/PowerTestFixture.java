@@ -58,7 +58,7 @@ public class PowerTestFixture{
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
-            entityType = TileEntity::create;
+            entityType = Building::create;
             consumes.power(powerPerTick);
         }};
     }
@@ -89,14 +89,14 @@ public class PowerTestFixture{
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
             tile.entity = block.newEntity().init(tile, Team.sharded, false);
             if(block.hasPower){
-                tile.entity.power().graph = new PowerGraph(){
+                tile.entity.power.graph = new PowerGraph(){
                     //assume there's always something consuming power
                     @Override
                     public float getUsageFraction(){
                         return 1f;
                     }
                 };
-                tile.entity.power().graph.add(tile.entity);
+                tile.entity.power.graph.add(tile.entity);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound

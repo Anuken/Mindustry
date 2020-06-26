@@ -172,7 +172,7 @@ public class Block extends UnlockableContent{
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
 
-    protected Prov<Tilec> entityType = null; //initialized later
+    protected Prov<Building> entityType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     protected TextureRegion[] generatedIcons;
@@ -184,7 +184,7 @@ public class Block extends UnlockableContent{
 
     public static TextureRegion[][] cracks;
     protected static final Seq<Tile> tempTiles = new Seq<>();
-    protected static final Seq<Tilec> tempTileEnts = new Seq<>();
+    protected static final Seq<Building> tempTileEnts = new Seq<>();
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -307,15 +307,15 @@ public class Block extends UnlockableContent{
         bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
-            Func<Tilec, Liquid> current;
+            Func<Building, Liquid> current;
             if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
                 Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
             }else{
-                current = entity -> entity.liquids().current();
+                current = entity -> entity.liquids.current();
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids().get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
-            () -> current.get(entity).barColor(), () -> entity.liquids().get(current.get(entity)) / liquidCapacity));
+            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
+            () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
@@ -323,12 +323,12 @@ public class Block extends UnlockableContent{
             boolean buffered = cons.buffered;
             float capacity = cons.capacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power().status * capacity) ? "<ERROR>" : (int)(entity.power().status * capacity)) :
-            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power().graph.getPowerProduced() + entity.power().graph.getBatteryStored() > 0f ? 1f : entity.power().status));
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : (int)(entity.power.status * capacity)) :
+            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
         }
 
         if(hasItems && configurable){
-            bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items().total()), () -> Pal.items, () -> (float)entity.items().total() / itemCapacity));
+            bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
     }
 
@@ -383,12 +383,12 @@ public class Block extends UnlockableContent{
     }
 
     /** Configure when a null value is passed.*/
-    public <E extends Tilec> void configClear(Cons<E> cons){
+    public <E extends Building> void configClear(Cons<E> cons){
         configurations.put(void.class, (tile, value) -> cons.get((E)tile));
     }
 
     /** Listen for a config by class type. */
-    public <T, E extends Tilec> void config(Class<T> type, Cons2<E, T> config){
+    public <T, E extends Building> void config(Class<T> type, Cons2<E, T> config){
         configurations.put(type, config);
     }
 
@@ -454,7 +454,7 @@ public class Block extends UnlockableContent{
         return destructible || update;
     }
 
-    public final Tilec newEntity(){
+    public final Building newEntity(){
         return entityType.get();
     }
 
@@ -536,11 +536,11 @@ public class Block extends UnlockableContent{
             }
 
             while(entityType == null && Block.class.isAssignableFrom(current)){
-                //first class that is subclass of Tilec
-                Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Tilec.class.isAssignableFrom(t) && !t.isInterface());
+                //first class that is subclass of Building
+                Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Building.class.isAssignableFrom(t) && !t.isInterface());
                 if(type != null){
                     //these are inner classes, so they have an implicit parameter generated
-                    Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getDeclaredConstructor(type.getDeclaringClass());
+                    Constructor<? extends Building> cons = (Constructor<? extends Building>)type.getDeclaredConstructor(type.getDeclaringClass());
                     entityType = () -> {
                         try{
                             return cons.newInstance(this);
@@ -559,7 +559,7 @@ public class Block extends UnlockableContent{
 
         if(entityType == null){
             //assign default value
-            entityType = TileEntity::create;
+            entityType = Building::create;
         }
     }
 

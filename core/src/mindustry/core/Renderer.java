@@ -259,7 +259,7 @@ public class Renderer implements ApplicationListener{
     private void drawLanding(){
         if(landTime > 0 && player.closestCore() != null){
             float fract = landTime / Fx.coreLand.lifetime;
-            Tilec entity = player.closestCore();
+            Building entity = player.closestCore();
 
             TextureRegion reg = entity.block().icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;

@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class NetworkIO{
 
-    public static void writeWorld(Playerc player, OutputStream os){
+    public static void writeWorld(Player player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(JsonIO.write(state.rules));

@@ -81,8 +81,8 @@ public class RemoteWriteGenerator{
                 return;
             }
 
-            if(!elem.getParameters().get(0).asType().toString().contains("Playerc")){
-                BaseProcessor.err("Client invoke methods should have a first parameter of type Playerc", elem);
+            if(!elem.getParameters().get(0).asType().toString().contains("Player")){
+                BaseProcessor.err("Client invoke methods should have a first parameter of type Player", elem);
                 return;
             }
         }

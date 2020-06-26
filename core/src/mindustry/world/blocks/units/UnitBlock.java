@@ -40,7 +40,7 @@ public class UnitBlock extends PayloadAcceptor{
             Fx.smeltsmoke.at(x + Tmp.v1.x, y + Tmp.v1.y);
 
             if(!net.client() && payload != null){
-                Unitc unit = payload.unit;
+                Unit unit = payload.unit;
                 unit.set(x, y);
                 unit.rotation(rotdeg());
                 unit.vel().trns(rotdeg(), payloadSpeed * 2f).add(Mathf.range(0.3f), Mathf.range(0.3f));

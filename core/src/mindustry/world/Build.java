@@ -21,7 +21,7 @@ public class Build{
             return;
         }
 
-        Tile tile = world.tilec(x, y);
+        Tile tile = world.Building(x, y);
         //this should never happen, but it doesn't hurt to check for links
         float prevPercent = 1f;
 

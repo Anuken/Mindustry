@@ -51,7 +51,7 @@ public class NetServer implements ApplicationListener{
                 if((state.rules.waveTeam == data.team && state.rules.waves) || !data.team.active()) return Integer.MAX_VALUE;
 
                 int count = 0;
-                for(Playerc other : players){
+                for(Player other : players){
                     if(other.team() == data.team && other != player){
                         count++;
                     }
@@ -75,7 +75,7 @@ public class NetServer implements ApplicationListener{
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
     /** Packet handlers for custom types of messages. */
-    private ObjectMap<String, Seq<Cons2<Playerc, String>>> customPacketHandlers = new ObjectMap<>();
+    private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
 
     public NetServer(){
 
@@ -207,7 +207,7 @@ public class NetServer implements ApplicationListener{
                 con.modclient = true;
             }
 
-            Playerc player = PlayerEntity.create();
+            Player player = Player.create();
             player.admin(admins.isAdmin(uuid, packet.usid));
             player.con(con);
             player.con().usid = packet.usid;
@@ -267,7 +267,7 @@ public class NetServer implements ApplicationListener{
     }
 
     private void registerCommands(){
-        clientCommands.<Playerc>register("help", "[page]", "Lists all commands.", (args, player) -> {
+        clientCommands.<Player>register("help", "[page]", "Lists all commands.", (args, player) -> {
             if(args.length > 0 && !Strings.canParseInt(args[0])){
                 player.sendMessage("[scarlet]'page' must be a number.");
                 return;
@@ -293,7 +293,7 @@ public class NetServer implements ApplicationListener{
             player.sendMessage(result.toString());
         });
 
-        clientCommands.<Playerc>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
+        clientCommands.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
             String message = admins.filterMessage(player, args[0]);
             if(message != null){
                 Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(message, player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id(), player.name())));
@@ -308,13 +308,13 @@ public class NetServer implements ApplicationListener{
         int voteCooldown = 60 * 5;
 
         class VoteSession{
-            Playerc target;
+            Player target;
             ObjectSet<String> voted = new ObjectSet<>();
             VoteSession[] map;
             Timer.Task task;
             int votes;
 
-            public VoteSession(VoteSession[] map, Playerc target){
+            public VoteSession(VoteSession[] map, Player target){
                 this.target = target;
                 this.map = map;
                 this.task = Timer.schedule(() -> {
@@ -326,7 +326,7 @@ public class NetServer implements ApplicationListener{
                 }, voteDuration);
             }
 
-            void vote(Playerc player, int d){
+            void vote(Player player, int d){
                 votes += d;
                 voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
                         
@@ -352,7 +352,7 @@ public class NetServer implements ApplicationListener{
         //current kick sessions
         VoteSession[] currentlyKicking = {null};
 
-        clientCommands.<Playerc>register("votekick", "[player...]", "Vote to kick a player.", (args, player) -> {
+        clientCommands.<Player>register("votekick", "[player...]", "Vote to kick a player.", (args, player) -> {
             if(!Config.enableVotekick.bool()){
                 player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
                 return;
@@ -377,7 +377,7 @@ public class NetServer implements ApplicationListener{
                 });
                 player.sendMessage(builder.toString());
             }else{
-                Playerc found;
+                Player found;
                 if(args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))){
                     int id = Strings.parseInt(args[0].substring(1));
                     found = Groups.player.find(p -> p.id() == id);
@@ -411,7 +411,7 @@ public class NetServer implements ApplicationListener{
             }
         });
 
-        clientCommands.<Playerc>register("vote", "<y/n>", "Vote to kick the current player.", (arg, player) -> {
+        clientCommands.<Player>register("vote", "<y/n>", "Vote to kick the current player.", (arg, player) -> {
             if(currentlyKicking[0] == null){
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             }else{
@@ -441,7 +441,7 @@ public class NetServer implements ApplicationListener{
             }
         });
 
-        clientCommands.<Playerc>register("sync", "Re-synchronize world state.", (args, player) -> {
+        clientCommands.<Player>register("sync", "Re-synchronize world state.", (args, player) -> {
             if(player.isLocal()){
                 player.sendMessage("[scarlet]Re-synchronizing as the host is pointless.");
             }else{
@@ -461,15 +461,15 @@ public class NetServer implements ApplicationListener{
         return 2 + (Groups.player.size() > 4 ? 1 : 0);
     }
 
-    public Team assignTeam(Playerc current){
+    public Team assignTeam(Player current){
         return assigner.assign(current, Groups.player);
     }
 
-    public Team assignTeam(Playerc current, Iterable<Playerc> players){
+    public Team assignTeam(Player current, Iterable<Player> players){
         return assigner.assign(current, players);
     }
 
-    public void sendWorldData(Playerc player){
+    public void sendWorldData(Player player){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         DeflaterOutputStream def = new FastDeflaterOutputStream(stream);
         NetworkIO.writeWorld(player, def);
@@ -480,15 +480,15 @@ public class NetServer implements ApplicationListener{
         Log.debug("Packed @ compressed bytes of world data.", stream.size());
     }
 
-    public void addPacketHandler(String type, Cons2<Playerc, String> handler){
+    public void addPacketHandler(String type, Cons2<Player, String> handler){
         customPacketHandlers.get(type, Seq::new).add(handler);
     }
 
-    public Seq<Cons2<Playerc, String>> getPacketHandlers(String type){
+    public Seq<Cons2<Player, String>> getPacketHandlers(String type){
         return customPacketHandlers.get(type, Seq::new);
     }
 
-    public static void onDisconnect(Playerc player, String reason){
+    public static void onDisconnect(Player player, String reason){
         //singleplayer multiplayer wierdness
         if(player.con() == null){
             player.remove();
@@ -510,22 +510,22 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client)
-    public static void serverPacketReliable(Playerc player, String type, String contents){
+    public static void serverPacketReliable(Player player, String type, String contents){
         if(netServer.customPacketHandlers.containsKey(type)){
-            for(Cons2<Playerc, String> c : netServer.customPacketHandlers.get(type)){
+            for(Cons2<Player, String> c : netServer.customPacketHandlers.get(type)){
                 c.get(player, contents);
             }
         }
     }
 
     @Remote(targets = Loc.client, unreliable = true)
-    public static void serverPacketUnreliable(Playerc player, String type, String contents){
+    public static void serverPacketUnreliable(Player player, String type, String contents){
         serverPacketReliable(player, type, contents);
     }
 
     @Remote(targets = Loc.client, unreliable = true)
     public static void onClientShapshot(
-        Playerc player,
+        Player player,
         int snapshotID,
         float x, float y,
         float pointerX, float pointerY,
@@ -599,7 +599,7 @@ public class NetServer implements ApplicationListener{
         connection.rejectedRequests.clear();
 
         if(!player.dead()){
-            Unitc unit = player.unit();
+            Unit unit = player.unit();
 
             unit.vel().set(xVelocity, yVelocity).limit(unit.type().speed);
             long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
@@ -664,7 +664,7 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
-    public static void onAdminRequest(Playerc player, Playerc other, AdminAction action){
+    public static void onAdminRequest(Player player, Player other, AdminAction action){
 
         if(!player.admin()){
             Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action without proper security access.",
@@ -700,7 +700,7 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client)
-    public static void connectConfirm(Playerc player){
+    public static void connectConfirm(Player player){
         if(player.con() == null || player.con().hasConnected) return;
 
         player.add();
@@ -773,7 +773,7 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
 
         short sent = 0;
-        for(Tilec entity : Groups.tile){
+        for(Building entity : Groups.tile){
             if(!entity.block().sync) continue;
             sent ++;
 
@@ -796,7 +796,7 @@ public class NetServer implements ApplicationListener{
         }
     }
 
-    public void writeEntitySnapshot(Playerc player) throws IOException{
+    public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
         Seq<CoreEntity> cores = state.teams.cores(player.team());
 
@@ -804,7 +804,7 @@ public class NetServer implements ApplicationListener{
 
         for(CoreEntity entity : cores){
             dataStream.writeInt(entity.tile().pos());
-            entity.items().write(Writes.get(dataStream));
+            entity.items.write(Writes.get(dataStream));
         }
 
         dataStream.close();
@@ -925,6 +925,6 @@ public class NetServer implements ApplicationListener{
     }
 
     public interface TeamAssigner{
-        Team assign(Playerc player, Iterable<Playerc> players);
+        Team assign(Player player, Iterable<Player> players);
     }
 }

@@ -59,7 +59,7 @@ public class RepairPoint extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class RepairPointEntity extends TileEntity{
+    public class RepairPointEntity extends Building{
         public Unitc target;
         public float strength, rotation = 90;
 
@@ -107,7 +107,7 @@ public class RepairPoint extends Block{
 
             if(timer(timerTarget, 20)){
                 rect.setSize(repairRadius * 2).setCenter(x, y);
-                target = Units.closest(team, x, y, repairRadius, Unitc::damaged);
+                target = Units.closest(team, x, y, repairRadius, Unit::damaged);
             }
         }
 

@@ -51,9 +51,9 @@ public class PointDefenseTurret extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class PointDefenseEntity extends TileEntity{
+    public class PointDefenseEntity extends Building{
         public float rotation = 90, reload;
-        public @Nullable Bulletc target;
+        public @Nullable Bullet target;
 
         @Override
         public void updateTile(){

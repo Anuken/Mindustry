@@ -19,12 +19,12 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public class Tile implements Position, QuadTreeObject, Displayable{
-    static final ObjectSet<Tilec> tileSet = new ObjectSet<>();
+    static final ObjectSet<Building> tileSet = new ObjectSet<>();
 
     /** Tile traversal cost. */
     public short cost = 1;
     /** Tile entity, usually null. */
-    public @Nullable Tilec entity;
+    public @Nullable Building entity;
     public short x, y;
     protected @NonNull Block block;
     protected @NonNull Floor floor;
@@ -106,7 +106,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends TileEntity> T ent(){
+    public <T extends Building> T ent(){
         return (T)entity;
     }
 
@@ -169,7 +169,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         setBlock(type, team, rotation, type::newEntity);
     }
 
-    public void setBlock(@NonNull Block type, Team team, int rotation, Prov<Tilec> entityprov){
+    public void setBlock(@NonNull Block type, Team team, int rotation, Prov<Building> entityprov){
         changing = true;
 
         this.block = type;
@@ -185,7 +185,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;
-            Tilec entity = this.entity;
+            Building entity = this.entity;
             Block block = this.block;
 
             //two passes: first one clears, second one sets
@@ -425,7 +425,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return null;
     }
 
-    public Tilec getNearbyEntity(int rotation){
+    public Building getNearbyEntity(int rotation){
         if(rotation == 0) return world.ent(x + 1, y);
         if(rotation == 1) return world.ent(x, y + 1);
         if(rotation == 2) return world.ent(x - 1, y);
@@ -434,19 +434,19 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     // ▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A
-    public @Nullable Tilec front(){
+    public @Nullable Building front(){
         return getNearbyEntity((rotation + 4) % 4);
     }
 
-    public @Nullable Tilec right(){
+    public @Nullable Building right(){
         return getNearbyEntity((rotation + 3) % 4);
     }
 
-    public @Nullable Tilec back(){
+    public @Nullable Building back(){
         return getNearbyEntity((rotation + 2) % 4);
     }
 
-    public @Nullable Tilec left(){
+    public @Nullable Building left(){
         return getNearbyEntity((rotation + 1) % 4);
     }
 
@@ -505,7 +505,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             //remove this tile's dangling entities
             if(entity.block().isMultiblock()){
                 int cx = entity.tileX(), cy = entity.tileY();
-                int size = entity.block().size;
+                int size = entity.block.size;
                 int offsetx = -(size - 1) / 2;
                 int offsety = -(size - 1) / 2;
                 for(int dx = 0; dx < size; dx++){
@@ -534,9 +534,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
-    protected void changeEntity(Team team, Prov<Tilec> entityprov){
+    protected void changeEntity(Team team, Prov<Building> entityprov){
         if(entity != null){
-            int size = entity.block().size;
+            int size = entity.block.size;
             entity.remove();
             entity = null;
 
@@ -544,14 +544,14 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             tileSet.clear();
 
             for(Point2 edge : Edges.getEdges(size)){
-                Tilec other = world.ent(x + edge.x, y + edge.y);
+                Building other = world.ent(x + edge.x, y + edge.y);
                 if(other != null){
                     tileSet.add(other);
                 }
             }
 
             //update proximity, since multiblock was just removed
-            for(Tilec t : tileSet){
+            for(Building t : tileSet){
                 t.updateProximity();
             }
         }
@@ -568,7 +568,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             }else{
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(Point2 p : Geometry.d4){
-                    Tilec tile = world.ent(x + p.x, y + p.y);
+                    Building tile = world.ent(x + p.x, y + p.y);
                     if(tile != null && !tile.tile().changing){
                         tile.onProximityUpdate();
                     }
@@ -633,7 +633,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     @Remote(called = Loc.server, unreliable = true)
     public static void onTileDamage(Tile tile, float health){
         if(tile.entity != null){
-            tile.entity.health(health);
+            tile.entity.health = health;
 
             if(tile.entity.damaged()){
                 indexer.notifyTileDamaged(tile.entity);

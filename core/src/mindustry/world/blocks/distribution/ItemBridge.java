@@ -122,7 +122,7 @@ public class ItemBridge extends Block{
         return null;
     }
 
-    public class ItemBridgeEntity extends TileEntity{
+    public class ItemBridgeEntity extends Building{
         public int link = -1;
         public IntSet incoming = new IntSet();
         public float uptime;
@@ -203,7 +203,7 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             //reverse connection
             if(other instanceof ItemBridgeEntity && ((ItemBridgeEntity)other).link == pos()){
                 configure(other.pos());
@@ -257,7 +257,7 @@ public class ItemBridge extends Block{
             }
         }
 
-        public void updateTransport(Tilec other){
+        public void updateTransport(Building other){
             if(uptime >= 0.5f && timer(timerTransport, transportTime)){
                 Item item = items.take();
                 if(item != null && other.acceptItem(this, item)){
@@ -314,7 +314,7 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             if(team != source.team()) return false;
 
             Tile other = world.tile(link);
@@ -332,12 +332,12 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public boolean canDumpLiquid(Tilec to, Liquid liquid){
+        public boolean canDumpLiquid(Building to, Liquid liquid){
             return checkDump(to);
         }
 
         @Override
-        public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
             if(team != source.team() || !hasLiquids) return false;
 
             Tile other = world.tile(link);
@@ -355,11 +355,11 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public boolean canDump(Tilec to, Item item){
+        public boolean canDump(Building to, Item item){
             return checkDump(to);
         }
 
-        protected boolean checkDump(Tilec to){
+        protected boolean checkDump(Building to){
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
                 Tile edge = Edges.getFacingEdge(to.tile(), tile);

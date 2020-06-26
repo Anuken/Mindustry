@@ -91,7 +91,7 @@ public class Conveyor extends Block implements Autotiler{
             Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
-    public class ConveyorEntity extends TileEntity{
+    public class ConveyorEntity extends Building{
         //parallel array data
         Item[] ids = new Item[capacity];
         float[] xs = new float[capacity];
@@ -99,7 +99,7 @@ public class Conveyor extends Block implements Autotiler{
         //amount of items, always < capacity
         int len = 0;
         //next entity
-        @Nullable Tilec next;
+        @Nullable Building next;
         @Nullable ConveyorEntity nextc;
         //whether the next conveyor's rotation == tile rotation
         boolean aligned;
@@ -169,7 +169,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public void unitOn(Unitc unit){
+        public void unitOn(Unit unit){
             if(clogHeat > 0.5f){
                 return;
             }
@@ -287,7 +287,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             if(len >= capacity) return false;
             Tile facing = Edges.getFacingEdge(source.tile(), tile);
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - tile.rotation());
@@ -295,7 +295,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
+        public void handleItem(Building source, Item item){
             if(len >= capacity) return;
 
             byte r = tile.rotation();

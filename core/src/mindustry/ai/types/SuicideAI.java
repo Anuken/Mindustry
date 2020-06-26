@@ -20,14 +20,14 @@ public class SuicideAI extends GroundAI{
             targetClosest();
         }
 
-        Tilec core = unit.closestEnemyCore();
+        Building core = unit.closestEnemyCore();
 
         boolean rotate = false, shoot = false;
 
         if(!Units.invalidateTarget(target, unit, unit.range())){
             rotate = true;
             shoot = unit.within(target, unit.type().weapons.first().bullet.range() +
-                (target instanceof Tilec ? ((Tilec)target).block().size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
+                (target instanceof Building ? ((Building)target).block().size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
 
             if(unit.type().hasWeapons()){
                 unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));

@@ -47,7 +47,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static int maxLength = 100;
     final static Vec2 stackTrns = new Vec2();
     final static Rect r1 = new Rect(), r2 = new Rect();
-    final static Seq<Unitc> units = new Seq<>();
+    final static Seq<Unit> units = new Seq<>();
     /** Distance on the back from where items originate. */
     final static float backTrns = 3f;
 
@@ -85,11 +85,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
-        if(tile == null || tile.entity == null || tile.entity.items() == null) return;
+        if(tile == null || tile.entity == null || tile.entity.items == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, tile, () -> {}));
         }
-        tile.entity.items().add(item, amount);
+        tile.entity.items.add(item, amount);
     }
 
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
@@ -105,7 +105,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
-    public static void dropItem(Playerc player, float angle){
+    public static void dropItem(Player player, float angle){
         if(net.server() && player.unit().stack().amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
@@ -115,7 +115,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
-    public static void rotateBlock(Playerc player, Tilec tile, boolean direction){
+    public static void rotateBlock(Player player, Building tile, boolean direction){
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.rotate, tile.tile(), action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
@@ -127,7 +127,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
-    public static void transferInventory(Playerc player, Tilec tile){
+    public static void transferInventory(Player player, Building tile){
         if(player == null || tile == null) return;
         if(net.server() && (player.unit().stack().amount <= 0 || !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile(), action -> {
@@ -149,14 +149,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         createItemTransfer(
             item,
             amount,
-            player.x() + Angles.trnsx(player.unit().rotation() + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation() + 180f, backTrns),
+            player.x() + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y() + Angles.trnsy(player.unit().rotation + 180f, backTrns),
             new Vec2(tile.x() + stackTrns.x, tile.y() + stackTrns.y),
             () -> tile.handleStack(item, accepted, player.unit())
         );
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onTileTapped(Playerc player, Tilec tile){
+    public static void onTileTapped(Player player, Building tile){
         if(tile == null || player == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
         !netServer.admins.allowAction(player, ActionType.tapTile, tile.tile(), action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
@@ -165,7 +165,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void onTileConfig(Playerc player, Tilec tile, @Nullable Object value){
+    public static void onTileConfig(Player player, Building tile, @Nullable Object value){
         if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
@@ -174,7 +174,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onUnitControl(Playerc player, @Nullable Unitc unit){
+    public static void onUnitControl(Player player, @Nullable Unit unit){
         //clear player unit when they possess a core
         if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreEntity)){
             Fx.spawn.at(player);
@@ -183,9 +183,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team() == player.team()){
+        }else if(unit.isAI() && unit.team == player.team()){
             player.unit(unit);
-            Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x(), unit.y(), 0f, unit));
+            Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
                 Fx.unitSpirit.at(player.x(), player.y(), 0f, unit);
             }
@@ -193,9 +193,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onUnitClear(Playerc player){
+    public static void onUnitClear(Player player){
         //no free core teleports?
-        if(!player.dead() && player.unit().spawnedByCore()) return;
+        if(!player.dead() && player.unit().spawnedByCore) return;
 
         Fx.spawn.at(player);
         player.clearUnit();
@@ -203,7 +203,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onUnitCommand(Playerc player){
+    public static void onUnitCommand(Player player){
         if(player.dead() || !(player.unit() instanceof Commanderc)) return;
 
         Commanderc commander = (Commanderc)player.unit();
@@ -212,7 +212,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             commander.clearCommand();
         }else{
             FormationPattern pattern = new SquareFormation();
-            Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation()), pattern);
+            Formation formation = new Formation(new Vec3(player.x(), player.y(), player.unit().rotation), pattern);
             formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
 
             units.clear();
@@ -260,7 +260,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead()){
-            Unitc unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+            Unit unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
 
             if(unit != null){
                 Call.onUnitControl(player, unit);
@@ -270,7 +270,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void checkUnit(){
         if(controlledType != null){
-            Unitc unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
+            Unit unit = Units.closest(player.team(), player.x(), player.y(), u -> !u.isPlayer() && u.type() == controlledType);
             if(unit == null && controlledType == UnitTypes.block){
                 unit = world.entWorld(player.x(), player.y()) instanceof ControlBlock ? ((ControlBlock)world.entWorld(player.x(), player.y())).unit() : null;
             }
@@ -481,7 +481,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
-                Tile tile = world.tilec(x, y);
+                Tile tile = world.Building(x, y);
                 if(tile == null || !validBreak(tile.x, tile.y)) continue;
 
                 drawBreaking(tile.x, tile.y);
@@ -597,7 +597,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int wx = x1 + x * Mathf.sign(x2 - x1);
                 int wy = y1 + y * Mathf.sign(y2 - y1);
 
-                Tile tile = world.tilec(wx, wy);
+                Tile tile = world.Building(wx, wy);
 
                 if(tile == null) continue;
 
@@ -663,7 +663,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     /** Handles tile tap events that are not platform specific. */
-    boolean tileTapped(@Nullable Tilec tile){
+    boolean tileTapped(@Nullable Building tile){
         if(tile == null){
             frag.inv.hide();
             frag.config.hideConfig();
@@ -702,7 +702,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile.interactable(player.team()) && tile.block().consumesTap){
             consumed = true;
         }else if(tile.interactable(player.team()) && tile.block().synthetic() && !consumed){
-            if(tile.block().hasItems && tile.items().total() > 0){
+            if(tile.block().hasItems && tile.items.total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
                 showedInventory = true;
@@ -747,7 +747,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
     }
 
-    Tilec entAt(float x, float y){
+    Building entAt(float x, float y){
         return world.ent(tileX(x), tileY(y));
     }
 
@@ -796,8 +796,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return Core.input.mouseWorld(getMouseX(), getMouseY()).sub(x, y).angle();
     }
 
-    public @Nullable Unitc selectedUnit(){
-        Unitc unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unitc::isAI);
+    public @Nullable Unit selectedUnit(){
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unit::isAI);
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
@@ -806,7 +806,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Building tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(tile instanceof ControlBlock && tile.team() == player.team()){
             return ((ControlBlock)tile).unit();
         }
@@ -865,7 +865,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return droppingItem;
     }
 
-    public void tryDropItems(@Nullable Tilec tile, float x, float y){
+    public void tryDropItems(@Nullable Building tile, float x, float y){
         if(!droppingItem || player.unit().stack().amount <= 0 || canTapPlayer(x, y) || state.isPaused() ){
             droppingItem = false;
             return;
@@ -1106,7 +1106,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     protected void updateTouch(){
         if(Units.invalidateTarget(target, this) &&
-            !(target instanceof Tilec && ((Tilec)target).damaged() && target.isValid() && target.team() == team && mech.canHeal && dst(target) < mech.range && !(((Tilec)target).block instanceof BuildBlock))){
+            !(target instanceof Building && ((Building)target).damaged() && target.isValid() && target.team() == team && mech.canHeal && dst(target) < mech.range && !(((Building)target).block instanceof BuildBlock))){
             target = null;
         }
 
@@ -1121,7 +1121,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(moveTarget != null && !moveTarget.dead()){
             targetX = moveTarget.getX();
             targetY = moveTarget.getY();
-            boolean tapping = moveTarget instanceof Tilec && moveTarget.team() == team;
+            boolean tapping = moveTarget instanceof Building && moveTarget.team() == team;
             attractDst = 0f;
 
             if(tapping){
@@ -1130,7 +1130,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             if(dst(moveTarget) <= 2f * Time.delta()){
                 if(tapping && !dead()){
-                    Tile tile = ((Tilec)moveTarget).tile;
+                    Tile tile = ((Building)moveTarget).tile;
                     tile.tapped(this);
                 }
 
@@ -1197,7 +1197,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         mineTile(null);
                     }
                 }
-            }else if(target.isValid() || (target instanceof Tilec && ((Tilec)target).damaged() && target.team() == team && mech.canHeal && dst(target) < mech.range)){
+            }else if(target.isValid() || (target instanceof Building && ((Building)target).damaged() && target.team() == team && mech.canHeal && dst(target) < mech.range)){
                 //rotate toward and shoot the target
                 if(mech.faceTarget){
                     rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);

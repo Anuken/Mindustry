@@ -57,7 +57,7 @@ public class MassDriver extends Block{
 
         //check if a mass driver is selected while placing this driver
         if(!control.input.frag.config.isShown()) return;
-        Tilec selected = control.input.frag.config.getSelectedTile();
+        Building selected = control.input.frag.config.getSelectedTile();
         if(selected == null || !(selected.block() instanceof MassDriver) || !(selected.dst(x * tilesize, y * tilesize) <= range)) return;
 
         //if so, draw a dotted line towards it while it is in range
@@ -85,7 +85,7 @@ public class MassDriver extends Block{
         }
     }
 
-    public class MassDriverEntity extends TileEntity{
+    public class MassDriverEntity extends Building{
         int link = -1;
         float rotation = 90;
         float reload = 0f;
@@ -98,7 +98,7 @@ public class MassDriver extends Block{
 
         @Override
         public void updateTile(){
-            Tilec link = world.ent(this.link);
+            Building link = world.ent(this.link);
             boolean hasLink = linkValid();
 
             //reload regardless of state
@@ -212,7 +212,7 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             if(this == other){
                 configure(-1);
                 return false;
@@ -230,7 +230,7 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             //mass drivers that ouput only cannot accept items
             return items.total() < itemCapacity && linkValid();
         }
@@ -265,7 +265,7 @@ public class MassDriver extends Block{
             Effects.shake(shake, shake, this);
         }
 
-        public void handlePayload(Bulletc bullet, DriverBulletData data){
+        public void handlePayload(Bullet bullet, DriverBulletData data){
             int totalItems = items.total();
 
             //add all the items possible

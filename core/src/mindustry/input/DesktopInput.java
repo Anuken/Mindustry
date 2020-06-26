@@ -199,7 +199,7 @@ public class DesktopInput extends InputHandler{
 
         if(!scene.hasMouse()){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
-                Unitc on = selectedUnit();
+                Unit on = selectedUnit();
                 if(on != null){
                     Call.onUnitControl(player, on);
                     shouldShoot = false;
@@ -546,7 +546,7 @@ public class DesktopInput extends InputHandler{
         }
     }
 
-    protected void updateMovement(Unitc unit){
+    protected void updateMovement(Unit unit){
         boolean omni = !(unit instanceof WaterMovec);
         boolean legs = unit.isGrounded();
 
@@ -588,12 +588,12 @@ public class DesktopInput extends InputHandler{
             Payloadc pay = (Payloadc)unit;
 
             if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
-                Unitc target = Units.closest(player.team(), pay.x(), pay.y(), 30f, u -> u.isAI() && u.isGrounded());
+                Unit target = Units.closest(player.team(), pay.x(), pay.y(), 30f, u -> u.isAI() && u.isGrounded());
                 if(target != null){
                     pay.pickup(target);
                 }else if(!pay.hasPayload()){
-                    Tilec tile = world.entWorld(pay.x(), pay.y());
-                    if(tile != null && tile.team() == unit.team() && tile.block().synthetic()){
+                    Building tile = world.entWorld(pay.x(), pay.y());
+                    if(tile != null && tile.team() == unit.team && tile.block().synthetic()){
                         //pick up block directly
                         if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
                             pay.pickup(tile);

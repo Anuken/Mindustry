@@ -123,7 +123,7 @@ public class Administration{
     }
 
     /** Filters out a chat message. */
-    public @Nullable String filterMessage(Playerc player, String message){
+    public @Nullable String filterMessage(Player player, String message){
         String current = message;
         for(ChatFilter f : chatFilters){
             current = f.filter(player, current);
@@ -138,7 +138,7 @@ public class Administration{
     }
 
     /** @return whether this action is allowed by the action filters. */
-    public boolean allowAction(Playerc player, ActionType type, Tile tile, Cons<PlayerAction> setter){
+    public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
         setter.get(act.set(player, type, tile));
         for(ActionFilter filter : actionFilters){
@@ -655,7 +655,7 @@ public class Administration{
     /** Handles chat messages from players and changes their contents. */
     public interface ChatFilter{
         /** @return the filtered message; a null string signals that the message should not be sent. */
-        @Nullable String filter(Playerc player, String message);
+        @Nullable String filter(Player player, String message);
     }
 
     /** Allows or disallows player actions. */
@@ -679,7 +679,7 @@ public class Administration{
     /** Defines a (potentially dangerous) action that a player has done in the world.
      * These objects are pooled; do not cache them! */
     public static class PlayerAction implements Poolable{
-        public @NonNull Playerc player;
+        public @NonNull Player player;
         public @NonNull ActionType type;
         public @NonNull Tile tile;
 
@@ -694,7 +694,7 @@ public class Administration{
         public @Nullable Item item;
         public int itemAmount;
 
-        public PlayerAction set(Playerc player, ActionType type, Tile tile){
+        public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
             this.tile = tile;

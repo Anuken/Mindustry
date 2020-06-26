@@ -102,7 +102,7 @@ public class World{
     }
 
     @Nullable
-    public Tile tilec(int x, int y){
+    public Tile Building(int x, int y){
         Tile tile = tiles.get(x, y);
         if(tile == null) return null;
         if(tile.entity != null) return tile.entity.tile();
@@ -110,14 +110,14 @@ public class World{
     }
 
     @Nullable
-    public Tilec ent(int x, int y){
+    public Building ent(int x, int y){
         Tile tile = tile(x, y);
         if(tile == null) return null;
         return tile.entity;
     }
 
     @Nullable
-    public Tilec ent(int pos){
+    public Building ent(int pos){
         Tile tile = tile(pos);
         if(tile == null) return null;
         return tile.entity;
@@ -134,7 +134,7 @@ public class World{
     }
 
     @Nullable
-    public Tilec entWorld(float x, float y){
+    public Building entWorld(float x, float y){
         return ent(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
@@ -166,7 +166,7 @@ public class World{
 
     /**
      * Call to signify the beginning of map loading.
-     * TileChangeEvents will not be fired until endMapLoad().
+     * BuildinghangeEvents will not be fired until endMapLoad().
      */
     public void beginMapLoad(){
         generating = true;
@@ -317,7 +317,7 @@ public class World{
 
     public void notifyChanged(Tile tile){
         if(!generating){
-            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
+            Core.app.post(() -> Events.fire(new BuildinghangeEvent(tile)));
         }
     }
 
