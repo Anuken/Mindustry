@@ -188,7 +188,6 @@ public class Shaders{
         public void apply(){
             setUniformf("u_dp", Scl.scl(1f));
             setUniformf("u_time", Time.time() / Scl.scl(1f));
-            setUniformf("u_shieldcolor", color);
             setUniformf("u_offset",
             Core.camera.position.x - Core.camera.width / 2,
             Core.camera.position.y - Core.camera.height / 2);
