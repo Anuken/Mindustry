@@ -158,7 +158,7 @@ public class ForceProjector extends Block{
 
                 Draw.z(Layer.shields);
 
-                Draw.color(Pal.accent);
+                Draw.color(tile.team().color);
 
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(x, y, 6, radius);
