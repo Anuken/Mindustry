@@ -1,22 +1,17 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.struct.IntSet;
-import arc.struct.IntSet.IntSetIterator;
-import arc.graphics.Color;
-import arc.graphics.Texture;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.game.EventType.*;
-import mindustry.game.Team;
-import mindustry.graphics.IndexedRenderer;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import mindustry.content.*;
+import mindustry.game.*;
+import mindustry.graphics.*;
+import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class MapRenderer implements Disposable{
     private static final int chunkSize = 64;
@@ -30,10 +25,6 @@ public class MapRenderer implements Disposable{
     public MapRenderer(MapEditor editor){
         this.editor = editor;
         this.texture = Core.atlas.find("clear-editor").getTexture();
-
-        Events.on(ContentReloadEvent.class, e -> {
-            texture = Core.atlas.find("clear-editor").getTexture();
-        });
     }
 
     public void resize(int width, int height){
@@ -62,13 +53,7 @@ public class MapRenderer implements Disposable{
     public void draw(float tx, float ty, float tw, float th){
         Draw.flush();
 
-        IntSetIterator it = updates.iterator();
-        while(it.hasNext){
-            int i = it.next();
-            int x = i % width;
-            int y = i / width;
-            render(x, y);
-        }
+        updates.each(i -> render(i % width, i / width));
         updates.clear();
 
         updates.addAll(delayedUpdates);

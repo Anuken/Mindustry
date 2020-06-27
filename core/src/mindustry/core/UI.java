@@ -64,7 +64,6 @@ public class UI implements ApplicationListener, Loadable{
     public ContentInfoDialog content;
     public PlanetDialog planet;
     public TechTreeDialog tech;
-    //public MinimapDialog minimap;
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
@@ -334,10 +333,17 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showInfo(String info){
+        showInfo(info, () -> {});
+    }
+
+    public void showInfo(String info, Runnable listener){
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.button("$ok", this::hide).size(110, 50).pad(4);
+            buttons.button("$ok", () -> {
+                hide();
+                listener.run();
+            }).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -373,43 +379,12 @@ public class UI implements ApplicationListener, Loadable{
             cont.add((text.startsWith("$") ? Core.bundle.get(text.substring(1)) : text) + (message == null ? "" : "\n[lightgray](" + message + ")")).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
             cont.row();
 
-            Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.parseException(exc, true)).color(Color.lightGray).left()), true);
+            Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.neatError(exc)).color(Color.lightGray).left()), true);
 
             cont.button("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
             cont.button("$ok", this::hide).size(110, 50).fillX().left();
             cont.row();
             cont.add(col).colspan(2).pad(2);
-        }}.show();
-    }
-
-    public void showExceptions(String text, String... messages){
-        loadfrag.hide();
-        new Dialog(""){{
-
-            setFillParent(true);
-            cont.margin(15);
-            cont.add("$error.title").colspan(2);
-            cont.row();
-            cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
-            cont.row();
-            cont.add(text).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
-            cont.row();
-
-            //cont.pane(p -> {
-                for(int i = 0; i < messages.length; i += 2){
-                    String btext = messages[i];
-                    String details = messages[i + 1];
-                    Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(details).color(Color.lightGray).left()), true);
-
-                    cont.add(btext).right();
-                    cont.button("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().left();
-                    cont.row();
-                    cont.add(col).colspan(2).pad(2);
-                    cont.row();
-                }
-            //}).colspan(2);
-
-            cont.button("$ok", this::hide).size(300, 50).fillX().colspan(2);
         }}.show();
     }
 

@@ -26,11 +26,11 @@ public class LightningBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
     }
 
     @Override
-    public void init(Bulletc b){
+    public void init(Bullet b){
         Lightning.create(b.team(), lightningColor, damage, b.x(), b.y(), b.rotation(), lightningLength);
     }
 }

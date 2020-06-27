@@ -36,7 +36,6 @@ if(!hasProperty("release")){
         ':Arc:extensions:box2d',
         ':Arc:extensions:g3d',
         ':Arc:extensions:fx',
-        ':Arc:extensions:discord',
         ':Arc:natives',
         ':Arc:natives:natives-desktop',
         ':Arc:natives:natives-android',

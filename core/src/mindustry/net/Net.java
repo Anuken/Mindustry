@@ -56,7 +56,7 @@ public class Net{
                 error = Core.bundle.get("error.io");
             }else if(error.equals("mismatch")){
                 error = Core.bundle.get("error.mismatch");
-            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address")) || Strings.parseException(e, true).contains("address associated")){
+            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address")) || Strings.neatError(e).contains("address associated")){
                 error = Core.bundle.get("error.invalidaddress");
             }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
                 error = Core.bundle.get("error.unreachable");

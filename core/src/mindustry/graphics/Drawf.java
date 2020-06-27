@@ -73,7 +73,7 @@ public class Drawf{
         return team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights;
     }
 
-    public static void selected(Tilec tile, Color color){
+    public static void selected(Building tile, Color color){
         selected(tile.tile(), color);
     }
 
@@ -188,11 +188,11 @@ public class Drawf{
         Draw.rect(Core.atlas.find("shape-3"), x, y - oy + length / 2f, width, length, width / 2f, oy, rotation - 90);
     }
 
-    public static void construct(Tilec t, UnlockableContent content, float rotation, float progress, float speed, float time){
+    public static void construct(Building t, UnlockableContent content, float rotation, float progress, float speed, float time){
         construct(t, content.icon(Cicon.full), rotation, progress, speed, time);
     }
 
-    public static void construct(Tilec t, TextureRegion region, float rotation, float progress, float speed, float time){
+    public static void construct(Building t, TextureRegion region, float rotation, float progress, float speed, float time){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
         Shaders.build.color.set(Pal.accent);

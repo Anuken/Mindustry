@@ -1,6 +1,7 @@
 package mindustry.world.consumers;
 
 import arc.func.*;
+import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -10,10 +11,10 @@ import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 public class ConsumeItemDynamic extends Consume{
-    public final @NonNull Func<Tilec, ItemStack[]> items;
+    public final @NonNull Func<Building, ItemStack[]> items;
 
-    public ConsumeItemDynamic(Func<Tilec, ItemStack[]> items){
-        this.items = items;
+    public <T extends Building> ConsumeItemDynamic(Func<T, ItemStack[]> items){
+        this.items = (Func<Building, ItemStack[]>)items;
     }
 
     @Override
@@ -27,7 +28,7 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public void build(Tilec tile, Table table){
+    public void build(Building tile, Table table){
         ItemStack[][] current = {items.get(tile)};
 
         table.update(() -> {
@@ -40,10 +41,10 @@ public class ConsumeItemDynamic extends Consume{
         rebuild(tile, table);
     }
 
-    private void rebuild(Tilec tile, Table table){
+    private void rebuild(Building tile, Table table){
         for(ItemStack stack : items.get(tile)){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
-            () -> tile.items() != null && tile.items().has(stack.item, stack.amount))).size(8 * 4).padRight(5);
+            () -> tile.items != null && tile.items.has(stack.item, stack.amount))).size(8 * 4).padRight(6 * Mathf.digits(stack.amount));
         }
     }
 
@@ -53,20 +54,20 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public void update(Tilec entity){
+    public void update(Building entity){
 
     }
 
     @Override
-    public void trigger(Tilec entity){
+    public void trigger(Building entity){
         for(ItemStack stack : items.get(entity)){
-            entity.items().remove(stack);
+            entity.items.remove(stack);
         }
     }
 
     @Override
-    public boolean valid(Tilec entity){
-        return entity.items() != null && entity.items().has(items.get(entity));
+    public boolean valid(Building entity){
+        return entity.items != null && entity.items.has(items.get(entity));
     }
 
     @Override

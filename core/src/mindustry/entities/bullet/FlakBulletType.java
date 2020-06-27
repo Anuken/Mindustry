@@ -23,7 +23,7 @@ public class FlakBulletType extends BasicBulletType{
     }
 
     @Override
-    public void update(Bulletc b){
+    public void update(Bullet b){
         super.update(b);
         if(b.data() instanceof Integer) return;
 

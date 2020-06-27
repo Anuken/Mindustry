@@ -10,6 +10,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -86,11 +87,8 @@ public class Drill extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("drillspeed", e -> {
-            DrillEntity entity = (DrillEntity)e;
-
-            return new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(entity.lastDrillSpeed * 60 * entity.timeScale(), 2)), () -> Pal.ammo, () -> entity.warmup);
-        });
+        bars.add("drillspeed", (DrillEntity e) ->
+             new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60 * e.timeScale(), 2)), () -> Pal.ammo, () -> e.warmup));
     }
 
     public Item getDrop(Tile tile){
@@ -98,7 +96,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile){
+    public boolean canPlaceOn(Tile tile, Team team){
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
                 if(canMine(other)){
@@ -184,7 +182,7 @@ public class Drill extends Block{
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canMine(other)){
-                oreCount.getAndIncrement(getDrop(other), 0, 1);
+                oreCount.increment(getDrop(other), 0, 1);
             }
         }
 
@@ -214,16 +212,15 @@ public class Drill extends Block{
         return drops != null && drops.hardness <= tier;
     }
 
-    public class DrillEntity extends TileEntity{
-        float progress;
-        int index;
-        float warmup;
-        float timeDrilled;
-        float lastDrillSpeed;
+    public class DrillEntity extends Building{
+        public float progress;
+        public int index;
+        public float warmup;
+        public float timeDrilled;
+        public float lastDrillSpeed;
 
-        int dominantItems;
-        Item dominantItem;
-
+        public int dominantItems;
+        public Item dominantItem;
 
         @Override
         public boolean shouldConsume(){
@@ -291,7 +288,6 @@ public class Drill extends Block{
 
             if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 offload(dominantItem);
-                useContent(dominantItem);
 
                 index ++;
                 progress %= delay;

@@ -28,12 +28,12 @@ public class HealBulletType extends BulletType{
     }
 
     @Override
-    public boolean collides(Bulletc b, Tilec tile){
+    public boolean collides(Bullet b, Building tile){
         return tile.team() != b.team() || tile.healthf() < 1f;
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
         Draw.color(backColor);
         Lines.stroke(bulletWidth);
         Lines.lineAngleCenter(b.x(), b.y(), b.rotation(), bulletHeight);
@@ -43,7 +43,7 @@ public class HealBulletType extends BulletType{
     }
 
     @Override
-    public void hitTile(Bulletc b, Tilec tile){
+    public void hitTile(Bullet b, Building tile){
         super.hit(b);
 
         if(tile.team() == b.team() && !(tile.block() instanceof BuildBlock)){

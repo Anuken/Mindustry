@@ -138,7 +138,7 @@ public abstract class Turret extends Block{
         public abstract BulletType type();
     }
 
-    public class TurretEntity extends TileEntity implements ControlBlock{
+    public class TurretEntity extends Building implements ControlBlock{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float reload, rotation = 90, recoil, heat;
@@ -154,8 +154,8 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public Unitc unit(){
-            return unit;
+        public Unit unit(){
+            return (Unit)unit;
         }
 
         @Override
@@ -237,7 +237,7 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public void handleLiquid(Tilec source, Liquid liquid, float amount){
+        public void handleLiquid(Building source, Liquid liquid, float amount){
             if(acceptCoolant && liquids.currentAmount() <= 0.001f){
                 Events.fire(Trigger.turretCool);
             }

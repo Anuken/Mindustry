@@ -51,7 +51,7 @@ public class BlockIndexer{
     private Seq<Tile> returnArray = new Seq<>();
 
     public BlockIndexer(){
-        Events.on(TileChangeEvent.class, event -> {
+        Events.on(BuildinghangeEvent.class, event -> {
             if(typeMap.get(event.tile.pos()) != null){
                 TileIndex index = typeMap.get(event.tile.pos());
                 for(BlockFlag flag : index.flags){
@@ -164,11 +164,11 @@ public class BlockIndexer{
         return flagMap[team.id][type.ordinal()];
     }
 
-    public boolean eachBlock(Teamc team, float range, Boolf<Tilec> pred, Cons<Tilec> cons){
+    public boolean eachBlock(Teamc team, float range, Boolf<Building> pred, Cons<Building> cons){
         return eachBlock(team.team(), team.getX(), team.getY(), range, pred, cons);
     }
 
-    public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Tilec> pred, Cons<Tilec> cons){
+    public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Building> pred, Cons<Building> cons){
         intSet.clear();
 
         int tx = world.toTile(wx);
@@ -181,7 +181,7 @@ public class BlockIndexer{
             for(int y = -tileRange + ty; y <= tileRange + ty; y++){
                 if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
 
-                Tilec other = world.ent(x, y);
+                Building other = world.ent(x, y);
 
                 if(other == null) continue;
 
@@ -211,7 +211,7 @@ public class BlockIndexer{
         return returnArray;
     }
 
-    public void notifyTileDamaged(Tilec entity){
+    public void notifyTileDamaged(Building entity){
         if(damagedTiles[(int)entity.team().id] == null){
             damagedTiles[(int)entity.team().id] = new TileArray();
         }
@@ -220,11 +220,11 @@ public class BlockIndexer{
         set.add(entity.tile());
     }
 
-    public Tilec findEnemyTile(Team team, float x, float y, float range, Boolf<Tilec> pred){
+    public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
         for(Team enemy : activeTeams){
             if(!team.isEnemy(enemy)) continue;
 
-            Tilec entity = indexer.findTile(enemy, x, y, range, pred, true);
+            Building entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
                 return entity;
             }
@@ -233,12 +233,12 @@ public class BlockIndexer{
         return null;
     }
 
-    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tilec> pred){
+    public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred){
         return findTile(team, x, y, range, pred, false);
     }
 
-    public Tilec findTile(Team team, float x, float y, float range, Boolf<Tilec> pred, boolean usePriority){
-        Tilec closest = null;
+    public Building findTile(Team team, float x, float y, float range, Boolf<Building> pred, boolean usePriority){
+        Building closest = null;
         float dst = 0;
         float range2 = range * range;
 
@@ -249,7 +249,7 @@ public class BlockIndexer{
 
                 for(int tx = rx * quadrantSize; tx < (rx + 1) * quadrantSize && tx < world.width(); tx++){
                     for(int ty = ry * quadrantSize; ty < (ry + 1) * quadrantSize && ty < world.height(); ty++){
-                        Tilec e = world.ent(tx, ty);
+                        Building e = world.ent(tx, ty);
 
                         if(e == null) continue;
 
@@ -390,7 +390,7 @@ public class BlockIndexer{
             outer:
             for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
-                    Tilec result = world.ent(x, y);
+                    Building result = world.ent(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result != null && result.team() == team){
                         bits.set(quadrantX, quadrantY);

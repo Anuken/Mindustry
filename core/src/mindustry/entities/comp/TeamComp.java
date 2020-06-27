@@ -17,15 +17,15 @@ abstract class TeamComp implements Posc{
         return team.rules().cheat;
     }
 
-    public @Nullable Tilec core(){
+    public @Nullable Building core(){
         return team.core();
     }
 
-    public @Nullable Tilec closestCore(){
+    public @Nullable Building closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable Tilec closestEnemyCore(){
+    public @Nullable Building closestEnemyCore(){
         return state.teams.closestEnemyCore(x, y, team);
     }
 }

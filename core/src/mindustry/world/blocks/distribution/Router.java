@@ -19,7 +19,7 @@ public class Router extends Block{
         unloadable = false;
     }
 
-    public class RouterEntity extends TileEntity{
+    public class RouterEntity extends Building{
         Item lastItem;
         Tile lastInput;
         float time;
@@ -32,7 +32,7 @@ public class Router extends Block{
 
             if(lastItem != null){
                 time += 1f / speed * delta();
-                Tilec target = getTileTarget(lastItem, lastInput, false);
+                Building target = getTileTarget(lastItem, lastInput, false);
 
                 if(target != null && (time >= 1f || !(target.block() instanceof Router))){
                     getTileTarget(lastItem, lastInput, true);
@@ -44,12 +44,12 @@ public class Router extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return team == source.team() && lastItem == null && items.total() == 0;
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
+        public void handleItem(Building source, Item item){
             items.add(item, 1);
             lastItem = item;
             time = 0f;
@@ -65,10 +65,10 @@ public class Router extends Block{
             return result;
         }
 
-        Tilec getTileTarget(Item item, Tile from, boolean set){
+        Building getTileTarget(Item item, Tile from, boolean set){
             int counter = tile.rotation();
             for(int i = 0; i < proximity.size; i++){
-                Tilec other = proximity.get((i + counter) % proximity.size);
+                Building other = proximity.get((i + counter) % proximity.size);
                 if(set) tile.rotation((byte)((tile.rotation() + 1) % proximity.size));
                 if(other.tile() == from && from.block() == Blocks.overflowGate) continue;
                 if(other.acceptItem(this, item)){

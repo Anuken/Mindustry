@@ -42,7 +42,7 @@ public class Effects{
             Rect pos = Tmp.r2.setSize(effect.size).setCenter(x, y);
 
             if(view.overlaps(pos)){
-                Effectc entity = EffectEntity.create();
+                EffectState entity = EffectState.create();
                 entity.effect(effect);
                 entity.rotation(rotation);
                 entity.data(data);
@@ -58,7 +58,7 @@ public class Effects{
     public static void decal(TextureRegion region, float x, float y, float rotation, float lifetime, Color color){
         if(headless || region == null || !Core.atlas.isFound(region)) return;
 
-        Decalc decal = DecalEntity.create();
+        Decal decal = Decal.create();
         decal.set(x, y);
         decal.rotation(rotation);
         decal.lifetime(lifetime);

@@ -73,7 +73,7 @@ public class NetClient implements ApplicationListener{
             });
 
             ConnectPacket c = new ConnectPacket();
-            c.name = player.name();
+            c.name = player.name;
             c.mods = mods.getModStrings();
             c.mobile = mobile;
             c.versionType = Version.type;
@@ -153,7 +153,7 @@ public class NetClient implements ApplicationListener{
 
     //called on all clients
     @Remote(targets = Loc.server, variants = Variant.both)
-    public static void sendMessage(String message, String sender, Playerc playersender){
+    public static void sendMessage(String message, String sender, Player playersender){
         if(Vars.ui != null){
             Vars.ui.chatfrag.addMessage(message, sender);
         }
@@ -174,7 +174,7 @@ public class NetClient implements ApplicationListener{
 
     //called when a server recieves a chat message from a player
     @Remote(called = Loc.server, targets = Loc.client)
-    public static void sendChatMessage(Playerc player, String message){
+    public static void sendChatMessage(Player player, String message){
         if(message.length() > maxTextLength){
             throw new ValidateException(player, "Player has sent a message above the text limit.");
         }
@@ -192,18 +192,18 @@ public class NetClient implements ApplicationListener{
 
             //special case; graphical server needs to see its message
             if(!headless){
-                sendMessage(message, colorizeName(player.id(), player.name()), player);
+                sendMessage(message, colorizeName(player.id(), player.name), player);
             }
 
             //server console logging
-            Log.info("&y@: &lb@", player.name(), message);
+            Log.info("&y@: &lb@", player.name, message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
-            Call.sendMessage(message, colorizeName(player.id(), player.name()), player);
+            Call.sendMessage(message, colorizeName(player.id(), player.name), player);
         }else{
             //log command to console but with brackets
-            Log.info("<&y@: &lm@&lg>", player.name(), message);
+            Log.info("<&y@: &lm@&lg>", player.name, message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
@@ -224,7 +224,7 @@ public class NetClient implements ApplicationListener{
     }
 
     public static String colorizeName(int id, String name){
-        Playerc player = Groups.player.getByID(id);
+        Player player = Groups.player.getByID(id);
         if(name == null || player == null) return null;
         return "[#" + player.color().toString().toUpperCase() + "]" + name;
     }
@@ -238,8 +238,8 @@ public class NetClient implements ApplicationListener{
     }
     
     @Remote(targets = Loc.client)
-    public static void onPing(Playerc player, long time){
-        Call.onPingResponse(player.con(), time);
+    public static void onPing(Player player, long time){
+        Call.onPingResponse(player.con, time);
     }
 
     @Remote(variants = Variant.one)
@@ -248,7 +248,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one)
-    public static void onTraceInfo(Playerc player, TraceInfo info){
+    public static void onTraceInfo(Player player, TraceInfo info){
         if(player != null){
             ui.traces.show(player, info);
         }
@@ -458,7 +458,7 @@ public class NetClient implements ApplicationListener{
                 Tile tile = world.tile(pos);
 
                 if(tile != null && tile.entity != null){
-                    tile.entity.items().read(Reads.get(input));
+                    tile.entity.items.read(Reads.get(input));
                 }else{
                     new ItemModule().read(Reads.get(input));
                 }
@@ -563,14 +563,14 @@ public class NetClient implements ApplicationListener{
                 }
             }
 
-            Unitc unit = player.dead() ? Nulls.unit : player.unit();
+            Unit unit = player.dead() ? Nulls.unit : player.unit();
 
             Call.onClientShapshot(lastSent++,
-            unit.x(), unit.y(),
+            unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
-            unit.rotation(),
+            unit.rotation,
             unit instanceof Mechc ? ((Mechc)unit).baseRotation() : 0,
-            unit.vel().x, unit.vel().y,
+            unit.vel.x, unit.vel.y,
             player.miner().mineTile(),
             control.input.isBoosting, control.input.isShooting, ui.chatfrag.shown(),
             requests,

@@ -69,12 +69,6 @@ public class Schematics implements Loadable{
             }
         });
 
-        Events.on(ContentReloadEvent.class, event -> {
-            previews.each((schem, m) -> m.dispose());
-            previews.clear();
-            load();
-        });
-
         Events.on(ClientLoadEvent.class, event -> {
             Pixmap pixmap = Core.atlas.getPixmap("error").crop();
             errorTexture = new Texture(pixmap);
@@ -278,7 +272,7 @@ public class Schematics implements Loadable{
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Seq<BuildPlan> toRequests(Schematic schem, int x, int y){
         return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
-            .removeAll(s -> !s.block.isVisible() || !s.block.unlockedCur());
+            .removeAll(s -> !s.block.isVisible() || !s.block.unlockedNow());
     }
 
     /** Adds a schematic to the list, also copying it into the files.*/
@@ -324,7 +318,7 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Tilec linked = world.ent(cx, cy);
+                Building linked = world.ent(cx, cy);
 
                 if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof BuildBlock)){
                     int top = linked.block().size/2;
@@ -352,7 +346,7 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Tilec tile = world.ent(cx, cy);
+                Building tile = world.ent(cx, cy);
 
                 if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
                     && (tile.block().isVisible() || (tile.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){

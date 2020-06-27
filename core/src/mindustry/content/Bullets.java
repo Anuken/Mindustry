@@ -390,19 +390,19 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void init(Bulletc b){
+            public void init(Bullet b){
                 b.vel().setLength(0.6f + Mathf.random(2f));
             }
 
             @Override
-            public void draw(Bulletc b){
+            public void draw(Bullet b){
                 Draw.color(Pal.lightFlame, Pal.darkFlame, Color.gray, b.fin());
                 Fill.circle(b.x(), b.y(), 3f * b.fout());
                 Draw.reset();
             }
 
             @Override
-            public void update(Bulletc b){
+            public void update(Bullet b){
                 if(Mathf.chance(0.04 * Time.delta())){
                     Tile tile = world.tileWorld(b.x(), b.y());
                     if(tile != null){
@@ -442,7 +442,7 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void draw(Bulletc b){
+            public void draw(Bullet b){
             }
         };
 
@@ -462,7 +462,7 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void draw(Bulletc b){
+            public void draw(Bullet b){
             }
         };
 
@@ -549,7 +549,7 @@ public class Bullets implements ContentList{
             }
 
             @Override
-            public void hit(Bulletc b, float x, float y){
+            public void hit(Bullet b, float x, float y){
                 super.hit(b, x, y);
 
                 for(int i = 0; i < 3; i++){

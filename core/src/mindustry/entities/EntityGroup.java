@@ -108,7 +108,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     public void intersect(float x, float y, float width, float height, Cons<? super T> out){
         //don't waste time for empty groups
         if(isEmpty()) return;
-        tree.intersect(height, x, y, width, out);
+        tree.intersect(x, y, width, height, out);
     }
 
     public Seq<T> intersect(float x, float y, float width, float height){

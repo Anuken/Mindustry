@@ -31,7 +31,7 @@ public class Tutorial{
     public Tutorial(){
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
-                blocksPlaced.getAndIncrement(event.tile.block(), 0, 1);
+                blocksPlaced.increment(event.tile.block(), 1);
             }
         });
 
@@ -239,7 +239,7 @@ public class Tutorial{
         //utility
 
         static void placeBlocks(){
-            Tilec core = state.teams.playerCores().first();
+            Building core = state.teams.playerCores().first();
             for(int i = 0; i < blocksToBreak; i++){
                 world.tile(core.tile().x + blockOffset, core.tile().y + i).remove();
                 world.tile(core.tile().x + blockOffset, core.tile().y + i).setBlock(Blocks.scrapWall, state.rules.defaultTeam);
@@ -247,7 +247,7 @@ public class Tutorial{
         }
 
         static boolean blocksBroken(){
-            Tilec core = state.teams.playerCores().first();
+            Building core = state.teams.playerCores().first();
 
             for(int i = 0; i < blocksToBreak; i++){
                 if(world.tile(core.tile().x + blockOffset, core.tile().y + i).block() == Blocks.scrapWall){

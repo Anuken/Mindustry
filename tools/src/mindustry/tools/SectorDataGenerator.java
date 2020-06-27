@@ -1,6 +1,7 @@
 package mindustry.tools;
 
 import arc.*;
+import arc.backend.headless.mock.*;
 import arc.files.*;
 import arc.mock.*;
 import arc.struct.*;
@@ -27,6 +28,7 @@ public class SectorDataGenerator{
         Core.files = new MockFiles();
         Core.app = new MockApplication();
         Core.settings = new MockSettings();
+        Core.graphics = new MockGraphics();
 
         headless = true;
         net = new Net(null);
@@ -121,6 +123,7 @@ public class SectorDataGenerator{
                 //TODO bad code
                 boolean hasSnow = data.floors[0].name.contains("ice") || data.floors[0].name.contains("snow");
                 boolean hasRain = !hasSnow && data.floors[0].name.contains("water");
+                boolean hasDesert = !hasSnow && !hasRain && data.floors[0].name.contains("sand");
 
                 if(hasSnow){
                     data.attributes |= (1 << SectorAttribute.snowy.ordinal());
@@ -128,6 +131,10 @@ public class SectorDataGenerator{
 
                 if(hasRain){
                     data.attributes |= (1 << SectorAttribute.rainy.ordinal());
+                }
+
+                if(hasDesert){
+                    data.attributes |= (1 << SectorAttribute.desert.ordinal());
                 }
 
                 data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(UnlockableContent.class);

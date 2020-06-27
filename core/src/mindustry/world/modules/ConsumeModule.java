@@ -7,9 +7,9 @@ import mindustry.world.meta.*;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid, optionalValid;
-    private final Tilec entity;
+    private final Building entity;
 
-    public ConsumeModule(Tilec entity){
+    public ConsumeModule(Building entity){
         this.entity = entity;
     }
 

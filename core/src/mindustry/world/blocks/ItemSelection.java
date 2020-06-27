@@ -24,7 +24,7 @@ public class ItemSelection{
         int i = 0;
 
         for(T item : items){
-            if(!data.isUnlocked(item) && state.isCampaign()) continue;
+            if(!item.unlockedNow()) continue;
 
             ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));

@@ -55,7 +55,7 @@ public class MendProjector extends Block{
         Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
     }
 
-    public class MendEntity extends TileEntity{
+    public class MendEntity extends Building{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;

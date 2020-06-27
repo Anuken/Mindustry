@@ -62,10 +62,10 @@ public class Rules{
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 60 * 60 * 2;
-    /** How many times longer a boss wave takes. */
-    public float bossWaveMultiplier = 3f;
     /** How many times longer a launch wave takes. */
     public float launchWaveMultiplier = 2f;
+    /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
+    public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
     /** Sector for saves that have them.*/
@@ -73,7 +73,7 @@ public class Rules{
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
     /** Starting items put in cores */
-    public Seq<ItemStack> loadout = Seq.with(ItemStack.with(Items.copper, 100));
+    public Seq<ItemStack> loadout = ItemStack.list(Items.copper, 100);
     /** Weather events that occur here. */
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
@@ -105,6 +105,8 @@ public class Rules{
         public boolean cheat;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
+        /** If true, this team has infinite unit ammo. */
+        public boolean infiniteAmmo;
     }
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */

@@ -72,7 +72,7 @@ public class Damage{
         }
     }
 
-    public static void collideLine(Bulletc hitter, Team team, Effect effect, float x, float y, float angle, float length){
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
         collideLine(hitter, team, effect, x, y, angle, length, false);
     }
 
@@ -80,11 +80,11 @@ public class Damage{
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bulletc hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
-            Tilec tile = world.ent(cx, cy);
+            Building tile = world.ent(cx, cy);
             if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team() != team && tile.collide(hitter)){
                 tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
@@ -122,7 +122,7 @@ public class Damage{
         rect.width += expand * 2;
         rect.height += expand * 2;
 
-        Cons<Unitc> cons = e -> {
+        Cons<Unit> cons = e -> {
             e.hitbox(hitrect);
             Rect other = hitrect;
             other.y -= expand;
@@ -143,8 +143,8 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unitc> predicate, Cons<Unitc> acceptor){
-        Cons<Unitc> cons = entity -> {
+    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unit> predicate, Cons<Unit> acceptor){
+        Cons<Unit> cons = entity -> {
             if(!predicate.get(entity)) return;
 
             entity.hitbox(hitrect);
@@ -180,8 +180,8 @@ public class Damage{
 
     /** Applies a status effect to all enemy units in a range. */
     public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
-        Cons<Unitc> cons = entity -> {
-            if(entity.team() == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+        Cons<Unit> cons = entity -> {
+            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
 
@@ -203,15 +203,15 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
-        Cons<Unitc> cons = entity -> {
-            if(entity.team() == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+        Cons<Unit> cons = entity -> {
+            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
             float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
             entity.damage(amount);
             //TODO better velocity displacement
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
-            entity.vel().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
+            entity.vel.add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
 
             if(complete && damage >= 9999999f && entity.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);

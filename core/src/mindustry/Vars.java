@@ -170,7 +170,6 @@ public class Vars implements Loadable{
     public static Net net;
     public static ContentLoader content;
     public static GameState state;
-    public static GlobalData data;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
     public static mindustry.audio.LoopControl loops;
@@ -196,7 +195,8 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
 
-    public static Playerc player;
+    public static
+    Player player;
 
     @Override
     public void loadAsync(){
@@ -256,7 +256,6 @@ public class Vars implements Loadable{
         bases = new BaseRegistry();
 
         state = new GameState();
-        data = new GlobalData();
 
         mobile = Core.app.isMobile() || testMobile;
         ios = Core.app.isIOS();

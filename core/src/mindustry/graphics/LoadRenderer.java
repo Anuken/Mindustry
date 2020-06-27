@@ -35,7 +35,7 @@ public class LoadRenderer implements Disposable{
     private Mesh mesh = MeshBuilder.buildHex(colorRed, 2, true, 1f);
     private Camera3D cam = new Camera3D();
     private int lastLength = -1;
-    private FxProcessor fx = new FxProcessor(Format.RGBA8888, 2, 2, false, true);
+    private FxProcessor fx = new FxProcessor(Format.rgba8888, 2, 2, false, true);
     private WindowedMean renderTimes = new WindowedMean(20);
     private long lastFrameTime;
 

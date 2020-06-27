@@ -34,7 +34,7 @@ public class FileMapGenerator implements WorldGenerator{
             if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && state.hasSector()){
                 for(Content content : state.getSector().data.resources){
                     if(content instanceof Item && Mathf.chance(0.3)){
-                        tile.entity.items().add((Item)content, Math.min(Mathf.random(500), tile.block().itemCapacity));
+                        tile.entity.items.add((Item)content, Math.min(Mathf.random(500), tile.block().itemCapacity));
                     }
                 }
             }

@@ -19,7 +19,7 @@ public class LogicExecutor{
         if(counter >= instructions.length) counter = 0;
     }
 
-    Tilec device(short id){
+    Building device(short id){
         return null; //TODO
     }
 
@@ -68,8 +68,8 @@ public class LogicExecutor{
     }
 
     enum ReadOp{
-        item((tile, id) -> tile.items() == null ? 0 : tile.items().get(id)),
-        itemTotal((tile, param) -> tile.items() == null ? 0 : tile.items().total());
+        item((tile, id) -> tile.items == null ? 0 : tile.items.get(id)),
+        itemTotal((tile, param) -> tile.items == null ? 0 : tile.items.total());
 
         final ReadOpLambda function;
         final String symbol;
@@ -80,7 +80,7 @@ public class LogicExecutor{
         }
 
         interface ReadOpLambda{
-            int get(Tilec tile, int parameter);
+            int get(Building tile, int parameter);
         }
     }
 

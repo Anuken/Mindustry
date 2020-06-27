@@ -24,13 +24,11 @@ public class SaveDialog extends LoadDialog{
     public void addSetup(){
 
         buttons.button("$save.new", Icon.add, () ->
-        ui.showTextInput("$save", "$save.newslot", 30, "", text -> {
-            ui.loadAnd("$saving", () -> {
-                control.saves.addSave(text);
-                Core.app.post(() -> Core.app.post(this::setup));
-            });
-        })
-        ).fillX().margin(10f);
+            ui.showTextInput("$save", "$save.newslot", 30, "",
+            text -> ui.loadAnd("$saving", () -> {
+            control.saves.addSave(text);
+            Core.app.post(() -> Core.app.post(this::setup));
+        }))).fillX().margin(10f);
     }
 
     @Override
@@ -44,7 +42,7 @@ public class SaveDialog extends LoadDialog{
 
     void save(SaveSlot slot){
 
-        ui.loadfrag.show("$saveload");
+        ui.loadfrag.show("$saving");
 
         Time.runTask(5f, () -> {
             hide();

@@ -30,7 +30,7 @@ public class LanguageDialog extends BaseDialog{
         Table langs = new Table();
         langs.marginRight(24f).marginLeft(24f);
         ScrollPane pane = new ScrollPane(langs);
-        pane.setFadeScrollBars(false);
+        pane.setScrollingDisabled(true, false);
 
         ButtonGroup<TextButton> group = new ButtonGroup<>();
 

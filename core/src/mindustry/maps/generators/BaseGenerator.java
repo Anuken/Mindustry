@@ -32,6 +32,10 @@ public class BaseGenerator{
         this.tiles = tiles;
         this.team = team;
         this.cores = cores;
+
+        //don't generate bases when there are no loaded schematics
+        if(bases.cores.isEmpty()) return;
+
         Mathf.random.setSeed(sector.id);
 
         for(Block block : content.blocks()){
@@ -40,6 +44,7 @@ public class BaseGenerator{
             }
         }
 
+        //TODO limit base size
         float costBudget = 1000;
 
         Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1);
@@ -58,9 +63,9 @@ public class BaseGenerator{
             Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? ores.get((Item)coreschem.required) : Blocks.oreCopper);
 
             //fill core with every type of item (even non-material)
-            Tilec entity = tile.entity;
+            Building entity = tile.entity;
             for(Item item : content.items()){
-                entity.items().add(item, entity.block().itemCapacity);
+                entity.items.add(item, entity.block().itemCapacity);
             }
         }
 

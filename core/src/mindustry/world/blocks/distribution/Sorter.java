@@ -28,8 +28,8 @@ public class Sorter extends Block{
         unloadable = false;
         saveConfig = true;
 
-        config(Item.class, (tile, item) -> ((SorterEntity)tile).sortItem = item);
-        configClear(tile -> ((SorterEntity)tile).sortItem = null);
+        config(Item.class, (SorterEntity tile, Item item) -> tile.sortItem = item);
+        configClear((SorterEntity tile) -> tile.sortItem = null);
     }
 
     @Override
@@ -47,11 +47,11 @@ public class Sorter extends Block{
         return tile.<SorterEntity>ent().sortItem == null ? 0 : tile.<SorterEntity>ent().sortItem.color.rgba();
     }
 
-    public class SorterEntity extends TileEntity{
+    public class SorterEntity extends Building{
         @Nullable Item sortItem;
 
         @Override
-        public void configured(Playerc player, Object value){
+        public void configured(Player player, Object value){
             super.configured(player, value);
 
             if(!headless){
@@ -73,28 +73,28 @@ public class Sorter extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
-            Tilec to = getTileTarget(item, source, false);
+        public boolean acceptItem(Building source, Item item){
+            Building to = getTileTarget(item, source, false);
 
             return to != null && to.acceptItem(this, item) && to.team() == team;
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
-            Tilec to = getTileTarget(item, source, true);
+        public void handleItem(Building source, Item item){
+            Building to = getTileTarget(item, source, true);
 
             to.handleItem(this, item);
         }
 
-        boolean isSame(Tilec other){
+        boolean isSame(Building other){
             //uncomment comment below to prevent sorter/gate chaining (hacky)
             return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
         }
 
-        Tilec getTileTarget(Item item, Tilec source, boolean flip){
+        Building getTileTarget(Item item, Building source, boolean flip){
             int dir = source.relativeTo(tile.x, tile.y);
             if(dir == -1) return null;
-            Tilec to;
+            Building to;
 
             if((item == sortItem) != invert){
                 //prevent 3-chains
@@ -103,8 +103,8 @@ public class Sorter extends Block{
                 }
                 to = nearby(dir);
             }else{
-                Tilec a = nearby(Mathf.mod(dir - 1, 4));
-                Tilec b = nearby(Mathf.mod(dir + 1, 4));
+                Building a = nearby(Mathf.mod(dir - 1, 4));
+                Building b = nearby(Mathf.mod(dir + 1, 4));
                 boolean ac = a != null && !(a.block().instantTransfer && source.block().instantTransfer) &&
                 a.acceptItem(this, item);
                 boolean bc = b != null && !(b.block().instantTransfer && source.block().instantTransfer) &&
@@ -136,7 +136,7 @@ public class Sorter extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             if(this == other){
                 deselect();
                 configure(null);

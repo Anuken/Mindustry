@@ -33,7 +33,7 @@ public class BlockRenderer implements Disposable{
     private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer();
     private FrameBuffer dark = new FrameBuffer();
-    private Seq<Tilec> outArray2 = new Seq<>();
+    private Seq<Building> outArray2 = new Seq<>();
     private Seq<Tile> shadowEvents = new Seq<>();
     private IntSet processedEntities = new IntSet();
     private boolean displayStatus = false;
@@ -44,7 +44,7 @@ public class BlockRenderer implements Disposable{
             shadowEvents.clear();
             lastCamY = lastCamX = -99; //invalidate camera position so blocks get updated
 
-            shadows.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            shadows.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
             shadows.resize(world.width(), world.height());
             shadows.begin();
             Core.graphics.clear(Color.white);
@@ -62,7 +62,7 @@ public class BlockRenderer implements Disposable{
             Draw.color();
             shadows.end();
 
-            dark.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            dark.getTexture().setFilter(TextureFilter.linear, TextureFilter.linear);
             dark.resize(world.width(), world.height());
             dark.begin();
             Core.graphics.clear(Color.white);
@@ -82,7 +82,7 @@ public class BlockRenderer implements Disposable{
             dark.end();
         });
 
-        Events.on(TileChangeEvent.class, event -> {
+        Events.on(BuildinghangeEvent.class, event -> {
             shadowEvents.add(event.tile);
 
             int avgx = (int)(camera.position.x / tilesize);
@@ -205,8 +205,8 @@ public class BlockRenderer implements Disposable{
                         lightview.add(tile);
                     }
 
-                    if(tile.entity != null && tile.entity.power() != null && tile.entity.power().links.size > 0){
-                        for(Tilec other : tile.entity.getPowerConnections(outArray2)){
+                    if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
+                        for(Building other : tile.entity.getPowerConnections(outArray2)){
                             if(other.block() instanceof PowerNode){ //TODO need a generic way to render connections!
                                 tileview.add(other.tile());
                             }
@@ -229,12 +229,13 @@ public class BlockRenderer implements Disposable{
         for(int i = 0; i < tileview.size; i++){
             Tile tile = tileview.items[i];
             Block block = tile.block();
-            Tilec entity = tile.entity;
+            Building entity = tile.entity;
 
             Draw.z(Layer.block);
 
             if(block != Blocks.air){
                 block.drawBase(tile);
+                Draw.reset();
                 Draw.z(Layer.block);
 
                 if(entity != null){
@@ -259,7 +260,7 @@ public class BlockRenderer implements Disposable{
         //draw lights
         for(int i = 0; i < lightview.size; i++){
             Tile tile = lightview.items[i];
-            Tilec entity = tile.entity;
+            Building entity = tile.entity;
 
             if(entity != null){
                 entity.drawLight();

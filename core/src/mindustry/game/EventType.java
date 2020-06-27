@@ -42,7 +42,6 @@ public class EventType{
     public static class SaveLoadEvent{}
     public static class ClientCreateEvent{}
     public static class ServerLoadEvent{}
-    public static class ContentReloadEvent{}
     public static class DisposeEvent{}
     public static class PlayEvent{}
     public static class ResetEvent{}
@@ -70,20 +69,20 @@ public class EventType{
 
 
     public static class CommandIssueEvent{
-        public final Tilec tile;
+        public final Building tile;
         public final UnitCommand command;
 
-        public CommandIssueEvent(Tilec tile, UnitCommand command){
+        public CommandIssueEvent(Building tile, UnitCommand command){
             this.tile = tile;
             this.command = command;
         }
     }
 
     public static class PlayerChatEvent{
-        public final Playerc player;
+        public final Player player;
         public final String message;
 
-        public PlayerChatEvent(Playerc player, String message){
+        public PlayerChatEvent(Player player, String message){
             this.player = player;
             this.message = message;
         }
@@ -121,12 +120,12 @@ public class EventType{
 
     /** Called when the player withdraws items from a block. */
     public static class WithdrawEvent{
-        public final Tilec tile;
-        public final Playerc player;
+        public final Building tile;
+        public final Player player;
         public final Item item;
         public final int amount;
 
-        public WithdrawEvent(Tilec tile, Playerc player, Item item, int amount){
+        public WithdrawEvent(Building tile, Player player, Item item, int amount){
             this.tile = tile;
             this.player = player;
             this.item = item;
@@ -136,12 +135,12 @@ public class EventType{
 
     /** Called when a player deposits items to a block.*/
     public static class DepositEvent{
-        public final Tilec tile;
-        public final Playerc player;
+        public final Building tile;
+        public final Player player;
         public final Item item;
         public final int amount;
 
-        public DepositEvent(Tilec tile, Playerc player, Item item, int amount){
+        public DepositEvent(Building tile, Player player, Item item, int amount){
             this.tile = tile;
             this.player = player;
             this.item = item;
@@ -151,10 +150,10 @@ public class EventType{
 
     /** Called when the player taps a block. */
     public static class TapEvent{
-        public final Tilec tile;
-        public final Playerc player;
+        public final Building tile;
+        public final Player player;
 
-        public TapEvent(Tilec tile, Playerc player){
+        public TapEvent(Building tile, Player player){
             this.tile = tile;
             this.player = player;
         }
@@ -162,11 +161,11 @@ public class EventType{
 
     /** Called when the player sets a specific block. */
     public static class TapConfigEvent{
-        public final Tilec tile;
-        public final Playerc player;
+        public final Building tile;
+        public final Player player;
         public final Object value;
 
-        public TapConfigEvent(Tilec tile, Playerc player, Object value){
+        public TapConfigEvent(Building tile, Player player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;
@@ -182,10 +181,10 @@ public class EventType{
     }
 
     /** Called from the logic thread. Do not access graphics here! */
-    public static class TileChangeEvent{
+    public static class BuildinghangeEvent{
         public final Tile tile;
 
-        public TileChangeEvent(Tile tile){
+        public BuildinghangeEvent(Tile tile){
             this.tile = tile;
         }
     }
@@ -234,10 +233,10 @@ public class EventType{
     public static class BlockBuildEndEvent{
         public final Tile tile;
         public final Team team;
-        public final @Nullable Unitc unit;
+        public final @Nullable Unit unit;
         public final boolean breaking;
 
-        public BlockBuildEndEvent(Tile tile, @Nullable Unitc unit, Team team, boolean breaking){
+        public BlockBuildEndEvent(Tile tile, @Nullable Unit unit, Team team, boolean breaking){
             this.tile = tile;
             this.team = team;
             this.unit = unit;
@@ -274,26 +273,26 @@ public class EventType{
     }
 
     public static class UnitDestroyEvent{
-        public final Unitc unit;
+        public final Unit unit;
 
-        public UnitDestroyEvent(Unitc unit){
+        public UnitDestroyEvent(Unit unit){
             this.unit = unit;
         }
     }
 
     public static class UnitCreateEvent{
-        public final Unitc unit;
+        public final Unit unit;
 
-        public UnitCreateEvent(Unitc unit){
+        public UnitCreateEvent(Unit unit){
             this.unit = unit;
         }
     }
 
     public static class UnitChangeEvent{
-        public final Playerc player;
-        public final Unitc unit;
+        public final Player player;
+        public final Unit unit;
 
-        public UnitChangeEvent(Playerc player, Unitc unit){
+        public UnitChangeEvent(Player player, Unit unit){
             this.player = player;
             this.unit = unit;
         }
@@ -301,42 +300,42 @@ public class EventType{
 
     /** Called after connecting; when a player recieves world data and is ready to play.*/
     public static class PlayerJoin{
-        public final Playerc player;
+        public final Player player;
 
-        public PlayerJoin(Playerc player){
+        public PlayerJoin(Player player){
             this.player = player;
         }
     }
 
     /** Called when a player connects, but has not joined the game yet.*/
     public static class PlayerConnect{
-        public final Playerc player;
+        public final Player player;
 
-        public PlayerConnect(Playerc player){
+        public PlayerConnect(Player player){
             this.player = player;
         }
     }
 
     public static class PlayerLeave{
-        public final Playerc player;
+        public final Player player;
 
-        public PlayerLeave(Playerc player){
+        public PlayerLeave(Player player){
             this.player = player;
         }
     }
     
     public static class PlayerBanEvent{
-        public final Playerc player;
+        public final Player player;
 
-        public PlayerBanEvent(Playerc player){
+        public PlayerBanEvent(Player player){
             this.player = player;
         }
     }
     
     public static class PlayerUnbanEvent{
-        public final Playerc player;
+        public final Player player;
 
-        public PlayerUnbanEvent(Playerc player){
+        public PlayerUnbanEvent(Player player){
             this.player = player;
         }
     }

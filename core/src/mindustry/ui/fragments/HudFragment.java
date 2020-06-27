@@ -56,6 +56,7 @@ public class HudFragment extends Fragment{
             showToast("Sector[accent] captured[]!");
         });
 
+        //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
         });
@@ -145,7 +146,7 @@ public class HudFragment extends Fragment{
                 cont.row();
             }
 
-            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH
+            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH/MAP/ETC
             /*
             cont.table(t -> {
 
@@ -308,7 +309,7 @@ public class HudFragment extends Fragment{
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> control.saves.isSaving());
-            t.add("$saveload").style(Styles.outlineLabel);
+            t.add("$saving").style(Styles.outlineLabel);
         });
 
         parent.fill(p -> {
@@ -324,7 +325,7 @@ public class HudFragment extends Fragment{
             p.touchable(Touchable.disabled);
         });
 
-        //DEBUG: rate table
+        //TODO DEBUG: rate table
         parent.fill(t -> {
             t.bottom().left();
             t.table(Styles.black6, c -> {
@@ -355,15 +356,24 @@ public class HudFragment extends Fragment{
                         rebuild.run();
                     }
                 });
-            });
+            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
+        });
 
+        //TODO move, select loadout, consume resources
+        parent.fill(t -> {
+            t.bottom().visible(() -> state.isCampaign() && player.team().core() != null);
+
+            t.button("test launch", Icon.warning, () -> {
+                ui.planet.show(state.getSector(), player.team().core());
+            }).width(150f)
+            .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)); //disable core when missing resources for launch
         });
 
         blockfrag.build(parent);
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
-    public static void setPlayerTeamEditor(Playerc player, Team team){
+    public static void setPlayerTeamEditor(Player player, Team team){
         if(state.isEditor() && player != null){
             player.team(team);
         }
@@ -644,7 +654,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((state.rules.waitEnemies && state.enemies > 0 ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
+                builder.append((logic.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }
@@ -662,12 +672,12 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((net.server() || player.admin()) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
+        return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
     private void addPlayButton(Table table){
         table.right().button(Icon.play, Styles.righti, 30f, () -> {
-            if(net.client() && player.admin()){
+            if(net.client() && player.admin){
                 Call.onAdminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
                 ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);

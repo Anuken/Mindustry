@@ -30,7 +30,7 @@ public class ItemsDisplay extends Table{
                 t.marginRight(30f);
                 t.left();
                 for(Item item : content.items()){
-                    if(item.type == ItemType.material && data.isUnlocked(item)){
+                    if(item.type == ItemType.material && item.unlocked()){
                         t.label(() -> format(item)).left();
                         t.image(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
                         t.add(item.localizedName).color(Color.lightGray).left();
@@ -51,10 +51,11 @@ public class ItemsDisplay extends Table{
 
     private String format(Item item){
         builder.setLength(0);
-        builder.append(ui.formatAmount(data.getItem(item)));
-        if(state.isGame() && player.team().data().hasCore() && player.team().core().items().get(item) > 0){
+        builder.append("[TODO implement]");
+        //builder.append(ui.formatAmount(data.getItem(item)));
+        if(state.isGame() && player.team().data().hasCore() && player.team().core().items.get(item) > 0){
             builder.append(" [unlaunched]+ ");
-            builder.append(ui.formatAmount(state.teams.get(player.team()).core().items().get(item)));
+            builder.append(ui.formatAmount(state.teams.get(player.team()).core().items.get(item)));
         }
         return builder.toString();
     }

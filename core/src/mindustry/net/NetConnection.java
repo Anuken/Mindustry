@@ -18,7 +18,7 @@ public abstract class NetConnection{
     public final String address;
     public String uuid = "AAAAAAAA", usid = uuid;
     public boolean mobile, modclient;
-    public @Nullable Playerc player;
+    public @Nullable Player player;
     public @Nullable Unitc lastUnit;
     public Vec2 lastPosition = new Vec2();
 

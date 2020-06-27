@@ -64,8 +64,8 @@ public class SStats implements SteamUserStatsCallback{
                 active50Crawlers.complete();
             }
 
-            for(Tilec entity : player.team().cores()){
-                if(!content.items().contains(i -> i.type == ItemType.material && entity.items().get(i) < entity.block().itemCapacity)){
+            for(Building entity : player.team().cores()){
+                if(!content.items().contains(i -> i.type == ItemType.material && entity.items.get(i) < entity.block().itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }
@@ -79,7 +79,7 @@ public class SStats implements SteamUserStatsCallback{
                 if(e.unit.team() != Vars.player.team()){
                     SStat.unitsDestroyed.add();
 
-                    if(e.unit instanceof Unitc && ((Unitc)e.unit).isBoss()){
+                    if(e.unit instanceof Unit && ((Unit)e.unit).isBoss()){
                         SStat.bossesDefeated.add();
                     }
                 }

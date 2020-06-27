@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -24,6 +25,7 @@ import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.text.*;
@@ -71,8 +73,8 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            if(Mathf.zero(player.x()) && Mathf.zero(player.y())){
-                Tilec core = state.teams.closestCore(0, 0, player.team());
+            if(Mathf.zero(player.x) && Mathf.zero(player.y)){
+                Building core = state.teams.closestCore(0, 0, player.team());
                 if(core != null){
                     player.set(core);
                     camera.position.set(core);
@@ -156,7 +158,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(Trigger.newGame, () -> {
-            Tilec core = player.closestCore();
+            Building core = player.closestCore();
 
             if(core == null) return;
 
@@ -183,8 +185,6 @@ public class Control implements ApplicationListener, Loadable{
 
         Core.input.setCatch(KeyCode.back, true);
 
-        data.load();
-
         Core.settings.defaults(
         "ip", "localhost",
         "color-0", playerColors[8].rgba(),
@@ -198,9 +198,9 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     void createPlayer(){
-        player = PlayerEntity.create();
-        player.name(Core.settings.getString("name"));
-        player.color().set(Core.settings.getInt("color-0"));
+        player = Player.create();
+        player.name = Core.settings.getString("name");
+        player.color.set(Core.settings.getInt("color-0"));
 
         if(mobile){
             input = new MobileInput();
@@ -241,6 +241,18 @@ public class Control implements ApplicationListener, Loadable{
         });
     }
 
+    //TODO move
+    public void handleLaunch(CoreEntity tile){
+        LaunchCorec ent = LaunchCore.create();
+        ent.set(tile);
+        ent.block(Blocks.coreShard);
+        ent.lifetime(Vars.launchDuration);
+        ent.add();
+
+        //remove launch requirements from core
+        tile.items.remove(tile.block.requirements);
+    }
+
     public void playSector(Sector sector){
         ui.loadAnd(() -> {
             ui.planet.hide();
@@ -256,7 +268,7 @@ public class Control implements ApplicationListener, Loadable{
                     if(state.rules.defaultTeam.cores().isEmpty()){
 
                         //kill all friendly units, since they should be dead anwyay
-                        for(Unitc unit : Groups.unit){
+                        for(Unit unit : Groups.unit){
                             if(unit.team() == state.rules.defaultTeam){
                                 unit.remove();
                             }
@@ -335,13 +347,13 @@ public class Control implements ApplicationListener, Loadable{
             zone.rules.get(state.rules);
             //TODO assign zone!!
             //state.rules.zone = zone;
-            for(Tilec core : state.teams.playerCores()){
+            for(Building core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.items().add(stack.item, stack.amount);
+                    core.items.add(stack.item, stack.amount);
                 }
             }
-            Tilec core = state.teams.playerCores().first();
-            core.items().clear();
+            Building core = state.teams.playerCores().first();
+            core.items.clear();
 
             logic.play();
             state.rules.waveTimer = false;
@@ -459,9 +471,6 @@ public class Control implements ApplicationListener, Loadable{
 
         input.updateState();
 
-        //autosave global data if it's modified
-        data.checkSave();
-
         music.update();
         loops.update();
         Time.updateGlobal();
@@ -478,16 +487,6 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
-
-            if(state.isCampaign()){
-                for(Tilec tile : state.teams.cores(player.team())){
-                    for(Item item : content.items()){
-                        if(tile.items().has(item)){
-                            data.unlockContent(item);
-                        }
-                    }
-                }
-            }
 
             if(state.rules.tutorial){
                 tutorial.update();

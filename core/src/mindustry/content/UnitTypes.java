@@ -36,7 +36,7 @@ public class UnitTypes implements ContentList{
 
     //air + building + mining
     //TODO implement other starter drones
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Trailc.class}) UnitType alpha, beta, gamma;
 
     //air + building + mining + payload
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType trident;
@@ -127,7 +127,7 @@ public class UnitTypes implements ContentList{
             @Override
             public void update(Unitc player){
 
-                if(player.timer().get(Playerc.timerAbility, healReload)){
+                if(player.timer().get(Player.timerAbility, healReload)){
                     wasHealed = false;
 
                     Units.nearby(player.team(), player.x, player.y, healRange, unit -> {
@@ -707,8 +707,8 @@ public class UnitTypes implements ContentList{
             }
 
             @Override
-            public void update(Playerc player){
-                if(player.timer.get(Playerc.timerAbility, healReload)){
+            public void update(Player player){
+                if(player.timer.get(Player.timerAbility, healReload)){
                     if(indexer.eachBlock(player, healRange, other -> other.entity.damaged(), other -> {
                         other.entity.heal(other.entity.maxHealth() * healPercent / 100f);
                         Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Pal.heal);
@@ -782,9 +782,9 @@ public class UnitTypes implements ContentList{
             }
 
             @Override
-            public void update(Playerc player){
+            public void update(Player player){
 
-                if(player.timer.get(Playerc.timerAbility, healReload)){
+                if(player.timer.get(Player.timerAbility, healReload)){
                     wasHealed = false;
 
                     Units.nearby(player.team(), player.x, player.y, healRange, unit -> {
@@ -834,12 +834,12 @@ public class UnitTypes implements ContentList{
             }
 
             @Override
-            public float getRotationAlpha(Playerc player){
+            public float getRotationAlpha(Player player){
                 return 0.6f - player.shootHeat * 0.3f;
             }
 
             @Override
-            public float spreadX(Playerc player){
+            public float spreadX(Player player){
                 return player.shootHeat * 2f;
             }
 
@@ -850,18 +850,18 @@ public class UnitTypes implements ContentList{
             }
 
             @Override
-            public void update(Playerc player){
+            public void update(Player player){
                 float scl = 1f - player.shootHeat / 2f*Time.delta();
                 player.vel().scl(scl);
             }
 
             @Override
-            public float getExtraArmor(Playerc player){
+            public float getExtraArmor(Player player){
                 return player.shootHeat * 30f;
             }
 
             @Override
-            public void draw(Playerc player){
+            public void draw(Player player){
                 if(player.shootHeat <= 0.01f) return;
 
                 Shaders.build.progress = player.shootHeat;
@@ -901,10 +901,10 @@ public class UnitTypes implements ContentList{
             }
 
             @Override
-            public void update(Playerc player){
+            public void update(Player player){
                 super.update(player);
 
-                if(player.timer.get(Playerc.timerAbility, effectReload)){
+                if(player.timer.get(Player.timerAbility, effectReload)){
 
                     Units.nearby(player.team(), player.x, player.y, effectRange, unit -> {
                         //unit.applyEffect(StatusEffects.overdrive, effectDuration);
@@ -955,12 +955,12 @@ public class UnitTypes implements ContentList{
             }
 
             @Override
-            public float getRotationAlpha(Playerc player){
+            public float getRotationAlpha(Player player){
                 return 0.5f;
             }
 
             @Override
-            public void update(Playerc player){
+            public void update(Player player){
                 float scl = scld(player);
                 if(Mathf.chanceDelta((0.15 * scl))){
                     Fx.hitLancer.at(Pal.lancerLaser, player.x, player.y);
@@ -970,7 +970,7 @@ public class UnitTypes implements ContentList{
             }
 
             @Override
-            public void draw(Playerc player){
+            public void draw(Player player){
                 float scl = scld(player);
                 if(scl < 0.01f) return;
                 Draw.color(Pal.lancerLaser);
@@ -980,7 +980,7 @@ public class UnitTypes implements ContentList{
                 Draw.blend();
             }
 
-            float scld(Playerc player){
+            float scld(Player player){
                 return Mathf.clamp((player.vel().len() - minV) / (maxV - minV));
             }
         };

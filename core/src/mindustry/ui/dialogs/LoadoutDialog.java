@@ -58,7 +58,6 @@ public class LoadoutDialog extends BaseDialog{
         this.updater = updater;
         this.capacity = capacity;
         this.hider = hider;
-        //this.filter = filter;
         show();
     }
 

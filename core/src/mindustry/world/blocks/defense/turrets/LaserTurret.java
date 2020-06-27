@@ -41,7 +41,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     public class LaserTurretEntity extends PowerTurretEntity{
-        Bulletc bullet;
+        Bullet bullet;
         float bulletLife;
 
         @Override

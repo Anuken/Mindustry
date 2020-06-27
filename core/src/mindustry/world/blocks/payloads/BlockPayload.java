@@ -11,13 +11,13 @@ import mindustry.world.*;
 import static mindustry.Vars.tilesize;
 
 public class BlockPayload implements Payload{
-    public Tilec entity;
+    public Building entity;
 
     public BlockPayload(Block block, Team team){
         this.entity = block.newEntity().create(block, team);
     }
 
-    public BlockPayload(Tilec entity){
+    public BlockPayload(Building entity){
         this.entity = entity;
     }
 

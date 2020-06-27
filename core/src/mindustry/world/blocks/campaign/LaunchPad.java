@@ -46,10 +46,10 @@ public class LaunchPad extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items().total()), () -> Pal.items, () -> (float)entity.items().total() / itemCapacity));
+        bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
-    public class LaunchPadEntity extends TileEntity{
+    public class LaunchPadEntity extends Building{
         @Override
         public void draw(){
             super.draw();
@@ -85,7 +85,7 @@ public class LaunchPad extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return items.total() < itemCapacity;
         }
 
@@ -95,7 +95,7 @@ public class LaunchPad extends Block{
 
             //launch when full and base conditions are met
             if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
-                LaunchPayloadc entity = LaunchPayloadEntity.create();
+                LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks().add(new ItemStack(item, amount)));
                 entity.set(this);
                 entity.lifetime(120f);
@@ -109,7 +109,7 @@ public class LaunchPad extends Block{
     }
 
     @EntityDef(LaunchPayloadc.class)
-    @Component
+    @Component(base = true)
     static abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
         @Import float x,y;
 
@@ -177,7 +177,8 @@ public class LaunchPad extends Block{
             //actually launch the items upon removal
             if(team() == Vars.state.rules.defaultTeam){
                 for(ItemStack stack : stacks){
-                    Vars.data.addItem(stack.item, stack.amount);
+                    //TODO where do the items go?
+                    //Vars.data.addItem(stack.item, stack.amount);
                     Events.fire(new LaunchItemEvent(stack));
                 }
             }

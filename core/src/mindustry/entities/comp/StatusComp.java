@@ -13,7 +13,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 @Component
 abstract class StatusComp implements Posc, Flyingc{
@@ -46,7 +46,7 @@ abstract class StatusComp implements Posc, Flyingc{
                     return;
                 }else if(entry.effect.reactsWith(effect)){ //find opposite
                     StatusEntry.tmp.effect = entry.effect;
-                    entry.effect.getTransition((Unitc)this, effect, entry.time, duration, StatusEntry.tmp);
+                    entry.effect.getTransition(base(), effect, entry.time, duration, StatusEntry.tmp);
                     entry.time = StatusEntry.tmp.time;
 
                     if(StatusEntry.tmp.effect != entry.effect){
@@ -128,15 +128,14 @@ abstract class StatusComp implements Posc, Flyingc{
                 speedMultiplier *= entry.effect.speedMultiplier;
                 armorMultiplier *= entry.effect.armorMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
-                //TODO ugly casting
-                entry.effect.update((Unitc)this, entry.time);
+                entry.effect.update(base(), entry.time);
             }
         }
     }
 
     public void draw(){
         for(StatusEntry e : statuses){
-            e.effect.draw((Unitc)this);
+            e.effect.draw(base());
         }
     }
 

@@ -55,10 +55,10 @@ public class Teams{
         return false;
     }
 
-    public void eachEnemyCore(Team team, Cons<Tilec> ret){
+    public void eachEnemyCore(Team team, Cons<Building> ret){
         for(TeamData data : active){
             if(areEnemies(team, data.team)){
-                for(Tilec tile : data.cores){
+                for(Building tile : data.cores){
                     ret.get(tile);
                 }
             }

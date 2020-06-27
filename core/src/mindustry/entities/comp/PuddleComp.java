@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 import static mindustry.entities.Puddles.*;
 
 @EntityDef(value = {Puddlec.class}, pooled = true)
-@Component
+@Component(base = true)
 abstract class PuddleComp implements Posc, Puddlec, Drawc{
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
@@ -128,6 +128,6 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Override
     public void afterRead(){
-        Puddles.register(this);
+        Puddles.register(base());
     }
 }

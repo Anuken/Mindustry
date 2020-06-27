@@ -48,7 +48,7 @@ public class Wall extends Block{
         return tile.block() instanceof Wall ? this : null;
     }
 
-    public class WallEntity extends TileEntity{
+    public class WallEntity extends Building{
 
         @Override
         public void draw(){

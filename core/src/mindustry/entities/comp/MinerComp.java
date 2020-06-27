@@ -35,7 +35,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
     @Override
     public void update(){
-        Tilec core = closestCore();
+        Building core = closestCore();
 
         if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && dst(core) < mineTransferRange){
             int accepted = core.acceptStack(item(), stack().amount, this);
