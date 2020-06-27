@@ -280,7 +280,7 @@ public class UnitType extends UnlockableContent{
             (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime);
 
             if(unit.isLocal()){
-                Fonts.outline.draw(unit.stack().amount + "",
+                Fonts.outline.draw(unit.stack.amount + "",
                 unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
                 unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,
                 Pal.accent, 0.25f * unit.itemTime / Scl.scl(1f), false, Align.center
@@ -320,7 +320,7 @@ public class UnitType extends UnlockableContent{
     public void drawWeapons(Unit unit){
         applyColor(unit);
 
-        for(WeaponMount mount : unit.mounts()){
+        for(WeaponMount mount : unit.mounts){
             Weapon weapon = mount.weapon;
 
             for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){

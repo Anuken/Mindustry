@@ -136,7 +136,6 @@ public class EntityProcess extends BaseProcessor{
                     if(!signatures.contains(cname + "()")){
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
                         .addAnnotations(Seq.with(field.annotations()).select(a -> a.toString().contains("Null")).map(AnnotationSpec::get))
-                        //.addAnnotation(Deprecated.class) //TODO undeprecate
                         .addJavadoc(field.doc() == null ? "" : field.doc())
                         .returns(field.tname()).build());
                     }
@@ -147,7 +146,6 @@ public class EntityProcess extends BaseProcessor{
                         inter.addMethod(MethodSpec.methodBuilder(cname).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC)
                         .addJavadoc(field.doc() == null ? "" : field.doc())
                         .addParameter(ParameterSpec.builder(field.tname(), field.name())
-                        //.addAnnotation(Deprecated.class) //TODO undeprecate
                         .addAnnotations(Seq.with(field.annotations())
                         .select(a -> a.toString().contains("Null")).map(AnnotationSpec::get)).build()).build());
                     }

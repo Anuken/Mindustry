@@ -36,7 +36,7 @@ public class UnitTypes implements ContentList{
 
     //air + building + mining
     //TODO implement other starter drones
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Trailc.class}) UnitType alpha, beta, gamma;
 
     //air + building + mining + payload
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType trident;

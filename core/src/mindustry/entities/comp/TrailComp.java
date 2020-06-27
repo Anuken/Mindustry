@@ -11,7 +11,7 @@ abstract class TrailComp implements Unitc{
     @Import UnitType type;
     @Import float x, y, rotation;
 
-    transient Trail trail = new Trail();
+    transient Trail trail = new Trail(4);
 
     @Override
     public void update(){

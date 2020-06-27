@@ -1,9 +1,6 @@
 #define HIGHP
 
-#define MAX_HITS 64
-#define HIT_RADIUS 12.0
 #define ALPHA 0.18
-#define thickness 1.0
 #define step 2.0
 
 uniform sampler2D u_texture;
