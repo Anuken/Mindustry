@@ -164,15 +164,15 @@ public abstract class SaveVersion extends SaveFileReader{
             stream.writeShort(tile.blockID());
 
             //make note of whether there was an entity here
-            stream.writeBoolean(tile.entity != null);
+            stream.writeBoolean(tile.build != null);
 
             //only write the entity for multiblocks once - in the center
-            if(tile.entity != null){
+            if(tile.build != null){
                 if(tile.isCenter()){
                     stream.writeBoolean(true);
                     writeChunk(stream, true, out -> {
-                        out.writeByte(tile.entity.version());
-                        tile.entity.writeAll(Writes.get(out));
+                        out.writeByte(tile.build.version());
+                        tile.build.writeAll(Writes.get(out));
                     });
                 }else{
                     stream.writeBoolean(false);
@@ -249,7 +249,7 @@ public abstract class SaveVersion extends SaveFileReader{
                             try{
                                 readChunk(stream, true, in -> {
                                     byte revision = in.readByte();
-                                    tile.entity.readAll(Reads.get(in), revision);
+                                    tile.build.readAll(Reads.get(in), revision);
                                 });
                             }catch(Throwable e){
                                 throw new IOException("Failed to read tile entity of block: " + block, e);

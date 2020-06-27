@@ -496,9 +496,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Tile tile = tileAt(screenX, screenY);
 
-            if(tile == null || tile.entity == null) return false;
+            if(tile == null || tile.build == null) return false;
 
-            tryDropItems(tile.entity, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+            tryDropItems(tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
@@ -542,7 +542,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
-        Tile linked = cursor.entity == null ? cursor : cursor.entity.tile();
+        Tile linked = cursor.build == null ? cursor : cursor.build.tile();
 
         checkTargets(worldx, worldy);
 
@@ -555,7 +555,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));
-        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.entity)){
+        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.build)){
             tryBeginMine(cursor);
         }
 

@@ -93,7 +93,7 @@ public class LiquidTurret extends Turret{
             shootSound.at(tile);
 
             if(shootShake > 0){
-                Effects.shake(shootShake, shootShake, tile.entity);
+                Effects.shake(shootShake, shootShake, tile.build);
             }
 
             recoil = recoilAmount;

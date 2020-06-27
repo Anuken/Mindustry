@@ -82,7 +82,7 @@ public class Unloader extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> configure(item));
+            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>bc().sortItem, item -> configure(item));
         }
 
         @Override

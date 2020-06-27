@@ -53,9 +53,9 @@ abstract class PayloadComp implements Posc, Rotc{
         Tile on = tileOn();
 
         //drop off payload on an acceptor if possible
-        if(on != null && on.entity != null && on.entity.acceptPayload(on.entity, payload)){
-            Fx.unitDrop.at(on.entity);
-            on.entity.handlePayload(on.entity, payload);
+        if(on != null && on.build != null && on.build.acceptPayload(on.build, payload)){
+            Fx.unitDrop.at(on.build);
+            on.build.handlePayload(on.build, payload);
             return true;
         }
 

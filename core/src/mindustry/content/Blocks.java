@@ -1270,7 +1270,7 @@ public class Blocks implements ContentList{
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
-            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 3000, Items.lead, 3000, Items.silicon, 2000));
+            requirements(Category.effect, with(Items.copper, 3000, Items.lead, 3000, Items.silicon, 2000));
 
             health = 2000;
             itemCapacity = 9000;
@@ -1278,7 +1278,7 @@ public class Blocks implements ContentList{
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
-            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 1000, Items.lead, 1000));
+            requirements(Category.effect, with(Items.copper, 1000, Items.lead, 1000));
 
             health = 4000;
             itemCapacity = 13000;

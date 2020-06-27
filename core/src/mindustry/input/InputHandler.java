@@ -85,11 +85,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
-        if(tile == null || tile.entity == null || tile.entity.items == null) return;
+        if(tile == null || tile.build == null || tile.build.items == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, tile, () -> {}));
         }
-        tile.entity.items.add(item, amount);
+        tile.build.items.add(item, amount);
     }
 
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
@@ -327,7 +327,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean requestMatches(BuildPlan request){
         Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>ent().cblock == request.block;
+        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>bc().cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){
@@ -925,7 +925,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void breakBlock(int x, int y){
         Tile tile = world.tile(x, y);
         //TODO hacky
-        if(tile != null && tile.entity != null) tile = tile.entity.tile();
+        if(tile != null && tile.build != null) tile = tile.build.tile();
         player.builder().addBuild(new BuildPlan(tile.x, tile.y));
     }
 

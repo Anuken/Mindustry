@@ -93,7 +93,7 @@ public class Units{
     /** Returns the neareset damaged tile. */
     public static Building findDamagedTile(Team team, float x, float y){
         Tile tile = Geometry.findClosest(x, y, indexer.getDamaged(team));
-        return tile == null ? null : tile.entity;
+        return tile == null ? null : tile.build;
     }
 
     /** Returns the neareset ally tile in a range. */

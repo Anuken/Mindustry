@@ -39,7 +39,7 @@ public class Wall extends Block{
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) && health > other.health;
+        return super.canReplace(other) && health > other.health && size == other.size;
     }
 
     public class WallEntity extends Building{

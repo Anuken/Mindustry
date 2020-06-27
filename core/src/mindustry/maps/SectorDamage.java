@@ -47,16 +47,16 @@ public class SectorDamage{
                     float resultDamage = currDamage;
 
                     //damage the tile if it's not friendly
-                    if(other.entity != null && other.team() != state.rules.waveTeam){
-                        resultDamage -= other.entity.health();
+                    if(other.build != null && other.team() != state.rules.waveTeam){
+                        resultDamage -= other.build.health();
 
                         if(direct){
-                            other.entity.damage(currDamage);
+                            other.build.damage(currDamage);
                         }else{ //indirect damage happens at game load time
-                            other.entity.health(other.entity.health() - currDamage);
+                            other.build.health(other.build.health() - currDamage);
 
                             //remove the block when destroyed
-                            if(other.entity.health() < 0){
+                            if(other.build.health() < 0){
                                 //rubble currently disabled
                                 //if(!other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
                                 //    Effects.rubble(other.entity.x(), other.entity.y(), other.block().size);

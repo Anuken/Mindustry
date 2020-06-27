@@ -112,7 +112,7 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return (other.block() == tile.block() || (!(tile.block() instanceof ItemBridge) && other.block() == this)) && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>ent().link != tile.pos());
+        return (other.block() == tile.block() || (!(tile.block() instanceof ItemBridge) && other.block() == this)) && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>bc().link != tile.pos());
     }
 
     public Tile findLink(int x, int y){
@@ -134,7 +134,7 @@ public class ItemBridge extends Block{
         public void playerPlaced(){
             Tile link = findLink(tile.x, tile.y);
             if(linkValid(tile, link)){
-                link.entity.configure(tile.pos());
+                link.build.configure(tile.pos());
             }
 
             lastPlaced = tile.pos();
@@ -154,7 +154,7 @@ public class ItemBridge extends Block{
         private void drawInput(Tile other){
             if(!linkValid(tile, other, false)) return;
             boolean linked = other.pos() == link;
-            if(!linked && !(other.<ItemBridgeEntity>ent().link == tile.pos())) return;
+            if(!linked && !(other.<ItemBridgeEntity>bc().link == tile.pos())) return;
 
             Tmp.v2.trns(tile.angleTo(other), 2f);
             float tx = tile.drawx(), ty = tile.drawy();
@@ -227,7 +227,7 @@ public class ItemBridge extends Block{
             while(it.hasNext){
                 int i = it.next();
                 Tile other = world.tile(i);
-                if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>ent().link != tile.pos()){
+                if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>bc().link != tile.pos()){
                     it.remove();
                 }
             }
@@ -245,7 +245,7 @@ public class ItemBridge extends Block{
                 dump();
                 uptime = 0f;
             }else{
-                ((ItemBridgeEntity)other.entity).incoming.add(tile.pos());
+                ((ItemBridgeEntity)other.build).incoming.add(tile.pos());
 
                 if(consValid() && Mathf.zero(1f - efficiency())){
                     uptime = Mathf.lerpDelta(uptime, 1f, 0.04f);
@@ -253,7 +253,7 @@ public class ItemBridge extends Block{
                     uptime = Mathf.lerpDelta(uptime, 0f, 0.02f);
                 }
 
-                updateTransport(other.entity);
+                updateTransport(other.build);
             }
         }
 

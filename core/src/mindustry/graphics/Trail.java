@@ -8,7 +8,8 @@ import arc.struct.*;
 import arc.util.pooling.*;
 
 public class Trail{
-    private final int length;
+    public int length;
+
     private final Seq<Vec3> points;
     private float lastX = -1, lastY = -1;
 

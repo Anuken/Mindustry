@@ -178,8 +178,8 @@ public class PowerNode extends PowerBlock{
 
         tempTileEnts.clear();
         graphs.clear();
-        if(tile.entity != null && tile.entity.power != null){
-            graphs.add(tile.entity.power.graph);
+        if(tile.build != null && tile.build.power != null){
+            graphs.add(tile.build.power.graph);
         }
 
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {

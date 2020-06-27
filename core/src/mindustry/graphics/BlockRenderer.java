@@ -192,21 +192,21 @@ public class BlockRenderer implements Disposable{
                 Tile tile = world.rawTile(x, y);
                 Block block = tile.block();
                 //link to center
-                if(tile.entity != null) tile = tile.entity.tile();
+                if(tile.build != null) tile = tile.build.tile();
 
-                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal && (tile.entity == null || !processedEntities.contains(tile.entity.id()))){
+                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal && (tile.build == null || !processedEntities.contains(tile.build.id()))){
                     if(block.expanded || !expanded){
                         tileview.add(tile);
-                        if(tile.entity != null) processedEntities.add(tile.entity.id());
+                        if(tile.build != null) processedEntities.add(tile.build.id());
                     }
 
                     //lights are drawn even in the expanded range
-                    if(tile.entity != null){
+                    if(tile.build != null){
                         lightview.add(tile);
                     }
 
-                    if(tile.entity != null && tile.entity.power != null && tile.entity.power.links.size > 0){
-                        for(Building other : tile.entity.getPowerConnections(outArray2)){
+                    if(tile.build != null && tile.build.power != null && tile.build.power.links.size > 0){
+                        for(Building other : tile.build.getPowerConnections(outArray2)){
                             if(other.block() instanceof PowerNode){ //TODO need a generic way to render connections!
                                 tileview.add(other.tile());
                             }
@@ -229,7 +229,7 @@ public class BlockRenderer implements Disposable{
         for(int i = 0; i < tileview.size; i++){
             Tile tile = tileview.items[i];
             Block block = tile.block();
-            Building entity = tile.entity;
+            Building entity = tile.build;
 
             Draw.z(Layer.block);
 
@@ -260,7 +260,7 @@ public class BlockRenderer implements Disposable{
         //draw lights
         for(int i = 0; i < lightview.size; i++){
             Tile tile = lightview.items[i];
-            Building entity = tile.entity;
+            Building entity = tile.build;
 
             if(entity != null){
                 entity.drawLight();

@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
@@ -348,6 +349,26 @@ public class SchematicsDialog extends BaseDialog{
                     }
                 }
             });
+            cont.row();
+            float cons = schem.powerConsumption(), prod = schem.powerProduction();
+            if(!Mathf.zero(cons) || !Mathf.zero(prod)){
+                cont.table(t -> {
+
+                    if(!Mathf.zero(prod)){
+                        t.image(Icon.powerSmall).color(Pal.powerLight).padRight(3);
+                        t.add("+" + Strings.autoFixed(prod, 2)).color(Pal.powerLight).left();
+
+                        if(!Mathf.zero(cons)){
+                            t.add().width(15);
+                        }
+                    }
+
+                    if(!Mathf.zero(cons)){
+                        t.image(Icon.powerSmall).color(Pal.remove).padRight(3);
+                        t.add("-" + Strings.autoFixed(cons, 2)).color(Pal.remove).left();
+                    }
+                });
+            }
 
             show();
         }

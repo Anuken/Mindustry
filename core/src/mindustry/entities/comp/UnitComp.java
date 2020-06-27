@@ -181,8 +181,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(tile != null && isGrounded()){
             //unit block update
-            if(tile.entity != null){
-                tile.entity.unitOn(base());
+            if(tile.build != null){
+                tile.build.unitOn(base());
             }
 
             //kill when stuck in wall

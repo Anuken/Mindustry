@@ -52,8 +52,8 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(tile.entity instanceof StackConveyorEntity){
-            int state = ((StackConveyorEntity)tile.entity).state;
+        if(tile.build instanceof StackConveyorEntity){
+            int state = ((StackConveyorEntity)tile.build).state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode

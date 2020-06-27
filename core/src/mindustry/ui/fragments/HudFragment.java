@@ -68,10 +68,7 @@ public class HudFragment extends Fragment{
             cont.top().left();
 
             if(mobile){
-
-                {
-                    Table select = new Table();
-
+                cont.table(select -> {
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -118,28 +115,7 @@ public class HudFragment extends Fragment{
                     });
 
                     select.image().color(Pal.gray).width(4f).fillY();
-
-                    float size = Scl.scl(dsize);
-                    Seq<Element> children = new Seq<>(select.getChildren());
-
-                    //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
-                    int index = 0;
-                    for(Element elem : children){
-                        int fi = index++;
-                        parent.addChild(elem);
-                        elem.visible(() -> {
-                            if(fi < 5){
-                                elem.setSize(size);
-                            }else{
-                                elem.setSize(Scl.scl(4f), size);
-                            }
-                            elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
-                            return true;
-                        });
-                    }
-
-                    cont.add().size(dsize * 5 + 3, dsize).left();
-                }
+                });
 
                 cont.row();
                 cont.image().height(4f).color(Pal.gray).fillX();
@@ -363,10 +339,8 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.bottom().visible(() -> state.isCampaign() && player.team().core() != null);
 
-            t.button("test launch", Icon.warning, () -> {
-                ui.planet.show(state.getSector(), player.team().core());
-            }).width(150f)
-            .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)); //disable core when missing resources for launch
+            t.button("test launch", Icon.warning, () -> ui.planet.show(state.getSector(), player.team().core()))
+            .width(150f).disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)); //disable core when missing resources for launch
         });
 
         blockfrag.build(parent);

@@ -1,7 +1,6 @@
 package mindustry.desktop.steam;
 
 import arc.*;
-import arc.struct.*;
 import arc.util.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
@@ -108,7 +107,7 @@ public class SStats implements SteamUserStatsCallback{
             if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){
                 SStat.blocksBuilt.add();
 
-                if(e.tile.block() == Blocks.router && e.tile.entity.proximity().contains(t -> t.block() == Blocks.router)){
+                if(e.tile.block() == Blocks.router && e.tile.build.proximity().contains(t -> t.block() == Blocks.router)){
                     chainRouters.complete();
                 }
 

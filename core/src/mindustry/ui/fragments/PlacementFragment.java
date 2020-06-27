@@ -450,9 +450,9 @@ public class PlacementFragment extends Fragment{
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null){
             //if the tile has an entity, display it
-            if(hoverTile.entity != null){
-                hoverTile.entity.updateFlow(true);
-                return hoverTile.entity;
+            if(hoverTile.build != null){
+                hoverTile.build.updateFlow(true);
+                return hoverTile.build;
             }
 
             //if the tile has a drop, display the drop

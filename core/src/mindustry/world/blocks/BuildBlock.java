@@ -59,13 +59,13 @@ public class BuildBlock extends Block{
     @Remote(called = Loc.server)
     public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
-        float healthf = tile.entity.healthf();
+        float healthf = tile.build.healthf();
         tile.setBlock(block, team, rotation);
-        tile.entity.health(block.health * healthf);
+        tile.build.health(block.health * healthf);
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.unit().id()){
             if(!skipConfig){
-                tile.entity.playerPlaced();
+                tile.build.playerPlaced();
             }
         }
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
@@ -97,7 +97,7 @@ public class BuildBlock extends Block{
 
     public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
-        tile.entity.placed();
+        tile.build.placed();
 
         Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));

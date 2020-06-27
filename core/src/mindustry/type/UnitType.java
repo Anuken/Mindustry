@@ -64,6 +64,7 @@ public class UnitType extends UnlockableContent{
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true;
     public int parts = 0;
+    public int trailLength = 5;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;

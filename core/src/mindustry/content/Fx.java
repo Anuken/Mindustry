@@ -144,6 +144,12 @@ public class Fx{
         Lines.circle(e.x, e.y, 4f + e.finpow() * 120f);
     }),
 
+    upgradeCore = new Effect(120f, e -> {
+        color(Color.white, Pal.accent, e.fin());
+        alpha(e.fout());
+        Fill.square(e.x, e.y, tilesize / 2f * e.rotation);
+    }),
+
     placeBlock = new Effect(16, e -> {
         color(Pal.accent);
         stroke(3f - e.fin() * 2f);

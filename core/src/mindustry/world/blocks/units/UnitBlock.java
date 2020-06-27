@@ -26,8 +26,8 @@ public class UnitBlock extends PayloadAcceptor{
 
     @Remote(called = Loc.server)
     public static void onUnitBlockSpawn(Tile tile){
-        if(!(tile.entity instanceof UnitBlockEntity)) return;
-        tile.<UnitBlockEntity>ent().spawned();
+        if(!(tile.build instanceof UnitBlockEntity)) return;
+        tile.<UnitBlockEntity>bc().spawned();
     }
 
     public class UnitBlockEntity extends PayloadAcceptorEntity<UnitPayload>{

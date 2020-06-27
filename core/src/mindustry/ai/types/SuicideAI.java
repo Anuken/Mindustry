@@ -38,8 +38,8 @@ public class SuicideAI extends GroundAI{
             //raycast for target
             boolean blocked = Vars.world.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
                 Tile tile = Vars.world.tile(x, y);
-                if(tile != null && tile.entity == target) return false;
-                if(tile != null && tile.entity != null && tile.entity.team() != unit.team()){
+                if(tile != null && tile.build == target) return false;
+                if(tile != null && tile.build != null && tile.build.team() != unit.team()){
                     blockedByBlock = true;
                     return true;
                 }else{

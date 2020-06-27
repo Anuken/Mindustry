@@ -400,8 +400,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         int trns = block.size/2 + 1;
         Tile next = tile.getNearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
 
-        if(next != null && next.entity != null && next.entity.team() == team && next.entity.acceptPayload(base(), todump)){
-            next.entity.handlePayload(base(), todump);
+        if(next != null && next.build != null && next.build.team() == team && next.build.acceptPayload(base(), todump)){
+            next.build.handlePayload(base(), todump);
             return true;
         }
 
@@ -485,8 +485,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(next == null) return 0;
 
-        if(next.entity != null){
-            return moveLiquid(next.entity, liquid);
+        if(next.build != null){
+            return moveLiquid(next.build, liquid);
         }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
             float leakAmount = liquids.get(liquid) / leakResistance;
             Puddles.deposit(next, tile, liquid, leakAmount);
@@ -673,8 +673,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         power.graph.remove(base());
         for(int i = 0; i < power.links.size; i++){
             Tile other = world.tile(power.links.get(i));
-            if(other != null && other.entity != null && other.entity.power != null){
-                other.entity.power.links.removeValue(pos());
+            if(other != null && other.build != null && other.build.power != null){
+                other.build.power.links.removeValue(pos());
             }
         }
     }
@@ -693,7 +693,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(int i = 0; i < power.links.size; i++){
             Tile link = world.tile(power.links.get(i));
-            if(link != null && link.entity != null && link.entity.power != null) out.add(link.entity);
+            if(link != null && link.build != null && link.build.power != null) out.add(link.build);
         }
         return out;
     }
@@ -803,8 +803,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
             if(!tempTiles.isEmpty()){
                 Tile toLink = tempTiles.first();
-                if(!toLink.entity.power.links.contains(pos())){
-                    toLink.entity.configureAny(pos());
+                if(!toLink.build.power.links.contains(pos())){
+                    toLink.build.configureAny(pos());
                 }
             }
         }
@@ -1125,7 +1125,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public boolean isValid(){
-        return tile.entity == base() && !dead();
+        return tile.build == base() && !dead();
     }
 
     @Override

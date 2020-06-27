@@ -10,6 +10,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -52,7 +53,7 @@ public class CoreBlock extends StorageBlock{
     public static void onPlayerSpawn(Tile tile, Player player){
         if(player == null || tile == null) return;
 
-        CoreEntity entity = tile.ent();
+        CoreEntity entity = tile.bc();
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
 
@@ -89,6 +90,27 @@ public class CoreBlock extends StorageBlock{
     @Override
     public boolean canBreak(Tile tile){
         return false;
+    }
+
+    @Override
+    public boolean canReplace(Block other){
+        //coreblocks can upgrade smaller cores
+        return super.canReplace(other) || (other instanceof CoreBlock && size > other.size);
+    }
+
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team){
+        return canReplace(tile.block());
+    }
+
+    @Override
+    public void placeBegan(Tile tile, Block previous){
+        //finish placement immediately when a block is replaced.
+        if(previous instanceof CoreBlock){
+            tile.setBlock(this, tile.team());
+            Fx.placeBlock.at(tile, tile.block().size);
+            Fx.upgradeCore.at(tile, tile.block().size);
+        }
     }
 
     public class CoreEntity extends Building implements ControlBlock{

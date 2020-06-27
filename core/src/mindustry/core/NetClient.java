@@ -425,11 +425,11 @@ public class NetClient implements ApplicationListener{
             for(int i = 0; i < amount; i++){
                 int pos = input.readInt();
                 Tile tile = world.tile(pos);
-                if(tile == null || tile.entity == null){
+                if(tile == null || tile.build == null){
                     Log.warn("Missing entity at @. Skipping block snapshot.", tile);
                     break;
                 }
-                tile.entity.readAll(Reads.get(input), tile.entity.version());
+                tile.build.readAll(Reads.get(input), tile.build.version());
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -457,8 +457,8 @@ public class NetClient implements ApplicationListener{
                 int pos = input.readInt();
                 Tile tile = world.tile(pos);
 
-                if(tile != null && tile.entity != null){
-                    tile.entity.items.read(Reads.get(input));
+                if(tile != null && tile.build != null){
+                    tile.build.items.read(Reads.get(input));
                 }else{
                     new ItemModule().read(Reads.get(input));
                 }

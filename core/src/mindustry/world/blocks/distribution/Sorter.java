@@ -44,7 +44,7 @@ public class Sorter extends Block{
 
     @Override
     public int minimapColor(Tile tile){
-        return tile.<SorterEntity>ent().sortItem == null ? 0 : tile.<SorterEntity>ent().sortItem.color.rgba();
+        return tile.<SorterEntity>bc().sortItem == null ? 0 : tile.<SorterEntity>bc().sortItem.color.rgba();
     }
 
     public class SorterEntity extends Building{

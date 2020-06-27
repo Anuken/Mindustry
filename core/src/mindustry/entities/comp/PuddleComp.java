@@ -80,7 +80,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
                 }
             });
 
-            if(liquid.temperature > 0.7f && (tile.entity != null) && Mathf.chance(0.3 * Time.delta())){
+            if(liquid.temperature > 0.7f && (tile.build != null) && Mathf.chance(0.3 * Time.delta())){
                 Fires.create(tile);
             }
 

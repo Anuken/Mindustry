@@ -68,7 +68,7 @@ public class ConsumePower extends Consume{
      * @return The amount of power which is requested per tick.
      */
     public float requestedPower(Building entity){
-        if(entity.tile().entity == null) return 0f;
+        if(entity.tile().build == null) return 0f;
         if(buffered){
             return (1f-entity.power.status)*capacity;
         }else{

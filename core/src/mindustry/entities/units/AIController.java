@@ -24,12 +24,12 @@ public class AIController implements UnitController{
 
     protected void targetClosestAllyFlag(BlockFlag flag){
         Tile target = Geometry.findClosest(unit.x, unit.y, indexer.getAllied(unit.team, flag));
-        if(target != null) this.target = target.entity;
+        if(target != null) this.target = target.build;
     }
 
     protected void targetClosestEnemyFlag(BlockFlag flag){
         Tile target = Geometry.findClosest(unit.x, unit.y, indexer.getEnemy(unit.team, flag));
-        if(target != null) this.target = target.entity;
+        if(target != null) this.target = target.build;
     }
 
     protected boolean retarget(){

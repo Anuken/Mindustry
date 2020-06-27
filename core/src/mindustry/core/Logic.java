@@ -38,11 +38,11 @@ public class Logic implements ApplicationListener{
             Tile tile = event.tile;
             Block block = tile.block();
             //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
-            if(tile.entity == null || !tile.block().rebuildable || net.client()) return;
+            if(tile.build == null || !tile.block().rebuildable || net.client()) return;
 
             if(block instanceof BuildBlock){
 
-                BuildEntity entity = tile.ent();
+                BuildEntity entity = tile.bc();
 
                 //update block to reflect the fact that something was being constructed
                 if(entity.cblock != null && entity.cblock.synthetic()){
@@ -65,7 +65,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, tile.rotation(), block.id, tile.entity.config()));
+            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, tile.rotation(), block.id, tile.build.config()));
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {

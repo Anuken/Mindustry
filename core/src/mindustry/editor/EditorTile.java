@@ -115,7 +115,7 @@ public class EditorTile extends Tile{
             return;
         }
 
-        entity = null;
+        build = null;
 
         if(block == null) block = Blocks.air;
         if(floor == null) floor = (Floor)Blocks.air;
@@ -123,11 +123,11 @@ public class EditorTile extends Tile{
         Block block = block();
 
         if(block.hasEntity()){
-            entity = entityprov.get().init(this, team, false);
-            entity.cons(new ConsumeModule(entity));
-            if(block.hasItems) entity.items(new ItemModule());
-            if(block.hasLiquids) entity.liquids(new LiquidModule());
-            if(block.hasPower) entity.power(new PowerModule());
+            build = entityprov.get().init(this, team, false);
+            build.cons(new ConsumeModule(build));
+            if(block.hasItems) build.items(new ItemModule());
+            if(block.hasLiquids) build.liquids(new LiquidModule());
+            if(block.hasPower) build.power(new PowerModule());
         }
     }
 

@@ -198,8 +198,8 @@ public class Block extends UnlockableContent{
 
     public void drawBase(Tile tile){
         //delegates to entity unless it is null
-        if(tile.entity != null){
-            tile.entity.draw();
+        if(tile.build != null){
+            tile.build.draw();
         }else{
             Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation * 90 : 0);
         }
@@ -255,11 +255,11 @@ public class Block extends UnlockableContent{
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
-        return tile.entity == null ? icon(Cicon.medium) : tile.entity.getDisplayIcon();
+        return tile.build == null ? icon(Cicon.medium) : tile.build.getDisplayIcon();
     }
 
     public String getDisplayName(Tile tile){
-        return tile.entity == null ? localizedName : tile.entity.getDisplayName();
+        return tile.build == null ? localizedName : tile.build.getDisplayName();
     }
 
     /** @return a custom minimap color for this or 0 to use default colors. */
@@ -333,7 +333,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean canReplace(Block other){
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size == other.size;
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
@@ -477,6 +477,11 @@ public class Block extends UnlockableContent{
 
     public boolean isPlaceable(){
         return isVisible() && buildPlaceability.placeable() && !state.rules.bannedBlocks.contains(this);
+    }
+
+    /** Called when building of this block begins. */
+    public void placeBegan(Tile tile, Block previous){
+
     }
 
     /** @return a message detailing why this block can't be placed. */

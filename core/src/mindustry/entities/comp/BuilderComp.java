@@ -100,25 +100,25 @@ abstract class BuilderComp implements Unitc{
             return;
         }
 
-        if(tile.entity instanceof BuildEntity && !current.initialized){
+        if(tile.build instanceof BuildEntity && !current.initialized){
             Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team(), (Builderc)this, current.breaking)));
             current.initialized = true;
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !infinite) || !(tile.entity instanceof BuildEntity)){
+        if((core == null && !infinite) || !(tile.build instanceof BuildEntity)){
             return;
         }
 
         //otherwise, update it.
-        BuildEntity entity = tile.ent();
+        BuildEntity entity = tile.bc();
 
         if(current.breaking){
             entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
             if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
-                    Call.onTileConfig(null, tile.entity, current.config);
+                    Call.onTileConfig(null, tile.build, current.config);
                 }
             }
         }
@@ -190,8 +190,8 @@ abstract class BuilderComp implements Unitc{
             plans.remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
-        if(tile != null && tile.entity instanceof BuildEntity){
-            place.progress = tile.<BuildEntity>ent().progress;
+        if(tile != null && tile.build instanceof BuildEntity){
+            place.progress = tile.<BuildEntity>bc().progress;
         }
         if(tail){
             plans.addLast(place);

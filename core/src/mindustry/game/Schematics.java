@@ -349,7 +349,7 @@ public class Schematics implements Loadable{
                 Building tile = world.ent(cx, cy);
 
                 if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
-                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
+                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
                     Object config = tile.config();
 
                     tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
@@ -388,8 +388,8 @@ public class Schematics implements Loadable{
             tile.rotation(st.rotation);
 
             Object config = st.config;
-            if(tile.entity != null){
-                tile.entity.configureAny(config);
+            if(tile.build != null){
+                tile.build.configureAny(config);
             }
 
             if(st.block instanceof Drill){
@@ -408,8 +408,8 @@ public class Schematics implements Loadable{
             tile.rotation(st.rotation);
 
             Object config = st.config;
-            if(tile.entity != null){
-                tile.entity.configureAny(config);
+            if(tile.build != null){
+                tile.build.configureAny(config);
             }
         });
     }

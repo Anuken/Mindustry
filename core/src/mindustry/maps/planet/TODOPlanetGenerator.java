@@ -293,6 +293,8 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void postGenerate(Tiles tiles){
-        basegen.postGenerate();
+        if(sector.hasEnemyBase()){
+            basegen.postGenerate();
+        }
     }
 }

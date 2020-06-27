@@ -89,8 +89,8 @@ public class BlockIndexer{
             for(Tile tile : world.tiles){
                 process(tile);
 
-                if(tile.entity != null && tile.entity.damaged()){
-                    notifyTileDamaged(tile.entity);
+                if(tile.build != null && tile.build.damaged()){
+                    notifyTileDamaged(tile.build);
                 }
 
                 if(tile.drop() != null) allOres.add(tile.drop());
@@ -147,7 +147,7 @@ public class BlockIndexer{
 
         TileArray set = damagedTiles[team.id];
         for(Tile tile : set){
-            if((tile.entity == null || tile.entity.team() != team || !tile.entity.damaged()) || tile.block() instanceof BuildBlock){
+            if((tile.build == null || tile.build.team() != team || !tile.build.damaged()) || tile.block() instanceof BuildBlock){
                 returnArray.add(tile);
             }
         }
@@ -380,7 +380,7 @@ public class BlockIndexer{
             GridBits bits = structQuadrant(team);
 
             //fast-set this quadrant to 'occupied' if the tile just placed is already of this team
-            if(tile.team() == team && tile.entity != null && tile.block().targetable){
+            if(tile.team() == team && tile.build != null && tile.block().targetable){
                 bits.set(quadrantX, quadrantY);
                 continue; //no need to process futher
             }

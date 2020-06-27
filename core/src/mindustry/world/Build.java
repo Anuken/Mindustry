@@ -3,6 +3,7 @@ package mindustry.world;
 import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -25,8 +26,8 @@ public class Build{
         //this should never happen, but it doesn't hurt to check for links
         float prevPercent = 1f;
 
-        if(tile.entity != null){
-            prevPercent = tile.entity.healthf();
+        if(tile.build != null){
+            prevPercent = tile.build.healthf();
         }
 
         int rotation = tile.rotation();
@@ -34,8 +35,8 @@ public class Build{
         Block sub = BuildBlock.get(previous.size);
 
         tile.setBlock(sub, team, rotation);
-        tile.<BuildEntity>ent().setDeconstruct(previous);
-        tile.entity.health(tile.entity.maxHealth() * prevPercent);
+        tile.<BuildEntity>bc().setDeconstruct(previous);
+        tile.build.health(tile.build.maxHealth() * prevPercent);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
@@ -56,7 +57,9 @@ public class Build{
         Block sub = BuildBlock.get(result.size);
 
         tile.setBlock(sub, team, rotation);
-        tile.<BuildEntity>ent().setConstruct(previous, result);
+        tile.<BuildEntity>bc().setConstruct(previous, result);
+
+        result.placeBegan(tile, previous);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, false)));
     }
@@ -80,14 +83,33 @@ public class Build{
 
         if(tile == null) return false;
 
-        //ca check
+        //campaign darkness check
         if(world.getDarkness(x, y) >= 3){
             return false;
         }
 
         if(type.isMultiblock()){
-            if((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type)) && tile.block().size == type.size && type.canPlaceOn(tile, team) && tile.interactable(team)){
-                return true;
+            if((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type)) &&
+                type.canPlaceOn(tile, team) && tile.interactable(team)){
+
+                //if the block can be replaced but the sizes differ, check all the spaces around the block to make sure it can fit
+                if(type.size != tile.block().size){
+                    int offsetx = -(type.size - 1) / 2;
+                    int offsety = -(type.size - 1) / 2;
+
+                    //this does not check *all* the conditions for placeability yet
+                    for(int dx = 0; dx < type.size; dx++){
+                        for(int dy = 0; dy < type.size; dy++){
+                            int wx = dx + offsetx + x, wy = dy + offsety + y;
+
+                            Tile check = world.tile(wx, wy);
+                            if(check == null || (!check.block.alwaysReplace && check.block != tile.block)) return false;
+                        }
+                    }
+                }
+
+                //make sure that the new block can fit the old one
+                return type.bounds(x, y, Tmp.r1).grow(0.01f).contains(tile.block.bounds(tile.centerX(), tile.centerY(), Tmp.r2));
             }
 
             //TODO should water blocks be placeable here?
@@ -106,7 +128,7 @@ public class Build{
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
                     if(
                         other == null ||
-                        (other.block() != Blocks.air && !other.block().alwaysReplace) ||
+                        !other.block().alwaysReplace ||
                         !other.floor().placeableOn ||
                         (other.floor().isDeep() && !type.floating && !type.requiresWater) ||
                         (type.requiresWater && tile.floor().liquidDrop != Liquids.water)
@@ -122,7 +144,7 @@ public class Build{
                 && (!tile.floor().isDeep() || type.floating || type.requiresWater)
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
-                && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>ent().cblock == type))
+                && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type))
                 && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                 && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile, team);
         }
