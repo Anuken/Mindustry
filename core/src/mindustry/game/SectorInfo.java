@@ -12,10 +12,12 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class SectorInfo{
-    /** export window size in seconds */
-    private static final int exportWindow = 60;
+    /** average window size in samples */
+    private static final int valueWindow = 60;
     /** refresh period of export in ticks */
     private static final float refreshPeriod = 60;
+    /** Core input statistics. */
+    public ObjectMap<Item, ExportStat> production = new ObjectMap<>();
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
     /** Items stored in all cores. */
@@ -70,7 +72,8 @@ public class SectorInfo{
         storageCapacity = entity != null ? entity.storageCapacity : 0;
     }
 
-    /** Update averages of various stats. */
+    /** Update averages of various stats.
+     * Called every frame. */
     public void update(){
         //create last stored core items
         if(lastCoreItems == null){
@@ -78,10 +81,12 @@ public class SectorInfo{
             updateCoreDeltas();
         }
 
+        CoreEntity ent = state.rules.defaultTeam.core();
+
         //refresh throughput
         if(time.get(refreshPeriod)){
-            CoreEntity ent = state.rules.defaultTeam.core();
 
+            //refresh export
             export.each((item, stat) -> {
                 //initialize stat after loading
                 if(!stat.loaded){
@@ -98,8 +103,33 @@ public class SectorInfo{
                 stat.mean = stat.means.rawMean();
             });
 
+            //refresh core items
+            for(Item item : content.items()){
+                ExportStat stat = production.get(item, ExportStat::new);
+                if(!stat.loaded){
+                    stat.means.fill(stat.mean);
+                    stat.loaded = true;
+                }
+
+                //get item delta
+                //TODO is preventing negative production a good idea?
+                int delta = Math.max((ent == null ? 0 : ent.items.get(item)) - lastCoreItems[item.id], 0);
+
+                //store means
+                stat.means.add(delta);
+                stat.mean = stat.means.rawMean();
+            }
+
             updateCoreDeltas();
         }
+    }
+
+    /** @return the items in this sector now, taking into account production. */
+    public ObjectIntMap<Item> getCurrentItems(float turnsPassed){
+        ObjectIntMap<Item> map = new ObjectIntMap<>();
+        map.putAll(coreItems);
+        production.each((item, stat) -> map.increment(item, (int)(stat.mean * turnsPassed)));
+        return map;
     }
 
     private void updateCoreDeltas(){
@@ -117,7 +147,7 @@ public class SectorInfo{
 
     public static class ExportStat{
         public transient float counter;
-        public transient WindowedMean means = new WindowedMean(exportWindow);
+        public transient WindowedMean means = new WindowedMean(valueWindow);
         public transient boolean loaded;
         public float mean;
     }

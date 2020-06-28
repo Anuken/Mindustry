@@ -86,8 +86,26 @@ public class Logic implements ApplicationListener{
 
         //when loading a 'damaged' sector, propagate the damage
         Events.on(WorldLoadEvent.class, e -> {
-            if(state.isCampaign() && state.rules.sector.hasWaves() && state.rules.sector.getTurnsPassed() > 0){
-                SectorDamage.apply(state.rules.sector.getTurnsPassed());
+            if(state.isCampaign() && state.rules.sector.getTurnsPassed() > 0){
+                int passed = state.rules.sector.getTurnsPassed();
+                Building core = state.rules.defaultTeam.core();
+
+                if(state.rules.sector.hasWaves()){
+                    SectorDamage.apply(passed);
+                }
+
+
+                //add resources based on turns passed
+                if(state.rules.sector.save != null && core != null){
+
+                    state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
+                        core.items.add(item, (int)(stat.mean * passed));
+
+                        //ensure positive items
+                        if(core.items.get(item) < 0) core.items.set(item, 0);
+                    });
+                }
+
                 state.rules.sector.setTurnsPassed(0);
             }
 

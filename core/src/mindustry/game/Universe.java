@@ -152,8 +152,8 @@ public class Universe{
         //TODO a turn passing may break the core; detect this, send an event and mark the sector as having no base!
         for(Planet planet : content.planets()){
             for(Sector sector : planet.sectors){
-                //attacks happen even for sectors without bases - stuff still gets destroyed
-                if(!sector.isBeingPlayed() && sector.hasSave() && sector.hasWaves()){
+                //update turns passed for all sectors
+                if(!sector.isBeingPlayed() && sector.hasSave()){
                     sector.setTurnsPassed(sector.getTurnsPassed() + 1);
                 }
             }
@@ -162,10 +162,6 @@ public class Universe{
         //calculate passive item generation
         //TODO make exports only update for sector with items
         //TODO items should be added directly to cores!
-        int[] exports = getTotalExports();
-        for(int i = 0; i < exports.length; i++){
-            //data.addItem(content.item(i), exports[i]);
-        }
 
         Events.fire(new TurnEvent());
     }
