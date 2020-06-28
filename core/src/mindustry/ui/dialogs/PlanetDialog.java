@@ -351,7 +351,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
                 }
 
-                if(mode == launch){
+                if(mode == launch && !sector.hasBase()){
                     shouldHide = false;
                     loadouts.show((CoreBlock)launcher.block, launcher, () -> {
                         control.handleLaunch(launcher);
