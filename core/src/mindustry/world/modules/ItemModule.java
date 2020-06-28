@@ -236,6 +236,10 @@ public class ItemModule extends BlockModule{
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
     }
 
+    public void remove(Iterable<ItemStack> stacks){
+        for(ItemStack stack : stacks) remove(stack.item, stack.amount);
+    }
+
     public void remove(ItemStack stack){
         remove(stack.item, stack.amount);
     }

@@ -249,8 +249,8 @@ public class Control implements ApplicationListener, Loadable{
         ent.lifetime(Vars.launchDuration);
         ent.add();
 
-        //remove launch requirements from core
-        tile.items.remove(tile.block.requirements);
+        //remove schematic requirements from core
+        tile.items.remove(universe.getLastLoadout().requirements());
     }
 
     public void playSector(Sector sector){

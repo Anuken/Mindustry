@@ -40,6 +40,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private @Nullable Sector selected, hovered, launchSector;
     private CoreEntity launcher;
     private Mode mode = look;
+    private boolean launching;
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -76,19 +77,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             zoom = Mathf.clamp(zoom + value / 10f, 0.5f, 2f);
         });
 
-        addListener(new ElementGestureListener(){
-            @Override
-            public void tap(InputEvent event, float x, float y, int count, KeyCode button){
-                if(hovered != null && (mode == launch ? canLaunch(hovered) && hovered != launchSector : hovered.unlocked())){
-                    selected = hovered;
-                }
-
-                if(selected != null){
-                    updateSelected();
-                }
-            }
-        });
-
         shown(this::setup);
     }
 
@@ -97,6 +85,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public Dialog show(){
         mode = look;
         selected = hovered = launchSector = null;
+        launching= false;
         return super.show();
     }
 
@@ -104,6 +93,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         this.launcher = launcher;
         selected = null;
         hovered = null;
+        launching = false;
 
         //update view to sector
         planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
@@ -204,7 +194,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         cont.clear();
         titleTable.remove();
 
-        cont.rect((x, y, w, h) -> planets.render(this)).grow();
+        //add listener to the background rect, so it doesn't get unnecessary touch input
+        cont.rect((x, y, w, h) -> planets.render(this)).grow().get().addListener(new ElementGestureListener(){
+            @Override
+            public void tap(InputEvent event, float x, float y, int count, KeyCode button){
+                if(hovered != null && (mode == launch ? canLaunch(hovered) && hovered != launchSector : hovered.unlocked())){
+                    selected = hovered;
+                }
+
+                if(selected != null){
+                    updateSelected();
+                }
+            }
+        });
     }
 
     @Override
@@ -234,6 +236,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             Vec3 pos = planets.cam.project(Tmp.v31.set(selected.tile.v).setLength(PlanetRenderer.outlineRad).rotate(Vec3.Y, -planets.planet.getRotation()).add(planets.planet.position));
             stable.setPosition(pos.x, pos.y, Align.center);
             stable.toFront();
+
+            //smooth camera toward the sector
+            if(mode == launch && launching){
+                float len = planets.camPos.len();
+                planets.camPos.slerp(Tmp.v31.set(selected.tile.v).rotate(Vec3.Y,-selected.planet.getRotation()).setLength(len), 0.1f);
+            }
         }else{
             stable.remove();
         }
@@ -348,6 +356,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     shouldHide = false;
                     loadouts.show((CoreBlock)launcher.block, launcher, () -> {
                         control.handleLaunch(launcher);
+                        launching = true;
                         zoom = 0.5f;
 
                         ui.hudfrag.showLaunchDirect();
@@ -366,14 +375,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.update(() -> {
             if(selected != null){
-                //fade out UI when not facing selected sector
-                Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planets.planet.getRotation()).scl(-1f).nor();
-                float dot = planets.cam.direction.dot(Tmp.v31);
-                stable.getColor().a = Math.max(dot, 0f)*2f;
-                if(dot*2f <= -0.1f){
-                    stable.remove();
-                    selected = null;
+                if(launching){
+                    stable.getColor().sub(0, 0, 0, 0.05f * Time.delta());
+                }else{
+                    //fade out UI when not facing selected sector
+                    Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planets.planet.getRotation()).scl(-1f).nor();
+                    float dot = planets.cam.direction.dot(Tmp.v31);
+                    stable.getColor().a = Math.max(dot, 0f)*2f;
+                    if(dot*2f <= -0.1f){
+                        stable.remove();
+                        selected = null;
+                    }
                 }
+
             }
         });
 
