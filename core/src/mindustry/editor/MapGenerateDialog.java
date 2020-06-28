@@ -1,15 +1,14 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.game.*;
@@ -21,16 +20,16 @@ import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
-public class MapGenerateDialog extends FloatingDialog{
+public class MapGenerateDialog extends BaseDialog{
     private final Prov<GenerateFilter>[] filterTypes = new Prov[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
         RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
-        BlendFilter::new, MirrorFilter::new, ClearFilter::new
+        BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new, EnemySpawnFilter::new
     };
     private final MapEditor editor;
     private final boolean applied;
@@ -38,7 +37,7 @@ public class MapGenerateDialog extends FloatingDialog{
     private Pixmap pixmap;
     private Texture texture;
     private GenerateInput input = new GenerateInput();
-    private Array<GenerateFilter> filters = new Array<>();
+    private Seq<GenerateFilter> filters = new Seq<>();
     private int scaling = mobile ? 3 : 1;
     private Table filterTable;
 
@@ -48,11 +47,11 @@ public class MapGenerateDialog extends FloatingDialog{
     private GenTile returnTile = new GenTile();
 
     private GenTile[][] buffer1, buffer2;
-    private Cons<Array<GenerateFilter>> applier;
+    private Cons<Seq<GenerateFilter>> applier;
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
-        protected void changed(){
+        protected void changeEntity(Team team, Prov<Building> entityprov){
 
         }
     };
@@ -66,27 +65,27 @@ public class MapGenerateDialog extends FloatingDialog{
         shown(this::setup);
         addCloseButton();
         if(applied){
-            buttons.addButton("$editor.apply", () -> {
+            buttons.button("$editor.apply", () -> {
                 ui.loadAnd(() -> {
                     apply();
                     hide();
                 });
             }).size(160f, 64f);
         }else{
-            buttons.addButton("$settings.reset", () -> {
+            buttons.button("$settings.reset", () -> {
                 filters.set(maps.readFilters(""));
                 rebuildFilters();
                 update();
             }).size(160f, 64f);
         }
-        buttons.addButton("$editor.randomize", () -> {
+        buttons.button("$editor.randomize", () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
         }).size(160f, 64f);
 
-        buttons.addImageTextButton("$add", Icon.add, this::showAdd).height(64f).width(140f);
+        buttons.button("$add", Icon.add, this::showAdd).height(64f).width(140f);
 
         if(!applied){
             hidden(this::apply);
@@ -95,18 +94,18 @@ public class MapGenerateDialog extends FloatingDialog{
         onResize(this::rebuildFilters);
     }
 
-    public void show(Array<GenerateFilter> filters, Cons<Array<GenerateFilter>> applier){
+    public void show(Seq<GenerateFilter> filters, Cons<Seq<GenerateFilter>> applier){
         this.filters = filters;
         this.applier = applier;
         show();
     }
 
-    public void show(Cons<Array<GenerateFilter>> applier){
+    public void show(Cons<Seq<GenerateFilter>> applier){
         show(this.filters, applier);
     }
 
     /** Applies the specified filters to the editor. */
-    public void applyToEditor(Array<GenerateFilter> filters){
+    public void applyToEditor(Seq<GenerateFilter> filters){
         //writeback buffer
         GenTile[][] writeTiles = new GenTile[editor.width()][editor.height()];
 
@@ -124,7 +123,7 @@ public class MapGenerateDialog extends FloatingDialog{
                     Tile tile = editor.tile(x, y);
                     input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
                     filter.apply(input);
-                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.getTeam(), tile.rotation());
+                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.team(), tile.rotation());
                 }
             }
 
@@ -146,7 +145,6 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         //reset undo stack as generation... messes things up
-        editor.load(editor::checkLinkedTiles);
         editor.renderer().updateAll();
         editor.clearOp();
     }
@@ -159,7 +157,7 @@ public class MapGenerateDialog extends FloatingDialog{
             texture = null;
         }
 
-        pixmap = new Pixmap(editor.width() / scaling, editor.height() / scaling, Format.RGBA8888);
+        pixmap = new Pixmap(editor.width() / scaling, editor.height() / scaling);
         texture = new Texture(pixmap);
 
         cont.clear();
@@ -235,24 +233,24 @@ public class MapGenerateDialog extends FloatingDialog{
                     t.table(b -> {
                         ImageButtonStyle style = Styles.cleari;
                         b.defaults().size(50f);
-                        b.addImageButton(Icon.refresh, style, () -> {
+                        b.button(Icon.refresh, style, () -> {
                             filter.randomize();
                             update();
                         });
 
-                        b.addImageButton(Icon.upOpen, style, () -> {
+                        b.button(Icon.upOpen, style, () -> {
                             int idx = filters.indexOf(filter);
                             filters.swap(idx, Math.max(0, idx - 1));
                             rebuildFilters();
                             update();
                         });
-                        b.addImageButton(Icon.downOpen, style, () -> {
+                        b.button(Icon.downOpen, style, () -> {
                             int idx = filters.indexOf(filter);
                             filters.swap(idx, Math.min(filters.size - 1, idx + 1));
                             rebuildFilters();
                             update();
                         });
-                        b.addImageButton(Icon.trash, style, () -> {
+                        b.button(Icon.trash, style, () -> {
                             filters.remove(filter);
                             rebuildFilters();
                             update();
@@ -263,7 +261,7 @@ public class MapGenerateDialog extends FloatingDialog{
                 //all the options
                 c.table(f -> {
                     f.left().top();
-                    for(FilterOption option : filter.options){
+                    for(FilterOption option : filter.options()){
                         option.changed = this::update;
 
                         f.table(t -> {
@@ -285,16 +283,16 @@ public class MapGenerateDialog extends FloatingDialog{
     }
 
     void showAdd(){
-        FloatingDialog selection = new FloatingDialog("$add");
+        BaseDialog selection = new BaseDialog("$add");
         selection.setFillParent(false);
         selection.cont.defaults().size(210f, 60f);
         int i = 0;
         for(Prov<GenerateFilter> gen : filterTypes){
             GenerateFilter filter = gen.get();
 
-            if(!applied && filter.buffered) continue;
+            if((!applied && filter.isBuffered()) || (filter.isPost() && applied)) continue;
 
-            selection.cont.addButton(filter.name(), () -> {
+            selection.cont.button(filter.name(), () -> {
                 filters.add(filter);
                 rebuildFilters();
                 update();
@@ -303,7 +301,7 @@ public class MapGenerateDialog extends FloatingDialog{
             if(++i % 2 == 0) selection.cont.row();
         }
 
-        selection.cont.addButton("$filter.defaultores", () -> {
+        selection.cont.button("$filter.defaultores", () -> {
             maps.addDefaultOres(filters);
             rebuildFilters();
             update();
@@ -343,7 +341,7 @@ public class MapGenerateDialog extends FloatingDialog{
             return;
         }
 
-        Array<GenerateFilter> copy = new Array<>(filters);
+        Seq<GenerateFilter> copy = new Seq<>(filters);
 
         result = executor.submit(() -> {
             try{
@@ -360,21 +358,17 @@ public class MapGenerateDialog extends FloatingDialog{
 
                 for(GenerateFilter filter : copy){
                     input.begin(filter, editor.width(), editor.height(), (x, y) -> buffer1[Mathf.clamp(x / scaling, 0, pixmap.getWidth()-1)][Mathf.clamp(y / scaling, 0, pixmap.getHeight()-1)].tile());
+
                     //read from buffer1 and write to buffer2
-                    for(int px = 0; px < pixmap.getWidth(); px++){
-                        for(int py = 0; py < pixmap.getHeight(); py++){
-                            int x = px * scaling, y = py * scaling;
-                            GenTile tile = buffer1[px][py];
-                            input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
-                            filter.apply(input);
-                            buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team), tile.rotation);
-                        }
-                    }
-                    for(int px = 0; px < pixmap.getWidth(); px++){
-                        for(int py = 0; py < pixmap.getHeight(); py++){
-                            buffer1[px][py].set(buffer2[px][py]);
-                        }
-                    }
+                    pixmap.each((px, py) -> {
+                        int x = px * scaling, y = py * scaling;
+                        GenTile tile = buffer1[px][py];
+                        input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
+                        filter.apply(input);
+                        buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team), tile.rotation);
+                    });
+
+                    pixmap.each((px, py) -> buffer1[px][py].set(buffer2[px][py]));
                 }
 
                 for(int px = 0; px < pixmap.getWidth(); px++){
@@ -396,7 +390,7 @@ public class MapGenerateDialog extends FloatingDialog{
                     if(pixmap == null || texture == null){
                         return;
                     }
-                    texture.draw(pixmap, 0, 0);
+                    texture.draw(pixmap);
                     generating = false;
                 });
             }catch(Exception e){
@@ -415,7 +409,7 @@ public class MapGenerateDialog extends FloatingDialog{
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
-            this.team = (byte) team.id;
+            this.team = team.id;
             this.rotation = (byte)rotation;
         }
 
@@ -428,7 +422,7 @@ public class MapGenerateDialog extends FloatingDialog{
         }
 
         public GenTile set(Tile other){
-            set(other.floor(), other.block(), other.overlay(), other.getTeam(), other.rotation());
+            set(other.floor(), other.block(), other.overlay(), other.team(), other.rotation());
             return this;
         }
 

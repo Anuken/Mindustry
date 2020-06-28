@@ -1,5 +1,6 @@
 package mindustry.tools;
 
+import arc.func.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.Structs;
@@ -54,10 +55,19 @@ class Image{
         return color;
     }
 
+    void each(Intc2 cons){
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                cons.get(x, y);
+            }
+        }
+    }
+
     void draw(int x, int y, Color color){
         graphics.setColor(new java.awt.Color(color.r, color.g, color.b, color.a));
         graphics.fillRect(x, y, 1, 1);
     }
+
 
     /** Draws a region at the top left corner. */
     void draw(TextureRegion region){

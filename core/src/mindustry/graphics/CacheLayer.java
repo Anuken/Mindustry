@@ -1,11 +1,10 @@
 package mindustry.graphics;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.gl.Shader;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
 
-import static arc.Core.camera;
 import static mindustry.Vars.renderer;
 
 public enum CacheLayer{
@@ -31,8 +30,31 @@ public enum CacheLayer{
             endShader(Shaders.tar);
         }
     },
-    normal,
+    slag{
+        @Override
+        public void begin(){
+            beginShader();
+        }
+
+        @Override
+        public void end(){
+            endShader(Shaders.slag);
+        }
+    },
+    normal(5),
     walls;
+
+    public static final CacheLayer[] all = values();
+    /** Capacity multiplier. */
+    public final int capacity;
+
+    CacheLayer(){
+        this(2);
+    }
+
+    CacheLayer(int capacity){
+        this.capacity = capacity;
+    }
 
     public void begin(){
 
@@ -46,7 +68,7 @@ public enum CacheLayer{
         if(!Core.settings.getBool("animatedwater")) return;
 
         renderer.blocks.floor.endc();
-        renderer.shieldBuffer.begin();
+        renderer.effectBuffer.begin();
         Core.graphics.clear(Color.clear);
         renderer.blocks.floor.beginc();
     }
@@ -55,11 +77,9 @@ public enum CacheLayer{
         if(!Core.settings.getBool("animatedwater")) return;
 
         renderer.blocks.floor.endc();
-        renderer.shieldBuffer.end();
+        renderer.effectBuffer.end();
 
-        Draw.shader(shader);
-        Draw.rect(Draw.wrap(renderer.shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
-        Draw.shader();
+        renderer.effectBuffer.blit(shader);
 
         renderer.blocks.floor.beginc();
     }

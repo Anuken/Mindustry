@@ -1,5 +1,6 @@
 package mindustry.world.blocks.sandbox;
 
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -18,12 +19,15 @@ public class LiquidVoid extends Block{
         bars.remove("liquid");
     }
 
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return true;
-    }
+    public class LiquidVoidEntity extends Building{
+        @Override
+        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+            return true;
+        }
 
-    @Override
-    public void handleLiquid(Tile tile, Tile source, Liquid liquid, float amount){}
+        @Override
+        public void handleLiquid(Building source, Liquid liquid, float amount){
+        }
+    }
 
 }

@@ -4,9 +4,11 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -18,7 +20,8 @@ public class Separator extends Block{
     public @NonNull ItemStack[] results;
     public float craftTime;
 
-    public int liquidRegion, spinnerRegion;
+    public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-spinner") TextureRegion spinnerRegion;
     public float spinnerSpeed = 3f;
 
     public Separator(String name){
@@ -27,10 +30,6 @@ public class Separator extends Block{
         solid = true;
         hasItems = true;
         hasLiquids = true;
-
-        liquidRegion = reg("-liquid");
-        spinnerRegion = reg("-spinner");
-        entityType = GenericCrafterEntity::new;
     }
 
     @Override
@@ -52,68 +51,101 @@ public class Separator extends Block{
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
     }
 
-    @Override
-    public boolean shouldConsume(Tile tile){
-        return tile.entity.items.total() < itemCapacity;
-    }
+    public class SeparatorEntity extends Building{
+        public float progress;
+        public float totalProgress;
+        public float warmup;
 
-    @Override
-    public void draw(Tile tile){
-        super.draw(tile);
-
-        GenericCrafterEntity entity = tile.ent();
-
-        Draw.color(tile.entity.liquids.current().color);
-        Draw.alpha(tile.entity.liquids.total() / liquidCapacity);
-        Draw.rect(reg(liquidRegion), tile.drawx(), tile.drawy());
-
-        Draw.reset();
-        if(Core.atlas.isFound(reg(spinnerRegion))){
-            Draw.rect(reg(spinnerRegion), tile.drawx(), tile.drawy(), entity.totalProgress * spinnerSpeed);
-        }
-    }
-
-    @Override
-    public void update(Tile tile){
-        GenericCrafterEntity entity = tile.ent();
-
-        entity.totalProgress += entity.warmup * entity.delta();
-
-        if(entity.cons.valid()){
-            entity.progress += getProgressIncrease(entity, craftTime);
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 1f, 0.02f);
-        }else{
-            entity.warmup = Mathf.lerpDelta(entity.warmup, 0f, 0.02f);
+        @Override
+        public boolean shouldIdleSound(){
+            return cons.valid();
         }
 
-        if(entity.progress >= 1f){
-            entity.progress = 0f;
-            int sum = 0;
-            for(ItemStack stack : results) sum += stack.amount;
-
-            int i = Mathf.random(sum);
-            int count = 0;
-            Item item = null;
-
-            //TODO guaranteed desync since items are random
-            for(ItemStack stack : results){
-                if(i >= count && i < count + stack.amount){
-                    item = stack.item;
-                    break;
+        @Override
+        public boolean shouldConsume(){
+            int total = items.total();
+            //very inefficient way of allowing separators to ignore input buffer storage
+            if(consumes.has(ConsumeType.item) && consumes.get(ConsumeType.item) instanceof ConsumeItems){
+                ConsumeItems c = consumes.get(ConsumeType.item);
+                for(ItemStack stack : c.items){
+                    total -= items.get(stack.item);
                 }
-                count += stack.amount;
             }
+            return total < itemCapacity;
+        }
 
-            entity.cons.trigger();
+        @Override
+        public void draw(){
+            super.draw();
 
-            if(item != null && entity.items.get(item) < itemCapacity){
-                useContent(tile, item);
-                offloadNear(tile, item);
+            Draw.color(liquids.current().color);
+            Draw.alpha(liquids.total() / liquidCapacity);
+            Draw.rect(liquidRegion, x, y);
+
+            Draw.reset();
+            if(Core.atlas.isFound(spinnerRegion)){
+                Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);
             }
         }
 
-        if(entity.timer.get(timerDump, dumpTime)){
-            tryDump(tile);
+        @Override
+        public void updateTile(){
+            totalProgress += warmup * delta();
+
+            if(consValid()){
+                progress += getProgressIncrease(craftTime);
+                warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
+            }else{
+                warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
+            }
+
+            if(progress >= 1f){
+                progress %= 1f;
+                int sum = 0;
+                for(ItemStack stack : results) sum += stack.amount;
+
+                int i = Mathf.random(sum);
+                int count = 0;
+                Item item = null;
+
+                //TODO guaranteed desync since items are random
+                for(ItemStack stack : results){
+                    if(i >= count && i < count + stack.amount){
+                        item = stack.item;
+                        break;
+                    }
+                    count += stack.amount;
+                }
+
+                consume();
+
+                if(item != null && items.get(item) < itemCapacity){
+                    offload(item);
+                }
+            }
+
+            if(timer(timerDump, dumpTime)){
+                dump();
+            }
+        }
+
+        @Override
+        public boolean canDump(Building to, Item item){
+            return !consumes.itemFilters.get(item.id);
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+            write.f(progress);
+            write.f(warmup);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            progress = read.f();
+            warmup = read.f();
         }
     }
 }

@@ -17,7 +17,7 @@ import java.util.*;
 
 import static mindustry.Vars.platform;
 
-public class FileChooser extends FloatingDialog{
+public class FileChooser extends BaseDialog{
     private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
     private static Fi lastDirectory = homeDirectory;
 
@@ -200,7 +200,6 @@ public class FileChooser extends FloatingDialog{
         files.add(upbutton).align(Align.topLeft).fillX().expandX().height(50).pad(2).colspan(2);
         files.row();
 
-
         ButtonGroup<TextButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
 
@@ -255,7 +254,7 @@ public class FileChooser extends FloatingDialog{
     }
 
     public class FileHistory{
-        private Array<Fi> history = new Array<>();
+        private Seq<Fi> history = new Seq<>();
         private int index;
 
         public FileHistory(){

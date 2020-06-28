@@ -13,32 +13,24 @@ import arc.util.serialization.*;
 import club.minnced.discord.rpc.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
-import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
+import mindustry.gen.*;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
-
-    boolean useDiscord = OS.is64Bit, loadError = false;
+    boolean useDiscord = OS.is64Bit && !OS.isARM && !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
-
-    static{
-        if(!Charset.forName("US-ASCII").newEncoder().canEncode(System.getProperty("user.name", ""))){
-            System.setProperty("com.codedisaster.steamworks.SharedLibraryExtractPath", new File("").getAbsolutePath());
-        }
-    }
 
     public static void main(String[] arg){
         try{
@@ -46,8 +38,7 @@ public class DesktopLauncher extends ClientLauncher{
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
                 maximized = true;
-                depth = 0;
-                stencil = 0;
+                stencil = 8;
                 width = 900;
                 height = 700;
                 setWindowIcon(FileType.internal, "icons/icon_64.png");
@@ -60,18 +51,17 @@ public class DesktopLauncher extends ClientLauncher{
     public DesktopLauncher(String[] args){
         Version.init();
         boolean useSteam = Version.modifier.contains("steam");
-        testMobile = Array.with(args).contains("-testMobile");
+        testMobile = Seq.with(args).contains("-testMobile");
 
         if(useDiscord){
             try{
-                DiscordEventHandlers handlers = new DiscordEventHandlers();
-                DiscordRPC.INSTANCE.Discord_Initialize(discordID, handlers, true, "1127400");
+                DiscordRPC.INSTANCE.Discord_Initialize(discordID, null, true, "1127400");
                 Log.info("Initialized Discord rich presence.");
-
                 Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
             }catch(Throwable t){
                 useDiscord = false;
-                Log.err("Failed to initialize discord.", t);
+                Log.err("Failed to initialize discord. Enable debug logging for details.");
+                Log.debug("Discord init error: \n@\n", Strings.getStackTrace(t));
             }
         }
 
@@ -122,7 +112,7 @@ public class DesktopLauncher extends ClientLauncher{
         loadError = true;
         Log.err(e);
         try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
-            String log = Strings.parseException(e, true);
+            String log = Strings.neatError(e);
             s.write(log.getBytes());
         }catch(Exception e2){
             Log.err(e2);
@@ -137,10 +127,9 @@ public class DesktopLauncher extends ClientLauncher{
         boolean[] isShutdown = {false};
 
         Events.on(ClientLoadEvent.class, event -> {
-            player.name = SVars.net.friends.getPersonaName();
+            player.name(SVars.net.friends.getPersonaName());
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
             Core.settings.put("name", player.name);
-            Core.settings.save();
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override
@@ -157,7 +146,7 @@ public class DesktopLauncher extends ClientLauncher{
                         long id = Long.parseLong(args[1]);
                         ui.join.connect("steam:" + id, port);
                     }catch(Exception e){
-                        Log.err("Failed to parse steam lobby ID: {0}", e.getMessage());
+                        Log.err("Failed to parse steam lobby ID: @", e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -204,7 +193,7 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
+    public Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
     }
 
@@ -249,27 +238,27 @@ public class DesktopLauncher extends ClientLauncher{
         if(!useDiscord && !steam) return;
 
         //common elements they each share
-        boolean inGame = !state.is(State.menu);
+        boolean inGame = state.isGame();
         String gameMapWithWave = "Unknown Map";
         String gameMode = "";
         String gamePlayersSuffix = "";
         String uiState = "";
 
         if(inGame){
-            if(world.getMap() != null){
-                gameMapWithWave = world.isZone() ? world.getZone().localizedName : Strings.capitalize(world.getMap().name());
-            }
+            //TODO implement nice name for sector
+            gameMapWithWave = Strings.capitalize(state.map.name());
+
             if(state.rules.waves){
                 gameMapWithWave += " | Wave " + state.wave;
             }
             gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : "Survival";
-            if(net.active() && playerGroup.size() > 1){
-                gamePlayersSuffix = " | " + playerGroup.size() + " Players";
+            if(net.active() && Groups.player.size() > 1){
+                gamePlayersSuffix = " | " + Groups.player.size() + " Players";
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){
                 uiState = "In Editor";
-            }else if(ui.deploy != null && ui.deploy.isShown()){
+            }else if(ui.planet != null && ui.planet.isShown()){
                 uiState = "In Launch Selection";
             }else{
                 uiState = "In Menu";

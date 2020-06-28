@@ -1,15 +1,14 @@
 package mindustry.desktop.steam;
 
 import arc.*;
-import arc.struct.*;
 import arc.util.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Stats.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
@@ -20,14 +19,14 @@ public class SStats implements SteamUserStatsCallback{
     public final SteamUserStats stats = new SteamUserStats(this);
 
     private boolean updated = false;
-    private ObjectSet<String> mechs = new ObjectSet<>();
+    //private ObjectSet<String> mechs = new ObjectSet<>();
     private int statSavePeriod = 4; //in minutes
 
     public SStats(){
         stats.requestCurrentStats();
 
         Events.on(ClientLoadEvent.class, e -> {
-            mechs = Core.settings.getObject("mechs", ObjectSet.class, ObjectSet::new);
+            //mechs = Core.settings.getObject("mechs", ObjectSet.class, ObjectSet::new);
 
             Core.app.addListener(new ApplicationListener(){
                 Interval i = new Interval();
@@ -54,18 +53,18 @@ public class SStats implements SteamUserStatsCallback{
 
     private void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(unitGroup.count(t -> t.getTeam() == player.getTeam()));
+            SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.phantom && u.getTeam() == player.getTeam()) >= 10){
+            if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
                 active10Phantoms.complete();
             }
 
-            if(unitGroup.count(u -> u.getType() == UnitTypes.crawler && u.getTeam() == player.getTeam()) >= 50){
+            if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
-            for(TileEntity entity : player.getTeam().cores()){
-                if(!content.items().contains(i -> i.type == ItemType.material && entity.items.get(i) < entity.block.itemCapacity)){
+            for(Building entity : player.team().cores()){
+                if(!content.items().contains(i -> i.type == ItemType.material && entity.items.get(i) < entity.block().itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }
@@ -76,10 +75,10 @@ public class SStats implements SteamUserStatsCallback{
     private void registerEvents(){
         Events.on(UnitDestroyEvent.class, e -> {
             if(ncustom()){
-                if(e.unit.getTeam() != Vars.player.getTeam()){
+                if(e.unit.team() != Vars.player.team()){
                     SStat.unitsDestroyed.add();
 
-                    if(e.unit instanceof BaseUnit && ((BaseUnit)e.unit).isBoss()){
+                    if(e.unit instanceof Unit && ((Unit)e.unit).isBoss()){
                         SStat.bossesDefeated.add();
                     }
                 }
@@ -87,13 +86,13 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            if(!content.zones().contains(z -> !z.canConfigure())){
+            if(!content.sectors().contains(z -> !z.canConfigure())){
                 configAllZones.complete();
             }
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {
-            if(campaign() && player.getClosestCore() != null && player.getClosestCore().items.total() >= 10 * 1000){
+            if(campaign() && player.core() != null && player.core().items().total() >= 10 * 1000){
                 drop10kitems.complete();
             }
         }));
@@ -105,24 +104,25 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(BlockBuildEndEvent.class, e -> {
-            if(campaign() && e.player == player && !e.breaking){
+            if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){
                 SStat.blocksBuilt.add();
 
-                if(e.tile.block() == Blocks.router && e.tile.entity.proximity().contains(t -> t.block() == Blocks.router)){
+                if(e.tile.block() == Blocks.router && e.tile.build.proximity().contains(t -> t.block() == Blocks.router)){
                     chainRouters.complete();
                 }
 
-                if(e.tile.block() == Blocks.daggerFactory){
-                    buildDaggerFactory.complete();
-                }
+                //TODO implement
+                //if(e.tile.block() == Blocks.daggerFactory){
+                //    buildDaggerFactory.complete();
+                //}
 
                 if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre){
                     if(e.tile.block() == Blocks.meltdown && !Core.settings.getBool("meltdownp", false)){
-                        Core.settings.putSave("meltdownp", true);
+                        Core.settings.put("meltdownp", true);
                     }
 
                     if(e.tile.block() == Blocks.spectre && !Core.settings.getBool("spectrep", false)){
-                        Core.settings.putSave("spectrep", true);
+                        Core.settings.put("spectrep", true);
                     }
 
                     if(Core.settings.getBool("meltdownp", false) && Core.settings.getBool("spectrep", false)){
@@ -133,7 +133,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(BlockDestroyEvent.class, e -> {
-            if(campaign() && e.tile.getTeam() != player.getTeam()){
+            if(campaign() && e.tile.team() != player.team()){
                 SStat.blocksDestroyed.add();
             }
         });
@@ -146,7 +146,7 @@ public class SStats implements SteamUserStatsCallback{
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
 
-            if(!content.zones().contains(Zone::locked)){
+            if(!content.sectors().contains(SectorPreset::locked)){
                 unlockAllZones.complete();
             }
         });
@@ -180,16 +180,17 @@ public class SStats implements SteamUserStatsCallback{
         trigger(Trigger.itemLaunch, launchItemPad);
 
         Events.on(UnitCreateEvent.class, e -> {
-            if(campaign() && e.unit.getTeam() == player.getTeam()){
+            if(campaign() && e.unit.team() == player.team()){
                 SStat.unitsBuilt.add();
             }
         });
 
         Events.on(LoseEvent.class, e -> {
             if(campaign()){
-                if(world.getZone().metCondition() && (state.wave - world.getZone().conditionWave) / world.getZone().launchPeriod >= 1){
-                    skipLaunching2Death.complete();
-                }
+                //TODO implement
+                //if(state.getSector().metCondition() && (state.wave - state.getSector().conditionWave) / state.getSector().launchPeriod >= 1){
+                //    skipLaunching2Death.complete();
+                //}
             }
         });
 
@@ -217,20 +218,20 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.on(PlayerJoin.class, e -> {
             if(Vars.net.server()){
-                SStat.maxPlayersServer.max(Vars.playerGroup.size());
+                SStat.maxPlayersServer.max(Groups.player.size());
             }
         });
 
         Events.on(ResearchEvent.class, e -> {
             if(e.content == Blocks.router) researchRouter.complete();
 
-            if(!TechTree.all.contains(t -> t.block.locked())){
+            if(!TechTree.all.contains(t -> t.content.locked())){
                 researchAll.complete();
             }
         });
 
         Events.on(WinEvent.class, e -> {
-            if(campaign()){
+            if(state.hasSector()){
                 if(Vars.state.wave <= 5 && state.rules.attackMode){
                     defeatAttack5Waves.complete();
                 }
@@ -239,7 +240,7 @@ public class SStats implements SteamUserStatsCallback{
                     SStat.attacksWon.add();
                 }
 
-                RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
+                RankResult result = state.stats.calculateRank(state.getSector(), state.launched);
                 if(result.rank == Rank.S) earnSRank.complete();
                 if(result.rank == Rank.SS) earnSSRank.complete();
             }
@@ -249,15 +250,15 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
+        //TODO dead achievement
+        /*
         Events.on(MechChangeEvent.class, e -> {
             if(campaign()){
                 if(mechs.add(e.mech.name)){
                     SStat.zoneMechsUsed.max(mechs.size);
-                    Core.settings.putObject("mechs", mechs);
-                    Core.settings.save();
                 }
             }
-        });
+        });*/
     }
 
     private void trigger(Trigger trigger, SAchievement ach){
@@ -273,7 +274,7 @@ public class SStats implements SteamUserStatsCallback{
     }
 
     private boolean campaign(){
-        return Vars.world.isZone();
+        return Vars.state.isCampaign();
     }
 
     @Override
@@ -281,7 +282,7 @@ public class SStats implements SteamUserStatsCallback{
         registerEvents();
 
         if(result != SteamResult.OK){
-            Log.err("Failed to recieve steam stats: {0}", result);
+            Log.err("Failed to recieve steam stats: @", result);
         }else{
             Log.info("Recieved steam stats.");
         }
@@ -289,7 +290,7 @@ public class SStats implements SteamUserStatsCallback{
 
     @Override
     public void onUserStatsStored(long gameID, SteamResult result){
-        Log.info("Stored stats: {0}", result);
+        Log.info("Stored stats: @", result);
 
         if(result == SteamResult.OK){
             updated = true;

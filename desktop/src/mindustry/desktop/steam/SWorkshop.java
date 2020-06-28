@@ -21,9 +21,9 @@ import static mindustry.Vars.*;
 public class SWorkshop implements SteamUGCCallback{
     public final SteamUGC ugc = new SteamUGC(this);
 
-    private ObjectMap<Class<? extends Publishable>, Array<Fi>> workshopFiles = new ObjectMap<>();
-    private ObjectMap<SteamUGCQuery, Cons2<Array<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
-    private Array<Cons<SteamPublishedFileID>> itemHandlers = new Array<>();
+    private ObjectMap<Class<? extends Publishable>, Seq<Fi>> workshopFiles = new ObjectMap<>();
+    private ObjectMap<SteamUGCQuery, Cons2<Seq<SteamUGCDetails>, SteamResult>> detailHandlers = new ObjectMap<>();
+    private Seq<Cons<SteamPublishedFileID>> itemHandlers = new Seq<>();
     private ObjectMap<SteamPublishedFileID, Runnable> updatedHandlers = new ObjectMap<>();
 
     public SWorkshop(){
@@ -32,7 +32,7 @@ public class SWorkshop implements SteamUGCCallback{
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getSubscribedItems(ids);
 
-        Array<Fi> folders = Array.with(ids).map(f -> {
+        Seq<Fi> folders = Seq.with(ids).map(f -> {
             ugc.getItemInstallInfo(f, info);
             return new Fi(info.getFolder());
         }).select(f -> f != null && f.list().length > 0);
@@ -46,12 +46,12 @@ public class SWorkshop implements SteamUGCCallback{
         }
 
         workshopFiles.each((type, list) -> {
-            Log.info("Fetched content ({0}): {1}", type.getSimpleName(), list.size);
+            Log.info("Fetched content (@): @", type.getSimpleName(), list.size);
         });
     }
 
-    public Array<Fi> getWorkshopFiles(Class<? extends Publishable> type){
-        return workshopFiles.getOr(type, () -> new Array<>(0));
+    public Seq<Fi> getWorkshopFiles(Class<? extends Publishable> type){
+        return workshopFiles.get(type, () -> new Seq<>(0));
     }
 
     /** Publish a new item and submit an update for it.
@@ -96,25 +96,25 @@ public class SWorkshop implements SteamUGCCallback{
                 if(details.getResult() == SteamResult.OK){
                     if(details.getOwnerID().equals(SVars.user.user.getSteamID())){
 
-                        FloatingDialog dialog = new FloatingDialog("$workshop.info");
+                        BaseDialog dialog = new BaseDialog("$workshop.info");
                         dialog.setFillParent(false);
                         dialog.cont.add("$workshop.menu").pad(20f);
                         dialog.addCloseButton();
 
-                        dialog.buttons.addImageTextButton("$view.workshop", Icon.link, () -> {
+                        dialog.buttons.button("$view.workshop", Icon.link, () -> {
                             viewListingID(id);
                             dialog.hide();
                         }).size(210f, 64f);
 
-                        dialog.buttons.addImageTextButton("$workshop.update", Icon.up, () -> {
-                            new FloatingDialog("$workshop.update"){{
+                        dialog.buttons.button("$workshop.update", Icon.up, () -> {
+                            new BaseDialog("$workshop.update"){{
                                 setFillParent(false);
                                 cont.margin(10).add("$changelog").padRight(6f);
                                 cont.row();
-                                TextArea field = cont.addArea("", t -> {}).size(500f, 160f).get();
+                                TextArea field = cont.area("", t -> {}).size(500f, 160f).get();
                                 field.setMaxLength(400);
                                 buttons.defaults().size(120, 54).pad(4);
-                                buttons.addButton("$ok", () -> {
+                                buttons.button("$ok", () -> {
                                     if(!p.prePublish()){
                                         Log.info("Rejecting due to pre-publish.");
                                         return;
@@ -125,7 +125,7 @@ public class SWorkshop implements SteamUGCCallback{
                                     dialog.hide();
                                     hide();
                                 });
-                                buttons.addButton("$cancel", this::hide);
+                                buttons.button("$cancel", this::hide);
                             }}.show();
 
                         }).size(210f, 64f);
@@ -150,7 +150,7 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     void update(Publishable p, SteamPublishedFileID id, String changelog){
-        Log.info("Calling update({0}) {1}", p.steamTitle(), id.handle());
+        Log.info("Calling update(@) @", p.steamTitle(), id.handle());
         String sid = id.handle() + "";
 
         updateItem(id, h -> {
@@ -158,7 +158,7 @@ public class SWorkshop implements SteamUGCCallback{
                 ugc.setItemDescription(h, p.steamDescription());
             }
 
-            Array<String> tags = p.extraTags();
+            Seq<String> tags = p.extraTags();
             tags.add(p.steamTag());
 
             ugc.setItemTitle(h, p.steamTitle());
@@ -177,15 +177,15 @@ public class SWorkshop implements SteamUGCCallback{
     }
 
     void showPublish(Cons<SteamPublishedFileID> published){
-        FloatingDialog dialog = new FloatingDialog("$confirm");
+        BaseDialog dialog = new BaseDialog("$confirm");
         dialog.setFillParent(false);
         dialog.cont.add("$publish.confirm").width(600f).wrap();
         dialog.addCloseButton();
-        dialog.buttons.addImageTextButton("$eula", Icon.link,
+        dialog.buttons.button("$eula", Icon.link,
             () -> SVars.net.friends.activateGameOverlayToWebPage("https://steamcommunity.com/sharedfiles/workshoplegalagreement"))
             .size(210f, 64f);
 
-        dialog.buttons.addImageTextButton("$ok", Icon.ok, () -> {
+        dialog.buttons.button("$ok", Icon.ok, () -> {
             Log.info("Accepted, publishing item...");
             itemHandlers.add(published);
             ugc.createItem(SVars.steamID, WorkshopFileType.Community);
@@ -195,7 +195,7 @@ public class SWorkshop implements SteamUGCCallback{
         dialog.show();
     }
 
-    void query(SteamUGCQuery query, Cons2<Array<SteamUGCDetails>, SteamResult> handler){
+    void query(SteamUGCQuery query, Cons2<Seq<SteamUGCDetails>, SteamResult> handler){
         Log.info("POST QUERY " + query);
         detailHandlers.put(query, handler);
         ugc.sendQueryUGCRequest(query);
@@ -204,7 +204,7 @@ public class SWorkshop implements SteamUGCCallback{
     void updateItem(SteamPublishedFileID publishedFileID, Cons<SteamUGCUpdateHandle> tagger, Runnable updated){
         try{
             SteamUGCUpdateHandle h = ugc.startItemUpdate(SVars.steamID, publishedFileID);
-            Log.info("begin updateItem({0})", publishedFileID.handle());
+            Log.info("begin updateItem(@)", publishedFileID.handle());
 
             tagger.get(h);
             Log.info("Tagged.");
@@ -240,8 +240,8 @@ public class SWorkshop implements SteamUGCCallback{
         if(detailHandlers.containsKey(query)){
             Log.info("Query being handled...");
             if(numResultsReturned > 0){
-                Log.info("{0} q results", numResultsReturned);
-                Array<SteamUGCDetails> details = new Array<>();
+                Log.info("@ q results", numResultsReturned);
+                Seq<SteamUGCDetails> details = new Seq<>();
                 for(int i = 0; i < numResultsReturned; i++){
                     details.add(new SteamUGCDetails());
                     ugc.getQueryUGCResult(query, i, details.get(i));
@@ -249,7 +249,7 @@ public class SWorkshop implements SteamUGCCallback{
                 detailHandlers.get(query).get(details, result);
             }else{
                 Log.info("Nothing found.");
-                detailHandlers.get(query).get(new Array<>(), SteamResult.FileNotFound);
+                detailHandlers.get(query).get(new Seq<>(), SteamResult.FileNotFound);
             }
 
             detailHandlers.remove(query);
@@ -262,7 +262,7 @@ public class SWorkshop implements SteamUGCCallback{
     public void onSubscribeItem(SteamPublishedFileID publishedFileID, SteamResult result){
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
-        Log.info("Item subscribed from {0}", info.getFolder());
+        Log.info("Item subscribed from @", info.getFolder());
         SAchievement.downloadMapWorkshop.complete();
     }
 
@@ -270,7 +270,7 @@ public class SWorkshop implements SteamUGCCallback{
     public void onUnsubscribeItem(SteamPublishedFileID publishedFileID, SteamResult result){
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
-        Log.info("Item unsubscribed from {0}", info.getFolder());
+        Log.info("Item unsubscribed from @", info.getFolder());
     }
 
     @Override
@@ -293,7 +293,7 @@ public class SWorkshop implements SteamUGCCallback{
     @Override
     public void onSubmitItemUpdate(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result){
         ui.loadfrag.hide();
-        Log.info("onsubmititemupdate {0} {1} {2}", publishedFileID.handle(), needsToAcceptWLA, result);
+        Log.info("onsubmititemupdate @ @ @", publishedFileID.handle(), needsToAcceptWLA, result);
         if(result == SteamResult.OK){
             //redirect user to page for further updates
             SVars.net.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + publishedFileID.handle());
@@ -314,7 +314,7 @@ public class SWorkshop implements SteamUGCCallback{
         SAchievement.downloadMapWorkshop.complete();
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
-        Log.info("Item downloaded to {0}", info.getFolder());
+        Log.info("Item downloaded to @", info.getFolder());
     }
 
     @Override
@@ -351,6 +351,6 @@ public class SWorkshop implements SteamUGCCallback{
     public void onDeleteItem(SteamPublishedFileID publishedFileID, SteamResult result){
         ItemInstallInfo info = new ItemInstallInfo();
         ugc.getItemInstallInfo(publishedFileID, info);
-        Log.info("Item removed from {0}", info.getFolder());
+        Log.info("Item removed from @", info.getFolder());
     }
 }

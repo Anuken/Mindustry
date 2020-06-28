@@ -1,10 +1,10 @@
 jdk:
 - openjdk8
-dist: trusty
+dist: xenial
 android:
   components:
   - android-29
-  - build-tools-29.0.2
+  - build-tools-29.0.3
 
 script:
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
@@ -20,6 +20,12 @@ script:
 - "./gradlew test"
 - "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
+- "./gradlew core:javadoc"
+- cd ../
+- git clone --depth=1 https://github.com/MindustryGame/docs.git
+- cp -a Mindustry/core/build/docs/javadoc/. docs/
+- cd docs
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add .; git commit -m "Update ${TRAVIS_BUILD_NUMBER}"; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/MindustryGame/docs; fi
 deploy:
 - provider: releases
   skip_cleanup: true

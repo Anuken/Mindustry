@@ -1,6 +1,6 @@
 package mindustry.world.consumers;
 
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 
 public abstract class ConsumeLiquidBase extends Consume{
     /** amount used per frame */
@@ -22,7 +22,7 @@ public abstract class ConsumeLiquidBase extends Consume{
         return ConsumeType.liquid;
     }
 
-    protected float use(TileEntity entity){
-        return Math.min(amount * entity.delta(), entity.block.liquidCapacity);
+    protected float use(Building entity){
+        return Math.min(amount * entity.delta(), entity.block().liquidCapacity);
     }
 }

@@ -1,11 +1,8 @@
 package mindustry.world.modules;
 
-import arc.struct.IntArray;
+import arc.struct.IntSeq;
+import arc.util.io.*;
 import mindustry.world.blocks.power.PowerGraph;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 public class PowerModule extends BlockModule{
     /**
@@ -15,25 +12,25 @@ public class PowerModule extends BlockModule{
      */
     public float status = 0.0f;
     public PowerGraph graph = new PowerGraph();
-    public IntArray links = new IntArray();
+    public IntSeq links = new IntSeq();
 
     @Override
-    public void write(DataOutput stream) throws IOException{
-        stream.writeShort(links.size);
+    public void write(Writes write){
+        write.s(links.size);
         for(int i = 0; i < links.size; i++){
-            stream.writeInt(links.get(i));
+            write.i(links.get(i));
         }
-        stream.writeFloat(status);
+        write.f(status);
     }
 
     @Override
-    public void read(DataInput stream) throws IOException{
+    public void read(Reads read){
         links.clear();
-        short amount = stream.readShort();
+        short amount = read.s();
         for(int i = 0; i < amount; i++){
-            links.add(stream.readInt());
+            links.add(read.i());
         }
-        status = stream.readFloat();
+        status = read.f();
         if(Float.isNaN(status) || Float.isInfinite(status)) status = 0f;
     }
 }

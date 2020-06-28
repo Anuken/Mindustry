@@ -7,7 +7,7 @@ import mindustry.net.Administration.*;
 
 import static mindustry.Vars.*;
 
-public class AdminsDialog extends FloatingDialog{
+public class AdminsDialog extends BaseDialog{
 
     public AdminsDialog(){
         super("$server.admins");
@@ -36,14 +36,14 @@ public class AdminsDialog extends FloatingDialog{
             Table res = new Table(Tex.button);
             res.margin(14f);
 
-            res.labelWrap("[LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
+            res.labelWrap("[lightgray]" + info.lastName).width(w - h - 24f);
             res.add().growX();
-            res.addImageButton(Icon.cancel, () -> {
+            res.button(Icon.cancel, () -> {
                 ui.showConfirm("$confirm", "$confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(info.id);
-                    playerGroup.all().each(player -> {
-                        if(player != null && player.uuid != null && player.uuid.equals(info.id)){
-                            player.isAdmin = false;
+                    Groups.player.each(player -> {
+                        if(player != null && !player.isLocal() && player.uuid().equals(info.id)){
+                            player.admin(false);
                         }
                     });
                     setup();

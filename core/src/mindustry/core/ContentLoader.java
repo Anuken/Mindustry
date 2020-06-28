@@ -8,7 +8,6 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.entities.bullet.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
@@ -24,27 +23,23 @@ import static mindustry.Vars.mods;
 @SuppressWarnings("unchecked")
 public class ContentLoader{
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
-    private Array<Content>[] contentMap = new Array[ContentType.values().length];
+    private Seq<Content>[] contentMap = new Seq[ContentType.values().length];
     private MappableContent[][] temporaryMapper;
     private @Nullable LoadedMod currentMod;
     private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
     private ContentList[] content = {
-        new Fx(),
         new Items(),
         new StatusEffects(),
         new Liquids(),
         new Bullets(),
-        new Mechs(),
         new UnitTypes(),
         new Blocks(),
         new Loadouts(),
         new TechTree(),
-        new Zones(),
-        new TypeIDs(),
-
-        //these are not really content classes, but this makes initialization easier
-        new LegacyColorMapper(),
+        new Weathers(),
+        new Planets(),
+        new SectorPresets()
     };
 
     public ContentLoader(){
@@ -54,11 +49,11 @@ public class ContentLoader{
     /** Clears all initialized content.*/
     public void clear(){
         contentNameMap = new ObjectMap[ContentType.values().length];
-        contentMap = new Array[ContentType.values().length];
+        contentMap = new Seq[ContentType.values().length];
         initialization = new ObjectSet<>();
 
         for(ContentType type : ContentType.values()){
-            contentMap[type.ordinal()] = new Array<>();
+            contentMap[type.ordinal()] = new Seq<>();
             contentNameMap[type.ordinal()] = new ObjectMap<>();
         }
     }
@@ -81,7 +76,7 @@ public class ContentLoader{
     /** Logs content statistics.*/
     public void logContent(){
         //check up ID mapping, make sure it's linear (debug only)
-        for(Array<Content> arr : contentMap){
+        for(Seq<Content> arr : contentMap){
             for(int i = 0; i < arr.size; i++){
                 int id = arr.get(i).id;
                 if(id != i){
@@ -92,9 +87,9 @@ public class ContentLoader{
 
         Log.debug("--- CONTENT INFO ---");
         for(int k = 0; k < contentMap.length; k++){
-            Log.debug("[{0}]: loaded {1}", ContentType.values()[k].name(), contentMap[k].size);
+            Log.debug("[@]: loaded @", ContentType.values()[k].name(), contentMap[k].size);
         }
-        Log.debug("Total content loaded: {0}", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
+        Log.debug("Total content loaded: @", Seq.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
         Log.debug("-------------------");
     }
 
@@ -137,17 +132,23 @@ public class ContentLoader{
             if(blocks().size > i){
                 int color = pixmap.getPixel(i, 0);
 
-                if(color == 0) continue;
+                if(color == 0 || color == 255) continue;
 
                 Block block = block(i);
-                block.color.set(color);
+                block.mapColor.rgba8888(color);
+                //partial alpha colors indicate a square sprite
+                block.squareSprite = block.mapColor.a > 0.5f;
+                block.mapColor.a = 1f;
+                block.hasColor = true;
             }
         }
         pixmap.dispose();
+        ColorMapper.load();
     }
 
     public void dispose(){
-        //clear all content, currently not used
+        initialize(Content::dispose);
+        clear();
     }
 
     /** Get last piece of content created for error-handling purposes. */
@@ -195,8 +196,14 @@ public class ContentLoader{
         this.temporaryMapper = temporaryMapper;
     }
 
-    public Array<Content>[] getContentMap(){
+    public Seq<Content>[] getContentMap(){
         return contentMap;
+    }
+
+    public void each(Cons<Content> cons){
+        for(Seq<Content> seq : contentMap){
+            seq.each(cons);
+        }
     }
 
     public <T extends MappableContent> T getByName(ContentType type, String name){
@@ -225,13 +232,13 @@ public class ContentLoader{
         return (T)contentMap[type.ordinal()].get(id);
     }
 
-    public <T extends Content> Array<T> getBy(ContentType type){
-        return (Array<T>)contentMap[type.ordinal()];
+    public <T extends Content> Seq<T> getBy(ContentType type){
+        return (Seq<T>)contentMap[type.ordinal()];
     }
 
     //utility methods, just makes things a bit shorter
 
-    public Array<Block> blocks(){
+    public Seq<Block> blocks(){
         return getBy(ContentType.block);
     }
 
@@ -239,7 +246,11 @@ public class ContentLoader{
         return (Block)getByID(ContentType.block, id);
     }
 
-    public Array<Item> items(){
+    public Block block(String name){
+        return (Block)getByName(ContentType.block, name);
+    }
+
+    public Seq<Item> items(){
         return getBy(ContentType.item);
     }
 
@@ -247,7 +258,7 @@ public class ContentLoader{
         return (Item)getByID(ContentType.item, id);
     }
 
-    public Array<Liquid> liquids(){
+    public Seq<Liquid> liquids(){
         return getBy(ContentType.liquid);
     }
 
@@ -255,7 +266,7 @@ public class ContentLoader{
         return (Liquid)getByID(ContentType.liquid, id);
     }
 
-    public Array<BulletType> bullets(){
+    public Seq<BulletType> bullets(){
         return getBy(ContentType.bullet);
     }
 
@@ -263,11 +274,15 @@ public class ContentLoader{
         return (BulletType)getByID(ContentType.bullet, id);
     }
 
-    public Array<Zone> zones(){
-        return getBy(ContentType.zone);
+    public Seq<SectorPreset> sectors(){
+        return getBy(ContentType.sector);
     }
 
-    public Array<UnitType> units(){
+    public Seq<UnitType> units(){
         return getBy(ContentType.unit);
+    }
+
+    public Seq<Planet> planets(){
+        return getBy(ContentType.planet);
     }
 }

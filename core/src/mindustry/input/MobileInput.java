@@ -14,14 +14,11 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
 import mindustry.entities.*;
-import mindustry.entities.traits.BuilderTrait.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -46,12 +43,12 @@ public class MobileInput extends InputHandler implements GestureListener{
     private float lineScale;
     /** Animation data for crosshair. */
     private float crosshairScale;
-    private TargetTrait lastTarget;
+    private Teamc lastTarget;
     /** Used for shifting build requests. */
     private float shiftDeltaX, shiftDeltaY;
 
     /** Place requests to be removed. */
-    private Array<BuildRequest> removals = new Array<>();
+    private Seq<BuildPlan> removals = new Seq<>();
     /** Whether or not the player is currently shifting all placed tiles. */
     private boolean selecting;
     /** Whether the player is currently in line-place mode. */
@@ -61,30 +58,32 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Whether no recipe was available when switching to break mode. */
     private Block lastBlock;
     /** Last placed request. Used for drawing block overlay. */
-    private BuildRequest lastPlaced;
+    private BuildPlan lastPlaced;
     /** Down tracking for panning.*/
     private boolean down = false;
+
+    private Teamc target;
 
     //region utility methods
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
-        Unit unit = Units.closestEnemy(player.getTeam(), x, y, 20f, u -> !u.isDead());
+        Unit unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead);
 
         if(unit != null){
-            player.setMineTile(null);
-            player.target = unit;
+            player.miner().mineTile(null);
+            target = unit;
         }else{
-            Tile tile = world.ltileWorld(x, y);
+            Building tile = world.entWorld(x, y);
 
-            if(tile != null && tile.synthetic() && player.getTeam().isEnemy(tile.getTeam())){
-                TileEntity entity = tile.entity;
-                player.setMineTile(null);
-                player.target = entity;
-            }else if(tile != null && player.mech.canHeal && tile.entity != null && tile.getTeam() == player.getTeam() && tile.entity.damaged()){
-                player.setMineTile(null);
-                player.target = tile.entity;
-            }
+            if(tile != null && player.team().isEnemy(tile.team())){
+                player.miner().mineTile(null);
+                target = tile;
+                //TODO implement healing
+            }//else if(tile != null && player.unit().canHeal && tile.entity != null && tile.team() == player.team() && tile.entity.damaged()){
+             ///   player.miner().mineTile(null);
+            //    target = tile.entity;
+           // }
         }
     }
 
@@ -98,7 +97,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         r2.setSize(block.size * tilesize);
         r2.setCenter(x * tilesize + block.offset(), y * tilesize + block.offset());
 
-        for(BuildRequest req : selectRequests){
+        for(BuildPlan req : selectRequests){
             Tile other = req.tile();
 
             if(other == null || req.breaking) continue;
@@ -111,7 +110,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        for(BuildRequest req : player.buildQueue()){
+        for(BuildPlan req : player.builder().plans()){
             Tile other = world.tile(req.x, req.y);
 
             if(other == null || req.breaking) continue;
@@ -127,11 +126,11 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     /** Returns the selection request that overlaps this tile, or null. */
-    BuildRequest getRequest(Tile tile){
+    BuildPlan getRequest(Tile tile){
         r2.setSize(tilesize);
         r2.setCenter(tile.worldx(), tile.worldy());
 
-        for(BuildRequest req : selectRequests){
+        for(BuildPlan req : selectRequests){
             Tile other = req.tile();
 
             if(other == null) continue;
@@ -140,22 +139,17 @@ public class MobileInput extends InputHandler implements GestureListener{
                 r1.setSize(req.block.size * tilesize);
                 r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
 
-                if(r2.overlaps(r1)){
-                    return req;
-                }
             }else{
                 r1.setSize(other.block().size * tilesize);
                 r1.setCenter(other.worldx() + other.block().offset(), other.worldy() + other.block().offset());
-
-                if(r2.overlaps(r1)){
-                    return req;
-                }
             }
+
+            if(r2.overlaps(r1)) return req;
         }
         return null;
     }
 
-    void removeRequest(BuildRequest request){
+    void removeRequest(BuildPlan request){
         selectRequests.remove(request, true);
         if(!request.breaking){
             removals.add(request);
@@ -175,23 +169,22 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void buildPlacementUI(Table table){
-        table.addImage().color(Pal.gray).height(4f).colspan(4).growX();
+        table.image().color(Pal.gray).height(4f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f);
 
-        table.addImageButton(Icon.hammer, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.hammer, Styles.clearTogglePartiali, () -> {
             mode = mode == breaking ? block == null ? none : placing : breaking;
             lastBlock = block;
         }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
 
         //diagonal swap button
-        table.addImageButton(Icon.diagonal, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.diagonal, Styles.clearTogglePartiali, () -> {
             Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
-            Core.settings.save();
         }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
 
         //rotate button
-        table.addImageButton(Icon.right, Styles.clearTogglePartiali, () -> {
+        table.button(Icon.right, Styles.clearTogglePartiali, () -> {
             if(block != null && block.rotate){
                 rotation = Mathf.mod(rotation + 1, 4);
             }else{
@@ -210,26 +203,22 @@ public class MobileInput extends InputHandler implements GestureListener{
         });
 
         //confirm button
-        table.addImageButton(Icon.ok, Styles.clearPartiali, () -> {
-            for(BuildRequest request : selectRequests){
+        table.button(Icon.ok, Styles.clearPartiali, () -> {
+            for(BuildPlan request : selectRequests){
                 Tile tile = request.tile();
 
                 //actually place/break all selected blocks
                 if(tile != null){
                     if(!request.breaking){
                         if(validPlace(request.x, request.y, request.block, request.rotation)){
-                            BuildRequest other = getRequest(request.x, request.y, request.block.size, null);
-                            BuildRequest copy = request.copy();
-
-                            if(copy.hasConfig && copy.block.posConfig){
-                                copy.config = Pos.get(Pos.x(copy.config) + copy.x - copy.originalX, Pos.y(copy.config) + copy.y - copy.originalY);
-                            }
+                            BuildPlan other = getRequest(request.x, request.y, request.block.size, null);
+                            BuildPlan copy = request.copy();
 
                             if(other == null){
-                                player.addBuildRequest(copy);
+                                player.builder().addBuild(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
-                                player.buildQueue().remove(other);
-                                player.addBuildRequest(copy);
+                                player.builder().plans().remove(other);
+                                player.builder().addBuild(copy);
                             }
                         }
 
@@ -252,9 +241,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
 
         group.fill(t -> {
-            t.bottom().left().visible(() -> (player.isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
-            t.addImageTextButton("$cancel", Icon.cancel, () -> {
-                player.clearBuilding();
+            t.visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.bottom().left();
+            t.button("$cancel", Icon.cancel, () -> {
+                player.builder().clearBuilding();
                 selectRequests.clear();
                 mode = none;
                 block = null;
@@ -269,37 +259,18 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 ImageButtonStyle style = Styles.clearPartiali;
 
-                b.addImageButton(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
-                b.addImageButton(Icon.cancel, style, () -> {
+                b.button(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                b.button(Icon.cancel, style, () -> {
                     selectRequests.clear();
                 });
                 b.row();
-                b.addImageButton(Icon.flipX, style, () -> flipRequests(selectRequests, true));
-                b.addImageButton(Icon.flipY, style, () -> flipRequests(selectRequests, false));
+                b.button(Icon.flipX, style, () -> flipRequests(selectRequests, true));
+                b.button(Icon.flipY, style, () -> flipRequests(selectRequests, false));
                 b.row();
-                b.addImageButton(Icon.rotate, style, () -> rotateRequests(selectRequests, 1));
+                b.button(Icon.rotate, style, () -> rotateRequests(selectRequests, 1));
 
             }).margin(4f);
         });
-    }
-
-    @Override
-    protected int schemOriginX(){
-        Tmp.v1.setZero();
-        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
-    }
-
-    @Override
-    protected int schemOriginY(){
-        Tmp.v1.setZero();
-        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
-    }
-
-    @Override
-    public boolean isPlacing(){
-        return super.isPlacing() && mode == placing;
     }
 
     @Override
@@ -307,7 +278,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         Lines.stroke(1f);
 
         //draw removals
-        for(BuildRequest request : removals){
+        for(BuildPlan request : removals){
             Tile tile = request.tile();
 
             if(tile == null) continue;
@@ -322,7 +293,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //draw list of requests
-        for(BuildRequest request : selectRequests){
+        for(BuildPlan request : selectRequests){
             Tile tile = request.tile();
 
             if(tile == null) continue;
@@ -341,7 +312,6 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(request.block.rotate) drawArrow(request.block, tile.x, tile.y, request.rotation);
             }
 
-            //Draw.mixcol(Tmp.c1, 1f);
             Draw.reset();
             drawRequest(request);
 
@@ -363,21 +333,17 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(mode == placing && block != null){
                 //draw placing
                 for(int i = 0; i < lineRequests.size; i++){
-                    BuildRequest req = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && req.block.rotate){
-                        drawArrow(block, req.x, req.y, req.rotation);
+                    BuildPlan request = lineRequests.get(i);
+                    if(i == lineRequests.size - 1 && request.block.rotate){
+                        drawArrow(block, request.x, request.y, request.rotation);
                     }
-
-                    BuildRequest request = lineRequests.get(i);
-                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(req.x, request.y, request.block.size, null) == null);
+                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
                     drawSelected(request.x, request.y, request.block, Pal.accent);
                 }
             }else if(mode == breaking){
                 drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
             }
         }
-
-        TargetTrait target = player.target;
 
         //draw targeting crosshair
         if(target != null && !state.isEditor()){
@@ -391,7 +357,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             Draw.color(Pal.remove);
             Lines.stroke(1f);
 
-            float radius = Interpolation.swingIn.apply(crosshairScale);
+            float radius = Interp.swingIn.apply(crosshairScale);
 
             Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time() * 1.5f);
             Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time() * 1.5f);
@@ -410,7 +376,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     @Override
-    protected void drawRequest(BuildRequest request){
+    protected void drawRequest(BuildPlan request){
         if(request.tile() == null) return;
         brequest.animScale = request.animScale = Mathf.lerpDelta(request.animScale, 1f, 0.1f);
 
@@ -423,7 +389,26 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     //endregion
-    //region input events
+    //region input events, overrides
+
+    @Override
+    protected int schemOriginX(){
+        Tmp.v1.setZero();
+        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
+    }
+
+    @Override
+    protected int schemOriginY(){
+        Tmp.v1.setZero();
+        selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
+    }
+
+    @Override
+    public boolean isPlacing(){
+        return super.isPlacing() && mode == placing;
+    }
 
     @Override
     public boolean isBreaking(){
@@ -433,17 +418,17 @@ public class MobileInput extends InputHandler implements GestureListener{
     @Override
     public void useSchematic(Schematic schem){
         selectRequests.clear();
-        selectRequests.addAll(schematics.toRequests(schem, world.toTile(player.x), world.toTile(player.y)));
+        selectRequests.addAll(schematics.toRequests(schem, player.tileX(), player.tileY()));
         lastSchematic = schem;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
-        if(state.is(State.menu)) return false;
+        if(state.isMenu()) return false;
 
         down = true;
 
-        if(player.isDead()) return false;
+        if(player.dead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(screenX, screenY);
@@ -469,7 +454,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = tileY;
             }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
-                player.isShooting = true;
+                isShooting = true;
             }
         }
 
@@ -511,16 +496,16 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Tile tile = tileAt(screenX, screenY);
 
-            if(tile == null) return false;
+            if(tile == null || tile.build == null) return false;
 
-            tryDropItems(tile.link(), Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+            tryDropItems(tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
 
     @Override
     public boolean longPress(float x, float y){
-        if(state.is(State.menu) || mode == none || player.isDead()) return false;
+        if(state.isMenu() || mode == none || player.dead()) return false;
 
         //get tile on cursor
         Tile cursor = tileAt(x, y);
@@ -537,10 +522,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         lineMode = true;
 
         if(mode == breaking){
-            Effects.effect(Fx.tapBlock, cursor.worldx(), cursor.worldy(), 1f);
+            Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
         }else if(block != null){
             updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
-            Effects.effect(Fx.tapBlock, cursor.worldx() + block.offset(), cursor.worldy() + block.offset(), block.size);
+            Fx.tapBlock.at(cursor.worldx() + block.offset(), cursor.worldy() + block.offset(), block.size);
         }
 
         return false;
@@ -548,7 +533,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean tap(float x, float y, int count, KeyCode button){
-        if(state.is(State.menu) || lineMode) return false;
+        if(state.isMenu() || lineMode) return false;
 
         float worldx = Core.input.mouseWorld(x, y).x, worldy = Core.input.mouseWorld(x, y).y;
 
@@ -557,6 +542,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
+        Tile linked = cursor.build == null ? cursor : cursor.build.tile();
 
         checkTargets(worldx, worldy);
 
@@ -565,12 +551,11 @@ public class MobileInput extends InputHandler implements GestureListener{
             removeRequest(getRequest(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
-            selectRequests.add(lastPlaced = new BuildRequest(cursor.x, cursor.y, rotation, block));
-        }else if(mode == breaking && validBreak(cursor.link().x, cursor.link().y) && !hasRequest(cursor.link())){
+            selectRequests.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block));
+        }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
-            cursor = cursor.link();
-            selectRequests.add(new BuildRequest(cursor.x, cursor.y));
-        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(cursor.link())){
+            selectRequests.add(new BuildPlan(linked.x, linked.y));
+        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.build)){
             tryBeginMine(cursor);
         }
 
@@ -579,13 +564,15 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void update(){
-        if(state.is(State.menu) ){
+        super.update();
+
+        if(state.isMenu() ){
             selectRequests.clear();
             removals.clear();
             mode = none;
         }
 
-        if(player.isDead()){
+        if(player.dead()){
             mode = none;
         }
 
@@ -602,11 +589,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(Core.settings.getBool("keyboard")){
             if(Core.input.keyRelease(Binding.select)){
-                player.isShooting = false;
+                isShooting = false;
             }
 
-            if(player.isShooting && !canShoot()){
-                player.isShooting = false;
+            if(isShooting && !canShoot()){
+                isShooting = false;
             }
         }
 
@@ -672,7 +659,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //remove place requests that have disappeared
         for(int i = removals.size - 1; i >= 0; i--){
-            BuildRequest request = removals.get(i);
+            BuildPlan request = removals.get(i);
 
             if(request.animScale <= 0.0001f){
                 removals.remove(i);
@@ -733,7 +720,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             int shiftedY = (int)(shiftDeltaY / tilesize);
 
             if(Math.abs(shiftedX) > 0 || Math.abs(shiftedY) > 0){
-                for(BuildRequest req : selectRequests){
+                for(BuildPlan req : selectRequests){
                     if(req.breaking) continue; //don't shift removal requests
                     req.x += shiftedX;
                     req.y += shiftedY;

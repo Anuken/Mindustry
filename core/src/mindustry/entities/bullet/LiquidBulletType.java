@@ -6,8 +6,7 @@ import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.type.Bullet;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -31,7 +30,7 @@ public class LiquidBulletType extends BulletType{
         hitEffect = Fx.hitLiquid;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
-        drag = 0.009f;
+        drag = 0.001f;
         knockback = 0.55f;
     }
 
@@ -49,9 +48,9 @@ public class LiquidBulletType extends BulletType{
         super.update(b);
 
         if(liquid.canExtinguish()){
-            Tile tile = world.tileWorld(b.x, b.y);
-            if(tile != null && Fire.has(tile.x, tile.y)){
-                Fire.extinguish(tile, 100f);
+            Tile tile = world.tileWorld(b.x(), b.y());
+            if(tile != null && Fires.has(tile.x, tile.y)){
+                Fires.extinguish(tile, 100f);
                 b.remove();
                 hit(b);
             }
@@ -62,19 +61,26 @@ public class LiquidBulletType extends BulletType{
     public void draw(Bullet b){
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
-        Fill.circle(b.x, b.y, 0.5f + b.fout() * 2.5f);
+        Fill.circle(b.x(), b.y(), 3f);
+    }
+
+    @Override
+    public void despawned(Bullet b){
+        super.despawned(b);
+
+        hit(b, b.x(), b.y());
     }
 
     @Override
     public void hit(Bullet b, float hitx, float hity){
-        Effects.effect(hitEffect, liquid.color, hitx, hity);
-        Puddle.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
+        hitEffect.at(hitx, hity, liquid.color);
+        Puddles.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
             float intensity = 400f;
-            Fire.extinguish(world.tileWorld(hitx, hity), intensity);
+            Fires.extinguish(world.tileWorld(hitx, hity), intensity);
             for(Point2 p : Geometry.d4){
-                Fire.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
+                Fires.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);
             }
         }
     }

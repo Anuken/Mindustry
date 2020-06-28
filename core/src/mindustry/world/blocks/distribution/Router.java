@@ -1,12 +1,10 @@
 package mindustry.world.blocks.distribution;
 
-import arc.struct.Array;
-import arc.util.Time;
 import mindustry.content.*;
-import mindustry.entities.type.TileEntity;
-import mindustry.type.Item;
+import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.*;
 
 public class Router extends Block{
     public float speed = 8f;
@@ -19,73 +17,65 @@ public class Router extends Block{
         itemCapacity = 1;
         group = BlockGroup.transportation;
         unloadable = false;
-        entityType = RouterEntity::new;
     }
 
-    @Override
-    public void update(Tile tile){
-        RouterEntity entity = tile.ent();
-
-        if(entity.lastItem == null && entity.items.total() > 0){
-            entity.items.clear();
-        }
-
-        if(entity.lastItem != null){
-            entity.time += 1f / speed * Time.delta();
-            Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
-
-            if(target != null && (entity.time >= 1f || !(target.block() instanceof Router))){
-                getTileTarget(tile, entity.lastItem, entity.lastInput, true);
-                target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
-                entity.items.remove(entity.lastItem, 1);
-                entity.lastItem = null;
-            }
-        }
-    }
-
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        RouterEntity entity = tile.ent();
-
-        return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
-    }
-
-    @Override
-    public void handleItem(Item item, Tile tile, Tile source){
-        RouterEntity entity = tile.ent();
-        entity.items.add(item, 1);
-        entity.lastItem = item;
-        entity.time = 0f;
-        entity.lastInput = source;
-    }
-
-    Tile getTileTarget(Tile tile, Item item, Tile from, boolean set){
-        Array<Tile> proximity = tile.entity.proximity();
-        int counter = tile.rotation();
-        for(int i = 0; i < proximity.size; i++){
-            Tile other = proximity.get((i + counter) % proximity.size);
-            if(set) tile.rotation((byte)((tile.rotation() + 1) % proximity.size));
-            if(other == from && from.block() == Blocks.overflowGate) continue;
-            if(other.block().acceptItem(item, other, Edges.getFacingEdge(tile, other))){
-                return other;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public int removeStack(Tile tile, Item item, int amount){
-        RouterEntity entity = tile.ent();
-        int result = super.removeStack(tile, item, amount);
-        if(result != 0 && item == entity.lastItem){
-            entity.lastItem = null;
-        }
-        return result;
-    }
-
-    public class RouterEntity extends TileEntity{
+    public class RouterEntity extends Building{
         Item lastItem;
         Tile lastInput;
         float time;
+
+        @Override
+        public void updateTile(){
+            if(lastItem == null && items.any()){
+                items.clear();
+            }
+
+            if(lastItem != null){
+                time += 1f / speed * delta();
+                Building target = getTileTarget(lastItem, lastInput, false);
+
+                if(target != null && (time >= 1f || !(target.block() instanceof Router))){
+                    getTileTarget(lastItem, lastInput, true);
+                    target.handleItem(this, lastItem);
+                    items.remove(lastItem, 1);
+                    lastItem = null;
+                }
+            }
+        }
+
+        @Override
+        public boolean acceptItem(Building source, Item item){
+            return team == source.team() && lastItem == null && items.total() == 0;
+        }
+
+        @Override
+        public void handleItem(Building source, Item item){
+            items.add(item, 1);
+            lastItem = item;
+            time = 0f;
+            lastInput = source.tile();
+        }
+
+        @Override
+        public int removeStack(Item item, int amount){
+            int result = super.removeStack(item, amount);
+            if(result != 0 && item == lastItem){
+                lastItem = null;
+            }
+            return result;
+        }
+
+        Building getTileTarget(Item item, Tile from, boolean set){
+            int counter = tile.rotation();
+            for(int i = 0; i < proximity.size; i++){
+                Building other = proximity.get((i + counter) % proximity.size);
+                if(set) tile.rotation((byte)((tile.rotation() + 1) % proximity.size));
+                if(other.tile() == from && from.block() == Blocks.overflowGate) continue;
+                if(other.acceptItem(this, item)){
+                    return other;
+                }
+            }
+            return null;
+        }
     }
 }

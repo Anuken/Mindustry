@@ -91,7 +91,7 @@ public class BeControl{
                 int[] length = {0};
                 Fi file = bebuildDirectory.child("client-be-" + updateBuild + ".jar");
 
-                FloatingDialog dialog = new FloatingDialog("$be.updating");
+                BaseDialog dialog = new BaseDialog("$be.updating");
                 download(updateUrl, file, i -> length[0] = i, v -> progress[0] = v, () -> cancel[0], () -> {
                     try{
                         Runtime.getRuntime().exec(new String[]{"java", "-DlastBuild=" + Version.build, "-Dberestart", "-jar", file.absolutePath()});
@@ -105,7 +105,7 @@ public class BeControl{
                 });
 
                 dialog.cont.add(new Bar(() -> length[0] == 0 ? Core.bundle.get("be.updating") : (int)(progress[0] * length[0]) / 1024/ 1024 + "/" + length[0]/1024/1024 + " MB", () -> Pal.accent, () -> progress[0])).width(400f).height(70f);
-                dialog.buttons.addImageTextButton("$cancel", Icon.cancel, () -> {
+                dialog.buttons.button("$cancel", Icon.cancel, () -> {
                     cancel[0] = true;
                     dialog.hide();
                 }).size(210f, 64f);
@@ -113,7 +113,7 @@ public class BeControl{
                 dialog.show();
             }, () -> checkUpdates = false);
         }else{
-            Log.info("&lcA new update is available: &lyBleeding Edge build {0}", updateBuild);
+            Log.info("&lcA new update is available: &lyBleeding Edge build @", updateBuild);
             if(Config.autoUpdate.bool()){
                 Log.info("&lcAuto-downloading next version...");
 
@@ -123,7 +123,7 @@ public class BeControl{
                     Fi dest = source.sibling("server-be-" + updateBuild + ".jar");
 
                     download(updateUrl, dest,
-                    len -> Core.app.post(() -> Log.info("&ly| Size: {0} MB.", Strings.fixed((float)len / 1024 / 1024, 2))),
+                    len -> Core.app.post(() -> Log.info("&ly| Size: @ MB.", Strings.fixed((float)len / 1024 / 1024, 2))),
                     progress -> {},
                     () -> false,
                     () -> Core.app.post(() -> {

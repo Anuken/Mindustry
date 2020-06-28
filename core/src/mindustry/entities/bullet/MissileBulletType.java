@@ -1,25 +1,19 @@
 package mindustry.entities.bullet;
 
-import arc.graphics.Color;
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.content.Fx;
-import mindustry.entities.Effects;
-import mindustry.entities.type.Bullet;
+import arc.graphics.*;
+import arc.math.*;
+import mindustry.content.*;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 
 public class MissileBulletType extends BasicBulletType{
     protected Color trailColor = Pal.missileYellowBack;
-
-    protected float weaveScale = 0f;
-    protected float weaveMag = -1f;
 
     public MissileBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
         backColor = Pal.missileYellowBack;
         frontColor = Pal.missileYellow;
-        homingPower = 7f;
+        homingPower = 0.08f;
         hitSound = Sounds.explosion;
     }
 
@@ -31,12 +25,8 @@ public class MissileBulletType extends BasicBulletType{
     public void update(Bullet b){
         super.update(b);
 
-        if(Mathf.chance(Time.delta() * 0.2)){
-            Effects.effect(Fx.missileTrail, trailColor, b.x, b.y, 2f);
-        }
-
-        if(weaveMag > 0){
-            b.velocity().rotate(Mathf.sin(Time.time() + b.id * 4422, weaveScale, weaveMag) * Time.delta());
+        if(Mathf.chanceDelta(0.2)){
+            Fx.missileTrail.at(b.x(), b.y(), 2f, trailColor);
         }
     }
 }

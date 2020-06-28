@@ -1,14 +1,15 @@
 package mindustry.world;
 
-import arc.math.Mathf;
+import arc.math.*;
 import arc.math.geom.*;
+import mindustry.gen.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static mindustry.Vars.world;
 
 public class Edges{
-    private static final int maxSize = 11;
+    private static final int maxSize = 14;
     private static final int maxRadius = 12;
     private static Point2[][] edges = new Point2[maxSize][0];
     private static Point2[][] edgeInside = new Point2[maxSize][0];
@@ -47,6 +48,10 @@ public class Edges{
                 Mathf.clamp(point.y, -(int)((i) / 2f), (int)(i / 2f + 0.5f)));
             }
         }
+    }
+
+    public static Tile getFacingEdge(Building tile, Building other){
+        return getFacingEdge(tile.block(), tile.tileX(), tile.tileY(), other.tile());
     }
 
     public static Tile getFacingEdge(Tile tile, Tile other){

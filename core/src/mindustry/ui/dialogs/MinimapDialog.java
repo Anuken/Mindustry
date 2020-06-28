@@ -10,7 +10,7 @@ import mindustry.gen.*;
 
 import static mindustry.Vars.renderer;
 
-public class MinimapDialog extends FloatingDialog{
+public class MinimapDialog extends BaseDialog{
 
     public MinimapDialog(){
         super("$minimap");
@@ -28,7 +28,7 @@ public class MinimapDialog extends FloatingDialog{
         cont.clear();
 
         cont.table(Tex.pane,t -> {
-            t.addRect((x, y, width, height) -> {
+            t.rect((x, y, width, height) -> {
                 if(renderer.minimap.getRegion() == null) return;
                 Draw.color(Color.white);
                 Draw.alpha(parentAlpha);

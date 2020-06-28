@@ -5,6 +5,7 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -12,20 +13,24 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.core.GameState.*;
-import mindustry.entities.traits.BuilderTrait.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.payloads.*;
+import mindustry.world.meta.*;
 
 import static arc.Core.scene;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
+    private Vec2 movement = new Vec2();
     /** Current cursor type. */
     private Cursor cursorType = SystemCursor.arrow;
     /** Position where the player started dragging a line. */
@@ -37,19 +42,19 @@ public class DesktopInput extends InputHandler{
     /** Animation scale for line. */
     private float selectScale;
     /** Selected build request for movement. */
-    private @Nullable BuildRequest sreq;
+    private @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
-    private boolean deleting = false;
+    private boolean deleting = false, shouldShoot = false;
 
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
-            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.isBuilding() ? 1f : 0f, 0.15f));
+            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.builder().isBuilding() ? 1f : 0f, 0.15f));
             t.visible(() -> Core.settings.getBool("hints") && selectRequests.isEmpty());
             t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
-                b.label(() -> Core.bundle.format(!player.isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.label(() -> Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
                 b.row();
@@ -58,7 +63,7 @@ public class DesktopInput extends InputHandler{
         });
 
         group.fill(t -> {
-            t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
+            t.visible(() -> Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -67,8 +72,17 @@ public class DesktopInput extends InputHandler{
                 Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.table(a -> {
-                    a.addImageTextButton("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                    a.button("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
+            }).margin(6f);
+        });
+
+        group.fill(t -> {
+            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore());
+            t.bottom();
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
             }).margin(6f);
         });
     }
@@ -79,39 +93,24 @@ public class DesktopInput extends InputHandler{
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
 
-        //draw selection(s)
-        if(mode == placing && block != null){
-            for(int i = 0; i < lineRequests.size; i++){
-                BuildRequest req = lineRequests.get(i);
-                if(i == lineRequests.size - 1 && req.block.rotate){
-                    drawArrow(block, req.x, req.y, req.rotation);
-                }
-                drawRequest(lineRequests.get(i));
-            }
-        }else if(mode == breaking){
+        //draw break selection
+        if(mode == breaking){
             drawBreakSelection(selectX, selectY, cursorX, cursorY);
-        }else if(isPlacing()){
-            if(block.rotate){
-                drawArrow(block, cursorX, cursorY, rotation);
-            }
-            Draw.color();
-            drawRequest(cursorX, cursorY, block, rotation);
-            block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
         }
 
-        if(mode == none && !isPlacing()){
-            BuildRequest req = getRequest(cursorX, cursorY);
-            if(req != null){
-                drawSelected(req.x, req.y, req.breaking ? req.tile().block() : req.block, Pal.accent);
-            }
+        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard()){
+            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
-        //draw schematic requests
-        for(BuildRequest request : selectRequests){
-            request.animScale = 1f;
-            drawRequest(request);
-        }
+        Draw.reset();
+    }
 
+    @Override
+    public void drawBottom(){
+        int cursorX = tileX(Core.input.mouseX());
+        int cursorY = tileY(Core.input.mouseY());
+
+        //draw request being moved
         if(sreq != null){
             boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
             if(sreq.block.rotate){
@@ -123,8 +122,50 @@ public class DesktopInput extends InputHandler{
             drawSelected(sreq.x, sreq.y, sreq.block, getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null ? Pal.remove : Pal.accent);
         }
 
-        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard()){
-            drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
+        //draw hover request
+        if(mode == none && !isPlacing()){
+            BuildPlan req = getRequest(cursorX, cursorY);
+            if(req != null){
+                drawSelected(req.x, req.y, req.breaking ? req.tile().block() : req.block, Pal.accent);
+            }
+        }
+
+        //draw schematic requests
+        for(BuildPlan request : selectRequests){
+            request.animScale = 1f;
+            drawRequest(request);
+        }
+
+        for(BuildPlan request : selectRequests){
+            drawOverRequest(request);
+        }
+
+        if(player.isBuilder()){
+            //draw things that may be placed soon
+            if(mode == placing && block != null){
+                for(int i = 0; i < lineRequests.size; i++){
+                    BuildPlan req = lineRequests.get(i);
+                    if(i == lineRequests.size - 1 && req.block.rotate){
+                        drawArrow(block, req.x, req.y, req.rotation);
+                    }
+                    drawRequest(lineRequests.get(i));
+                }
+            }else if(isPlacing()){
+                if(block.rotate){
+                    drawArrow(block, cursorX, cursorY, rotation);
+                }
+                Draw.color();
+                drawRequest(cursorX, cursorY, block, rotation);
+                block.drawPlace(cursorX, cursorY, rotation, validPlace(cursorX, cursorY, block, rotation));
+
+                if(block.saveConfig && block.lastConfig != null){
+                    brequest.set(cursorX, cursorY, rotation, block);
+                    brequest.config = block.lastConfig;
+                    block.drawRequestConfig(brequest, allRequests());
+                    brequest.config = null;
+                }
+
+            }
         }
 
         Draw.reset();
@@ -132,37 +173,66 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void update(){
+        super.update();
+
         if(net.active() && Core.input.keyTap(Binding.player_list)){
             ui.listfrag.toggle();
         }
 
-        if(((player.getClosestCore() == null && player.isDead()) || state.isPaused()) && !ui.chatfrag.shown()){
-            //move camera around
-            float camSpeed = !Core.input.keyDown(Binding.dash) ? 3f : 8f;
-            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
+        //TODO awful UI state checking code
+        if((player.dead() || state.isPaused()) && !ui.chatfrag.shown()){
+            if(!(scene.getKeyboardFocus() instanceof TextField) && !scene.hasDialog()){
+                //move camera around
+                float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
+                Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
 
-            if(Core.input.keyDown(Binding.mouse_move)){
-                Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
-                Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
+                if(Core.input.keyDown(Binding.mouse_move)){
+                    Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
+                    Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
+                }
+            }
+        }else if(!player.dead()){
+            Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
+        }
+
+        shouldShoot = true;
+
+        if(!scene.hasMouse()){
+            if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
+                Unit on = selectedUnit();
+                if(on != null){
+                    Call.onUnitControl(player, on);
+                    shouldShoot = false;
+                }
+            }
+        }
+
+        if(!player.dead() && !state.isPaused() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+            updateMovement(player.unit());
+
+            if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore()){
+                Call.onUnitClear(player);
+                controlledType = null;
             }
         }
 
         if(Core.input.keyRelease(Binding.select)){
-            player.isShooting = false;
+            isShooting = false;
         }
 
-        if(!state.is(State.menu) && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
+        if(state.isGame() && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
             ui.minimapfrag.toggle();
         }
 
-        if(state.is(State.menu) || Core.scene.hasDialog()) return;
+        if(state.isMenu() || Core.scene.hasDialog()) return;
 
         //zoom camera
-        if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+        if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
+            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
-        if(player.isDead()){
+        if(player.dead()){
             cursorType = SystemCursor.arrow;
             return;
         }
@@ -174,11 +244,11 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(player.isShooting && !canShoot()){
-            player.isShooting = false;
+        if(isShooting && !canShoot()){
+            isShooting = false;
         }
 
-        if(isPlacing()){
+        if(isPlacing() && player.isBuilder()){
             cursorType = SystemCursor.hand;
             selectScale = Mathf.lerpDelta(selectScale, 1f, 0.2f);
         }else{
@@ -195,16 +265,16 @@ public class DesktopInput extends InputHandler{
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
             }else if(!selectRequests.isEmpty()){
-                rotateRequests(selectRequests, (int)Core.input.axisTap(Binding.rotate));
+                rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
             }
         }
 
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
         if(cursor != null){
-            cursor = cursor.link();
-
-            cursorType = cursor.block().getCursor(cursor);
+            if(cursor.build != null){
+                cursorType = cursor.build.getCursor();
+            }
 
             if(isPlacing() || !selectRequests.isEmpty()){
                 cursorType = SystemCursor.hand;
@@ -222,8 +292,8 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.unloadCursor;
             }
 
-            if(cursor.interactable(player.getTeam()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
-                Call.rotateBlock(player, cursor, Core.input.axisTap(Binding.rotate) > 0);
+            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+                Call.rotateBlock(player, cursor.build, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
 
@@ -252,11 +322,11 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildPlacementUI(Table table){
-        table.addImage().color(Pal.gray).height(4f).colspan(4).growX();
+        table.image().color(Pal.gray).height(4f).colspan(4).growX();
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
-        table.addImageButton(Icon.paste, Styles.clearPartiali, () -> {
+        table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
         });
     }
@@ -270,9 +340,9 @@ public class DesktopInput extends InputHandler{
         int rawCursorX = world.toTile(Core.input.mouseWorld().x), rawCursorY = world.toTile(Core.input.mouseWorld().y);
 
         // automatically pause building if the current build queue is empty
-        if(Core.settings.getBool("buildautopause") && player.isBuilding && !player.isBuilding()){
-            player.isBuilding = false;
-            player.buildWasAutoPaused = true;
+        if(Core.settings.getBool("buildautopause") && isBuilding && !player.builder().isBuilding()){
+            isBuilding = false;
+            buildWasAutoPaused = true;
         }
 
         if(!selectRequests.isEmpty()){
@@ -288,11 +358,11 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.deselect)){
-            player.setMineTile(null);
+            player.miner().mineTile(null);
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
-            player.clearBuilding();
+            player.builder().clearBuilding();
         }
 
         if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard()){
@@ -305,6 +375,7 @@ public class DesktopInput extends InputHandler{
                 ui.schematics.hide();
             }else{
                 ui.schematics.show();
+                ui.schematics.focusSearchField();
             }
         }
 
@@ -344,8 +415,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.pause_building)){
-            player.isBuilding = !player.isBuilding;
-            player.buildWasAutoPaused = false;
+            isBuilding = !isBuilding;
+            buildWasAutoPaused = false;
         }
 
         if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == placing){
@@ -355,7 +426,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            BuildRequest req = getRequest(cursorX, cursorY);
+            BuildPlan req = getRequest(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){
                 mode = none;
@@ -374,12 +445,12 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.buildQueue().size == 0 || !player.isBuilding) && !droppingItem &&
-                !tryBeginMine(selected) && player.getMineTile() == null && !Core.scene.hasKeyboard()){
-                    player.isShooting = true;
+                if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
+                !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
+                    isShooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
-                player.isShooting = true;
+                isShooting = shouldShoot;
             }
         }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;
@@ -387,7 +458,7 @@ public class DesktopInput extends InputHandler{
         }else if(Core.input.keyTap(Binding.deselect) && !selectRequests.isEmpty()){
             selectRequests.clear();
             lastSchematic = null;
-        }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse()){
+        }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse() && player.isBuilder()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
             deleting = false;
             mode = breaking;
@@ -396,9 +467,9 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyDown(Binding.select) && mode == none && !isPlacing() && deleting){
-            BuildRequest req = getRequest(cursorX, cursorY);
+            BuildPlan req = getRequest(cursorX, cursorY);
             if(req != null && req.breaking){
-                player.buildQueue().remove(req);
+                player.builder().plans().remove(req);
             }
         }else{
             deleting = false;
@@ -423,18 +494,20 @@ public class DesktopInput extends InputHandler{
                 removeSelection(selectX, selectY, cursorX, cursorY);
             }
 
-            if(selected != null){
-                tryDropItems(selected.link(), Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            }
+            tryDropItems(selected == null ? null : selected.build, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(sreq != null){
                 if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
-                    player.buildQueue().remove(sreq, true);
+                    player.builder().plans().remove(sreq, true);
                 }
                 sreq = null;
             }
 
             mode = none;
+        }
+
+        if(Core.input.keyTap(Binding.toggle_block_status)){
+            Core.settings.put("blockstatus", !Core.settings.getBool("blockstatus"));
         }
 
         if(Core.input.keyTap(Binding.toggle_power_lines)){
@@ -464,12 +537,88 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void updateState(){
-        if(state.is(State.menu)){
+        if(state.isMenu()){
             droppingItem = false;
             mode = none;
             block = null;
             sreq = null;
             selectRequests.clear();
+        }
+    }
+
+    protected void updateMovement(Unit unit){
+        boolean omni = !(unit instanceof WaterMovec);
+        boolean legs = unit.isGrounded();
+
+        float strafePenalty = legs ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
+        float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation()) * strafePenalty;
+        float xa = Core.input.axis(Binding.move_x);
+        float ya = Core.input.axis(Binding.move_y);
+        boolean boosted = (unit instanceof Mechc && unit.isFlying());
+
+        movement.set(xa, ya).nor().scl(speed);
+        float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
+        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
+
+        if(aimCursor){
+            unit.lookAt(mouseAngle);
+        }else{
+            if(unit.moving()){
+                unit.lookAt(unit.vel().angle());
+            }
+        }
+
+        if(omni){
+            unit.moveAt(movement);
+        }else{
+            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()));
+            if(!movement.isZero() && legs){
+                unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
+            }
+        }
+
+        unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
+        unit.controlWeapons(true, isShooting && !boosted);
+
+        isBoosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
+        player.boosting(isBoosting);
+
+        //TODO netsync this
+        if(unit instanceof Payloadc){
+            Payloadc pay = (Payloadc)unit;
+
+            if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
+                Unit target = Units.closest(player.team(), pay.x(), pay.y(), 30f, u -> u.isAI() && u.isGrounded());
+                if(target != null){
+                    pay.pickup(target);
+                }else if(!pay.hasPayload()){
+                    Building tile = world.entWorld(pay.x(), pay.y());
+                    if(tile != null && tile.team() == unit.team && tile.block().synthetic()){
+                        //pick up block directly
+                        if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
+                            pay.pickup(tile);
+                        }else{ //pick up block payload
+                            Payload taken = tile.takePayload();
+                            if(taken != null){
+                                pay.addPayload(taken);
+                                Fx.unitPickup.at(tile);
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            if(Core.input.keyTap(Binding.dropCargo)){
+                pay.dropLastPayload();
+            }
+        }
+
+        if(unit instanceof Commanderc){
+
+            if(Core.input.keyTap(Binding.command)){
+                Call.onUnitCommand(player);
+            }
         }
     }
 }

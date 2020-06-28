@@ -12,7 +12,7 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -35,6 +35,8 @@ public abstract class FilterOption{
         final Floatc setter;
         final float min, max, step;
 
+        boolean display;
+
         SliderOption(String name, Floatp getter, Floatc setter, float min, float max){
             this(name, getter, setter, min, max, (max - min) / 200);
         }
@@ -48,11 +50,20 @@ public abstract class FilterOption{
             this.step = step;
         }
 
+        public SliderOption display(){
+            display = true;
+            return this;
+        }
+
         @Override
         public void build(Table table){
-            table.add("$filter.option." + name);
+            if(!display){
+                table.add("$filter.option." + name);
+            }else{
+                table.label(() -> Core.bundle.get("filter.option." + name) + ": " + (int)getter.get());
+            }
             table.row();
-            Slider slider = table.addSlider(min, max, step, setter).growX().get();
+            Slider slider = table.slider(min, max, step, setter).growX().get();
             slider.setValue(getter.get());
             if(updateEditorOnChange){
                 slider.changed(changed);
@@ -77,15 +88,15 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.addButton(b -> b.addImage(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
+            table.button(b -> b.image(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
                 .setRegion(supplier.get() == Blocks.air ? Icon.block.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
-                FloatingDialog dialog = new FloatingDialog("");
+                BaseDialog dialog = new BaseDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){
                     if(!filter.get(block)) continue;
 
-                    dialog.cont.addImage(block == Blocks.air ? Icon.block.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
+                    dialog.cont.image(block == Blocks.air ? Icon.block.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
                         consumer.get(block);
                         dialog.hide();
                         changed.run();

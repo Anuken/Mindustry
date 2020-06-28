@@ -23,14 +23,14 @@ public class DiscordDialog extends Dialog{
             t.background(Tex.button).margin(0);
 
             t.table(img -> {
-                img.addImage().height(h - 5).width(40f).color(color);
+                img.image().height(h - 5).width(40f).color(color);
                 img.row();
-                img.addImage().height(5).width(40f).color(color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
+                img.image().height(5).width(40f).color(color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
             }).expandY();
 
             t.table(i -> {
                 i.background(Tex.button);
-                i.addImage(Icon.discord);
+                i.image(Icon.discord);
             }).size(h).left();
 
             t.add("$discord").color(Pal.accent).growX().padLeft(10f);
@@ -38,12 +38,12 @@ public class DiscordDialog extends Dialog{
 
         buttons.defaults().size(150f, 50);
 
-        buttons.addButton("$back", this::hide);
-        buttons.addButton("$copylink", () -> {
+        buttons.button("$back", this::hide);
+        buttons.button("$copylink", () -> {
             Core.app.setClipboardText(discordURL);
         });
-        buttons.addButton("$openlink", () -> {
-            if(!Core.net.openURI(discordURL)){
+        buttons.button("$openlink", () -> {
+            if(!Core.app.openURI(discordURL)){
                 ui.showErrorMessage("$linkfail");
                 Core.app.setClipboardText(discordURL);
             }

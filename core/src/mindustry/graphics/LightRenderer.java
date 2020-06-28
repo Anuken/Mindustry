@@ -1,31 +1,29 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 
 import static mindustry.Vars.state;
 
 /** Renders overlay lights. Client only. */
 public class LightRenderer{
     private static final int scaling = 4;
+
     private float[] vertices = new float[24];
-    private FrameBuffer buffer = new FrameBuffer(2, 2);
-    private Array<Runnable> lights = new Array<>();
+    private FrameBuffer buffer = new FrameBuffer();
+    private Seq<Runnable> lights = new Seq<>();
 
     public void add(Runnable run){
         if(!enabled()) return;
 
         lights.add(run);
-    }
-
-    public void add(Position pos, float radius, Color color, float opacity){
-        add(pos.getX(), pos.getY(), radius, color, opacity);
     }
 
     public void add(float x, float y, float radius, Color color, float opacity){
@@ -50,13 +48,12 @@ public class LightRenderer{
         });
     }
 
-    public void line(float x, float y, float x2, float y2){
+    public void line(float x, float y, float x2, float y2, float stroke, Color tint, float alpha){
         if(!enabled()) return;
 
         add(() -> {
-            Draw.color(Color.orange, 0.3f);
+            Draw.color(tint, alpha);
 
-            float stroke = 30f;
             float rot = Mathf.angleExact(x2 - x, y2 - y);
             TextureRegion ledge = Core.atlas.find("circle-end"), lmid = Core.atlas.find("circle-mid");
 
@@ -178,9 +175,12 @@ public class LightRenderer{
     }
 
     public void draw(){
-        if(buffer.getWidth() != Core.graphics.getWidth()/scaling || buffer.getHeight() != Core.graphics.getHeight()/scaling){
-            buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
+        if(!Vars.enableLight){
+            lights.clear();
+            return;
         }
+
+        buffer.resize(Core.graphics.getWidth()/scaling, Core.graphics.getHeight()/scaling);
 
         Draw.color();
         buffer.begin(Color.clear);
@@ -195,9 +195,7 @@ public class LightRenderer{
 
         Draw.color();
         Shaders.light.ambient.set(state.rules.ambientLight);
-        Draw.shader(Shaders.light);
-        Draw.rect(Draw.wrap(buffer.getTexture()), Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
-        Draw.shader();
+        buffer.blit(Shaders.light);
 
         lights.clear();
     }

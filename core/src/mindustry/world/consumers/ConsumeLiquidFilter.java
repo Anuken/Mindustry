@@ -3,12 +3,11 @@ package mindustry.world.consumers;
 import arc.struct.*;
 import arc.func.Boolf;
 import arc.scene.ui.layout.Table;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.type.Liquid;
 import mindustry.ui.Cicon;
 import mindustry.ui.MultiReqImage;
 import mindustry.ui.ReqImage;
-import mindustry.world.Tile;
 import mindustry.world.meta.BlockStat;
 import mindustry.world.meta.BlockStats;
 import mindustry.world.meta.values.LiquidFilterValue;
@@ -29,10 +28,10 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void build(Tile tile, Table table){
-        Array<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
+    public void build(Building tile, Table table){
+        Seq<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
-        list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () -> tile.entity != null && tile.entity.liquids != null && tile.entity.liquids.get(liquid) >= use(tile.entity))));
+        list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () -> tile.liquids != null && tile.liquids.get(liquid) >= use(tile))));
 
         table.add(image).size(8 * 4);
     }
@@ -43,12 +42,12 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void update(TileEntity entity){
+    public void update(Building entity){
         entity.liquids.remove(entity.liquids.current(), use(entity));
     }
 
     @Override
-    public boolean valid(TileEntity entity){
+    public boolean valid(Building entity){
         return entity != null && entity.liquids != null && filter.get(entity.liquids.current()) && entity.liquids.currentAmount() >= use(entity);
     }
 

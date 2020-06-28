@@ -3,57 +3,42 @@ package mindustry.world.blocks.defense.turrets;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.tilesize;
 
 public class LiquidTurret extends Turret{
-    public ObjectMap<Liquid, BulletType> ammo = new ObjectMap<>();
-    public int liquidRegion;
+    public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
+    public @Load("@-liquid") TextureRegion liquidRegion;
 
     public LiquidTurret(String name){
         super(name);
+        acceptCoolant = false;
         hasLiquids = true;
         activeSound = Sounds.spray;
-        liquidRegion = reg("-liquid");
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
     protected void ammo(Object... objects){
-        ammo = OrderedMap.of(objects);
-    }
-
-    @Override
-    public void drawLayer(Tile tile){
-        super.drawLayer(tile);
-        TurretEntity entity = tile.ent();
-
-        if(Core.atlas.isFound(reg(liquidRegion))){
-            Draw.color(entity.liquids.current().color);
-            Draw.alpha(entity.liquids.total() / liquidCapacity);
-            Draw.rect(reg(liquidRegion), tile.drawx() + tr2.x, tile.drawy() + tr2.y, entity.rotation - 90);
-            Draw.color();
-        }
+        ammoTypes = OrderedMap.of(objects);
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.ammo, new AmmoListValue<>(ammo));
-        consumes.add(new ConsumeLiquidFilter(i -> ammo.containsKey(i), 1f){
+        stats.add(BlockStat.ammo, new AmmoListValue<>(ammoTypes));
+        consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
             @Override
-            public boolean valid(TileEntity entity){
-                return !((TurretEntity)entity).ammo.isEmpty();
+            public boolean valid(Building entity){
+                return entity.liquids.total() > 0.001f;
             }
 
             @Override
@@ -63,85 +48,85 @@ public class LiquidTurret extends Turret{
         });
     }
 
-    @Override
-    public boolean shouldActiveSound(Tile tile){
-        TurretEntity entity = tile.ent();
-        return entity.target != null && hasAmmo(tile);
-    }
+    public class LiquidTurretEntity extends TurretEntity{
 
-    @Override
-    protected boolean validateTarget(Tile tile){
-        TurretEntity entity = tile.ent();
-        if(entity.liquids.current().canExtinguish() && entity.target instanceof Tile){
-            return Fire.has(((Tile)entity.target).x, ((Tile)entity.target).y);
-        }
-        return super.validateTarget(tile);
-    }
-
-    @Override
-    protected void findTarget(Tile tile){
-        TurretEntity entity = tile.ent();
-        if(entity.liquids.current().canExtinguish()){
-            int tr = (int)(range / tilesize);
-            for(int x = -tr; x <= tr; x++){
-                for(int y = -tr; y <= tr; y++){
-                    if(Fire.has(x + tile.x, y + tile.y)){
-                        entity.target = world.tile(x + tile.x, y + tile.y);
-                        return;
-                    }
-                }
+        @Override
+        public void draw(){
+            super.draw();
+            
+            if(Core.atlas.isFound(liquidRegion)){
+                Draw.color(liquids.current().color);
+                Draw.alpha(liquids.total() / liquidCapacity);
+                Draw.rect(liquidRegion, x + tr2.x, y + tr2.y, rotation - 90);
+                Draw.color();
             }
         }
 
-        super.findTarget(tile);
-    }
-
-    @Override
-    protected void effects(Tile tile){
-        BulletType type = peekAmmo(tile);
-
-        TurretEntity entity = tile.ent();
-
-        Effects.effect(type.shootEffect, entity.liquids.current().color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
-        Effects.effect(type.smokeEffect, entity.liquids.current().color, tile.drawx() + tr.x, tile.drawy() + tr.y, entity.rotation);
-        //shootSound.at(tile);
-
-        if(shootShake > 0){
-            Effects.shake(shootShake, shootShake, tile.entity);
+        @Override
+        public boolean shouldActiveSound(){
+            return target != null && hasAmmo();
         }
 
-        entity.recoil = recoil;
-    }
+        @Override
+        protected void findTarget(){
+            if(liquids.current().canExtinguish()){
+                int tr = (int)(range / tilesize);
+                for(int x = -tr; x <= tr; x++){
+                    for(int y = -tr; y <= tr; y++){
+                        if(Fires.has(x + tile.x, y + tile.y)){
+                            target = Fires.get(x + tile.x, y + tile.y);
+                            return;
+                        }
+                    }
+                }
+            }
 
-    @Override
-    public BulletType useAmmo(Tile tile){
-        TurretEntity entity = tile.ent();
-        if(tile.isEnemyCheat()) return ammo.get(entity.liquids.current());
-        BulletType type = ammo.get(entity.liquids.current());
-        entity.liquids.remove(entity.liquids.current(), type.ammoMultiplier);
-        return type;
-    }
+            super.findTarget();
+        }
 
-    @Override
-    public BulletType peekAmmo(Tile tile){
-        return ammo.get(tile.entity.liquids.current());
-    }
+        @Override
+        protected void effects(){
+            BulletType type = peekAmmo();
 
-    @Override
-    public boolean hasAmmo(Tile tile){
-        TurretEntity entity = tile.ent();
-        return ammo.get(entity.liquids.current()) != null && entity.liquids.total() >= ammo.get(entity.liquids.current()).ammoMultiplier;
-    }
+            type.shootEffect.at(x + tr.x, y + tr.y, rotation, liquids.current().color);
+            type.smokeEffect.at(x + tr.x, y + tr.y, rotation, liquids.current().color);
+            shootSound.at(tile);
 
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        return false;
-    }
+            if(shootShake > 0){
+                Effects.shake(shootShake, shootShake, tile.build);
+            }
 
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return ammo.get(liquid) != null
-        && (tile.entity.liquids.current() == liquid || (ammo.containsKey(tile.entity.liquids.current()) && tile.entity.liquids.get(tile.entity.liquids.current()) <= ammo.get(tile.entity.liquids.current()).ammoMultiplier + 0.001f));
-    }
+            recoil = recoilAmount;
+        }
 
+        @Override
+        public BulletType useAmmo(){
+            if(cheating()) return ammoTypes.get(liquids.current());
+            BulletType type = ammoTypes.get(liquids.current());
+            liquids.remove(liquids.current(), type.ammoMultiplier);
+            return type;
+        }
+
+        @Override
+        public BulletType peekAmmo(){
+            return ammoTypes.get(liquids.current());
+        }
+
+        @Override
+        public boolean hasAmmo(){
+            return ammoTypes.get(liquids.current()) != null && liquids.total() >= ammoTypes.get(liquids.current()).ammoMultiplier;
+        }
+
+        @Override
+        public boolean acceptItem(Building source, Item item){
+            return false;
+        }
+
+        @Override
+        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+            return ammoTypes.get(liquid) != null
+                && (liquids.current() == liquid || (ammoTypes.containsKey(liquids.current())
+                && liquids.get(liquids.current()) <= ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f));
+        }
+    }
 }

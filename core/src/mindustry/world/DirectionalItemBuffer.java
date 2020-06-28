@@ -1,23 +1,20 @@
 package mindustry.world;
 
-import mindustry.annotations.Annotations.Struct;
-import arc.util.Time;
-import mindustry.gen.BufferItem;
-import mindustry.type.Item;
-
-import java.io.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.gen.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.content;
 
 public class DirectionalItemBuffer{
     public final long[][] buffers;
     public final int[] indexes;
-    private final float speed;
 
-    public DirectionalItemBuffer(int capacity, float speed){
+    public DirectionalItemBuffer(int capacity){
         this.buffers = new long[4][capacity];
         this.indexes = new int[5];
-        this.speed = speed;
     }
 
     public boolean accepts(int buffer){
@@ -29,7 +26,7 @@ public class DirectionalItemBuffer{
         buffers[buffer][indexes[buffer]++] = BufferItem.get((byte)item.id, Time.time());
     }
 
-    public Item poll(int buffer){
+    public Item poll(int buffer, float speed){
         if(indexes[buffer] > 0){
             long l = buffers[buffer][0];
             float time = BufferItem.time(l);
@@ -46,22 +43,22 @@ public class DirectionalItemBuffer{
         indexes[buffer] --;
     }
 
-    public void write(DataOutput stream) throws IOException{
+    public void write(Writes write){
         for(int i = 0; i < 4; i++){
-            stream.writeByte(indexes[i]);
-            stream.writeByte(buffers[i].length);
+            write.b(indexes[i]);
+            write.b(buffers[i].length);
             for(long l : buffers[i]){
-                stream.writeLong(l);
+                write.l(l);
             }
         }
     }
 
-    public void read(DataInput stream) throws IOException{
+    public void read(Reads read){
         for(int i = 0; i < 4; i++){
-            indexes[i] = stream.readByte();
-            byte length = stream.readByte();
+            indexes[i] = read.b();
+            byte length = read.b();
             for(int j = 0; j < length; j++){
-                long value = stream.readLong();
+                long value = read.l();
                 if(j < buffers[i].length){
                     buffers[i][j] = value;
                 }

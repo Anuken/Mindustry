@@ -6,7 +6,7 @@ import arc.scene.ui.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
-public class ColorPicker extends FloatingDialog{
+public class ColorPicker extends BaseDialog{
     private Cons<Color> cons = c -> {};
     private Color current = new Color();
 
@@ -38,24 +38,24 @@ public class ColorPicker extends FloatingDialog{
 
             t.defaults().padBottom(4);
             t.add("R").color(Pal.remove);
-            t.addSlider(0f, 1f, 0.01f, current.r, current::r).width(w);
+            t.slider(0f, 1f, 0.01f, current.r, current::r).width(w);
             t.row();
             t.add("G").color(Color.lime);
-            t.addSlider(0f, 1f, 0.01f, current.g, current::g).width(w);
+            t.slider(0f, 1f, 0.01f, current.g, current::g).width(w);
             t.row();
             t.add("B").color(Color.royal);
-            t.addSlider(0f, 1f, 0.01f, current.b, current::b).width(w);
+            t.slider(0f, 1f, 0.01f, current.b, current::b).width(w);
             t.row();
             if(alpha){
                 t.add("A");
-                t.addSlider(0f, 1f, 0.01f, current.a, current::a).width(w);
+                t.slider(0f, 1f, 0.01f, current.a, current::a).width(w);
                 t.row();
             }
         });
 
         buttons.clear();
         addCloseButton();
-        buttons.addImageTextButton("$ok", Icon.ok, () -> {
+        buttons.button("$ok", Icon.ok, () -> {
             cons.get(current);
             hide();
         });

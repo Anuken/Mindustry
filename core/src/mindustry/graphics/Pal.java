@@ -8,10 +8,14 @@ public class Pal{
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
-    bulletYellow = Color.valueOf("ffeec9"),
-    bulletYellowBack = Color.valueOf("f9c87a"),
+    shield = Color.valueOf("ffd37f").a(0.7f),
+    shieldIn = Color.black.cpy().a(0f),
+
+    bulletYellow = Color.valueOf("fff8e8"),
+    bulletYellowBack = Color.valueOf("f9c27a"),
 
     darkMetal = Color.valueOf("6e7080"),
+    darkerMetal = Color.valueOf("565666"),
 
     missileYellow = Color.valueOf("ffd2ae"),
     missileYellowBack = Color.valueOf("e58956"),
@@ -23,8 +27,6 @@ public class Pal{
 
     lightFlame = Color.valueOf("ffdd55"),
     darkFlame = Color.valueOf("db401c"),
-
-    power2 = Color.valueOf("ff9f6c"),
 
     lightPyraFlame = Color.valueOf("ffb855"),
     darkPyraFlame = Color.valueOf("db661c"),
@@ -55,6 +57,7 @@ public class Pal{
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),
     gray = Color.valueOf("454545"),
+    metalGrayDark = Color.valueOf("6e7080"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),

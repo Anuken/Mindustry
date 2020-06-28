@@ -2,28 +2,30 @@ package mindustry.mod;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
-import org.mozilla.javascript.*;
-import org.mozilla.javascript.commonjs.module.*;
-import org.mozilla.javascript.commonjs.module.provider.*;
+import rhino.*;
+import rhino.module.*;
+import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
+    private final Seq<String> blacklist = Seq.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke");
-    private final Array<String> whitelist = Array.with("mindustry.net");
+        ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");
+    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
     private final Context context;
-    private Scriptable scope;
+    private final Scriptable scope;
     private boolean errored;
     private LoadedMod currentMod = null;
+    private Seq<EventHandle> events = new Seq<>();
 
     public Scripts(){
         Time.mark();
@@ -31,6 +33,7 @@ public class Scripts implements Disposable{
         context = Vars.platform.getScriptContext();
         context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains) || whitelist.contains(type.toLowerCase()::contains));
         context.getWrapFactory().setJavaPrimitiveWrap(false);
+        context.setLanguageVersion(Context.VERSION_ES6);
 
         scope = new ImporterTopLevel(context);
 
@@ -41,7 +44,7 @@ public class Scripts implements Disposable{
         if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
             errored = true;
         }
-        Log.debug("Time to load script engine: {0}", Time.elapsed());
+        Log.debug("Time to load script engine: @", Time.elapsed());
     }
 
     public boolean hasErrored(){
@@ -51,12 +54,8 @@ public class Scripts implements Disposable{
     public String runConsole(String text){
         try{
             Object o = context.evaluateString(scope, text, "console.js", 1, null);
-            if(o instanceof NativeJavaObject){
-                o = ((NativeJavaObject)o).unwrap();
-            }
-            if(o instanceof Undefined){
-                o = "undefined";
-            }
+            if(o instanceof NativeJavaObject) o = ((NativeJavaObject)o).unwrap();
+            if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
         }catch(Throwable t){
             return getError(t);
@@ -73,7 +72,12 @@ public class Scripts implements Disposable{
     }
 
     public void log(LogLevel level, String source, String message){
-        Log.log(level, "[{0}]: {1}", source, message);
+        Log.log(level, "[@]: @", source, message);
+    }
+
+    public <T> void onEvent(Class<T> type, Cons<T> listener){
+        Events.on(type, listener);
+        events.add(new EventHandle(type, listener));
     }
 
     public void run(LoadedMod mod, Fi file){
@@ -88,7 +92,9 @@ public class Scripts implements Disposable{
                 //inject script info into file (TODO maybe rhino handles this?)
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
             }
-            context.evaluateString(scope, script, file, 1, null);
+            context.evaluateString(scope,
+            "(function(){\n" + script + "\n})();",
+            file, 0, null);
             return true;
         }catch(Throwable t){
             if(currentMod != null){
@@ -101,7 +107,21 @@ public class Scripts implements Disposable{
 
     @Override
     public void dispose(){
+        for(EventHandle e : events){
+            Events.remove(e.type, e.listener);
+        }
+        events.clear();
         Context.exit();
+    }
+
+    private static class EventHandle{
+        Class type;
+        Cons listener;
+
+        public EventHandle(Class type, Cons listener){
+            this.type = type;
+            this.listener = listener;
+        }
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{

@@ -2,13 +2,12 @@ package mindustry.ui.fragments;
 
 import arc.func.*;
 import arc.graphics.*;
-import arc.scene.Group;
+import arc.scene.*;
 import arc.scene.actions.*;
-import arc.scene.event.Touchable;
-import arc.scene.ui.Label;
-import arc.scene.ui.TextButton;
-import arc.scene.ui.layout.Table;
-import mindustry.graphics.Pal;
+import arc.scene.event.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import mindustry.graphics.*;
 import mindustry.ui.*;
 
 public class LoadingFragment extends Fragment{
@@ -22,16 +21,16 @@ public class LoadingFragment extends Fragment{
             t.visible(false);
             t.touchable(Touchable.enabled);
             t.add().height(133f).row();
-            t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.add(new WarningBar()).growX().height(24f);
             t.row();
-            t.add("$loading").name("namelabel").pad(10f);
+            t.add("$loading").name("namelabel").pad(10f).style(Styles.techLabel);
             t.row();
-            t.addImage().growX().height(3f).pad(4f).growX().get().setColor(Pal.accent);
+            t.add(new WarningBar()).growX().height(24f);
             t.row();
 
             bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();
             t.row();
-            button = t.addButton("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            button = t.button("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
             table = t;
         });
     }

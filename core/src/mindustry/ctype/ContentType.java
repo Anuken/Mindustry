@@ -4,17 +4,18 @@ package mindustry.ctype;
 public enum ContentType{
     item,
     block,
-    mech,
+    mech_UNUSED,
     bullet,
     liquid,
     status,
     unit,
     weather,
-    effect,
-    zone,
-    loadout,
-    typeid,
-    error;
+    effect_UNUSED,
+    sector,
+    loadout_UNUSED,
+    typeid_UNUSED,
+    error,
+    planet;
 
     public static final ContentType[] all = values();
 }

@@ -5,33 +5,45 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import arc.util.pooling.Pool.*;
+import arc.util.pooling.*;
 import mindustry.*;
-import mindustry.annotations.Annotations.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.headless;
+import java.io.*;
+
+import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
     /** All player info. Maps UUIDs to info. This persists throughout restarts. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    private Array<String> bannedIPs = new Array<>();
-    private Array<String> whitelist = new Array<>();
-    private Array<ChatFilter> chatFilters = new Array<>();
-    private Array<ActionFilter> actionFilters = new Array<>();
-    private Array<String> subnetBans = new Array<>();
+    private Seq<String> bannedIPs = new Seq<>();
+    private Seq<String> whitelist = new Seq<>();
+    private Seq<ChatFilter> chatFilters = new Seq<>();
+    private Seq<ActionFilter> actionFilters = new Seq<>();
+    private Seq<String> subnetBans = new Seq<>();
+    private IntIntMap lastPlaced = new IntIntMap();
 
     public Administration(){
         load();
 
+        Events.on(ResetEvent.class, e -> lastPlaced = new IntIntMap());
+
+        //keep track of who placed what on the server
+        Events.on(BlockBuildEndEvent.class, e -> {
+            //players should be able to configure their own tiles
+            if(net.server() && e.unit != null && e.unit.isPlayer()){
+                lastPlaced.put(e.tile.pos(), e.unit.getPlayer().id());
+            }
+        });
+
         //anti-spam
         addChatFilter((player, message) -> {
             long resetTime = Config.messageRateLimit.num() * 1000;
-            if(Config.antiSpam.bool() && !player.isLocal && !player.isAdmin){
+            if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
                 //prevent people from spamming messages quickly
                 if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
                     //supress message
@@ -58,9 +70,34 @@ public class Administration{
 
             return message;
         });
+
+        //block interaction rate limit
+        addActionFilter(action -> {
+            if(action.type != ActionType.breakBlock &&
+                action.type != ActionType.placeBlock &&
+                action.type != ActionType.tapTile &&
+                Config.antiSpam.bool() &&
+                //make sure players can configure their own stuff, e.g. in schematics
+                lastPlaced.get(action.tile.pos(), -1) != action.player.id()){
+
+                Ratekeeper rate = action.player.getInfo().rate;
+                if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
+                    return true;
+                }else{
+                    if(rate.occurences > Config.interactRateKick.num()){
+                        player.kick("You are interacting with too many blocks.", 1000 * 30);
+                    }else{
+                        player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
+                    }
+
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 
-    public Array<String> getSubnetBans(){
+    public Seq<String> getSubnetBans(){
         return subnetBans;
     }
 
@@ -89,7 +126,7 @@ public class Administration{
     public @Nullable String filterMessage(Player player, String message){
         String current = message;
         for(ChatFilter f : chatFilters){
-            current = f.filter(player, message);
+            current = f.filter(player, current);
             if(current == null) return null;
         }
         return current;
@@ -119,7 +156,7 @@ public class Administration{
     }
 
     public void setPlayerLimit(int limit){
-        Core.settings.putSave("playerlimit", limit);
+        Core.settings.put("playerlimit", limit);
     }
 
     public boolean getStrict(){
@@ -172,7 +209,7 @@ public class Administration{
         getCreateInfo(id).banned = true;
 
         save();
-        Events.fire(new PlayerBanEvent(Vars.playerGroup.find(p -> id.equals(p.uuid))));
+        Events.fire(new PlayerBanEvent(Groups.player.find(p -> id.equals(p.uuid()))));
         return true;
     }
 
@@ -212,15 +249,15 @@ public class Administration{
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
         save();
-        Events.fire(new PlayerUnbanEvent(Vars.playerGroup.find(p -> id.equals(p.uuid))));
+        Events.fire(new PlayerUnbanEvent(Groups.player.find(p -> id.equals(p.uuid()))));
         return true;
     }
 
     /**
      * Returns list of all players with admin status
      */
-    public Array<PlayerInfo> getAdmins(){
-        Array<PlayerInfo> result = new Array<>();
+    public Seq<PlayerInfo> getAdmins(){
+        Seq<PlayerInfo> result = new Seq<>();
         for(PlayerInfo info : playerInfo.values()){
             if(info.admin){
                 result.add(info);
@@ -232,8 +269,8 @@ public class Administration{
     /**
      * Returns list of all players which are banned
      */
-    public Array<PlayerInfo> getBanned(){
-        Array<PlayerInfo> result = new Array<>();
+    public Seq<PlayerInfo> getBanned(){
+        Seq<PlayerInfo> result = new Seq<>();
         for(PlayerInfo info : playerInfo.values()){
             if(info.banned){
                 result.add(info);
@@ -245,18 +282,18 @@ public class Administration{
     /**
      * Returns all banned IPs. This does not include the IPs of ID-banned players.
      */
-    public Array<String> getBannedIPs(){
+    public Seq<String> getBannedIPs(){
         return bannedIPs;
     }
 
     /**
-     * Makes a player an admin. Returns whether this player was already an admin.
+     * Makes a player an admin.
+     * @return whether this player was already an admin.
      */
     public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
 
-        if(info.admin && info.adminUsid != null && info.adminUsid.equals(usid))
-            return false;
+        if(info.admin && info.adminUsid != null && info.adminUsid.equals(usid)) return false;
 
         info.adminUsid = usid;
         info.admin = true;
@@ -266,13 +303,13 @@ public class Administration{
     }
 
     /**
-     * Makes a player no longer an admin. Returns whether this player was an admin in the first place.
+     * Makes a player no longer an admin.
+     * @return whether this player was an admin in the first place.
      */
     public boolean unAdminPlayer(String id){
         PlayerInfo info = getCreateInfo(id);
 
-        if(!info.admin)
-            return false;
+        if(!info.admin) return false;
 
         info.admin = false;
         save();
@@ -347,8 +384,8 @@ public class Administration{
         return result;
     }
 
-    public Array<PlayerInfo> findByIPs(String ip){
-        Array<PlayerInfo> result = new Array<>();
+    public Seq<PlayerInfo> findByIPs(String ip){
+        Seq<PlayerInfo> result = new Seq<>();
 
         for(PlayerInfo info : playerInfo.values()){
             if(info.ips.contains(ip, false)){
@@ -376,8 +413,8 @@ public class Administration{
         return null;
     }
 
-    public Array<PlayerInfo> getWhitelisted(){
-        return playerInfo.values().toArray().select(p -> isWhitelisted(p.id, p.adminUsid));
+    public Seq<PlayerInfo> getWhitelisted(){
+        return playerInfo.values().toSeq().select(p -> isWhitelisted(p.id, p.adminUsid));
     }
 
     private PlayerInfo getCreateInfo(String id){
@@ -392,19 +429,119 @@ public class Administration{
     }
 
     public void save(){
-        Core.settings.putObject("player-info", playerInfo);
-        Core.settings.putObject("banned-ips", bannedIPs);
-        Core.settings.putObject("whitelisted", whitelist);
-        Core.settings.putObject("subnet-bans", subnetBans);
-        Core.settings.save();
+        Core.settings.putJson("player-data", playerInfo);
+        Core.settings.putJson("ip-bans", String.class, bannedIPs);
+        Core.settings.putJson("whitelist-ids", String.class, whitelist);
+        Core.settings.putJson("banned-subnets", String.class, subnetBans);
     }
 
     @SuppressWarnings("unchecked")
     private void load(){
-        playerInfo = Core.settings.getObject("player-info", ObjectMap.class, ObjectMap::new);
-        bannedIPs = Core.settings.getObject("banned-ips", Array.class, Array::new);
-        whitelist = Core.settings.getObject("whitelisted", Array.class, Array::new);
-        subnetBans = Core.settings.getObject("subnet-bans", Array.class, Array::new);
+        if(!loadLegacy()){
+            //load default data
+            playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
+            bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
+            whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
+            subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
+        }else{
+            //save over loaded legacy data
+            save();
+            Log.info("Loaded legacy (5.0) server data.");
+        }
+    }
+
+    private boolean loadLegacy(){
+        try{
+            byte[] info = Core.settings.getBytes("player-info");
+            byte[] ips = Core.settings.getBytes("banned-ips");
+            byte[] whitelist = Core.settings.getBytes("whitelisted");
+            byte[] subnet = Core.settings.getBytes("subnet-bans");
+
+            if(info != null){
+                DataInputStream d = new DataInputStream(new ByteArrayInputStream(info));
+                int size = d.readInt();
+                if(size != 0){
+                    d.readUTF();
+                    d.readUTF();
+
+                    for(int i = 0; i < size; i++){
+                        String mapKey = d.readUTF();
+
+                        PlayerInfo data = new PlayerInfo();
+
+                        data.id = d.readUTF();
+                        data.lastName = d.readUTF();
+                        data.lastIP = d.readUTF();
+                        int ipsize = d.readInt();
+                        if(ipsize != 0){
+                            d.readUTF();
+                            for(int j = 0; j < ipsize; j++){
+                                data.ips.add(d.readUTF());
+                            }
+                        }
+
+                        int namesize = d.readInt();
+                        if(namesize != 0){
+                            d.readUTF();
+                            for(int j = 0; j < ipsize; j++){
+                                data.names.add(d.readUTF());
+                            }
+                        }
+                        //ips, names...
+                        data.adminUsid = d.readUTF();
+                        data.timesKicked = d.readInt();
+                        data.timesJoined = d.readInt();
+                        data.banned = d.readBoolean();
+                        data.admin = d.readBoolean();
+                        data.lastKicked = d.readLong();
+
+                        playerInfo.put(mapKey, data);
+                    }
+                }
+                Core.settings.remove("player-info");
+            }
+
+            if(ips != null){
+                DataInputStream d = new DataInputStream(new ByteArrayInputStream(ips));
+                int size = d.readInt();
+                if(size != 0){
+                    d.readUTF();
+                    for(int i = 0; i < size; i++){
+                        bannedIPs.add(d.readUTF());
+                    }
+                }
+                Core.settings.remove("banned-ips");
+            }
+
+            if(whitelist != null){
+                DataInputStream d = new DataInputStream(new ByteArrayInputStream(whitelist));
+                int size = d.readInt();
+                if(size != 0){
+                    d.readUTF();
+                    for(int i = 0; i < size; i++){
+                        this.whitelist.add(d.readUTF());
+                    }
+                }
+                Core.settings.remove("whitelisted");
+            }
+
+            if(subnet != null){
+                DataInputStream d = new DataInputStream(new ByteArrayInputStream(subnet));
+                int size = d.readInt();
+                if(size != 0){
+                    d.readUTF();
+                    for(int i = 0; i < size; i++){
+                        subnetBans.add(d.readUTF());
+                    }
+                }
+                Core.settings.remove("subnet-bans");
+            }
+
+            return info != null || ips != null || whitelist != null || subnet != null;
+        }catch(Throwable e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /** Server configuration definition. Each config value can be a string, boolean or number. */
@@ -420,6 +557,9 @@ public class Administration{
         logging("Whether to log everything to files.", true),
         strict("Whether strict mode is on - corrects positions and prevents duplicate UUIDs.", true),
         antiSpam("Whether spammers are automatically kicked and rate-limited.", headless),
+        interactRateWindow("Block interaction rate limit window, in seconds.", 6),
+        interactRateLimit("Block interaction rate limit.", 25),
+        interactRateKick("How many times a player must interact inside the window to get kicked.", 60),
         messageRateLimit("Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick("How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         socketInput("Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
@@ -483,17 +623,16 @@ public class Administration{
         }
 
         public void set(Object value){
-            Core.settings.putSave(key, value);
+            Core.settings.put(key, value);
             changed.run();
         }
     }
 
-    @Serialize
     public static class PlayerInfo{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
-        public Array<String> ips = new Array<>();
-        public Array<String> names = new Array<>();
+        public Seq<String> ips = new Seq<>();
+        public Seq<String> names = new Seq<>();
         public String adminUsid;
         public int timesKicked;
         public int timesJoined;
@@ -503,6 +642,7 @@ public class Administration{
         public transient long lastMessageTime, lastSyncTime;
         public transient String lastSentMessage;
         public transient int messageInfractions;
+        public transient Ratekeeper rate = new Ratekeeper();
 
         PlayerInfo(String id){
             this.id = id;
@@ -548,7 +688,7 @@ public class Administration{
         public int rotation;
 
         /** valid for configure and rotation-type events only. */
-        public int config;
+        public Object config;
 
         /** valid for item-type events only. */
         public @Nullable Item item;
@@ -564,7 +704,8 @@ public class Administration{
         @Override
         public void reset(){
             item = null;
-            itemAmount = config = 0;
+            itemAmount = 0;
+            config = null;
             player = null;
             type = null;
             tile = null;

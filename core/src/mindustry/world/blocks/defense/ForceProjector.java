@@ -7,17 +7,14 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.io.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
-import mindustry.entities.type.BaseEntity;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
-
-import java.io.*;
 
 import static mindustry.Vars.*;
 
@@ -32,17 +29,15 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float basePowerDraw = 0.2f;
-    public TextureRegion topRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
-    private static Tile paramTile;
-    private static ForceProjector paramBlock;
-    private static ForceEntity paramEntity;
-    private static Cons<AbsorbTrait> shieldConsumer = trait -> {
-        if(trait.canBeAbsorbed() && trait.getTeam() != paramTile.getTeam() && Intersector.isInsideHexagon(trait.getX(), trait.getY(), paramBlock.realRadius(paramEntity) * 2f, paramTile.drawx(), paramTile.drawy())){
+    private static ForceProjectorEntity paramEntity;
+    private static Cons<Shielderc> shieldConsumer = trait -> {
+        if(trait.team() != paramEntity.team() && Intersector.isInsideHexagon(paramEntity.x(), paramEntity.y(), paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
-            Effects.effect(Fx.absorb, trait);
+            Fx.absorb.at(trait);
             paramEntity.hit = 1f;
-            paramEntity.buildup += trait.getShieldDamage() * paramEntity.warmup;
+            paramEntity.buildup += trait.damage() * paramEntity.warmup;
         }
     };
 
@@ -51,22 +46,15 @@ public class ForceProjector extends Block{
         update = true;
         solid = true;
         hasPower = true;
-        canOverdrive = false;
         hasLiquids = true;
         hasItems = true;
+        expanded = true;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
-        entityType = ForceEntity::new;
     }
 
     @Override
     public boolean outputsItems(){
         return false;
-    }
-
-    @Override
-    public void load(){
-        super.load();
-        topRegion = Core.atlas.find(name + "-top");
     }
 
     @Override
@@ -81,90 +69,16 @@ public class ForceProjector extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Draw.color(Pal.accent);
+        Draw.color(Pal.gray);
+        Lines.stroke(3f);
+        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Draw.color(player.team().color);
         Lines.stroke(1f);
         Lines.poly(x * tilesize, y * tilesize, 6, radius);
         Draw.color();
     }
 
-    @Override
-    public void update(Tile tile){
-        ForceEntity entity = tile.ent();
-
-        if(entity.shield == null){
-            entity.shield = new ShieldEntity(tile);
-            entity.shield.add();
-        }
-
-        boolean phaseValid = consumes.get(ConsumeType.item).valid(tile.entity);
-
-        entity.phaseHeat = Mathf.lerpDelta(entity.phaseHeat, Mathf.num(phaseValid), 0.1f);
-
-        if(phaseValid && !entity.broken && entity.timer.get(timerUse, phaseUseTime) && entity.efficiency() > 0){
-            entity.cons.trigger();
-        }
-
-        entity.radscl = Mathf.lerpDelta(entity.radscl, entity.broken ? 0f : entity.warmup, 0.05f);
-
-        if(Mathf.chance(Time.delta() * entity.buildup / breakage * 0.1f)){
-            Effects.effect(Fx.reactorsmoke, tile.drawx() + Mathf.range(tilesize / 2f), tile.drawy() + Mathf.range(tilesize / 2f));
-        }
-
-        entity.warmup = Mathf.lerpDelta(entity.warmup, entity.efficiency(), 0.1f);
-
-        if(entity.buildup > 0){
-            float scale = !entity.broken ? cooldownNormal : cooldownBrokenBase;
-            ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
-            if(cons.valid(entity)){
-                cons.update(entity);
-                scale *= (cooldownLiquid * (1f + (entity.liquids.current().heatCapacity - 0.4f) * 0.9f));
-            }
-
-            entity.buildup -= Time.delta() * scale;
-        }
-
-        if(entity.broken && entity.buildup <= 0){
-            entity.broken = false;
-        }
-
-        if(entity.buildup >= breakage && !entity.broken){
-            entity.broken = true;
-            entity.buildup = breakage;
-            Effects.effect(Fx.shieldBreak, tile.drawx(), tile.drawy(), radius);
-        }
-
-        if(entity.hit > 0f){
-            entity.hit -= 1f / 5f * Time.delta();
-        }
-
-        float realRadius = realRadius(entity);
-
-        paramTile = tile;
-        paramEntity = entity;
-        paramBlock = this;
-        bulletGroup.intersect(tile.drawx() - realRadius, tile.drawy() - realRadius, realRadius*2f, realRadius * 2f, shieldConsumer);
-    }
-
-    float realRadius(ForceEntity entity){
-        return (radius + entity.phaseHeat * phaseRadiusBoost) * entity.radscl;
-    }
-
-    @Override
-    public void draw(Tile tile){
-        super.draw(tile);
-
-        ForceEntity entity = tile.ent();
-
-        if(entity.buildup <= 0f) return;
-        Draw.alpha(entity.buildup / breakage * 0.75f);
-        Draw.blend(Blending.additive);
-        Draw.rect(topRegion, tile.drawx(), tile.drawy());
-        Draw.blend();
-        Draw.reset();
-    }
-
-    class ForceEntity extends TileEntity{
-        ShieldEntity shield;
+    public class ForceProjectorEntity extends Building{
         boolean broken = true;
         float buildup = 0f;
         float radscl = 0f;
@@ -173,79 +87,114 @@ public class ForceProjector extends Block{
         float phaseHeat;
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeBoolean(broken);
-            stream.writeFloat(buildup);
-            stream.writeFloat(radscl);
-            stream.writeFloat(warmup);
-            stream.writeFloat(phaseHeat);
-        }
+        public void updateTile(){
+            boolean phaseValid = consumes.get(ConsumeType.item).valid(this);
 
-        @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
-            broken = stream.readBoolean();
-            buildup = stream.readFloat();
-            radscl = stream.readFloat();
-            warmup = stream.readFloat();
-            phaseHeat = stream.readFloat();
-        }
-    }
+            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
-    public class ShieldEntity extends BaseEntity implements DrawTrait{
-        final ForceEntity entity;
+            if(phaseValid && !broken && timer(timerUse, phaseUseTime) && efficiency() > 0){
+                consume();
+            }
 
-        public ShieldEntity(Tile tile){
-            this.entity = tile.ent();
-            set(tile.drawx(), tile.drawy());
-        }
+            radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.05f);
 
-        @Override
-        public void update(){
-            if(entity.isDead() || !entity.isAdded()){
-                remove();
+            if(Mathf.chanceDelta(buildup / breakage * 0.1f)){
+                Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2f), y + Mathf.range(tilesize / 2f));
+            }
+
+            warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
+
+            if(buildup > 0){
+                float scale = !broken ? cooldownNormal : cooldownBrokenBase;
+                ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
+                if(cons.valid(this)){
+                    cons.update(this);
+                    scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
+                }
+
+                buildup -= delta() * scale;
+            }
+
+            if(broken && buildup <= 0){
+                broken = false;
+            }
+
+            if(buildup >= breakage && !broken){
+                broken = true;
+                buildup = breakage;
+                Fx.shieldBreak.at(x, y, radius);
+            }
+
+            if(hit > 0f){
+                hit -= 1f / 5f * Time.delta();
+            }
+
+            float realRadius = realRadius();
+
+            if(realRadius > 0 && !broken){
+                paramEntity = this;
+                Groups.bullet.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, shieldConsumer);
             }
         }
 
-        @Override
-        public float drawSize(){
-            return realRadius(entity) * 2f + 2f;
+        float realRadius(){
+            return (radius + phaseHeat * phaseRadiusBoost) * radscl;
         }
 
         @Override
         public void draw(){
-            Draw.color(Pal.accent);
-            Fill.poly(x, y, 6, realRadius(entity));
-            Draw.color();
-        }
+            super.draw();
 
-        public void drawOver(){
-            if(entity.hit <= 0f) return;
+            if(buildup > 0f){
+                Draw.alpha(buildup / breakage * 0.75f);
+                Draw.blend(Blending.additive);
+                Draw.rect(topRegion, x, y);
+                Draw.blend();
+                Draw.reset();
+            }
 
-            Draw.color(Color.white);
-            Draw.alpha(entity.hit);
-            Fill.poly(x, y, 6, realRadius(entity));
-            Draw.color();
-        }
+            if(!broken){
+                float radius = realRadius();
 
-        public void drawSimple(){
-            if(realRadius(entity) < 0.5f) return;
+                Draw.z(Layer.shields);
 
-            float rad = realRadius(entity);
+                Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
-            Draw.color(Pal.accent);
-            Lines.stroke(1.5f);
-            Draw.alpha(0.09f + 0.08f * entity.hit);
-            Fill.poly(x, y, 6, rad);
-            Draw.alpha(1f);
-            Lines.poly(x, y, 6, rad);
+                if(Core.settings.getBool("animatedshields")){
+                    Fill.poly(x, y, 6, radius);
+
+                    Draw.z(Layer.shields + 0.01f);
+                }else{
+                    Lines.stroke(1.5f);
+                    Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
+                    Fill.poly(x, y, 6, radius);
+                    Draw.alpha(1f);
+                    Lines.poly(x, y, 6, radius);
+                    Draw.reset();
+                }
+            }
+
             Draw.reset();
         }
 
         @Override
-        public EntityGroup targetGroup(){
-            return shieldGroup;
+        public void write(Writes write){
+            super.write(write);
+            write.bool(broken);
+            write.f(buildup);
+            write.f(radscl);
+            write.f(warmup);
+            write.f(phaseHeat);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+            broken = read.bool();
+            buildup = read.f();
+            radscl = read.f();
+            warmup = read.f();
+            phaseHeat = read.f();
         }
     }
 }

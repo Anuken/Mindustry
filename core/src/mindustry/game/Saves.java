@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
@@ -22,12 +23,12 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Saves{
-    private Array<SaveSlot> saves = new Array<>();
-    private SaveSlot current;
+    private Seq<SaveSlot> saves = new Seq<>();
+    private @Nullable SaveSlot current;
+    private @Nullable SaveSlot lastSectorSave;
     private AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
-    private Fi zoneFile;
 
     private long totalPlaytime;
     private long lastTimestamp;
@@ -46,7 +47,6 @@ public class Saves{
 
     public void load(){
         saves.clear();
-        zoneFile = saveDirectory.child("-1.msav");
 
         for(Fi file : saveDirectory.list()){
             if(!file.name().contains("backup") && SaveIO.isSaveValid(file)){
@@ -55,16 +55,29 @@ public class Saves{
                 slot.meta = SaveIO.getMeta(file);
             }
         }
+
+        lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
+
+        //automatically assign sector save slots
+        for(SaveSlot slot : saves){
+            if(slot.getSector() != null){
+                slot.getSector().save = slot;
+            }
+        }
     }
 
-    public SaveSlot getCurrent(){
+    public @Nullable SaveSlot getLastSector(){
+        return lastSectorSave;
+    }
+
+    public @Nullable SaveSlot getCurrent(){
         return current;
     }
 
     public void update(){
         SaveSlot current = this.current;
 
-        if(current != null && !state.is(State.menu)
+        if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
                 totalPlaytime += Time.timeSinceMillis(lastTimestamp);
@@ -72,7 +85,7 @@ public class Saves{
             lastTimestamp = Time.millis();
         }
 
-        if(!state.is(State.menu) && !state.gameOver && current != null && current.isAutosave() && !state.rules.tutorial){
+        if(state.isGame() && !state.gameOver && current != null && current.isAutosave() && !state.rules.tutorial){
             time += Time.delta();
             if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
@@ -80,7 +93,7 @@ public class Saves{
                 Time.runTask(2f, () -> {
                     try{
                         current.save();
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         e.printStackTrace();
                     }
                     saving = false;
@@ -105,12 +118,19 @@ public class Saves{
         return saving;
     }
 
-    public void zoneSave(){
-        SaveSlot slot = new SaveSlot(zoneFile);
-        slot.setName("zone");
-        saves.remove(s -> s.file.equals(zoneFile));
-        saves.add(slot);
-        slot.save();
+    public Fi getSectorFile(Sector sector){
+        return saveDirectory.child("sector-" + sector.planet.name + "-" + sector.id + "." + saveExtension);
+    }
+
+    public void saveSector(Sector sector){
+        if(sector.save == null){
+            sector.save = new SaveSlot(getSectorFile(sector));
+            sector.save.setName(sector.save.file.nameWithoutExtension());
+            saves.add(sector.save);
+        }
+        sector.save.save();
+        lastSectorSave = sector.save;
+        Core.settings.put("last-sector-save", sector.save.getName());
     }
 
     public SaveSlot addSave(String name){
@@ -131,11 +151,6 @@ public class Saves{
         return slot;
     }
 
-    public SaveSlot getZoneSlot(){
-        SaveSlot slot = getSaveSlots().find(s -> s.file.equals(zoneFile));
-        return slot == null || slot.getZone() == null ? null : slot;
-    }
-
     public Fi getNextSlotFile(){
         int i = 0;
         Fi file;
@@ -145,15 +160,14 @@ public class Saves{
         return file;
     }
 
-    public Array<SaveSlot> getSaveSlots(){
+    public Seq<SaveSlot> getSaveSlots(){
         return saves;
     }
 
     public class SaveSlot{
-        //public final int index;
         public final Fi file;
         boolean requestedPreview;
-        SaveMeta meta;
+        public SaveMeta meta;
 
         public SaveSlot(Fi file){
             this.file = file;
@@ -178,7 +192,7 @@ public class Saves{
 
             SaveIO.save(file);
             meta = SaveIO.getMeta(file);
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 current = this;
             }
 
@@ -225,7 +239,7 @@ public class Saves{
         }
 
         public boolean isHidden(){
-            return getZone() != null;
+            return isSector();
         }
 
         public String getPlayTime(){
@@ -245,7 +259,7 @@ public class Saves{
         }
 
         public void cautiousLoad(Runnable run){
-            Array<String> mods = Array.with(getMods());
+            Seq<String> mods = Seq.with(getMods());
             mods.removeAll(Vars.mods.getModStrings());
 
             if(!mods.isEmpty()){
@@ -261,19 +275,22 @@ public class Saves{
 
         public void setName(String name){
             Core.settings.put("save-" + index() + "-name", name);
-            Core.settings.save();
         }
 
         public String[] getMods(){
             return meta.mods;
         }
 
-        public Zone getZone(){
-            return meta == null || meta.rules == null ? null : meta.rules.zone;
+        public Sector getSector(){
+            return meta == null || meta.rules == null ? null : meta.rules.sector;
+        }
+
+        public boolean isSector(){
+            return getSector() != null;
         }
 
         public Gamemode mode(){
-            return Gamemode.bestFit(meta.rules);
+            return meta.rules.mode();
         }
 
         public int getBuild(){
@@ -290,7 +307,6 @@ public class Saves{
 
         public void setAutosave(boolean save){
             Core.settings.put("save-" + index() + "-autosave", save);
-            Core.settings.save();
         }
 
         public void importFile(Fi from) throws IOException{

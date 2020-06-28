@@ -1,21 +1,19 @@
 package mindustry.entities;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.entities.Effects.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -33,12 +31,11 @@ public class Damage{
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
         for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
             int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
-            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3,
-            x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
         }
 
         for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-            Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), 1, 1));
+            Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
         }
 
         int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
@@ -47,21 +44,21 @@ public class Damage{
             int f = i;
             Time.run(i * 2f, () -> {
                 Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
-                Effects.effect(Fx.blockExplosionSmoke, x + Mathf.range(radius), y + Mathf.range(radius));
+                Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
             });
         }
 
         if(explosiveness > 15f){
-            Effects.effect(Fx.shockwave, x, y);
+            Fx.shockwave.at(x, y);
         }
 
         if(explosiveness > 30f){
-            Effects.effect(Fx.bigShockwave, x, y);
+            Fx.bigShockwave.at(x, y);
         }
 
         float shake = Math.min(explosiveness / 4f + 3f, 9f);
         Effects.shake(shake, shake, x, y);
-        Effects.effect(Fx.dynamicExplosion, x, y, radius / 8f);
+        Fx.dynamicExplosion.at(x, y, radius / 8f);
     }
 
     public static void createIncend(float x, float y, float range, int amount){
@@ -70,7 +67,7 @@ public class Damage{
             float cy = y + Mathf.range(range);
             Tile tile = world.tileWorld(cx, cy);
             if(tile != null){
-                Fire.create(tile);
+                Fires.create(tile);
             }
         }
     }
@@ -87,11 +84,11 @@ public class Damage{
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
-            Tile tile = world.ltile(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.entity != null && tile.getTeamID() != team.id && tile.entity.collide(hitter)){
-                tile.entity.collision(hitter);
+            Building tile = world.ent(cx, cy);
+            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team() != team && tile.collide(hitter)){
+                tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
-                hitter.getBulletType().hit(hitter, tile.worldx(), tile.worldy());
+                hitter.type().hit(hitter, tile.x(), tile.y());
             }
         };
 
@@ -136,7 +133,7 @@ public class Damage{
             Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
 
             if(vec != null){
-                Effects.effect(effect, vec.x, vec.y);
+                effect.at(vec.x, vec.y);
                 e.collision(hitter, vec.x, vec.y);
                 hitter.collision(e, vec.x, vec.y);
             }
@@ -177,18 +174,46 @@ public class Damage{
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean air, boolean ground){
+        damage(team, x, y, radius, damage, false, air, ground);
+    }
+
+    /** Applies a status effect to all enemy units in a range. */
+    public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
         Cons<Unit> cons = entity -> {
-            if(entity.getTeam() == team || entity.dst(x, y) > radius){
+            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
-            float amount = calculateDamage(x, y, entity.x, entity.y, radius, damage);
+
+            entity.apply(effect, duration);
+        };
+
+        rect.setSize(radius * 2).setCenter(x, y);
+        if(team != null){
+            Units.nearbyEnemies(team, rect, cons);
+        }else{
+            Units.nearby(rect, cons);
+        }
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
+        damage(team, x, y, radius, damage, complete, true, true);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
+        Cons<Unit> cons = entity -> {
+            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+                return;
+            }
+            float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
             entity.damage(amount);
             //TODO better velocity displacement
-            float dst = tr.set(entity.x - x, entity.y - y).len();
-            entity.velocity().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
+            float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
+            entity.vel.add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
 
-            if(complete && damage >= 9999999f && entity == player){
+            if(complete && damage >= 9999999f && entity.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);
             }
         };
@@ -211,47 +236,53 @@ public class Damage{
         }
     }
 
-    public static void tileDamage(Team team, int startx, int starty, int radius, float baseDamage){
-        bits.clear();
-        propagation.clear();
-        int bitOffset = bits.width() / 2;
+    public static void tileDamage(Team team, int startx, int starty, int baseRadius, float baseDamage){
+        //tile damage is posted, so that destroying a block that causes a chain explosion will run in the next frame
+        //this prevents recursive damage calls from messing up temporary variables
+        Core.app.post(() -> {
 
-        propagation.addFirst(PropCell.get((byte)0, (byte)0, (short)baseDamage));
-        //clamp radius to fit bits
-        radius = Math.min(radius, bits.width() / 2);
+            bits.clear();
+            propagation.clear();
+            int bitOffset = bits.width() / 2;
 
-        while(!propagation.isEmpty()){
-            int prop = propagation.removeLast();
-            int x = PropCell.x(prop);
-            int y = PropCell.y(prop);
-            int damage = PropCell.damage(prop);
-            //manhattan distance used for calculating falloff, results in a diamond pattern
-            int dst = Math.abs(x) + Math.abs(y);
+            propagation.addFirst(PropCell.get((byte)0, (byte)0, (short)baseDamage));
+            //clamp radius to fit bits
+            int radius = Math.min(baseRadius, bits.width() / 2);
 
-            int scaledDamage = (int)(damage * (1f - (float)dst / radius));
+            while(!propagation.isEmpty()){
+                int prop = propagation.removeLast();
+                int x = PropCell.x(prop);
+                int y = PropCell.y(prop);
+                int damage = PropCell.damage(prop);
+                //manhattan distance used for calculating falloff, results in a diamond pattern
+                int dst = Math.abs(x) + Math.abs(y);
 
-            bits.set(bitOffset + x, bitOffset + y);
-            Tile tile = world.ltile(startx + x, starty + y);
+                int scaledDamage = (int)(damage * (1f - (float)dst / radius));
 
-            if(scaledDamage <= 0 || tile == null) continue;
+                bits.set(bitOffset + x, bitOffset + y);
+                Tile tile = world.tile(startx + x, starty + y);
 
-            //apply damage to entity if needed
-            if(tile.entity != null && tile.getTeam() != team){
-                int health = (int)tile.entity.health;
-                if(tile.entity.health > 0){
-                    tile.entity.damage(scaledDamage);
-                    scaledDamage -= health;
+                if(scaledDamage <= 0 || tile == null) continue;
 
-                    if(scaledDamage <= 0) continue;
+                //apply damage to entity if needed
+                if(tile.build != null && tile.team() != team){
+                    int health = (int)tile.build.health();
+                    if(tile.build.health() > 0){
+                        tile.build.damage(scaledDamage);
+                        scaledDamage -= health;
+
+                        if(scaledDamage <= 0) continue;
+                    }
+                }
+
+                for(Point2 p : Geometry.d4){
+                    if(!bits.get(bitOffset + x + p.x, bitOffset + y + p.y)){
+                        propagation.addFirst(PropCell.get((byte)(x + p.x), (byte)(y + p.y), (short)scaledDamage));
+                    }
                 }
             }
+        });
 
-            for(Point2 p : Geometry.d4){
-                if(!bits.get(bitOffset + x + p.x, bitOffset + y + p.y)){
-                    propagation.addFirst(PropCell.get((byte)(x + p.x), (byte)(y + p.y), (short)scaledDamage));
-                }
-            }
-        }
     }
 
     private static void completeDamage(Team team, float x, float y, float radius, float damage){
@@ -259,8 +290,8 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.getTeam())) && Mathf.dst(dx, dy) <= trad){
-                    tile.entity.damage(damage);
+                if(tile != null && tile.build != null && (team == null ||team.isEnemy(tile.team())) && Mathf.dst(dx, dy) <= trad){
+                    tile.build.damage(damage);
                 }
             }
         }
@@ -274,6 +305,7 @@ public class Damage{
     }
 
     @Struct
+    static
     class PropCellStruct{
         byte x;
         byte y;

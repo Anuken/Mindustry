@@ -8,7 +8,7 @@ import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.ui;
 
-public class MapSaveDialog extends FloatingDialog{
+public class MapSaveDialog extends BaseDialog{
     private TextField field;
     private Cons<String> listener;
 
@@ -38,7 +38,7 @@ public class MapSaveDialog extends FloatingDialog{
         });
 
         buttons.defaults().size(200f, 50f).pad(2f);
-        buttons.addButton("$cancel", this::hide);
+        buttons.button("$cancel", this::hide);
 
         TextButton button = new TextButton("$save");
         button.clicked(() -> {

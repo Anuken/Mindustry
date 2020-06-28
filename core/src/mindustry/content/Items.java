@@ -22,6 +22,7 @@ public class Items implements ContentList{
             type = ItemType.material;
             hardness = 1;
             cost = 0.7f;
+            alwaysUnlocked = true;
         }};
 
         metaglass = new Item("metaglass", Color.valueOf("ebeef5")){{

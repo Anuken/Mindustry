@@ -7,8 +7,6 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.core.GameState.*;
-import mindustry.entities.type.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
@@ -22,13 +20,14 @@ public class PlayerListFragment extends Fragment{
     private Table content = new Table().marginRight(13f).marginLeft(13f);
     private Interval timer = new Interval();
     private TextField sField;
+    private boolean found = false;
 
     @Override
     public void build(Group parent){
         parent.fill(cont -> {
             cont.visible(() -> visible);
             cont.update(() -> {
-                if(!(net.active() && !state.is(State.menu))){
+                if(!(net.active() && state.isGame())){
                     visible = false;
                     return;
                 }
@@ -43,13 +42,14 @@ public class PlayerListFragment extends Fragment{
             });
 
             cont.table(Tex.buttonTrans, pane -> {
-                pane.label(() -> Core.bundle.format(playerGroup.size() == 1 ? "players.single" : "players", playerGroup.size()));
+                pane.label(() -> Core.bundle.format(Groups.player.size() == 1 ? "players.single" : "players", Groups.player.size()));
                 pane.row();
-                sField = pane.addField(null, text -> {
+                sField = pane.field(null, text -> {
                     rebuild();
                 }).grow().pad(8).get();
                 sField.setMaxLength(maxNameLength);
                 sField.setMessageText(Core.bundle.format("players.search"));
+
                 pane.row();
                 pane.pane(content).grow().get().setScrollingDisabled(true, false);
                 pane.row();
@@ -57,9 +57,9 @@ public class PlayerListFragment extends Fragment{
                 pane.table(menu -> {
                     menu.defaults().growX().height(50f).fillY();
 
-                    menu.addButton("$server.bans", ui.bans::show).disabled(b -> net.client());
-                    menu.addButton("$server.admins", ui.admins::show).disabled(b -> net.client());
-                    menu.addButton("$close", this::toggle);
+                    menu.button("$server.bans", ui.bans::show).disabled(b -> net.client());
+                    menu.button("$server.admins", ui.admins::show).disabled(b -> net.client());
+                    menu.button("$close", this::toggle);
                 }).margin(0f).pad(10f).growX();
 
             }).touchable(Touchable.enabled).margin(14f);
@@ -72,13 +72,15 @@ public class PlayerListFragment extends Fragment{
         content.clear();
 
         float h = 74f;
+        found = false;
 
-        playerGroup.all().sort(Structs.comparing(Unit::getTeam));
-        playerGroup.all().each(user -> {
+        Groups.player.sort(Structs.comparing(Player::team));
+        Groups.player.each(user -> {
+            found = true;
             NetConnection connection = user.con;
 
-            if(connection == null && net.server() && !user.isLocal) return;
-            if(sField.getText().length() > 0 && !user.name.toLowerCase().contains(sField.getText().toLowerCase()) && !Strings.stripColors(user.name.toLowerCase()).contains(sField.getText().toLowerCase())) return;
+            if(connection == null && net.server() && !user.isLocal()) return;
+            if(sField.getText().length() > 0 && !user.name().toLowerCase().contains(sField.getText().toLowerCase()) && !Strings.stripColors(user.name().toLowerCase()).contains(sField.getText().toLowerCase())) return;
 
             Table button = new Table();
             button.left();
@@ -96,15 +98,15 @@ public class PlayerListFragment extends Fragment{
                 }
             };
             table.margin(8);
-            table.add(new Image(user.getIconRegion()).setScaling(Scaling.none)).grow();
+            table.add(new Image(user.icon()).setScaling(Scaling.none)).grow();
 
             button.add(table).size(h);
-            button.labelWrap("[#" + user.color.toString().toUpperCase() + "]" + user.name).width(170f).pad(10);
+            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);
             button.add().grow();
 
-            button.addImage(Icon.admin).visible(() -> user.isAdmin && !(!user.isLocal && net.server())).padRight(5).get().updateVisibility();
+            button.image(Icon.admin).visible(() -> user.admin && !(!user.isLocal() && net.server())).padRight(5).get().updateVisibility();
 
-            if((net.server() || player.isAdmin) && !user.isLocal && (!user.isAdmin || net.server())){
+            if((net.server() || player.admin) && !user.isLocal() && (!user.admin || net.server())){
                 button.add().growY();
 
                 float bs = (h) / 2f;
@@ -112,46 +114,53 @@ public class PlayerListFragment extends Fragment{
                 button.table(t -> {
                     t.defaults().size(bs);
 
-                    t.addImageButton(Icon.hammer, Styles.clearPartiali,
-                            () -> ui.showConfirm("$confirm", Core.bundle.format("confirmban",  user.name), () -> Call.onAdminRequest(user, AdminAction.ban)));
-                    t.addImageButton(Icon.cancel, Styles.clearPartiali,
-                            () -> ui.showConfirm("$confirm", Core.bundle.format("confirmkick",  user.name), () -> Call.onAdminRequest(user, AdminAction.kick)));
+                    t.button(Icon.hammer, Styles.clearPartiali,
+                    () -> {
+                        ui.showConfirm("$confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.onAdminRequest(user, AdminAction.ban));
+                    });
+                    t.button(Icon.cancel, Styles.clearPartiali,
+                    () -> {
+                        ui.showConfirm("$confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.onAdminRequest(user, AdminAction.kick));
+                    });
 
                     t.row();
 
-                    t.addImageButton(Icon.admin, Styles.clearTogglePartiali, () -> {
+                    t.button(Icon.admin, Styles.clearTogglePartiali, () -> {
                         if(net.client()) return;
 
-                        String id = user.uuid;
+                        String id = user.uuid();
 
                         if(netServer.admins.isAdmin(id, connection.address)){
-                            ui.showConfirm("$confirm", Core.bundle.format("confirmunadmin",  user.name), () -> netServer.admins.unAdminPlayer(id));
+                            ui.showConfirm("$confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> netServer.admins.unAdminPlayer(id));
                         }else{
-                            ui.showConfirm("$confirm", Core.bundle.format("confirmadmin",  user.name), () -> netServer.admins.adminPlayer(id, user.usid));
+                            ui.showConfirm("$confirm", Core.bundle.format("confirmadmin",  user.name()), () -> netServer.admins.adminPlayer(id, user.usid()));
                         }
-                    })
-                            .update(b -> b.setChecked(user.isAdmin))
-                            .disabled(b -> net.client())
-                            .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
-                            .checked(user.isAdmin);
+                    }).update(b -> b.setChecked(user.admin))
+                        .disabled(b -> net.client())
+                        .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
+                        .checked(user.admin);
 
-                    t.addImageButton(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
+                    t.button(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
-            }else if(!user.isLocal && !user.isAdmin && net.client() && playerGroup.size() >= 3 && player.getTeam() == user.getTeam()){ //votekick
+            }else if(!user.isLocal() && !user.admin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
                 button.add().growY();
 
-                button.addImageButton(Icon.hammer, Styles.clearPartiali,
-                        () -> ui.showConfirm("$confirm", Core.bundle.format("confirmvotekick",  user.name), () -> Call.sendChatMessage("/votekick " + user.name))).size(h);
+                button.button(Icon.hammer, Styles.clearPartiali,
+                () -> {
+                    ui.showConfirm("$confirm", Core.bundle.format("confirmvotekick",  user.name()), () -> {
+                        Call.sendChatMessage("/votekick " + user.name());
+                    });
+                }).size(h);
             }
 
             content.add(button).padBottom(-6).width(350f).maxHeight(h + 14);
             content.row();
-            content.addImage().height(4f).color(state.rules.pvp ? user.getTeam().color : Pal.gray).growX();
+            content.image().height(4f).color(state.rules.pvp ? user.team().color : Pal.gray).growX();
             content.row();
         });
 
-        if(sField.getText().length() > 0 && !playerGroup.all().contains(user -> user.name.toLowerCase().contains(sField.getText().toLowerCase()))) {
+        if(!found){
             content.add(Core.bundle.format("players.notfound")).padBottom(6).width(350f).maxHeight(h + 14);
         }
 

@@ -17,11 +17,10 @@ public class ControlsDialog extends KeybindDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", Icon.left, this::hide).size(230f, 64f);
+        buttons.button("$back", Icon.left, this::hide).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK)
-                hide();
+            if(key == KeyCode.escape || key == KeyCode.back) hide();
         });
     }
 }

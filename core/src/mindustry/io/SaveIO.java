@@ -1,16 +1,18 @@
 package mindustry.io;
 
+import arc.*;
+import arc.files.*;
 import arc.struct.*;
-import arc.files.Fi;
-import arc.util.io.CounterInputStream;
-import arc.util.io.FastDeflaterOutputStream;
-import mindustry.Vars;
+import arc.util.io.*;
+import mindustry.*;
+import mindustry.game.EventType.*;
+import mindustry.io.legacy.*;
 import mindustry.io.versions.*;
-import mindustry.world.WorldContext;
+import mindustry.world.*;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.zip.InflaterInputStream;
+import java.util.*;
+import java.util.zip.*;
 
 import static mindustry.Vars.*;
 
@@ -18,7 +20,7 @@ public class SaveIO{
     /** Format header. This is the string 'MSAV' in ASCII. */
     public static final byte[] header = {77, 83, 65, 86};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
-    public static final Array<SaveVersion> versionArray = Array.with(new Save1(), new Save2(), new Save3());
+    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4());
 
     static{
         for(SaveVersion version : versionArray){
@@ -141,7 +143,7 @@ public class SaveIO{
         }
     }
 
-    /** Loads from a deflated (!) input stream.*/
+    /** Loads from a deflated (!) input stream. */
     public static void load(InputStream is, WorldContext context) throws SaveException{
         try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();
@@ -150,6 +152,7 @@ public class SaveIO{
             SaveVersion ver = versions.get(version);
 
             ver.read(stream, counter, context);
+            Events.fire(new SaveLoadEvent());
         }catch(Exception e){
             throw new SaveException(e);
         }finally{

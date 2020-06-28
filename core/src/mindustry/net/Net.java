@@ -21,10 +21,9 @@ public class Net{
     private boolean server;
     private boolean active;
     private boolean clientLoaded;
-    private @Nullable
-    StreamBuilder currentStream;
+    private @Nullable StreamBuilder currentStream;
 
-    private final Array<Object> packetQueue = new Array<>();
+    private final Seq<Object> packetQueue = new Seq<>();
     private final ObjectMap<Class<?>, Cons> clientListeners = new ObjectMap<>();
     private final ObjectMap<Class<?>, Cons2<NetConnection, Object>> serverListeners = new ObjectMap<>();
     private final IntMap<StreamBuilder> streams = new IntMap<>();
@@ -57,7 +56,7 @@ public class Net{
                 error = Core.bundle.get("error.io");
             }else if(error.equals("mismatch")){
                 error = Core.bundle.get("error.mismatch");
-            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address")) || Strings.parseException(e, true).contains("address associated")){
+            }else if(error.contains("port out of range") || error.contains("invalid argument") || (error.contains("invalid") && error.contains("address")) || Strings.neatError(e).contains("address associated")){
                 error = Core.bundle.get("error.invalidaddress");
             }else if(error.contains("connection refused") || error.contains("route to host") || type.contains("unknownhost")){
                 error = Core.bundle.get("error.unreachable");
@@ -168,7 +167,7 @@ public class Net{
 
     /**
      * Starts discovering servers on a different thread.
-     * Callback is run on the main libGDX thread.
+     * Callback is run on the main Arc thread.
      */
     public void discoverServers(Cons<Host> cons, Runnable done){
         provider.discoverServers(cons, done);
@@ -252,7 +251,7 @@ public class Net{
                 Pools.free(object);
             }
         }else{
-            Log.err("Unhandled packet type: '{0}'!", object);
+            Log.err("Unhandled packet type: '@'!", object);
         }
     }
 
@@ -266,7 +265,7 @@ public class Net{
                 serverListeners.get(object.getClass()).get(connection, object);
             Pools.free(object);
         }else{
-            Log.err("Unhandled packet type: '{0}'!", object.getClass());
+            Log.err("Unhandled packet type: '@'!", object.getClass());
         }
     }
 

@@ -72,11 +72,16 @@ public class MapView extends Element implements GestureListener{
                     return false;
                 }
 
-                if(!mobile && button != KeyCode.MOUSE_LEFT && button != KeyCode.MOUSE_MIDDLE){
+                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
                     return true;
                 }
+                
+                if(button == KeyCode.mouseRight){
+                    lastTool = tool;
+                    tool = EditorTool.eraser;
+                }
 
-                if(button == KeyCode.MOUSE_MIDDLE){
+                if(button == KeyCode.mouseMiddle){
                     lastTool = tool;
                     tool = EditorTool.zoom;
                 }
@@ -102,7 +107,7 @@ public class MapView extends Element implements GestureListener{
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                if(!mobile && button != KeyCode.MOUSE_LEFT && button != KeyCode.MOUSE_MIDDLE){
+                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
                     return;
                 }
 
@@ -117,7 +122,7 @@ public class MapView extends Element implements GestureListener{
 
                 editor.flushOp();
 
-                if(button == KeyCode.MOUSE_MIDDLE && lastTool != null){
+                if((button == KeyCode.mouseMiddle || button == KeyCode.mouseRight) && lastTool != null){
                     tool = lastTool;
                     lastTool = null;
                 }
@@ -172,26 +177,26 @@ public class MapView extends Element implements GestureListener{
     public void act(float delta){
         super.act(delta);
 
-        if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) && !Core.input.keyDown(KeyCode.CONTROL_LEFT)){
+        if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) && !Core.input.keyDown(KeyCode.controlLeft)){
             float ax = Core.input.axis(Binding.move_x);
             float ay = Core.input.axis(Binding.move_y);
             offsetx -= ax * 15f / zoom;
             offsety -= ay * 15f / zoom;
         }
 
-        if(Core.input.keyTap(KeyCode.SHIFT_LEFT)){
+        if(Core.input.keyTap(KeyCode.shiftLeft)){
             lastTool = tool;
             tool = EditorTool.pick;
         }
 
-        if(Core.input.keyRelease(KeyCode.SHIFT_LEFT) && lastTool != null){
+        if(Core.input.keyRelease(KeyCode.shiftLeft) && lastTool != null){
             tool = lastTool;
             lastTool = null;
         }
 
         if(Core.scene.getScrollFocus() != this) return;
 
-        zoom += Core.input.axis(KeyCode.SCROLL) / 10f * zoom;
+        zoom += Core.input.axis(KeyCode.scroll) / 10f * zoom;
         clampZoom();
     }
 
@@ -236,7 +241,7 @@ public class MapView extends Element implements GestureListener{
 
         image.setImageSize(editor.width(), editor.height());
 
-        if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){
+        if(!ScissorStack.push(rect.set(x, y, width, height))){
             return;
         }
 
@@ -304,7 +309,7 @@ public class MapView extends Element implements GestureListener{
         Lines.rect(x, y, width, height);
         Draw.reset();
 
-        ScissorStack.popScissors();
+        ScissorStack.pop();
     }
 
     private boolean active(){

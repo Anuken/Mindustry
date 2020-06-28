@@ -43,8 +43,10 @@ public class MinimapFragment extends Fragment{
 
         elem.visible(() -> shown);
         elem.update(() -> {
-            elem.requestKeyboard();
-            elem.requestScroll();
+            if(!ui.chatfrag.shown()){
+                elem.requestKeyboard();
+                elem.requestScroll();
+            }
             elem.setFillParent(true);
             elem.setBounds(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
@@ -100,7 +102,7 @@ public class MinimapFragment extends Fragment{
             t.row();
             t.add().growY();
             t.row();
-            t.addImageTextButton("$back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
+            t.button("$back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
         });
     }
 

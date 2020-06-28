@@ -14,15 +14,15 @@ import mindustry.ui.Links.*;
 
 import static mindustry.Vars.*;
 
-public class AboutDialog extends FloatingDialog{
-    private Array<String> contributors = new Array<>();
+public class AboutDialog extends BaseDialog{
+    private Seq<String> contributors = new Seq<>();
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
 
     public AboutDialog(){
         super("$about.button");
 
         shown(() -> {
-            contributors = Array.with(Core.files.internal("contributors").readString("UTF-8").split("\n"));
+            contributors = Seq.with(Core.files.internal("contributors").readString("UTF-8").split("\n"));
             Core.app.post(this::setup);
         });
 
@@ -48,14 +48,14 @@ public class AboutDialog extends FloatingDialog{
             Table table = new Table(Tex.underline);
             table.margin(0);
             table.table(img -> {
-                img.addImage().height(h - 5).width(40f).color(link.color);
+                img.image().height(h - 5).width(40f).color(link.color);
                 img.row();
-                img.addImage().height(5).width(40f).color(link.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
+                img.image().height(5).width(40f).color(link.color.cpy().mul(0.8f, 0.8f, 0.8f, 1f));
             }).expandY();
 
             table.table(i -> {
                 i.background(Tex.buttonEdge3);
-                i.addImage(link.icon);
+                i.image(link.icon);
             }).size(h - 5, h);
 
             table.table(inset -> {
@@ -64,10 +64,10 @@ public class AboutDialog extends FloatingDialog{
                 inset.labelWrap(link.description).width(w - 100f).color(Color.lightGray).growX();
             }).padLeft(8);
 
-            table.addImageButton(Icon.link, () -> {
+            table.button(Icon.link, () -> {
                 if(link.name.equals("wiki")) Events.fire(Trigger.openWiki);
 
-                if(!Core.net.openURI(link.link)){
+                if(!Core.app.openURI(link.link)){
                     ui.showErrorMessage("$linkfail");
                     Core.app.setClipboardText(link.link);
                 }
@@ -82,7 +82,7 @@ public class AboutDialog extends FloatingDialog{
 
         addCloseButton();
 
-        buttons.addButton("$credits", this::showCredits).size(200f, 64f);
+        buttons.button("$credits", this::showCredits).size(200f, 64f);
 
         if(Core.graphics.isPortrait()){
             for(Cell<?> cell : buttons.getCells()){
@@ -93,12 +93,12 @@ public class AboutDialog extends FloatingDialog{
     }
 
     public void showCredits(){
-        FloatingDialog dialog = new FloatingDialog("$credits");
+        BaseDialog dialog = new BaseDialog("$credits");
         dialog.addCloseButton();
         dialog.cont.add("$credits.text").fillX().wrap().get().setAlignment(Align.center);
         dialog.cont.row();
         if(!contributors.isEmpty()){
-            dialog.cont.addImage().color(Pal.accent).fillX().height(3f).pad(3f);
+            dialog.cont.image().color(Pal.accent).fillX().height(3f).pad(3f);
             dialog.cont.row();
             dialog.cont.add("$contributors");
             dialog.cont.row();

@@ -5,29 +5,21 @@ import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.serialization.*;
 import com.squareup.javapoet.*;
-import mindustry.annotations.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.annotations.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic.*;
-import javax.tools.*;
 import java.util.*;
 
 @SupportedAnnotationTypes("mindustry.annotations.Annotations.StyleDefaults")
 public class AssetsProcess extends BaseProcessor{
-    private String path;
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
-        path = Fi.get(BaseProcessor.filer.createResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-        .toUri().toURL().toString().substring(System.getProperty("os.name").contains("Windows") ? 6 : "file:".length()))
-        .parent().parent().parent().parent().parent().parent().toString();
-        path = path.replace("%20", " ");
-
-        processSounds("Sounds", path + "/assets/sounds", "arc.audio.Sound");
-        processSounds("Musics", path + "/assets/music", "arc.audio.Music");
+        processSounds("Sounds", rootDirectory + "/core/assets/sounds", "arc.audio.Sound");
+        processSounds("Musics", rootDirectory + "/core/assets/music", "arc.audio.Music");
         processUI(env.getElementsAnnotatedWith(StyleDefaults.class));
     }
 
@@ -38,8 +30,8 @@ public class AssetsProcess extends BaseProcessor{
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder loadStyles = MethodSpec.methodBuilder("loadStyles").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        String resources = path + "/assets-raw/sprites/ui";
-        Jval icons = Jval.read(Fi.get(path + "/assets-raw/fontgen/config.json").readString());
+        String resources = rootDirectory + "/core/assets-raw/sprites/ui";
+        Jval icons = Jval.read(Fi.get(rootDirectory + "/core/assets-raw/fontgen/config.json").readString());
 
         ictype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectMap.class, String.class, TextureRegionDrawable.class),
                 "icons", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectMap<>()").build());
@@ -77,7 +69,7 @@ public class AssetsProcess extends BaseProcessor{
         });
 
         for(Element elem : elements){
-            Array.with(((TypeElement)elem).getEnclosedElements()).each(e -> e.getKind() == ElementKind.FIELD, field -> {
+            Seq.with(((TypeElement)elem).getEnclosedElements()).each(e -> e.getKind() == ElementKind.FIELD, field -> {
                 String fname = field.getSimpleName().toString();
                 if(fname.startsWith("default")){
                     loadStyles.addStatement("arc.Core.scene.addStyle(" + field.asType().toString() + ".class, mindustry.ui.Styles." + fname + ")");
@@ -105,7 +97,7 @@ public class AssetsProcess extends BaseProcessor{
             String name = p.nameWithoutExtension();
 
             if(names.contains(name)){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Duplicate file name: " + p.toString() + "!");
+                BaseProcessor.err("Duplicate file name: " + p.toString() + "!");
             }else{
                 names.add(name);
             }

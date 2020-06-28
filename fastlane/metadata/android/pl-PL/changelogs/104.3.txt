@@ -1,0 +1,6 @@
+- Optymalizacja przenośników
+- Ekstraktor bierze po równo przedmioty z przylegających bloków
+- Utworzono kategorie serwerów (dodane dzięki @Quezler)
+- Dodano funckję require()  dla skryptów (dodane dzięki @DeltaNedas)
+- Dodano gradient kolorystyczny dla statusu baterii (dodane dzięki @Arkanic)
+- Zmieniono ładowanie skryptów: dla modów z więcej niż jednym plikiem skryptowym, główny plik musi nazywać się "main.js" oraz musi zawierać require() do pozostałych plików

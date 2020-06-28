@@ -58,7 +58,7 @@ public class ArcNetProvider implements NetProvider{
                 Core.app.post(() -> {
                     try{
                         net.handleClientReceived(object);
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         handleException(e);
                     }
                 });
@@ -85,7 +85,7 @@ public class ArcNetProvider implements NetProvider{
                 Connect c = new Connect();
                 c.addressTCP = ip;
 
-                Log.debug("&bRecieved connection: {0}", c.addressTCP);
+                Log.debug("&bRecieved connection: @", c.addressTCP);
 
                 connections.add(kn);
                 Core.app.post(() -> net.handleServerReceived(kn, c));
@@ -113,9 +113,7 @@ public class ArcNetProvider implements NetProvider{
                 Core.app.post(() -> {
                     try{
                         net.handleServerReceived(k, object);
-                    }catch(RuntimeException e){
-                        e.printStackTrace();
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         e.printStackTrace();
                     }
                 });
@@ -200,7 +198,7 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void discoverServers(Cons<Host> callback, Runnable done){
-        Array<InetAddress> foundAddresses = new Array<>();
+        Seq<InetAddress> foundAddresses = new Seq<>();
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
             Core.app.post(() -> {
                 try{
@@ -267,7 +265,7 @@ public class ArcNetProvider implements NetProvider{
         return null;
     }
 
-    private void handleException(Exception e){
+    private void handleException(Throwable e){
         if(e instanceof ArcNetException){
             Core.app.post(() -> net.showError(new IOException("mismatch")));
         }else if(e instanceof ClosedChannelException){
@@ -341,7 +339,6 @@ public class ArcNetProvider implements NetProvider{
 
     @SuppressWarnings("unchecked")
     public static class PacketSerializer implements NetSerializer{
-        static Cons2<Packet, ByteBuffer> writer = Packet::write;
 
         @Override
         public Object read(ByteBuffer byteBuffer){
@@ -361,13 +358,11 @@ public class ArcNetProvider implements NetProvider{
                 byteBuffer.put((byte)-2); //code for framework message
                 writeFramework(byteBuffer, (FrameworkMessage)o);
             }else{
-                if(!(o instanceof Packet))
-                    throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
+                if(!(o instanceof Packet)) throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
                 byte id = Registrator.getID(o.getClass());
-                if(id == -1)
-                    throw new RuntimeException("Unregistered class: " + o.getClass());
+                if(id == -1) throw new RuntimeException("Unregistered class: " + o.getClass());
                 byteBuffer.put(id);
-                writer.get((Packet)o, byteBuffer);
+                ((Packet)o).write(byteBuffer);
             }
         }
 

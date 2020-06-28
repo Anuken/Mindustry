@@ -2,23 +2,23 @@ package mindustry.world.meta;
 
 import arc.struct.OrderedMap;
 import arc.func.Func;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.ui.Bar;
 
 public class BlockBars{
-    private OrderedMap<String, Func<TileEntity, Bar>> bars = new OrderedMap<>();
+    private OrderedMap<String, Func<Building, Bar>> bars = new OrderedMap<>();
 
-    public void add(String name, Func<TileEntity, Bar> sup){
-        bars.put(name, sup);
+    public <T extends Building> void add(String name, Func<T, Bar> sup){
+        bars.put(name, (Func<Building, Bar>)sup);
     }
 
     public void remove(String name){
         if(!bars.containsKey(name))
-            throw new RuntimeException("No bar with name '" + name + "' found; current bars: " + bars.keys().toArray());
+            throw new RuntimeException("No bar with name '" + name + "' found; current bars: " + bars.keys().toSeq());
         bars.remove(name);
     }
 
-    public Iterable<Func<TileEntity, Bar>> list(){
+    public Iterable<Func<Building, Bar>> list(){
         return bars.values();
     }
 }

@@ -1,24 +1,20 @@
 package mindustry.graphics;
 
-import arc.Core;
-import arc.struct.Array;
-import arc.func.Floatc2;
-import arc.graphics.Camera;
-import arc.graphics.Color;
+import arc.*;
+import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.FrameBuffer;
+import arc.graphics.gl.*;
 import arc.math.*;
-import arc.scene.ui.layout.Scl;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.noise.RidgedPerlin;
-import arc.util.noise.Simplex;
-import mindustry.content.Blocks;
-import mindustry.content.UnitTypes;
-import mindustry.type.UnitType;
-import mindustry.ui.Cicon;
+import arc.util.noise.*;
+import mindustry.content.*;
+import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.Floor;
-import mindustry.world.blocks.OreBlock;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
@@ -40,12 +36,13 @@ public class MenuRenderer implements Disposable{
         Time.mark();
         generate();
         cache();
-        Log.info("Time to generate menu: {0}", Time.elapsed());
+        Log.info("Time to generate menu: @", Time.elapsed());
     }
 
     private void generate(){
-        Tile[][] tiles = world.createTiles(width, height);
-        Array<Block> ores = content.blocks().select(b -> b instanceof OreBlock);
+        world.beginMapLoad();
+        Tiles tiles = world.resize(width, height);
+        Seq<Block> ores = content.blocks().select(b -> b instanceof OreBlock);
         shadows = new FrameBuffer(width, height);
         int offset = Mathf.random(100000);
         Simplex s1 = new Simplex(offset);
@@ -155,14 +152,16 @@ public class MenuRenderer implements Disposable{
                 }
 
                 Tile tile;
-                tiles[x][y] = (tile = new CachedTile());
+                tiles.set(x, y, (tile = new CachedTile()));
                 tile.x = (short)x;
                 tile.y = (short)y;
-                tile.setFloor((Floor) floor);
+                tile.setFloor(floor.asFloor());
                 tile.setBlock(wall);
                 tile.setOverlay(ore);
             }
         }
+
+        world.endMapLoad();
     }
 
     private void cache(){
@@ -171,47 +170,34 @@ public class MenuRenderer implements Disposable{
         Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
         shadows.begin(Color.clear);
         Draw.color(Color.black);
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                if(world.rawTile(x, y).block() != Blocks.air){
-                    Fill.rect(x + 0.5f, y + 0.5f, 1, 1);
-                }
+
+        for(Tile tile : world.tiles){
+            if(tile.block() != Blocks.air){
+                Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
         }
+
         Draw.color();
         shadows.end();
 
-        SpriteBatch prev = Core.batch;
+        Batch prev = Core.batch;
 
         Core.batch = batch = new CacheBatch(new SpriteCache(width * height * 6, false));
         batch.beginCache();
 
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = world.rawTile(x, y);
-                tile.floor().draw(tile);
-            }
+        for(Tile tile : world.tiles){
+            tile.floor().drawBase(tile);
         }
 
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = world.rawTile(x, y);
-                if(tile.overlay() != Blocks.air){
-                    tile.overlay().draw(tile);
-                }
-            }
+        for(Tile tile : world.tiles){
+            tile.overlay().drawBase(tile);
         }
 
         cacheFloor = batch.endCache();
         batch.beginCache();
 
-        for(int x = 0; x < width; x++){
-            for(int y = 0; y < height; y++){
-                Tile tile = world.rawTile(x, y);
-                if(tile.block() != Blocks.air){
-                    tile.block().draw(tile);
-                }
-            }
+        for(Tile tile : world.tiles){
+            tile.block().drawBase(tile);
         }
 
         cacheWall = batch.endCache();
@@ -228,8 +214,8 @@ public class MenuRenderer implements Disposable{
 
         mat.set(Draw.proj());
         Draw.flush();
-        Draw.proj(camera.projection());
-        batch.setProjection(camera.projection());
+        Draw.proj(camera);
+        batch.setProjection(camera.mat);
         batch.beginDraw();
         batch.drawCache(cacheFloor);
         batch.endDraw();
@@ -251,6 +237,8 @@ public class MenuRenderer implements Disposable{
     }
 
     private void drawFlyers(){
+        //TODO fix
+        if(true) return;
         Draw.color(0f, 0f, 0f, 0.4f);
 
         TextureRegion icon = flyerType.icon(Cicon.full);

@@ -1,6 +1,7 @@
 package mindustry.android;
 
 import android.*;
+import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
@@ -68,7 +69,7 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public org.mozilla.javascript.Context getScriptContext(){
+            public rhino.Context getScriptContext(){
                 return AndroidRhinoContext.enter(getContext().getCacheDir());
             }
 
@@ -144,9 +145,9 @@ public class AndroidLauncher extends AndroidApplication{
 
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
-            depth = 0;
             hideStatusBar = true;
             errorHandler = CrashSender::log;
+            stencil = 8;
         }});
         checkFiles(getIntent());
 

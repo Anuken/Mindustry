@@ -1,6 +1,3 @@
-apply plugin: "java"
-
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
 project.ext.mainClassName = "mindustry.server.ServerLauncher"
@@ -33,22 +30,18 @@ task debug(dependsOn: classes, type: JavaExec){
     debug = true
 }
 
-task dist(type: Jar){
+task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from{ configurations.compile.collect{ zipTree(it) } }
+    from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
     from files(project.assetsDir)
     exclude("sprites/**")
     exclude("music/**")
     exclude("sounds/**")
     exclude("fonts/**")
     exclude("zones/**")
-    exclude("com/badlogic/gdx/**")
     exclude("icons/**")
     exclude("bundles/**")
-    if(!versionModifier.contains("steam")){
-        exclude("**.dll", "**.so", "**.dylib")
-    }
 
     manifest{
         attributes 'Main-Class': project.mainClassName

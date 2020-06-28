@@ -2,11 +2,14 @@ package mindustry.net;
 
 import arc.*;
 import arc.struct.*;
+import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.core.*;
 import mindustry.io.*;
 
+import java.io.*;
 import java.nio.*;
+import java.util.zip.*;
 
 /**
  * Class for storing all packets.
@@ -65,31 +68,29 @@ public class Packets{
     }
 
     public static class InvokePacket implements Packet{
+        private static ReusableByteInStream bin;
+        private static Reads read = new Reads(new DataInputStream(bin = new ReusableByteInStream()));
+
         public byte type, priority;
 
-        public ByteBuffer writeBuffer;
-        public int writeLength;
+        public byte[] bytes;
+        public int length;
 
         @Override
         public void read(ByteBuffer buffer){
             type = buffer.get();
             priority = buffer.get();
-            writeLength = buffer.getShort();
-            byte[] bytes = new byte[writeLength];
+            short writeLength = buffer.getShort();
+            bytes = new byte[writeLength];
             buffer.get(bytes);
-            writeBuffer = ByteBuffer.wrap(bytes);
         }
 
         @Override
         public void write(ByteBuffer buffer){
             buffer.put(type);
             buffer.put(priority);
-            buffer.putShort((short)writeLength);
-
-            writeBuffer.position(0);
-            for(int i = 0; i < writeLength; i++){
-                buffer.put(writeBuffer.get());
-            }
+            buffer.putShort((short)length);
+            buffer.put(bytes, 0, length);
         }
 
         @Override
@@ -105,6 +106,11 @@ public class Packets{
         @Override
         public boolean isUnimportant(){
             return priority == 2;
+        }
+
+        public Reads reader(){
+            bin.setBytes(bytes);
+            return read;
         }
     }
 
@@ -153,7 +159,7 @@ public class Packets{
     public static class ConnectPacket implements Packet{
         public int version;
         public String versionType;
-        public Array<String> mods;
+        public Seq<String> mods;
         public String name, uuid, usid;
         public boolean mobile;
         public int color;
@@ -164,9 +170,14 @@ public class Packets{
             TypeIO.writeString(buffer, versionType);
             TypeIO.writeString(buffer, name);
             TypeIO.writeString(buffer, usid);
-            buffer.put(mobile ? (byte)1 : 0);
+
             buffer.put(Base64Coder.decode(uuid));
-            buffer.put((byte)color);
+            CRC32 crc = new CRC32();
+            crc.update(Base64Coder.decode(uuid));
+            buffer.putLong(crc.getValue());
+
+            buffer.put(mobile ? (byte)1 : 0);
+            buffer.putInt(color);
             buffer.put((byte)mods.size);
             for(int i = 0; i < mods.size; i++){
                 TypeIO.writeString(buffer, mods.get(i));
@@ -179,13 +190,13 @@ public class Packets{
             versionType = TypeIO.readString(buffer);
             name = TypeIO.readString(buffer);
             usid = TypeIO.readString(buffer);
-            mobile = buffer.get() == 1;
-            color = buffer.getInt();
             byte[] idbytes = new byte[16];
             buffer.get(idbytes);
             uuid = new String(Base64Coder.encode(idbytes));
+            mobile = buffer.get() == 1;
+            color = buffer.getInt();
             int totalMods = buffer.get();
-            mods = new Array<>(totalMods);
+            mods = new Seq<>(totalMods);
             for(int i = 0; i < totalMods; i++){
                 mods.add(TypeIO.readString(buffer));
             }

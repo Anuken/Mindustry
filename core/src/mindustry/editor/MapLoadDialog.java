@@ -10,7 +10,7 @@ import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.maps;
 
-public class MapLoadDialog extends FloatingDialog{
+public class MapLoadDialog extends BaseDialog{
     private Map selected = null;
 
     public MapLoadDialog(Cons<Map> loader){
@@ -28,7 +28,7 @@ public class MapLoadDialog extends FloatingDialog{
         });
 
         buttons.defaults().size(200f, 50f);
-        buttons.addButton("$cancel", this::hide);
+        buttons.button("$cancel", this::hide);
         buttons.add(button);
     }
 

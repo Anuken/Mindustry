@@ -1,12 +1,11 @@
 package mindustry.world.blocks.defense;
 
-import arc.Core;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import arc.math.Mathf;
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.meta.BlockGroup;
+import arc.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class Wall extends Block{
     public int variants = 0;
@@ -34,21 +33,24 @@ public class Wall extends Block{
     }
 
     @Override
-    public void draw(Tile tile){
-        if(variants == 0){
-            Draw.rect(region, tile.drawx(), tile.drawy());
-        }else{
-            Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.drawx(), tile.drawy());
-        }
-    }
-
-    @Override
-    public TextureRegion[] generateIcons(){
+    public TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) && health > other.health;
+        return super.canReplace(other) && health > other.health && size == other.size;
+    }
+
+    public class WallEntity extends Building{
+
+        @Override
+        public void draw(){
+            if(variants == 0){
+                Draw.rect(region, x, y);
+            }else{
+                Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], x, y);
+            }
+        }
     }
 }

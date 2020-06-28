@@ -1,8 +1,7 @@
 package mindustry.world.blocks.liquid;
 
-import mindustry.type.Liquid;
-import mindustry.world.Tile;
-import mindustry.world.blocks.LiquidBlock;
+import mindustry.gen.*;
+import mindustry.type.*;
 
 public class LiquidRouter extends LiquidBlock{
 
@@ -10,16 +9,17 @@ public class LiquidRouter extends LiquidBlock{
         super(name);
     }
 
-    @Override
-    public void update(Tile tile){
-
-        if(tile.entity.liquids.total() > 0.01f){
-            tryDumpLiquid(tile, tile.entity.liquids.current());
+    public class LiquidRouterEntity extends LiquidBlockEntity{
+        @Override
+        public void updateTile(){
+            if(liquids.total() > 0.01f){
+                dumpLiquid(liquids.current());
+            }
         }
-    }
 
-    @Override
-    public boolean acceptLiquid(Tile tile, Tile source, Liquid liquid, float amount){
-        return tile.entity.liquids.get(liquid) + amount < liquidCapacity && (tile.entity.liquids.current() == liquid || tile.entity.liquids.get(tile.entity.liquids.current()) < 0.2f);
+        @Override
+        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+            return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.currentAmount() < 0.2f);
+        }
     }
 }

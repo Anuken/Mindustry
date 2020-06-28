@@ -1,16 +1,14 @@
 package mindustry.type;
 
-import arc.struct.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.entities.*;
-import mindustry.entities.Effects.*;
-import mindustry.entities.type.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 
 public class StatusEffect extends MappableContent{
     /** Damage dealt by the unit with the effect. */
@@ -21,6 +19,8 @@ public class StatusEffect extends MappableContent{
     public float speedMultiplier = 1f;
     /** Damage per frame. */
     public float damage;
+    /** If true, the effect never disappears. */
+    public boolean permanent;
     /** Tint color of effect. */
     public Color color = Color.white.cpy();
     /** Effect that happens randomly on top of the affected unit. */
@@ -46,13 +46,13 @@ public class StatusEffect extends MappableContent{
     /** Runs every tick on the affected unit while time is greater than 0. */
     public void update(Unit unit, float time){
         if(damage > 0){
-            unit.damagePeriodic(damage);
+            unit.damageContinuousPierce(damage);
         }else if(damage < 0){ //heal unit
-            unit.healBy(damage * Time.delta());
+            unit.heal(damage * Time.delta());
         }
 
-        if(effect != Fx.none && Mathf.chance(Time.delta() * 0.15f)){
-            Effects.effect(effect, unit.x + Mathf.range(unit.getSize() / 2f), unit.y + Mathf.range(unit.getSize() / 2f));
+        if(effect != Fx.none && Mathf.chanceDelta(0.15f)){
+            effect.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
         }
     }
 
@@ -71,6 +71,10 @@ public class StatusEffect extends MappableContent{
                 result.set(sup, newTime);
             });
         }
+    }
+
+    public void draw(Unit unit){
+
     }
 
     public boolean reactsWith(StatusEffect effect){

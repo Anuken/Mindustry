@@ -19,6 +19,8 @@ public class FileTree implements FileHandleResolver{
             return files.get(path);
         }else if(files.containsKey("/" + path)){
             return files.get("/" + path);
+        }else if(Core.files == null){ //headless
+            return Fi.get(path);
         }else{
             return Core.files.internal(path);
         }

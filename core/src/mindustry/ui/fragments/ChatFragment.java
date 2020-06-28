@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class ChatFragment extends Table{
     private final static int messagesShown = 10;
-    private Array<ChatMessage> messages = new Array<>();
+    private Seq<ChatMessage> messages = new Seq<>();
     private float fadetime;
     private boolean shown = false;
     private TextField chatfield;
@@ -32,7 +32,7 @@ public class ChatFragment extends Table{
     private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
     private float textspacing = Scl.scl(10);
-    private Array<String> history = new Array<>();
+    private Seq<String> history = new Seq<>();
     private int historyPos = 0;
     private int scrollPos = 0;
     private Fragment container = new Fragment(){
@@ -62,7 +62,7 @@ public class ChatFragment extends Table{
 
         update(() -> {
 
-            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
+            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null || ui.minimapfrag.shown())){
                 toggle();
             }
 
@@ -246,7 +246,7 @@ public class ChatFragment extends Table{
             if(sender == null){ //no sender, this is a server message?
                 formattedMessage = message;
             }else{
-                formattedMessage = "[CORAL][[" + sender + "[CORAL]]:[WHITE] " + message;
+                formattedMessage = "[coral][[" + sender + "[coral]]:[white] " + message;
             }
         }
     }

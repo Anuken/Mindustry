@@ -5,7 +5,6 @@ import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -69,15 +68,30 @@ public class JsonIO{
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
 
-        json.setSerializer(Zone.class, new Serializer<Zone>(){
+        //TODO this is terrible
+
+        json.setSerializer(Sector.class, new Serializer<Sector>(){
             @Override
-            public void write(Json json, Zone object, Class knownType){
+            public void write(Json json, Sector object, Class knownType){
+                json.writeValue(object.planet.name + "-" + object.id);
+            }
+
+            @Override
+            public Sector read(Json json, JsonValue jsonData, Class type){
+                String[] split = jsonData.asString().split("-");
+                return Vars.content.<Planet>getByName(ContentType.planet, split[0]).sectors.get(Integer.parseInt(split[1]));
+            }
+        });
+
+        json.setSerializer(SectorPreset.class, new Serializer<SectorPreset>(){
+            @Override
+            public void write(Json json, SectorPreset object, Class knownType){
                 json.writeValue(object.name);
             }
 
             @Override
-            public Zone read(Json json, JsonValue jsonData, Class type){
-                return Vars.content.getByName(ContentType.zone, jsonData.asString());
+            public SectorPreset read(Json json, JsonValue jsonData, Class type){
+                return Vars.content.getByName(ContentType.sector, jsonData.asString());
             }
         });
 
@@ -115,7 +129,20 @@ public class JsonIO{
 
             @Override
             public Block read(Json json, JsonValue jsonData, Class type){
-                return Vars.content.getByName(ContentType.block, jsonData.asString());
+                Block block = Vars.content.getByName(ContentType.block, jsonData.asString());
+                return block == null ? Blocks.air : block;
+            }
+        });
+
+        json.setSerializer(Weather.class, new Serializer<Weather>(){
+            @Override
+            public void write(Json json, Weather object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Weather read(Json json, JsonValue jsonData, Class type){
+                return Vars.content.getByName(ContentType.weather, jsonData.asString());
             }
         });
 
