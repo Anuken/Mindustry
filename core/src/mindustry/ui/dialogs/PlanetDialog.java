@@ -32,6 +32,7 @@ import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private final FrameBuffer buffer = new FrameBuffer(2, 2, true);
     private final PlanetRenderer planets = renderer.planets;
+    private final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
     private final Table stable  = new Table().background(Styles.black3);
 
     private int launchRange;
@@ -331,7 +332,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     return;
                 }
 
-                hide();
+                boolean shouldHide = true;
 
                 //save before launch.
                 if(control.saves.getCurrent() != null && state.isGame()){
@@ -344,14 +345,19 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
 
                 if(mode == launch){
-                    control.handleLaunch(launcher);
-                    zoom = 0.5f;
+                    shouldHide = false;
+                    loadouts.show((CoreBlock)launcher.block, launcher, () -> {
+                        control.handleLaunch(launcher);
+                        zoom = 0.5f;
 
-                    ui.hudfrag.showLaunchDirect();
-                    Time.runTask(launchDuration, () -> control.playSector(sector));
+                        ui.hudfrag.showLaunchDirect();
+                        Time.runTask(launchDuration, () -> control.playSector(sector));
+                    });
                 }else{
                     control.playSector(sector);
                 }
+
+                if(shouldHide) hide();
             }).growX().padTop(2f).height(50f).minWidth(170f);
         }
 

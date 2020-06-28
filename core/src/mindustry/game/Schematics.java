@@ -55,6 +55,7 @@ public class Schematics implements Loadable{
     private Seq<Schematic> all = new Seq<>();
     private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
     private ObjectSet<Schematic> errored = new ObjectSet<>();
+    private ObjectMap<CoreBlock, Seq<Schematic>> loadouts = new ObjectMap<>();
     private FrameBuffer shadowBuffer;
     private Texture errorTexture;
     private long lastClearTime;
@@ -85,6 +86,8 @@ public class Schematics implements Loadable{
     public void load(){
         all.clear();
 
+        loadLoadouts();
+
         for(Fi file : schematicDirectory.list()){
             loadFile(file);
         }
@@ -107,6 +110,10 @@ public class Schematics implements Loadable{
 
         //load base schematics
         bases.load();
+    }
+
+    private void loadLoadouts(){
+        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s,false));
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){
@@ -136,6 +143,7 @@ public class Schematics implements Loadable{
         try{
             Schematic s = read(file);
             all.add(s);
+            checkLoadout(s, true);
 
             //external file from workshop
             if(!s.file.parent().equals(schematicDirectory)){
@@ -275,6 +283,22 @@ public class Schematics implements Loadable{
             .removeAll(s -> !s.block.isVisible() || !s.block.unlockedNow());
     }
 
+    /** @return all the valid loadouts for a specific core type. */
+    public Seq<Schematic> getLoadouts(CoreBlock block){
+        return loadouts.get(block, Seq::new);
+    }
+
+    /** Checks a schematic for deployment validity and adds it to the cache. */
+    private void checkLoadout(Schematic s, boolean validate){
+        Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
+
+        //make sure a core exists, and that the schematic is small enough.
+        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2))) return;
+
+        //place in the cache
+        loadouts.get((CoreBlock)core.block, Seq::new).add(s);
+    }
+
     /** Adds a schematic to the list, also copying it into the files.*/
     public void add(Schematic schematic){
         all.add(schematic);
@@ -286,11 +310,14 @@ public class Schematics implements Loadable{
             ui.showException(e);
             Log.err(e);
         }
+
+        checkLoadout(schematic, true);
         all.sort();
     }
 
     public void remove(Schematic s){
         all.remove(s);
+        loadouts.each((block, seq) -> seq.remove(s));
         if(s.file != null){
             s.file.delete();
         }

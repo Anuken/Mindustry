@@ -70,7 +70,7 @@ public class SchematicsDialog extends BaseDialog{
             });
 
             rebuildPane[0] = () -> {
-                int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
+                int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
 
                 t.clear();
                 int i = 0;
@@ -153,7 +153,7 @@ public class SchematicsDialog extends BaseDialog{
 
                     sel[0].getStyle().up = Tex.pane;
 
-                    if(++i % maxwidth == 0){
+                    if(++i % cols == 0){
                         t.row();
                     }
                 }

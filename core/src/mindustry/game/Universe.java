@@ -10,6 +10,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.io.*;
 import mindustry.type.*;
+import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -19,6 +20,7 @@ public class Universe{
     private float secondCounter;
     private int turn;
     private float turnCounter;
+    private Schematic lastLoadout = Loadouts.basicShard;
 
     public Universe(){
         load();
@@ -71,6 +73,31 @@ public class Universe{
             state.rules.ambientLight.a = 1f - alpha;
             state.rules.lighting = !Mathf.equal(alpha, 1f);
         }
+    }
+
+    /** Updates selected loadout for future deployment. */
+    public void updateLoadout(CoreBlock block, Schematic schem){
+        Core.settings.put("lastloadout-" + block.name, schem.file == null ? "" : schem.file.nameWithoutExtension());
+        lastLoadout = schem;
+    }
+
+    public Schematic getLastLoadout(){
+        return lastLoadout;
+    }
+
+    /** @return the last selected loadout for this specific core type. */
+    public Schematic getLoadout(CoreBlock core){
+        //for tools - schem
+        if(schematics == null) return Loadouts.basicShard;
+
+        //find last used loadout file name
+        String file = Core.settings.getString("lastloadout-" + core.name, "");
+
+        //use default (first) schematic if not found
+        Seq<Schematic> all = schematics.getLoadouts(core);
+        Schematic schem = all.find(s -> s.file != null && s.file.nameWithoutExtension().equals(file));
+
+        return schem == null ? all.first() : schem;
     }
 
     public int[] getTotalExports(){

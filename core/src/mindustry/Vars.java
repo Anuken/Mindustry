@@ -36,6 +36,8 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
+    /** Maximum extra padding around deployment schematics. */
+    public static final int maxLoadoutSchematicPad = 4;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/

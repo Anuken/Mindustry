@@ -54,8 +54,7 @@ public class FileMapGenerator implements WorldGenerator{
             }
 
             if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
-                //TODO PLACE THE (CORRECT) LOADOUT
-                Schematics.placeLoadout(Loadouts.basicShard, tile.x, tile.y);
+                Schematics.placeLoadout(universe.getLastLoadout(), tile.x, tile.y);
                 anyCores = true;
             }
 

@@ -116,6 +116,13 @@ public class ItemModule extends BlockModule{
         return true;
     }
 
+    public boolean has(Iterable<ItemStack> stacks){
+        for(ItemStack stack : stacks){
+            if(!has(stack.item, stack.amount)) return false;
+        }
+        return true;
+    }
+
     public boolean has(ItemStack[] stacks, float multiplier){
         for(ItemStack stack : stacks){
             if(!has(stack.item, Math.round(stack.amount * multiplier))) return false;

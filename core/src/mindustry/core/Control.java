@@ -43,7 +43,7 @@ import static mindustry.Vars.*;
  */
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
-    public mindustry.audio.MusicControl music;
+    public MusicControl music;
     public Tutorial tutorial;
     public InputHandler input;
 
@@ -265,6 +265,7 @@ public class Control implements ApplicationListener, Loadable{
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
+                    //TODO this is broken?
                     if(state.rules.defaultTeam.cores().isEmpty()){
 
                         //kill all friendly units, since they should be dead anwyay
@@ -276,7 +277,7 @@ public class Control implements ApplicationListener, Loadable{
 
                         Tile spawn = world.tile(sector.getSpawnPosition());
                         //TODO PLACE CORRECT LOADOUT
-                        Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+                        Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
 
                         //set up camera/player locations
                         player.set(spawn.x * tilesize, spawn.y * tilesize);
