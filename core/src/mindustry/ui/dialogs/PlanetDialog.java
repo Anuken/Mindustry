@@ -18,7 +18,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
-import mindustry.graphics.g3d.PlanetRenderer.*;
 import mindustry.type.*;
 import mindustry.type.Sector.*;
 import mindustry.ui.*;

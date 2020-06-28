@@ -251,6 +251,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //remove schematic requirements from core
         tile.items.remove(universe.getLastLoadout().requirements());
+        tile.items.remove(universe.getLaunchResources());
     }
 
     public void playSector(Sector sector){

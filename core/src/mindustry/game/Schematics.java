@@ -399,6 +399,13 @@ public class Schematics implements Loadable{
         }
     }
 
+    /** Places the last launch loadout at the coordinates and fills it with the launch resources. */
+    public static void placeLaunchLoadout(int x, int y){
+        placeLoadout(universe.getLastLoadout(), x, y);
+        if(world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
+        world.tile(x, y).build.items.add(universe.getLaunchResources());
+    }
+
     public static void placeLoadout(Schematic schem, int x, int y){
         placeLoadout(schem, x, y, state.rules.defaultTeam, Blocks.oreCopper);
     }

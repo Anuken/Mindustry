@@ -207,6 +207,12 @@ public class ItemModule extends BlockModule{
         items[item.id] = amount;
     }
 
+    public void add(Iterable<ItemStack> stacks){
+        for(ItemStack stack : stacks){
+            add(stack.item, stack.amount);
+        }
+    }
+
     public void add(Item item, int amount){
         add(item.id, amount);
     }

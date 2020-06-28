@@ -20,7 +20,9 @@ public class Universe{
     private float secondCounter;
     private int turn;
     private float turnCounter;
+
     private Schematic lastLoadout = Loadouts.basicShard;
+    private Seq<ItemStack> lastLaunchResources = new Seq<>();
 
     public Universe(){
         load();
@@ -73,6 +75,16 @@ public class Universe{
             state.rules.ambientLight.a = 1f - alpha;
             state.rules.lighting = !Mathf.equal(alpha, 1f);
         }
+    }
+
+    public Seq<ItemStack> getLaunchResources(){
+        lastLaunchResources = Core.settings.getJson("launch-resources", Seq.class, ItemStack.class, Seq::new);
+        return lastLaunchResources;
+    }
+
+    public void updateLaunchResources(Seq<ItemStack> stacks){
+        this.lastLaunchResources = stacks;
+        Core.settings.putJson("launch-resources", ItemStack.class, lastLaunchResources);
     }
 
     /** Updates selected loadout for future deployment. */
