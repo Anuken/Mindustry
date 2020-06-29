@@ -109,7 +109,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     boolean canLaunch(Sector sector){
-        return mode == launch && sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2);
+        return mode == launch &&
+            (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
+            //TODO completely untested
+            || (sector.preset != null && sector.preset.unlocked() && sector.preset.requirements.contains(r -> r.zone() != null && r.zone() == sector.preset))); //is an unlocked preset
     }
 
     @Override
@@ -308,7 +311,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 t.left();
 
                 t.table(res -> {
-                    ObjectIntMap<Item> map = sector.save.meta.secinfo.getCurrentItems(sector.getTurnsPassed());
+                    ObjectIntMap<Item> map = sector.save.meta.secinfo.getCurrentItems(sector);
 
                     int i = 0;
                     for(Item item : content.items()){
@@ -355,6 +358,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
 
                 if(mode == launch && !sector.hasBase()){
+                    Sector current = state.rules.sector;
                     shouldHide = false;
                     loadouts.show((CoreBlock)launcher.block, launcher, () -> {
                         control.handleLaunch(launcher);
@@ -362,7 +366,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         zoom = 0.5f;
 
                         ui.hudfrag.showLaunchDirect();
-                        Time.runTask(launchDuration, () -> control.playSector(sector));
+                        Time.runTask(launchDuration, () -> control.playSector(current, sector));
                     });
                 }else{
                     control.playSector(sector);

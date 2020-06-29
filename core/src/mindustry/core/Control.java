@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -255,6 +256,10 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playSector(Sector sector){
+        playSector(sector, sector);
+    }
+
+    public void playSector(@Nullable Sector origin, Sector sector){
         ui.loadAnd(() -> {
             ui.planet.hide();
             SaveSlot slot = sector.save;
@@ -294,7 +299,7 @@ public class Control implements ApplicationListener, Loadable{
                     sector.save = null;
                     Time.runTask(10f, () -> ui.showErrorMessage("$save.corrupted"));
                     slot.delete();
-                    playSector(sector);
+                    playSector(origin, sector);
                 }
                 ui.planet.hide();
             }else{
@@ -302,6 +307,8 @@ public class Control implements ApplicationListener, Loadable{
                 logic.reset();
                 world.loadSector(sector);
                 state.rules.sector = sector;
+                //assign origin when launching
+                state.secinfo.origin = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);

@@ -3,6 +3,7 @@ package mindustry.game;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -28,6 +29,8 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
+    /** Sector that was launched from. */
+    public @Nullable Sector origin;
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
@@ -124,11 +127,14 @@ public class SectorInfo{
         }
     }
 
-    /** @return the items in this sector now, taking into account production. */
-    public ObjectIntMap<Item> getCurrentItems(float turnsPassed){
+    /** @return the items in this sector now, taking into account production and items recieved. */
+    public ObjectIntMap<Item> getCurrentItems(Sector sector){
         ObjectIntMap<Item> map = new ObjectIntMap<>();
         map.putAll(coreItems);
-        production.each((item, stat) -> map.increment(item, (int)(stat.mean * turnsPassed)));
+        int turns = sector.getTurnsPassed();
+        production.each((item, stat) -> map.increment(item, (int)(stat.mean * turns)));
+        //increment based on recieved items
+        sector.getRecievedItems().each(stack -> map.increment(stack.item, stack.amount));
         return map;
     }
 

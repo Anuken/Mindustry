@@ -2,6 +2,7 @@ package mindustry.core;
 
 import arc.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -99,14 +100,25 @@ public class Logic implements ApplicationListener{
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){
 
+                    //add produced items
+                    //TODO move to recieved items
                     state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
                         core.items.add(item, (int)(stat.mean * passed));
+                    });
 
+                    //add recieved items
+                    state.rules.sector.getRecievedItems().each(stack -> core.items.add(stack.item, stack.amount));
+
+                    //clear recieved items
+                    state.rules.sector.setRecievedItems(new Seq<>());
+
+                    //validation
+                    for(Item item : content.items()){
                         //ensure positive items
                         if(core.items.get(item) < 0) core.items.set(item, 0);
                         //cap the items
                         if(core.items.get(item) > core.storageCapacity) core.items.set(item, core.storageCapacity);
-                    });
+                    }
                 }
 
                 state.rules.sector.setTurnsPassed(0);
@@ -255,14 +267,22 @@ public class Logic implements ApplicationListener{
 
         //TODO containers must be launched too
         Time.runTask(30f, () -> {
-            for(Building entity : state.teams.playerCores()){
-                for(Item item : content.items()){
-                    //TODO where do the items go?
-                    //data.addItem(item, entity.items.get(item));
-                    //Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items.get(item))));
+            Sector origin = sector.save.meta.secinfo.origin;
+            if(origin != null){
+                Seq<ItemStack> stacks = origin.getRecievedItems();
+
+                //add up all items into list
+                for(Building entity : state.teams.playerCores()){
+                    entity.items.each((item, amount) -> ItemStack.insert(stacks, item, amount));
                 }
-                entity.tile().remove();
+
+                //save recieved items
+                origin.setRecievedItems(stacks);
             }
+
+            //remove all the cores
+            state.teams.playerCores().each(b -> b.tile.remove());
+
             state.launched = true;
             state.gameOver = true;
 
@@ -271,8 +291,11 @@ public class Logic implements ApplicationListener{
 
             //run a turn, since launching takes up a turn
             universe.runTurn();
+
+            //TODO ???
             sector.setTurnsPassed(sector.getTurnsPassed() + 3);
 
+            //TODO load the sector that was launched from
             Events.fire(new LaunchEvent());
             //manually fire game over event now
             Events.fire(new GameOverEvent(state.rules.defaultTeam));
