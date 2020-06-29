@@ -99,7 +99,27 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
             if(mount.shoot && (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo)){
                 float rotation = this.rotation - 90;
-
+                
+                if(mount.shoot && ammo <= 0){
+                    if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
+                        for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
+                            i *= (mount.weapon.mirror ? -Mathf.sign(mount.side) : -Mathf.sign(weapon.flipped));
+                            
+                            //m a t h
+                            float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
+                            float mountX = this.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
+                                mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
+                            float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
+                                shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
+                            
+                            noAmmo(weapon, shootX, shootY, -i);
+                        }
+                        
+                        if(mount.weapon.mirror) mount.side = !mount.side;
+                        mount.reload = weapon.reload;
+                    }
+                }
+                
                 //shoot if applicable
                 if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
                     for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
@@ -137,14 +157,17 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
         sequenceNum = 0;
         if(weapon.shotDelay > 0.01f){
-            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                Time.run(sequenceNum * weapon.shotDelay, () -> bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl));
+            Angles.shotgun(weapon.shots, weapon.spacing * shootSide * inOut, rotation, f -> {
+                Time.run(sequenceNum * weapon.shotDelay, () -> {
+                    bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
+                    weapon.shootSound.at(x + this.x - baseX, y + this.y - baseY, Mathf.random(0.8f, 1.0f));
+                });
                 sequenceNum++;
             });
         }else{
+            weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
         }
-
         Tmp.v1.trns(rotation + 180f, ammo.recoil);
 
         if(this instanceof Velc){
@@ -160,7 +183,14 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         ammo.shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
     }
-
+    
+    private void noAmmo(Weapon weapon, float x, float y, int side){
+      
+        float baseX = this.x, baseY = this.y;
+        int shootSide = -Mathf.sign(side);
+        weapon.noAmmoSound.at(x + this.x - baseX, y + this.y - baseY, Mathf.random(0.8f, 1.0f));
+    }
+    
     private void bullet(Weapon weapon, float x, float y, float angle, float lifescl){
         Tmp.v1.trns(angle, 3f);
         weapon.bullet.create(this, team(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
