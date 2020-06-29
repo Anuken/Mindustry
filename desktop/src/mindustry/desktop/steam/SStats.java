@@ -64,7 +64,7 @@ public class SStats implements SteamUserStatsCallback{
             }
 
             for(Building entity : player.team().cores()){
-                if(!content.items().contains(i -> i.type == ItemType.material && entity.items.get(i) < entity.block().itemCapacity)){
+                if(!content.items().contains(i -> entity.items.get(i) < entity.block().itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }

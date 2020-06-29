@@ -76,7 +76,7 @@ public class CoreBlock extends StorageBlock{
             new Bar(
                 () -> Core.bundle.format("bar.capacity", ui.formatAmount(e.storageCapacity)),
                 () -> Pal.items,
-                () -> e.items().total() / ((float)e.storageCapacity * content.items().count(i -> i.type == ItemType.material))
+                () -> e.items().total() / ((float)e.storageCapacity * content.items().size)
             ));
 
         bars.add("units", e ->
@@ -154,7 +154,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return item.type == ItemType.material ? storageCapacity : 0;
+            return storageCapacity;
         }
 
         @Override
