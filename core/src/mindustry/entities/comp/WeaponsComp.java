@@ -97,29 +97,9 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
             
-            if(mount.shoot && ammo <= 0){
-                if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
-                    for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
-                        i *= (mount.weapon.mirror ? -Mathf.sign(mount.side) : -Mathf.sign(weapon.flipped));
-                        
-                        //m a t h
-                        float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
-                        float mountX = this.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
-                            mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
-                        float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
-                            shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
-                        
-                        noAmmo(weapon, shootX, shootY, -i);
-                    }
-                    
-                    if(mount.weapon.mirror) mount.side = !mount.side;
-                    mount.reload = weapon.reload;
-                }
-            }
-            
-            if(mount.shoot && (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo)){
+            if(mount.shoot){
                 float rotation = this.rotation - 90;
-                                
+                
                 //shoot if applicable
                 if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
                     for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
@@ -132,15 +112,19 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                         float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
                             shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
                         float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
+                        
+                        if(ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo){
+                            shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, -i);
 
-                        shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, -i);
+                            ammo --;
+                            if(ammo < 0) ammo = 0;
+                        }else{
+                            noAmmo(weapon, shootX, shootY, -i);
+                        }
                     }
-
+                    
                     if(mount.weapon.mirror) mount.side = !mount.side;
                     mount.reload = weapon.reload;
-
-                    ammo --;
-                    if(ammo < 0) ammo = 0;
                 }
             }
         }
