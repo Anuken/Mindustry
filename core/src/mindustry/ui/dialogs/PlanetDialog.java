@@ -312,7 +312,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     int i = 0;
                     for(Item item : content.items()){
-                        int amount = map.get(item);
+                        int amount = Math.min(map.get(item), sector.save.meta.secinfo.storageCapacity);
                         if(amount > 0){
                             res.image(item.icon(Cicon.small)).padRight(3);
                             res.add(ui.formatAmount(amount)).color(Color.lightGray);

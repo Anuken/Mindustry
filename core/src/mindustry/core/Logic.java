@@ -16,6 +16,7 @@ import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
 
@@ -88,7 +89,7 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             if(state.isCampaign() && state.rules.sector.getTurnsPassed() > 0){
                 int passed = state.rules.sector.getTurnsPassed();
-                Building core = state.rules.defaultTeam.core();
+                CoreEntity core = state.rules.defaultTeam.core();
 
                 if(state.rules.sector.hasWaves()){
                     SectorDamage.apply(passed);
@@ -103,6 +104,8 @@ public class Logic implements ApplicationListener{
 
                         //ensure positive items
                         if(core.items.get(item) < 0) core.items.set(item, 0);
+                        //cap the items
+                        if(core.items.get(item) > core.storageCapacity) core.items.set(item, core.storageCapacity);
                     });
                 }
 
