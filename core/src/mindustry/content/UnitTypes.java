@@ -167,7 +167,14 @@ public class UnitTypes implements ContentList{
                 recoil = 4f;
                 shootSound = Sounds.laser;
 
-                bullet = Bullets.oculonLaser;
+                bullet = new LaserBulletType(){{
+                    damage = 20f;
+                    recoil = 1f;
+                    sideAngle = 45f;
+                    sideWidth = 1f;
+                    sideLength = 70f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
             }});
         }};
 
@@ -186,7 +193,18 @@ public class UnitTypes implements ContentList{
                 shake = 2f;
                 ejectEffect = Fx.shellEjectMedium;
                 shootSound = Sounds.artillery;
-                bullet = Bullets.artilleryFortress;
+                bullet = new ArtilleryBulletType(2f, 8, "shell"){{
+                    hitEffect = Fx.blastExplosion;
+                    knockback = 0.8f;
+                    lifetime = 110f;
+                    width = height = 14f;
+                    collides = true;
+                    collidesTiles = true;
+                    splashDamageRadius = 20f;
+                    splashDamage = 38f;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                }};
             }});
         }};
 
@@ -204,7 +222,16 @@ public class UnitTypes implements ContentList{
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 shootSound = Sounds.explosion;
-                bullet = Bullets.bombCrawler;
+                bullet = new BombBulletType(0f, 0f, "clear"){{
+                    hitEffect = Fx.pulverize;
+                    lifetime = 10f;
+                    speed = 1f;
+                    splashDamageRadius = 55f;
+                    instantDisappear = true;
+                    splashDamage = 30f;
+                    killShooter = true;
+                    hittable = false;
+                }};
             }});
         }};
 
@@ -229,7 +256,13 @@ public class UnitTypes implements ContentList{
                 recoil = 1f;
                 x = 7f;
                 shootSound = Sounds.flame;
-                bullet = Bullets.eruptorShot;
+
+                bullet = new LiquidBulletType(Liquids.slag){{
+                    damage = 11;
+                    speed = 2.3f;
+                    drag = 0.02f;
+                    shootEffect = Fx.shootSmall;
+                }};
             }});
         }};
 
@@ -336,7 +369,25 @@ public class UnitTypes implements ContentList{
                     mirror = false;
                     flipSprite = !b;
                     shake = 1f;
-                    bullet = Bullets.missileRevenant;
+
+                    bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                        width = 8f;
+                        height = 8f;
+                        shrinkY = 0f;
+                        drag = -0.003f;
+                        homingRange = 60f;
+                        keepVelocity = false;
+                        splashDamageRadius = 25f;
+                        splashDamage = 10f;
+                        lifetime = 60f;
+                        trailColor = Pal.unitBack;
+                        backColor = Pal.unitBack;
+                        frontColor = Pal.unitFront;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.blastExplosion;
+                        weaveScale = 6f;
+                        weaveMag = 1f;
+                    }};
                 }});
             }
         }};
@@ -460,7 +511,14 @@ public class UnitTypes implements ContentList{
                 shootX = 3.5f;
                 alternate = true;
 
-                bullet = Bullets.standardAlpha;
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 60f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    tileDamageMultiplier = 0.1f;
+                }};
             }});
         }};
 
