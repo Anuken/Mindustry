@@ -49,8 +49,12 @@ public class DesktopInput extends InputHandler{
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
-            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.builder().isBuilding() ? 1f : 0f, 0.15f));
-            t.visible(() -> Core.settings.getBool("hints") && selectRequests.isEmpty());
+            t.bottom();
+            t.visible(() -> {
+                t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.builder().isBuilding() ? 1f : 0f, 0.15f);
+
+                return Core.settings.getBool("hints") && selectRequests.isEmpty() && t.getColor().a > 0.01f;
+            });
             t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();

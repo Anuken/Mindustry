@@ -221,8 +221,7 @@ public class BlockIndexer{
     }
 
     public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
-        for(Team enemy : activeTeams){
-            if(!team.isEnemy(enemy)) continue;
+        for(Team enemy : team.enemies()){
 
             Building entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){

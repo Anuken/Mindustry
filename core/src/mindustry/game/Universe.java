@@ -21,7 +21,7 @@ public class Universe{
     private int turn;
     private float turnCounter;
 
-    private Schematic lastLoadout = Loadouts.basicShard;
+    private Schematic lastLoadout;
     private Seq<ItemStack> lastLaunchResources = new Seq<>();
 
     public Universe(){
@@ -94,6 +94,7 @@ public class Universe{
     }
 
     public Schematic getLastLoadout(){
+        if(lastLoadout == null) lastLoadout = Loadouts.basicShard;
         return lastLoadout;
     }
 
