@@ -330,8 +330,8 @@ public class NetServer implements ApplicationListener{
                 votes += d;
                 voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
 
-                Call.sendMessage(Strings.format("[orange]@[lightgray] has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
-                            player.name, target.name, votes, votesRequired()));
+                Call.sendMessage(Strings.format("[lightgray]A player has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                            target.name, votes, votesRequired()));
             }
 
             boolean checkPass(){
