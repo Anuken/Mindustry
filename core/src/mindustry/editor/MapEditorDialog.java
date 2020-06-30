@@ -234,6 +234,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         show();
         state.rules = (lastSavedRules == null ? new Rules() : lastSavedRules);
         lastSavedRules = null;
+        saved = false;
         editor.renderer().updateAll();
     }
 

@@ -76,7 +76,7 @@ public class CoreBlock extends StorageBlock{
             new Bar(
                 () -> Core.bundle.format("bar.capacity", ui.formatAmount(e.storageCapacity)),
                 () -> Pal.items,
-                () -> e.items().total() / ((float)e.storageCapacity * content.items().size)
+                () -> e.items().total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
             ));
 
         bars.add("units", e ->
