@@ -131,8 +131,8 @@ public class SectorInfo{
     public ObjectIntMap<Item> getCurrentItems(Sector sector){
         ObjectIntMap<Item> map = new ObjectIntMap<>();
         map.putAll(coreItems);
-        int turns = sector.getTurnsPassed();
-        production.each((item, stat) -> map.increment(item, (int)(stat.mean * turns)));
+        long seconds = sector.getSecondsPassed();
+        production.each((item, stat) -> map.increment(item, (int)(stat.mean * seconds)));
         //increment based on recieved items
         sector.getRecievedItems().each(stack -> map.increment(stack.item, stack.amount));
         return map;
@@ -155,6 +155,8 @@ public class SectorInfo{
         public transient float counter;
         public transient WindowedMean means = new WindowedMean(valueWindow);
         public transient boolean loaded;
+
+        /** mean in terms of items produced per refresh rate (currently, per second) */
         public float mean;
     }
 }

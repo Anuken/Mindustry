@@ -31,7 +31,7 @@ public class CachedTile extends Tile{
             n.cons(new ConsumeModule(build));
             n.tile(this);
             n.block(block);
-            if(block.hasItems) n.items(new ItemModule());
+            if(block.hasItems) n.items = new ItemModule();
             if(block.hasLiquids) n.liquids(new LiquidModule());
             if(block.hasPower) n.power(new PowerModule());
             build = n;

@@ -151,7 +151,7 @@ public class MassDriver extends Block{
 
                 if(
                 items.total() >= minDistribute && //must shoot minimum amount of items
-                link.block().itemCapacity - link.items().total() >= minDistribute //must have minimum amount of space
+                link.block().itemCapacity - link.items.total() >= minDistribute //must have minimum amount of space
                 ){
                     MassDriverEntity other = (MassDriverEntity)link;
                     other.waitingShooters.add(tile);

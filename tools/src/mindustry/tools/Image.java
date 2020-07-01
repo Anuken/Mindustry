@@ -2,19 +2,18 @@ package mindustry.tools;
 
 import arc.func.*;
 import arc.graphics.Color;
-import arc.graphics.g2d.TextureRegion;
-import arc.util.Structs;
-import mindustry.tools.ImagePacker.GenRegion;
+import arc.graphics.g2d.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.tools.ImagePacker.*;
 
-import javax.imageio.ImageIO;
+import javax.imageio.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.awt.image.*;
+import java.io.*;
 
 class Image{
-    private static ArrayList<Image> toDispose = new ArrayList<>();
+    private static Seq<Image> toDispose = new Seq<>();
 
     private BufferedImage image;
     private Graphics2D graphics;
@@ -135,7 +134,7 @@ class Image{
     }
 
     static int total(){
-        return toDispose.size();
+        return toDispose.size;
     }
 
     static void dispose(){

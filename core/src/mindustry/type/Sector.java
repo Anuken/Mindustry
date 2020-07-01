@@ -13,7 +13,7 @@ import mindustry.game.Saves.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 /** A small section of a planet. */
 public class Sector{
@@ -131,12 +131,12 @@ public class Sector{
         return Core.settings.getInt(key("spawn-position"), Point2.pack(world.width() / 2, world.height() / 2));
     }
 
-    public void setTurnsPassed(int number){
-        put("turns-passed", number);
+    public void setLastSecond(long number){
+        put("last-second", number);
     }
 
-    public int getTurnsPassed(){
-        return Core.settings.getInt(key("turns-passed"));
+    public long getSecondsPassed(){
+        return universe.seconds() - Core.settings.getLong(key("last-second"));
     }
 
     private String key(String key){

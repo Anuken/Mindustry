@@ -25,6 +25,18 @@ public class ItemModule extends BlockModule{
 
     private @Nullable WindowedMean[] flow;
 
+    public ItemModule copy(){
+        ItemModule out = new ItemModule();
+        out.set(this);
+        return out;
+    }
+
+    public void set(ItemModule other){
+        total = other.total;
+        takeRotation = other.takeRotation;
+        System.arraycopy(other.items, 0, items, 0, items.length);
+    }
+
     public void update(boolean showFlow){
         if(showFlow){
             if(flow == null){

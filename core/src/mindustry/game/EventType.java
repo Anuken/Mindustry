@@ -32,7 +32,6 @@ public class EventType{
         update
     }
 
-    public static class TurnEvent{}
     public static class WinEvent{}
     public static class LoseEvent{}
     public static class LaunchEvent{}

@@ -11,7 +11,6 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
@@ -88,13 +87,14 @@ public class Logic implements ApplicationListener{
 
         //when loading a 'damaged' sector, propagate the damage
         Events.on(WorldLoadEvent.class, e -> {
-            if(state.isCampaign() && state.rules.sector.getTurnsPassed() > 0){
-                int passed = state.rules.sector.getTurnsPassed();
+            if(state.isCampaign() && state.rules.sector.getSecondsPassed() > 0){
+                long seconds = state.rules.sector.getSecondsPassed();
                 CoreEntity core = state.rules.defaultTeam.core();
 
-                if(state.rules.sector.hasWaves()){
-                    SectorDamage.apply(passed);
-                }
+                //TODO figure out how to apply damage properly
+               // if(state.rules.sector.hasWaves()){
+                    //SectorDamage.apply(seconds);
+                //}
 
 
                 //add resources based on turns passed
@@ -103,7 +103,7 @@ public class Logic implements ApplicationListener{
                     //add produced items
                     //TODO move to recieved items
                     state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
-                        core.items.add(item, (int)(stat.mean * passed));
+                        core.items.add(item, (int)(stat.mean * seconds));
                     });
 
                     //add recieved items
@@ -121,21 +121,12 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                state.rules.sector.setTurnsPassed(0);
+                state.rules.sector.setLastSecond(universe.seconds());
             }
 
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
         });
-
-        //TODO dying takes up a turn (?)
-        /*
-        Events.on(GameOverEvent.class, e -> {
-            //simulate a turn on a normal non-launch gameover
-            if(state.isCampaign() && !state.launched){
-                universe.runTurn();
-            }
-        });*/
 
     }
 
@@ -253,14 +244,9 @@ public class Logic implements ApplicationListener{
             ui.hudfrag.showLaunch();
         }
 
-        //TODO core launch effect
+        //TODO better core launch effect
         for(Building tile : state.teams.playerCores()){
             Fx.launch.at(tile);
-        }
-
-        if(state.isCampaign()){
-            //TODO implement?
-            //state.getSector().setLaunched();
         }
 
         Sector sector = state.rules.sector;
@@ -290,10 +276,10 @@ public class Logic implements ApplicationListener{
             sector.save.save();
 
             //run a turn, since launching takes up a turn
-            universe.runTurn();
+            universe.runEvents();
 
-            //TODO ???
-            sector.setTurnsPassed(sector.getTurnsPassed() + 3);
+            //TODO apply extra damage to sector
+            //sector.setTurnsPassed(sector.getTurnsPassed() + 3);
 
             //TODO load the sector that was launched from
             Events.fire(new LaunchEvent());

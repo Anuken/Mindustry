@@ -74,6 +74,7 @@ public abstract class SaveVersion extends SaveFileReader{
         //prepare campaign data for writing
         if(state.isCampaign()){
             state.secinfo.prepare();
+            state.getSector().setLastSecond(universe.seconds());
         }
 
         //flush tech node progress

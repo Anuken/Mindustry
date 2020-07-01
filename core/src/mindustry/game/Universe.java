@@ -4,11 +4,7 @@ import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
-import mindustry.game.EventType.*;
-import mindustry.game.SectorInfo.*;
-import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
 
@@ -18,8 +14,8 @@ import static mindustry.Vars.*;
 public class Universe{
     private long seconds;
     private float secondCounter;
-    private int turn;
-    private float turnCounter;
+    private int event;
+    private float eventCounter;
 
     private Schematic lastLoadout;
     private Seq<ItemStack> lastLaunchResources = new Seq<>();
@@ -59,11 +55,11 @@ public class Universe{
             }
         }
 
-        //update turn state - happens only in-game
-        turnCounter += Time.delta();
+        //update event counter - happens only in-game
+        eventCounter += Time.delta();
 
-        if(turnCounter >= turnDuration){
-            runTurn();
+        if(eventCounter >= eventRate){
+            runEvents();
         }
 
         if(state.hasSector()){
@@ -113,70 +109,12 @@ public class Universe{
         return schem == null ? all.first() : schem;
     }
 
-    public int[] getTotalExports(){
-        int[] exports = new int[Vars.content.items().size];
+    /** Runs possible events. Resets event counter. */
+    public void runEvents(){
+        event++;
+        eventCounter = 0;
 
-        for(Planet planet : content.planets()){
-            for(Sector sector : planet.sectors){
-
-                //ignore the current sector if the player is in it right now
-                if(sector.hasBase() && !sector.isBeingPlayed()){
-                    SaveMeta meta = sector.save.meta;
-
-                    for(ObjectMap.Entry<Item, ExportStat> entry : meta.secinfo.export){
-                        //total is calculated by  items/sec (value) * turn duration in seconds
-                        int total = (int)(entry.value.mean * turnDuration / 60f);
-
-                        exports[entry.key.id] += total;
-                    }
-                }
-            }
-        }
-
-        return exports;
-    }
-
-    public void runTurns(int amount){
-        for(int i = 0; i < amount; i++){
-            runTurn();
-        }
-    }
-
-    /** Runs a turn once. Resets turn counter. */
-    public void runTurn(){
-        turn ++;
-        turnCounter = 0;
-
-        //TODO EVENTS + a notification
-
-        //increment turns passed for sectors with waves
-        //TODO a turn passing may break the core; detect this, send an event and mark the sector as having no base!
-        for(Planet planet : content.planets()){
-            for(Sector sector : planet.sectors){
-                //update turns passed for all sectors
-                if(!sector.isBeingPlayed() && sector.hasSave()){
-                    sector.setTurnsPassed(sector.getTurnsPassed() + 1);
-                }
-            }
-        }
-
-        //calculate passive item generation
-        //TODO make exports only update for sector with items
-        //TODO items should be added directly to cores!
-
-        Events.fire(new TurnEvent());
-    }
-
-    public int getTurn(){
-        return turn;
-    }
-
-    public int getSectorsAttacked(){
-        int count = 0;
-        for(Planet planet : content.planets()){
-            count += planet.sectors.count(s -> !s.isBeingPlayed() && s.hasSave() && s.hasWaves());
-        }
-        return count;
+        //TODO events
     }
 
     public float secondsMod(float mod, float scale){
@@ -193,14 +131,14 @@ public class Universe{
 
     private void save(){
         Core.settings.put("utime", seconds);
-        Core.settings.put("turn", turn);
-        Core.settings.put("turntime", turnCounter);
+        Core.settings.put("event", event);
+        Core.settings.put("eventtime", eventCounter);
     }
 
     private void load(){
         seconds = Core.settings.getLong("utime");
-        turn = Core.settings.getInt("turn");
-        turnCounter = Core.settings.getFloat("turntime");
+        event = Core.settings.getInt("event");
+        eventCounter = Core.settings.getFloat("eventtime");
     }
 
 }

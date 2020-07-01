@@ -294,7 +294,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 t.left();
 
                 sector.save.meta.secinfo.exportRates().each(entry -> {
-                    int total = (int)(entry.value * turnDuration / 60f);
+                    int total = (int)(entry.value * eventRate / 60f);
                     if(total > 1){
                         t.image(entry.key.icon(Cicon.small)).padRight(3);
                         t.add(ui.formatAmount(total) + " /turn").color(Color.lightGray);
@@ -330,11 +330,13 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         //display how many turns this sector has been attacked
+        //TODO implement properly
+        /*
         if(sector.getTurnsPassed() > 0 && sector.hasBase()){
             stable.row();
 
             stable.add("[scarlet]" + Iconc.warning + " " + sector.getTurnsPassed() + "x attacks");
-        }
+        }*/
 
         stable.row();
 

@@ -45,11 +45,6 @@ public class HudFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        Events.on(TurnEvent.class, e -> {
-            //TODO localize, clean up, etc
-            int attacked = universe.getSectorsAttacked();
-            showToast("New turn: [accent]" + universe.getTurn() + "[]" + (attacked > 0 ? "\n[scarlet]" + Iconc.warning + " " + attacked + " sectors attacked!": ""));
-        });
 
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{

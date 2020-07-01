@@ -78,8 +78,8 @@ public class Vars implements Loadable{
     public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
-    /** duration of one turn in ticks */
-    public static final float turnDuration = 5 * Time.toMinutes;
+    /** duration of time between events in ticks */
+    public static final float eventRate = 5 * Time.toMinutes;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.05f;
     /** launch animation duration */

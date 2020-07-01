@@ -484,6 +484,11 @@ public class Block extends UnlockableContent{
 
     }
 
+    /** Called right before building of this block begins. */
+    public void beforePlaceBegan(Tile tile, Block previous){
+
+    }
+
     /** @return a message detailing why this block can't be placed. */
     public String unplaceableMessage(){
         return state.rules.bannedBlocks.contains(this) ? Core.bundle.get("banned") : buildPlaceability.message();

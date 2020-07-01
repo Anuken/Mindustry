@@ -56,6 +56,8 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(result.size);
 
+        result.beforePlaceBegan(tile, previous);
+
         tile.setBlock(sub, team, rotation);
         tile.<BuildEntity>bc().setConstruct(previous, result);
 

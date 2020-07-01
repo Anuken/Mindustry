@@ -92,7 +92,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {
-            if(campaign() && player.core() != null && player.core().items().total() >= 10 * 1000){
+            if(campaign() && player.core() != null && player.core().items.total() >= 10 * 1000){
                 drop10kitems.complete();
             }
         }));
