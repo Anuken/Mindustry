@@ -514,7 +514,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                     return flow;
                 }else if(ofract > 0.1f && fract > 0.1f){
                     //TODO these are incorrect effect positions
-                    float fx = (x + next.x()) / 2f, fy = (y + next.y()) / 2f;
+                    float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
 
                     Liquid other = next.liquids().current();
                     if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){

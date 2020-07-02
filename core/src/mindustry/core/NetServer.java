@@ -657,8 +657,8 @@ public class NetServer implements ApplicationListener{
             //read sync data so it can be used for interpolation for the server
             unit.readSyncManual(fbuffer);
         }else{
-            player.x(x);
-            player.y(y);
+            player.x = x;
+            player.y = y;
         }
 
         connection.lastRecievedClientSnapshot = snapshotID;

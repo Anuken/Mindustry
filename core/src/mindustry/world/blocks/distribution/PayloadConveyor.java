@@ -75,8 +75,8 @@ public class PayloadConveyor extends Block{
                 //differing sizes
                 (accept.block().size > size &&
                     (rotation() % 2 == 0 ? //check orientation
-                    Math.abs(accept.y() - y) <= (accept.block().size * tilesize - size * tilesize)/2f : //check Y alignment
-                    Math.abs(accept.x() - x) <= (accept.block().size * tilesize - size * tilesize)/2f   //check X alignment
+                    Math.abs(accept.y - y) <= (accept.block().size * tilesize - size * tilesize)/2f : //check Y alignment
+                    Math.abs(accept.x - x) <= (accept.block().size * tilesize - size * tilesize)/2f   //check X alignment
                 )))){
                 next = accept;
             }else{

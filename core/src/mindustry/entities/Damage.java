@@ -88,7 +88,7 @@ public class Damage{
             if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team() != team && tile.collide(hitter)){
                 tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
-                hitter.type().hit(hitter, tile.x(), tile.y());
+                hitter.type().hit(hitter, tile.x, tile.y);
             }
         };
 

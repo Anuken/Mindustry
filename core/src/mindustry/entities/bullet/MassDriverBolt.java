@@ -66,7 +66,7 @@ public class MassDriverBolt extends BulletType{
             if(Angles.near(angleTo, baseAngle, 2f)){
                 intersect = true;
                 //snap bullet position back; this is used for low-FPS situations
-                b.set(data.to.x() + Angles.trnsx(baseAngle, hitDst), data.to.y() + Angles.trnsy(baseAngle, hitDst));
+                b.set(data.to.x + Angles.trnsx(baseAngle, hitDst), data.to.y + Angles.trnsy(baseAngle, hitDst));
             }
         }
 

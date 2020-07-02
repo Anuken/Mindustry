@@ -76,7 +76,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -1339,7 +1339,7 @@ public class Blocks implements ContentList{
             Items.metaglass, Bullets.flakGlass
             );
             reloadTime = 18f;
-            range = 170f;
+            range = 160f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
@@ -1653,6 +1653,20 @@ public class Blocks implements ContentList{
             bulletDamage = 12f;
             reloadTime = 25f;
             health = 190 * size * size;
+        }};
+
+        parallax = new TractorBeamTurret("parallax"){{
+            requirements(Category.turret, with(Items.silicon, 120, Items.titanium, 90));
+
+            hasPower = true;
+            size = 2;
+            force = 3f;
+            range = 170f;
+            damage = 0.08f;
+            health = 160 * size * size;
+            rotateSpeed = 10;
+
+            consumes.power(3f);
         }};
 
         //endregion

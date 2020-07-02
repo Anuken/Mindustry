@@ -150,7 +150,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             item,
             amount,
             player.x + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y + Angles.trnsy(player.unit().rotation + 180f, backTrns),
-            new Vec2(tile.x() + stackTrns.x, tile.y() + stackTrns.y),
+            new Vec2(tile.x + stackTrns.x, tile.y + stackTrns.y),
             () -> tile.handleStack(item, accepted, player.unit())
         );
     }

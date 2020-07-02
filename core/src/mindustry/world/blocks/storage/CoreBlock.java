@@ -236,7 +236,7 @@ public class CoreBlock extends StorageBlock{
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
                     float offset = -Math.max(t.block().size - 1, 0) / 2f * tilesize;
-                    Draw.rect("block-select", t.x() + offset * p.x, t.y() + offset * p.y, i * 90);
+                    Draw.rect("block-select", t.x + offset * p.x, t.y + offset * p.y, i * 90);
                 }
             };
             if(proximity.contains(e -> isContainer(e) && e.items == items)){

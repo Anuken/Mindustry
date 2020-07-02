@@ -177,13 +177,13 @@ public class Drawf{
         Shaders.build.time = -time / 20f;
 
         Draw.shader(Shaders.build);
-        Draw.rect(region, t.x(), t.y(), rotation);
+        Draw.rect(region, t.x, t.y, rotation);
         Draw.shader();
 
         Draw.color(Pal.accent);
         Draw.alpha(speed);
 
-        Lines.lineAngleCenter(t.x() + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block().size - 2f), t.y(), 90, t.block().size * Vars.tilesize - 4f);
+        Lines.lineAngleCenter(t.x + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block().size - 2f), t.y, 90, t.block().size * Vars.tilesize - 4f);
 
         Draw.reset();
     }

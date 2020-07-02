@@ -59,7 +59,7 @@ public class BlockInventoryFragment extends Fragment{
         player.unit().addItem(item, removed);
         Events.fire(new WithdrawEvent(tile, player, item, amount));
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x(), tile.y(), player.unit()));
+            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x, tile.y, player.unit()));
         }
     }
 
@@ -231,7 +231,7 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     private void updateTablePosition(){
-        Vec2 v = Core.input.mouseScreen(tile.x() + tile.block().size * tilesize / 2f, tile.y() + tile.block().size * tilesize / 2f);
+        Vec2 v = Core.input.mouseScreen(tile.x + tile.block().size * tilesize / 2f, tile.y + tile.block().size * tilesize / 2f);
         table.pack();
         table.setPosition(v.x, v.y, Align.topLeft);
     }

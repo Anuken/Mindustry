@@ -47,7 +47,7 @@ public class HealBulletType extends BulletType{
         super.hit(b);
 
         if(tile.team() == b.team() && !(tile.block() instanceof BuildBlock)){
-            Fx.healBlockFull.at(tile.x(), tile.y(), tile.block().size, Pal.heal);
+            Fx.healBlockFull.at(tile.x, tile.y, tile.block().size, Pal.heal);
             tile.heal(healPercent / 100f * tile.maxHealth());
         }
     }

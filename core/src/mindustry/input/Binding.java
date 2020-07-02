@@ -34,7 +34,7 @@ public enum Binding implements KeyBind{
     schematic_flip_y(KeyCode.x),
     schematic_menu(KeyCode.t),
 
-    category_prev(KeyCode.comma),
+    category_prev(KeyCode.comma, "blocks"),
     category_next(KeyCode.period),
 
     block_select_left(KeyCode.left),

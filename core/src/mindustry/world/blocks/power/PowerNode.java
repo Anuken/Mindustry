@@ -122,10 +122,10 @@ public class PowerNode extends PowerBlock{
         Drawf.circles(x * tilesize + offset(), y * tilesize + offset(), laserRange * tilesize);
 
         getPotentialLinks(tile, other -> {
-            Drawf.square(other.x(), other.y(), other.block().size * tilesize / 2f + 2f, Pal.place);
+            Drawf.square(other.x, other.y, other.block().size * tilesize / 2f + 2f, Pal.place);
 
             insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
-                Drawf.square(cause.x(), cause.y(), cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
+                Drawf.square(cause.x, cause.y, cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
             });
         });
 
@@ -158,7 +158,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected boolean overlaps(Building src, Building other, float range){
-        return overlaps(src.x(), src.y(), other.tile(), range);
+        return overlaps(src.x, src.y, other.tile(), range);
     }
 
     protected boolean overlaps(Tile src, Tile other, float range){
@@ -352,7 +352,7 @@ public class PowerNode extends PowerBlock{
                         boolean linked = linked(link);
 
                         if(linked){
-                            Drawf.square(link.x(), link.y(), link.block().size * tilesize / 2f + 1f, Pal.place);
+                            Drawf.square(link.x, link.y, link.block().size * tilesize / 2f + 1f, Pal.place);
                         }
                     }
                 }
@@ -387,7 +387,7 @@ public class PowerNode extends PowerBlock{
         }
 
         protected void drawLaserTo(Building target){
-            drawLaser(team, x, y, target.x(), target.y(), power.graph.getSatisfaction(), size, target.block().size);
+            drawLaser(team, x, y, target.x, target.y, power.graph.getSatisfaction(), size, target.block().size);
         }
 
         @Override

@@ -88,7 +88,7 @@ public class WaveSpawner{
             Building firstCore = state.teams.playerCores().first();
             for(Building core : state.rules.waveTeam.cores()){
                 Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block().size * tilesize);
-                cons.accept(core.x() + Tmp.v1.x, core.y() + Tmp.v1.y, false);
+                cons.accept(core.x + Tmp.v1.x, core.y + Tmp.v1.y, false);
             }
         }
     }
@@ -105,7 +105,7 @@ public class WaveSpawner{
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
             for(Building core : state.teams.get(state.rules.waveTeam).cores){
-                cons.get(core.x(), core.y());
+                cons.get(core.x, core.y);
             }
         }
     }

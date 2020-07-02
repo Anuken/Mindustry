@@ -28,6 +28,8 @@ public class RepairPoint extends Block{
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
 
+    public Color laserColor = Color.valueOf("e8ffd7");
+
     public RepairPoint(String name){
         super(name);
         update = true;
@@ -60,7 +62,7 @@ public class RepairPoint extends Block{
     }
 
     public class RepairPointEntity extends Building{
-        public Unitc target;
+        public Unit target;
         public float strength, rotation = 90;
 
         @Override
@@ -75,7 +77,7 @@ public class RepairPoint extends Block{
                 float ang = angleTo(target);
                 float len = 5f;
 
-                Draw.color(Color.valueOf("e8ffd7"));
+                Draw.color(laserColor);
                 Drawf.laser(team, laser, laserEnd,
                 x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),
                 target.x(), target.y(), strength);
