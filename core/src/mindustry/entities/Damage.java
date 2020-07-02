@@ -225,14 +225,16 @@ public class Damage{
             Units.nearby(rect, cons);
         }
 
-        if(!complete){
-            int trad = (int)(radius / tilesize);
-            Tile tile = world.tileWorld(x, y);
-            if(tile != null){
-                tileDamage(team, tile.x, tile.y, trad, damage);
+        if(ground){
+            if(!complete){
+                int trad = (int)(radius / tilesize);
+                Tile tile = world.tileWorld(x, y);
+                if(tile != null){
+                    tileDamage(team, tile.x, tile.y, trad, damage);
+                }
+            }else{
+                completeDamage(team, x, y, radius, damage);
             }
-        }else{
-            completeDamage(team, x, y, radius, damage);
         }
     }
 

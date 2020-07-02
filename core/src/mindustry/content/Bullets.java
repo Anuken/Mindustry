@@ -20,7 +20,7 @@ public class Bullets implements ContentList{
     artilleryDense, artilleryPlastic, artilleryPlasticFrag, artilleryHoming, artilleryIncendiary, artilleryExplosive,
 
     //flak
-    flakScrap, flakLead, flakPlastic, flakExplosive, flakSurge, flakGlass, glassFrag,
+    flakScrap, flakLead, flakPlastic, flakExplosive, flakSurge, flakGlass, flakGlassFrag, flakPlasticFrag,
 
     //missiles
     missileExplosive, missileIncendiary, missileSurge, missileJavelin, missileSwarm,
@@ -62,6 +62,7 @@ public class Bullets implements ContentList{
             backColor = Pal.plastaniumBack;
             frontColor = Pal.plastaniumFront;
             despawnEffect = Fx.none;
+            collidesAir = false;
         }};
 
         artilleryPlastic = new ArtilleryBulletType(3.4f, 12, "shell"){{
@@ -122,7 +123,7 @@ public class Bullets implements ContentList{
             statusDuration = 60f;
         }};
 
-        glassFrag = new BasicBulletType(3f, 5, "bullet"){{
+        flakGlassFrag = new BasicBulletType(3f, 5, "bullet"){{
             width = 5f;
             height = 12f;
             shrinkY = 1f;
@@ -130,6 +131,7 @@ public class Bullets implements ContentList{
             backColor = Pal.gray;
             frontColor = Color.white;
             despawnEffect = Fx.none;
+            collidesGround = false;
         }};
 
         flakLead = new FlakBulletType(4.2f, 3){{
@@ -165,14 +167,25 @@ public class Bullets implements ContentList{
             hitEffect = Fx.flakExplosion;
             splashDamage = 20f;
             splashDamageRadius = 20f;
-            fragBullet = glassFrag;
+            fragBullet = flakGlassFrag;
             fragBullets = 5;
+        }};
+
+        flakPlasticFrag = new BasicBulletType(2.5f, 10, "bullet"){{
+            width = 10f;
+            height = 12f;
+            shrinkY = 1f;
+            lifetime = 15f;
+            backColor = Pal.plastaniumBack;
+            frontColor = Pal.plastaniumFront;
+            despawnEffect = Fx.none;
+            collidesGround = false;
         }};
 
         flakPlastic = new FlakBulletType(4f, 6){{
             splashDamageRadius = 50f;
             splashDamage = 25f;
-            fragBullet = artilleryPlasticFrag;
+            fragBullet = flakPlasticFrag;
             fragBullets = 6;
             hitEffect = Fx.plasticExplosion;
             frontColor = Pal.plastaniumFront;
