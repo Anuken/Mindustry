@@ -3,7 +3,6 @@ package mindustry.ui;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -22,7 +21,8 @@ public class CoreItemsDisplay extends Table{
 
     void rebuild(){
         clear();
-        background(Tex.button);
+        background(Styles.black6);
+        margin(4);
 
         update(() -> {
             CoreEntity core = Vars.player.team().core();
@@ -40,10 +40,10 @@ public class CoreItemsDisplay extends Table{
         CoreEntity core = Vars.player.team().core();
         for(Item item : content.items()){
             if(usedItems.contains(item)){
-                image(item.icon(Cicon.medium)).padRight(4);
-                label(() -> core == null ? "0" : ui.formatAmount(core.items.get(item))).padRight(4);
+                image(item.icon(Cicon.small)).padRight(3);
+                label(() -> core == null ? "0" : ui.formatAmount(core.items.get(item))).padRight(3);
 
-                if(++i % 2 == 0){
+                if(++i % 4 == 0){
                     row();
                 }
             }

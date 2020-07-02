@@ -35,7 +35,6 @@ public class HudFragment extends Fragment{
     private Table lastUnlockLayout;
     private boolean shown = true;
     private float dsize = 47.2f;
-    //TODO implement
     private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
@@ -201,6 +200,12 @@ public class HudFragment extends Fragment{
                 .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
                 .touchable(Touchable.disabled);
             t.top().right();
+        });
+
+        //core items
+        parent.fill(t -> {
+            t.top().add(coreItems);
+            t.visible(() -> Core.settings.getBool("coreitems") && !mobile);
         });
 
         //spawner warning
