@@ -327,6 +327,7 @@ public class Vars implements Loadable{
 
         settings.defaults("locale", "default", "blocksync", true);
         keybinds.setDefaults(Binding.values());
+        settings.setAutosave(false);
         settings.load();
 
         Scl.setProduct(settings.getInt("uiscale", 100) / 100f);

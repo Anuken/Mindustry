@@ -178,6 +178,7 @@ public class Control implements ApplicationListener, Loadable{
                 Effects.shake(5f, 5f, core);
             });
         });
+
     }
 
     @Override

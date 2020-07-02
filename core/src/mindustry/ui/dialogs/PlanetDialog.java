@@ -293,11 +293,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.table(t -> {
                 t.left();
 
-                sector.save.meta.secinfo.exportRates().each(entry -> {
-                    int total = (int)(entry.value * eventRate / 60f);
+                sector.save.meta.secinfo.production.each((item, stat) -> {
+                    int total = (int)(stat.mean * 60);
                     if(total > 1){
-                        t.image(entry.key.icon(Cicon.small)).padRight(3);
-                        t.add(ui.formatAmount(total) + " /turn").color(Color.lightGray);
+                        t.image(item.icon(Cicon.small)).padRight(3);
+                        t.add(ui.formatAmount(total) + " /min").color(Color.lightGray);
                         t.row();
                     }
                 });

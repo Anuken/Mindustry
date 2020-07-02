@@ -23,9 +23,32 @@ import mindustry.world.blocks.legacy.*;
 import static mindustry.Vars.*;
 
 public class Generators{
+    //used for changing colors in the UI - testing only
+    static final IntIntMap paletteMap = IntIntMap.with(
+    //empty for now
+    0x454545ff, 0x00000000,//0x32394bff,
+    0x00000099, 0x00000000//0x000000ff
+    );
 
     public static void generate(){
         ObjectMap<Block, Image> gens = new ObjectMap<>();
+
+        if(!paletteMap.isEmpty()){
+            ImagePacker.generate("uipalette", () -> {
+                Fi.get("../ui").walk(fi -> {
+                    if(!fi.extEquals("png")) return;
+
+                    Pixmap pix = new Pixmap(fi);
+                    pix.setBlending(Pixmap.Blending.sourceOver);
+                    pix.each((x, y) -> {
+                        int value = pix.getPixel(x, y);
+                        pix.draw(x, y, paletteMap.get(value, value));
+                    });
+
+                    fi.writePNG(pix);
+                });
+            });
+        }
 
         ImagePacker.generate("splashes", () -> {
             ArcNativesLoader.load();

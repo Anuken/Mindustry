@@ -96,7 +96,6 @@ public class Logic implements ApplicationListener{
                     //SectorDamage.apply(seconds);
                 //}
 
-
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){
 
@@ -126,6 +125,9 @@ public class Logic implements ApplicationListener{
 
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
+
+            //save settings
+            Core.settings.manualSave();
         });
 
     }
@@ -161,6 +163,9 @@ public class Logic implements ApplicationListener{
         Groups.all.clear();
         Time.clear();
         Events.fire(new ResetEvent());
+
+        //save settings on reset
+        Core.settings.manualSave();
     }
 
     public void runWave(){
@@ -293,6 +298,12 @@ public class Logic implements ApplicationListener{
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);
         netClient.setQuiet();
+    }
+
+    @Override
+    public void dispose(){
+        //save the settings before quitting
+        Core.settings.manualSave();
     }
 
     @Override
