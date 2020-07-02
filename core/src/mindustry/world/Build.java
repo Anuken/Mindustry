@@ -114,8 +114,7 @@ public class Build{
                 return type.bounds(x, y, Tmp.r1).grow(0.01f).contains(tile.block.bounds(tile.centerX(), tile.centerY(), Tmp.r2));
             }
 
-            //TODO should water blocks be placeable here?
-            if(/*!type.requiresWater && */!contactsShallows(tile.x, tile.y, type)){
+            if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type)){
                 return false;
             }
 
@@ -142,7 +141,7 @@ public class Build{
             return true;
         }else{
             return tile.interactable(team)
-                && contactsShallows(tile.x, tile.y, type)
+                && (contactsShallows(tile.x, tile.y, type) || type.requiresWater)
                 && (!tile.floor().isDeep() || type.floating || type.requiresWater)
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)

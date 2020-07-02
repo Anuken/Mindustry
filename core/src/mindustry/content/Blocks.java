@@ -749,26 +749,30 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        phaseWall = new DeflectorWall("phase-wall"){{
+        phaseWall = new Wall("phase-wall"){{
             requirements(Category.defense, with(Items.phasefabric, 6));
             health = 150 * wallHealthMultiplier;
+            flashWhite = deflect = true;
         }};
 
-        phaseWallLarge = new DeflectorWall("phase-wall-large"){{
+        phaseWallLarge = new Wall("phase-wall-large"){{
             requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
+            flashWhite = deflect = true;
         }};
 
-        surgeWall = new SurgeWall("surge-wall"){{
+        surgeWall = new Wall("surge-wall"){{
             requirements(Category.defense, with(Items.surgealloy, 6));
             health = 230 * wallHealthMultiplier;
+            lightningChance = 0.05f;
         }};
 
-        surgeWallLarge = new SurgeWall("surge-wall-large"){{
+        surgeWallLarge = new Wall("surge-wall-large"){{
             requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
             health = 230 * 4 * wallHealthMultiplier;
             size = 2;
+            lightningChance = 0.05f;
         }};
 
         door = new Door("door"){{
