@@ -360,8 +360,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     /**
-     * Returns the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
-     * This array contains all linked tiles, including this tile itself.
+     * Iterates through the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
+     * The result contains all linked tiles, including this tile itself.
      */
     public void getLinkedTiles(Cons<Tile> cons){
         if(block.isMultiblock()){
@@ -391,7 +391,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /**
      * Returns the list of all tiles linked to this multiblock if it were this block.
-     * This array contains all linked tiles, including this tile itself.
+     * The result contains all linked tiles, including this tile itself.
      */
     public Seq<Tile> getLinkedTilesAs(Block block, Seq<Tile> tmpArray){
         tmpArray.clear();

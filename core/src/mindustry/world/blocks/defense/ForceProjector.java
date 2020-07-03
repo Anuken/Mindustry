@@ -32,7 +32,7 @@ public class ForceProjector extends Block{
     public @Load("@-top") TextureRegion topRegion;
 
     private static ForceProjectorEntity paramEntity;
-    private static Cons<Shielderc> shieldConsumer = trait -> {
+    private static final Cons<Shielderc> shieldConsumer = trait -> {
         if(trait.team() != paramEntity.team() && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);

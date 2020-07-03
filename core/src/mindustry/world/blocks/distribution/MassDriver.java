@@ -58,7 +58,7 @@ public class MassDriver extends Block{
         //check if a mass driver is selected while placing this driver
         if(!control.input.frag.config.isShown()) return;
         Building selected = control.input.frag.config.getSelectedTile();
-        if(selected == null || !(selected.block() instanceof MassDriver) || !(selected.dst(x * tilesize, y * tilesize) <= range)) return;
+        if(selected == null || !(selected.block() instanceof MassDriver) || !(selected.within(x * tilesize, y * tilesize, range))) return;
 
         //if so, draw a dotted line towards it while it is in range
         float sin = Mathf.absin(Time.time(), 6f, 1f);

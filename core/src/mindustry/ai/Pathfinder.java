@@ -86,11 +86,6 @@ public class Pathfinder implements Runnable{
         queue.clear();
     }
 
-    //public int debugValue(Team team, int x, int y){
-    //    if(pathMap[team.id][FlagTarget.enemyCores.ordinal()] == null) return 0;
-    //    return pathMap[team.id][FlagTarget.enemyCores.ordinal()].weights[x][y];
-    //}
-
     /** Update a tile in the internal pathfinding grid.
      * Causes a complete pathfinding reclaculation. Main thread only. */
     public void updateTile(Tile tile){

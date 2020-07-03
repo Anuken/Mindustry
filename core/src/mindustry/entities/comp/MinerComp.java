@@ -40,7 +40,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     public void update(){
         Building core = closestCore();
 
-        if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && dst(core) < mineTransferRange){
+        if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && within(core, mineTransferRange)){
             int accepted = core.acceptStack(item(), stack().amount, this);
             if(accepted > 0){
                 Call.transferItemTo(item(), accepted,
@@ -63,7 +63,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             if(mineTimer >= 50f + item.hardness*10f){
                 mineTimer = 0;
 
-                if(dst(core) < mineTransferRange && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
+                if(within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
                     Call.transferItemTo(item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile());

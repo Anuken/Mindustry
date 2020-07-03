@@ -327,10 +327,10 @@ public abstract class SaveVersion extends SaveFileReader{
     public void readContentHeader(DataInput stream) throws IOException{
         byte mapped = stream.readByte();
 
-        MappableContent[][] map = new MappableContent[ContentType.values().length][0];
+        MappableContent[][] map = new MappableContent[ContentType.all.length][0];
 
         for(int i = 0; i < mapped; i++){
-            ContentType type = ContentType.values()[stream.readByte()];
+            ContentType type = ContentType.all[stream.readByte()];
             short total = stream.readShort();
             map[type.ordinal()] = new MappableContent[total];
 

@@ -72,11 +72,11 @@ abstract class BuilderComp implements Unitc{
 
         BuildPlan current = buildPlan();
 
-        if(dst(current.tile()) > finalPlaceDst) return;
+        if(!within(current.tile(), finalPlaceDst)) return;
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(dst(tile) <= finalPlaceDst){
+        if(!within(tile, finalPlaceDst)){
             rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
         }
 
