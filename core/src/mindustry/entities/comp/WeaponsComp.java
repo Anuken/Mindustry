@@ -84,6 +84,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta(), 0);
 
+            //flip weapon shoot side for alternating weapons at half reload
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&
                 mount.reload + Time.delta() > weapon.reload/2f && mount.reload <= weapon.reload/2f){
                 mounts[weapon.otherSide].side = !mounts[weapon.otherSide].side;

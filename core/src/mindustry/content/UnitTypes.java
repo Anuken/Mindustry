@@ -103,44 +103,16 @@ public class UnitTypes implements ContentList{
             buildSpeed = 0.8f;
 
             weapons.add(new Weapon("heal-weapon"){{
-                shootY = 1.5f;
+                shootY = 2f;
                 reload = 24f;
-                x = 3.5f;
+                x = 4.5f;
                 alternate = false;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 bullet = Bullets.healBullet;
                 shootSound = Sounds.pew;
             }});
-        }
-
-            /*
-
-            float healRange = 60f;
-            float healAmount = 10f;
-            float healReload = 160f;
-            boolean wasHealed;
-
-            @Override
-            public void update(Unitc player){
-
-                if(player.timer().get(Player.timerAbility, healReload)){
-                    wasHealed = false;
-
-                    Units.nearby(player.team(), player.x, player.y, healRange, unit -> {
-                        if(unit.health < unit.maxHealth()){
-                            Fx.heal.at(unit);
-                            wasHealed = true;
-                        }
-                        unit.heal(healAmount);
-                    });
-
-                    if(wasHealed){
-                        Fx.healWave.at(player);
-                    }
-                }
-            }*/
-        };
+        }};
 
         oculon = new UnitType("oculon"){{
             drillTier = 1;
