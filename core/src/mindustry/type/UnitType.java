@@ -53,7 +53,7 @@ public class UnitType extends UnlockableContent{
 
     public int itemCapacity = 30;
     public int ammoCapacity = 220;
-    public int drillTier = -1;
+    public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
     public float engineOffset = 5f, engineSize = 2.5f;

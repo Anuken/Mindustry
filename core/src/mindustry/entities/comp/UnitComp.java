@@ -264,19 +264,4 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //deaths are synced; this calls killed()
         Call.onUnitDeath(base());
     }
-
-    @Override
-    public boolean canMine(Item item){
-        return type.drillTier >= item.hardness;
-    }
-
-    @Override
-    public float miningSpeed(){
-        return type.mineSpeed;
-    }
-
-    @Override
-    public boolean offloadImmediately(){
-        return false;
-    }
 }

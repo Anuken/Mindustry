@@ -115,7 +115,7 @@ public class UnitTypes implements ContentList{
         }};
 
         oculon = new UnitType("oculon"){{
-            drillTier = 1;
+            mineTier = 1;
             hitsize = 9f;
             boostMultiplier = 2f;
             itemCapacity = 20;
@@ -413,7 +413,7 @@ public class UnitTypes implements ContentList{
             mineSpeed = 0.9f;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            drillTier = 1;
+            mineTier = 1;
         }};
 
         spirit = new UnitType("spirit"){{
@@ -443,6 +443,7 @@ public class UnitTypes implements ContentList{
 
             flying = true;
             mineSpeed = 2f;
+            mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;
             speed = 2.4f;
