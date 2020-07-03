@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.EnumSet;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -111,11 +110,10 @@ public class BlockIndexer{
     }
 
     private GridBits structQuadrant(Team t){
-        int id = Pack.u(t.id);
-        if(structQuadrants[id] == null){
-            structQuadrants[id] = new GridBits(Mathf.ceil(world.width() / (float)quadrantSize), Mathf.ceil(world.height() / (float)quadrantSize));
+        if(structQuadrants[t.id] == null){
+            structQuadrants[t.id] = new GridBits(Mathf.ceil(world.width() / (float)quadrantSize), Mathf.ceil(world.height() / (float)quadrantSize));
         }
-        return structQuadrants[id];
+        return structQuadrants[t.id];
     }
 
     /** Updates all the structure quadrants for a newly activated team. */

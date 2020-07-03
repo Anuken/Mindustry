@@ -13,7 +13,7 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
 
     //ground
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, chaosArray, eradicator;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, siegeArray, eradicator;
 
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType tau;
@@ -24,14 +24,14 @@ public class UnitTypes implements ContentList{
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix, eruptor;
 
-    //air
+    //air (no special traits)
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
 
-    //air + mining
-    public static @EntityDef({Unitc.class, Minerc.class}) UnitType draug;
-
     //air + building
-    public static @EntityDef({Unitc.class, Builderc.class}) UnitType phantom, spirit;
+    public static @EntityDef({Unitc.class, Builderc.class}) UnitType spirit;
+
+    //air + mining
+    public static @EntityDef({Unitc.class, Minerc.class}) UnitType phantom;
 
     //air + building + mining
     //TODO implement other starter drones
@@ -401,19 +401,6 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
             }});
-        }};
-
-        draug = new UnitType("draug"){{
-            flying = true;
-            drag = 0.05f;
-            speed = 2f;
-            range = 50f;
-            accel = 0.2f;
-            health = 80;
-            mineSpeed = 0.9f;
-            engineSize = 1.8f;
-            engineOffset = 5.7f;
-            mineTier = 1;
         }};
 
         spirit = new UnitType("spirit"){{

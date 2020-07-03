@@ -409,7 +409,7 @@ public class MapGenerateDialog extends BaseDialog{
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
-            this.team = team.id;
+            this.team = (byte)team.id;
             this.rotation = (byte)rotation;
         }
 

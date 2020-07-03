@@ -62,10 +62,10 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        if(map[team.uid] == null){
-            map[team.uid] = new TeamData(team);
+        if(map[team.id] == null){
+            map[team.id] = new TeamData(team);
         }
-        return map[team.uid];
+        return map[team.id];
     }
 
     public Seq<CoreEntity> playerCores(){

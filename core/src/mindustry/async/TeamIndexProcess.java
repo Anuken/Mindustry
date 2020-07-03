@@ -13,9 +13,9 @@ public class TeamIndexProcess implements AsyncProcess{
     private int[] counts = new int[Team.all.length];
 
     public QuadTree<Unit> tree(Team team){
-        if(trees[team.uid] == null) trees[team.uid] = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
+        if(trees[team.id] == null) trees[team.id] = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
 
-        return trees[team.uid];
+        return trees[team.id];
     }
 
     public int count(Team team){
@@ -36,8 +36,8 @@ public class TeamIndexProcess implements AsyncProcess{
     public void begin(){
 
         for(Team team : Team.all){
-            if(trees[team.uid] != null){
-                trees[team.uid].clear();
+            if(trees[team.id] != null){
+                trees[team.id].clear();
             }
         }
 

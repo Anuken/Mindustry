@@ -171,7 +171,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return build == null ? y : build.tile.y;
     }
 
-    public byte getTeamID(){
+    public int getTeamID(){
         return team().id;
     }
 

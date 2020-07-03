@@ -1689,7 +1689,6 @@ public class Blocks implements ContentList{
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.wraith, 200f, with(Items.silicon, 10)),
                 new UnitPlan(UnitTypes.spirit, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.draug, 200f, with(Items.silicon, 10)),
                 new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
             };
             size = 3;

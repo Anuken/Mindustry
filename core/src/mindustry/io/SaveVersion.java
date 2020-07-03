@@ -98,7 +98,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
-            "playerteam", player == null ? state.rules.defaultTeam.uid : player.team().uid
+            "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id
         ).merge(tags));
     }
 
@@ -119,7 +119,7 @@ public abstract class SaveVersion extends SaveFileReader{
             player.set(Tmp.v1);
 
             control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType", "<none>"));
-            Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.uid));
+            Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.id));
             if(!net.client() && team != Team.derelict){
                 player.team(team);
             }
