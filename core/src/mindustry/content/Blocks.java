@@ -1578,10 +1578,10 @@ public class Blocks implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
-            Items.metaglass, Bullets.flakGlass,
-            Items.blastCompound, Bullets.flakExplosive,
-            Items.plastanium, Bullets.flakPlastic,
-            Items.surgealloy, Bullets.flakSurge
+            Items.metaglass, Bullets.fragGlass,
+            Items.blastCompound, Bullets.fragExplosive,
+            Items.plastanium, Bullets.fragPlastic,
+            Items.surgealloy, Bullets.fragSurge
             );
             xRand = 4f;
             reloadTime = 6f;
@@ -1592,7 +1592,6 @@ public class Blocks implements ContentList{
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
-            targetGround = false;
 
             health = 145 * size * size;
         }};
