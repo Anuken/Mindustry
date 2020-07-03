@@ -53,7 +53,7 @@ public class MassDriver extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize, y*tilesize, range, Pal.accent);
+        Drawf.dashCircle(x * tilesize, y * tilesize, range, Pal.accent);
 
         //check if a mass driver is selected while placing this driver
         if(!control.input.frag.config.isShown()) return;
@@ -64,7 +64,7 @@ public class MassDriver extends Block{
         float sin = Mathf.absin(Time.time(), 6f, 1f);
         Tmp.v1.set(x * tilesize + offset(), y * tilesize + offset()).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
-        x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
+            x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
         int segs = (int)(selected.dst(x * tilesize, y * tilesize) / tilesize);
 
         Lines.stroke(4f, Pal.gray);

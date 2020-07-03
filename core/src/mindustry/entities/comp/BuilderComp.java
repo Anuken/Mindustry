@@ -118,7 +118,7 @@ abstract class BuilderComp implements Unitc{
         }else{
             if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
-                    Call.onTileConfig(null, tile.build, current.config);
+                    Call.tileConfig(null, tile.build, current.config);
                 }
             }
         }

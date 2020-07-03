@@ -137,7 +137,7 @@ public class ServerControl implements ApplicationListener{
             Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
             nextMapOverride = null;
             if(map != null){
-                Call.onInfoMessage((state.rules.pvp
+                Call.infoMessage((state.rules.pvp
                 ? "[yellow]The " + event.winner.name + " team is victorious![]" : "[scarlet]Game over![]")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
@@ -395,7 +395,7 @@ public class ServerControl implements ApplicationListener{
                 }
 
                 Core.settings.put("globalrules", base.toString());
-                Call.onSetRules(state.rules);
+                Call.setRules(state.rules);
             }
         });
 
@@ -885,7 +885,7 @@ public class ServerControl implements ApplicationListener{
             
             logic.reset();
 
-            Call.onWorldDataBegin();
+            Call.worldDataBegin();
             run.run();
             state.rules = state.map.applyRules(lastMode);
             logic.play();

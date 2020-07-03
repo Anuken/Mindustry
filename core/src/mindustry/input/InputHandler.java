@@ -156,7 +156,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onTileTapped(Player player, Building tile){
+    public static void tileTapped(Player player, Building tile){
         if(tile == null || player == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
         !netServer.admins.allowAction(player, ActionType.tapTile, tile.tile(), action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
@@ -165,7 +165,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void onTileConfig(Player player, Building tile, @Nullable Object value){
+    public static void tileConfig(Player player, Building tile, @Nullable Object value){
         if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
@@ -174,7 +174,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onUnitControl(Player player, @Nullable Unit unit){
+    public static void unitControl(Player player, @Nullable Unit unit){
         //clear player unit when they possess a core
         if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreEntity)){
             Fx.spawn.at(player);
@@ -193,7 +193,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onUnitClear(Player player){
+    public static void unitClear(Player player){
         //no free core teleports?
         if(!player.dead() && player.unit().spawnedByCore) return;
 
@@ -203,7 +203,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void onUnitCommand(Player player){
+    public static void unitCommand(Player player){
         if(player.dead() || !(player.unit() instanceof Commanderc)) return;
 
         Commanderc commander = (Commanderc)player.unit();
@@ -263,7 +263,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType);
 
             if(unit != null){
-                Call.onUnitControl(player, unit);
+                Call.unitControl(player, unit);
             }
         }
     }
@@ -277,7 +277,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             if(unit != null){
                 if(net.client()){
-                    Call.onUnitControl(player, unit);
+                    Call.unitControl(player, unit);
                 }else{
                     unit.controller(player);
                 }
@@ -695,7 +695,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         //call tapped event
         if(!consumed && tile.interactable(player.team())){
-            Call.onTileTapped(player, tile);
+            Call.tileTapped(player, tile);
         }
 
         //consume tap event if necessary

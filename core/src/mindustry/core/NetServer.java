@@ -162,7 +162,7 @@ public class NetServer implements ApplicationListener{
                 info.lastName = packet.name;
                 info.id = packet.uuid;
                 admins.save();
-                Call.onInfoMessage(con, "You are not whitelisted here.");
+                Call.infoMessage(con, "You are not whitelisted here.");
                 Log.info("&lcDo &lywhitelist-add @&lc to whitelist the player &lb'@'", packet.uuid, packet.name);
                 con.kick(KickReason.whitelist);
                 return;
@@ -453,7 +453,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 player.getInfo().lastSyncTime = Time.millis();
-                Call.onWorldDataBegin(player.con);
+                Call.worldDataBegin(player.con);
                 netServer.sendWorldData(player);
             }
         });
@@ -501,7 +501,7 @@ public class NetServer implements ApplicationListener{
             if(player.con.hasConnected){
                 Events.fire(new PlayerLeave(player));
                 if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
-                Call.onPlayerDisconnect(player.id());
+                Call.playerDisconnect(player.id());
             }
 
             if(Config.showConnectMessages.bool()) Log.info("&lm[@] &lc@ has disconnected. &lg&fi(@)", player.uuid(), player.name, reason);
@@ -526,7 +526,7 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client, unreliable = true)
-    public static void onClientShapshot(
+    public static void clientShapshot(
         Player player,
         int snapshotID,
         float x, float y,
@@ -633,7 +633,7 @@ public class NetServer implements ApplicationListener{
                 newx = x;
                 newy = y;
             }else if(!Mathf.within(x, y, newx, newy, correctDist)){
-                Call.onPositionSet(player.con, newx, newy); //teleport and correct position when necessary
+                Call.setPosition(player.con, newx, newy); //teleport and correct position when necessary
             }
 
             //reset player to previous synced position so it gets interpolated
@@ -666,7 +666,7 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
-    public static void onAdminRequest(Player player, Player other, AdminAction action){
+    public static void adminRequest(Player player, Player other, AdminAction action){
 
         if(!player.admin){
             Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action without proper security access.",
@@ -693,9 +693,9 @@ public class NetServer implements ApplicationListener{
         }else if(action == AdminAction.trace){
             TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile);
             if(player.con != null){
-                Call.onTraceInfo(player.con, other, info);
+                Call.traceInfo(player.con, other, info);
             }else{
-                NetClient.onTraceInfo(other, info);
+                NetClient.traceInfo(other, info);
             }
             Log.info("&lc@ has requested trace info of @.", player.name, other.name);
         }
@@ -785,7 +785,7 @@ public class NetServer implements ApplicationListener{
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
                 byte[] stateBytes = syncStream.toByteArray();
-                Call.onBlockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+                Call.blockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
                 sent = 0;
                 syncStream.reset();
             }
@@ -794,7 +794,7 @@ public class NetServer implements ApplicationListener{
         if(sent > 0){
             dataStream.close();
             byte[] stateBytes = syncStream.toByteArray();
-            Call.onBlockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+            Call.blockSnapshot(sent, (short)stateBytes.length, net.compressSnapshot(stateBytes));
         }
     }
 
@@ -813,7 +813,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.onStateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
@@ -832,7 +832,7 @@ public class NetServer implements ApplicationListener{
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
                 byte[] syncBytes = syncStream.toByteArray();
-                Call.onEntitySnapshot(player.con, (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
+                Call.entitySnapshot(player.con, (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
                 sent = 0;
                 syncStream.reset();
             }
@@ -842,7 +842,7 @@ public class NetServer implements ApplicationListener{
             dataStream.close();
 
             byte[] syncBytes = syncStream.toByteArray();
-            Call.onEntitySnapshot(player.con, (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
+            Call.entitySnapshot(player.con, (short)sent, (short)syncBytes.length, net.compressSnapshot(syncBytes));
         }
 
     }

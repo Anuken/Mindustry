@@ -174,12 +174,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void configure(Object value){
         //save last used config
         block.lastConfig = value;
-        Call.onTileConfig(player, base(), value);
+        Call.tileConfig(player, base(), value);
     }
 
     /** Configure from a server. */
     public void configureAny(Object value){
-        Call.onTileConfig(null, base(), value);
+        Call.tileConfig(null, base(), value);
     }
 
     /** Deselect this tile from configuration. */
@@ -1126,6 +1126,30 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public boolean isValid(){
         return tile.build == base() && !dead();
+    }
+
+    @Replace
+    @Override
+    public void kill(){
+        Call.tileDestroyed(base());
+    }
+
+    @Replace
+    @Override
+    public void damage(float damage){
+        if(dead()) return;
+
+        if(Mathf.zero(state.rules.blockHealthMultiplier)){
+            damage = health + 1;
+        }else{
+            damage /= state.rules.blockHealthMultiplier;
+        }
+
+        Call.tileDamage(base(), health - handleDamage(damage));
+
+        if(health <= 0){
+            Call.tileDestroyed(base());
+        }
     }
 
     @Override

@@ -641,19 +641,19 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void onTileDamage(Tile tile, float health){
-        if(tile.build != null){
-            tile.build.health = health;
+    public static void tileDamage(Building build, float health){
+        if(build == null) return;
 
-            if(tile.build.damaged()){
-                indexer.notifyTileDamaged(tile.build);
-            }
+        build.health = health;
+
+        if(build.damaged()){
+            indexer.notifyTileDamaged(build);
         }
     }
 
     @Remote(called = Loc.server)
-    public static void onTileDestroyed(Tile tile){
-        if(tile.build == null) return;
-        tile.build.killed();
+    public static void tileDestroyed(Building build){
+        if(build == null) return;
+        build.killed();
     }
 }

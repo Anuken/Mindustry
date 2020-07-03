@@ -111,7 +111,7 @@ public class Control implements ApplicationListener, Loadable{
             state.stats.wavesLasted = state.wave;
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
-            Call.onGameOver(event.winner);
+            Call.gameOver(event.winner);
         });
 
         //autohost for pvp maps

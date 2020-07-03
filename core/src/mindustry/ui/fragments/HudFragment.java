@@ -652,7 +652,7 @@ public class HudFragment extends Fragment{
     private void addPlayButton(Table table){
         table.right().button(Icon.play, Styles.righti, 30f, () -> {
             if(net.client() && player.admin){
-                Call.onAdminRequest(player, AdminAction.wave);
+                Call.adminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
                 ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);
             }else{

@@ -205,7 +205,7 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
                 Unit on = selectedUnit();
                 if(on != null){
-                    Call.onUnitControl(player, on);
+                    Call.unitControl(player, on);
                     shouldShoot = false;
                 }
             }
@@ -215,7 +215,7 @@ public class DesktopInput extends InputHandler{
             updateMovement(player.unit());
 
             if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore()){
-                Call.onUnitClear(player);
+                Call.unitClear(player);
                 controlledType = null;
             }
         }
@@ -621,7 +621,7 @@ public class DesktopInput extends InputHandler{
         if(unit instanceof Commanderc){
 
             if(Core.input.keyTap(Binding.command)){
-                Call.onUnitCommand(player);
+                Call.unitCommand(player);
             }
         }
     }

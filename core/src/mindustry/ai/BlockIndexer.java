@@ -210,11 +210,11 @@ public class BlockIndexer{
     }
 
     public void notifyTileDamaged(Building entity){
-        if(damagedTiles[(int)entity.team().id] == null){
-            damagedTiles[(int)entity.team().id] = new TileArray();
+        if(damagedTiles[entity.team().id] == null){
+            damagedTiles[entity.team().id] = new TileArray();
         }
 
-        TileArray set = damagedTiles[(int)entity.team().id];
+        TileArray set = damagedTiles[entity.team().id];
         set.add(entity.tile());
     }
 

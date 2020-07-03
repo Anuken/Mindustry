@@ -262,6 +262,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(dead || net.client()) return;
 
         //deaths are synced; this calls killed()
-        Call.onUnitDeath(base());
+        Call.unitDeath(base());
     }
 }

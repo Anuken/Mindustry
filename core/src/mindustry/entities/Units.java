@@ -17,7 +17,7 @@ public class Units{
     private static boolean boolResult;
 
     @Remote(called = Loc.server)
-    public static void onUnitDeath(Unit unit){
+    public static void unitDeath(Unit unit){
         unit.killed();
     }
 

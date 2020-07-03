@@ -46,7 +46,7 @@ public abstract class NetConnection{
             info.lastKicked = Math.max(Time.millis() + 30 * 1000, info.lastKicked);
         }
 
-        Call.onKick(this, reason);
+        Call.kick(this, reason);
 
         Time.runTask(2f, this::close);
 
@@ -66,7 +66,7 @@ public abstract class NetConnection{
         info.timesKicked++;
         info.lastKicked = Math.max(Time.millis() + kickDuration, info.lastKicked);
 
-        Call.onKick(this, reason);
+        Call.kick(this, reason);
 
         Time.runTask(2f, this::close);
 

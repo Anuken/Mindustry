@@ -53,7 +53,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Remote(called = Loc.server)
-    public static void onPlayerSpawn(Tile tile, Player player){
+    public static void playerSpawn(Tile tile, Player player){
         if(player == null || tile == null) return;
 
         CoreEntity entity = tile.bc();
@@ -171,7 +171,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         public void requestSpawn(Player player){
-            Call.onPlayerSpawn(tile, player);
+            Call.playerSpawn(tile, player);
         }
 
         @Override

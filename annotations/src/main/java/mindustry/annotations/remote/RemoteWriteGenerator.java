@@ -66,7 +66,7 @@ public class RemoteWriteGenerator{
 
         //create builder
         MethodSpec.Builder method = MethodSpec.methodBuilder(elem.getSimpleName().toString() + (forwarded ? "__forward" : "")) //add except suffix when forwarding
-        .addModifiers(Modifier.STATIC, Modifier.SYNCHRONIZED)
+        .addModifiers(Modifier.STATIC)
         .returns(void.class);
 
         //forwarded methods aren't intended for use, and are not public
