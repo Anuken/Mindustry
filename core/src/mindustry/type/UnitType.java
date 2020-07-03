@@ -137,6 +137,29 @@ public class UnitType extends UnlockableContent{
                 range = Math.max(range, weapon.bullet.range());
             }
         }
+
+        //add mirrored weapon variants
+        Seq<Weapon> mapped = new Seq<>();
+        for(Weapon w : weapons){
+            mapped.add(w);
+
+            //mirrors are copies with X values negated
+            if(w.mirror){
+                Weapon copy = w.copy();
+                copy.x *= -1;
+                copy.shootX *= -1;
+                copy.flipSprite = !copy.flipSprite;
+                mapped.add(copy);
+
+                //since there are now two weapons, the reload time must be doubled
+                w.reload *= 2f;
+                copy.reload *= 2f;
+
+                w.otherSide = mapped.size - 1;
+                copy.otherSide = mapped.size - 2;
+            }
+        }
+        this.weapons = mapped;
     }
 
     @CallSuper
@@ -324,23 +347,17 @@ public class UnitType extends UnlockableContent{
         for(WeaponMount mount : unit.mounts){
             Weapon weapon = mount.weapon;
 
-            for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
-                i *= Mathf.sign(weapon.flipped);
+            float rotation = unit.rotation - 90;
+            float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
+            float width = weapon.region.getWidth();
+            float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
 
-                float rotation = unit.rotation - 90;
-                float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-                float width = i > 0 ? -weapon.region.getWidth() : weapon.region.getWidth();
-                float recoil = -(mount.reload / weapon.reload * weapon.recoil) * (weapon.alternate ? Mathf.num(i == Mathf.sign(mount.side)) : 1);
-
-                if(weapon.mirror) rotation = weaponRotation;
-
-                Draw.rect(weapon.region,
-                unit.x + Angles.trnsx(rotation, weapon.x * i, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
-                unit.y + Angles.trnsy(rotation, weapon.x * i, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
-                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.region.getHeight() * Draw.scl,
-                weaponRotation);
-            }
+            Draw.rect(weapon.region,
+            unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
+            unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
+            width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+            weapon.region.getHeight() * Draw.scl,
+            weaponRotation);
         }
 
         Draw.reset();

@@ -28,6 +28,7 @@ public class TractorBeamTurret extends Block{
     public float shootCone = 6f;
     public float laserWidth = 0.6f;
     public float force = 0.3f;
+    public float scaledForce = 0f;
     public float damage = 0f;
     public boolean targetAir = true, targetGround = false;
 
@@ -88,7 +89,7 @@ public class TractorBeamTurret extends Block{
 
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
-                    target.impulse(Tmp.v1.set(this).sub(target).limit(force * efficiency() * timeScale));
+                    target.impulse(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * efficiency() * timeScale));
                 }
             }else{
                 target = null;

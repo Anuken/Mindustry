@@ -1,7 +1,6 @@
 package mindustry.content;
 
 import arc.graphics.*;
-import arc.math.*;
 import arc.struct.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -70,7 +69,7 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon("large-weapon"){{
                 reload = 14f;
                 x = 4f;
-                alternate = true;
+                y = 2f;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
             }});
@@ -88,7 +87,6 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.flame;
                 shootY = 2f;
                 reload = 14f;
-                alternate = true;
                 recoil = 1f;
                 ejectEffect = Fx.none;
                 bullet = Bullets.basicFlame;
@@ -107,8 +105,7 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon("heal-weapon"){{
                 shootY = 1.5f;
                 reload = 24f;
-                x = 1f;
-                shootX = 3.5f;
+                x = 3.5f;
                 alternate = false;
                 ejectEffect = Fx.none;
                 recoil = 2f;
@@ -160,10 +157,8 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon("beam-weapon"){{
                 shake = 2f;
                 shootY = 4f;
-                shootX = 6f;
-                x = 0.25f;
+                x = 6.5f;
                 reload = 50f;
-                alternate = true;
                 recoil = 4f;
                 shootSound = Sounds.laser;
 
@@ -188,7 +183,6 @@ public class UnitTypes implements ContentList{
                 y = 1f;
                 x = 9f;
                 reload = 60f;
-                alternate = true;
                 recoil = 4f;
                 shake = 2f;
                 ejectEffect = Fx.shellEjectMedium;
@@ -251,7 +245,6 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon("eruption"){{
                 shootY = 3f;
                 reload = 10f;
-                alternate = true;
                 ejectEffect = Fx.none;
                 recoil = 1f;
                 x = 7f;
@@ -288,18 +281,14 @@ public class UnitTypes implements ContentList{
             legSplashDamage = 32;
             legSplashRange = 30;
 
-            for(boolean b : Mathf.booleans){
-                weapons.add(
-                new Weapon("missiles-mount"){{
-                    reload = 20f;
-                    x = 4f * Mathf.sign(b);
-                    rotate = true;
-                    mirror = false;
-                    flipSprite = !b;
-                    shake = 1f;
-                    bullet = Bullets.missileSwarm;
-                }});
-            }
+            weapons.add(
+            new Weapon("missiles-mount"){{
+                reload = 20f;
+                x = 4f;
+                rotate = true;
+                shake = 1f;
+                bullet = Bullets.missileSwarm;
+            }});
         }};
 
         wraith = new UnitType("wraith"){{
@@ -315,7 +304,6 @@ public class UnitTypes implements ContentList{
                 y = 0f;
                 x = 2f;
                 reload = 15f;
-                alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
                 shootSound = Sounds.shoot;
@@ -338,7 +326,6 @@ public class UnitTypes implements ContentList{
                 shootY = 0f;
                 reload = 12f;
                 shootCone = 180f;
-                alternate = true;
                 ejectEffect = Fx.none;
                 inaccuracy = 15f;
                 ignoreRotation = true;
@@ -360,36 +347,31 @@ public class UnitTypes implements ContentList{
             engineOffset = 12f;
             engineSize = 3f;
 
-            for(boolean b : Mathf.booleans){
-                weapons.add(
-                new Weapon("revenant-missiles"){{
-                    reload = 70f;
-                    x = 7f * Mathf.sign(b);
-                    rotate = true;
-                    mirror = false;
-                    flipSprite = !b;
-                    shake = 1f;
+            weapons.add(new Weapon("revenant-missiles"){{
+                reload = 70f;
+                x = 7f;
+                rotate = true;
+                shake = 1f;
 
-                    bullet = new MissileBulletType(2.7f, 12, "missile"){{
-                        width = 8f;
-                        height = 8f;
-                        shrinkY = 0f;
-                        drag = -0.003f;
-                        homingRange = 60f;
-                        keepVelocity = false;
-                        splashDamageRadius = 25f;
-                        splashDamage = 10f;
-                        lifetime = 60f;
-                        trailColor = Pal.unitBack;
-                        backColor = Pal.unitBack;
-                        frontColor = Pal.unitFront;
-                        hitEffect = Fx.blastExplosion;
-                        despawnEffect = Fx.blastExplosion;
-                        weaveScale = 6f;
-                        weaveMag = 1f;
-                    }};
-                }});
-            }
+                bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                    width = 8f;
+                    height = 8f;
+                    shrinkY = 0f;
+                    drag = -0.003f;
+                    homingRange = 60f;
+                    keepVelocity = false;
+                    splashDamageRadius = 25f;
+                    splashDamage = 10f;
+                    lifetime = 60f;
+                    trailColor = Pal.unitBack;
+                    backColor = Pal.unitBack;
+                    frontColor = Pal.unitFront;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 6f;
+                    weaveMag = 1f;
+                }};
+            }});
         }};
 
         reaper = new UnitType("reaper"){{
@@ -407,7 +389,6 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon(){{
                 y = 1.5f;
                 reload = 28f;
-                alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
                 shootSound = Sounds.shoot;
@@ -429,7 +410,6 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon(){{
                 y = 1.5f;
                 reload = 28f;
-                alternate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
                 shootSound = Sounds.shoot;
@@ -445,7 +425,6 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 10f;
                 x = 1.25f;
-                alternate = true;
                 rotate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
@@ -478,7 +457,6 @@ public class UnitTypes implements ContentList{
                 y = 1.5f;
                 reload = 40f;
                 x = 0.5f;
-                alternate = true;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 bullet = Bullets.healBulletBig;
@@ -506,10 +484,8 @@ public class UnitTypes implements ContentList{
 
             weapons.add(new Weapon("small-basic-weapon"){{
                 reload = 15f;
-                x = -1f;
-                y = -1f;
-                shootX = 3.5f;
-                alternate = true;
+                x = 2.75f;
+                y = 1f;
 
                 bullet = new BasicBulletType(2.5f, 9){{
                     width = 7f;
@@ -551,28 +527,21 @@ public class UnitTypes implements ContentList{
             hitsize = 14f;
             engineSize = 3f;
 
-            for(boolean b : Mathf.booleans){
-                weapons.add(
-                new Weapon("heal-weapon-mount"){{
-                    reload = 25f;
-                    x = 8f * Mathf.sign(b);
-                    y = -6f;
-                    rotate = true;
-                    mirror = false;
-                    flipSprite = !b;
-                    bullet = Bullets.healBulletBig;
-                }},
-                new Weapon("heal-weapon-mount"){{
-                    reload = 15f;
-                    x = 4f * Mathf.sign(b);
-                    y = 5f;
-                    rotate = true;
-                    mirror = false;
-                    flipSprite = !b;
-                    bullet = Bullets.healBullet;
-                }}
-                );
-            }
+            weapons.add(
+            new Weapon("heal-weapon-mount"){{
+                reload = 25f;
+                x = 8f;
+                y = -6f;
+                rotate = true;
+                bullet = Bullets.healBulletBig;
+            }},
+            new Weapon("heal-weapon-mount"){{
+                reload = 15f;
+                x = 4f;
+                y = 5f;
+                rotate = true;
+                bullet = Bullets.healBullet;
+            }});
         }};
         
         /*

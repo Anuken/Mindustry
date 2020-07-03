@@ -5653,6 +5653,13 @@ artillery
   orig: 48, 56
   offset: 0, 0
   index: -1
+beam-weapon
+  rotate: false
+  xy: 2793, 803
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
 chaos
   rotate: false
   xy: 1023, 245
@@ -5777,20 +5784,6 @@ wraith
   xy: 3793, 719
   size: 48, 48
   orig: 48, 48
-  offset: 0, 0
-  index: -1
-beam-weapon
-  rotate: false
-  xy: 2793, 803
-  size: 80, 80
-  orig: 80, 80
-  offset: 0, 0
-  index: -1
-beam-weapon
-  rotate: false
-  xy: 2793, 803
-  size: 80, 80
-  orig: 80, 80
   offset: 0, 0
   index: -1
 

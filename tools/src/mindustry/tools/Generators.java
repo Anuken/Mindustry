@@ -302,6 +302,7 @@ public class Generators{
             if(type.isHidden()) return; //hidden units don't generate
 
             type.load();
+            type.init();
 
             Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
             for(int i = 1; i < type.parts; i++){
@@ -335,14 +336,10 @@ public class Generators{
             for(Weapon weapon : type.weapons){
                 weapon.load();
 
-                for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
-                    i *= Mathf.sign(weapon.flipped);
-
-                    image.draw(weapon.region,
-                    (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
-                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
-                    i > 0, false);
-                }
+                image.draw(weapon.region,
+                (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.getWidth() / 2f),
+                (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                weapon.flipSprite, false);
             }
 
             image.save("unit-" + type.name + "-full");

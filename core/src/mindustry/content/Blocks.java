@@ -1592,6 +1592,7 @@ public class Blocks implements ContentList{
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
+            targetGround = false;
 
             health = 145 * size * size;
         }};
@@ -1660,7 +1661,8 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 3f;
+            force = 2.5f;
+            scaledForce = 5f;
             range = 170f;
             damage = 0.08f;
             health = 160 * size * size;
