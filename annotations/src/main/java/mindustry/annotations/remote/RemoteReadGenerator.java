@@ -1,12 +1,12 @@
 package mindustry.annotations.remote;
 
+import arc.struct.*;
 import arc.util.io.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
 import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
-import java.util.*;
 
 /** Generates code for reading remote invoke packets on the client and server. */
 public class RemoteReadGenerator{
@@ -24,7 +24,7 @@ public class RemoteReadGenerator{
      * @param packageName Full target package name.
      * @param needsPlayer Whether this read method requires a reference to the player sender.
      */
-    public void generateFor(List<MethodEntry> entries, String className, String packageName, boolean needsPlayer) throws Exception{
+    public void generateFor(Seq<MethodEntry> entries, String className, String packageName, boolean needsPlayer) throws Exception{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
         classBuilder.addJavadoc(RemoteProcess.autogenWarning);

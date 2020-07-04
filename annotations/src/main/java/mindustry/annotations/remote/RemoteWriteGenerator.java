@@ -9,7 +9,6 @@ import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
 import java.io.*;
-import java.util.*;
 
 /** Generates code for writing remote invoke packets on the client and server. */
 public class RemoteWriteGenerator{
@@ -21,7 +20,7 @@ public class RemoteWriteGenerator{
     }
 
     /** Generates all classes in this list. */
-    public void generateFor(List<ClassEntry> entries, String packageName) throws IOException{
+    public void generateFor(Seq<ClassEntry> entries, String packageName) throws IOException{
 
         for(ClassEntry entry : entries){
             //create builder
