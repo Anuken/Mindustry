@@ -16,10 +16,10 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, siegeArray, eradicator;
 
     //ground + builder
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType tau;
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova;
 
     //ground + builder + miner + commander
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType oculon;
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType quasar;
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix, eruptor;
@@ -28,20 +28,22 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
 
     //air + building
-    public static @EntityDef({Unitc.class, Builderc.class}) UnitType spirit;
+    public static @EntityDef({Unitc.class, Builderc.class}) UnitType mono;
+
+    //air + building + mining
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType poly;
+
+    //air + building + mining + payload
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
 
     //air + mining
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType phantom;
 
     //air + building + mining
-    //TODO implement other starter drones
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Trailc.class}) UnitType alpha, beta, gamma;
 
-    //air + building + mining + payload
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType trident;
-
     //water
-    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType vanguard;
+    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risse, minke, bryde;
 
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
@@ -93,7 +95,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        tau = new UnitType("tau"){{
+        nova = new UnitType("nova"){{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
@@ -114,7 +116,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        oculon = new UnitType("oculon"){{
+        quasar = new UnitType("quasar"){{
             mineTier = 1;
             hitsize = 9f;
             boostMultiplier = 2f;
@@ -388,7 +390,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        vanguard = new UnitType("vanguard"){{
+        risse = new UnitType("risse"){{
             speed = 1.3f;
             drag = 0.1f;
             hitsize = 8f;
@@ -403,23 +405,33 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        spirit = new UnitType("spirit"){{
-            flying = true;
-            drag = 0.05f;
-            accel = 0.2f;
-            speed = 2f;
-            range = 50f;
-            health = 100;
-            engineSize = 1.8f;
-            engineOffset = 5.7f;
-            weapons.add(new Weapon(){{
-                y = 1.5f;
-                reload = 40f;
-                x = 0.5f;
-                ejectEffect = Fx.none;
-                recoil = 2f;
-                bullet = Bullets.healBulletBig;
-                shootSound = Sounds.pew;
+        minke = new UnitType("minke"){{
+            speed = 1.3f;
+            drag = 0.1f;
+            hitsize = 8f;
+            health = 130;
+            immunities = ObjectSet.with(StatusEffects.wet);
+            weapons.add(new Weapon("mount-weapon"){{
+                reload = 10f;
+                x = 1.25f;
+                rotate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+            }});
+        }};
+
+        bryde = new UnitType("bryde"){{
+            speed = 1.3f;
+            drag = 0.1f;
+            hitsize = 8f;
+            health = 130;
+            immunities = ObjectSet.with(StatusEffects.wet);
+            weapons.add(new Weapon("mount-weapon"){{
+                reload = 10f;
+                x = 1.25f;
+                rotate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
             }});
         }};
 
@@ -458,7 +470,97 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        phantom = new UnitType("phantom"){{
+        beta = new UnitType("beta"){{
+            //TODO maybe these should be changed
+            defaultController = BuilderAI::new;
+            isCounted = false;
+
+            flying = true;
+            mineSpeed = 2f;
+            mineTier = 1;
+            buildSpeed = 0.5f;
+            drag = 0.05f;
+            speed = 2.4f;
+            rotateSpeed = 15f;
+            accel = 0.1f;
+            range = 70f;
+            itemCapacity = 30;
+            health = 80f;
+            engineOffset = 6f;
+            hitsize = 8f;
+
+            weapons.add(new Weapon("small-basic-weapon"){{
+                reload = 15f;
+                x = 2.75f;
+                y = 1f;
+
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 60f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    tileDamageMultiplier = 0.1f;
+                }};
+            }});
+        }};
+
+        gamma = new UnitType("gamma"){{
+            //TODO maybe these should be changed
+            defaultController = BuilderAI::new;
+            isCounted = false;
+
+            flying = true;
+            mineSpeed = 2f;
+            mineTier = 1;
+            buildSpeed = 0.5f;
+            drag = 0.05f;
+            speed = 2.4f;
+            rotateSpeed = 15f;
+            accel = 0.1f;
+            range = 70f;
+            itemCapacity = 30;
+            health = 80f;
+            engineOffset = 6f;
+            hitsize = 8f;
+
+            weapons.add(new Weapon("small-basic-weapon"){{
+                reload = 15f;
+                x = 2.75f;
+                y = 1f;
+
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 60f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    tileDamageMultiplier = 0.1f;
+                }};
+            }});
+        }};
+
+        mono = new UnitType("mono"){{
+            flying = true;
+            drag = 0.05f;
+            accel = 0.2f;
+            speed = 2f;
+            range = 50f;
+            health = 100;
+            engineSize = 1.8f;
+            engineOffset = 5.7f;
+            weapons.add(new Weapon(){{
+                y = 1.5f;
+                reload = 40f;
+                x = 0.5f;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                bullet = Bullets.healBulletBig;
+                shootSound = Sounds.pew;
+            }});
+        }};
+
+        poly = new UnitType("poly"){{
             defaultController = BuilderAI::new;
 
             flying = true;
@@ -474,7 +576,7 @@ public class UnitTypes implements ContentList{
             hitsize = 8f;
         }};
 
-        trident = new UnitType("trident"){{
+        mega = new UnitType("mega"){{
 
             health = 500;
             speed = 2f;
@@ -484,7 +586,7 @@ public class UnitTypes implements ContentList{
             flying = true;
             engineOffset = 10.5f;
             rotateShooting = false;
-            hitsize = 14f;
+            hitsize = 15f;
             engineSize = 3f;
 
             weapons.add(
