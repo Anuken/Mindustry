@@ -1692,7 +1692,7 @@ public class Blocks implements ContentList{
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.wraith, 200f, with(Items.silicon, 10)),
                 new UnitPlan(UnitTypes.mono, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
+                //new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1723,6 +1723,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.crawler, UnitTypes.eruptor},
                 {UnitTypes.wraith, UnitTypes.ghoul},
                 {UnitTypes.mono, UnitTypes.poly},
+                {UnitTypes.risse, UnitTypes.minke},
             };
         }};
 
@@ -1739,6 +1740,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.ghoul, UnitTypes.revenant},
                 {UnitTypes.mace, UnitTypes.fortress},
                 {UnitTypes.poly, UnitTypes.mega},
+                {UnitTypes.minke, UnitTypes.bryde},
             };
         }};
 

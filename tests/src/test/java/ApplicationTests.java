@@ -481,8 +481,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.phantom.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.phantom.create(Team.sharded);
+        Builderc d1 = (Builderc)UnitTypes.mono.create(Team.sharded);
+        Builderc d2 = (Builderc)UnitTypes.mono.create(Team.sharded);
 
         //infinite build range
         state.rules.editor = true;
@@ -508,8 +508,8 @@ public class ApplicationTests{
     void buildingDestruction(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.phantom.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.phantom.create(Team.sharded);
+        Builderc d1 = (Builderc)UnitTypes.mono.create(Team.sharded);
+        Builderc d2 = (Builderc)UnitTypes.mono.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
@@ -591,7 +591,7 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
-        Unit unit = UnitTypes.spirit.create(Team.derelict);
+        Unit unit = UnitTypes.mono.create(Team.derelict);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
         int capacity = tile.block().itemCapacity;
 
