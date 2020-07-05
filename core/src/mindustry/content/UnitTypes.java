@@ -11,6 +11,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 
 public class UnitTypes implements ContentList{
+    //region definitions
 
     //ground
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, siegeArray, eradicator;
@@ -19,7 +20,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova;
 
     //ground + builder + miner + commander
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType quasar;
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType pulsar, quasar;
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix, eruptor;
@@ -36,9 +37,6 @@ public class UnitTypes implements ContentList{
     //air + building + mining + payload
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
 
-    //air + mining
-    public static @EntityDef({Unitc.class, Minerc.class}) UnitType phantom;
-
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Trailc.class}) UnitType alpha, beta, gamma;
 
@@ -48,21 +46,11 @@ public class UnitTypes implements ContentList{
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
 
+    //endregion
+
     @Override
     public void load(){
-        block = new UnitType("block"){
-            {
-                speed = 0f;
-                hitsize = 0f;
-                health = 1;
-                rotateSpeed = 360f;
-            }
-
-            @Override
-            public boolean isHidden(){
-                return true;
-            }
-        };
+        //region ground attack
 
         dagger = new UnitType("dagger"){{
             speed = 0.5f;
@@ -95,7 +83,60 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        fortress = new UnitType("fortress"){{
+            speed = 0.38f;
+            hitsize = 13f;
+            rotateSpeed = 3f;
+            targetAir = false;
+            health = 750;
+            weapons.add(new Weapon("artillery"){{
+                y = 1f;
+                x = 9f;
+                reload = 60f;
+                recoil = 4f;
+                shake = 2f;
+                ejectEffect = Fx.shellEjectMedium;
+                shootSound = Sounds.artillery;
+                bullet = new ArtilleryBulletType(2f, 8, "shell"){{
+                    hitEffect = Fx.blastExplosion;
+                    knockback = 0.8f;
+                    lifetime = 110f;
+                    width = height = 14f;
+                    collides = true;
+                    collidesTiles = true;
+                    splashDamageRadius = 20f;
+                    splashDamage = 38f;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                }};
+            }});
+        }};
+
+        //endregion
+        //region ground support
+
         nova = new UnitType("nova"){{
+            itemCapacity = 60;
+            canBoost = true;
+            boostMultiplier = 1.5f;
+            speed = 0.5f;
+            hitsize = 8f;
+            health = 100f;
+            buildSpeed = 0.8f;
+
+            weapons.add(new Weapon("heal-weapon"){{
+                shootY = 2f;
+                reload = 24f;
+                x = 4.5f;
+                alternate = false;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                bullet = Bullets.healBullet;
+                shootSound = Sounds.pew;
+            }});
+        }};
+
+        pulsar = new UnitType("pulsar"){{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
@@ -147,34 +188,8 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        fortress = new UnitType("fortress"){{
-            speed = 0.38f;
-            hitsize = 13f;
-            rotateSpeed = 3f;
-            targetAir = false;
-            health = 750;
-            weapons.add(new Weapon("artillery"){{
-                y = 1f;
-                x = 9f;
-                reload = 60f;
-                recoil = 4f;
-                shake = 2f;
-                ejectEffect = Fx.shellEjectMedium;
-                shootSound = Sounds.artillery;
-                bullet = new ArtilleryBulletType(2f, 8, "shell"){{
-                    hitEffect = Fx.blastExplosion;
-                    knockback = 0.8f;
-                    lifetime = 110f;
-                    width = height = 14f;
-                    collides = true;
-                    collidesTiles = true;
-                    splashDamageRadius = 20f;
-                    splashDamage = 38f;
-                    backColor = Pal.bulletYellowBack;
-                    frontColor = Pal.bulletYellow;
-                }};
-            }});
-        }};
+        //endregion
+        //region ground legs
 
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
@@ -264,6 +279,9 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.missileSwarm;
             }});
         }};
+
+        //endregion
+        //region air attack
 
         wraith = new UnitType("wraith"){{
             speed = 3f;
@@ -390,6 +408,78 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        //endregion
+        //region air support
+
+        mono = new UnitType("mono"){{
+            flying = true;
+            drag = 0.05f;
+            accel = 0.2f;
+            speed = 2f;
+            range = 50f;
+            health = 100;
+            engineSize = 1.8f;
+            engineOffset = 5.7f;
+            weapons.add(new Weapon(){{
+                y = 1.5f;
+                reload = 40f;
+                x = 0.5f;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                bullet = Bullets.healBulletBig;
+                shootSound = Sounds.pew;
+            }});
+        }};
+
+        poly = new UnitType("poly"){{
+            defaultController = BuilderAI::new;
+
+            flying = true;
+            drag = 0.05f;
+            speed = 3f;
+            rotateSpeed = 15f;
+            accel = 0.3f;
+            range = 70f;
+            itemCapacity = 70;
+            health = 400;
+            buildSpeed = 0.5f;
+            engineOffset = 6.5f;
+            hitsize = 8f;
+        }};
+
+        mega = new UnitType("mega"){{
+
+            health = 500;
+            speed = 2f;
+            accel = 0.05f;
+            drag = 0.016f;
+            lowAltitude = true;
+            flying = true;
+            engineOffset = 10.5f;
+            rotateShooting = false;
+            hitsize = 15f;
+            engineSize = 3f;
+
+            weapons.add(
+            new Weapon("heal-weapon-mount"){{
+                reload = 25f;
+                x = 8f;
+                y = -6f;
+                rotate = true;
+                bullet = Bullets.healBulletBig;
+            }},
+            new Weapon("heal-weapon-mount"){{
+                reload = 15f;
+                x = 4f;
+                y = 5f;
+                rotate = true;
+                bullet = Bullets.healBullet;
+            }});
+        }};
+
+        //endregion
+        //region naval attack
+
         risse = new UnitType("risse"){{
             speed = 1.3f;
             drag = 0.1f;
@@ -434,6 +524,9 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.standardCopper;
             }});
         }};
+
+        //endregion
+        //region core
 
         alpha = new UnitType("alpha"){{
             //TODO maybe these should be changed
@@ -540,505 +633,23 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        mono = new UnitType("mono"){{
-            flying = true;
-            drag = 0.05f;
-            accel = 0.2f;
-            speed = 2f;
-            range = 50f;
-            health = 100;
-            engineSize = 1.8f;
-            engineOffset = 5.7f;
-            weapons.add(new Weapon(){{
-                y = 1.5f;
-                reload = 40f;
-                x = 0.5f;
-                ejectEffect = Fx.none;
-                recoil = 2f;
-                bullet = Bullets.healBulletBig;
-                shootSound = Sounds.pew;
-            }});
-        }};
+        //endregion
+        //region internal
 
-        poly = new UnitType("poly"){{
-            defaultController = BuilderAI::new;
-
-            flying = true;
-            drag = 0.05f;
-            speed = 3f;
-            rotateSpeed = 15f;
-            accel = 0.3f;
-            range = 70f;
-            itemCapacity = 70;
-            health = 400;
-            buildSpeed = 0.5f;
-            engineOffset = 6.5f;
-            hitsize = 8f;
-        }};
-
-        mega = new UnitType("mega"){{
-
-            health = 500;
-            speed = 2f;
-            accel = 0.05f;
-            drag = 0.016f;
-            lowAltitude = true;
-            flying = true;
-            engineOffset = 10.5f;
-            rotateShooting = false;
-            hitsize = 15f;
-            engineSize = 3f;
-
-            weapons.add(
-            new Weapon("heal-weapon-mount"){{
-                reload = 25f;
-                x = 8f;
-                y = -6f;
-                rotate = true;
-                bullet = Bullets.healBulletBig;
-            }},
-            new Weapon("heal-weapon-mount"){{
-                reload = 15f;
-                x = 4f;
-                y = 5f;
-                rotate = true;
-                bullet = Bullets.healBullet;
-            }});
-        }};
-        
-        /*
-        chaosArray = new UnitType("chaos-array", GroundUnit::new){{
-            maxVelocity = 0.68f;
-            speed = 0.12f;
-            drag = 0.4f;
-            mass = 5f;
-            hitsize = 20f;
-            rotatespeed = 0.06f;
-            health = 3000;
-            weapons.add(new Weapon("chaos"){{
-                length = 8f;
-                reload = 50f;
-                width = 17f;
-                alternate = true;
-                recoil = 3f;
-                shake = 2f;
-                shots = 4;
-                spacing = 4f;
-                shotDelay = 5;
-                ejectEffect = Fx.shellEjectMedium;
-                bullet = Bullets.flakSurge;
-                shootSound = Sounds.shootBig;
-            }});
-        }};
-
-        eradicator = new UnitType("eradicator", GroundUnit::new){{
-            maxVelocity = 0.68f;
-            speed = 0.12f;
-            drag = 0.4f;
-            mass = 5f;
-            hitsize = 20f;
-            rotatespeed = 0.06f;
-            health = 9000;
-            weapons.add(new Weapon("eradication"){{
-                length = 13f;
-                reload = 30f;
-                width = 22f;
-                alternate = true;
-                recoil = 3f;
-                shake = 2f;
-                inaccuracy = 3f;
-                shots = 4;
-                spacing = 0f;
-                shotDelay = 3;
-                ejectEffect = Fx.shellEjectMedium;
-                bullet = Bullets.standardThoriumBig;
-                shootSound = Sounds.shootBig;
-            }});
-        }};
-
-        lich = new UnitType("lich", HoverUnit::new){{
-            health = 6000;
-            mass = 20f;
-            hitsize = 40f;
-            speed = 0.01f;
-            maxVelocity = 0.6f;
-            drag = 0.02f;
-            range = 80f;
-            shootCone = 20f;
-            flying = true;
-            //rotateWeapons = true;
-            engineOffset = 21;
-            engineSize = 5.3f;
-            rotatespeed = 0.01f;
-            attackLength = 90f;
-            baseRotateSpeed = 0.04f;
-            weapons.add(new Weapon("lich-missiles"){{
-                length = 4f;
-                reload = 160f;
-                width = 22f;
-                shots = 16;
-                shootCone = 100f;
-                shotDelay = 2;
-                inaccuracy = 10f;
-                alternate = true;
-                ejectEffect = Fx.none;
-                velocityRnd = 0.2f;
-                spacing = 1f;
-                bullet = Bullets.missileRevenant;
-                shootSound = Sounds.artillery;
-            }});
-        }};
-
-        reaper = new UnitType("reaper", HoverUnit::new){{
-            health = 11000;
-            mass = 30f;
-            hitsize = 56f;
-            speed = 0.01f;
-            maxVelocity = 0.6f;
-            drag = 0.02f;
-            range = 80f;
-            shootCone = 30f;
-            flying = true;
-            //rotateWeapons = true;
-            engineOffset = 40;
-            engineSize = 7.3f;
-            rotatespeed = 0.01f;
-            baseRotateSpeed = 0.04f;
-            weapons.add(new Weapon("reaper-gun"){{
-                length = 3f;
-                reload = 10f;
-                width = 32f;
-                shots = 1;
-                shootCone = 100f;
-
-                shake = 1f;
-                inaccuracy = 3f;
-                alternate = true;
-                ejectEffect = Fx.none;
-                bullet = new BasicBulletType(7f, 42, "bullet"){
-                    {
-                        bulletWidth = 15f;
-                        bulletHeight = 21f;
-                        shootEffect = Fx.shootBig;
-                    }
-
-                    @Override
-                    public float range(){
-                        return 165f;
-                    }
-                };
-                shootSound = Sounds.shootBig;
-            }});
-        }};
+        block = new UnitType("block"){
+            {
+                speed = 0f;
+                hitsize = 0f;
+                health = 1;
+                rotateSpeed = 360f;
             }
 
             @Override
-            public boolean alwaysUnlocked(){
+            public boolean isHidden(){
                 return true;
             }
-
-            @Override
-            public void update(Player player){
-                if(player.timer.get(Player.timerAbility, healReload)){
-                    if(indexer.eachBlock(player, healRange, other -> other.entity.damaged(), other -> {
-                        other.entity.heal(other.entity.maxHealth() * healPercent / 100f);
-                        Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Pal.heal);
-                    })){
-                        Fx.healWave.at(player);
-                    }
-                }
-            }
         };
 
-        delta = new UnitType("delta-mech", false){
-            {
-                drillPower = 1;
-                mineSpeed = 1.5f;
-                mass = 1.2f;
-                speed = 0.5f;
-                itemCapacity = 40;
-                boostSpeed = 0.95f;
-                buildSpeed = 1.2f;
-                engineColor = Color.valueOf("ffd37f");
-                health = 250f;
-                weaponOffsetX = 4f;
-
-                weapons.add(new Weapon("flamethrower"){{
-                    length = 1.5f;
-                    reload = 30f;
-                    width = 4f;
-                    alternate = true;
-                    shots = 3;
-                    inaccuracy = 40f;
-                    shootSound = Sounds.spark;
-                    bullet = new LightningBulletType(){{
-                        damage = 5;
-                        lightningLength = 10;
-                        lightningColor = Pal.lightFlame;
-                    }});
-        }};
-            }
-        };
-
-        tau = new UnitType("tau-mech", false){
-            float healRange = 60f;
-            float healAmount = 10f;
-            float healReload = 160f;
-            boolean wasHealed;
-
-            {
-                drillPower = 4;
-                mineSpeed = 3f;
-                itemCapacity = 70;
-                weaponOffsetY = -1;
-                weaponOffsetX = 1;
-                mass = 1.75f;
-                speed = 0.44f;
-                drag = 0.35f;
-                boostSpeed = 0.8f;
-                canHeal = true;
-                health = 200f;
-                buildSpeed = 1.6f;
-                engineColor = Pal.heal;
-
-                weapons.add(new Weapon("heal-gun"){{
-                    length = 1.5f;
-                    reload = 24f;
-                    alternate = false;
-                    ejectEffect = Fx.none;
-                    recoil = 2f;
-                    bullet = Bullets.healBullet;
-                    shootSound = Sounds.pew;
-                }};
-            }
-
-            @Override
-            public void update(Player player){
-
-                if(player.timer.get(Player.timerAbility, healReload)){
-                    wasHealed = false;
-
-                    Units.nearby(player.team(), player.x, player.y, healRange, unit -> {
-                        if(unit.health < unit.maxHealth()){
-                            Fx.heal.at(unit);
-                            wasHealed = true;
-                        }
-                        unit.heal(healAmount);
-                    });
-
-                    if(wasHealed){
-                        Fx.healWave.at(player);
-                    }
-                }
-            }
-        };
-
-        omega = new UnitType("omega-mech", false){
-            protected TextureRegion armorRegion;
-
-            {
-                drillPower = 2;
-                mineSpeed = 1.5f;
-                itemCapacity = 80;
-                speed = 0.36f;
-                boostSpeed = 0.6f;
-                mass = 4f;
-                shake = 4f;
-                weaponOffsetX = 1;
-                weaponOffsetY = 0;
-                engineColor = Color.valueOf("feb380");
-                health = 350f;
-                buildSpeed = 1.5f;
-                weapons.add(new Weapon("missiles"){{
-                    length = 1.5f;
-                    recoil = 4f;
-                    reload = 38f;
-                    shots = 4;
-                    spacing = 8f;
-                    inaccuracy = 8f;
-                    alternate = true;
-                    ejectEffect = Fx.none;
-                    shake = 3f;
-                    bullet = Bullets.missileSwarm;
-                    shootSound = Sounds.shootBig;
-                }};
-            }
-
-            @Override
-            public float getRotationAlpha(Player player){
-                return 0.6f - player.shootHeat * 0.3f;
-            }
-
-            @Override
-            public float spreadX(Player player){
-                return player.shootHeat * 2f;
-            }
-
-            @Override
-            public void load(){
-                super.load();
-                armorRegion = Core.atlas.find(name + "-armor");
-            }
-
-            @Override
-            public void update(Player player){
-                float scl = 1f - player.shootHeat / 2f*Time.delta();
-                player.vel().scl(scl);
-            }
-
-            @Override
-            public float getExtraArmor(Player player){
-                return player.shootHeat * 30f;
-            }
-
-            @Override
-            public void draw(Player player){
-                if(player.shootHeat <= 0.01f) return;
-
-                Shaders.build.progress = player.shootHeat;
-                Shaders.build.region = armorRegion;
-                Shaders.build.time = Time.time() / 10f;
-                Shaders.build.color.set(Pal.accent).a = player.shootHeat;
-                Draw.shader(Shaders.build);
-                Draw.rect(armorRegion, player.x, player.y, player.rotation);
-                Draw.shader();
-            }
-        };
-
-        dart = new UnitType("dart-ship"){
-            float effectRange = 60f;
-            float effectReload = 60f * 5;
-            float effectDuration = 60f * 10f;
-
-            {
-                flying = true;
-                drillPower = 1;
-                mineSpeed = 2f;
-                speed = 0.5f;
-                drag = 0.09f;
-                health = 200f;
-                weaponOffsetX = -1;
-                weaponOffsetY = -1;
-                engineColor = Pal.lightTrail;
-                cellTrnsY = 1f;
-                buildSpeed = 1.1f;
-                weapons.add(new Weapon("gun"){{
-                    length = 1.5f;
-                    reload = 15f;
-                    alternate = true;
-                    ejectEffect = Fx.shellEjectSmall;
-                    bullet = Bullets.standardCopper;
-                }};
-            }
-
-            @Override
-            public void update(Player player){
-                super.update(player);
-
-                if(player.timer.get(Player.timerAbility, effectReload)){
-
-                    Units.nearby(player.team(), player.x, player.y, effectRange, unit -> {
-                        //unit.applyEffect(StatusEffects.overdrive, effectDuration);
-                    });
-
-                    indexer.eachBlock(player, effectRange, other -> other.entity.damaged(), other -> {
-                        other.entity.applyBoost(1.5f, effectDuration);
-                        Fx.healBlockFull.at(other.drawx(), other.drawy(), other.block().size, Pal.heal);
-                    });
-
-                    Fx.overdriveWave.at(player);
-                }
-            }
-        };
-
-        javelin = new UnitType("javelin-ship"){
-            float minV = 3.6f;
-            float maxV = 6f;
-            TextureRegion shield;
-
-            {
-                flying = true;
-                drillPower = -1;
-                speed = 0.11f;
-                drag = 0.01f;
-                mass = 2f;
-                health = 170f;
-                engineColor = Color.valueOf("d3ddff");
-                cellTrnsY = 1f;
-                weapons.add(new Weapon("missiles"){{
-                    length = 1.5f;
-                    reload = 70f;
-                    shots = 4;
-                    inaccuracy = 2f;
-                    alternate = true;
-                    ejectEffect = Fx.none;
-                    velocityRnd = 0.2f;
-                    spacing = 1f;
-                    bullet = Bullets.missileJavelin;
-                    shootSound = Sounds.missile;
-                }};
-            }
-
-            @Override
-            public void load(){
-                super.load();
-                shield = Core.atlas.find(name + "-shield");
-            }
-
-            @Override
-            public float getRotationAlpha(Player player){
-                return 0.5f;
-            }
-
-            @Override
-            public void update(Player player){
-                float scl = scld(player);
-                if(Mathf.chanceDelta((0.15 * scl))){
-                    Fx.hitLancer.at(Pal.lancerLaser, player.x, player.y);
-                    Lightning.create(player.team(), Pal.lancerLaser, 10f * Vars.state.rules.playerDamageMultiplier,
-                    player.x + player.vel().x, player.y + player.vel().y, player.rotation, 14);
-                }
-            }
-
-            @Override
-            public void draw(Player player){
-                float scl = scld(player);
-                if(scl < 0.01f) return;
-                Draw.color(Pal.lancerLaser);
-                Draw.alpha(scl / 2f);
-                Draw.blend(Blending.additive);
-                Draw.rect(shield, player.x + Mathf.range(scl / 2f), player.y + Mathf.range(scl / 2f), player.rotation - 90);
-                Draw.blend();
-            }
-
-            float scld(Player player){
-                return Mathf.clamp((player.vel().len() - minV) / (maxV - minV));
-            }
-        };
-
-        glaive = new UnitType("glaive-ship"){
-            {
-                flying = true;
-                drillPower = 4;
-                mineSpeed = 1.3f;
-                speed = 0.32f;
-                drag = 0.06f;
-                mass = 3f;
-                health = 240f;
-                itemCapacity = 60;
-                engineColor = Color.valueOf("feb380");
-                cellTrnsY = 1f;
-                buildSpeed = 1.2f;
-
-                weapons.add(new Weapon("bomber"){{
-                    length = 1.5f;
-                    reload = 13f;
-                    alternate = true;
-                    ejectEffect = Fx.shellEjectSmall;
-                    bullet = Bullets.standardGlaive;
-                    shootSound = Sounds.shootSnap;
-                }};
-            }
-        };*/
+        //endregion
     }
 }
