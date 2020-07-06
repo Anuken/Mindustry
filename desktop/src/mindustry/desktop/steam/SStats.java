@@ -55,9 +55,10 @@ public class SStats implements SteamUserStatsCallback{
         if(campaign()){
             SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
 
-            if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
-                active10Phantoms.complete();
-            }
+            //TODO
+            //if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
+           //     active10Phantoms.complete();
+            //}
 
             if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();

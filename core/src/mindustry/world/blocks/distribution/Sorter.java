@@ -87,7 +87,7 @@ public class Sorter extends Block{
         }
 
         boolean isSame(Building other){
-            //uncomment comment below to prevent sorter/gate chaining (hacky)
+            //uncomment code below to prevent sorter/gate chaining
             return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
         }
 

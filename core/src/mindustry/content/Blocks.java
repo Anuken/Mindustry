@@ -1268,6 +1268,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 1000, Items.lead, 1000));
             alwaysUnlocked = true;
 
+            unitType = UnitTypes.alpha;
             health = 1100;
             itemCapacity = 4000;
             size = 3;
@@ -1276,6 +1277,7 @@ public class Blocks implements ContentList{
         coreFoundation = new CoreBlock("core-foundation"){{
             requirements(Category.effect, with(Items.copper, 3000, Items.lead, 3000, Items.silicon, 2000));
 
+            unitType = UnitTypes.beta;
             health = 2000;
             itemCapacity = 9000;
             size = 4;
@@ -1284,6 +1286,7 @@ public class Blocks implements ContentList{
         coreNucleus = new CoreBlock("core-nucleus"){{
             requirements(Category.effect, with(Items.copper, 1000, Items.lead, 1000));
 
+            unitType = UnitTypes.gamma;
             health = 4000;
             itemCapacity = 13000;
             size = 5;
@@ -1678,7 +1681,7 @@ public class Blocks implements ContentList{
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.dagger, 200f, with(Items.silicon, 10, Items.lead, 10)),
                 new UnitPlan(UnitTypes.crawler, 200f, with(Items.silicon, 10, Items.blastCompound, 5)),
-                new UnitPlan(UnitTypes.tau, 200f, with(Items.silicon, 20, Items.lead, 10)),
+                new UnitPlan(UnitTypes.nova, 200f, with(Items.silicon, 20, Items.lead, 10)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1688,8 +1691,8 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.wraith, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.spirit, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.mono, 200f, with(Items.silicon, 10)),
+                //new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1698,7 +1701,7 @@ public class Blocks implements ContentList{
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.vanguard, 200f, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.risse, 200f, with(Items.silicon, 10)),
             };
             size = 3;
             requiresWater = true;
@@ -1715,10 +1718,12 @@ public class Blocks implements ContentList{
             constructTime = 60f * 5f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.tau, UnitTypes.oculon},
+                {UnitTypes.nova, UnitTypes.quasar},
                 {UnitTypes.dagger, UnitTypes.mace},
                 {UnitTypes.crawler, UnitTypes.eruptor},
                 {UnitTypes.wraith, UnitTypes.ghoul},
+                {UnitTypes.mono, UnitTypes.poly},
+                {UnitTypes.risse, UnitTypes.minke},
             };
         }};
 
@@ -1734,6 +1739,8 @@ public class Blocks implements ContentList{
             upgrades = new UnitType[][]{
                 {UnitTypes.ghoul, UnitTypes.revenant},
                 {UnitTypes.mace, UnitTypes.fortress},
+                {UnitTypes.poly, UnitTypes.mega},
+                {UnitTypes.minke, UnitTypes.bryde},
             };
         }};
 

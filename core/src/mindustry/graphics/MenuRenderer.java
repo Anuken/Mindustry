@@ -30,7 +30,7 @@ public class MenuRenderer implements Disposable{
     private float time = 0f;
     private float flyerRot = 45f;
     private int flyers = Mathf.chance(0.2) ? Mathf.random(35) : Mathf.random(15);
-    private UnitType flyerType = Structs.select(UnitTypes.wraith, UnitTypes.wraith, UnitTypes.ghoul, UnitTypes.phantom, UnitTypes.phantom, UnitTypes.revenant);
+    private UnitType flyerType = Structs.select(UnitTypes.wraith, UnitTypes.wraith, UnitTypes.ghoul, UnitTypes.mono, UnitTypes.poly, UnitTypes.mega, UnitTypes.revenant);
 
     public MenuRenderer(){
         Time.mark();

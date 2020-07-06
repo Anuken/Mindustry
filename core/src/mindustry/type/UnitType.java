@@ -79,6 +79,7 @@ public class UnitType extends UnlockableContent{
         super(name);
 
         constructor = EntityMapping.map(name);
+        if(constructor == null) throw new IllegalArgumentException("no unit for " + name);
     }
 
     public UnitController createController(){
