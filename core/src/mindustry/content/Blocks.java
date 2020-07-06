@@ -76,7 +76,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
+    duo, tracker, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -1320,7 +1320,7 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.standardIncendiary,
             Items.silicon, Bullets.standardHoming
             );
-
+            
             spread = 4f;
             shots = 2;
             alternate = true;
@@ -1332,6 +1332,29 @@ public class Blocks implements ContentList{
             health = 250;
             inaccuracy = 2f;
             rotatespeed = 10f;
+        }};
+
+        tracker = new ItemTurret("tracker"){{
+            requirements(Category.turret, with(Items.lead, 65), true);
+            ammo(
+            Items.copper, Bullets.standardDense,
+            Items.thorium, Bullets.standardThorium,
+            Items.blastCompound, Bullets.standardIncendiary
+            );
+            
+            helper = true;
+            size = 2;
+            spread = 1f;
+            shots = 2;
+            alternate = false;
+            reloadTime = 30f;
+            restitution = 0.03f;
+            range = 150;
+            shootCone = 360f;
+            ammoUseEffect = Fx.shellEjectSmall;
+            health = 350;
+            inaccuracy = 10f;
+            rotatespeed = 20f;
         }};
 
         scatter = new ItemTurret("scatter"){{
