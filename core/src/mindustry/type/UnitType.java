@@ -79,7 +79,6 @@ public class UnitType extends UnlockableContent{
         super(name);
 
         constructor = EntityMapping.map(name);
-        if(constructor == null) throw new IllegalArgumentException("no unit for " + name);
     }
 
     public UnitController createController(){
@@ -132,6 +131,8 @@ public class UnitType extends UnlockableContent{
     @CallSuper
     @Override
     public void init(){
+        if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
+
         //set up default range
         if(range < 0){
             for(Weapon weapon : weapons){

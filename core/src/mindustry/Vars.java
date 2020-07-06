@@ -286,7 +286,13 @@ public class Vars implements Loadable{
             if(!headless && (ui == null || ui.scriptfrag == null)){
                 logBuffer.add(result);
             }else if(!headless){
-                ui.scriptfrag.addMessage(result);
+                if(!OS.isWindows){
+                    for(String code : ColorCodes.codes.values()){
+                        result = result.replace(code, "");
+                    }
+                }
+
+                ui.scriptfrag.addMessage(Log.removeCodes(result));
             }
         });
 

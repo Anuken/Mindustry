@@ -301,48 +301,53 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 
-            type.load();
-            type.init();
+            try{
+                type.load();
+                type.init();
 
-            Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
-            for(int i = 1; i < type.parts; i++){
-                image.draw(ImagePacker.get(type.partRegions[i]));
+                Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
+                for(int i = 1; i < type.parts; i++){
+                    image.draw(ImagePacker.get(type.partRegions[i]));
+                }
+                if(type.parts > 0){
+                    image.save(type.name);
+                }
+
+                if(type.constructor.get() instanceof Mechc){
+                    image.drawCenter(type.baseRegion);
+                    image.drawCenter(type.legRegion);
+                    image.drawCenter(type.legRegion, true, false);
+                    image.draw(type.region);
+                }
+
+                Image baseCell = ImagePacker.get(type.parts > 0 ? type.partCellRegions[0] : type.cellRegion);
+                for(int i = 1; i < type.parts; i++){
+                    baseCell.draw(ImagePacker.get(type.partCellRegions[i]));
+                }
+
+                if(type.parts > 0){
+                    image.save(type.name + "-cell");
+                }
+
+                Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
+                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
+
+                image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
+
+                for(Weapon weapon : type.weapons){
+                    weapon.load();
+
+                    image.draw(weapon.region,
+                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.getWidth() / 2f),
+                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                    weapon.flipSprite, false);
+                }
+
+                image.save("unit-" + type.name + "-full");
+            }catch(IllegalArgumentException e){
+                Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
             }
-            if(type.parts > 0){
-                image.save(type.name);
-            }
 
-            if(type.constructor.get() instanceof Mechc){
-                image.drawCenter(type.baseRegion);
-                image.drawCenter(type.legRegion);
-                image.drawCenter(type.legRegion, true, false);
-                image.draw(type.region);
-            }
-
-            Image baseCell = ImagePacker.get(type.parts > 0 ? type.partCellRegions[0] : type.cellRegion);
-            for(int i = 1; i < type.parts; i++){
-                baseCell.draw(ImagePacker.get(type.partCellRegions[i]));
-            }
-
-            if(type.parts > 0){
-                image.save(type.name + "-cell");
-            }
-
-            Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
-            cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
-
-            image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
-
-            for(Weapon weapon : type.weapons){
-                weapon.load();
-
-                image.draw(weapon.region,
-                (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.getWidth() / 2f),
-                (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
-                weapon.flipSprite, false);
-            }
-
-            image.save("unit-" + type.name + "-full");
         }));
 
         ImagePacker.generate("ore-icons", () -> {
