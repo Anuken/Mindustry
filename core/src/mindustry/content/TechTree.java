@@ -97,26 +97,27 @@ public class TechTree implements ContentList{
                             });
                         });
                     });
+
                 });
-
-                node(scorch, () -> {
-                    node(arc, () -> {
-                        node(wave, () -> {
-
-                        });
-
-                        node(lancer, () -> {
-                            node(meltdown, () -> {
+                node(tracker, () -> {
+                    node(scorch, () -> {
+                        node(arc, () -> {
+                            node(wave, () -> {
 
                             });
 
-                            node(shockMine, () -> {
+                            node(lancer, () -> {
+                                node(meltdown, () -> {
 
+                                });
+
+                                node(shockMine, () -> {
+
+                                });
                             });
                         });
                     });
                 });
-
 
                 node(copperWall, () -> {
                     node(copperWallLarge, () -> {
