@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -59,6 +60,7 @@ public abstract class Turret extends Block{
     public boolean targetAir = true;
     public boolean targetGround = true;
     public boolean acceptCoolant = true;
+    public boolean helper = false;
     /** How much reload is lowered by for each unit of liquid of heat capacity. */
     public float coolantMultiplier = 5f;
     /** Effect displayed when coolant is used. */
@@ -185,6 +187,11 @@ public abstract class Turret extends Block{
             unit.team(team);
 
             if(hasAmmo()){
+            	float targetRot = angleTo(targetPos);
+
+            	if(helper && !Vars.net.client()){
+            		helperTurnTo(targetRot);
+            	}
 
                 if(timer(timerTarget, targetInterval)){
                     findTarget();
@@ -213,13 +220,13 @@ public abstract class Turret extends Block{
                         }
                     }
 
-                    float targetRot = angleTo(targetPos);
-
-                    if(shouldTurn()){
+                    if(Vars.net.client() && shouldTurn()){
+                    	turnToTarget(targetRot);
+                    } else if (shouldTurn() && !helper){
                         turnToTarget(targetRot);
                     }
 
-                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot && !helper){
                         updateShooting();
                     }
                 }
@@ -274,6 +281,16 @@ public abstract class Turret extends Block{
             rotation = Angles.moveToward(rotation, targetRot, rotatespeed * delta() * baseReloadSpeed());
         }
 
+        protected void helperTurnTo(float targetRot){
+        	if(!Vars.mobile){
+            	rotation = Angles.mouseAngle(x, y);
+            } else {
+            	rotation = Angles.moveToward(rotation, targetRot, rotatespeed * delta() * baseReloadSpeed());
+            }
+            if(Vars.player.unit().isShooting){
+            	updateShooting();
+            }
+        }
         public boolean shouldTurn(){
             return true;
         }
