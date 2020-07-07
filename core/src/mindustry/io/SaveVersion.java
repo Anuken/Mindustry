@@ -113,6 +113,11 @@ public abstract class SaveVersion extends SaveFileReader{
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
 
+        //load time spent on sector into state
+        if(state.rules.sector != null){
+            state.secinfo.internalTimeSpent = state.rules.sector.getStoredTimeSpent();
+        }
+
         if(!headless){
             Tmp.v1.tryFromString(map.get("viewpos"));
             Core.camera.position.set(Tmp.v1);

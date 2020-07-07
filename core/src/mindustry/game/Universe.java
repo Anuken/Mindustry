@@ -5,6 +5,8 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.core.GameState.*;
+import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
 
@@ -14,8 +16,7 @@ import static mindustry.Vars.*;
 public class Universe{
     private long seconds;
     private float secondCounter;
-    private int event;
-    private float eventCounter;
+    private int turn;
 
     private Schematic lastLoadout;
     private Seq<ItemStack> lastLaunchResources = new Seq<>();
@@ -30,6 +31,10 @@ public class Universe{
         updatePlanet(Planets.sun);
     }
 
+    public int turn(){
+        return turn;
+    }
+
     private void updatePlanet(Planet planet){
         planet.position.setZero();
         planet.addParentOffset(planet.position);
@@ -38,6 +43,14 @@ public class Universe{
         }
         for(Planet child : planet.children){
             updatePlanet(child);
+        }
+    }
+
+    public void displayTimeEnd(){
+        if(!headless){
+            state.set(State.paused);
+
+            ui.announce("Next turn incoming.");
         }
     }
 
@@ -53,13 +66,6 @@ public class Universe{
             if(seconds % 10 == 1){
                 save();
             }
-        }
-
-        //update event counter - happens only in-game
-        eventCounter += Time.delta();
-
-        if(eventCounter >= eventRate){
-            runEvents();
         }
 
         if(state.hasSector()){
@@ -110,11 +116,31 @@ public class Universe{
     }
 
     /** Runs possible events. Resets event counter. */
-    public void runEvents(){
-        event++;
-        eventCounter = 0;
+    public void runTurn(){
+        turn++;
 
+        int newSecondsPassed = (int)(turnDuration / 60);
+
+        //update relevant sectors
+        for(Planet planet : content.planets()){
+            for(Sector sector : planet.sectors){
+                if(sector.hasSave()){
+                    int spent = (int)(sector.getTimeSpent() / 60);
+                    int actuallyPassed = Math.max(newSecondsPassed - spent, 0);
+
+                    //increment seconds passed for this sector by the time that just passed with this turn
+                    if(!sector.isBeingPlayed()){
+                        sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
+                    }
+
+                    //reset time spent to 0
+                    sector.setTimeSpent(0f);
+                }
+            }
+        }
         //TODO events
+
+        Events.fire(new TurnEvent());
     }
 
     public float secondsMod(float mod, float scale){
@@ -131,14 +157,12 @@ public class Universe{
 
     private void save(){
         Core.settings.put("utime", seconds);
-        Core.settings.put("event", event);
-        Core.settings.put("eventtime", eventCounter);
+        Core.settings.put("turn", turn);
     }
 
     private void load(){
         seconds = Core.settings.getLong("utime");
-        event = Core.settings.getInt("event");
-        eventCounter = Core.settings.getFloat("eventtime");
+        turn = Core.settings.getInt("turn");
     }
 
 }

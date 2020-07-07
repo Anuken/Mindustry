@@ -7,6 +7,7 @@ import arc.graphics.gl.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -197,19 +198,36 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         cont.clear();
         titleTable.remove();
 
-        //add listener to the background rect, so it doesn't get unnecessary touch input
-        cont.rect((x, y, w, h) -> planets.render(this)).grow().get().addListener(new ElementGestureListener(){
-            @Override
-            public void tap(InputEvent event, float x, float y, int count, KeyCode button){
-                if(hovered != null && (mode == launch ? canLaunch(hovered) && hovered != launchSector : hovered.unlocked())){
-                    selected = hovered;
-                }
 
-                if(selected != null){
-                    updateSelected();
-                }
+        cont.stack(
+        new Element(){
+            {
+                //add listener to the background rect, so it doesn't get unnecessary touch input
+                addListener(new ElementGestureListener(){
+                    @Override
+                    public void tap(InputEvent event, float x, float y, int count, KeyCode button){
+                        if(hovered != null && (mode == launch ? canLaunch(hovered) && hovered != launchSector : hovered.unlocked())){
+                            selected = hovered;
+                        }
+
+                        if(selected != null){
+                            updateSelected();
+                        }
+                    }
+                });
             }
-        });
+
+            @Override
+            public void draw(){
+                planets.render(PlanetDialog.this);
+            }
+        },
+        new Table(t -> {
+            //TODO localize
+            t.top();
+            t.label(() -> "Turn " + universe.turn()).style(Styles.outlineLabel).color(Pal.accent);
+        })).grow();
+
     }
 
     @Override

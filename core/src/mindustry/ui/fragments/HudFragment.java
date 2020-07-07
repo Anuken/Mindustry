@@ -47,12 +47,23 @@ public class HudFragment extends Fragment{
 
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
+            //TODO localize
             showToast("Sector[accent] captured[]!");
         });
 
         //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
+        });
+
+        Events.on(TurnEvent.class, e -> {
+            ui.announce("[accent][[ Turn " + universe.turn() + " ]");
+        });
+
+        //paused table
+        parent.fill(t -> {
+            t.top().visible(() -> state.isPaused() && !state.isOutOfTime()).touchable(Touchable.disabled);
+            t.table(Styles.black5, top -> top.add("$paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
         //TODO tear this all down
@@ -254,6 +265,27 @@ public class HudFragment extends Fragment{
             .update(label -> label.getColor().set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
+        //paused table for when the player is out of time
+        parent.fill(t -> {
+            t.top().visible(() -> state.isOutOfTime());
+            t.table(Styles.black5, top -> {
+                //TODO localize when done
+                top.add("Out of sector time.").style(Styles.outlineLabel).color(Pal.accent).update(l -> l.color.a = Mathf.absin(Time.globalTime(), 7f, 1f)).colspan(2);
+                top.row();
+
+                top.defaults().pad(2).size(150f, 54f);
+                top.button("Next Turn", () -> {
+                    universe.runTurn();
+                    state.set(State.playing);
+                });
+
+                top.button("Back to Planet", () -> {
+                    ui.paused.runExitSave();
+                    ui.planet.show();
+                });
+            }).margin(8).growX();
+        });
+
         //tutorial text
         parent.fill(t -> {
             Runnable resize = () -> {
@@ -274,12 +306,6 @@ public class HudFragment extends Fragment{
 
             resize.run();
             Events.on(ResizeEvent.class, e -> resize.run());
-        });
-
-        //paused table
-        parent.fill(t -> {
-            t.top().visible(() -> state.isPaused()).touchable(Touchable.disabled);
-            t.table(Tex.buttonTrans, top -> top.add("$paused").pad(5f));
         });
 
         //'saving' indicator
@@ -333,14 +359,6 @@ public class HudFragment extends Fragment{
                     }
                 });
             }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
-        });
-
-        //TODO move, select loadout, consume resources
-        parent.fill(t -> {
-            t.bottom().visible(() -> state.isCampaign() && player.team().core() != null);
-
-            t.button("test launch", Icon.warning, () -> ui.planet.show(state.getSector(), player.team().core()))
-            .width(150f).disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)); //disable core when missing resources for launch
         });
 
         blockfrag.build(parent);

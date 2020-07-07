@@ -131,12 +131,42 @@ public class Sector{
         return Core.settings.getInt(key("spawn-position"), Point2.pack(world.width() / 2, world.height() / 2));
     }
 
-    public void setLastSecond(long number){
-        put("last-second", number);
+    /** @return time spent in this sector this turn in ticks. */
+    public float getTimeSpent(){
+        //return currently counting time spent if being played on
+        if(isBeingPlayed()) return state.secinfo.internalTimeSpent;
+
+        //else return the stored value
+        return getStoredTimeSpent();
+    }
+
+    public void setTimeSpent(float time){
+        put("time-spent", time);
+
+        //update counting time
+        if(isBeingPlayed()){
+            state.secinfo.internalTimeSpent = time;
+        }
+    }
+
+    public String displayTimeRemaining(){
+        float amount = Vars.turnDuration - getTimeSpent();
+        int seconds = (int)(amount / 60);
+        int sf = seconds % 60;
+        return (seconds / 60) + ":" + (sf < 10 ? "0" : "") + sf;
+    }
+
+    /** @return the stored amount of time spent in this sector this turn in ticks. */
+    public float getStoredTimeSpent(){
+        return Core.settings.getFloat(key("time-spent"));
+    }
+
+    public void setSecondsPassed(long number){
+        put("seconds-passed", number);
     }
 
     public long getSecondsPassed(){
-        return universe.seconds() - Core.settings.getLong(key("last-second"));
+        return Core.settings.getLong(key("seconds-passed"));
     }
 
     private String key(String key){

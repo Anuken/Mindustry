@@ -45,6 +45,7 @@ public class EventType{
     public static class PlayEvent{}
     public static class ResetEvent{}
     public static class WaveEvent{}
+    public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/
     public static class LineConfirmEvent{}
     /** Called when a turret recieves ammo, but only when the tutorial is active! */

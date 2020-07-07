@@ -17,6 +17,7 @@ public class SectorInfo{
     private static final int valueWindow = 60;
     /** refresh period of export in ticks */
     private static final float refreshPeriod = 60;
+
     /** Core input statistics. */
     public ObjectMap<Item, ExportStat> production = new ObjectMap<>();
     /** Export statistics. */
@@ -31,6 +32,8 @@ public class SectorInfo{
     public boolean hasCore = true;
     /** Sector that was launched from. */
     public @Nullable Sector origin;
+    /** Time spent at this sector. Do not use unless you know what you're doing. */
+    public transient float internalTimeSpent;
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
@@ -73,11 +76,21 @@ public class SectorInfo{
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
+
+        //update sector's internal time spent counter1
+        state.rules.sector.setTimeSpent(internalTimeSpent);
     }
 
     /** Update averages of various stats.
      * Called every frame. */
     public void update(){
+        internalTimeSpent += Time.delta();
+
+        //time spent exceeds turn duration!
+        if(internalTimeSpent >= turnDuration && internalTimeSpent - Time.delta() < turnDuration){
+            universe.displayTimeEnd();
+        }
+
         //create last stored core items
         if(lastCoreItems == null){
             lastCoreItems = new int[content.items().size];

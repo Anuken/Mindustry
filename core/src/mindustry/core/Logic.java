@@ -120,7 +120,7 @@ public class Logic implements ApplicationListener{
                     }
                 }
 
-                state.rules.sector.setLastSecond(universe.seconds());
+                state.rules.sector.setSecondsPassed(0);
             }
 
             //enable infinite ammo for wave team by default
@@ -281,7 +281,7 @@ public class Logic implements ApplicationListener{
             sector.save.save();
 
             //run a turn, since launching takes up a turn
-            universe.runEvents();
+            universe.runTurn();
 
             //TODO apply extra damage to sector
             //sector.setTurnsPassed(sector.getTurnsPassed() + 3);
@@ -314,6 +314,11 @@ public class Logic implements ApplicationListener{
         if(state.isGame()){
             if(!net.client()){
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
+            }
+
+            //force pausing when the player is out of sector time
+            if(state.isOutOfTime()){
+                state.set(State.paused);
             }
 
             if(!state.isPaused()){

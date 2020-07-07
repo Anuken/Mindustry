@@ -534,7 +534,7 @@ public class UnitTypes implements ContentList{
             isCounted = false;
 
             flying = true;
-            mineSpeed = 2f;
+            mineSpeed = 12f;
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;

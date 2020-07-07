@@ -467,6 +467,15 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
+    public void announce(String text){
+        Table t = new Table();
+        t.background(Styles.black3).margin(8f)
+        .add(text).style(Styles.outlineLabel);
+        t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
+        t.actions(Actions.fadeOut(3, Interp.pow4In));
+        Core.scene.add(t);
+    }
+
     public void showOkText(String title, String text, Runnable confirmed){
         BaseDialog dialog = new BaseDialog(title);
         dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
