@@ -6,7 +6,6 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.Saves.*;
@@ -29,7 +28,7 @@ public class Sector{
     public @Nullable SectorPreset preset;
 
     /** Sector enemy hostility from 0 to 1 */
-    public float hostility;
+    //public float hostility;
 
     //TODO implement a dynamic launch period
     public int launchPeriod = 10;
@@ -57,7 +56,7 @@ public class Sector{
 
     /** @return whether the enemy has a generated base here. */
     public boolean hasEnemyBase(){
-        return hostility >= 0.02f && (save == null || save.meta.rules.waves);
+        return is(SectorAttribute.base) && (save == null || save.meta.rules.waves);
     }
 
     public boolean isBeingPlayed(){
@@ -80,7 +79,7 @@ public class Sector{
 
     public void generate(){
         //TODO use simplex and a seed
-        hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.5f, 0.4f), 0);
+        //hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.5f, 0.4f), 0);
     }
 
     public boolean locked(){
@@ -156,7 +155,8 @@ public class Sector{
         return (seconds / 60) + ":" + (sf < 10 ? "0" : "") + sf;
     }
 
-    /** @return the stored amount of time spent in this sector this turn in ticks. */
+    /** @return the stored amount of time spent in this sector this turn in ticks.
+     * Do not use unless you know what you're doing. */
     public float getStoredTimeSpent(){
         return Core.settings.getFloat(key("time-spent"));
     }
@@ -165,6 +165,8 @@ public class Sector{
         put("seconds-passed", number);
     }
 
+    /** @return how much time has passed in this sector without the player resuming here.
+     * Used for resource production calculations. */
     public long getSecondsPassed(){
         return Core.settings.getLong(key("seconds-passed"));
     }
@@ -284,6 +286,8 @@ public class Sector{
         /** Has snow. */
         snowy,
         /** Has sandstorms. */
-        desert
+        desert,
+        /** Has an enemy base. */
+        base
     }
 }

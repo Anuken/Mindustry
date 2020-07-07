@@ -77,15 +77,24 @@ public class ModsDialog extends BaseDialog{
                     t.button("$mod.import.file", Icon.file, bstyle, () -> {
                         dialog.hide();
 
-                        platform.showFileChooser(true, "zip", file -> {
-                            try{
-                                mods.importMod(file);
-                                setup();
-                            }catch(IOException e){
-                                ui.showException(e);
-                                e.printStackTrace();
+                        platform.showMultiFileChooser(file -> {
+                            Runnable go = () -> {
+                                try{
+                                    mods.importMod(file);
+                                    setup();
+                                }catch(IOException e){
+                                    ui.showException(e);
+                                    e.printStackTrace();
+                                }
+                            };
+
+                            //show unsafe jar file warning
+                            if(file.extEquals("jar")){
+                                ui.showConfirm("$warning", "$mod.jarwarn", go);
+                            }else{
+                                go.run();
                             }
-                        });
+                        }, "zip", "jar");
                     }).margin(12f);
 
                     t.row();

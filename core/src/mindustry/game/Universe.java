@@ -141,6 +141,8 @@ public class Universe{
         //TODO events
 
         Events.fire(new TurnEvent());
+
+        save();
     }
 
     public float secondsMod(float mod, float scale){
