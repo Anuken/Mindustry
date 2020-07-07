@@ -176,6 +176,7 @@ allprojects{
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
         options.encoding = "UTF-8"
+        options.compilerArgs += ["-Xlint:deprecation"]
     }
 }
 
@@ -183,7 +184,6 @@ project(":desktop"){
     apply plugin: "java"
 
     compileJava.options.fork = true
-    compileJava.options.compilerArgs += ["-XDignore.symbol.file"]
 
     dependencies{
         implementation project(":core")
@@ -325,7 +325,7 @@ project(":tools"){
         implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
 
-        implementation "org.reflections:reflections:0.9.12"
+        implementation "org.reflections:reflections:0.9.11"
     }
 }
 

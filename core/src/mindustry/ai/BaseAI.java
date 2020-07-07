@@ -45,7 +45,7 @@ public class BaseAI{
 
             //create AI core unit
             if(!Groups.unit.contains(u -> u.team() == data.team && u.type() == block.unitType)){
-                Unitc unit = block.unitType.create(data.team);
+                Unit unit = block.unitType.create(data.team);
                 unit.set(data.core());
                 unit.add();
                 Fx.spawn.at(unit);

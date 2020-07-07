@@ -10,9 +10,9 @@ import static mindustry.Vars.tilesize;
 abstract class BlockUnitComp implements Unitc{
     @Import Team team;
 
-    @ReadOnly transient Tilec tile;
+    @ReadOnly transient Building tile;
 
-    public void tile(Tilec tile){
+    public void tile(Building tile){
         this.tile = tile;
 
         //sets up block stats

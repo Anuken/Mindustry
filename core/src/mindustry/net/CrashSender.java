@@ -18,6 +18,7 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
+import static arc.Core.*;
 import static mindustry.Vars.net;
 
 public class CrashSender{
@@ -38,6 +39,11 @@ public class CrashSender{
 
         try{
             exception.printStackTrace();
+
+            //try saving game data
+            try{
+                settings.manualSave();
+            }catch(Throwable ignored){}
 
             //don't create crash logs for custom builds, as it's expected
             if(Version.build == -1 || (System.getProperty("user.name").equals("anuke") && "release".equals(Version.modifier))){

@@ -136,13 +136,26 @@ public interface Platform{
      * @param extension File extension to filter
      */
     default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-        new FileChooser(open ? "$open" : "$save", file -> file.extension().toLowerCase().equals(extension), open, file -> {
+        new FileChooser(open ? "$open" : "$save", file -> file.extEquals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
             }else{
                 cons.get(file);
             }
         }).show();
+    }
+
+    /**
+     * Show a file chooser for multiple file types. Only supported on desktop.
+     * @param cons Selection listener
+     * @param extensions File extensions to filter
+     */
+    default void showMultiFileChooser(Cons<Fi> cons, String... extensions){
+        if(mobile){
+            showFileChooser(true, extensions[0], cons);
+        }else{
+            new FileChooser("$open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+        }
     }
 
     /** Hide the app. Android only. */

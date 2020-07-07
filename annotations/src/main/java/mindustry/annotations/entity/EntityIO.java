@@ -32,7 +32,7 @@ public class EntityIO{
     MethodSpec.Builder method;
     ObjectSet<String> presentFields = new ObjectSet<>();
 
-    EntityIO(String name, TypeSpec.Builder type, ClassSerializer serializer, Fi directory){
+    EntityIO(String name, TypeSpec.Builder type, Seq<FieldSpec> typeFields, ClassSerializer serializer, Fi directory){
         this.directory = directory;
         this.type = type;
         this.serializer = serializer;
@@ -49,7 +49,7 @@ public class EntityIO{
         int nextRevision = revisions.isEmpty() ? 0 : revisions.max(r -> r.version).version + 1;
 
         //resolve preferred field order based on fields that fit
-        Seq<FieldSpec> fields = Seq.with(type.fieldSpecs).select(spec ->
+        Seq<FieldSpec> fields = typeFields.select(spec ->
             !spec.hasModifier(Modifier.TRANSIENT) &&
             !spec.hasModifier(Modifier.STATIC) &&
             !spec.hasModifier(Modifier.FINAL)/* &&

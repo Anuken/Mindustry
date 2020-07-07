@@ -36,7 +36,11 @@ abstract class EntityComp{
         return false;
     }
 
-    <T> T as(Class<T> type){
+    <T extends Entityc> T base(){
+        return (T)this;
+    }
+
+    <T> T as(){
         return (T)this;
     }
 

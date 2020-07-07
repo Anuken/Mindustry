@@ -13,15 +13,15 @@ public class DrawWeave extends DrawBlock{
 
     @Override
     public void draw(GenericCrafterEntity entity){
-        Draw.rect(bottom, entity.x(), entity.y());
-        Draw.rect(weave, entity.x(), entity.y(), entity.totalProgress);
+        Draw.rect(bottom, entity.x, entity.y);
+        Draw.rect(weave, entity.x, entity.y, entity.totalProgress);
 
         Draw.color(Pal.accent);
         Draw.alpha(entity.warmup);
 
         Lines.lineAngleCenter(
-        entity.x() + Mathf.sin(entity.totalProgress, 6f, Vars.tilesize / 3f * entity.block.size),
-        entity.y(),
+        entity.x + Mathf.sin(entity.totalProgress, 6f, Vars.tilesize / 3f * entity.block.size),
+        entity.y,
         90,
         entity.block.size * Vars.tilesize / 2f);
 

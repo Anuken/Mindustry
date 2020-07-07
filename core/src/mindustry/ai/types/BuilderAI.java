@@ -27,7 +27,7 @@ public class BuilderAI extends AIController{
             BuildPlan req = builder.buildPlan();
 
             boolean valid =
-                (req.tile().entity instanceof BuildEntity && req.tile().<BuildEntity>ent().cblock == req.block) ||
+                (req.tile().build instanceof BuildEntity && req.tile().<BuildEntity>bc().cblock == req.block) ||
                 (req.breaking ?
                     Build.validBreak(unit.team(), req.x, req.y) :
                     Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));

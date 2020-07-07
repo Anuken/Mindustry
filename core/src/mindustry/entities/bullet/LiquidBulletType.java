@@ -44,7 +44,7 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
-    public void update(Bulletc b){
+    public void update(Bullet b){
         super.update(b);
 
         if(liquid.canExtinguish()){
@@ -58,21 +58,21 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
         Fill.circle(b.x(), b.y(), 3f);
     }
 
     @Override
-    public void despawned(Bulletc b){
+    public void despawned(Bullet b){
         super.despawned(b);
 
         hit(b, b.x(), b.y());
     }
 
     @Override
-    public void hit(Bulletc b, float hitx, float hity){
+    public void hit(Bullet b, float hitx, float hity){
         hitEffect.at(hitx, hity, liquid.color);
         Puddles.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 

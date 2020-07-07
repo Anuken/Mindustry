@@ -25,6 +25,18 @@ public class ItemModule extends BlockModule{
 
     private @Nullable WindowedMean[] flow;
 
+    public ItemModule copy(){
+        ItemModule out = new ItemModule();
+        out.set(this);
+        return out;
+    }
+
+    public void set(ItemModule other){
+        total = other.total;
+        takeRotation = other.takeRotation;
+        System.arraycopy(other.items, 0, items, 0, items.length);
+    }
+
     public void update(boolean showFlow){
         if(showFlow){
             if(flow == null){
@@ -116,6 +128,13 @@ public class ItemModule extends BlockModule{
         return true;
     }
 
+    public boolean has(Iterable<ItemStack> stacks){
+        for(ItemStack stack : stacks){
+            if(!has(stack.item, stack.amount)) return false;
+        }
+        return true;
+    }
+
     public boolean has(ItemStack[] stacks, float multiplier){
         for(ItemStack stack : stacks){
             if(!has(stack.item, Math.round(stack.amount * multiplier))) return false;
@@ -200,6 +219,12 @@ public class ItemModule extends BlockModule{
         items[item.id] = amount;
     }
 
+    public void add(Iterable<ItemStack> stacks){
+        for(ItemStack stack : stacks){
+            add(stack.item, stack.amount);
+        }
+    }
+
     public void add(Item item, int amount){
         add(item.id, amount);
     }
@@ -226,6 +251,10 @@ public class ItemModule extends BlockModule{
     }
 
     public void remove(ItemStack[] stacks){
+        for(ItemStack stack : stacks) remove(stack.item, stack.amount);
+    }
+
+    public void remove(Iterable<ItemStack> stacks){
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
     }
 

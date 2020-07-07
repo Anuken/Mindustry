@@ -1,15 +1,15 @@
 package mindustry.annotations.remote;
 
+import arc.struct.*;
 import com.squareup.javapoet.*;
-import mindustry.annotations.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.annotations.*;
 import mindustry.annotations.util.*;
 import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 import java.util.*;
-import java.util.stream.*;
 
 
 /** The annotation processor for generating remote method call code. */
@@ -33,13 +33,13 @@ public class RemoteProcess extends BaseProcessor{
     //class serializers
     private ClassSerializer serializer;
     //all elements with the Remote annotation
-    private Set<? extends Element> elements;
+    private Seq<Smethod> elements;
     //map of all classes to generate by name
     private HashMap<String, ClassEntry> classMap;
     //list of all method entries
-    private ArrayList<MethodEntry> methods;
+    private Seq<MethodEntry> methods;
     //list of all method entries
-    private ArrayList<ClassEntry> classes;
+    private Seq<ClassEntry> classes;
 
     {
         rounds = 2;
@@ -54,23 +54,23 @@ public class RemoteProcess extends BaseProcessor{
             //last method ID used
             int lastMethodID = 0;
             //find all elements with the Remote annotation
-            elements = roundEnv.getElementsAnnotatedWith(Remote.class);
+            elements = methods(Remote.class);
             //map of all classes to generate by name
             classMap = new HashMap<>();
             //list of all method entries
-            methods = new ArrayList<>();
+            methods = new Seq<>();
             //list of all method entries
-            classes = new ArrayList<>();
+            classes = new Seq<>();
 
-            List<Element> orderedElements = new ArrayList<>(elements);
-            orderedElements.sort(Comparator.comparing(Object::toString));
+            Seq<Smethod> orderedElements = elements.copy();
+            orderedElements.sortComparing(Object::toString);
 
             //create methods
-            for(Element element : orderedElements){
-                Remote annotation = element.getAnnotation(Remote.class);
+            for(Smethod element : orderedElements){
+                Remote annotation = element.annotation(Remote.class);
 
                 //check for static
-                if(!element.getModifiers().contains(Modifier.STATIC) || !element.getModifiers().contains(Modifier.PUBLIC)){
+                if(!element.is(Modifier.STATIC) || !element.is(Modifier.PUBLIC)){
                     err("All @Remote methods must be public and static: ", element);
                 }
 
@@ -89,8 +89,8 @@ public class RemoteProcess extends BaseProcessor{
                 ClassEntry entry = classMap.get(callLocation);
 
                 //create and add entry
-                MethodEntry method = new MethodEntry(entry.name, BaseProcessor.getMethodName(element), annotation.targets(), annotation.variants(),
-                annotation.called(), annotation.unreliable(), annotation.forward(), lastMethodID++, (ExecutableElement)element, annotation.priority());
+                MethodEntry method = new MethodEntry(entry.name, BaseProcessor.getMethodName(element.e), annotation.targets(), annotation.variants(),
+                annotation.called(), annotation.unreliable(), annotation.forward(), lastMethodID++, element.e, annotation.priority());
 
                 entry.methods.add(method);
                 methods.add(method);
@@ -105,15 +105,15 @@ public class RemoteProcess extends BaseProcessor{
             RemoteReadGenerator readgen = new RemoteReadGenerator(serializer);
 
             //generate server readers
-            readgen.generateFor(methods.stream().filter(method -> method.where.isClient).collect(Collectors.toList()), readServerName, packageName, true);
+            readgen.generateFor(methods.select(method -> method.where.isClient), readServerName, packageName, true);
             //generate client readers
-            readgen.generateFor(methods.stream().filter(method -> method.where.isServer).collect(Collectors.toList()), readClientName, packageName, false);
+            readgen.generateFor(methods.select(method -> method.where.isServer), readClientName, packageName, false);
 
             //create class for storing unique method hash
             TypeSpec.Builder hashBuilder = TypeSpec.classBuilder("MethodHash").addModifiers(Modifier.PUBLIC);
             hashBuilder.addJavadoc(autogenWarning);
             hashBuilder.addField(FieldSpec.builder(int.class, "HASH", Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
-            .initializer("$1L", Objects.hash(methods)).build());
+            .initializer("$1L", Arrays.hashCode(methods.map(m -> m.element).toArray())).build());
 
             //build and write resulting hash class
             TypeSpec spec = hashBuilder.build();

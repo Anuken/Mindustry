@@ -19,7 +19,7 @@ public class OverlayRenderer{
     private static final float spawnerMargin = tilesize*11f;
     private static final Rect rect = new Rect();
     private float buildFade, unitFade;
-    private Unitc lastSelect;
+    private Unit lastSelect;
 
     public void drawBottom(){
         InputHandler input = control.input;
@@ -36,12 +36,12 @@ public class OverlayRenderer{
     public void drawTop(){
 
         if(Core.settings.getBool("playerindicators")){
-            for(Playerc player : Groups.player){
+            for(Player player : Groups.player){
                 if(Vars.player != player && Vars.player.team() == player.team()){
                     if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
-                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x(), player.y())){
+                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
 
-                        Tmp.v1.set(player.x(), player.y()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+                        Tmp.v1.set(player.x, player.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
 
                         Lines.stroke(2f, player.team().color);
                         Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
@@ -67,7 +67,7 @@ public class OverlayRenderer{
 
         InputHandler input = control.input;
 
-        Unitc select = input.selectedUnit();
+        Unit select = input.selectedUnit();
         if(!Core.input.keyDown(Binding.control)) select = null;
         unitFade = Mathf.lerpDelta(unitFade, Mathf.num(select != null), 0.1f);
 
@@ -79,19 +79,19 @@ public class OverlayRenderer{
 
             if(select instanceof BlockUnitc){
                 //special selection for block "units"
-                Fill.square(select.x(), select.y(), ((BlockUnitc)select).tile().block().size * tilesize/2f);
+                Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block().size * tilesize/2f);
             }else{
                 Draw.rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
             }
 
             Lines.stroke(unitFade);
-            Lines.square(select.x(), select.y(), select.hitSize() * 1.5f, Time.time() * 2f);
+            Lines.square(select.x, select.y, select.hitSize() * 1.5f, Time.time() * 2f);
             Draw.reset();
         }
 
         //draw config selected block
         if(input.frag.config.isShown()){
-            Tilec tile = input.frag.config.getSelectedTile();
+            Building tile = input.frag.config.getSelectedTile();
             tile.drawConfigure();
         }
 
@@ -107,9 +107,9 @@ public class OverlayRenderer{
                 float dst = core.dst(player);
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
                     Draw.color(Color.darkGray);
-                    Lines.circle(core.x(), core.y() - 2, state.rules.enemyCoreBuildRadius);
+                    Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
                     Draw.color(Pal.accent, core.team().color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
-                    Lines.circle(core.x(), core.y(), state.rules.enemyCoreBuildRadius);
+                    Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 }
             });
         }
@@ -118,7 +118,7 @@ public class OverlayRenderer{
         Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time(), 8f, 1f));
 
         for(Tile tile : spawner.getSpawns()){
-            if(tile.within(player.x(), player.y(), state.rules.dropZoneRadius + spawnerMargin)){
+            if(tile.within(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
                 Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
                 Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
             }
@@ -129,7 +129,7 @@ public class OverlayRenderer{
         //draw selected block
         if(input.block == null && !Core.scene.hasMouse()){
             Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
-            Tilec tile = world.entWorld(vec.x, vec.y);
+            Building tile = world.entWorld(vec.x, vec.y);
 
             if(tile != null && tile.team() == player.team()){
                 tile.drawSelect();
@@ -137,7 +137,7 @@ public class OverlayRenderer{
                 if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.team())){
                     control.input.drawArrow(tile.block(), tile.tileX(), tile.tileY(), tile.rotation(), true);
                     Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
-                    Fill.square(tile.x(), tile.y(), tile.block().size * tilesize/2f);
+                    Fill.square(tile.x, tile.y, tile.block().size * tilesize/2f);
                     Draw.color();
                 }
             }
@@ -152,12 +152,12 @@ public class OverlayRenderer{
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
             Draw.reset();
 
-            Tilec tile = world.entWorld(v.x, v.y);
-            if(tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack().amount, player.unit()) > 0){
+            Building tile = world.entWorld(v.x, v.y);
+            if(tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0){
                 Lines.stroke(3f, Pal.gray);
-                Lines.square(tile.x(), tile.y(), tile.block().size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
+                Lines.square(tile.x, tile.y, tile.block().size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
                 Lines.stroke(1f, Pal.place);
-                Lines.square(tile.x(), tile.y(), tile.block().size * tilesize / 2f + 2 + Mathf.absin(Time.time(), 5f, 1f));
+                Lines.square(tile.x, tile.y, tile.block().size * tilesize / 2f + 2 + Mathf.absin(Time.time(), 5f, 1f));
                 Draw.reset();
 
             }

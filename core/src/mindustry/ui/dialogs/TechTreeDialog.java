@@ -18,7 +18,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
-import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -47,15 +46,6 @@ public class TechTreeDialog extends BaseDialog{
         Stack stack = cont.stack(view = new View()/*, items = new ItemsDisplay()*/).grow().get();
 
         shouldPause = true;
-
-        Events.on(ContentReloadEvent.class, e -> {
-            nodes.clear();
-            root = new TechTreeNode(TechTree.root, null);
-            checkNodes(root);
-            treeLayout();
-            stack.getChildren().get(0).remove();
-            stack.addChildAt(0, view = new View());
-        });
 
         shown(() -> {
             checkNodes(root);

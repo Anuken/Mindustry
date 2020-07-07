@@ -238,7 +238,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
-        game.checkPref("coreselect", false);
         game.checkPref("hints", true);
         if(!mobile){
             game.checkPref("buildautopause", false);
@@ -325,6 +324,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
+        if(!mobile){
+            graphics.checkPref("coreitems", false);
+        }
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);

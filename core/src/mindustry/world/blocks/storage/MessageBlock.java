@@ -54,7 +54,7 @@ public class MessageBlock extends Block{
         });
     }
 
-    public class MessageBlockEntity extends TileEntity{
+    public class MessageBlockEntity extends Building{
         public String message = "";
         public String[] lines = {""};
 

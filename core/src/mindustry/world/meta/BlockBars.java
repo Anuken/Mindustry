@@ -6,10 +6,10 @@ import mindustry.gen.*;
 import mindustry.ui.Bar;
 
 public class BlockBars{
-    private OrderedMap<String, Func<Tilec, Bar>> bars = new OrderedMap<>();
+    private OrderedMap<String, Func<Building, Bar>> bars = new OrderedMap<>();
 
-    public <T extends Tilec> void add(String name, Func<T, Bar> sup){
-        bars.put(name, (Func<Tilec, Bar>)sup);
+    public <T extends Building> void add(String name, Func<T, Bar> sup){
+        bars.put(name, (Func<Building, Bar>)sup);
     }
 
     public void remove(String name){
@@ -18,7 +18,7 @@ public class BlockBars{
         bars.remove(name);
     }
 
-    public Iterable<Func<Tilec, Bar>> list(){
+    public Iterable<Func<Building, Bar>> list(){
         return bars.values();
     }
 }

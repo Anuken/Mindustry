@@ -13,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -51,9 +52,17 @@ public class PointDefenseTurret extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class PointDefenseEntity extends TileEntity{
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
+        stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
+    }
+
+    public class PointDefenseEntity extends Building{
         public float rotation = 90, reload;
-        public @Nullable Bulletc target;
+        public @Nullable Bullet target;
 
         @Override
         public void updateTile(){
@@ -66,7 +75,7 @@ public class PointDefenseTurret extends Block{
             //look at target
             if(target != null && target.within(this, range) && target.team() != team && target.type().hittable){
                 float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation,dest, rotateSpeed * edelta());
+                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 reload -= edelta();
 
                 //shoot when possible

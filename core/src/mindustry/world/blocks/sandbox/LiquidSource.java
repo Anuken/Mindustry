@@ -41,7 +41,7 @@ public class LiquidSource extends Block{
         drawRequestConfigCenter(req, req.config, "center");
     }
 
-    public class LiquidSourceEntity extends TileEntity{
+    public class LiquidSourceEntity extends Building{
         public @Nullable Liquid source = null;
 
         @Override
@@ -71,7 +71,7 @@ public class LiquidSource extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             if(this == other){
                 deselect();
                 configure(null);

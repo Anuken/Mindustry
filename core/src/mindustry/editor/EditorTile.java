@@ -55,7 +55,7 @@ public class EditorTile extends Tile{
 
         op(OpType.block, block.id);
         if(rotation != 0) op(OpType.rotation, (byte)rotation);
-        if(team() != Team.derelict) op(OpType.team, team().id);
+        if(team() != Team.derelict) op(OpType.team, (byte)team().id);
         super.setBlock(type, team, rotation);
     }
 
@@ -67,7 +67,7 @@ public class EditorTile extends Tile{
         }
 
         if(getTeamID() == team.id) return;
-        op(OpType.team, getTeamID());
+        op(OpType.team, (byte)getTeamID());
         super.setTeam(team);
     }
 
@@ -109,13 +109,13 @@ public class EditorTile extends Tile{
     }
     
     @Override
-    protected void changeEntity(Team team, Prov<Tilec> entityprov){
+    protected void changeEntity(Team team, Prov<Building> entityprov){
         if(state.isGame()){
             super.changeEntity(team, entityprov);
             return;
         }
 
-        entity = null;
+        build = null;
 
         if(block == null) block = Blocks.air;
         if(floor == null) floor = (Floor)Blocks.air;
@@ -123,11 +123,11 @@ public class EditorTile extends Tile{
         Block block = block();
 
         if(block.hasEntity()){
-            entity = entityprov.get().init(this, team, false);
-            entity.cons(new ConsumeModule(entity));
-            if(block.hasItems) entity.items(new ItemModule());
-            if(block.hasLiquids) entity.liquids(new LiquidModule());
-            if(block.hasPower) entity.power(new PowerModule());
+            build = entityprov.get().init(this, team, false);
+            build.cons(new ConsumeModule(build));
+            if(block.hasItems) build.items = new ItemModule();
+            if(block.hasLiquids) build.liquids(new LiquidModule());
+            if(block.hasPower) build.power(new PowerModule());
         }
     }
 

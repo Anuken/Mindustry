@@ -2,17 +2,17 @@ package mindustry.type;
 
 import arc.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.Saves.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 /** A small section of a planet. */
 public class Sector{
@@ -28,7 +28,7 @@ public class Sector{
     public @Nullable SectorPreset preset;
 
     /** Sector enemy hostility from 0 to 1 */
-    public float hostility;
+    //public float hostility;
 
     //TODO implement a dynamic launch period
     public int launchPeriod = 10;
@@ -56,7 +56,7 @@ public class Sector{
 
     /** @return whether the enemy has a generated base here. */
     public boolean hasEnemyBase(){
-        return hostility >= 0.02f && (save == null || save.meta.rules.waves);
+        return is(SectorAttribute.base) && (save == null || save.meta.rules.waves);
     }
 
     public boolean isBeingPlayed(){
@@ -79,7 +79,7 @@ public class Sector{
 
     public void generate(){
         //TODO use simplex and a seed
-        hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.5f, 0.4f), 0);
+        //hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.5f, 0.4f), 0);
     }
 
     public boolean locked(){
@@ -110,6 +110,16 @@ public class Sector{
         return false;
     }
 
+    //TODO this should be stored in a more efficient structure, and be updated each turn
+    public Seq<ItemStack> getRecievedItems(){
+        return Core.settings.getJson(key("recieved-items"),Seq.class, ItemStack.class, Seq::new);
+    }
+
+    public void setRecievedItems(Seq<ItemStack> stacks){
+        Core.settings.putJson(key("recieved-items"), ItemStack.class, stacks);
+    }
+
+    //TODO these methods should maybe move somewhere else and/or be contained in a data object
     public void setSpawnPosition(int position){
         put("spawn-position", position);
     }
@@ -120,12 +130,45 @@ public class Sector{
         return Core.settings.getInt(key("spawn-position"), Point2.pack(world.width() / 2, world.height() / 2));
     }
 
-    public void setTurnsPassed(int number){
-        put("turns-passed", number);
+    /** @return time spent in this sector this turn in ticks. */
+    public float getTimeSpent(){
+        //return currently counting time spent if being played on
+        if(isBeingPlayed()) return state.secinfo.internalTimeSpent;
+
+        //else return the stored value
+        return getStoredTimeSpent();
     }
 
-    public int getTurnsPassed(){
-        return Core.settings.getInt(key("turns-passed"));
+    public void setTimeSpent(float time){
+        put("time-spent", time);
+
+        //update counting time
+        if(isBeingPlayed()){
+            state.secinfo.internalTimeSpent = time;
+        }
+    }
+
+    public String displayTimeRemaining(){
+        float amount = Vars.turnDuration - getTimeSpent();
+        int seconds = (int)(amount / 60);
+        int sf = seconds % 60;
+        return (seconds / 60) + ":" + (sf < 10 ? "0" : "") + sf;
+    }
+
+    /** @return the stored amount of time spent in this sector this turn in ticks.
+     * Do not use unless you know what you're doing. */
+    public float getStoredTimeSpent(){
+        return Core.settings.getFloat(key("time-spent"));
+    }
+
+    public void setSecondsPassed(long number){
+        put("seconds-passed", number);
+    }
+
+    /** @return how much time has passed in this sector without the player resuming here.
+     * Used for resource production calculations. */
+    public long getSecondsPassed(){
+        return Core.settings.getLong(key("seconds-passed"));
     }
 
     private String key(String key){
@@ -243,6 +286,8 @@ public class Sector{
         /** Has snow. */
         snowy,
         /** Has sandstorms. */
-        desert
+        desert,
+        /** Has an enemy base. */
+        base
     }
 }

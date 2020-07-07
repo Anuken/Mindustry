@@ -333,10 +333,17 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public void showInfo(String info){
+        showInfo(info, () -> {});
+    }
+
+    public void showInfo(String info, Runnable listener){
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.button("$ok", this::hide).size(110, 50).pad(4);
+            buttons.button("$ok", () -> {
+                hide();
+                listener.run();
+            }).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -458,6 +465,15 @@ public class UI implements ApplicationListener, Loadable{
         dialog.keyDown(KeyCode.escape, dialog::hide);
         dialog.keyDown(KeyCode.back, dialog::hide);
         dialog.show();
+    }
+
+    public void announce(String text){
+        Table t = new Table();
+        t.background(Styles.black3).margin(8f)
+        .add(text).style(Styles.outlineLabel);
+        t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
+        t.actions(Actions.fadeOut(3, Interp.pow4In));
+        Core.scene.add(t);
     }
 
     public void showOkText(String title, String text, Runnable confirmed){

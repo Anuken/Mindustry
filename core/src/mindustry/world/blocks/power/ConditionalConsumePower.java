@@ -6,15 +6,15 @@ import mindustry.world.consumers.ConsumePower;
 
 /** A power consumer that only activates sometimes. */
 public class ConditionalConsumePower extends ConsumePower{
-    private final Boolf<Tilec> consume;
+    private final Boolf<Building> consume;
 
-    public ConditionalConsumePower(float usage, Boolf<Tilec> consume){
+    public ConditionalConsumePower(float usage, Boolf<Building> consume){
         super(usage, 0, false);
         this.consume = consume;
     }
 
     @Override
-    public float requestedPower(Tilec entity){
+    public float requestedPower(Building entity){
         return consume.get(entity) ? usage : 0f;
     }
 }

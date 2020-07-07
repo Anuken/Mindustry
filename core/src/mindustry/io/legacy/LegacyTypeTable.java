@@ -73,7 +73,7 @@ public class LegacyTypeTable{
 13 = Revenant
 
     private static final Prov[] build81Table = {
-        Playerc::new,
+        Player::new,
         Fire::new,
         Puddle::new,
         MinerDrone::new,
@@ -90,7 +90,7 @@ public class LegacyTypeTable{
     };
 
     private static final Prov[] build80Table = {
-        Playerc::new,
+        Player::new,
         Fire::new,
         Puddle::new,
         Bullet::new,
@@ -109,7 +109,7 @@ public class LegacyTypeTable{
     };
 
     private static final Prov[] build79Table = {
-        Playerc::new,
+        Player::new,
         Fire::new,
         Puddle::new,
         Bullet::new,

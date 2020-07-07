@@ -11,6 +11,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -20,11 +21,12 @@ import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
-@Component
+@Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable{
 
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
     @Import boolean dead;
+    @Import Team team;
 
     private UnitController controller;
     private UnitType type;
@@ -60,13 +62,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public float bounds(){
-        return hitSize() *  2f;
+        return hitSize *  2f;
     }
 
     @Override
     public void controller(UnitController next){
         this.controller = next;
-        if(controller.unit() != this) controller.unit(this);
+        if(controller.unit() != base()) controller.unit(base());
     }
 
     @Override
@@ -128,23 +130,25 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void afterSync(){
         //set up type info after reading
         setStats(this.type);
-        controller.unit(this);
+        controller.unit(base());
     }
 
     @Override
     public void afterRead(){
         afterSync();
+        //reset controller state
+        controller(type.createController());
     }
 
     @Override
     public void add(){
-        teamIndex.updateCount(team(), 1);
+        teamIndex.updateCount(team, 1);
     }
 
     @Override
     public void remove(){
-        teamIndex.updateCount(team(), -1);
-        controller.removed(this);
+        teamIndex.updateCount(team, -1);
+        controller.removed(base());
     }
 
     @Override
@@ -153,17 +157,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             Effects.shake(type.landShake, type.landShake, this);
         }
 
-        type.landed(this);
+        type.landed(base());
     }
 
     @Override
     public void update(){
-        type.update(this);
+        type.update(base());
 
         drag(type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f));
 
         //apply knockback based on spawns
-        if(team() != state.rules.waveTeam){
+        if(team != state.rules.waveTeam){
             float relativeSize = state.rules.dropZoneRadius + bounds()/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
@@ -177,8 +181,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(tile != null && isGrounded()){
             //unit block update
-            if(tile.entity != null){
-                tile.entity.unitOn(this);
+            if(tile.build != null){
+                tile.build.unitOn(base());
             }
 
             //kill when stuck in wall
@@ -206,7 +210,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void display(Table table){
-        type.display(this, table);
+        type.display(base(), table);
     }
 
     @Override
@@ -216,17 +220,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void draw(){
-        type.draw(this);
+        type.draw(base());
     }
 
     @Override
     public boolean isPlayer(){
-        return controller instanceof Playerc;
+        return controller instanceof Player;
     }
 
     @Nullable
-    public Playerc getPlayer(){
-        return isPlayer() ? (Playerc)controller : null;
+    public Player getPlayer(){
+        return isPlayer() ? (Player)controller : null;
     }
 
     @Override
@@ -238,12 +242,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         float flammability = item().flammability * stack().amount;
         Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
 
-        Effects.scorch(x, y, (int)(hitSize() / 5));
+        Effects.scorch(x, y, (int)(hitSize / 5));
         Fx.explosion.at(this);
         Effects.shake(2f, 2f, this);
         type.deathSound.at(this);
 
-        Events.fire(new UnitDestroyEvent(this));
+        Events.fire(new UnitDestroyEvent(base()));
 
         if(explosiveness > 7f && isLocal()){
             Events.fire(Trigger.suicideBomb);
@@ -258,21 +262,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(dead || net.client()) return;
 
         //deaths are synced; this calls killed()
-        Call.onUnitDeath(this);
-    }
-
-    @Override
-    public boolean canMine(Item item){
-        return type.drillTier >= item.hardness;
-    }
-
-    @Override
-    public float miningSpeed(){
-        return type.mineSpeed;
-    }
-
-    @Override
-    public boolean offloadImmediately(){
-        return false;
+        Call.unitDeath(base());
     }
 }

@@ -2,7 +2,6 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 
 import static mindustry.Vars.renderer;

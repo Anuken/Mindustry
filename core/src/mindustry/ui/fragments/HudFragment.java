@@ -35,7 +35,6 @@ public class HudFragment extends Fragment{
     private Table lastUnlockLayout;
     private boolean shown = true;
     private float dsize = 47.2f;
-    //TODO implement
     private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
@@ -45,20 +44,26 @@ public class HudFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        Events.on(TurnEvent.class, e -> {
-            //TODO localize, clean up, etc
-            int attacked = universe.getSectorsAttacked();
-            showToast("New turn: [accent]" + universe.getTurn() + "[]" + (attacked > 0 ? "\n[scarlet]" + Iconc.warning + " " + attacked + " sectors attacked!": ""));
-        });
 
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
+            //TODO localize
             showToast("Sector[accent] captured[]!");
         });
 
         //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
+        });
+
+        Events.on(TurnEvent.class, e -> {
+            ui.announce("[accent][[ Turn " + universe.turn() + " ]");
+        });
+
+        //paused table
+        parent.fill(t -> {
+            t.top().visible(() -> state.isPaused() && !state.isOutOfTime()).touchable(Touchable.disabled);
+            t.table(Styles.black5, top -> top.add("$paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
         //TODO tear this all down
@@ -68,10 +73,7 @@ public class HudFragment extends Fragment{
             cont.top().left();
 
             if(mobile){
-
-                {
-                    Table select = new Table();
-
+                cont.table(select -> {
                     select.left();
                     select.defaults().size(dsize).left();
 
@@ -118,28 +120,7 @@ public class HudFragment extends Fragment{
                     });
 
                     select.image().color(Pal.gray).width(4f).fillY();
-
-                    float size = Scl.scl(dsize);
-                    Seq<Element> children = new Seq<>(select.getChildren());
-
-                    //now, you may be wondering, why is this necessary? the answer is, I don't know, but it fixes layout issues somehow
-                    int index = 0;
-                    for(Element elem : children){
-                        int fi = index++;
-                        parent.addChild(elem);
-                        elem.visible(() -> {
-                            if(fi < 5){
-                                elem.setSize(size);
-                            }else{
-                                elem.setSize(Scl.scl(4f), size);
-                            }
-                            elem.setPosition(fi * size, Core.graphics.getHeight(), Align.topLeft);
-                            return true;
-                        });
-                    }
-
-                    cont.add().size(dsize * 5 + 3, dsize).left();
-                }
+                });
 
                 cont.row();
                 cont.image().height(4f).color(Pal.gray).fillX();
@@ -232,6 +213,12 @@ public class HudFragment extends Fragment{
             t.top().right();
         });
 
+        //core items
+        parent.fill(t -> {
+            t.top().add(coreItems);
+            t.visible(() -> Core.settings.getBool("coreitems") && !mobile);
+        });
+
         //spawner warning
         parent.fill(t -> {
             t.touchable(Touchable.disabled);
@@ -278,6 +265,27 @@ public class HudFragment extends Fragment{
             .update(label -> label.getColor().set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
+        //paused table for when the player is out of time
+        parent.fill(t -> {
+            t.top().visible(() -> state.isOutOfTime());
+            t.table(Styles.black5, top -> {
+                //TODO localize when done
+                top.add("Out of sector time.").style(Styles.outlineLabel).color(Pal.accent).update(l -> l.color.a = Mathf.absin(Time.globalTime(), 7f, 1f)).colspan(2);
+                top.row();
+
+                top.defaults().pad(2).size(150f, 54f);
+                top.button("Next Turn", () -> {
+                    universe.runTurn();
+                    state.set(State.playing);
+                });
+
+                top.button("Back to Planet", () -> {
+                    ui.paused.runExitSave();
+                    ui.planet.show();
+                });
+            }).margin(8).growX();
+        });
+
         //tutorial text
         parent.fill(t -> {
             Runnable resize = () -> {
@@ -298,12 +306,6 @@ public class HudFragment extends Fragment{
 
             resize.run();
             Events.on(ResizeEvent.class, e -> resize.run());
-        });
-
-        //paused table
-        parent.fill(t -> {
-            t.top().visible(() -> state.isPaused()).touchable(Touchable.disabled);
-            t.table(Tex.buttonTrans, top -> top.add("$paused").pad(5f));
         });
 
         //'saving' indicator
@@ -359,21 +361,11 @@ public class HudFragment extends Fragment{
             }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
         });
 
-        //TODO move, select loadout, consume resources
-        parent.fill(t -> {
-            t.bottom().visible(() -> state.isCampaign() && player.team().core() != null);
-
-            t.button("test launch", Icon.warning, () -> {
-                ui.planet.show(state.getSector(), player.team().core());
-            }).width(150f)
-            .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)); //disable core when missing resources for launch
-        });
-
         blockfrag.build(parent);
     }
 
     @Remote(targets = Loc.both, forward = true, called = Loc.both)
-    public static void setPlayerTeamEditor(Playerc player, Team team){
+    public static void setPlayerTeamEditor(Player player, Team team){
         if(state.isEditor() && player != null){
             player.team(team);
         }
@@ -672,13 +664,13 @@ public class HudFragment extends Fragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((net.server() || player.admin()) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
+        return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
     private void addPlayButton(Table table){
         table.right().button(Icon.play, Styles.righti, 30f, () -> {
-            if(net.client() && player.admin()){
-                Call.onAdminRequest(player, AdminAction.wave);
+            if(net.client() && player.admin){
+                Call.adminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
                 ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);
             }else{

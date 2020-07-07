@@ -52,7 +52,7 @@ public class DrawOperation{
         }else if(type == OpType.rotation.ordinal()){
             return tile.rotation();
         }else if(type == OpType.team.ordinal()){
-            return tile.getTeamID();
+            return (byte)tile.getTeamID();
         }else if(type == OpType.overlay.ordinal()){
             return tile.overlayID();
         }

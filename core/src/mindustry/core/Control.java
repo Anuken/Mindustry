@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -43,7 +44,7 @@ import static mindustry.Vars.*;
  */
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
-    public mindustry.audio.MusicControl music;
+    public MusicControl music;
     public Tutorial tutorial;
     public InputHandler input;
 
@@ -73,8 +74,8 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            if(Mathf.zero(player.x()) && Mathf.zero(player.y())){
-                Tilec core = state.teams.closestCore(0, 0, player.team());
+            if(Mathf.zero(player.x) && Mathf.zero(player.y)){
+                Building core = state.teams.closestCore(0, 0, player.team());
                 if(core != null){
                     player.set(core);
                     camera.position.set(core);
@@ -110,7 +111,7 @@ public class Control implements ApplicationListener, Loadable{
             state.stats.wavesLasted = state.wave;
             Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
-            Call.onGameOver(event.winner);
+            Call.gameOver(event.winner);
         });
 
         //autohost for pvp maps
@@ -158,7 +159,7 @@ public class Control implements ApplicationListener, Loadable{
         });
 
         Events.on(Trigger.newGame, () -> {
-            Tilec core = player.closestCore();
+            Building core = player.closestCore();
 
             if(core == null) return;
 
@@ -177,6 +178,7 @@ public class Control implements ApplicationListener, Loadable{
                 Effects.shake(5f, 5f, core);
             });
         });
+
     }
 
     @Override
@@ -198,9 +200,9 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     void createPlayer(){
-        player = PlayerEntity.create();
-        player.name(Core.settings.getString("name"));
-        player.color().set(Core.settings.getInt("color-0"));
+        player = Player.create();
+        player.name = Core.settings.getString("name");
+        player.color.set(Core.settings.getInt("color-0"));
 
         if(mobile){
             input = new MobileInput();
@@ -243,17 +245,22 @@ public class Control implements ApplicationListener, Loadable{
 
     //TODO move
     public void handleLaunch(CoreEntity tile){
-        LaunchCorec ent = LaunchCoreEntity.create();
+        LaunchCorec ent = LaunchCore.create();
         ent.set(tile);
         ent.block(Blocks.coreShard);
         ent.lifetime(Vars.launchDuration);
         ent.add();
 
-        //remove launch requirements from core
-        tile.items.remove(tile.block.requirements);
+        //remove schematic requirements from core
+        tile.items.remove(universe.getLastLoadout().requirements());
+        tile.items.remove(universe.getLaunchResources());
     }
 
     public void playSector(Sector sector){
+        playSector(sector, sector);
+    }
+
+    public void playSector(@Nullable Sector origin, Sector sector){
         ui.loadAnd(() -> {
             ui.planet.hide();
             SaveSlot slot = sector.save;
@@ -265,10 +272,11 @@ public class Control implements ApplicationListener, Loadable{
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
+                    //TODO this is broken?
                     if(state.rules.defaultTeam.cores().isEmpty()){
 
                         //kill all friendly units, since they should be dead anwyay
-                        for(Unitc unit : Groups.unit){
+                        for(Unit unit : Groups.unit){
                             if(unit.team() == state.rules.defaultTeam){
                                 unit.remove();
                             }
@@ -276,7 +284,7 @@ public class Control implements ApplicationListener, Loadable{
 
                         Tile spawn = world.tile(sector.getSpawnPosition());
                         //TODO PLACE CORRECT LOADOUT
-                        Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+                        Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
 
                         //set up camera/player locations
                         player.set(spawn.x * tilesize, spawn.y * tilesize);
@@ -292,7 +300,7 @@ public class Control implements ApplicationListener, Loadable{
                     sector.save = null;
                     Time.runTask(10f, () -> ui.showErrorMessage("$save.corrupted"));
                     slot.delete();
-                    playSector(sector);
+                    playSector(origin, sector);
                 }
                 ui.planet.hide();
             }else{
@@ -300,6 +308,8 @@ public class Control implements ApplicationListener, Loadable{
                 logic.reset();
                 world.loadSector(sector);
                 state.rules.sector = sector;
+                //assign origin when launching
+                state.secinfo.origin = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);
@@ -347,13 +357,13 @@ public class Control implements ApplicationListener, Loadable{
             zone.rules.get(state.rules);
             //TODO assign zone!!
             //state.rules.zone = zone;
-            for(Tilec core : state.teams.playerCores()){
+            for(Building core : state.teams.playerCores()){
                 for(ItemStack stack : zone.getStartingItems()){
-                    core.items().add(stack.item, stack.amount);
+                    core.items.add(stack.item, stack.amount);
                 }
             }
-            Tilec core = state.teams.playerCores().first();
-            core.items().clear();
+            Building core = state.teams.playerCores().first();
+            core.items.clear();
 
             logic.play();
             state.rules.waveTimer = false;
@@ -497,7 +507,7 @@ public class Control implements ApplicationListener, Loadable{
                 platform.updateRPC();
             }
 
-            if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(Core.input.keyTap(Binding.pause) && !state.isOutOfTime() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 

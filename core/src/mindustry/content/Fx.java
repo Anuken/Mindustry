@@ -26,31 +26,31 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
 
     unitSpawn = new Effect(30f, e -> {
-        if(!(e.data instanceof Unitc)) return;
+        if(!(e.data instanceof Unit)) return;
 
         alpha(e.fin());
 
         float scl = 1f + e.fout() * 2f;
 
-        Unitc unit = (Unitc)e.data;
+        Unit unit = e.data();
         rect(unit.type().region, e.x, e.y,
         unit.type().region.getWidth() * Draw.scl * scl, unit.type().region.getHeight() * Draw.scl * scl, 180f);
 
     }),
 
     unitControl = new Effect(30f, e -> {
-        if(!(e.data instanceof Unitc)) return;
+        if(!(e.data instanceof Unit)) return;
 
-        Unitc select = (Unitc)e.data;
+        Unit select = e.data();
 
         mixcol(Pal.accent, 1f);
         alpha(e.fout());
-        rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90f);
+        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
         alpha(1f);
         Lines.stroke(e.fslope() * 1f);
-        Lines.square(select.x(), select.y(), e.fout() * select.hitSize() * 2f, 45);
+        Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);
         Lines.stroke(e.fslope() * 2f);
-        Lines.square(select.x(), select.y(), e.fout() * select.hitSize() * 3f, 45f);
+        Lines.square(select.x, select.y, e.fout() * select.hitSize * 3f, 45f);
         reset();
     }),
 
@@ -142,6 +142,12 @@ public class Fx{
         color(Pal.command);
         stroke(e.fout() * 2f);
         Lines.circle(e.x, e.y, 4f + e.finpow() * 120f);
+    }),
+
+    upgradeCore = new Effect(120f, e -> {
+        color(Color.white, Pal.accent, e.fin());
+        alpha(e.fout());
+        Fill.square(e.x, e.y, tilesize / 2f * e.rotation);
     }),
 
     placeBlock = new Effect(16, e -> {
@@ -1256,7 +1262,7 @@ public class Fx{
     unitShieldBreak = new Effect(35, e -> {
         if(!(e.data instanceof Unitc)) return;
 
-        Unitc unit = e.data();
+        Unit unit = e.data();
 
         float radius = unit.hitSize() * 1.3f;
 

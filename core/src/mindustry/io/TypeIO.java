@@ -140,26 +140,26 @@ public class TypeIO{
         return noMounts;
     }
 
-    public static void writeUnit(Writes write, Unitc unit){
+    public static void writeUnit(Writes write, Unit unit){
         write.b(unit.isNull() ? 0 : unit instanceof BlockUnitc ? 1 : 2);
         //block units are special
         if(unit instanceof BlockUnitc){
             write.i(((BlockUnitc)unit).tile().pos());
         }else{
-            write.i(unit.id());
+            write.i(unit.id);
         }
     }
 
-    public static Unitc readUnit(Reads read){
+    public static Unit readUnit(Reads read){
         byte type = read.b();
         int id = read.i();
         //nothing
         if(type == 0) return Nulls.unit;
         if(type == 2){ //standard unit
-            Unitc unit = Groups.unit.getByID(id);
+            Unit unit = Groups.unit.getByID(id);
             return unit == null ? Nulls.unit : unit;
         }else if(type == 1){ //block
-            Tilec tile = world.ent(id);
+            Building tile = world.ent(id);
             return tile instanceof ControlBlock ? ((ControlBlock)tile).unit() : Nulls.unit;
         }
         return Nulls.unit;
@@ -173,11 +173,11 @@ public class TypeIO{
         return (T)Groups.all.getByID(read.i());
     }
 
-    public static void writeTilec(Writes write, Tilec tile){
+    public static void writeBuilding(Writes write, Building tile){
         write.i(tile == null ? -1 : tile.pos());
     }
 
-    public static Tilec readTilec(Reads read){
+    public static Building readBuilding(Reads read){
         return world.ent(read.i());
     }
 
@@ -264,9 +264,9 @@ public class TypeIO{
 
     public static void writeController(Writes write, UnitController control){
         //no real unit controller state is written, only the type
-        if(control instanceof Playerc){
+        if(control instanceof Player){
             write.b(0);
-            write.i(((Playerc)control).id());
+            write.i(((Player)control).id());
         }else if(control instanceof FormationAI){
             write.b(1);
             write.i(((FormationAI)control).leader.id());
@@ -279,7 +279,7 @@ public class TypeIO{
         byte type = read.b();
         if(type == 0){ //is player
             int id = read.i();
-            Playerc player = Groups.player.getByID(id);
+            Player player = Groups.player.getByID(id);
             //make sure player exists
             if(player == null) return prev;
             return player;

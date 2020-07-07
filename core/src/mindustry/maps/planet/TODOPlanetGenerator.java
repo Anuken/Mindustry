@@ -279,8 +279,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        //TODO PLACE CORRECT LOADOUT
-        Schematics.placeLoadout(Loadouts.advancedShard, spawn.x, spawn.y);
+        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
@@ -293,6 +292,8 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void postGenerate(Tiles tiles){
-        basegen.postGenerate();
+        if(sector.hasEnemyBase()){
+            basegen.postGenerate();
+        }
     }
 }

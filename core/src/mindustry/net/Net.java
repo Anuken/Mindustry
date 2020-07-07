@@ -138,7 +138,7 @@ public class Net{
      */
     public void closeServer(){
         for(NetConnection con : getConnections()){
-            Call.onKick(con, KickReason.serverClose);
+            Call.kick(con, KickReason.serverClose);
         }
 
         provider.closeServer();

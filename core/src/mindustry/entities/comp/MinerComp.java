@@ -17,17 +17,20 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
+abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     @Import float x, y, rotation;
+    @Import UnitType type;
 
     transient float mineTimer;
     @Nullable Tile mineTile;
 
-    abstract boolean canMine(Item item);
+    public boolean canMine(Item item){
+        return type.mineTier >= item.hardness;
+    }
 
-    abstract float miningSpeed();
-
-    abstract boolean offloadImmediately();
+    public boolean offloadImmediately(){
+        return isPlayer();
+    }
 
     boolean mining(){
         return mineTile != null;
@@ -35,9 +38,9 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
     @Override
     public void update(){
-        Tilec core = closestCore();
+        Building core = closestCore();
 
-        if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && dst(core) < mineTransferRange){
+        if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && within(core, mineTransferRange)){
             int accepted = core.acceptStack(item(), stack().amount, this);
             if(accepted > 0){
                 Call.transferItemTo(item(), accepted,
@@ -55,12 +58,12 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
         }else{
             Item item = mineTile.drop();
             rotation(Mathf.slerpDelta(rotation(), angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f));
-            mineTimer += Time.delta()*miningSpeed();
+            mineTimer += Time.delta()*type.mineSpeed;
 
             if(mineTimer >= 50f + item.hardness*10f){
                 mineTimer = 0;
 
-                if(dst(core) < mineTransferRange && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
+                if(within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
                     Call.transferItemTo(item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile());
@@ -91,6 +94,8 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
         float ex = mineTile.worldx() + Mathf.sin(Time.time() + 48, swingScl, swingMag);
         float ey = mineTile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
+
+        Draw.z(Layer.flyingUnit + 0.1f);
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 

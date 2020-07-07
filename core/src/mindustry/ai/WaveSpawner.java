@@ -34,7 +34,7 @@ public class WaveSpawner{
 
     /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
-        return !player.dead() && spawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x(), player.y()) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
+        return !player.dead() && spawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
     }
 
     public void spawnEnemies(){
@@ -48,7 +48,7 @@ public class WaveSpawner{
 
                 eachFlyerSpawn((spawnX, spawnY) -> {
                     for(int i = 0; i < spawned; i++){
-                        Unitc unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
+                        Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Mathf.range(spread), spawnY + Mathf.range(spread));
                         unit.add();
                     }
@@ -61,7 +61,7 @@ public class WaveSpawner{
                     for(int i = 0; i < spawned; i++){
                         Tmp.v1.rnd(spread);
 
-                        Unitc unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
+                        Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
                         Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
                     }
@@ -85,10 +85,10 @@ public class WaveSpawner{
         }
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
-            Tilec firstCore = state.teams.playerCores().first();
-            for(Tilec core : state.rules.waveTeam.cores()){
+            Building firstCore = state.teams.playerCores().first();
+            for(Building core : state.rules.waveTeam.cores()){
                 Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block().size * tilesize);
-                cons.accept(core.x() + Tmp.v1.x, core.y() + Tmp.v1.y, false);
+                cons.accept(core.x + Tmp.v1.x, core.y + Tmp.v1.y, false);
             }
         }
     }
@@ -104,8 +104,8 @@ public class WaveSpawner{
         }
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
-            for(Tilec core : state.teams.get(state.rules.waveTeam).cores){
-                cons.get(core.x(), core.y());
+            for(Building core : state.teams.get(state.rules.waveTeam).cores){
+                cons.get(core.x, core.y);
             }
         }
     }
@@ -124,7 +124,7 @@ public class WaveSpawner{
         }
     }
 
-    private void spawnEffect(Unitc unit){
+    private void spawnEffect(Unit unit){
         Fx.unitSpawn.at(unit.x(), unit.y(), 0f, unit);
         Time.run(30f, () -> {
             unit.add();

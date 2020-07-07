@@ -24,7 +24,7 @@ public class ArtilleryBulletType extends BasicBulletType{
     }
 
     @Override
-    public void update(Bulletc b){
+    public void update(Bullet b){
         super.update(b);
 
         if(b.timer(0, 3 + b.fslope() * 2f)){
@@ -33,7 +33,7 @@ public class ArtilleryBulletType extends BasicBulletType{
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
         float baseScale = 0.7f;
         float scale = (baseScale + b.fslope() * (1f - baseScale));
 

@@ -44,7 +44,7 @@ public class ItemSource extends Block{
         return true;
     }
 
-    public class ItemSourceEntity extends TileEntity{
+    public class ItemSourceEntity extends Building{
         Item outputItem;
 
         @Override
@@ -73,7 +73,7 @@ public class ItemSource extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             if(this == other){
                 deselect();
                 configure(null);
@@ -84,7 +84,7 @@ public class ItemSource extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return false;
         }
 

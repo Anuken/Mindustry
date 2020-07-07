@@ -82,7 +82,7 @@ abstract class HealthComp implements Entityc{
     }
 
     void damageContinuous(float amount){
-        damage(amount * Time.delta(), hitTime <= -20 + hitDuration);
+        damage(amount * Time.delta(), hitTime <= -10 + hitDuration);
     }
 
     void damageContinuousPierce(float amount){

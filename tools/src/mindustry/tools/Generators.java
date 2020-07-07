@@ -23,9 +23,32 @@ import mindustry.world.blocks.legacy.*;
 import static mindustry.Vars.*;
 
 public class Generators{
+    //used for changing colors in the UI - testing only
+    static final IntIntMap paletteMap = IntIntMap.with(
+    //empty for now
+    0x454545ff, 0x00000000,//0x32394bff,
+    0x00000099, 0x00000000//0x000000ff
+    );
 
     public static void generate(){
         ObjectMap<Block, Image> gens = new ObjectMap<>();
+
+        if(!paletteMap.isEmpty()){
+            ImagePacker.generate("uipalette", () -> {
+                Fi.get("../ui").walk(fi -> {
+                    if(!fi.extEquals("png")) return;
+
+                    Pixmap pix = new Pixmap(fi);
+                    pix.setBlending(Pixmap.Blending.sourceOver);
+                    pix.each((x, y) -> {
+                        int value = pix.getPixel(x, y);
+                        pix.draw(x, y, paletteMap.get(value, value));
+                    });
+
+                    fi.writePNG(pix);
+                });
+            });
+        }
 
         ImagePacker.generate("splashes", () -> {
             ArcNativesLoader.load();
@@ -278,51 +301,53 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 
-            type.load();
+            try{
+                type.load();
+                type.init();
 
-            Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
-            for(int i = 1; i < type.parts; i++){
-                image.draw(ImagePacker.get(type.partRegions[i]));
-            }
-            if(type.parts > 0){
-                image.save(type.name);
-            }
+                Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
+                for(int i = 1; i < type.parts; i++){
+                    image.draw(ImagePacker.get(type.partRegions[i]));
+                }
+                if(type.parts > 0){
+                    image.save(type.name);
+                }
 
-            if(type.constructor.get() instanceof Mechc){
-                image.drawCenter(type.baseRegion);
-                image.drawCenter(type.legRegion);
-                image.drawCenter(type.legRegion, true, false);
-                image.draw(type.region);
-            }
+                if(type.constructor.get() instanceof Mechc){
+                    image.drawCenter(type.baseRegion);
+                    image.drawCenter(type.legRegion);
+                    image.drawCenter(type.legRegion, true, false);
+                    image.draw(type.region);
+                }
 
-            Image baseCell = ImagePacker.get(type.parts > 0 ? type.partCellRegions[0] : type.cellRegion);
-            for(int i = 1; i < type.parts; i++){
-                baseCell.draw(ImagePacker.get(type.partCellRegions[i]));
-            }
+                Image baseCell = ImagePacker.get(type.parts > 0 ? type.partCellRegions[0] : type.cellRegion);
+                for(int i = 1; i < type.parts; i++){
+                    baseCell.draw(ImagePacker.get(type.partCellRegions[i]));
+                }
 
-            if(type.parts > 0){
-                image.save(type.name + "-cell");
-            }
+                if(type.parts > 0){
+                    image.save(type.name + "-cell");
+                }
 
-            Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
-            cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
+                Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
+                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
 
-            image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
+                image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
 
-            for(Weapon weapon : type.weapons){
-                weapon.load();
-
-                for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
-                    i *= Mathf.sign(weapon.flipped);
+                for(Weapon weapon : type.weapons){
+                    weapon.load();
 
                     image.draw(weapon.region,
-                    (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
+                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.getWidth() / 2f),
                     (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
-                    i > 0, false);
+                    weapon.flipSprite, false);
                 }
+
+                image.save("unit-" + type.name + "-full");
+            }catch(IllegalArgumentException e){
+                Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
             }
 
-            image.save("unit-" + type.name + "-full");
         }));
 
         ImagePacker.generate("ore-icons", () -> {

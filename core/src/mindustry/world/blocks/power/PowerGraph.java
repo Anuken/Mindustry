@@ -8,15 +8,15 @@ import mindustry.gen.*;
 import mindustry.world.consumers.*;
 
 public class PowerGraph{
-    private final static Queue<Tilec> queue = new Queue<>();
-    private final static Seq<Tilec> outArray1 = new Seq<>();
-    private final static Seq<Tilec> outArray2 = new Seq<>();
+    private final static Queue<Building> queue = new Queue<>();
+    private final static Seq<Building> outArray1 = new Seq<>();
+    private final static Seq<Building> outArray2 = new Seq<>();
     private final static IntSet closedSet = new IntSet();
 
-    private final ObjectSet<Tilec> producers = new ObjectSet<>();
-    private final ObjectSet<Tilec> consumers = new ObjectSet<>();
-    private final ObjectSet<Tilec> batteries = new ObjectSet<>();
-    private final ObjectSet<Tilec> all = new ObjectSet<>();
+    private final ObjectSet<Building> producers = new ObjectSet<>();
+    private final ObjectSet<Building> consumers = new ObjectSet<>();
+    private final ObjectSet<Building> batteries = new ObjectSet<>();
+    private final ObjectSet<Building> all = new ObjectSet<>();
 
     private final WindowedMean powerBalance = new WindowedMean(60);
     private float lastPowerProduced, lastPowerNeeded, lastUsageFraction;
@@ -61,7 +61,7 @@ public class PowerGraph{
 
     public float getPowerProduced(){
         float powerProduced = 0f;
-        for(Tilec producer : producers){
+        for(Building producer : producers){
             powerProduced += producer.getPowerProduction() * producer.delta();
         }
         return powerProduced;
@@ -69,7 +69,7 @@ public class PowerGraph{
 
     public float getPowerNeeded(){
         float powerNeeded = 0f;
-        for(Tilec consumer : consumers){
+        for(Building consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.hasPower()){
                 ConsumePower consumePower = consumes.getPower();
@@ -83,7 +83,7 @@ public class PowerGraph{
 
     public float getBatteryStored(){
         float totalAccumulator = 0f;
-        for(Tilec battery : batteries){
+        for(Building battery : batteries){
             Consumers consumes = battery.block().consumes;
             if(consumes.hasPower()){
                 totalAccumulator += battery.power().status * consumes.getPower().capacity;
@@ -94,7 +94,7 @@ public class PowerGraph{
 
     public float getBatteryCapacity(){
         float totalCapacity = 0f;
-        for(Tilec battery : batteries){
+        for(Building battery : batteries){
             if(battery.block().consumes.hasPower()){
                 ConsumePower power = battery.block().consumes.getPower();
                 totalCapacity += (1f - battery.power().status) * power.capacity;
@@ -105,7 +105,7 @@ public class PowerGraph{
 
     public float getTotalBatteryCapacity(){
         float totalCapacity = 0f;
-        for(Tilec battery : batteries){
+        for(Building battery : batteries){
             if(battery.block().consumes.hasPower()){
                 totalCapacity += battery.block().consumes.getPower().capacity;
             }
@@ -119,7 +119,7 @@ public class PowerGraph{
 
         float used = Math.min(stored, needed);
         float consumedPowerPercentage = Math.min(1.0f, needed / stored);
-        for(Tilec battery : batteries){
+        for(Building battery : batteries){
             Consumers consumes = battery.block().consumes;
             if(consumes.hasPower()){
                 battery.power().status *= (1f-consumedPowerPercentage);
@@ -134,7 +134,7 @@ public class PowerGraph{
         float chargedPercent = Math.min(excess/capacity, 1f);
         if(Mathf.equal(capacity, 0f)) return 0f;
 
-        for(Tilec battery : batteries){
+        for(Building battery : batteries){
             Consumers consumes = battery.block().consumes;
             if(consumes.hasPower()){
                 ConsumePower consumePower = consumes.getPower();
@@ -149,7 +149,7 @@ public class PowerGraph{
     public void distributePower(float needed, float produced){
         //distribute even if not needed. this is because some might be requiring power but not using it; it updates consumers
         float coverage = Mathf.zero(needed) && Mathf.zero(produced) ? 0f : Mathf.zero(needed) ? 1f : Math.min(1, produced / needed);
-        for(Tilec consumer : consumers){
+        for(Building consumer : consumers){
             Consumers consumes = consumer.block().consumes;
             if(consumes.hasPower()){
                 ConsumePower consumePower = consumes.getPower();
@@ -180,8 +180,8 @@ public class PowerGraph{
             return;
         }else if(!consumers.isEmpty() && consumers.first().cheating()){
             //when cheating, just set status to 1
-            for(Tilec tile : consumers){
-                tile.power().status = 1f;
+            for(Building tile : consumers){
+                tile.power.status = 1f;
             }
 
             lastPowerNeeded = lastPowerProduced = lastUsageFraction = 1f;
@@ -221,15 +221,15 @@ public class PowerGraph{
         lastUsageFraction = Mathf.zero(rawProduced) ? 1f : Mathf.clamp(powerNeeded / rawProduced);
     }
 
-    public void add(PowerGraph graph){
-        for(Tilec tile : graph.all){
+    public void addGraph(PowerGraph graph){
+        for(Building tile : graph.all){
             add(tile);
         }
     }
 
-    public void add(Tilec tile){
-        if(tile == null || tile.power() == null) return;
-        tile.power().graph = this;
+    public void add(Building tile){
+        if(tile == null || tile.power == null) return;
+        tile.power.graph = this;
         all.add(tile);
 
         if(tile.block().outputsPower && tile.block().consumesPower && !tile.block().consumes.getPower().buffered){
@@ -244,14 +244,14 @@ public class PowerGraph{
         }
     }
 
-    public void reflow(Tilec tile){
+    public void reflow(Building tile){
         queue.clear();
         queue.addLast(tile);
         closedSet.clear();
         while(queue.size > 0){
-            Tilec child = queue.removeFirst();
+            Building child = queue.removeFirst();
             add(child);
-            for(Tilec next : child.getPowerConnections(outArray2)){
+            for(Building next : child.getPowerConnections(outArray2)){
                 if(!closedSet.contains(next.pos())){
                     queue.addLast(next);
                     closedSet.add(next.pos());
@@ -260,20 +260,20 @@ public class PowerGraph{
         }
     }
 
-    private void removeSingle(Tilec tile){
+    private void removeSingle(Building tile){
         all.remove(tile);
         producers.remove(tile);
         consumers.remove(tile);
         batteries.remove(tile);
     }
 
-    public void remove(Tilec tile){
+    public void remove(Building tile){
         removeSingle(tile);
         //begin by clearing the closed set
         closedSet.clear();
 
         //go through all the connections of this tile
-        for(Tilec other : tile.getPowerConnections(outArray1)){
+        for(Building other : tile.getPowerConnections(outArray1)){
             //a graph has already been assigned to this tile from a previous call, skip it
             if(other.power().graph != this) continue;
 
@@ -285,13 +285,13 @@ public class PowerGraph{
             queue.addLast(other);
             while(queue.size > 0){
                 //get child from queue
-                Tilec child = queue.removeFirst();
+                Building child = queue.removeFirst();
                 //remove it from this graph
                 removeSingle(child);
                 //add it to the new branch graph
                 graph.add(child);
                 //go through connections
-                for(Tilec next : child.getPowerConnections(outArray2)){
+                for(Building next : child.getPowerConnections(outArray2)){
                     //make sure it hasn't looped back, and that the new graph being assigned hasn't already been assigned
                     //also skip closed tiles
                     if(next != tile && next.power().graph != graph && !closedSet.contains(next.pos())){
@@ -305,7 +305,7 @@ public class PowerGraph{
         }
     }
 
-    private boolean otherConsumersAreValid(Tilec tile, Consume consumePower){
+    private boolean otherConsumersAreValid(Building tile, Consume consumePower){
         for(Consume cons : tile.block().consumes.all()){
             if(cons != consumePower && !cons.isOptional() && !cons.valid(tile)){
                 return false;

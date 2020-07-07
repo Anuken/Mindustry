@@ -22,6 +22,10 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     transient float drownTime;
     transient float splashTimer;
 
+    boolean checkTarget(boolean targetAir, boolean targetGround){
+        return (isGrounded() && targetGround) || (isFlying() && targetAir);
+    }
+
     boolean isGrounded(){
         return elevation < 0.001f;
     }

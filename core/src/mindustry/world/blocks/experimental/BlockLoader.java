@@ -53,7 +53,7 @@ public class BlockLoader extends PayloadAcceptor{
     public class BlockLoaderEntity extends PayloadAcceptorEntity<BlockPayload>{
 
         @Override
-        public boolean acceptPayload(Tilec source, Payload payload){
+        public boolean acceptPayload(Building source, Payload payload){
             return super.acceptPayload(source, payload) &&
                 (payload instanceof BlockPayload) &&
                 ((((BlockPayload)payload).entity.block().hasItems && ((BlockPayload)payload).block().unloadable && ((BlockPayload)payload).block().itemCapacity >= 10)/* ||
@@ -61,7 +61,7 @@ public class BlockLoader extends PayloadAcceptor{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return items.total() < itemCapacity;
         }
 
@@ -117,9 +117,9 @@ public class BlockLoader extends PayloadAcceptor{
                 if(payload.block().hasLiquids && liquids.total() >= 0.001f){
                     Liquid liq = liquids.current();
                     float total = liquids.currentAmount();
-                    float flow = Math.min(Math.min(liquidsLoaded * delta(), payload.block().liquidCapacity - payload.entity.liquids().get(liq) - 0.0001f), total);
+                    float flow = Math.min(Math.min(liquidsLoaded * delta(), payload.block().liquidCapacity - payload.entity.liquids.get(liq) - 0.0001f), total);
                     if(payload.entity.acceptLiquid(payload.entity, liq, flow)){
-                        payload.entity.liquids().add(liq, flow);
+                        payload.entity.liquids.add(liq, flow);
                         liquids.remove(liq, flow);
                     }
                 }*/
@@ -127,13 +127,13 @@ public class BlockLoader extends PayloadAcceptor{
         }
 
         public float fraction(){
-            return payload == null ? 0f : payload.entity.items().total() / (float)payload.entity.block().itemCapacity;
+            return payload == null ? 0f : payload.entity.items.total() / (float)payload.entity.block().itemCapacity;
         }
 
         public boolean shouldExport(){
             return payload != null &&
-                ((payload.block().hasLiquids && payload.entity.liquids().total() >= payload.block().liquidCapacity - 0.001f) ||
-                (payload.block().hasItems && payload.entity.items().total() >= payload.block().itemCapacity));
+                ((payload.block().hasLiquids && payload.entity.liquids.total() >= payload.block().liquidCapacity - 0.001f) ||
+                (payload.block().hasItems && payload.entity.items.total() >= payload.block().itemCapacity));
         }
     }
 }

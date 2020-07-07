@@ -41,7 +41,7 @@ public class Door extends Wall{
         return req.config == Boolean.TRUE ? openRegion : region;
     }
 
-    public class DoorEntity extends TileEntity{
+    public class DoorEntity extends Building{
         public boolean open = false;
 
         @Override
@@ -60,7 +60,7 @@ public class Door extends Wall{
         }
 
         @Override
-        public void tapped(Playerc player){
+        public void tapped(Player player){
             if((Units.anyEntities(tile) && open) || !timer(timerToggle, 30f)){
                 return;
             }

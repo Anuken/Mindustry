@@ -33,7 +33,7 @@ public class ResupplyPoint extends Block{
         Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.placing);
     }
 
-    public class ResupplyPointEntity extends TileEntity{
+    public class ResupplyPointEntity extends Building{
 
         @Override
         public void drawSelect(){
@@ -50,10 +50,10 @@ public class ResupplyPoint extends Block{
 
     /** Tries to resupply nearby units.
      * @return whether resupplying was successful. If unit ammo is disabled, always returns false. */
-    public static boolean resupply(TileEntity tile, float range, int ammoAmount, Color ammoColor){
+    public static boolean resupply(Building tile, float range, int ammoAmount, Color ammoColor){
         if(!state.rules.unitAmmo) return false;
 
-        Unitc unit = Units.closest(tile.team, tile.x, tile.y, range, u -> u.ammo() <= u.type().ammoCapacity - ammoAmount);
+        Unit unit = Units.closest(tile.team, tile.x, tile.y, range, u -> u.ammo() <= u.type().ammoCapacity - ammoAmount);
         if(unit != null){
             Fx.itemTransfer.at(tile.x, tile.y, ammoAmount / 2f, ammoColor, unit);
             unit.ammo(Math.min(unit.ammo() + ammoAmount, unit.type().ammoCapacity));

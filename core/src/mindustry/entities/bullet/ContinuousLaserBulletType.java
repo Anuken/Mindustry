@@ -43,7 +43,7 @@ public class ContinuousLaserBulletType extends BulletType{
     }
 
     @Override
-    public void update(Bulletc b){
+    public void update(Bullet b){
         //TODO possible laser absorption from blocks
 
         //damage every 5 ticks
@@ -57,7 +57,7 @@ public class ContinuousLaserBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
         float baseLen = length * b.fout();
 
         Lines.lineAngle(b.x(), b.y(), b.rotation(), baseLen);
@@ -77,7 +77,7 @@ public class ContinuousLaserBulletType extends BulletType{
     }
 
     @Override
-    public void drawLight(Bulletc b){
+    public void drawLight(Bullet b){
         //no light drawn here
     }
 

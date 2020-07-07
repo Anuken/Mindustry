@@ -13,7 +13,7 @@ import static mindustry.Vars.*;
 
 public class BlockConfigFragment extends Fragment{
     private Table table = new Table();
-    private Tilec configTile;
+    private Building configTile;
 
     @Override
     public void build(Group parent){
@@ -38,11 +38,11 @@ public class BlockConfigFragment extends Fragment{
         return table.isVisible() && configTile != null;
     }
 
-    public Tilec getSelectedTile(){
+    public Building getSelectedTile(){
         return configTile;
     }
 
-    public void showConfig(Tilec tile){
+    public void showConfig(Building tile){
         if(tile.configTapped()){
             configTile = tile;
 

@@ -32,7 +32,7 @@ public class UnitType extends UnlockableContent{
     private static final Vec2 legOffset = new Vec2();
 
     public boolean flying;
-    public @NonNull Prov<? extends Unitc> constructor;
+    public @NonNull Prov<? extends Unit> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f;
@@ -53,7 +53,7 @@ public class UnitType extends UnlockableContent{
 
     public int itemCapacity = 30;
     public int ammoCapacity = 220;
-    public int drillTier = -1;
+    public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
     public float engineOffset = 5f, engineSize = 2.5f;
@@ -64,6 +64,7 @@ public class UnitType extends UnlockableContent{
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true;
     public int parts = 0;
+    public int trailLength = 5;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -84,8 +85,8 @@ public class UnitType extends UnlockableContent{
         return defaultController.get();
     }
 
-    public Unitc create(Team team){
-        Unitc unit = constructor.get();
+    public Unit create(Team team){
+        Unit unit = constructor.get();
         unit.team(team);
         unit.type(this);
         unit.ammo(ammoCapacity); //fill up on ammo upon creation
@@ -97,11 +98,11 @@ public class UnitType extends UnlockableContent{
         return weapons.size > 0;
     }
 
-    public void update(Unitc unit){}
+    public void update(Unit unit){}
 
-    public void landed(Unitc unit){}
+    public void landed(Unit unit){}
 
-    public void display(Unitc unit, Table table){
+    public void display(Unit unit, Table table){
         table.table(t -> {
             t.left();
             t.add(new Image(icon(Cicon.medium))).size(8 * 4);
@@ -116,7 +117,7 @@ public class UnitType extends UnlockableContent{
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)unit.ammo() / ammoCapacity));
+                bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)unit.ammo / ammoCapacity));
                 bars.row();
             }
         }).growX();
@@ -130,12 +131,37 @@ public class UnitType extends UnlockableContent{
     @CallSuper
     @Override
     public void init(){
+        if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
+
         //set up default range
         if(range < 0){
             for(Weapon weapon : weapons){
                 range = Math.max(range, weapon.bullet.range());
             }
         }
+
+        //add mirrored weapon variants
+        Seq<Weapon> mapped = new Seq<>();
+        for(Weapon w : weapons){
+            mapped.add(w);
+
+            //mirrors are copies with X values negated
+            if(w.mirror){
+                Weapon copy = w.copy();
+                copy.x *= -1;
+                copy.shootX *= -1;
+                copy.flipSprite = !copy.flipSprite;
+                mapped.add(copy);
+
+                //since there are now two weapons, the reload time must be doubled
+                w.reload *= 2f;
+                copy.reload *= 2f;
+
+                w.otherSide = mapped.size - 1;
+                copy.otherSide = mapped.size - 2;
+            }
+        }
+        this.weapons = mapped;
     }
 
     @CallSuper
@@ -169,9 +195,9 @@ public class UnitType extends UnlockableContent{
 
     //region drawing
 
-    public void draw(Unitc unit){
+    public void draw(Unit unit){
         Mechc legs = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = unit.elevation() > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
+        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
@@ -185,21 +211,21 @@ public class UnitType extends UnlockableContent{
         Draw.z(z - 0.02f);
 
         if(legs != null){
-            drawMech(legs);
+            drawMech((Unit & Mechc)legs);
 
             float ft = Mathf.sin(legs.walkTime(), 3f, 3f);
-            legOffset.trns(legs.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation()));
+            legOffset.trns(legs.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation));
             unit.trns(legOffset.x, legOffset.y);
         }
 
         if(unit instanceof Legsc){
-            drawLegs((Legsc)unit);
+            drawLegs((Unit & Legsc)unit);
         }
 
         Draw.z(Math.min(z - 0.01f, Layer.bullet - 1f));
 
         if(unit instanceof Payloadc){
-            drawPayload((Payloadc)unit);
+            drawPayload((Unit & Payloadc)unit);
         }
 
         drawOcclusion(unit);
@@ -212,7 +238,7 @@ public class UnitType extends UnlockableContent{
         if(drawItems) drawItems(unit);
         drawLight(unit);
 
-        if(unit.shieldAlpha() > 0){
+        if(unit.shieldAlpha > 0){
             drawShield(unit);
         }
 
@@ -221,36 +247,36 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    public void drawPayload(Payloadc unit){
+    public <T extends Unit & Payloadc> void drawPayload(T unit){
         if(unit.hasPayload()){
             Payload pay = unit.payloads().first();
-            pay.set(unit.x(), unit.y(), unit.rotation());
+            pay.set(unit.x, unit.y, unit.rotation);
             pay.draw();
         }
     }
 
-    public void drawShield(Unitc unit){
+    public void drawShield(Unit unit){
         float alpha = unit.shieldAlpha();
         float radius = unit.hitSize() * 1.3f;
-        Fill.light(unit.x(), unit.y(), Lines.circleVertices(radius), radius, Tmp.c1.set(Pal.shieldIn), Tmp.c2.set(Pal.shield).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(Pal.shield.a * alpha));
+        Fill.light(unit.x, unit.y, Lines.circleVertices(radius), radius, Tmp.c1.set(Pal.shieldIn), Tmp.c2.set(Pal.shield).lerp(Color.white, Mathf.clamp(unit.hitTime() / 2f)).a(Pal.shield.a * alpha));
     }
 
-    public void drawControl(Unitc unit){
+    public void drawControl(Unit unit){
         Draw.z(Layer.groundUnit - 2);
 
         Draw.color(Pal.accent, Color.white, Mathf.absin(4f, 0.3f));
-        Lines.poly(unit.x(), unit.y(), 4, unit.hitSize() + 1.5f);
+        Lines.poly(unit.x, unit.y, 4, unit.hitSize + 1.5f);
 
         Draw.reset();
     }
 
-    public void drawShadow(Unitc unit){
+    public void drawShadow(Unit unit){
         Draw.color(shadowColor);
-        Draw.rect(shadowRegion, unit.x() + shadowTX * unit.elevation(), unit.y() + shadowTY * unit.elevation(), unit.rotation() - 90);
+        Draw.rect(shadowRegion, unit.x + shadowTX * unit.elevation, unit.y + shadowTY * unit.elevation, unit.rotation - 90);
         Draw.color();
     }
 
-    public void drawOcclusion(Unitc unit){
+    public void drawOcclusion(Unit unit){
         Draw.color(0, 0, 0, 0.4f);
         float rad = 1.6f;
         float size = Math.max(region.getWidth(), region.getHeight()) * Draw.scl;
@@ -258,32 +284,32 @@ public class UnitType extends UnlockableContent{
         Draw.color();
     }
 
-    public void drawItems(Unitc unit){
+    public void drawItems(Unit unit){
         applyColor(unit);
 
         //draw back items
-        if(unit.hasItem() && unit.itemTime() > 0.01f){
-            float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime();
+        if(unit.hasItem() && unit.itemTime > 0.01f){
+            float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime;
 
             Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
             Draw.rect(unit.item().icon(Cicon.medium),
-            unit.x() + Angles.trnsx(unit.rotation() + 180f, itemOffsetY),
-            unit.y() + Angles.trnsy(unit.rotation() + 180f, itemOffsetY),
-            size, size, unit.rotation());
+            unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
+            unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
+            size, size, unit.rotation);
 
             Draw.mixcol();
 
             Lines.stroke(1f, Pal.accent);
             Lines.circle(
-            unit.x() + Angles.trnsx(unit.rotation() + 180f, itemOffsetY),
-            unit.y() + Angles.trnsy(unit.rotation() + 180f, itemOffsetY),
-            (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime());
+            unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
+            unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
+            (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime);
 
             if(unit.isLocal()){
-                Fonts.outline.draw(unit.stack().amount + "",
-                unit.x() + Angles.trnsx(unit.rotation() + 180f, itemOffsetY),
-                unit.y() + Angles.trnsy(unit.rotation() + 180f, itemOffsetY) - 3,
-                Pal.accent, 0.25f * unit.itemTime() / Scl.scl(1f), false, Align.center
+                Fonts.outline.draw(unit.stack.amount + "",
+                unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
+                unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,
+                Pal.accent, 0.25f * unit.itemTime / Scl.scl(1f), false, Align.center
                 );
             }
 
@@ -291,87 +317,81 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-    public void drawEngine(Unitc unit){
+    public void drawEngine(Unit unit){
         if(!unit.isFlying()) return;
 
-        float scale = unit.elevation();
+        float scale = unit.elevation;
         float offset = engineOffset/2f + engineOffset/2f*scale;
 
         if(unit instanceof Trailc){
             Trail trail = ((Trailc)unit).trail();
-            trail.draw(unit.team().color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale));
+            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale));
         }
 
-        Draw.color(unit.team().color);
+        Draw.color(unit.team.color);
         Fill.circle(
-            unit.x() + Angles.trnsx(unit.rotation() + 180, offset),
-            unit.y() + Angles.trnsy(unit.rotation() + 180, offset),
+            unit.x + Angles.trnsx(unit.rotation + 180, offset),
+            unit.y + Angles.trnsy(unit.rotation + 180, offset),
             (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) * scale
         );
         Draw.color(Color.white);
         Fill.circle(
-            unit.x() + Angles.trnsx(unit.rotation() + 180, offset - 1f),
-            unit.y() + Angles.trnsy(unit.rotation() + 180, offset - 1f),
+            unit.x + Angles.trnsx(unit.rotation + 180, offset - 1f),
+            unit.y + Angles.trnsy(unit.rotation + 180, offset - 1f),
             (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f  * scale
         );
         Draw.color();
     }
 
-    public void drawWeapons(Unitc unit){
+    public void drawWeapons(Unit unit){
         applyColor(unit);
 
-        for(WeaponMount mount : unit.mounts()){
+        for(WeaponMount mount : unit.mounts){
             Weapon weapon = mount.weapon;
 
-            for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
-                i *= Mathf.sign(weapon.flipped);
+            float rotation = unit.rotation - 90;
+            float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
+            float width = weapon.region.getWidth();
+            float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
 
-                float rotation = unit.rotation() - 90;
-                float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-                float width = i > 0 ? -weapon.region.getWidth() : weapon.region.getWidth();
-                float recoil = -(mount.reload / weapon.reload * weapon.recoil) * (weapon.alternate ? Mathf.num(i == Mathf.sign(mount.side)) : 1);
-
-                if(weapon.mirror) rotation = weaponRotation;
-
-                Draw.rect(weapon.region,
-                unit.x() + Angles.trnsx(rotation, weapon.x * i, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
-                unit.y() + Angles.trnsy(rotation, weapon.x * i, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
-                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.region.getHeight() * Draw.scl,
-                weaponRotation);
-            }
+            Draw.rect(weapon.region,
+            unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
+            unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
+            width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+            weapon.region.getHeight() * Draw.scl,
+            weaponRotation);
         }
 
         Draw.reset();
     }
 
-    public void drawBody(Unitc unit){
+    public void drawBody(Unit unit){
         applyColor(unit);
 
-        Draw.rect(region, unit, unit.rotation() - 90);
+        Draw.rect(region, unit, unit.rotation - 90);
 
         Draw.reset();
     }
 
-    public void drawCell(Unitc unit){
+    public void drawCell(Unit unit){
         applyColor(unit);
 
         Draw.color(cellColor(unit));
-        Draw.rect(cellRegion, unit, unit.rotation() - 90);
+        Draw.rect(cellRegion, unit, unit.rotation - 90);
         Draw.reset();
     }
 
-    public Color cellColor(Unitc unit){
-        return Tmp.c1.set(Color.black).lerp(unit.team().color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
+    public Color cellColor(Unit unit){
+        return Tmp.c1.set(Color.black).lerp(unit.team.color, unit.healthf() + Mathf.absin(Time.time(), Math.max(unit.healthf() * 5f, 1f), 1f - unit.healthf()));
     }
 
-    public void drawLight(Unitc unit){
+    public void drawLight(Unit unit){
         if(lightRadius > 0){
-            Drawf.light(unit.team(), unit, lightRadius, lightColor, lightOpacity);
+            Drawf.light(unit.team, unit, lightRadius, lightColor, lightOpacity);
         }
     }
 
-    public void drawLegs(Legsc unit){
+    public <T extends Unit & Legsc> void drawLegs(T unit){
         //Draw.z(Layer.groundUnit - 0.02f);
 
         Leg[] legs = unit.legs();
@@ -385,7 +405,7 @@ public class UnitType extends UnlockableContent{
 
         //TODO should be below/above legs
         if(baseRegion.found()){
-            Draw.rect(baseRegion, unit.x(), unit.y(), rotation);
+            Draw.rect(baseRegion, unit.x, unit.y, rotation);
         }
 
         //TODO figure out layering
@@ -427,14 +447,14 @@ public class UnitType extends UnlockableContent{
         Draw.reset();
     }
 
-    public void drawMech(Mechc unit){
+    public <T extends Unit & Mechc> void drawMech(T unit){
         Draw.reset();
 
-        Draw.mixcol(Color.white, unit.hitTime());
+        Draw.mixcol(Color.white, unit.hitTime);
 
-        float e = unit.elevation();
+        float e = unit.elevation;
         float sin = Mathf.lerp(Mathf.sin(unit.walkTime(), 3f, 1f), 0f, e);
-        float ft = sin*(2.5f + (unit.hitSize()-8f)/2f);
+        float ft = sin*(2.5f + (unit.hitSize-8f)/2f);
         float boostTrns = e * 2f;
 
         Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
@@ -445,8 +465,8 @@ public class UnitType extends UnlockableContent{
 
         for(int i : Mathf.signs){
             Draw.rect(legRegion,
-            unit.x() + Angles.trnsx(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
-            unit.y() + Angles.trnsy(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
+            unit.x + Angles.trnsx(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
+            unit.y + Angles.trnsy(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
             legRegion.getWidth() * i * Draw.scl,
             legRegion.getHeight() * Draw.scl - Math.max(-sin * i, 0) * legRegion.getHeight() * 0.5f * Draw.scl,
             unit.baseRotation() - 90 + 35f*i*e);
@@ -463,10 +483,10 @@ public class UnitType extends UnlockableContent{
         Draw.mixcol();
     }
 
-    public void applyColor(Unitc unit){
-        Draw.mixcol(Color.white, unit.hitTime());
-        if(unit.drownTime() > 0 && unit.floorOn().isDeep()){
-            Draw.mixcol(unit.floorOn().mapColor, unit.drownTime() * 0.8f);
+    public void applyColor(Unit unit){
+        Draw.mixcol(Color.white, unit.hitTime);
+        if(unit.drownTime > 0 && unit.floorOn().isDeep()){
+            Draw.mixcol(unit.floorOn().mapColor, unit.drownTime * 0.8f);
         }
     }
 

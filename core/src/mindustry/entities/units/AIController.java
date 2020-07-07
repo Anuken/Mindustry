@@ -14,7 +14,7 @@ public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
     protected static final int timerTarget = 0;
 
-    protected Unitc unit;
+    protected Unit unit;
     protected Teamc target;
     protected Interval timer = new Interval(4);
 
@@ -23,13 +23,13 @@ public class AIController implements UnitController{
     }
 
     protected void targetClosestAllyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(unit.x(), unit.y(), indexer.getAllied(unit.team(), flag));
-        if(target != null) this.target = target.entity;
+        Tile target = Geometry.findClosest(unit.x, unit.y, indexer.getAllied(unit.team, flag));
+        if(target != null) this.target = target.build;
     }
 
     protected void targetClosestEnemyFlag(BlockFlag flag){
-        Tile target = Geometry.findClosest(unit.x(), unit.y(), indexer.getEnemy(unit.team(), flag));
-        if(target != null) this.target = target.entity;
+        Tile target = Geometry.findClosest(unit.x, unit.y, indexer.getEnemy(unit.team, flag));
+        if(target != null) this.target = target.build;
     }
 
     protected boolean retarget(){
@@ -37,7 +37,7 @@ public class AIController implements UnitController{
     }
 
     protected void targetClosest(){
-        Teamc newTarget = Units.closestTarget(unit.team(), unit.x(), unit.y(), Math.max(unit.range(), unit.type().range), u -> (unit.type().targetAir && u.isFlying()) || (unit.type().targetGround && !u.isFlying()));
+        Teamc newTarget = Units.closestTarget(unit.team, unit.x, unit.y, Math.max(unit.range(), unit.type().range), u -> (unit.type().targetAir && u.isFlying()) || (unit.type().targetGround && !u.isFlying()));
         if(newTarget != null){
             target = newTarget;
         }
@@ -48,7 +48,7 @@ public class AIController implements UnitController{
     }
 
     @Override
-    public void unit(Unitc unit){
+    public void unit(Unit unit){
         if(this.unit == unit) return;
 
         this.unit = unit;
@@ -56,7 +56,7 @@ public class AIController implements UnitController{
     }
 
     @Override
-    public Unitc unit(){
+    public Unit unit(){
         return unit;
     }
 }

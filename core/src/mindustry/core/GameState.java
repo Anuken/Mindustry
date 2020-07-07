@@ -33,8 +33,8 @@ public class GameState{
     private State state = State.menu;
 
     //TODO optimize
-    public Unitc boss(){
-        return Groups.unit.find(u -> u.isBoss() && u.team() == rules.waveTeam);
+    public Unit boss(){
+        return Groups.unit.find(u -> u.isBoss() && u.team == rules.waveTeam);
     }
 
     public void set(State astate){
@@ -45,6 +45,11 @@ public class GameState{
     /** Note that being in a campaign does not necessarily mean having a sector. */
     public boolean isCampaign(){
         return rules.sector != null;
+    }
+
+    /** @return whether the player is in a campaign and they are out of sector time */
+    public boolean isOutOfTime(){
+        return isCampaign() && isGame() && getSector().getTimeSpent() >= turnDuration;
     }
 
     public boolean hasSector(){

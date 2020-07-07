@@ -49,8 +49,12 @@ public class DesktopInput extends InputHandler{
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
-            t.bottom().update(() -> t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.builder().isBuilding() ? 1f : 0f, 0.15f));
-            t.visible(() -> Core.settings.getBool("hints") && selectRequests.isEmpty());
+            t.bottom();
+            t.visible(() -> {
+                t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.builder().isBuilding() ? 1f : 0f, 0.15f);
+
+                return Core.settings.getBool("hints") && selectRequests.isEmpty() && t.getColor().a > 0.01f;
+            });
             t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -199,9 +203,9 @@ public class DesktopInput extends InputHandler{
 
         if(!scene.hasMouse()){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
-                Unitc on = selectedUnit();
+                Unit on = selectedUnit();
                 if(on != null){
-                    Call.onUnitControl(player, on);
+                    Call.unitControl(player, on);
                     shouldShoot = false;
                 }
             }
@@ -211,7 +215,7 @@ public class DesktopInput extends InputHandler{
             updateMovement(player.unit());
 
             if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore()){
-                Call.onUnitClear(player);
+                Call.unitClear(player);
                 controlledType = null;
             }
         }
@@ -272,8 +276,8 @@ public class DesktopInput extends InputHandler{
         Tile cursor = tileAt(Core.input.mouseX(), Core.input.mouseY());
 
         if(cursor != null){
-            if(cursor.entity != null){
-                cursorType = cursor.entity.getCursor();
+            if(cursor.build != null){
+                cursorType = cursor.build.getCursor();
             }
 
             if(isPlacing() || !selectRequests.isEmpty()){
@@ -292,8 +296,8 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.unloadCursor;
             }
 
-            if(cursor.entity != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
-                Call.rotateBlock(player, cursor.entity, Core.input.axisTap(Binding.rotate) > 0);
+            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+                Call.rotateBlock(player, cursor.build, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
 
@@ -445,7 +449,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected.entity) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
+                if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
                 !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
                     isShooting = shouldShoot;
                 }
@@ -494,7 +498,7 @@ public class DesktopInput extends InputHandler{
                 removeSelection(selectX, selectY, cursorX, cursorY);
             }
 
-            tryDropItems(selected == null ? null : selected.entity, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            tryDropItems(selected == null ? null : selected.build, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
             if(sreq != null){
                 if(getRequest(sreq.x, sreq.y, sreq.block.size, sreq) != null){
@@ -546,7 +550,7 @@ public class DesktopInput extends InputHandler{
         }
     }
 
-    protected void updateMovement(Unitc unit){
+    protected void updateMovement(Unit unit){
         boolean omni = !(unit instanceof WaterMovec);
         boolean legs = unit.isGrounded();
 
@@ -588,12 +592,12 @@ public class DesktopInput extends InputHandler{
             Payloadc pay = (Payloadc)unit;
 
             if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
-                Unitc target = Units.closest(player.team(), pay.x(), pay.y(), 30f, u -> u.isAI() && u.isGrounded());
+                Unit target = Units.closest(player.team(), pay.x(), pay.y(), 30f, u -> u.isAI() && u.isGrounded());
                 if(target != null){
                     pay.pickup(target);
                 }else if(!pay.hasPayload()){
-                    Tilec tile = world.entWorld(pay.x(), pay.y());
-                    if(tile != null && tile.team() == unit.team() && tile.block().synthetic()){
+                    Building tile = world.entWorld(pay.x(), pay.y());
+                    if(tile != null && tile.team() == unit.team && tile.block().synthetic()){
                         //pick up block directly
                         if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
                             pay.pickup(tile);
@@ -617,7 +621,7 @@ public class DesktopInput extends InputHandler{
         if(unit instanceof Commanderc){
 
             if(Core.input.keyTap(Binding.command)){
-                Call.onUnitCommand(player);
+                Call.unitCommand(player);
             }
         }
     }
