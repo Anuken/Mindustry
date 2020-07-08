@@ -146,6 +146,14 @@ public class Block extends UnlockableContent{
     public Sound breakSound = Sounds.boom;
     /** How reflective this block is. */
     public float albedo = 0f;
+    /** Environmental passive light color. */
+    public Color lightColor = Color.white.cpy();
+    /**
+     * Whether this environmental block passively emits light.
+     * Not valid for non-environmental blocks. */
+    public boolean emitLight = false;
+    /** Radius of the light emitted by this block. */
+    public float lightRadius = 60f;
 
     /** The sound that this block makes while active. One sound loop. Do not overuse.*/
     public Sound activeSound = Sounds.none;
@@ -210,6 +218,10 @@ public class Block extends UnlockableContent{
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
             .sumf(other -> !other.floor().isLiquid ? 1f : 0f) / size / size;
+    }
+
+    public void drawEnvironmentLight(Tile tile){
+        Drawf.light(tile.worldx(), tile.worldy(), lightRadius, lightColor, lightColor.a);
     }
 
     /** Drawn when you are placing a block. */

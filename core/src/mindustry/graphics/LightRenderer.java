@@ -171,7 +171,7 @@ public class LightRenderer{
     }
 
     public boolean enabled(){
-        return state.rules.lighting;
+        return state.rules.lighting && state.rules.ambientLight.a > 0.00001f;
     }
 
     public void draw(){

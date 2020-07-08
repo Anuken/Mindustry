@@ -201,7 +201,7 @@ public class BlockRenderer implements Disposable{
                     }
 
                     //lights are drawn even in the expanded range
-                    if(tile.build != null){
+                    if(tile.build != null || tile.block().emitLight){
                         lightview.add(tile);
                     }
 
@@ -212,6 +212,11 @@ public class BlockRenderer implements Disposable{
                             }
                         }
                     }
+                }
+
+                //special case for floors
+                if(block == Blocks.air && tile.floor().emitLight){
+                    lightview.add(tile);
                 }
             }
         }
@@ -257,15 +262,23 @@ public class BlockRenderer implements Disposable{
             }
         }
 
-        //draw lights
-        for(int i = 0; i < lightview.size; i++){
-            Tile tile = lightview.items[i];
-            Building entity = tile.build;
+        if(renderer.lights.enabled()){
+            //draw lights
+            for(int i = 0; i < lightview.size; i++){
+                Tile tile = lightview.items[i];
+                Building entity = tile.build;
 
-            if(entity != null){
-                entity.drawLight();
+                if(entity != null){
+                    entity.drawLight();
+                }else if(tile.block().emitLight){
+                    tile.block().drawEnvironmentLight(tile);
+                }else if(tile.floor().emitLight){
+                    tile.floor().drawEnvironmentLight(tile);
+                }
             }
         }
+
+
     }
 
     @Override

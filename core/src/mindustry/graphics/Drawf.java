@@ -26,6 +26,10 @@ public class Drawf{
         return z;
     }
 
+    public static void light(float x, float y, float radius, Color color, float opacity){
+        renderer.lights.add(x, y, radius, color, opacity);
+    }
+
     public static void light(Team team, float x, float y, float radius, Color color, float opacity){
         if(allowLight(team)) renderer.lights.add(x, y, radius, color, opacity);
     }

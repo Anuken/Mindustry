@@ -194,6 +194,9 @@ public class Styles{
             down = flatDown;
             up = none;
             over = flatOver;
+            disabled = black8;
+            imageDisabledColor = Color.lightGray;
+            imageUpColor = Color.white;
         }};
         clearPartial2i = new ImageButtonStyle(){{
             down = whiteui;

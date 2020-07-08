@@ -228,6 +228,10 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.heat, 0.5f);
             attributes.set(Attribute.water, -0.2f);
             blendGroup = ignarock;
+
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Color.orange.cpy().a(0.15f);
         }};
 
         magmarock = new Floor("magmarock"){{
@@ -235,6 +239,10 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.water, -0.5f);
             updateEffect = Fx.magmasmoke;
             blendGroup = ignarock;
+
+            emitLight = true;
+            lightRadius = 60f;
+            lightColor = Color.orange.cpy().a(0.3f);
         }};
 
         sand = new Floor("sand"){{
