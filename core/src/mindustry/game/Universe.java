@@ -23,6 +23,13 @@ public class Universe{
 
     public Universe(){
         load();
+
+        //update base coverage on capture
+        Events.on(SectorCaptureEvent.class, e -> {
+            if(state.isCampaign()){
+                state.getSector().planet.updateBaseCoverage();
+            }
+        });
     }
 
     /** Update regardless of whether the player is in the campaign. */
@@ -131,6 +138,17 @@ public class Universe{
                     //increment seconds passed for this sector by the time that just passed with this turn
                     if(!sector.isBeingPlayed()){
                         sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
+
+                        //check if the sector has been attacked too many times...
+                        if(sector.hasBase() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                            //fire event for losing the sector
+                            Events.fire(new SectorLoseEvent(sector));
+
+                            //if so, just delete the save for now. it's lost.
+                            //TODO don't delete it later maybe
+                            sector.save.delete();
+                            sector.save = null;
+                        }
                     }
 
                     //reset time spent to 0

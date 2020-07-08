@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
@@ -28,13 +29,14 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
+    private static final float dsize = 47.2f;
+
     public final PlacementFragment blockfrag = new PlacementFragment();
 
     private ImageButton flip;
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
     private boolean shown = true;
-    private float dsize = 47.2f;
     private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
@@ -49,6 +51,11 @@ public class HudFragment extends Fragment{
         Events.on(SectorCaptureEvent.class, e ->{
             //TODO localize
             showToast("Sector[accent] captured[]!");
+        });
+
+        //TODO localize
+        Events.on(SectorLoseEvent.class, e -> {
+            showToast(Icon.warning, "Sector " + e.sector.id + " [scarlet]lost!");
         });
 
         //TODO full implementation
@@ -393,6 +400,10 @@ public class HudFragment extends Fragment{
     }
 
     public void showToast(String text){
+        showToast(Icon.ok, text);
+    }
+
+    public void showToast(Drawable icon, String text){
         if(state.isMenu()) return;
 
         scheduleToast(() -> {
@@ -405,7 +416,7 @@ public class HudFragment extends Fragment{
                 }
             });
             table.margin(12);
-            table.image(Icon.ok).pad(3);
+            table.image(icon).pad(3);
             table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
             table.pack();
 

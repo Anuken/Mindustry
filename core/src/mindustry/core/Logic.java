@@ -11,6 +11,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
@@ -87,14 +88,16 @@ public class Logic implements ApplicationListener{
 
         //when loading a 'damaged' sector, propagate the damage
         Events.on(WorldLoadEvent.class, e -> {
-            if(state.isCampaign() && state.rules.sector.getSecondsPassed() > 0){
+            if(state.isCampaign() && state.rules.sector.getSecondsPassed() > 0 && state.rules.sector.hasBase()){
                 long seconds = state.rules.sector.getSecondsPassed();
                 CoreEntity core = state.rules.defaultTeam.core();
 
-                //TODO figure out how to apply damage properly
-               // if(state.rules.sector.hasWaves()){
-                    //SectorDamage.apply(seconds);
-                //}
+                //apply fractional damage based on how many turns have passed for this sector
+                float turnsPassed = seconds / (turnDuration / 60f);
+
+                if(state.rules.sector.hasWaves()){
+                    SectorDamage.apply(turnsPassed / sectorDestructionTurns);
+                }
 
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){

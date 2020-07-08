@@ -1,6 +1,7 @@
 package mindustry.type;
 
 import arc.*;
+import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -16,6 +17,9 @@ import static mindustry.Vars.*;
 
 /** A small section of a planet. */
 public class Sector{
+    private static final Seq<Sector> tmpSeq1 = new Seq<>(), tmpSeq2 = new Seq<>(), tmpSeq3 = new Seq<>();
+    private static final ObjectSet<Sector> tmpSet = new ObjectSet<>();
+
     public final SectorRect rect;
     public final Plane plane;
     public final Planet planet;
@@ -27,8 +31,7 @@ public class Sector{
     public @Nullable SaveSlot save;
     public @Nullable SectorPreset preset;
 
-    /** Sector enemy hostility from 0 to 1 */
-    //public float hostility;
+    public float baseCoverage;
 
     //TODO implement a dynamic launch period
     public int launchPeriod = 10;
@@ -40,6 +43,45 @@ public class Sector{
         this.rect = makeRect();
         this.id = tile.id;
         this.data = data;
+    }
+
+    public Seq<Sector> inRange(int range){
+        //TODO cleanup/remove
+        if(true){
+            tmpSeq1.clear();
+            neighbors(tmpSeq1::add);
+
+            return tmpSeq1;
+        }
+
+        tmpSeq1.clear();
+        tmpSeq2.clear();
+        tmpSet.clear();
+
+        tmpSeq1.add(this);
+        tmpSet.add(this);
+        for(int i = 0; i < range; i++){
+            while(!tmpSeq1.isEmpty()){
+                Sector sec = tmpSeq1.pop();
+                tmpSet.add(sec);
+                sec.neighbors(other -> {
+                    if(tmpSet.add(other)){
+                        tmpSeq2.add(other);
+                    }
+                });
+            }
+            tmpSeq1.clear();
+            tmpSeq1.addAll(tmpSeq2);
+        }
+
+        tmpSeq3.clear().addAll(tmpSeq2);
+        return tmpSeq3;
+    }
+
+    public void neighbors(Cons<Sector> cons){
+        for(Ptile tile : tile.tiles){
+            cons.get(planet.getSector(tile));
+        }
     }
 
     /** @return whether this sector can be landed on at all.
@@ -75,11 +117,6 @@ public class Sector{
 
     public boolean hasSave(){
         return save != null;
-    }
-
-    public void generate(){
-        //TODO use simplex and a seed
-        //hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.5f, 0.4f), 0);
     }
 
     public boolean locked(){

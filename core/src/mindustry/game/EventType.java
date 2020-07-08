@@ -59,6 +59,15 @@ public class EventType{
     /** Called when a game begins and the world is loaded. */
     public static class WorldLoadEvent{}
 
+    /** Called when a sector is destroyed by waves when you're not there. */
+    public static class SectorLoseEvent{
+        public final Sector sector;
+
+        public SectorLoseEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
     public static class LaunchItemEvent{
         public final ItemStack stack;
 

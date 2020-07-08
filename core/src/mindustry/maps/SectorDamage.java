@@ -3,7 +3,10 @@ package mindustry.maps;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.ai.*;
 import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
@@ -11,21 +14,43 @@ import static mindustry.Vars.*;
 
 public class SectorDamage{
     //direct damage is for testing only
-    private static final boolean direct = false;
+    private static final boolean direct = false, rubble = true;
 
-    //TODO amount of damage could be related to wave spacing
-    public static void apply(float turns){
+    public static void apply(float fraction){
         Tiles tiles = world.tiles;
 
         Queue<Tile> frontier = new Queue<>();
         float[][] values = new float[tiles.width][tiles.height];
-        float damage = turns*50;
+        float damage = fraction*80; //arbitrary damage value
 
         //phase one: find all spawnpoints
         for(Tile tile : tiles){
             if((tile.block() instanceof CoreBlock && tile.team() == state.rules.waveTeam) || tile.overlay() == Blocks.spawn){
                 frontier.add(tile);
                 values[tile.x][tile.y] = damage;
+            }
+        }
+
+        Building core = state.rules.defaultTeam.core();
+        if(core != null && !frontier.isEmpty()){
+            for(Tile spawner : frontier){
+                //find path from spawn to core
+                Seq<Tile> path = Astar.pathfind(spawner, core.tile, t -> t.cost, t -> !(t.block().isStatic() && t.solid()));
+                int amount = (int)(path.size * fraction);
+                for(int i = 0; i < amount; i++){
+                    Tile t = path.get(i);
+                    Geometry.circle(t.x, t.y, tiles.width, tiles.height, 5, (cx, cy) -> {
+                        Tile other = tiles.getn(cx, cy);
+                        //just remove all the buildings in the way - as long as they're not cores!
+                        if(other.build != null && other.team() == state.rules.defaultTeam && !(other.block() instanceof CoreBlock)){
+                            if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
+                                Effects.rubble(other.build.x, other.build.y, other.block().size);
+                            }
+
+                            other.remove();
+                        }
+                    });
+                }
             }
         }
 
@@ -53,14 +78,16 @@ public class SectorDamage{
                         if(direct){
                             other.build.damage(currDamage);
                         }else{ //indirect damage happens at game load time
-                            other.build.health(other.build.health() - currDamage);
+                            other.build.health -= currDamage;
+                            //don't kill the core!
+                            if(other.block() instanceof CoreBlock) other.build.health = Math.max(other.build.health, 1f);
 
                             //remove the block when destroyed
-                            if(other.build.health() < 0){
-                                //rubble currently disabled
-                                //if(!other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                //    Effects.rubble(other.entity.x(), other.entity.y(), other.block().size);
-                                //}
+                            if(other.build.health < 0){
+                                //rubble
+                                if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
+                                    Effects.rubble(other.build.x, other.build.y, other.block().size);
+                                }
 
                                 other.remove();
                             }
@@ -77,6 +104,8 @@ public class SectorDamage{
                 }
             }
         }
+
+
 
     }
 }

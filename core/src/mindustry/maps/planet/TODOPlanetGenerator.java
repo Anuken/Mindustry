@@ -288,6 +288,16 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         }
 
         state.rules.waves = true;
+
+        float difficulty = sector.baseCoverage;
+
+        //scale up the spawning base on difficulty (this is just for testing)
+        for(SpawnGroup group : state.rules.spawns){
+            group.unitAmount *= difficulty;
+            if(group.unitScaling != SpawnGroup.never){
+                group.unitScaling *= difficulty;
+            }
+        }
     }
 
     @Override
