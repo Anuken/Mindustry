@@ -538,7 +538,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;
-            speed = 2.4f;
+            speed = 2.6f;
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 70f;
@@ -573,7 +573,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;
-            speed = 2.4f;
+            speed = 2.9f;
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 70f;
@@ -608,7 +608,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;
-            speed = 2.4f;
+            speed = 3.4f;
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 70f;
