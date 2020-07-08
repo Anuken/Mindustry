@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -12,12 +11,12 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
-import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
+import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -25,25 +24,25 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
 import mindustry.ui.layout.TreeLayout.*;
+import mindustry.world.modules.*;
 
 import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class TechTreeDialog extends BaseDialog{
+public class ResearchDialog extends BaseDialog{
     private final float nodeSize = Scl.scl(60f);
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
     private Rect bounds = new Rect();
     private View view;
-    private Cons<TechNode> selector = c -> {};
 
-    public TechTreeDialog(){
+    public ResearchDialog(){
         super("");
 
         titleTable.remove();
         margin(0f).marginBottom(8);
-        Stack stack = cont.stack(view = new View()/*, items = new ItemsDisplay()*/).grow().get();
+        cont.add(view = new View()).grow().get();
 
         shouldPause = true;
 
@@ -105,13 +104,8 @@ public class TechTreeDialog extends BaseDialog{
         });
     }
 
-    public Dialog show(Cons<TechNode> selector){
-        this.selector = selector;
-        return super.show();
-    }
-
-    public Dialog show(){
-        return show(c -> {});
+    ItemModule items(){
+        return state.rules.defaultTeam.items();
     }
 
     void treeLayout(){
@@ -262,13 +256,9 @@ public class TechTreeDialog extends BaseDialog{
                                 }
                             });
                         }
-                    }else if(locked(node.node)){
-                        selector.get(node.node);
+                    }else if(items().has(node.node.requirements) && locked(node.node)){
+                        unlock(node.node);
                     }
-                    //TODO select it
-                    //else if(data.hasItems(node.node.requirements) && locked(node.node)){
-                    //    unlock(node.node);
-                    //}
                 });
                 button.hovered(() -> {
                     if(!mobile && hoverNode != button && node.visible){
@@ -288,7 +278,7 @@ public class TechTreeDialog extends BaseDialog{
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : Tex.button;
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !items().has(node.node.requirements) ? Tex.buttonRed : Tex.button;
                     ((TextureRegionDrawable)button.getStyle().imageUp)
                     .setRegion(node.visible ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : Color.gray);
@@ -323,11 +313,9 @@ public class TechTreeDialog extends BaseDialog{
             panY = ry - bounds.y - oy;
         }
 
-        /*
         void unlock(TechNode node){
-            data.unlockContent(node.content);
-            //TODO this should not happen
-            //data.removeItems(node.requirements);
+            node.content.unlock();
+            items().remove(node.requirements);
             showToast(Core.bundle.format("researched", node.content.localizedName));
             checkNodes(root);
             hoverNode = null;
@@ -336,7 +324,7 @@ public class TechTreeDialog extends BaseDialog{
             Core.scene.act();
             Sounds.unlock.play();
             Events.fire(new ResearchEvent(node.content));
-        }*/
+        }
 
         void rebuild(){
             ImageButton button = hoverNode;
@@ -379,7 +367,7 @@ public class TechTreeDialog extends BaseDialog{
                                     list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
                                     list.add(req.item.localizedName).color(Color.lightGray);
                                     list.label(() -> " " + (player.team().core() != null ? Math.min(player.team().core().items.get(req.item), req.amount) + " / " : "") + req.amount)
-                                    .update(l -> {}/*l.setColor(data.has(req.item, req.amount) ? Color.lightGray : Color.scarlet)*/);//TODO
+                                    .update(l -> l.setColor(items().has(req.item, req.amount) ? Color.lightGray : Color.scarlet));//TODO
                                 }).fillX().left();
                                 t.row();
                             }
@@ -404,13 +392,11 @@ public class TechTreeDialog extends BaseDialog{
                     }
                 }).pad(9);
 
-                //TODO research select button
-                /*
                 if(mobile && locked(node)){
                     b.row();
                     b.button("$research", Icon.ok, Styles.nodet, () -> unlock(node))
-                    .disabled(i -> !data.hasItems(node.requirements)).growX().height(44f).colspan(3);
-                }*/
+                    .disabled(i -> !items().has(node.requirements)).growX().height(44f).colspan(3);
+                }
             });
 
             infoTable.row();

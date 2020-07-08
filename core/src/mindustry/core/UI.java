@@ -63,7 +63,7 @@ public class UI implements ApplicationListener, Loadable{
     public DatabaseDialog database;
     public ContentInfoDialog content;
     public PlanetDialog planet;
-    public TechTreeDialog tech;
+    public ResearchDialog research;
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
@@ -175,7 +175,7 @@ public class UI implements ApplicationListener, Loadable{
         maps = new MapsDialog();
         content = new ContentInfoDialog();
         planet = new PlanetDialog();
-        tech = new TechTreeDialog();
+        research = new ResearchDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
 

@@ -178,10 +178,11 @@ public class ResearchBlock extends Block{
         @Override
         public boolean configTapped(){
             //configure with tech node
-            ui.tech.show(node -> {
-                configure(node);
-                ui.tech.hide();
-            });
+            ui.showInfo("this does nothing");
+            //ui.research.show(node -> {
+            //    configure(node);
+            //    ui.research.hide();
+            //});
 
             return false;
         }

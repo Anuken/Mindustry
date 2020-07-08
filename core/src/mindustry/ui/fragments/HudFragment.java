@@ -114,7 +114,7 @@ public class HudFragment extends Fragment{
                                 ui.chatfrag.toggle();
                             }
                         }else if(state.isCampaign()){
-                            ui.tech.show();
+                            ui.research.show();
                         }else{
                             ui.database.show();
                         }
@@ -133,13 +133,6 @@ public class HudFragment extends Fragment{
                 cont.image().height(4f).color(Pal.gray).fillX();
                 cont.row();
             }
-
-            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH/MAP/ETC
-            /*
-            cont.table(t -> {
-
-            });
-            cont.row();*/
 
             cont.update(() -> {
                 if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
@@ -683,9 +676,9 @@ public class HudFragment extends Fragment{
             if(net.client() && player.admin){
                 Call.adminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
-                ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);
+                ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
             }else{
-                state.wavetime = 0f;
+                logic.skipWave();
             }
         }).growY().fillX().right().width(40f)
         .visible(this::canSkipWave);

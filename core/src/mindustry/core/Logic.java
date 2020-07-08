@@ -171,6 +171,15 @@ public class Logic implements ApplicationListener{
         Core.settings.manualSave();
     }
 
+    public void skipWave(){
+        if(state.isCampaign()){
+            //warp time spent forward because the wave was just skipped.
+            state.secinfo.internalTimeSpent += state.wavetime;
+        }
+
+        state.wavetime = 0;
+    }
+
     public void runWave(){
         spawner.spawnEnemies();
         state.wave++;

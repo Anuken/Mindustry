@@ -9,6 +9,7 @@ import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
@@ -69,6 +70,12 @@ public class Team implements Comparable<Team>{
         palette[1] = pal2;
         palette[2] = pal3;
         hasPalette = true;
+    }
+
+    /** @return the core items for this team, or an empty item module.
+     * Never add to the resulting item module, as it is mutable. */
+    public @NonNull ItemModule items(){
+        return core() == null ? ItemModule.empty : core().items;
     }
 
     /** @return the team-specific rules. */

@@ -682,7 +682,7 @@ public class NetServer implements ApplicationListener{
         if(action == AdminAction.wave){
             //no verification is done, so admins can hypothetically spam waves
             //not a real issue, because server owners may want to do just that
-            state.wavetime = 0f;
+            logic.skipWave();
         }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(other.con.address);
             other.kick(KickReason.banned);

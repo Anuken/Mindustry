@@ -12,6 +12,8 @@ import java.util.*;
 import static mindustry.Vars.content;
 
 public class ItemModule extends BlockModule{
+    public static final ItemModule empty = new ItemModule();
+
     private static final int windowSize = 60 * 4;
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;

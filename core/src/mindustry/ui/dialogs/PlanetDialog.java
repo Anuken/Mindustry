@@ -122,7 +122,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //draw all sector stuff
         for(Sector sec : planet.sectors){
             if(selectAlpha > 0.01f){
-                if(/*canLaunch(sec) || sec.unlocked()*/true){
+                if(canLaunch(sec) || sec.unlocked()){
                     if(sec.baseCoverage > 0){
                         planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.1f * sec.baseCoverage * selectAlpha), -0.002f);
                     }
@@ -230,7 +230,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         new Table(t -> {
             //TODO localize
             t.top();
-            t.label(() -> "Turn " + universe.turn()).style(Styles.outlineLabel).color(Pal.accent);
+            t.label(() -> mode == launch ? "Select Launch Sector" : "Turn " + universe.turn()).style(Styles.outlineLabel).color(Pal.accent);
         })).grow();
 
     }
@@ -249,7 +249,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(doBuffer){
             buffer.end();
 
-            buffer.blit(Shaders.screenspace);
+            Draw.color(color);
+            Draw.rect(Draw.wrap(buffer.getTexture()), width/2f, height/2f, width, -height);
+            Draw.color();
         }
     }
 
@@ -302,7 +304,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(sector.hasBase() && sector.hasWaves()){
             stable.add("[scarlet]Under attack!");
             stable.row();
-            stable.add("[accent]" + Mathf.ceil(sectorDestructionTurns - (sector.getSecondsPassed() * 60) / turnDuration) + " turn(s) until destruction");
+            stable.add("[accent]" + Mathf.ceil(sectorDestructionTurns - (sector.getSecondsPassed() * 60) / turnDuration) + " turn(s)\nuntil destruction");
             stable.row();
         }
 
