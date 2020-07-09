@@ -164,7 +164,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void update(){
         type.update(base());
 
-        drag(type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f));
+        drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
 
         //apply knockback based on spawns
         if(team != state.rules.waveTeam){
@@ -173,6 +173,36 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
                 }
+            }
+        }
+
+        //simulate falling down
+        if(dead){
+            //less drag when dead
+            drag = 0.01f;
+
+            //standard fall smoke
+            if(Mathf.chanceDelta(0.1)){
+                Tmp.v1.setToRandomDirection().scl(hitSize);
+                type.fallEffect.at(x + Tmp.v1.x, y + Tmp.v1.y);
+            }
+
+            //thruster fall trail
+            if(Mathf.chanceDelta(0.2)){
+                float offset = type.engineOffset/2f + type.engineOffset/2f*elevation;
+                float range = Mathf.range(type.engineSize);
+                type.fallThrusterEffect.at(
+                    x + Angles.trnsx(rotation + 180, offset) + Mathf.range(range),
+                    y + Angles.trnsy(rotation + 180, offset) + Mathf.range(range),
+                    Mathf.random()
+                );
+            }
+
+            //move down
+            elevation -= type.fallSpeed * Time.delta();
+
+            if(isGrounded()){
+                destroy();
             }
         }
 
@@ -197,7 +227,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //AI only updates on the server
-        if(!net.client()){
+        if(!net.client() && !dead){
             controller.updateUnit();
         }
 
@@ -206,6 +236,43 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             Fx.unitDespawn.at(x, y, 0, this);
             remove();
         }
+    }
+
+    /** Actually destroys the unit, removing it and creating explosions. **/
+    public void destroy(){
+        float explosiveness = 2f + item().explosiveness * stack().amount;
+        float flammability = item().flammability * stack().amount;
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
+
+        float shake = hitSize / 3f;
+
+        Effects.scorch(x, y, (int)(hitSize / 5));
+        Fx.explosion.at(this);
+        Effects.shake(shake, shake, this);
+        type.deathSound.at(this);
+
+        Events.fire(new UnitDestroyEvent(base()));
+
+        if(explosiveness > 7f && isLocal()){
+            Events.fire(Trigger.suicideBomb);
+        }
+
+        //if this unit crash landed (was flying), damage stuff in a radius
+        if(type.flying){
+            Damage.damage(team,x, y, hitSize * 1.1f, hitSize * type.crashDamageMultiplier, true, false, true);
+        }
+
+        if(!headless){
+            for(int i = 0; i < type.wreckRegions.length; i++){
+                if(type.wreckRegions[i].found()){
+                    float range = type.hitsize/4f;
+                    Tmp.v1.rnd(range);
+                    Effects.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                }
+            }
+        }
+
+        remove();
     }
 
     @Override
@@ -238,22 +305,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         health = 0;
         dead = true;
 
-        float explosiveness = 2f + item().explosiveness * stack().amount;
-        float flammability = item().flammability * stack().amount;
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
-
-        Effects.scorch(x, y, (int)(hitSize / 5));
-        Fx.explosion.at(this);
-        Effects.shake(2f, 2f, this);
-        type.deathSound.at(this);
-
-        Events.fire(new UnitDestroyEvent(base()));
-
-        if(explosiveness > 7f && isLocal()){
-            Events.fire(Trigger.suicideBomb);
+        //don't waste time when the unit is already on the ground, just destroy it
+        if(isGrounded()){
+            destroy();
         }
-
-        remove();
     }
 
     @Override

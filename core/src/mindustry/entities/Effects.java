@@ -55,6 +55,10 @@ public class Effects{
         }
     }
 
+    public static void decal(TextureRegion region, float x, float y, float rotation){
+        decal(region, x, y, rotation, 3600f, Pal.rubble);
+    }
+
     public static void decal(TextureRegion region, float x, float y, float rotation, float lifetime, Color color){
         if(headless || region == null || !Core.atlas.isFound(region)) return;
 

@@ -11,7 +11,7 @@ import static mindustry.Vars.*;
 
 /** Utility class for unit and team interactions.*/
 public class Units{
-    private static Rect hitrect = new Rect();
+    private static final Rect hitrect = new Rect();
     private static Unit result;
     private static float cdist;
     private static boolean boolResult;

@@ -5,6 +5,7 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -344,6 +345,43 @@ public class Generators{
                 }
 
                 image.save("unit-" + type.name + "-full");
+
+                Rand rand = new Rand();
+                rand.setSeed(type.name.hashCode());
+
+                //generate random wrecks
+
+                int splits = 3;
+                float degrees = rand.random(360f);
+                float offsetRange = Math.max(image.width, image.height) * 0.15f;
+                Vec2 offset = new Vec2(1, 1).rotate(rand.random(360f)).setLength(rand.random(0, offsetRange)).add(image.width/2f, image.height/2f);
+
+                Image[] wrecks = new Image[splits];
+                for(int i = 0; i < wrecks.length; i++){
+                    wrecks[i] = new Image(image.width, image.height);
+                }
+
+                RidgedPerlin r = new RidgedPerlin(1, 3);
+                VoronoiNoise vn = new VoronoiNoise(type.id, true);
+
+                image.each((x, y) -> {
+                    //add darker cracks on top
+                    boolean rValue = Math.max(r.getValue(x, y, 1f / (20f + image.width/8f)), 0) > 0.16f;
+                    //cut out random chunks with voronoi
+                    boolean vval = vn.noise(x, y, 1f / (14f + image.width/40f)) > 0.47;
+
+                    float dst =  offset.dst(x, y);
+                    //distort edges with random noise
+                    float noise = (float)Noise.rawNoise(dst / (9f + image.width/70f)) * (60 + image.width/30f);
+                    int section = (int)Mathf.clamp(Mathf.mod(offset.angleTo(x, y) + noise + degrees, 360f) / 360f * splits, 0, splits - 1);
+                    if(!vval) wrecks[section].draw(x, y, image.getColor(x, y).mul(rValue ? 0.7f : 1f));
+                });
+
+                for(int i = 0; i < wrecks.length; i++){
+                    wrecks[i].save(type.name + "-wreck" + i);
+                }
+
+                //TODO GENERATE WRECKS
             }catch(IllegalArgumentException e){
                 Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
             }

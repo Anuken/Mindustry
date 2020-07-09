@@ -183,6 +183,27 @@ public class Fx{
         Fill.circle(e.x, e.y, (7f - e.fin() * 7f)/2f);
     }),
 
+    fallSmoke = new Effect(110, e -> {
+        color(Color.gray, Color.darkGray, e.rotation);
+        Fill.circle(e.x, e.y, e.fout() * 3.5f);
+    }),
+
+    unitWreck = new Effect(200f, e -> {
+        if(!(e.data instanceof TextureRegion)) return;
+
+        Draw.mixcol(Pal.rubble, 1f);
+
+        TextureRegion reg = e.data();
+        float vel = e.fin(Interp.pow5Out) * 2f * Mathf.randomSeed(e.id, 1f);
+        float totalRot = Mathf.randomSeed(e.id + 1, 10f);
+        Tmp.v1.trns(Mathf.randomSeed(e.id + 2, 360f), vel);
+
+        Draw.z(Mathf.lerp(Layer.flyingUnitLow, Layer.debris, e.fin()));
+        Draw.alpha(e.fout(Interp.pow5Out));
+
+        Draw.rect(reg, e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.rotation - 90 + totalRot * e.fin(Interp.pow5Out));
+    }),
+
     rocketSmoke = new Effect(120, e -> {
         color(Color.gray);
         alpha(Mathf.clamp(e.fout()*1.6f - Interp.pow3In.apply(e.rotation)*1.2f));

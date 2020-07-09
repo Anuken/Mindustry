@@ -35,15 +35,21 @@ public class UnitType extends UnlockableContent{
     public @NonNull Prov<? extends Unit> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f;
+    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, armor = 0f;
+    public float crashDamageMultiplier = 4f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
+    public boolean destructibleWreck = true;
+    public float wreckHealth = 15f;
     public float sway = 1f;
     public int payloadCapacity = 1;
     public int commandLimit = 24;
     public float baseElevation = 0f;
+    public float deathShake = 2f;
+    public Effect fallEffect = Fx.fallSmoke;
+    public Effect fallThrusterEffect = Fx.fallSmoke;
 
     //TODO document
     public int legCount = 4, legGroupSize = 2;
@@ -72,8 +78,7 @@ public class UnitType extends UnlockableContent{
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
         occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion;
-    public TextureRegion[] partRegions;
-    public TextureRegion[] partCellRegions;
+    public TextureRegion[] partRegions, partCellRegions, wreckRegions;
 
     public UnitType(String name){
         super(name);
@@ -185,6 +190,11 @@ public class UnitType extends UnlockableContent{
         for(int i = 0; i < parts; i++){
             partRegions[i] = Core.atlas.find(name + "-part" + i);
             partCellRegions[i] = Core.atlas.find(name + "-cell" + i);
+        }
+
+        wreckRegions = new TextureRegion[3];
+        for(int i = 0; i < wreckRegions.length; i++){
+            wreckRegions[i] = Core.atlas.find(name + "-wreck" + i);
         }
     }
 

@@ -377,6 +377,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 38;
             engineSize = 7.3f;
             hitsize = 58f;
+            destructibleWreck = false;
 
             weapons.add(new Weapon(){{
                 y = 1.5f;

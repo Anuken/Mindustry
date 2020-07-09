@@ -39,6 +39,12 @@ class Image{
         this(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
     }
 
+    Image copy(){
+        Image out =new Image(width, height);
+        out.draw(this);
+        return out;
+    }
+
     boolean isEmpty(int x, int y){
         if(!Structs.inBounds(x, y, width, height)){
             return true;
