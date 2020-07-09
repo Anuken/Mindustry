@@ -58,7 +58,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
-    public boolean isShooting, isBuilding = true, buildWasAutoPaused = false, isBoosting = false;
+    public boolean isBuilding = true, buildWasAutoPaused = false;
     public @Nullable UnitType controlledType;
 
     protected @Nullable Schematic lastSchematic;
@@ -249,7 +249,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void update(){
-        player.typing(ui.chatfrag.shown());
+        player.typing = ui.chatfrag.shown();
 
         if(player.isBuilder()){
             player.builder().building(isBuilding);

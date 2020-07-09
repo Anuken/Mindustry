@@ -343,7 +343,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void worldDataBegin(){
-        Groups.all.clear();
+        Groups.clear();
         netClient.removed.clear();
         logic.reset();
 
@@ -361,6 +361,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one)
     public static void setPosition(float x, float y){
+        player.unit().set(x, y);
         player.set(x, y);
     }
 
@@ -517,7 +518,7 @@ public class NetClient implements ApplicationListener{
         quiet = false;
         lastSent = 0;
 
-        Groups.all.clear();
+        Groups.clear();
         ui.chatfrag.clearMessages();
     }
 
@@ -566,13 +567,14 @@ public class NetClient implements ApplicationListener{
             Unit unit = player.dead() ? Nulls.unit : player.unit();
 
             Call.clientShapshot(lastSent++,
+            player.dead(),
             unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
             unit.rotation,
             unit instanceof Mechc ? ((Mechc)unit).baseRotation() : 0,
             unit.vel.x, unit.vel.y,
             player.miner().mineTile(),
-            control.input.isBoosting, control.input.isShooting, ui.chatfrag.shown(),
+            player.boosting, player.shooting, ui.chatfrag.shown(),
             requests,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width * viewScale, Core.camera.height * viewScale);

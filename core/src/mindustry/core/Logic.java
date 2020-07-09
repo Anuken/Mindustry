@@ -163,7 +163,7 @@ public class Logic implements ApplicationListener{
         //fire change event, since it was technically changed
         Events.fire(new StateChangeEvent(prev, State.menu));
 
-        Groups.all.clear();
+        Groups.clear();
         Time.clear();
         Events.fire(new ResetEvent());
 

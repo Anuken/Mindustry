@@ -529,6 +529,7 @@ public class NetServer implements ApplicationListener{
     public static void clientShapshot(
         Player player,
         int snapshotID,
+        boolean dead,
         float x, float y,
         float pointerX, float pointerY,
         float rotation, float baseRotation,
@@ -538,23 +539,24 @@ public class NetServer implements ApplicationListener{
         @Nullable BuildPlan[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
-        NetConnection connection = player.con;
-        if(connection == null || snapshotID < connection.lastRecievedClientSnapshot) return;
+        NetConnection con = player.con;
+        if(con == null || snapshotID < con.lastRecievedClientSnapshot) return;
 
         boolean verifyPosition = !player.dead() && netServer.admins.getStrict() && headless;
 
-        if(connection.lastRecievedClientTime == 0) connection.lastRecievedClientTime = Time.millis() - 16;
+        if(con.lastRecievedClientTime == 0) con.lastRecievedClientTime = Time.millis() - 16;
 
-        connection.viewX = viewX;
-        connection.viewY = viewY;
-        connection.viewWidth = viewWidth;
-        connection.viewHeight = viewHeight;
+        con.viewX = viewX;
+        con.viewY = viewY;
+        con.viewWidth = viewWidth;
+        con.viewHeight = viewHeight;
 
         //disable shooting when a mech flies
         if(!player.dead() && player.unit().isFlying() && player.unit() instanceof Mechc){
             shooting = false;
         }
 
+        //TODO these need to be assigned elsewhere
         player.mouseX = pointerX;
         player.mouseY = pointerY;
         player.typing = chatting;
@@ -582,7 +584,7 @@ public class NetServer implements ApplicationListener{
                     continue;
                 }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                     continue;
-                }else if(connection.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
+                }else if(con.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
                     continue;
                 }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
                     action.block = req.block;
@@ -591,33 +593,39 @@ public class NetServer implements ApplicationListener{
                 })){
                     //force the player to remove this request if that's not the case
                     Call.removeQueueBlock(player.con, req.x, req.y, req.breaking);
-                    connection.rejectedRequests.add(req);
+                    con.rejectedRequests.add(req);
                     continue;
                 }
                 player.builder().plans().addLast(req);
             }
         }
 
-        connection.rejectedRequests.clear();
+        con.rejectedRequests.clear();
 
         if(!player.dead()){
             Unit unit = player.unit();
 
-            unit.vel().set(xVelocity, yVelocity).limit(unit.type().speed);
-            long elapsed = Time.timeSinceMillis(connection.lastRecievedClientTime);
-            float maxSpeed = player.dead() ? Float.MAX_VALUE : player.unit().type().speed;
+            unit.vel.set(xVelocity, yVelocity).limit(unit.type().speed);
+            long elapsed = Time.timeSinceMillis(con.lastRecievedClientTime);
+            float maxSpeed = player.unit().type().speed;
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
-            if(connection.lastUnit != unit && !player.dead()){
-                connection.lastUnit = unit;
-                connection.lastPosition.set(unit);
+            if(con.lastUnit != unit){
+                con.lastUnit = unit;
+                con.lastPosition.set(unit);
             }
 
-            vector.set(x, y).sub(connection.lastPosition);
+            //if the player think they're dead their position should be ignored
+            if(dead){
+                x = unit.x;
+                y = unit.y;
+            }
+
+            vector.set(x, y).sub(con.lastPosition);
             vector.limit(maxMove);
 
-            float prevx = unit.x(), prevy = unit.y();
-            unit.set(connection.lastPosition);
+            float prevx = unit.x, prevy = unit.y;
+            unit.set(con.lastPosition);
             if(!unit.isFlying()){
                 unit.move(vector.x, vector.y);
             }else{
@@ -625,21 +633,15 @@ public class NetServer implements ApplicationListener{
             }
 
             //set last position after movement
-            connection.lastPosition.set(unit);
-            float newx = unit.x(), newy = unit.y();
+            con.lastPosition.set(unit);
+            float newx = unit.x, newy = unit.y;
 
             if(!verifyPosition){
                 unit.set(prevx, prevy);
                 newx = x;
                 newy = y;
-            }else if(!Mathf.within(x, y, newx, newy, correctDist)){
+            }else if(!Mathf.within(x, y, newx, newy, correctDist) && !dead){
                 Call.setPosition(player.con, newx, newy); //teleport and correct position when necessary
-            }
-
-            //reset player to previous synced position so it gets interpolated
-            //the server does not interpolate
-            if(!headless){
-                unit.set(prevx, prevy);
             }
 
             //write sync data to the buffer
@@ -647,8 +649,8 @@ public class NetServer implements ApplicationListener{
             fbuffer.position(0);
 
             //now, put the new position, rotation and baserotation into the buffer so it can be read
+            //TODO this is terrible
             if(unit instanceof Mechc) fbuffer.put(baseRotation); //base rotation is optional
-            fbuffer.put(unit.elevation());
             fbuffer.put(rotation); //rotation is always there
             fbuffer.put(newx);
             fbuffer.put(newy);
@@ -661,8 +663,8 @@ public class NetServer implements ApplicationListener{
             player.y = y;
         }
 
-        connection.lastRecievedClientSnapshot = snapshotID;
-        connection.lastRecievedClientTime = Time.millis();
+        con.lastRecievedClientSnapshot = snapshotID;
+        con.lastRecievedClientTime = Time.millis();
     }
 
     @Remote(targets = Loc.client, called = Loc.server)

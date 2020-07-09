@@ -221,7 +221,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyRelease(Binding.select)){
-            isShooting = false;
+            player.shooting = false;
         }
 
         if(state.isGame() && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
@@ -248,8 +248,8 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(isShooting && !canShoot()){
-            isShooting = false;
+        if(player.shooting && !canShoot()){
+            player.shooting = false;
         }
 
         if(isPlacing() && player.isBuilder()){
@@ -464,10 +464,10 @@ public class DesktopInput extends InputHandler{
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
                 !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
-                    isShooting = shouldShoot;
+                    player.shooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
-                isShooting = shouldShoot;
+                player.shooting = shouldShoot;
             }
         }else if(Core.input.keyTap(Binding.deselect) && isPlacing()){
             block = null;
@@ -575,7 +575,7 @@ public class DesktopInput extends InputHandler{
 
         movement.set(xa, ya).nor().scl(speed);
         float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
-        boolean aimCursor = omni && isShooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
+        boolean aimCursor = omni && player.shooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
@@ -595,10 +595,11 @@ public class DesktopInput extends InputHandler{
         }
 
         unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
-        unit.controlWeapons(true, isShooting && !boosted);
+        unit.controlWeapons(true, player.shooting && !boosted);
 
-        isBoosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
-        player.boosting(isBoosting);
+        player.boosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
+        player.mouseX = unit.aimX();
+        player.mouseY = unit.aimY();
 
         //TODO netsync this
         if(unit instanceof Payloadc){

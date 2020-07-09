@@ -3,6 +3,7 @@ package mindustry.entities;
 import arc.func.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -19,6 +20,12 @@ public class Units{
     @Remote(called = Loc.server)
     public static void unitDeath(Unit unit){
         unit.killed();
+    }
+
+    @Remote(called = Loc.server)
+    public static void unitDespawn(Unit unit){
+        Fx.unitDespawn.at(unit.x, unit.y, 0, unit);
+        unit.remove();
     }
 
     /** @return whether a new instance of a unit of this team can be created. */

@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
@@ -233,9 +234,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //remove units spawned by the core
         if(spawnedByCore && !isPlayer()){
-            Fx.unitDespawn.at(x, y, 0, this);
-            remove();
+            Call.unitDespawn(base());
         }
+    }
+
+    /** @return a preview icon for this unit. */
+    public TextureRegion icon(){
+        return type.icon(Cicon.full);
     }
 
     /** Actually destroys the unit, removing it and creating explosions. **/

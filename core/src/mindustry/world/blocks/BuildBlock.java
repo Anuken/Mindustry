@@ -59,9 +59,9 @@ public class BuildBlock extends Block{
     @Remote(called = Loc.server)
     public static void constructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
-        float healthf = tile.build.healthf();
+        float healthf = tile.build == null ? 1f : tile.build.healthf();
         tile.setBlock(block, team, rotation);
-        tile.build.health(block.health * healthf);
+        tile.build.health = block.health * healthf;
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.unit().id()){
             if(!skipConfig){

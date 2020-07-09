@@ -19,7 +19,7 @@ abstract class DecalComp implements Drawc, Timedc, Rotc, Posc{
     public void draw(){
         Draw.z(Layer.scorch);
 
-        Draw.mixcol(color, 1f);
+        Draw.mixcol(color, color.a);
         Draw.alpha(1f - Mathf.curve(fin(), 0.98f));
         Draw.rect(region, x, y, rotation);
         Draw.reset();

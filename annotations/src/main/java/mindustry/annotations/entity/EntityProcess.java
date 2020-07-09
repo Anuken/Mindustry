@@ -566,6 +566,14 @@ public class EntityProcess extends BaseProcessor{
             //write the groups
             groupsBuilder.addMethod(groupInit.build());
 
+            MethodSpec.Builder groupClear = MethodSpec.methodBuilder("clear").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            for(GroupDefinition group : groupDefs){
+                groupClear.addStatement("$L.clear()", group.name);
+            }
+
+            //write clear
+            groupsBuilder.addMethod(groupClear.build());
+
             //add method for resizing all necessary groups
             MethodSpec.Builder groupResize = MethodSpec.methodBuilder("resize")
                 .addParameter(TypeName.FLOAT, "x").addParameter(TypeName.FLOAT, "y").addParameter(TypeName.FLOAT, "w").addParameter(TypeName.FLOAT, "h")

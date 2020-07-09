@@ -28,7 +28,7 @@ abstract class BuilderComp implements Unitc{
 
     @Import float x, y, rotation;
 
-    Queue<BuildPlan> plans = new Queue<>();
+    @SyncLocal Queue<BuildPlan> plans = new Queue<>();
     transient boolean building = true;
 
     @Override

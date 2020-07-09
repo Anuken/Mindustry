@@ -22,7 +22,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     @Import UnitType type;
 
     transient float mineTimer;
-    @Nullable Tile mineTile;
+    @Nullable @SyncLocal Tile mineTile;
 
     public boolean canMine(Item item){
         return type.mineTier >= item.hardness;

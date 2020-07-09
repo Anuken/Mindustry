@@ -27,7 +27,7 @@ public class NetworkIO{
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
 
-            stream.writeInt(player.id());
+            stream.writeInt(player.id);
             player.write(Writes.get(stream));
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
@@ -47,11 +47,11 @@ public class NetworkIO{
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
 
-            Groups.all.clear();
+            Groups.clear();
             int id = stream.readInt();
             player.reset();
             player.read(Reads.get(stream));
-            player.id(id);
+            player.id = id;
             player.add();
 
             SaveIO.getSaveWriter().readContentHeader(stream);

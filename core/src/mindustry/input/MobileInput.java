@@ -454,7 +454,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = tileY;
             }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
-                isShooting = true;
+                player.shooting = true;
             }
         }
 
@@ -589,11 +589,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(Core.settings.getBool("keyboard")){
             if(Core.input.keyRelease(Binding.select)){
-                isShooting = false;
+                player.shooting = false;
             }
 
-            if(isShooting && !canShoot()){
-                isShooting = false;
+            if(player.shooting && !canShoot()){
+                player.shooting = false;
             }
         }
 

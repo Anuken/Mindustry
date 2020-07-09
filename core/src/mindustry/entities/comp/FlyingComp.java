@@ -17,7 +17,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     @Import float x, y;
     @Import Vec2 vel;
 
-    @SyncField(value = true, clamped = true) @SyncLocal float elevation;
+    @SyncLocal float elevation;
     private transient boolean wasFlying;
     transient float drownTime;
     transient float splashTimer;

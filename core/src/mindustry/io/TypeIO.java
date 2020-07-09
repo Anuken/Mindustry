@@ -170,7 +170,7 @@ public class TypeIO{
     }
 
     public static <T extends Entityc> T readEntity(Reads read){
-        return (T)Groups.all.getByID(read.i());
+        return (T)Groups.sync.getByID(read.i());
     }
 
     public static void writeBuilding(Writes write, Building tile){

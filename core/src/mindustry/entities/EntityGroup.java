@@ -166,6 +166,9 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         int idx = array.indexOf(type, true);
         if(idx != -1){
             array.remove(idx);
+            if(map != null){
+                map.remove(type.id());
+            }
 
             //fix iteration index when removing
             if(index >= idx){
