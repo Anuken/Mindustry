@@ -350,7 +350,7 @@ public class SchematicsDialog extends BaseDialog{
                 }
             });
             cont.row();
-            float cons = schem.powerConsumption(), prod = schem.powerProduction();
+            float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
             if(!Mathf.zero(cons) || !Mathf.zero(prod)){
                 cont.table(t -> {
 
