@@ -11,7 +11,10 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.struct.IntIntMap.*;
 import arc.util.*;
+import mindustry.*;
+import mindustry.world.meta.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -331,6 +334,27 @@ public class SchematicsDialog extends BaseDialog{
             cont.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray);
             cont.row();
             cont.add(new SchematicImage(schem)).maxSize(800f);
+            cont.row();
+
+            IntIntMap blocks = new IntIntMap();
+            schem.tiles.each(t -> {
+                blocks.increment(t.block.id);
+            });
+            cont.table(t -> {
+                int i = 0;
+                for(Entry ent : blocks){
+                    int v = ent.value;
+                    t.image(Vars.content.block(ent.key).icon(Cicon.small)).left();
+                    t.label(() -> {
+                        return "[lightgray]" + v;
+                    }).left().padLeft(4).padRight(6).padTop(4).padBottom(4);
+
+                    if(++i % 6 == 0){
+                        t.row();
+                    }
+                }
+
+            });
             cont.row();
 
             Seq<ItemStack> arr = schem.requirements();
