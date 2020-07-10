@@ -337,9 +337,7 @@ public class SchematicsDialog extends BaseDialog{
             cont.row();
 
             IntIntMap blocks = new IntIntMap();
-            schem.tiles.each(t -> {
-                blocks.increment(t.block.id);
-            });
+            schem.tiles.each(t -> blocks.increment(t.block.id));
             cont.table(t -> {
                 int i = 0;
                 for(Entry ent : blocks){
