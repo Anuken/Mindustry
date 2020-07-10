@@ -1698,7 +1698,7 @@ public class Blocks implements ContentList{
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.wraith, 200f, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.flare, 200f, with(Items.silicon, 10)),
                 new UnitPlan(UnitTypes.mono, 200f, with(Items.silicon, 10)),
                 //new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
             };
@@ -1729,7 +1729,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.nova, UnitTypes.quasar},
                 {UnitTypes.dagger, UnitTypes.mace},
                 {UnitTypes.crawler, UnitTypes.eruptor},
-                {UnitTypes.wraith, UnitTypes.ghoul},
+                {UnitTypes.flare, UnitTypes.horizon},
                 {UnitTypes.mono, UnitTypes.poly},
                 {UnitTypes.risse, UnitTypes.minke},
             };
@@ -1745,10 +1745,11 @@ public class Blocks implements ContentList{
             constructTime = 60f * 15f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.ghoul, UnitTypes.revenant},
+                {UnitTypes.horizon, UnitTypes.zenith},
                 {UnitTypes.mace, UnitTypes.fortress},
                 {UnitTypes.poly, UnitTypes.mega},
                 {UnitTypes.minke, UnitTypes.bryde},
+                {UnitTypes.quasar, UnitTypes.pulsar},
             };
         }};
 
@@ -1763,7 +1764,7 @@ public class Blocks implements ContentList{
             constructTime = 60f * 60f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.revenant, UnitTypes.lich},
+                {UnitTypes.zenith, UnitTypes.antumbra},
             };
         }};
 
@@ -1778,7 +1779,7 @@ public class Blocks implements ContentList{
             constructTime = 60f * 60f * 3;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.lich, UnitTypes.reaper},
+                {UnitTypes.antumbra, UnitTypes.eclipse},
             };
         }};
 

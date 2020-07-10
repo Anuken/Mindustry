@@ -27,7 +27,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix, eruptor;
 
     //air (no special traits)
-    public static @EntityDef({Unitc.class}) UnitType wraith, reaper, ghoul, revenant, lich;
+    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
 
     //air + building
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType mono;
@@ -319,7 +319,7 @@ public class UnitTypes implements ContentList{
         //endregion
         //region air attack
 
-        wraith = new UnitType("wraith"){{
+        flare = new UnitType("flare"){{
             speed = 3f;
             accel = 0.08f;
             drag = 0.01f;
@@ -338,7 +338,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        ghoul = new UnitType("ghoul"){{
+        horizon = new UnitType("horizon"){{
             health = 220;
             speed = 2f;
             accel = 0.08f;
@@ -362,7 +362,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        revenant = new UnitType("revenant"){{
+        zenith = new UnitType("zenith"){{
             health = 220;
             speed = 1.9f;
             accel = 0.04f;
@@ -375,7 +375,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 12f;
             engineSize = 3f;
 
-            weapons.add(new Weapon("revenant-missiles"){{
+            weapons.add(new Weapon("zenith-missiles"){{
                 reload = 70f;
                 x = 7f;
                 rotate = true;
@@ -402,7 +402,28 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        reaper = new UnitType("reaper"){{
+        antumbra = new UnitType("antumbra"){{
+            speed = 1.1f;
+            accel = 0.02f;
+            drag = 0.05f;
+            rotateSpeed = 2.5f;
+            flying = true;
+            lowAltitude = true;
+            health = 75000;
+            engineOffset = 38;
+            engineSize = 7.3f;
+            hitsize = 58f;
+
+            weapons.add(new Weapon(){{
+                y = 1.5f;
+                reload = 28f;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+                shootSound = Sounds.shoot;
+            }});
+        }};
+
+        eclipse = new UnitType("eclipse"){{
             speed = 1.1f;
             accel = 0.02f;
             drag = 0.05f;
@@ -414,27 +435,6 @@ public class UnitTypes implements ContentList{
             engineSize = 7.3f;
             hitsize = 58f;
             destructibleWreck = false;
-
-            weapons.add(new Weapon(){{
-                y = 1.5f;
-                reload = 28f;
-                ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
-                shootSound = Sounds.shoot;
-            }});
-        }};
-
-        lich = new UnitType("lich"){{
-            speed = 1.1f;
-            accel = 0.02f;
-            drag = 0.05f;
-            rotateSpeed = 2.5f;
-            flying = true;
-            lowAltitude = true;
-            health = 75000;
-            engineOffset = 38;
-            engineSize = 7.3f;
-            hitsize = 58f;
 
             weapons.add(new Weapon(){{
                 y = 1.5f;
