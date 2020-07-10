@@ -535,21 +535,20 @@ public class UnitTypes implements ContentList{
             isCounted = false;
 
             flying = true;
-            mineSpeed = 10f;
+            mineSpeed = 6f;
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;
             speed = 2.6f;
             rotateSpeed = 15f;
             accel = 0.1f;
-            range = 70f;
             itemCapacity = 30;
             health = 80f;
             engineOffset = 6f;
             hitsize = 8f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
-                reload = 15f;
+                reload = 20f;
                 x = 2.75f;
                 y = 1f;
 
@@ -570,31 +569,36 @@ public class UnitTypes implements ContentList{
             isCounted = false;
 
             flying = true;
-            mineSpeed = 2f;
+            mineSpeed = 7f;
             mineTier = 1;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.75f;
             drag = 0.05f;
             speed = 2.9f;
-            rotateSpeed = 15f;
+            rotateSpeed = 17f;
             accel = 0.1f;
-            range = 70f;
-            itemCapacity = 30;
-            health = 80f;
+            itemCapacity = 50;
+            health = 120f;
             engineOffset = 6f;
-            hitsize = 8f;
+            hitsize = 9f;
+            rotateShooting = false;
+            lowAltitude = true;
 
-            weapons.add(new Weapon("small-basic-weapon"){{
-                reload = 15f;
-                x = 2.75f;
-                y = 1f;
+            weapons.add(new Weapon("small-mount-weapon"){{
+                reload = 20f;
+                x = 3f;
+                y = 0.5f;
+                rotate = true;
+                shots = 2;
+                shotDelay = 4f;
+                spacing = 0f;
 
-                bullet = new BasicBulletType(2.5f, 9){{
+                bullet = new BasicBulletType(3f, 9){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.1f;
+                    tileDamageMultiplier = 0.14f;
                 }};
             }});
         }};
@@ -605,31 +609,35 @@ public class UnitTypes implements ContentList{
             isCounted = false;
 
             flying = true;
-            mineSpeed = 2f;
-            mineTier = 1;
-            buildSpeed = 0.5f;
+            mineSpeed = 8f;
+            mineTier = 2;
+            buildSpeed = 1f;
             drag = 0.05f;
             speed = 3.4f;
-            rotateSpeed = 15f;
-            accel = 0.1f;
-            range = 70f;
-            itemCapacity = 30;
-            health = 80f;
+            rotateSpeed = 19f;
+            accel = 0.11f;
+            itemCapacity = 70;
+            health = 160f;
             engineOffset = 6f;
-            hitsize = 8f;
+            hitsize = 10f;
 
-            weapons.add(new Weapon("small-basic-weapon"){{
+            weapons.add(new Weapon("small-mount-weapon"){{
                 reload = 15f;
-                x = 2.75f;
-                y = 1f;
+                x = 1f;
+                y = 2f;
+                shots = 2;
+                spacing = 2f;
+                inaccuracy = 3f;
+                shotDelay = 3f;
 
-                bullet = new BasicBulletType(2.5f, 9){{
-                    width = 7f;
-                    height = 9f;
-                    lifetime = 60f;
+                bullet = new BasicBulletType(3.5f, 9){{
+                    width = 6.5f;
+                    height = 11f;
+                    lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.1f;
+                    tileDamageMultiplier = 0.15f;
+                    homingPower = 0.04f;
                 }};
             }});
         }};

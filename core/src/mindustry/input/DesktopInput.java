@@ -622,7 +622,6 @@ public class DesktopInput extends InputHandler{
         }
 
         if(unit instanceof Commanderc){
-
             if(Core.input.keyTap(Binding.command)){
                 Call.unitCommand(player);
             }
