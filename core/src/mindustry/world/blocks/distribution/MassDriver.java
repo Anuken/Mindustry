@@ -103,7 +103,7 @@ public class MassDriver extends Block{
 
             //reload regardless of state
             if(reload > 0f){
-                reload = Mathf.clamp(reload - delta() / reloadTime * efficiency());
+                reload = Mathf.clamp(reload - edelta() / reloadTime);
             }
 
             //cleanup waiting shooters that are not valid

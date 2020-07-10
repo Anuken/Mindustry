@@ -33,8 +33,10 @@ import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.meta.*;
 
 import java.util.*;
 
@@ -102,6 +104,50 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
         player.builder().removeBuild(x, y, breaking);
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void pickupUnitPayload(Player player, Unit target){
+        Unit unit = player.unit();
+        Payloadc pay = (Payloadc)unit;
+
+        if(target.isAI() && target.isGrounded() && pay.payloads().size < unit.type().payloadCapacity
+            && target.within(unit, unit.type().hitsize * 1.5f)){
+            pay.pickup(target);
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void pickupBlockPayload(Player player, Building tile){
+        Unit unit = player.unit();
+        Payloadc pay = (Payloadc)unit;
+
+        if(tile != null && tile.team() == unit.team && pay.payloads().size < unit.type().payloadCapacity
+            && unit.within(tile, tilesize * tile.block.size * 1.2f)){
+            //pick up block directly
+            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
+                pay.pickup(tile);
+            }else{ //pick up block payload
+                Payload taken = tile.takePayload();
+                if(taken != null){
+                    pay.addPayload(taken);
+                    Fx.unitPickup.at(tile);
+                }
+            }
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    public static void dropPayload(Player player, float x, float y){
+        Payloadc pay = (Payloadc)player.unit();
+
+        //allow a slight margin of error
+        if(pay.within(x, y, tilesize * 2f)){
+            float prevx = pay.x(), prevy = pay.y();
+            pay.set(x, y);
+            pay.dropLastPayload();
+            pay.set(prevx, prevy);
+        }
     }
 
     @Remote(targets = Loc.client, called = Loc.server)

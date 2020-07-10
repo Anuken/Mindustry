@@ -13,7 +13,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -22,10 +21,9 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.payloads.*;
-import mindustry.world.meta.*;
 
-import static arc.Core.scene;
+import static arc.Core.*;
+import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
@@ -601,33 +599,24 @@ public class DesktopInput extends InputHandler{
         player.mouseX = unit.aimX();
         player.mouseY = unit.aimY();
 
-        //TODO netsync this
         if(unit instanceof Payloadc){
             Payloadc pay = (Payloadc)unit;
 
             if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
-                Unit target = Units.closest(player.team(), pay.x(), pay.y(), 30f, u -> u.isAI() && u.isGrounded());
+                Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 1.1f, u -> u.isAI() && u.isGrounded());
                 if(target != null){
-                    pay.pickup(target);
+                    Call.pickupUnitPayload(player, target);
                 }else if(!pay.hasPayload()){
                     Building tile = world.entWorld(pay.x(), pay.y());
-                    if(tile != null && tile.team() == unit.team && tile.block().synthetic()){
-                        //pick up block directly
-                        if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
-                            pay.pickup(tile);
-                        }else{ //pick up block payload
-                            Payload taken = tile.takePayload();
-                            if(taken != null){
-                                pay.addPayload(taken);
-                                Fx.unitPickup.at(tile);
-                            }
-                        }
 
+                    if(tile != null && tile.team() == unit.team){
+                        Call.pickupBlockPayload(player, tile);
                     }
                 }
             }
 
             if(Core.input.keyTap(Binding.dropCargo)){
+                Call.dropPayload(player, player.x, player.y);
                 pay.dropLastPayload();
             }
         }
