@@ -16,8 +16,12 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 import mindustry.world.consumers.*;
+import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
+
+
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
@@ -157,7 +161,7 @@ public class Drill extends Block{
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
 
-
+        stats.add(BlockStat.booster, new DrillBoosterListValue(1f, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
     }
 
     @Override
