@@ -1186,7 +1186,7 @@ public class Blocks implements ContentList{
             drillTime = 600;
             size = 2;
             drawMineItem = true;
-            consumes.liquid(Liquids.water, 0.05f).boost();
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.05f)).update(false).boost();
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
@@ -1195,7 +1195,7 @@ public class Blocks implements ContentList{
             drillTime = 400;
             size = 2;
             drawMineItem = true;
-            consumes.liquid(Liquids.water, 0.06f).boost();
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.06f)).update(false).boost();
         }};
 
         laserDrill = new Drill("laser-drill"){{
@@ -1208,7 +1208,7 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineBig;
 
             consumes.power(1.10f);
-            consumes.liquid(Liquids.water, 0.08f).boost();
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.08f)).update(false).boost();
         }};
 
         blastDrill = new Drill("blast-drill"){{
@@ -1225,7 +1225,7 @@ public class Blocks implements ContentList{
             warmupSpeed = 0.01f;
 
             consumes.power(3f);
-            consumes.liquid(Liquids.water, 0.1f).boost();
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).update(false).boost();
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
