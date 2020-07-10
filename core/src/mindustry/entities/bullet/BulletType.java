@@ -15,7 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 
 public abstract class BulletType extends Content{
-    public float lifetime;
+    public float lifetime = 40f;
     public float speed;
     public float damage;
     public float hitSize = 4;
@@ -100,7 +100,6 @@ public abstract class BulletType extends Content{
     public BulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
-        lifetime = 40f;
         hitEffect = Fx.hitBulletSmall;
         despawnEffect = Fx.hitBulletSmall;
     }
@@ -183,12 +182,12 @@ public abstract class BulletType extends Content{
         if(homingPower > 0.0001f){
             Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
-                b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
+                b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
             }
         }
 
         if(weaveMag > 0){
-            b.vel().rotate(Mathf.sin(Time.time() + b.id() * 3, weaveScale, weaveMag) * Time.delta());
+            b.vel.rotate(Mathf.sin(Time.time() + b.id() * 3, weaveScale, weaveMag) * Time.delta());
         }
     }
 
@@ -226,8 +225,8 @@ public abstract class BulletType extends Content{
         bullet.type(this);
         bullet.owner(owner);
         bullet.team(team);
-        bullet.vel().trns(angle, speed * velocityScl);
-        bullet.set(x - bullet.vel().x * Time.delta(), y - bullet.vel().y * Time.delta());
+        bullet.vel.trns(angle, speed * velocityScl);
+        bullet.set(x - bullet.vel.x * Time.delta(), y - bullet.vel.y * Time.delta());
         bullet.lifetime(lifetime * lifetimeScl);
         bullet.data(data);
         bullet.drag(drag);
@@ -235,7 +234,7 @@ public abstract class BulletType extends Content{
         bullet.damage(damage < 0 ? this.damage : damage);
         bullet.add();
 
-        if(keepVelocity && owner instanceof Hitboxc) bullet.vel().add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
+        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
         return bullet;
 
     }

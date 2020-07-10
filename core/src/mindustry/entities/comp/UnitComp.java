@@ -33,6 +33,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private UnitType type;
     boolean spawnedByCore;
 
+    transient float timer1, timer2;
+
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
     }

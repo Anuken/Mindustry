@@ -101,14 +101,14 @@ public class Wall extends Block{
                 if(bullet.damage() > maxDamageDeflect) return true;
 
                 //translate bullet back to where it was upon collision
-                bullet.trns(-bullet.vel().x, -bullet.vel().y);
+                bullet.trns(-bullet.vel.x, -bullet.vel.y);
 
-                float penX = Math.abs(x - bullet.x()), penY = Math.abs(y - bullet.y());
+                float penX = Math.abs(x - bullet.x), penY = Math.abs(y - bullet.y);
 
                 if(penX > penY){
-                    bullet.vel().x *= -1;
+                    bullet.vel.x *= -1;
                 }else{
-                    bullet.vel().y *= -1;
+                    bullet.vel.y *= -1;
                 }
 
                 bullet.owner(this);

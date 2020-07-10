@@ -9,7 +9,7 @@ import mindustry.world.blocks.*;
 
 public class HealBulletType extends BulletType{
     protected float healPercent = 3f;
-    protected float bulletHeight = 7f, bulletWidth = 2f;
+    protected float height = 7f, width = 2f;
     protected Color backColor = Pal.heal, frontColor = Color.white;
 
     public HealBulletType(float speed, float damage){
@@ -35,10 +35,10 @@ public class HealBulletType extends BulletType{
     @Override
     public void draw(Bullet b){
         Draw.color(backColor);
-        Lines.stroke(bulletWidth);
-        Lines.lineAngleCenter(b.x(), b.y(), b.rotation(), bulletHeight);
+        Lines.stroke(width);
+        Lines.lineAngleCenter(b.x, b.y, b.rotation(), height);
         Draw.color(frontColor);
-        Lines.lineAngleCenter(b.x(), b.y(), b.rotation(), bulletHeight / 2f);
+        Lines.lineAngleCenter(b.x, b.y, b.rotation(), height / 2f);
         Draw.reset();
     }
 

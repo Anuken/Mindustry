@@ -32,7 +32,7 @@ public class Weapon{
     /** amount of shots per fire */
     public int shots = 1;
     /** spacing in degrees between multiple shots, if applicable */
-    public float spacing = 12f;
+    public float spacing = 0;
     /** inaccuracy of degrees of each shot */
     public float inaccuracy = 0f;
     /** intensity and duration of each shot's screen shake */

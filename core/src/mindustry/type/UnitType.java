@@ -50,6 +50,7 @@ public class UnitType extends UnlockableContent{
     public float deathShake = 2f;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
+    public Seq<Ability> abilities = new Seq<>();
 
     //TODO document
     public int legCount = 4, legGroupSize = 2;
@@ -103,7 +104,13 @@ public class UnitType extends UnlockableContent{
         return weapons.size > 0;
     }
 
-    public void update(Unit unit){}
+    public void update(Unit unit){
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.update(unit);
+            }
+        }
+    }
 
     public void landed(Unit unit){}
 
@@ -250,6 +257,12 @@ public class UnitType extends UnlockableContent{
 
         if(unit.shieldAlpha > 0){
             drawShield(unit);
+        }
+
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.draw(unit);
+            }
         }
 
         if(legs != null){

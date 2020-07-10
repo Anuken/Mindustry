@@ -6,6 +6,7 @@ import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -55,7 +56,7 @@ public class UnitTypes implements ContentList{
         dagger = new UnitType("dagger"){{
             speed = 0.5f;
             hitsize = 8f;
-            health = 130;
+            health = 140;
             weapons.add(new Weapon("large-weapon"){{
                 reload = 14f;
                 x = 4f;
@@ -69,7 +70,8 @@ public class UnitTypes implements ContentList{
             speed = 0.4f;
             hitsize = 9f;
             range = 10f;
-            health = 460;
+            health = 500;
+            armor = 1f;
 
             immunities.add(StatusEffects.burning);
 
@@ -88,7 +90,9 @@ public class UnitTypes implements ContentList{
             hitsize = 13f;
             rotateSpeed = 3f;
             targetAir = false;
-            health = 750;
+            health = 790;
+            armor = 4f;
+
             weapons.add(new Weapon("artillery"){{
                 y = 1f;
                 x = 9f;
@@ -104,7 +108,7 @@ public class UnitTypes implements ContentList{
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
-                    splashDamageRadius = 20f;
+                    splashDamageRadius = 24f;
                     splashDamage = 38f;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
@@ -119,10 +123,11 @@ public class UnitTypes implements ContentList{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.5f;
+            speed = 0.52f;
             hitsize = 8f;
-            health = 100f;
+            health = 110f;
             buildSpeed = 0.8f;
+            armor = 1f;
 
             weapons.add(new Weapon("heal-weapon"){{
                 shootY = 2f;
@@ -140,34 +145,62 @@ public class UnitTypes implements ContentList{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.5f;
-            hitsize = 8f;
-            health = 100f;
-            buildSpeed = 0.8f;
+            speed = 0.48f;
+            hitsize = 10f;
+            health = 300f;
+            buildSpeed = 0.9f;
+            armor = 3f;
 
-            weapons.add(new Weapon("heal-weapon"){{
-                shootY = 2f;
-                reload = 24f;
-                x = 4.5f;
-                alternate = false;
+            mineTier = 2;
+            mineSpeed = 5f;
+            commandLimit = 8;
+
+            abilities.add(new HealFieldAbility(10f, 200f, 60f));
+
+            weapons.add(new Weapon("heal-shotgun-weapon"){{
+                x = 5f;
+                shake = 2.2f;
+                y = 0.5f;
+                shootY = 5f;
+
+                shootY = 2.5f;
+                reload = 38f;
+                shots = 3;
+                inaccuracy = 35;
+                shotDelay = 0.5f;
+                spacing = 0f;
                 ejectEffect = Fx.none;
-                recoil = 2f;
-                bullet = Bullets.healBullet;
+                recoil = 2.5f;
                 shootSound = Sounds.pew;
+
+                bullet = new LightningBulletType(){{
+                    lightningColor = hitColor = Pal.heal;
+                    damage = 11f;
+                    lightningLength = 7;
+                    lightningLengthRand = 7;
+                    shootEffect = Fx.shootHeal;
+                }};
             }});
         }};
 
         quasar = new UnitType("quasar"){{
             mineTier = 1;
-            hitsize = 9f;
+            hitsize = 12f;
             boostMultiplier = 2f;
-            itemCapacity = 20;
-            health = 230f;
-            buildSpeed = 1.5f;
+            itemCapacity = 80;
+            health = 640f;
+            buildSpeed = 1.7f;
             canBoost = true;
+            armor = 6f;
+            landShake = 2f;
 
             speed = 0.4f;
             hitsize = 10f;
+
+            mineTier = 2;
+            mineSpeed = 7f;
+
+            abilities.add(new HealFieldAbility(15f, 170f, 60f));
 
             weapons.add(new Weapon("beam-weapon"){{
                 shake = 2f;
@@ -178,7 +211,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.laser;
 
                 bullet = new LaserBulletType(){{
-                    damage = 20f;
+                    damage = 27f;
                     recoil = 1f;
                     sideAngle = 45f;
                     sideWidth = 1f;

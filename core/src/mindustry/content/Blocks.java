@@ -1535,7 +1535,7 @@ public class Blocks implements ContentList{
                 @Override
                 public void init(Bullet b){
                     for(int i = 0; i < rays; i++){
-                        Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
+                        Damage.collideLine(b, b.team(), hitEffect, b.x, b.y, b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
                 }
 
@@ -1547,11 +1547,11 @@ public class Blocks implements ContentList{
                     for(int i = 0; i < 7; i++){
                         Tmp.v1.trns(b.rotation(), i * 8f);
                         float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
-                        Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 4f, sl, b.rotation() + 90);
-                        Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 4f, sl, b.rotation() - 90);
+                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rotation() + 90);
+                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rotation() - 90);
                     }
-                    Drawf.tri(b.x(), b.y(), 20f * b.fout(), (rayLength + 50), b.rotation());
-                    Drawf.tri(b.x(), b.y(), 20f * b.fout(), 10f, b.rotation() + 180f);
+                    Drawf.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rotation());
+                    Drawf.tri(b.x, b.y, 20f * b.fout(), 10f, b.rotation() + 180f);
                     Draw.reset();
                 }
             });

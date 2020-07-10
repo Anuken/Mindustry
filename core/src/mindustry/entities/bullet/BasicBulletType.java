@@ -44,9 +44,9 @@ public class BasicBulletType extends BulletType{
         float width = this.width * ((1f - shrinkX) + shrinkX * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x(), b.y(), width, height, b.rotation() - 90);
+        Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x(), b.y(), width, height, b.rotation() - 90);
+        Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() - 90);
         Draw.color();
     }
 }

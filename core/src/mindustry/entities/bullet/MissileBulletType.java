@@ -26,7 +26,7 @@ public class MissileBulletType extends BasicBulletType{
         super.update(b);
 
         if(Mathf.chanceDelta(0.2)){
-            Fx.missileTrail.at(b.x(), b.y(), 2f, trailColor);
+            Fx.missileTrail.at(b.x, b.y, 2f, trailColor);
         }
     }
 }

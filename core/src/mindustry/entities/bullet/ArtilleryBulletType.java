@@ -28,7 +28,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         super.update(b);
 
         if(b.timer(0, 3 + b.fslope() * 2f)){
-            trailEffect.at(b.x(), b.y(), b.fslope() * 4f, backColor);
+            trailEffect.at(b.x, b.y, b.fslope() * 4f, backColor);
         }
     }
 
@@ -40,9 +40,9 @@ public class ArtilleryBulletType extends BasicBulletType{
         float height = this.height * ((1f - shrinkY) + shrinkY * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x(), b.y(), width * scale, height * scale, b.rotation() - 90);
+        Draw.rect(backRegion, b.x, b.y, width * scale, height * scale, b.rotation() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x(), b.y(), width * scale, height * scale, b.rotation() - 90);
+        Draw.rect(frontRegion, b.x, b.y, width * scale, height * scale, b.rotation() - 90);
         Draw.color();
     }
 }

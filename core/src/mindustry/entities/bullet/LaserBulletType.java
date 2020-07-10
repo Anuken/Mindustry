@@ -53,15 +53,15 @@ public class LaserBulletType extends BulletType{
 
         furthest = null;
 
-        world.raycast(b.tileX(), b.tileY(), world.toTile(b.x() + Tmp.v1.x), world.toTile(b.y() + Tmp.v1.y),
+        world.raycast(b.tileX(), b.tileY(), world.toTile(b.x + Tmp.v1.x), world.toTile(b.y + Tmp.v1.y),
             (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team() && furthest.block().absorbLasers);
 
         float resultLength = furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
 
-        Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), resultLength);
+        Damage.collideLine(b, b.team(), hitEffect, b.x, b.y, b.rotation(), resultLength);
         if(furthest != null) b.data(resultLength);
 
-        laserEffect.at(b.x(), b.y(), b.rotation(), resultLength * 0.75f);
+        laserEffect.at(b.x, b.y, b.rotation(), resultLength * 0.75f);
     }
 
     @Override
@@ -73,18 +73,18 @@ public class LaserBulletType extends BulletType{
         float cwidth = width;
         float compound = 1f;
 
-        Lines.lineAngle(b.x(), b.y(), b.rotation(), baseLen);
+        Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
         Lines.precise(true);
         for(Color color : colors){
             Draw.color(color);
             Lines.stroke((cwidth *= lengthFalloff) * b.fout());
-            Lines.lineAngle(b.x(), b.y(), b.rotation(), baseLen, CapStyle.none);
+            Lines.lineAngle(b.x, b.y, b.rotation(), baseLen, CapStyle.none);
             Tmp.v1.trns(b.rotation(), baseLen);
-            Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, Lines.getStroke() * 1.22f, cwidth * 2f + width / 2f, b.rotation());
+            Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke() * 1.22f, cwidth * 2f + width / 2f, b.rotation());
 
-            Fill.circle(b.x(), b.y(), 1f * cwidth * b.fout());
+            Fill.circle(b.x, b.y, 1f * cwidth * b.fout());
             for(int i : Mathf.signs){
-                Drawf.tri(b.x(), b.y(), sideWidth * b.fout() * cwidth, sideLength * compound, b.rotation() + sideAngle * i);
+                Drawf.tri(b.x, b.y, sideWidth * b.fout() * cwidth, sideLength * compound, b.rotation() + sideAngle * i);
             }
 
             compound *= lengthFalloff;
@@ -93,7 +93,7 @@ public class LaserBulletType extends BulletType{
         Draw.reset();
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
-        Drawf.light(b.team(), b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
+        Drawf.light(b.team(), b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
     }
 
     @Override
