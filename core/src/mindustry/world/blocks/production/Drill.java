@@ -31,7 +31,7 @@ public class Drill extends Block{
     /** Base time to drill one ore, in frames. */
     public float drillTime = 300;
     /** How powerful coolants are. */
-    public float coolantMultiplier = 10f;
+    public float coolantMultiplier = 25f;
     /** Speed at which the drill speeds up. */
     public float warmupSpeed = 0.02f;
 
@@ -156,6 +156,8 @@ public class Drill extends Block{
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
+
+
     }
 
     @Override
