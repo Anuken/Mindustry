@@ -17,7 +17,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
+import mindustry.world.consumers.*;
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
@@ -30,8 +30,6 @@ public class Drill extends Block{
     public int tier;
     /** Base time to drill one ore, in frames. */
     public float drillTime = 300;
-    /** How many times faster the drill will progress when boosted. */
-    public float liquidBoostIntensity = 1f;
     /** How powerful coolants are. */
     public float coolantMultiplier = 10f;
     /** Speed at which the drill speeds up. */
@@ -210,6 +208,8 @@ public class Drill extends Block{
         public float warmup;
         public float timeDrilled;
         public float lastDrillSpeed;
+        public float liquidBoostIntensity;
+
 
         public int dominantItems;
         public Item dominantItem;
@@ -254,11 +254,13 @@ public class Drill extends Block{
 
             timeDrilled += warmup * delta();
 
+
             if(items.total() < itemCapacity && dominantItems > 0 && consValid()){
 
                 float speed = 1f;
 
                 if(cons().optionalValid()){
+                    updateCooling();
                     speed = (float) Math.sqrt(liquidBoostIntensity);
                 }
 
@@ -286,11 +288,15 @@ public class Drill extends Block{
 
                 drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
             }
+
             
+        }
+
+        protected void updateCooling(){
             float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
-            Liquid liquid = entity.liquids.current();
-            entity.liquidBoostIntensity = liquidBoostIntensity + (maxUsed * liquid.heatCapacity * coolantMultiplier);
-            entity.liquids.remove(liquid, maxUsed);
+            Liquid liquid = liquids.current();
+            liquidBoostIntensity = 1f + (maxUsed * liquid.heatCapacity * coolantMultiplier);
+            liquids.remove(liquid, maxUsed);
         }
 
         @Override
