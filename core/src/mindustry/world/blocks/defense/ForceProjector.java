@@ -122,7 +122,7 @@ public class ForceProjector extends Block{
             if(buildup >= breakage && !broken){
                 broken = true;
                 buildup = breakage;
-                Fx.shieldBreak.at(x, y, radius);
+                Fx.shieldBreak.at(x, y, radius, team.color);
             }
 
             if(hit > 0f){
@@ -162,8 +162,6 @@ public class ForceProjector extends Block{
 
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(x, y, 6, radius);
-
-                    Draw.z(Layer.shields + 0.01f);
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));

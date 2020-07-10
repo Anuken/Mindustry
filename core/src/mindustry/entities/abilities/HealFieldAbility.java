@@ -1,4 +1,4 @@
-package mindustry.entities.units;
+package mindustry.entities.abilities;
 
 import arc.util.*;
 import mindustry.content.*;

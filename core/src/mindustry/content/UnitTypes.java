@@ -5,8 +5,8 @@ import arc.struct.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -129,6 +129,8 @@ public class UnitTypes implements ContentList{
             buildSpeed = 0.8f;
             armor = 1f;
 
+            abilities.add(new HealFieldAbility(10f, 60f * 4, 60f));
+
             weapons.add(new Weapon("heal-weapon"){{
                 shootY = 2f;
                 reload = 24f;
@@ -155,7 +157,7 @@ public class UnitTypes implements ContentList{
             mineSpeed = 5f;
             commandLimit = 8;
 
-            abilities.add(new HealFieldAbility(10f, 200f, 60f));
+            abilities.add(new ShieldFieldAbility(15f, 30f, 60f * 5, 60f));
 
             weapons.add(new Weapon("heal-shotgun-weapon"){{
                 x = 5f;
@@ -199,8 +201,9 @@ public class UnitTypes implements ContentList{
 
             mineTier = 2;
             mineSpeed = 7f;
+            drawShields = false;
 
-            abilities.add(new HealFieldAbility(15f, 170f, 60f));
+            abilities.add(new ForceFieldAbility(60f, 0.12f, 200f, 60f * 8));
 
             weapons.add(new Weapon("beam-weapon"){{
                 shake = 2f;
