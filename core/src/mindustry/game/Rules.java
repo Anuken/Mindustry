@@ -16,7 +16,7 @@ import mindustry.world.*;
  * Does not store game state, just configuration.
  */
 public class Rules{
-    /** Whether ever team has infinite resources and instant build speed. */
+    /** Sandbox mode: Enables infinite resources, build range and build speed. */
     public boolean infiniteResources;
     /** Team-specific rules. */
     public TeamRules teams = new TeamRules();
@@ -38,6 +38,8 @@ public class Rules{
     public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
+    /** Whether units use and require ammo. */
+    public boolean unitAmmo = false;
     /** How fast unit pads build units. */
     public float unitBuildSpeedMultiplier = 1f;
     /** How much health units start with. */
@@ -60,10 +62,10 @@ public class Rules{
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 60 * 60 * 2;
-    /** How many times longer a boss wave takes. */
-    public float bossWaveMultiplier = 3f;
     /** How many times longer a launch wave takes. */
     public float launchWaveMultiplier = 2f;
+    /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
+    public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
     public int unitCap = 0;
     /** Sector for saves that have them.*/
@@ -71,13 +73,16 @@ public class Rules{
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
     /** Starting items put in cores */
-    public Seq<ItemStack> loadout = Seq.with(ItemStack.with(Items.copper, 100));
+    public Seq<ItemStack> loadout = ItemStack.list(Items.copper, 100);
     /** Weather events that occur here. */
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
-    /** Whether everything is dark. Enables lights. Experimental. */
+    /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
+    /** Whether enemy lighting is visible.
+     * If lighting is enabled and this is false, a fog-of-war effect is partially achieved. */
+    public boolean enemyLights = true;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
     /** Multiplier for solar panel power output.
@@ -94,10 +99,14 @@ public class Rules{
     public static class TeamRule{
         /** Whether to use building AI. */
         public boolean ai;
+        /** TODO Tier of blocks/designs that the AI uses for building. [0, 1]*/
+        public float aiTier = 0f;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
         /** If true, resources are not consumed when building. */
         public boolean infiniteResources;
+        /** If true, this team has infinite unit ammo. */
+        public boolean infiniteAmmo;
     }
 
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
@@ -125,16 +134,16 @@ public class Rules{
         final TeamRule[] values = new TeamRule[Team.all.length];
 
         public TeamRule get(Team team){
-            TeamRule out = values[team.uid];
-            if(out == null) values[team.uid] = (out = new TeamRule());
+            TeamRule out = values[team.id];
+            if(out == null) values[team.id] = (out = new TeamRule());
             return out;
         }
 
         @Override
         public void write(Json json){
             for(Team team : Team.all){
-                if(values[team.uid] != null){
-                    json.writeValue(team.uid + "", values[team.uid], TeamRule.class);
+                if(values[team.id] != null){
+                    json.writeValue(team.id + "", values[team.id], TeamRule.class);
                 }
             }
         }

@@ -31,11 +31,11 @@ public class Cultivator extends GenericCrafter{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("multiplier", entity -> new Bar(() ->
+        bars.add("multiplier", (CultivatorEntity entity) -> new Bar(() ->
         Core.bundle.formatFloat("bar.efficiency",
-        ((((CultivatorEntity)entity).boost + 1f) * ((CultivatorEntity)entity).warmup) * 100f, 1),
+        ((entity.boost + 1f) * entity.warmup) * 100f, 1),
         () -> Pal.ammo,
-        () -> ((CultivatorEntity)entity).warmup));
+        () -> entity.warmup));
     }
 
     @Override

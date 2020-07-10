@@ -7,7 +7,6 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.mock.*;
-import arc.struct.Seq;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -463,7 +462,7 @@ public class ContentParser{
         if(t.getMessage() != null && t instanceof JsonParseException){
             builder.append("[accent][[JsonParse][] ").append(":\n").append(t.getMessage());
         }else if(t instanceof NullPointerException){
-            builder.append(Strings.parseException(t, true));
+            builder.append(Strings.neatError(t));
         }else{
             Seq<Throwable> causes = Strings.getCauses(t);
             for(Throwable e : causes){

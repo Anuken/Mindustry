@@ -17,6 +17,6 @@ public class SerializerResolver{
     }
 
     private static boolean isEntity(TypeMirror mirror){
-        return !mirror.toString().contains(".") && mirror.toString().endsWith("c");
+        return !mirror.toString().contains(".") || mirror.toString().startsWith("mindustry.gen.") && !mirror.toString().startsWith("byte");
     }
 }

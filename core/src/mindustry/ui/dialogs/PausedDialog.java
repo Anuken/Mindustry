@@ -34,17 +34,25 @@ public class PausedDialog extends BaseDialog{
         });
 
         if(!mobile){
+            //TODO localize
+            cont.label(() -> state.getSector() == null ? "" :
+            "[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining())
+            .visible(() -> state.getSector() != null).colspan(2);
+            cont.row();
+
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
             cont.button("$back", Icon.left, this::hide).colspan(2).width(dw * 2 + 20f);
 
             cont.row();
-            if(state.isCampaign()){
-                cont.button("$techtree", Icon.tree, ui.tech::show);
-            }else{
-                cont.button("$database", Icon.book, ui.database::show);
-            }
+            //if(state.isCampaign()){
+            //    cont.button("$techtree", Icon.tree, ui.tech::show);
+            //}else{
+            //    cont.button("$database", Icon.book, ui.database::show);
+            //}
+            //TODO remove
+            cont.button("nothing", Icon.warning, () -> ui.showInfo("no"));
             cont.button("$settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){
@@ -120,7 +128,7 @@ public class PausedDialog extends BaseDialog{
             return;
         }
 
-        ui.loadAnd("$saveload", () -> {
+        ui.loadAnd("$saving", () -> {
             try{
                 control.saves.getCurrent().save();
             }catch(Throwable e){

@@ -26,9 +26,9 @@ public class PayloadAcceptor extends Block{
         update = true;
     }
 
-    public static boolean blends(Tilec tile, int direction){
+    public static boolean blends(Building tile, int direction){
         int size = tile.block().size;
-        Tilec accept = tile.nearby(Geometry.d4(direction).x * size, Geometry.d4(direction).y * size);
+        Building accept = tile.nearby(Geometry.d4(direction).x * size, Geometry.d4(direction).y * size);
         return accept != null &&
             accept.block().outputsPayload &&
 
@@ -40,24 +40,24 @@ public class PayloadAcceptor extends Block{
             //if the other block is smaller, check alignment
             (accept.block().size < size &&
             (accept.rotation() % 2 == 0 ? //check orientation; make sure it's aligned properly with this block.
-                Math.abs(accept.y() - tile.y()) <= (size * tilesize - accept.block().size * tilesize)/2f : //check Y alignment
-                Math.abs(accept.x() - tile.x()) <= (size * tilesize - accept.block().size * tilesize)/2f   //check X alignment
+                Math.abs(accept.y - tile.y) <= (size * tilesize - accept.block().size * tilesize)/2f : //check Y alignment
+                Math.abs(accept.x - tile.x) <= (size * tilesize - accept.block().size * tilesize)/2f   //check X alignment
                 )) && (!accept.block().rotate || accept.front() == tile || !accept.block().outputFacing) //make sure it's facing this block
             );
     }
 
-    public class PayloadAcceptorEntity<T extends Payload> extends TileEntity{
+    public class PayloadAcceptorEntity<T extends Payload> extends Building{
         public @Nullable T payload;
         public Vec2 payVector = new Vec2();
         public float payRotation;
 
         @Override
-        public boolean acceptPayload(Tilec source, Payload payload){
+        public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null;
         }
 
         @Override
-        public void handlePayload(Tilec source, Payload payload){
+        public void handlePayload(Building source, Payload payload){
             this.payload = (T)payload;
             this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = source.angleTo(this);
@@ -105,7 +105,7 @@ public class PayloadAcceptor extends Block{
             if(payVector.len() >= size * tilesize/2f){
                 payVector.clamp(-size * tilesize / 2f, size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f);
 
-                Tilec front = front();
+                Building front = front();
                 if(front != null && front.block().outputsPayload){
                     if(movePayload(payload)){
                         payload = null;

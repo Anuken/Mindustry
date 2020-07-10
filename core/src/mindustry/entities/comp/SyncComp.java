@@ -22,8 +22,19 @@ abstract class SyncComp implements Entityc{
 
     @Override
     public void update(){
-        if(Vars.net.client() && !isLocal()){
+        //interpolate the player if:
+        //- this is a client and the entity is everything except the local player
+        //- this is a server and the entity is a remote player
+        if((Vars.net.client() && !isLocal()) || isRemote()){
             interpolate();
+        }
+    }
+
+    @Override
+    public void remove(){
+        //notify client of removal
+        if(Vars.net.client()){
+            Vars.netClient.addRemovedEntity(id());
         }
     }
 }

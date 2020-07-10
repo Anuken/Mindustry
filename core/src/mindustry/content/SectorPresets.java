@@ -4,10 +4,8 @@ import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
 
-import static arc.struct.Seq.with;
-import static mindustry.content.Items.*;
-import static mindustry.content.Planets.starter;
-import static mindustry.type.ItemStack.list;
+import static arc.struct.Seq.*;
+import static mindustry.content.Planets.*;
 
 public class SectorPresets implements ContentList{
     public static SectorPreset
@@ -20,16 +18,15 @@ public class SectorPresets implements ContentList{
     public void load(){
 
         groundZero = new SectorPreset("groundZero", starter, 15){{
-            baseLaunchCost = list(copper, -60);
-            startingItems = list(copper, 60);
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
+            rules = r -> {
+                r.winWave = 30;
+            };
         }};
 
         saltFlats = new SectorPreset("saltFlats", starter, 101){{
-            startingItems = list(copper, 200, silicon, 200, lead, 200);
-            loadout = Loadouts.basicFoundation;
             conditionWave = 10;
             launchPeriod = 5;
             requirements = with(
@@ -42,8 +39,6 @@ public class SectorPresets implements ContentList{
         }};
 
         frozenForest = new SectorPreset("frozenForest", starter, 86){{
-            loadout = Loadouts.basicFoundation;
-            startingItems = list(copper, 250);
             conditionWave = 10;
             requirements = with(
             new SectorWave(groundZero, 10),
@@ -53,7 +48,6 @@ public class SectorPresets implements ContentList{
         }};
 
         craters = new SectorPreset("craters", starter, 18){{
-            startingItems = list(copper, 100);
             conditionWave = 10;
             requirements = with(
             new SectorWave(frozenForest, 10),
@@ -63,8 +57,6 @@ public class SectorPresets implements ContentList{
         }};
 
         ruinousShores = new SectorPreset("ruinousShores", starter, 19){{
-            loadout = Loadouts.basicFoundation;
-            startingItems = list(copper, 140, lead, 50);
             conditionWave = 20;
             launchPeriod = 20;
             requirements = with(
@@ -78,8 +70,6 @@ public class SectorPresets implements ContentList{
         }};
 
         stainedMountains = new SectorPreset("stainedMountains", starter, 20){{
-            loadout = Loadouts.basicFoundation;
-            startingItems = list(copper, 200, lead, 50);
             conditionWave = 10;
             launchPeriod = 10;
             requirements = with(
@@ -91,7 +81,6 @@ public class SectorPresets implements ContentList{
         }};
 
         fungalPass = new SectorPreset("fungalPass", starter, 21){{
-            startingItems = list(copper, 250, lead, 250, Items.metaglass, 100, Items.graphite, 100);
             requirements = with(
             new SectorWave(stainedMountains, 15),
             //new Unlock(Blocks.daggerFactory),
@@ -102,10 +91,8 @@ public class SectorPresets implements ContentList{
         }};
 
         overgrowth = new SectorPreset("overgrowth", starter, 22){{
-            startingItems = list(copper, 1500, lead, 1000, Items.silicon, 500, Items.metaglass, 250);
             conditionWave = 12;
             launchPeriod = 4;
-            loadout = Loadouts.basicNucleus;
             requirements = with(
             new SectorWave(craters, 40),
             new Launched(fungalPass),
@@ -117,8 +104,6 @@ public class SectorPresets implements ContentList{
         }};
 
         tarFields = new SectorPreset("tarFields", starter, 23){{
-            loadout = Loadouts.basicFoundation;
-            startingItems = list(copper, 250, lead, 100);
             conditionWave = 15;
             launchPeriod = 10;
             requirements = with(
@@ -130,8 +115,6 @@ public class SectorPresets implements ContentList{
         }};
 
         desolateRift = new SectorPreset("desolateRift", starter, 123){{
-            loadout = Loadouts.basicNucleus;
-            startingItems = list(copper, 1000, lead, 1000, Items.graphite, 250, titanium, 250, Items.silicon, 250);
             conditionWave = 3;
             launchPeriod = 2;
             requirements = with(
@@ -143,8 +126,6 @@ public class SectorPresets implements ContentList{
 
 
         nuclearComplex = new SectorPreset("nuclearComplex", starter, 130){{
-            loadout = Loadouts.basicNucleus;
-            startingItems = list(copper, 1250, lead, 1500, Items.silicon, 400, Items.metaglass, 250);
             conditionWave = 30;
             launchPeriod = 15;
             requirements = with(

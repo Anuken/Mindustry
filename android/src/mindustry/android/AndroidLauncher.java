@@ -69,7 +69,7 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public org.mozilla.javascript.Context getScriptContext(){
+            public rhino.Context getScriptContext(){
                 return AndroidRhinoContext.enter(getContext().getCacheDir());
             }
 

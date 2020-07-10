@@ -10,11 +10,12 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.content.*;
-import mindustry.gen.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
@@ -32,12 +33,11 @@ public class PlacementFragment extends Fragment{
     boolean[] categoryEmpty = new boolean[Category.all.length];
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
     ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
-    Block hovered, lastDisplay;
-    Tile lastHover;
-    Tile hoverTile;
+    Block menuHoverBlock;
+    Object lastDisplayState;
+    boolean wasHovered;
     Table blockTable, toggler, topTable;
     ScrollPane blockPane;
-    boolean lastGround;
     boolean blockSelectEnd;
     int blockSelectSeq;
     long blockSelectSeqMillis;
@@ -90,7 +90,7 @@ public class PlacementFragment extends Fragment{
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
         if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
-            Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Building tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
             Object tryConfig = tile == null ? null : tile.config();
 
@@ -115,7 +115,7 @@ public class PlacementFragment extends Fragment{
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
                 if(i > 9) { //select block directionally
-                    Seq<Block> blocks = getByCategory(currentCategory);
+                    Seq<Block> blocks = getUnlockedByCategory(currentCategory);
                     Block currentBlock = getSelectedBlock(currentCategory);
                     for(int j = 0; j < blocks.size; j++){
                         if(blocks.get(j) == currentBlock){
@@ -140,7 +140,7 @@ public class PlacementFragment extends Fragment{
                     }
                 }else if(blockSelectEnd || Time.timeSinceMillis(blockSelectSeqMillis) > Core.settings.getInt("blockselecttimeout")){ //1st number of combo, select category
                     //select only visible categories
-                    if(!getByCategory(Category.all[i]).isEmpty()){
+                    if(!getUnlockedByCategory(Category.all[i]).isEmpty()){
                         currentCategory = Category.all[i];
                         if(input.block != null){
                             input.block = getSelectedBlock(currentCategory);
@@ -158,6 +158,7 @@ public class PlacementFragment extends Fragment{
                         blockSelectEnd = true;
                     }
                     Seq<Block> blocks = getByCategory(currentCategory);
+                    if(!unlocked(blocks.get(i))) return true;
                     input.block = (i < blocks.size) ? blocks.get(i) : null;
                     selectedBlocks.put(currentCategory, input.block);
                     blockSelectSeqMillis = Time.millis();
@@ -203,7 +204,8 @@ public class PlacementFragment extends Fragment{
                     ButtonGroup<ImageButton> group = new ButtonGroup<>();
                     group.setMinCheckCount(0);
 
-                    for(Block block : getByCategory(currentCategory)){
+                    for(Block block : getUnlockedByCategory(currentCategory)){
+                        if(!unlocked(block)) continue;
                         if(index++ % rowWidth == 0){
                             blockTable.row();
                         }
@@ -222,8 +224,8 @@ public class PlacementFragment extends Fragment{
                         button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
-                            Tilec core = player.core();
-                            Color color = (state.rules.infiniteResources || (core != null && (core.items().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
+                            Building core = player.core();
+                            Color color = (state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -232,10 +234,10 @@ public class PlacementFragment extends Fragment{
                             }
                         });
 
-                        button.hovered(() -> hovered = block);
+                        button.hovered(() -> menuHoverBlock = block);
                         button.exited(() -> {
-                            if(hovered == block){
-                                hovered = null;
+                            if(menuHoverBlock == block){
+                                menuHoverBlock = null;
                             }
                         });
                     }
@@ -258,27 +260,32 @@ public class PlacementFragment extends Fragment{
                 frame.table(Tex.buttonEdge2,top -> {
                     topTable = top;
                     top.add(new Table()).growX().update(topTable -> {
+
+                        //find current hovered thing
+                        Displayable hovered = hovered();
+                        Block displayBlock = menuHoverBlock != null ? menuHoverBlock : control.input.block;
+                        Object displayState = displayBlock != null ? displayBlock : hovered;
+                        boolean isHovered = displayBlock == null; //use hovered thing if displayblock is null
+
                         //don't refresh unnecessarily
-                        if((tileDisplayBlock() == null && lastDisplay == getSelected() && !lastGround)
-                        || (tileDisplayBlock() != null && lastHover == hoverTile && lastDisplay == tileDisplayBlock() && lastGround))
-                            return;
+                        //refresh only when the hover state changes, or the displayed block changes
+                        if(wasHovered == isHovered && lastDisplayState == displayState) return;
 
                         topTable.clear();
                         topTable.top().left().margin(5);
 
-                        lastHover = hoverTile;
-                        lastDisplay = getSelected();
-                        lastGround = tileDisplayBlock() != null;
+                        lastDisplayState = displayState;
+                        wasHovered = isHovered;
 
-                        if(lastDisplay != null){ //show selected recipe
-                            lastGround = false;
+                        //show details of selected block, with costs
+                        if(displayBlock != null){
 
                             topTable.table(header -> {
                                 String keyCombo = "";
                                 if(!mobile && Core.settings.getBool("blockselectkeys")){
                                     Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
-                                        if(blocks.get(i) == lastDisplay && (i + 1) / 10 - 1 < blockSelect.length){
+                                        if(blocks.get(i) == displayBlock && (i + 1) / 10 - 1 < blockSelect.length){
                                             keyCombo = Core.bundle.format("placement.blockselectkeys", Core.keybinds.get(blockSelect[currentCategory.ordinal()]).key.toString())
                                                 + (i < 10 ? "" : Core.keybinds.get(blockSelect[(i + 1) / 10 - 1]).key.toString() + ",")
                                                 + Core.keybinds.get(blockSelect[i % 10]).key.toString() + "]";
@@ -288,13 +295,13 @@ public class PlacementFragment extends Fragment{
                                 }
                                 final String keyComboFinal = keyCombo;
                                 header.left();
-                                header.add(new Image(lastDisplay.icon(Cicon.medium))).size(8 * 4);
-                                header.labelWrap(() -> !unlocked(lastDisplay) ? Core.bundle.get("block.unknown") : lastDisplay.localizedName + keyComboFinal)
+                                header.add(new Image(displayBlock.icon(Cicon.medium))).size(8 * 4);
+                                header.labelWrap(() -> !unlocked(displayBlock) ? Core.bundle.get("block.unknown") : displayBlock.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
-                                if(unlocked(lastDisplay)){
+                                if(unlocked(displayBlock)){
                                     header.button("?", Styles.clearPartialt, () -> {
-                                        ui.content.show(lastDisplay);
+                                        ui.content.show(displayBlock);
                                         Events.fire(new BlockInfoEvent());
                                     }).size(8 * 5).padTop(-5).padRight(-5).right().grow().name("blockinfo");
                                 }
@@ -304,16 +311,16 @@ public class PlacementFragment extends Fragment{
                             topTable.table(req -> {
                                 req.top().left();
 
-                                for(ItemStack stack : lastDisplay.requirements){
+                                for(ItemStack stack : displayBlock.requirements){
                                     req.table(line -> {
                                         line.left();
                                         line.image(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
-                                            Tilec core = player.core();
+                                            Building core = player.core();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
-                                            int amount = core.items().get(stack.item);
+                                            int amount = core.items.get(stack.item);
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
 
@@ -324,34 +331,21 @@ public class PlacementFragment extends Fragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if(!lastDisplay.isPlaceable() || !player.isBuilder()){
+                            if(!displayBlock.isPlaceable() || !player.isBuilder()){
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "$unit.nobuild" : lastDisplay.unplaceableMessage()).width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "$unit.nobuild" : displayBlock.unplaceableMessage()).width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }
 
-                        }else if(tileDisplayBlock() != null){ //show selected tile
-                            lastDisplay = tileDisplayBlock();
-                            topTable.table(t -> {
-                                t.left();
-                                t.add(new Image(lastDisplay.getDisplayIcon(hoverTile))).size(8 * 4);
-                                t.labelWrap(lastDisplay.getDisplayName(hoverTile)).left().width(190f).padLeft(5);
-                            }).growX().left();
-                            if(hoverTile.team() == player.team()){
-                                topTable.row();
-                                topTable.table(t -> {
-                                    t.left().defaults().left();
-                                    if(hoverTile.entity != null){
-                                        hoverTile.entity.display(t);
-                                    }
-                                }).left().growX();
-                            }
+                        }else if(hovered != null){
+                            //show hovered item, whatever that may be
+                            hovered.display(topTable);
                         }
                     });
-                }).colspan(3).fillX().visible(() -> getSelected() != null || tileDisplayBlock() != null).touchable(Touchable.enabled);
+                }).colspan(3).fillX().visible(this::hasInfoBox).touchable(Touchable.enabled);
                 frame.row();
                 frame.image().color(Pal.gray).colspan(3).height(4).growX();
                 frame.row();
@@ -384,7 +378,7 @@ public class PlacementFragment extends Fragment{
 
                     //update category empty values
                     for(Category cat : Category.all){
-                        Seq<Block> blocks = getByCategory(cat);
+                        Seq<Block> blocks = getUnlockedByCategory(cat);
                         categoryEmpty[cat.ordinal()] = blocks.isEmpty();
                     }
 
@@ -416,69 +410,57 @@ public class PlacementFragment extends Fragment{
     }
 
     Seq<Category> getCategories(){
-        returnCatArray.clear();
-        returnCatArray.addAll(Category.all);
-        returnCatArray.sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
-        return returnCatArray;
+        return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
     }
 
     Seq<Block> getByCategory(Category cat){
-        returnArray.clear();
-        for(Block block : content.blocks()){
-            if(block.category == cat && block.isVisible() && unlocked(block)){
-                returnArray.add(block);
-            }
-        }
-        returnArray.sort((b1, b2) -> {
-            int locked = -Boolean.compare(unlocked(b1), unlocked(b2));
-            if(locked != 0) return locked;
-            return Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable());
-        });
-        return returnArray;
+        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible());
+    }
+
+    Seq<Block> getUnlockedByCategory(Category cat){
+        return returnArray.selectFrom(content.blocks(), block -> block.category == cat && block.isVisible() && unlocked(block)).sort((b1, b2) -> Boolean.compare(!b1.isPlaceable(), !b2.isPlaceable()));
     }
 
     Block getSelectedBlock(Category cat){
-        if(selectedBlocks.get(cat) == null){
-            selectedBlocks.put(cat, getByCategory(cat).find(this::unlocked));
-        }
-        return selectedBlocks.get(cat);
+        return selectedBlocks.get(cat, () -> getByCategory(cat).find(this::unlocked));
     }
 
     boolean unlocked(Block block){
-        return !state.isCampaign() || data.isUnlocked(block);
+        return block.unlockedNow();
     }
 
-    /** Returns the currently displayed block in the top box. */
-    Block getSelected(){
-        Block toDisplay = null;
+    boolean hasInfoBox(){
+        return control.input.block != null || menuHoverBlock != null || hovered() != null;
+    }
 
+    /** Returns the thing being hovered over. */
+    @Nullable
+    Displayable hovered(){
         Vec2 v = topTable.stageToLocalCoordinates(Core.input.mouse());
 
-        //setup hovering tile
-        if(!Core.scene.hasMouse() && topTable.hit(v.x, v.y, false) == null){
-            hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            if(hoverTile != null && hoverTile.entity != null){
-                hoverTile.entity.updateFlow(true);
+        //if the mouse intersects the table or the UI has the mouse, no hovering can occur
+        if(Core.scene.hasMouse() || topTable.hit(v.x, v.y, false) != null) return null;
+
+        //check for a unit
+        Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal());
+        //if cursor has a unit, display it
+        if(unit != null) return unit;
+
+        //check tile being hovered over
+        Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        if(hoverTile != null){
+            //if the tile has an entity, display it
+            if(hoverTile.build != null){
+                hoverTile.build.updateFlow(true);
+                return hoverTile.build;
             }
-        }else{
-            hoverTile = null;
+
+            //if the tile has a drop, display the drop
+            if(hoverTile.drop() != null){
+                return hoverTile;
+            }
         }
 
-        //block currently selected
-        if(control.input.block != null){
-            toDisplay = control.input.block;
-        }
-
-        //block hovered on in build menu
-        if(hovered != null){
-            toDisplay = hovered;
-        }
-
-        return toDisplay;
-    }
-
-    /** Returns the block currently being hovered over in the world. */
-    Block tileDisplayBlock(){
-        return hoverTile == null ? null : hoverTile.block().synthetic() ? hoverTile.block() : hoverTile.drop() != null  && hoverTile.block() == Blocks.air ? hoverTile.overlay().itemDrop != null ? hoverTile.overlay() : hoverTile.floor() : null;
+        return null;
     }
 }

@@ -21,7 +21,11 @@ public enum Gamemode{
         rules.attackMode = true;
         rules.waves = true;
         rules.waveTimer = true;
-    }, map -> map.teams.contains(state.rules.waveTeam.id) && !map.rules().pvp),
+
+        rules.waveSpacing /= 2f;
+        rules.teams.get(rules.waveTeam).ai = true;
+        rules.teams.get(rules.waveTeam).infiniteResources = true;
+    }, map -> map.teams.contains(state.rules.waveTeam.id)),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;

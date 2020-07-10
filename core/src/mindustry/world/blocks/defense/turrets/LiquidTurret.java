@@ -37,8 +37,8 @@ public class LiquidTurret extends Turret{
         stats.add(BlockStat.ammo, new AmmoListValue<>(ammoTypes));
         consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
             @Override
-            public boolean valid(Tilec entity){
-                return entity.liquids().total() > 0.001f;
+            public boolean valid(Building entity){
+                return entity.liquids.total() > 0.001f;
             }
 
             @Override
@@ -93,7 +93,7 @@ public class LiquidTurret extends Turret{
             shootSound.at(tile);
 
             if(shootShake > 0){
-                Effects.shake(shootShake, shootShake, tile.entity);
+                Effects.shake(shootShake, shootShake, tile.build);
             }
 
             recoil = recoilAmount;
@@ -118,12 +118,12 @@ public class LiquidTurret extends Turret{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return false;
         }
 
         @Override
-        public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
             return ammoTypes.get(liquid) != null
                 && (liquids.current() == liquid || (ammoTypes.containsKey(liquids.current())
                 && liquids.get(liquids.current()) <= ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f));

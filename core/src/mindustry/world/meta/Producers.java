@@ -11,6 +11,6 @@ public class Producers{
     }
 
     interface Produce{
-        void add(Tilec entity);
+        void add(Building entity);
     }
 }

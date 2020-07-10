@@ -64,7 +64,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.hasLiquids && otherblock.outputsLiquid && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
+        return otherblock.hasLiquids && otherblock.outputsLiquid && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         }
 
         @Override
-        public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
             noSleep();
             return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
                 && ((source.relativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());

@@ -48,7 +48,7 @@ public class LaserBulletType extends BulletType{
     }
 
     @Override
-    public void init(Bulletc b){
+    public void init(Bullet b){
         Tmp.v1.trns(b.rotation(), length);
 
         furthest = null;
@@ -65,7 +65,7 @@ public class LaserBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
         float realLength = b.data() == null ? length : (Float)b.data();
 
         float f = Mathf.curve(b.fin(), 0f, 0.2f);
@@ -93,11 +93,11 @@ public class LaserBulletType extends BulletType{
         Draw.reset();
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
-        Drawf.light(b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
+        Drawf.light(b.team(), b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, width * 1.4f * b.fout(), colors[0], 0.6f);
     }
 
     @Override
-    public void drawLight(Bulletc b){
+    public void drawLight(Bullet b){
         //no light drawn here
     }
 }

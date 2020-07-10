@@ -60,8 +60,8 @@ public class SpawnGroup implements Serializable{
      * Creates a unit, and assigns correct values based on this group's data.
      * This method does not add() the unit.
      */
-    public Unitc createUnit(Team team, int wave){
-        Unitc unit = type.create(team);
+    public Unit createUnit(Team team, int wave){
+        Unit unit = type.create(team);
 
         if(effect != null){
             unit.apply(effect, 999999f);

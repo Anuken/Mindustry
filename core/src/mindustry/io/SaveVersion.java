@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -75,6 +76,11 @@ public abstract class SaveVersion extends SaveFileReader{
             state.secinfo.prepare();
         }
 
+        //flush tech node progress
+        for(TechNode node : TechTree.all){
+            node.save();
+        }
+
         writeStringMap(stream, StringMap.of(
             "saved", Time.millis(),
             "playtime", headless ? 0 : control.saves.getTotalPlaytime(),
@@ -91,7 +97,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
-            "playerteam", player == null ? state.rules.defaultTeam.uid : player.team().uid
+            "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id
         ).merge(tags));
     }
 
@@ -106,13 +112,18 @@ public abstract class SaveVersion extends SaveFileReader{
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
 
+        //load time spent on sector into state
+        if(state.rules.sector != null){
+            state.secinfo.internalTimeSpent = state.rules.sector.getStoredTimeSpent();
+        }
+
         if(!headless){
             Tmp.v1.tryFromString(map.get("viewpos"));
             Core.camera.position.set(Tmp.v1);
             player.set(Tmp.v1);
 
             control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType", "<none>"));
-            Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.uid));
+            Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.id));
             if(!net.client() && team != Team.derelict){
                 player.team(team);
             }
@@ -158,15 +169,15 @@ public abstract class SaveVersion extends SaveFileReader{
             stream.writeShort(tile.blockID());
 
             //make note of whether there was an entity here
-            stream.writeBoolean(tile.entity != null);
+            stream.writeBoolean(tile.build != null);
 
             //only write the entity for multiblocks once - in the center
-            if(tile.entity != null){
+            if(tile.build != null){
                 if(tile.isCenter()){
                     stream.writeBoolean(true);
                     writeChunk(stream, true, out -> {
-                        out.writeByte(tile.entity.version());
-                        tile.entity.writeAll(Writes.get(out));
+                        out.writeByte(tile.build.version());
+                        tile.build.writeAll(Writes.get(out));
                     });
                 }else{
                     stream.writeBoolean(false);
@@ -243,7 +254,7 @@ public abstract class SaveVersion extends SaveFileReader{
                             try{
                                 readChunk(stream, true, in -> {
                                     byte revision = in.readByte();
-                                    tile.entity.readAll(Reads.get(in), revision);
+                                    tile.build.readAll(Reads.get(in), revision);
                                 });
                             }catch(Throwable e){
                                 throw new IOException("Failed to read tile entity of block: " + block, e);
@@ -320,10 +331,10 @@ public abstract class SaveVersion extends SaveFileReader{
     public void readContentHeader(DataInput stream) throws IOException{
         byte mapped = stream.readByte();
 
-        MappableContent[][] map = new MappableContent[ContentType.values().length][0];
+        MappableContent[][] map = new MappableContent[ContentType.all.length][0];
 
         for(int i = 0; i < mapped; i++){
-            ContentType type = ContentType.values()[stream.readByte()];
+            ContentType type = ContentType.all[stream.readByte()];
             short total = stream.readShort();
             map[type.ordinal()] = new MappableContent[total];
 

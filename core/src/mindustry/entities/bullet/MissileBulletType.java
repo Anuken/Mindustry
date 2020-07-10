@@ -22,7 +22,7 @@ public class MissileBulletType extends BasicBulletType{
     }
 
     @Override
-    public void update(Bulletc b){
+    public void update(Bullet b){
         super.update(b);
 
         if(Mathf.chanceDelta(0.2)){

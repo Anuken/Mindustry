@@ -37,20 +37,12 @@ public class UnitFactory extends UnitBlock{
         outputsPayload = true;
         rotate = true;
 
-        config(Integer.class, (tile, i) -> {
-            ((UnitFactoryEntity)tile).currentPlan = i < 0 || i >= plans.length ? -1 : i;
-            ((UnitFactoryEntity)tile).progress = 0;
+        config(Integer.class, (UnitFactoryEntity tile, Integer i) -> {
+            tile.currentPlan = i < 0 || i >= plans.length ? -1 : i;
+            tile.progress = 0;
         });
 
-        consumes.add(new ConsumeItemDynamic(e -> {
-            UnitFactoryEntity entity = (UnitFactoryEntity)e;
-
-            if(entity.currentPlan != -1){
-                return plans[entity.currentPlan].requirements;
-            }
-
-            return ItemStack.empty;
-        }));
+        consumes.add(new ConsumeItemDynamic((UnitFactoryEntity e) -> e.currentPlan != -1 ? plans[e.currentPlan].requirements : ItemStack.empty));
     }
 
     @Override
@@ -69,7 +61,7 @@ public class UnitFactory extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((UnitFactoryEntity)entity)::fraction));
+        bars.add("progress", (UnitFactoryEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
     }
 
     @Override
@@ -125,7 +117,7 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
-        public boolean acceptPayload(Tilec source, Payload payload){
+        public boolean acceptPayload(Building source, Payload payload){
             return false;
         }
 
@@ -210,7 +202,7 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return currentPlan != -1 && items.get(item) < getMaximumAccepted(item) &&
                 Structs.contains(plans[currentPlan].requirements, stack -> stack.item == item);
         }

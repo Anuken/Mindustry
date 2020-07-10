@@ -11,13 +11,13 @@ import mindustry.world.*;
 import static mindustry.Vars.tilesize;
 
 public class BlockPayload implements Payload{
-    public Tilec entity;
+    public Building entity;
 
     public BlockPayload(Block block, Team team){
         this.entity = block.newEntity().create(block, team);
     }
 
-    public BlockPayload(Tilec entity){
+    public BlockPayload(Building entity){
         this.entity = entity;
     }
 
@@ -53,7 +53,7 @@ public class BlockPayload implements Payload{
 
     @Override
     public void draw(){
-        Drawf.shadow(entity.x(), entity.y(), entity.block().size * tilesize * 2f);
-        Draw.rect(entity.block().icon(Cicon.full), entity.x(), entity.y());
+        Drawf.shadow(entity.x, entity.y, entity.block().size * tilesize * 2f);
+        Draw.rect(entity.block().icon(Cicon.full), entity.x, entity.y);
     }
 }

@@ -77,15 +77,24 @@ public class ModsDialog extends BaseDialog{
                     t.button("$mod.import.file", Icon.file, bstyle, () -> {
                         dialog.hide();
 
-                        platform.showFileChooser(true, "zip", file -> {
-                            try{
-                                mods.importMod(file);
-                                setup();
-                            }catch(IOException e){
-                                ui.showException(e);
-                                e.printStackTrace();
+                        platform.showMultiFileChooser(file -> {
+                            Runnable go = () -> {
+                                try{
+                                    mods.importMod(file);
+                                    setup();
+                                }catch(IOException e){
+                                    ui.showException(e);
+                                    e.printStackTrace();
+                                }
+                            };
+
+                            //show unsafe jar file warning
+                            if(file.extEquals("jar")){
+                                ui.showConfirm("$warning", "$mod.jarwarn", go);
+                            }else{
+                                go.run();
                             }
-                        });
+                        }, "zip", "jar");
                     }).margin(12f);
 
                     t.row();
@@ -110,7 +119,6 @@ public class ModsDialog extends BaseDialog{
                                             file.delete();
                                             Core.app.post(() -> {
                                                 try{
-                                                    mods.reloadContent();
                                                     setup();
                                                     ui.loadfrag.hide();
                                                 }catch(Throwable e){
@@ -131,8 +139,6 @@ public class ModsDialog extends BaseDialog{
 
                 dialog.show();
             }).margin(margin);
-
-            buttons.button("$mods.reload", Icon.refresh, style, this::reload).margin(margin);
 
             if(!mobile){
                 buttons.button("$mods.openfolder", Icon.link, style, () -> Core.app.openFolder(modDirectory.absolutePath())).margin(margin);
@@ -234,15 +240,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void reload(){
-        ui.loadAnd("$reloading", () -> {
-            mods.eachEnabled(mod -> {
-                if(mod.hasUnmetDependencies()){
-                    ui.showErrorMessage(Core.bundle.format("mod.nowdisabled", mod.name, mod.missingDependencies.toString(", ")));
-                }
-            });
-            mods.reloadContent();
-            setup();
-        });
+        ui.showInfo("$mods.reloadexit", () -> Core.app.exit());
     }
 
     private void showMod(LoadedMod mod){

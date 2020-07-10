@@ -27,12 +27,8 @@ public class Unloader extends Block{
         saveConfig = true;
         itemCapacity = 0;
 
-        config(Item.class, (tile, item) -> {
-            tile.items().clear();
-            ((UnloaderEntity)tile).sortItem = item;
-        });
-
-        configClear(tile -> ((UnloaderEntity)tile).sortItem = null);
+        config(Item.class, (UnloaderEntity tile, Item item) -> tile.sortItem = item);
+        configClear((UnloaderEntity tile) -> tile.sortItem = null);
     }
 
     @Override
@@ -46,28 +42,28 @@ public class Unloader extends Block{
         bars.remove("items");
     }
 
-    public class UnloaderEntity extends TileEntity{
+    public class UnloaderEntity extends Building{
         public Item sortItem = null;
-        public Tilec dumpingTo;
+        public Building dumpingTo;
 
         @Override
         public void updateTile(){
             if(timer(timerUnload, speed / timeScale())){
-                for(Tilec other : proximity){
+                for(Building other : proximity){
                     if(other.interactable(team) && other.block().unloadable && other.block().hasItems
-                        && ((sortItem == null && other.items().total() > 0) || (sortItem != null && other.items().has(sortItem)))){
+                        && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
                         //make sure the item can't be dumped back into this block
                         dumpingTo = other;
 
                         //get item to be taken
-                        Item item = sortItem == null ? other.items().beginTake() : sortItem;
+                        Item item = sortItem == null ? other.items.beginTake() : sortItem;
 
                         //remove item if it's dumped correctly
                         if(put(item)){
                             if(sortItem == null){
-                                other.items().endTake(item);
+                                other.items.endTake(item);
                             }else{
-                                other.items().remove(item, 1);
+                                other.items.remove(item, 1);
                             }
                         }
                     }
@@ -86,11 +82,11 @@ public class Unloader extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>ent().sortItem, item -> configure(item));
+            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>bc().sortItem, item -> configure(item));
         }
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             if(this == other){
                 deselect();
                 configure(null);
@@ -101,7 +97,7 @@ public class Unloader extends Block{
         }
 
         @Override
-        public boolean canDump(Tilec to, Item item){
+        public boolean canDump(Building to, Item item){
             return !(to.block() instanceof StorageBlock) && to != dumpingTo;
         }
 

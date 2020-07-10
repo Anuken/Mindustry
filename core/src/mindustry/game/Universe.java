@@ -4,29 +4,42 @@ import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
-import mindustry.game.SectorInfo.*;
-import mindustry.io.*;
 import mindustry.type.*;
+import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
-/** Updates the campaign universe. Has no relevance to other gamemodes. */
+/** Updates and handles state of the campaign universe. Has no relevance to other gamemodes. */
 public class Universe{
     private long seconds;
     private float secondCounter;
     private int turn;
-    private float turnCounter;
+
+    private Schematic lastLoadout;
+    private Seq<ItemStack> lastLaunchResources = new Seq<>();
 
     public Universe(){
         load();
+
+        //update base coverage on capture
+        Events.on(SectorCaptureEvent.class, e -> {
+            if(state.isCampaign()){
+                state.getSector().planet.updateBaseCoverage();
+            }
+        });
     }
 
+    /** Update regardless of whether the player is in the campaign. */
     public void updateGlobal(){
         //currently only updates one solar system
         updatePlanet(Planets.sun);
+    }
+
+    public int turn(){
+        return turn;
     }
 
     private void updatePlanet(Planet planet){
@@ -40,6 +53,15 @@ public class Universe{
         }
     }
 
+    public void displayTimeEnd(){
+        if(!headless){
+            state.set(State.paused);
+
+            ui.announce("Next turn incoming.");
+        }
+    }
+
+    /** Update planet rotations, global time and relevant state. */
     public void update(){
         secondCounter += Time.delta() / 60f;
 
@@ -53,13 +75,6 @@ public class Universe{
             }
         }
 
-        //update turn state - happens only in-game
-        turnCounter += Time.delta();
-
-        if(turnCounter >= turnDuration){
-            runTurn();
-        }
-
         if(state.hasSector()){
             //update sector light
             float light = state.getSector().getLight();
@@ -71,72 +86,81 @@ public class Universe{
         }
     }
 
-    public int[] getTotalExports(){
-        int[] exports = new int[Vars.content.items().size];
-
-        for(Planet planet : content.planets()){
-            for(Sector sector : planet.sectors){
-
-                //ignore the current sector if the player is in it right now
-                if(sector.hasBase() && !sector.isBeingPlayed()){
-                    SaveMeta meta = sector.save.meta;
-
-                    for(ObjectMap.Entry<Item, ExportStat> entry : meta.secinfo.export){
-                        //total is calculated by  items/sec (value) * turn duration in seconds
-                        int total = (int)(entry.value.mean * turnDuration / 60f);
-
-                        exports[entry.key.id] += total;
-                    }
-                }
-            }
-        }
-
-        return exports;
+    public Seq<ItemStack> getLaunchResources(){
+        lastLaunchResources = Core.settings.getJson("launch-resources", Seq.class, ItemStack.class, Seq::new);
+        return lastLaunchResources;
     }
 
-    public void runTurns(int amount){
-        for(int i = 0; i < amount; i++){
-            runTurn();
-        }
+    public void updateLaunchResources(Seq<ItemStack> stacks){
+        this.lastLaunchResources = stacks;
+        Core.settings.putJson("launch-resources", ItemStack.class, lastLaunchResources);
     }
 
-    /** Runs a turn once. Resets turn counter. */
+    /** Updates selected loadout for future deployment. */
+    public void updateLoadout(CoreBlock block, Schematic schem){
+        Core.settings.put("lastloadout-" + block.name, schem.file == null ? "" : schem.file.nameWithoutExtension());
+        lastLoadout = schem;
+    }
+
+    public Schematic getLastLoadout(){
+        if(lastLoadout == null) lastLoadout = Loadouts.basicShard;
+        return lastLoadout;
+    }
+
+    /** @return the last selected loadout for this specific core type. */
+    public Schematic getLoadout(CoreBlock core){
+        //for tools - schem
+        if(schematics == null) return Loadouts.basicShard;
+
+        //find last used loadout file name
+        String file = Core.settings.getString("lastloadout-" + core.name, "");
+
+        //use default (first) schematic if not found
+        Seq<Schematic> all = schematics.getLoadouts(core);
+        Schematic schem = all.find(s -> s.file != null && s.file.nameWithoutExtension().equals(file));
+
+        return schem == null ? all.first() : schem;
+    }
+
+    /** Runs possible events. Resets event counter. */
     public void runTurn(){
-        turn ++;
-        turnCounter = 0;
+        turn++;
 
-        //TODO EVENTS + a notification
+        int newSecondsPassed = (int)(turnDuration / 60);
 
-        //increment turns passed for sectors with waves
-        //TODO a turn passing may break the core; detect this, send an event and mark the sector as having no base!
+        //update relevant sectors
         for(Planet planet : content.planets()){
             for(Sector sector : planet.sectors){
-                //attacks happen even for sectors without bases - stuff still gets destroyed
-                if(!sector.isBeingPlayed() && sector.hasSave() && sector.hasWaves()){
-                    sector.setTurnsPassed(sector.getTurnsPassed() + 1);
+                if(sector.hasSave()){
+                    int spent = (int)(sector.getTimeSpent() / 60);
+                    int actuallyPassed = Math.max(newSecondsPassed - spent, 0);
+
+                    //increment seconds passed for this sector by the time that just passed with this turn
+                    if(!sector.isBeingPlayed()){
+                        sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
+
+                        //check if the sector has been attacked too many times...
+                        if(sector.hasBase() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                            //fire event for losing the sector
+                            Events.fire(new SectorLoseEvent(sector));
+
+                            //if so, just delete the save for now. it's lost.
+                            //TODO don't delete it later maybe
+                            sector.save.delete();
+                            sector.save = null;
+                        }
+                    }
+
+                    //reset time spent to 0
+                    sector.setTimeSpent(0f);
                 }
             }
         }
-
-        //calculate passive item generation
-        int[] exports = getTotalExports();
-        for(int i = 0; i < exports.length; i++){
-            data.addItem(content.item(i), exports[i]);
-        }
+        //TODO events
 
         Events.fire(new TurnEvent());
-    }
 
-    public int getTurn(){
-        return turn;
-    }
-
-    public int getSectorsAttacked(){
-        int count = 0;
-        for(Planet planet : content.planets()){
-            count += planet.sectors.count(s -> !s.isBeingPlayed() && s.hasSave() && s.hasWaves());
-        }
-        return count;
+        save();
     }
 
     public float secondsMod(float mod, float scale){
@@ -154,13 +178,11 @@ public class Universe{
     private void save(){
         Core.settings.put("utime", seconds);
         Core.settings.put("turn", turn);
-        Core.settings.put("turntime", turnCounter);
     }
 
     private void load(){
         seconds = Core.settings.getLong("utime");
         turn = Core.settings.getInt("turn");
-        turnCounter = Core.settings.getFloat("turntime");
     }
 
 }

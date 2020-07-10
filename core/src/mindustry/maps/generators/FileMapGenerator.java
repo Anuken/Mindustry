@@ -34,7 +34,7 @@ public class FileMapGenerator implements WorldGenerator{
             if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && state.hasSector()){
                 for(Content content : state.getSector().data.resources){
                     if(content instanceof Item && Mathf.chance(0.3)){
-                        tile.entity.items().add((Item)content, Math.min(Mathf.random(500), tile.block().itemCapacity));
+                        tile.build.items.add((Item)content, Math.min(Mathf.random(500), tile.block().itemCapacity));
                     }
                 }
             }
@@ -54,15 +54,9 @@ public class FileMapGenerator implements WorldGenerator{
             }
 
             if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
-                //TODO PLACE THE (CORRECT) LOADOUT
-                Schematics.placeLoadout(Loadouts.basicShard, tile.x, tile.y);
+                Schematics.placeLaunchLoadout(tile.x, tile.y);
                 anyCores = true;
             }
-
-            //add random decoration
-            //if(Mathf.chance(0.015) && !tile.floor().isLiquid && tile.block() == Blocks.air){
-            //    tile.setBlock(tile.floor().decoration);
-            //}
         }
 
         if(!anyCores){

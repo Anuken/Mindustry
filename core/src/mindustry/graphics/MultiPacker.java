@@ -12,7 +12,7 @@ public class MultiPacker implements Disposable{
     public MultiPacker(){
         for(int i = 0; i < packers.length; i++){
             int pageSize = 2048;
-            packers[i] = new PixmapPacker(pageSize, pageSize, Format.RGBA8888, 2, true);
+            packers[i] = new PixmapPacker(pageSize, pageSize, Format.rgba8888, 2, true);
         }
     }
 

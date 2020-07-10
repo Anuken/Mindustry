@@ -22,7 +22,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
         float w = 11f, h = 13f;
 
         Draw.color(Pal.bulletYellowBack);
@@ -35,7 +35,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void update(Bulletc b){
+    public void update(Bullet b){
         //data MUST be an instance of DriverBulletData
         if(!(b.data() instanceof DriverBulletData)){
             hit(b);
@@ -66,7 +66,7 @@ public class MassDriverBolt extends BulletType{
             if(Angles.near(angleTo, baseAngle, 2f)){
                 intersect = true;
                 //snap bullet position back; this is used for low-FPS situations
-                b.set(data.to.x() + Angles.trnsx(baseAngle, hitDst), data.to.y() + Angles.trnsy(baseAngle, hitDst));
+                b.set(data.to.x + Angles.trnsx(baseAngle, hitDst), data.to.y + Angles.trnsy(baseAngle, hitDst));
             }
         }
 
@@ -81,7 +81,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void despawned(Bulletc b){
+    public void despawned(Bullet b){
         super.despawned(b);
 
         if(!(b.data() instanceof DriverBulletData)) return;
@@ -98,7 +98,7 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void hit(Bulletc b, float hitx, float hity){
+    public void hit(Bullet b, float hitx, float hity){
         super.hit(b, hitx, hity);
         despawned(b);
     }

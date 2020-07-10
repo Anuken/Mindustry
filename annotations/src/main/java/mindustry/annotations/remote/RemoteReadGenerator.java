@@ -1,14 +1,12 @@
 package mindustry.annotations.remote;
 
+import arc.struct.*;
 import arc.util.io.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
 import mindustry.annotations.util.TypeIOResolver.*;
 
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.*;
-import java.lang.reflect.*;
-import java.util.*;
 
 /** Generates code for reading remote invoke packets on the client and server. */
 public class RemoteReadGenerator{
@@ -26,7 +24,7 @@ public class RemoteReadGenerator{
      * @param packageName Full target package name.
      * @param needsPlayer Whether this read method requires a reference to the player sender.
      */
-    public void generateFor(List<MethodEntry> entries, String className, String packageName, boolean needsPlayer) throws Exception{
+    public void generateFor(Seq<MethodEntry> entries, String className, String packageName, boolean needsPlayer) throws Exception{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
         classBuilder.addJavadoc(RemoteProcess.autogenWarning);
@@ -39,14 +37,8 @@ public class RemoteReadGenerator{
         .returns(void.class);
 
         if(needsPlayer){
-            //since the player type isn't loaded yet, creating a type def is necessary
-            //this requires reflection since the TypeName constructor is private for some reason
-            Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
-            cons.setAccessible(true);
-
-            TypeName playerType = cons.newInstance("mindustry.gen.Playerc");
             //add player parameter
-            readMethod.addParameter(playerType, "player");
+            readMethod.addParameter(ClassName.get(packageName, "Player"), "player");
         }
 
         CodeBlock.Builder readBlock = CodeBlock.builder(); //start building block of code inside read method
@@ -111,7 +103,7 @@ public class RemoteReadGenerator{
             if(entry.forward && entry.where.isServer && needsPlayer){
                 //call forwarded method
                 readBlock.addStatement(packageName + "." + entry.className + "." + entry.element.getSimpleName() +
-                "__forward(player.con()" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
+                "__forward(player.con" + (varResult.length() == 0 ? "" : ", ") + varResult.toString() + ")");
             }
 
             readBlock.nextControlFlow("catch (java.lang.Exception e)");

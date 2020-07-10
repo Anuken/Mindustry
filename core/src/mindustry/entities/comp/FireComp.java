@@ -14,7 +14,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 @EntityDef(value = {Firec.class}, pooled = true)
-@Component
+@Component(base = true)
 abstract class FireComp implements Timedc, Posc, Firec{
     private static final float spreadChance = 0.05f, fireballChance = 0.07f;
 
@@ -49,7 +49,7 @@ abstract class FireComp implements Timedc, Posc, Firec{
             return;
         }
 
-        Tilec entity = tile.entity;
+        Building entity = tile.build;
         boolean damage = entity != null;
 
         float flammability = baseFlammability + puddleFlammability;
@@ -59,7 +59,7 @@ abstract class FireComp implements Timedc, Posc, Firec{
         }
 
         if(baseFlammability < 0 || block != tile.block()){
-            baseFlammability = tile.entity == null ? 0 : tile.entity.getFlammability();
+            baseFlammability = tile.build == null ? 0 : tile.build.getFlammability();
             block = tile.block();
         }
 
@@ -97,6 +97,6 @@ abstract class FireComp implements Timedc, Posc, Firec{
 
     @Override
     public void afterRead(){
-        Fires.register(this);
+        Fires.register(base());
     }
 }

@@ -110,19 +110,19 @@ public abstract class BulletType extends Content{
         return speed * lifetime * (1f - drag);
     }
 
-    public boolean collides(Bulletc bullet, Tilec tile){
+    public boolean collides(Bullet bullet, Building tile){
         return true;
     }
 
-    public void hitTile(Bulletc b, Tilec tile){
+    public void hitTile(Bullet b, Building tile){
         hit(b);
     }
 
-    public void hit(Bulletc b){
+    public void hit(Bullet b){
         hit(b, b.getX(), b.getY());
     }
 
-    public void hit(Bulletc b, float x, float y){
+    public void hit(Bullet b, float x, float y){
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
@@ -153,7 +153,7 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void despawned(Bulletc b){
+    public void despawned(Bullet b){
         despawnEffect.at(b.getX(), b.getY(), b.rotation());
         hitSound.at(b);
 
@@ -162,14 +162,14 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
     }
 
-    public void drawLight(Bulletc b){
-        Drawf.light(b, lightRadius, lightColor, lightOpacity);
+    public void drawLight(Bullet b){
+        Drawf.light(b.team(), b, lightRadius, lightColor, lightOpacity);
     }
 
-    public void init(Bulletc b){
+    public void init(Bullet b){
         if(killShooter && b.owner() instanceof Healthc){
             ((Healthc)b.owner()).kill();
         }
@@ -179,7 +179,7 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void update(Bulletc b){
+    public void update(Bullet b){
         if(homingPower > 0.0001f){
             Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
@@ -197,32 +197,32 @@ public abstract class BulletType extends Content{
         return ContentType.bullet;
     }
 
-    public Bulletc create(Teamc owner, float x, float y, float angle){
+    public Bullet create(Teamc owner, float x, float y, float angle){
         return create(owner, owner.team(), x, y, angle);
     }
 
-    public Bulletc create(Entityc owner, Team team, float x, float y, float angle){
+    public Bullet create(Entityc owner, Team team, float x, float y, float angle){
         return create(owner, team, x, y, angle, 1f);
     }
 
-    public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl){
+    public Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl){
         return create(owner, team, x, y, angle, -1, velocityScl, 1f, null);
     }
 
-    public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+    public Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
         return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null);
     }
 
-    public Bulletc create(Bulletc parent, float x, float y, float angle){
+    public Bullet create(Bullet parent, float x, float y, float angle){
         return create(parent.owner(), parent.team(), x, y, angle);
     }
 
-    public Bulletc create(Bulletc parent, float x, float y, float angle, float velocityScl){
+    public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
         return create(parent.owner(), parent.team(), x, y, angle, velocityScl);
     }
 
-    public Bulletc create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
-        Bulletc bullet = BulletEntity.create();
+    public Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
+        Bullet bullet = Bullet.create();
         bullet.type(this);
         bullet.owner(owner);
         bullet.team(team);

@@ -10,22 +10,22 @@ import mindustry.type.*;
 import mindustry.world.*;
 
 public class Puddles{
-    private static final IntMap<Puddlec> map = new IntMap<>();
+    private static final IntMap<Puddle> map = new IntMap<>();
 
     public static final float maxLiquid = 70f;
 
-    /** Deposists a Puddlec between tile and source. */
+    /** Deposists a Puddle between tile and source. */
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount){
         deposit(tile, source, liquid, amount, 0);
     }
 
-    /** Deposists a Puddlec at a tile. */
+    /** Deposists a Puddle at a tile. */
     public static void deposit(Tile tile, Liquid liquid, float amount){
         deposit(tile, tile, liquid, amount, 0);
     }
 
-    /** Returns the Puddlec on the specified tile. May return null. */
-    public static Puddlec get(Tile tile){
+    /** Returns the Puddle on the specified tile. May return null. */
+    public static Puddle get(Tile tile){
         return map.get(tile.pos());
     }
 
@@ -36,7 +36,7 @@ public class Puddles{
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile,
             (tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f);
 
-            Puddlec p = map.get(tile.pos());
+            Puddle p = map.get(tile.pos());
 
             if(generation == 0 && p != null && p.lastRipple() <= Time.time() - 40f){
                 Fx.ripple.at((tile.worldx() + source.worldx()) / 2f, (tile.worldy() + source.worldy()) / 2f, 1f, tile.floor().liquidDrop.color);
@@ -45,9 +45,9 @@ public class Puddles{
             return;
         }
 
-        Puddlec p = map.get(tile.pos());
+        Puddle p = map.get(tile.pos());
         if(p == null){
-            Puddlec puddle = PuddleEntity.create();
+            Puddle puddle = Puddle.create();
             puddle.tile(tile);
             puddle.liquid(liquid);
             puddle.amount(amount);
@@ -73,7 +73,7 @@ public class Puddles{
         map.remove(tile.pos());
     }
 
-    public static void register(Puddlec puddle){
+    public static void register(Puddle puddle){
         map.put(puddle.tile().pos(), puddle);
     }
 
@@ -85,12 +85,12 @@ public class Puddles{
             if(Mathf.chance(0.006 * amount)){
                 Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), -1f, 1f, 1f);
             }
-        }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot Puddlec
+        }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot Puddle
             if(Mathf.chance(0.5f * amount)){
                 Fx.steam.at(x, y);
             }
             return -0.1f * amount;
-        }else if(liquid.temperature > 0.7f && dest.temperature < 0.55f){ //hot liquid poured onto cold Puddlec
+        }else if(liquid.temperature > 0.7f && dest.temperature < 0.55f){ //hot liquid poured onto cold Puddle
             if(Mathf.chance(0.8f * amount)){
                 Fx.steam.at(x, y);
             }

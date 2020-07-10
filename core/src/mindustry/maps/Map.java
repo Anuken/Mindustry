@@ -80,7 +80,6 @@ public class Map implements Comparable<Map>, Publishable{
 
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
-        Vars.data.modified();
     }
 
     /** Returns the result of applying this map's rules to the specified gamemode.*/
@@ -203,7 +202,7 @@ public class Map implements Comparable<Map>, Publishable{
 
     @Override
     public boolean prePublish(){
-        tags.put("author", player.name());
+        tags.put("author", player.name);
         ui.editor.editor.getTags().put("author", tags.get("author"));
         ui.editor.save();
 

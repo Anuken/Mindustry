@@ -1,15 +1,14 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.game.*;
@@ -52,7 +51,7 @@ public class MapGenerateDialog extends BaseDialog{
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
-        protected void changeEntity(Team team, Prov<Tilec> entityprov){
+        protected void changeEntity(Team team, Prov<Building> entityprov){
 
         }
     };
@@ -158,7 +157,7 @@ public class MapGenerateDialog extends BaseDialog{
             texture = null;
         }
 
-        pixmap = new Pixmap(editor.width() / scaling, editor.height() / scaling, Format.RGBA8888);
+        pixmap = new Pixmap(editor.width() / scaling, editor.height() / scaling);
         texture = new Texture(pixmap);
 
         cont.clear();
@@ -410,7 +409,7 @@ public class MapGenerateDialog extends BaseDialog{
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
-            this.team = team.id;
+            this.team = (byte)team.id;
             this.rotation = (byte)rotation;
         }
 

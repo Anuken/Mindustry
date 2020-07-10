@@ -68,13 +68,13 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     /** Check and assign targets for a specific position. */
     void checkTargets(float x, float y){
-        Unitc unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead());
+        Unit unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead);
 
         if(unit != null){
             player.miner().mineTile(null);
             target = unit;
         }else{
-            Tilec tile = world.entWorld(x, y);
+            Building tile = world.entWorld(x, y);
 
             if(tile != null && player.team().isEnemy(tile.team())){
                 player.miner().mineTile(null);
@@ -454,7 +454,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 lastLineY = tileY;
             }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
                 //shoot on touch down when in keyboard mode
-                isShooting = true;
+                player.shooting = true;
             }
         }
 
@@ -496,9 +496,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Tile tile = tileAt(screenX, screenY);
 
-            if(tile == null || tile.entity == null) return false;
+            if(tile == null || tile.build == null) return false;
 
-            tryDropItems(tile.entity, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+            tryDropItems(tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
@@ -542,7 +542,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
-        Tile linked = cursor.entity == null ? cursor : cursor.entity.tile();
+        Tile linked = cursor.build == null ? cursor : cursor.build.tile();
 
         checkTargets(worldx, worldy);
 
@@ -555,7 +555,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));
-        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.entity)){
+        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.build)){
             tryBeginMine(cursor);
         }
 
@@ -589,11 +589,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(Core.settings.getBool("keyboard")){
             if(Core.input.keyRelease(Binding.select)){
-                isShooting = false;
+                player.shooting = false;
             }
 
-            if(isShooting && !canShoot()){
-                isShooting = false;
+            if(player.shooting && !canShoot()){
+                player.shooting = false;
             }
         }
 

@@ -157,7 +157,7 @@ public class DefaultWaves{
                 spacing = 3;
             }},
 
-            new SpawnGroup(UnitTypes.chaosArray){{
+            new SpawnGroup(UnitTypes.siegeArray){{
                 begin = 41;
                 unitAmount = 1;
                 unitScaling = 1;

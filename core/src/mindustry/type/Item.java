@@ -12,8 +12,6 @@ import static mindustry.Vars.content;
 public class Item extends UnlockableContent{
     public final Color color;
 
-    /** type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}. */
-    public ItemType type = ItemType.resource;
     /** how explosive this item is. */
     public float explosiveness = 0f;
     /** flammability above 0.3 makes this eleigible for item burners. */

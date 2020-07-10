@@ -28,8 +28,8 @@ public class DirectConsumerTests extends PowerTestFixture{
             consumes.power(requestedPower);
             consumes.items(new ItemStack(Items.silicon, 30), new ItemStack(Items.lead, 30));
         }});
-        consumerTile.entity.items().add(Items.silicon, siliconAmount);
-        consumerTile.entity.items().add(Items.lead, leadAmount);
+        consumerTile.entity.items.add(Items.silicon, siliconAmount);
+        consumerTile.entity.items.add(Items.lead, leadAmount);
 
         Tile producerTile = createFakeTile(2, 0, createFakeProducerBlock(producedPower));
         producerTile.<PowerGenerator.GeneratorEntity>ent().productionEfficiency = 1f;
@@ -41,6 +41,6 @@ public class DirectConsumerTests extends PowerTestFixture{
         consumerTile.entity.update();
         graph.update();
 
-        assertEquals(expectedSatisfaction, consumerTile.entity.power().status);
+        assertEquals(expectedSatisfaction, consumerTile.entity.power.status);
     }*/
 }

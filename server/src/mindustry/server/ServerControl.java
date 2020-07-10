@@ -137,7 +137,7 @@ public class ServerControl implements ApplicationListener{
             Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
             nextMapOverride = null;
             if(map != null){
-                Call.onInfoMessage((state.rules.pvp
+                Call.infoMessage((state.rules.pvp
                 ? "[yellow]The " + event.winner.name + " team is victorious![]" : "[scarlet]Game over![]")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
@@ -290,7 +290,7 @@ public class ServerControl implements ApplicationListener{
 
                 if(Groups.player.size() > 0){
                     info("  &lyPlayers: @", Groups.player.size());
-                    for(Playerc p : Groups.player){
+                    for(Player p : Groups.player){
                         info("    &y@ / @", p.name(), p.uuid());
                     }
                 }else{
@@ -395,7 +395,7 @@ public class ServerControl implements ApplicationListener{
                 }
 
                 Core.settings.put("globalrules", base.toString());
-                Call.onSetRules(state.rules);
+                Call.setRules(state.rules);
             }
         });
 
@@ -418,9 +418,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(Item item : content.items()){
-                if(item.type == ItemType.material){
-                    state.teams.cores(team).first().items().set(item, state.teams.cores(team).first().block().itemCapacity);
-                }
+                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block().itemCapacity);
             }
 
             info("Core filled.");
@@ -577,7 +575,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Playerc target = Groups.player.find(p -> p.name().equals(arg[0]));
+            Player target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
                 Call.sendMessage("[scarlet] " + target.name() + "[scarlet] has been kicked by the server.");
@@ -593,7 +591,7 @@ public class ServerControl implements ApplicationListener{
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
             }else if(arg[0].equals("name")){
-                Playerc target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+                Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
                 if(target != null){
                     netServer.admins.banPlayer(target.uuid());
                     info("Banned.");
@@ -607,10 +605,10 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid type.");
             }
 
-            for(Playerc player : Groups.player){
+            for(Player player : Groups.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
-                    Call.sendMessage("[scarlet] " + player.name() + " has been banned.");
-                    player.con().kick(KickReason.banned);
+                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
+                    player.con.kick(KickReason.banned);
                 }
             }
         });
@@ -677,7 +675,7 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Playerc playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+            Player playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
             if(playert != null){
                 target = playert.getInfo();
             }else{
@@ -716,7 +714,7 @@ public class ServerControl implements ApplicationListener{
                 info("No players are currently in the server.");
             }else{
                 info("&lyPlayers: @", Groups.player.size());
-                for(Playerc user : Groups.player){
+                for(Player user : Groups.player){
                     PlayerInfo userInfo = user.getInfo();
                     info(" &lm @ /  ID: '@' / IP: '@' / Admin: '@'", userInfo.lastName, userInfo.id, userInfo.lastIP, userInfo.admin);
                 }
@@ -879,21 +877,21 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-            Seq<Playerc> players = new Seq<>();
-            for(Playerc p : Groups.player){
+            Seq<Player> players = new Seq<>();
+            for(Player p : Groups.player){
                 players.add(p);
                 p.clearUnit();
             }
             
             logic.reset();
 
-            Call.onWorldDataBegin();
+            Call.worldDataBegin();
             run.run();
             state.rules = state.map.applyRules(lastMode);
             logic.play();
 
-            for(Playerc p : players){
-                if(p.con() == null) continue;
+            for(Player p : players){
+                if(p.con == null) continue;
 
                 p.reset();
                 if(state.rules.pvp){

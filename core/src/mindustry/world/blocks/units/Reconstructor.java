@@ -41,7 +41,7 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((ReconstructorEntity)entity)::fraction));
+        bars.add("progress", (ReconstructorEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
-        public boolean acceptPayload(Tilec source, Payload payload){
+        public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null
                 && relativeTo(source) != rotation()
                 && payload instanceof UnitPayload

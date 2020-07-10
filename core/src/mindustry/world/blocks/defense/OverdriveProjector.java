@@ -60,14 +60,14 @@ public class OverdriveProjector extends Block{
         }
     }
 
-    public class OverdriveEntity extends TileEntity{
+    public class OverdriveEntity extends Building{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
+            Drawf.light(team, x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
         }
 
         @Override

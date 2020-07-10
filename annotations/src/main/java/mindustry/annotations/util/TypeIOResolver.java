@@ -29,7 +29,7 @@ public class TypeIOResolver{
                     }else if(params.size == 1 && params.first().tname().toString().equals("arc.util.io.Reads") && !meth.isVoid()){
                         //1 param, one is reader, returns type
                         out.readers.put(fix(meth.retn().toString()), type.fullName() + "." + meth.name());
-                    }else if(params.size == 2 && params.first().tname().toString().equals("arc.util.io.Reads") && !meth.isVoid() && meth.ret() == meth.params().get(1).mirror()){
+                    }else if(params.size == 2 && params.first().tname().toString().equals("arc.util.io.Reads") && !meth.isVoid() && meth.ret().equals(meth.params().get(1).mirror())){
                         //2 params, one is reader, other is type, returns type - these are made to reduce garbage allocated
                         out.mutatorReaders.put(fix(meth.retn().toString()), type.fullName() + "." + meth.name());
                     }

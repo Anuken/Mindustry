@@ -4,7 +4,6 @@ import com.badlogicgames.packr.PackrConfig
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "mindustry.desktop.DesktopLauncher"

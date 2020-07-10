@@ -22,7 +22,7 @@ public class PhysicsProcess implements AsyncProcess{
 
     public PhysicsProcess(){
         def = new BodyDef();
-        def.type = BodyType.DynamicBody;
+        def.type = BodyType.dynamicBody;
 
         //currently only enabled for units
         group = Groups.unit;

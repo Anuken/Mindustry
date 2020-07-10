@@ -58,7 +58,6 @@ public class LoadoutDialog extends BaseDialog{
         this.updater = updater;
         this.capacity = capacity;
         this.hider = hider;
-        //this.filter = filter;
         show();
     }
 
@@ -107,8 +106,7 @@ public class LoadoutDialog extends BaseDialog{
 
     private void reseed(){
         this.stacks = originalStacks.map(ItemStack::copy);
-        this.stacks.addAll(content.items().select(i -> i.type == ItemType.material &&
-                !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
+        this.stacks.addAll(content.items().select(i -> !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
         this.stacks.sort(Structs.comparingInt(s -> s.item.id));
     }
 

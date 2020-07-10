@@ -24,10 +24,10 @@ public class LightBlock extends Block{
         configurable = true;
         saveConfig = true;
 
-        config(Integer.class, (tile, value) -> ((LightEntity)tile).color = value);
+        config(Integer.class, (LightEntity tile, Integer value) -> tile.color = value);
     }
 
-    public class LightEntity extends TileEntity{
+    public class LightEntity extends Building{
         public int color = Pal.accent.rgba();
 
         @Override
@@ -50,7 +50,7 @@ public class LightBlock extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, radius, Tmp.c1.set(color), brightness * efficiency());
+            Drawf.light(team, x, y, radius, Tmp.c1.set(color), brightness * efficiency());
         }
 
         @Override

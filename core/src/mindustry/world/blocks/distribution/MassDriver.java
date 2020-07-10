@@ -42,8 +42,8 @@ public class MassDriver extends Block{
         hasPower = true;
         outlineIcon = true;
         //point2 is relative
-        config(Point2.class, (tile, point) -> ((MassDriverEntity)tile).link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
-        config(Integer.class, (tile, point) -> ((MassDriverEntity)tile).link = point);
+        config(Point2.class, (MassDriverEntity tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
+        config(Integer.class, (MassDriverEntity tile, Integer point) -> tile.link = point);
     }
 
     @Override
@@ -53,18 +53,18 @@ public class MassDriver extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize, y*tilesize, range, Pal.accent);
+        Drawf.dashCircle(x * tilesize, y * tilesize, range, Pal.accent);
 
         //check if a mass driver is selected while placing this driver
         if(!control.input.frag.config.isShown()) return;
-        Tilec selected = control.input.frag.config.getSelectedTile();
-        if(selected == null || !(selected.block() instanceof MassDriver) || !(selected.dst(x * tilesize, y * tilesize) <= range)) return;
+        Building selected = control.input.frag.config.getSelectedTile();
+        if(selected == null || !(selected.block() instanceof MassDriver) || !(selected.within(x * tilesize, y * tilesize, range))) return;
 
         //if so, draw a dotted line towards it while it is in range
         float sin = Mathf.absin(Time.time(), 6f, 1f);
-        Tmp.v1.set(x * tilesize + offset(), y * tilesize + offset()).sub(selected.x(), selected.y()).limit((size / 2f + 1) * tilesize + sin + 0.5f);
+        Tmp.v1.set(x * tilesize + offset(), y * tilesize + offset()).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
-        x1 = selected.x() + Tmp.v1.x, y1 = selected.y() + Tmp.v1.y;
+            x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
         int segs = (int)(selected.dst(x * tilesize, y * tilesize) / tilesize);
 
         Lines.stroke(4f, Pal.gray);
@@ -85,7 +85,7 @@ public class MassDriver extends Block{
         }
     }
 
-    public class MassDriverEntity extends TileEntity{
+    public class MassDriverEntity extends Building{
         int link = -1;
         float rotation = 90;
         float reload = 0f;
@@ -98,12 +98,12 @@ public class MassDriver extends Block{
 
         @Override
         public void updateTile(){
-            Tilec link = world.ent(this.link);
+            Building link = world.ent(this.link);
             boolean hasLink = linkValid();
 
             //reload regardless of state
             if(reload > 0f){
-                reload = Mathf.clamp(reload - delta() / reloadTime * efficiency());
+                reload = Mathf.clamp(reload - edelta() / reloadTime);
             }
 
             //cleanup waiting shooters that are not valid
@@ -151,7 +151,7 @@ public class MassDriver extends Block{
 
                 if(
                 items.total() >= minDistribute && //must shoot minimum amount of items
-                link.block().itemCapacity - link.items().total() >= minDistribute //must have minimum amount of space
+                link.block().itemCapacity - link.items.total() >= minDistribute //must have minimum amount of space
                 ){
                     MassDriverEntity other = (MassDriverEntity)link;
                     other.waitingShooters.add(tile);
@@ -212,7 +212,7 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public boolean onConfigureTileTapped(Tilec other){
+        public boolean onConfigureTileTapped(Building other){
             if(this == other){
                 configure(-1);
                 return false;
@@ -230,7 +230,7 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             //mass drivers that ouput only cannot accept items
             return items.total() < itemCapacity && linkValid();
         }
@@ -265,7 +265,7 @@ public class MassDriver extends Block{
             Effects.shake(shake, shake, this);
         }
 
-        public void handlePayload(Bulletc bullet, DriverBulletData data){
+        public void handlePayload(Bullet bullet, DriverBulletData data){
             int totalItems = items.total();
 
             //add all the items possible
@@ -290,7 +290,7 @@ public class MassDriver extends Block{
         protected boolean shooterValid(Tile other){
             if(other == null) return true;
             if(!(other.block() instanceof MassDriver)) return false;
-            MassDriverEntity entity = other.ent();
+            MassDriverEntity entity = other.bc();
             return entity.link == tile.pos() && tile.dst(other) <= range;
         }
 

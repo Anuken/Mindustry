@@ -13,6 +13,7 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -21,7 +22,11 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 
-import static arc.Core.bundle;
+import java.io.*;
+import java.util.zip.*;
+
+import static arc.Core.*;
+import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
@@ -107,7 +112,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
                     try{
-                        data.exportData(file);
+                        exportData(file);
                     }catch(Exception e){
                         ui.showException(e);
                     }
@@ -115,7 +120,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }else{
                     platform.showFileChooser(false, "zip", file -> {
                         try{
-                            data.exportData(file);
+                            exportData(file);
                             ui.showInfo("$data.exported");
                         }catch(Exception e){
                             e.printStackTrace();
@@ -129,7 +134,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.button("$data.import", Icon.download, style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                 try{
-                    data.importData(file);
+                    importData(file);
                     Core.app.exit();
                 }catch(IllegalArgumentException e){
                     ui.showErrorMessage("$data.invalid");
@@ -233,7 +238,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
-        game.checkPref("coreselect", false);
         game.checkPref("hints", true);
         if(!mobile){
             game.checkPref("buildautopause", false);
@@ -320,7 +324,11 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("destroyedblocks", true);
         graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
+        if(!mobile){
+            graphics.checkPref("coreitems", false);
+        }
         graphics.checkPref("minimap", !mobile);
+        graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
         if(!mobile){
@@ -333,10 +341,12 @@ public class SettingsMenuDialog extends SettingsDialog{
             graphics.checkPref("animatedshields", !mobile);
         }
         if(!ios){
-            graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
+            graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
         }else{
             Core.settings.put("bloom", false);
         }
+
+
 
         graphics.checkPref("pixelate", false, val -> {
             if(val){
@@ -346,14 +356,14 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         graphics.checkPref("linear", true, b -> {
             for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = b ? TextureFilter.Linear : TextureFilter.Nearest;
+                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
                 tex.setFilter(filter, filter);
             }
         });
 
         if(Core.settings.getBool("linear")){
             for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = TextureFilter.Linear;
+                TextureFilter filter = TextureFilter.linear;
                 tex.setFilter(filter, filter);
             }
         }
@@ -363,6 +373,43 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         graphics.checkPref("flow", true);
+    }
+
+    public void exportData(Fi file) throws IOException{
+        Seq<Fi> files = new Seq<>();
+        files.add(Core.settings.getSettingsFile());
+        files.addAll(customMapDirectory.list());
+        files.addAll(saveDirectory.list());
+        files.addAll(screenshotDirectory.list());
+        files.addAll(modDirectory.list());
+        files.addAll(schematicDirectory.list());
+        String base = Core.settings.getDataDirectory().path();
+
+        try(OutputStream fos = file.write(false, 2048); ZipOutputStream zos = new ZipOutputStream(fos)){
+            for(Fi add : files){
+                if(add.isDirectory()) continue;
+                zos.putNextEntry(new ZipEntry(add.path().substring(base.length())));
+                Streams.copy(add.read(), zos);
+                zos.closeEntry();
+            }
+        }
+    }
+
+    public void importData(Fi file){
+        Fi dest = Core.files.local("zipdata.zip");
+        file.copyTo(dest);
+        Fi zipped = new ZipFi(dest);
+
+        Fi base = Core.settings.getDataDirectory();
+        if(!zipped.child("settings.bin").exists()){
+            throw new IllegalArgumentException("Not valid save data.");
+        }
+
+        //purge existing tmp data, keep everything else
+        tmpDirectory.deleteDirectory();
+
+        zipped.walk(f -> f.copyTo(base.child(f.path())));
+        dest.delete();
     }
 
     private void back(){

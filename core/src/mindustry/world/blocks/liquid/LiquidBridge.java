@@ -26,7 +26,7 @@ public class LiquidBridge extends ItemBridge{
 
             checkIncoming();
 
-            Tilec other = world.ent(link);
+            Building other = world.ent(link);
             if(other == null || !linkValid(tile, other.tile())){
                 dumpLiquid(liquids.current());
             }else{
@@ -54,7 +54,7 @@ public class LiquidBridge extends ItemBridge{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return false;
         }
     }

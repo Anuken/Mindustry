@@ -229,8 +229,7 @@ public class BranchTreeLayout implements TreeLayout{
             TreeNode previousChild = null;
             for(TreeNode w : v.children){
                 firstWalk(w, previousChild);
-                defaultAncestor = apportion(w, defaultAncestor, previousChild,
-                v);
+                defaultAncestor = apportion(w, defaultAncestor, previousChild, v);
                 previousChild = w;
             }
             executeShifts(v);
@@ -257,8 +256,7 @@ public class BranchTreeLayout implements TreeLayout{
         }else if(alignment == TreeAlignment.towardsRoot){
             y = levelStart + levelChangeSign * (getNodeThickness(v) / 2);
         }else{
-            y = levelStart + levelSize - levelChangeSign
-            * (getNodeThickness(v) / 2);
+            y = levelStart + levelSize - levelChangeSign * (getNodeThickness(v) / 2);
         }
 
         if(!levelChangeOnYAxis){

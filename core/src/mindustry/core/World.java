@@ -102,25 +102,25 @@ public class World{
     }
 
     @Nullable
-    public Tile tilec(int x, int y){
+    public Tile Building(int x, int y){
         Tile tile = tiles.get(x, y);
         if(tile == null) return null;
-        if(tile.entity != null) return tile.entity.tile();
+        if(tile.build != null) return tile.build.tile();
         return tile;
     }
 
     @Nullable
-    public Tilec ent(int x, int y){
+    public Building ent(int x, int y){
         Tile tile = tile(x, y);
         if(tile == null) return null;
-        return tile.entity;
+        return tile.build;
     }
 
     @Nullable
-    public Tilec ent(int pos){
+    public Building ent(int pos){
         Tile tile = tile(pos);
         if(tile == null) return null;
-        return tile.entity;
+        return tile.build;
     }
 
     @NonNull
@@ -134,7 +134,7 @@ public class World{
     }
 
     @Nullable
-    public Tilec entWorld(float x, float y){
+    public Building entWorld(float x, float y){
         return ent(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
@@ -144,8 +144,8 @@ public class World{
 
     private void clearTileEntities(){
         for(Tile tile : tiles){
-            if(tile != null && tile.entity != null){
-                tile.entity.remove();
+            if(tile != null && tile.build != null){
+                tile.build.remove();
             }
         }
     }
@@ -166,7 +166,7 @@ public class World{
 
     /**
      * Call to signify the beginning of map loading.
-     * TileChangeEvents will not be fired until endMapLoad().
+     * BuildinghangeEvents will not be fired until endMapLoad().
      */
     public void beginMapLoad(){
         generating = true;
@@ -187,8 +187,8 @@ public class World{
 
             tile.updateOcclusion();
 
-            if(tile.entity != null){
-                tile.entity.updateProximity();
+            if(tile.build != null){
+                tile.build.updateProximity();
             }
         }
 
@@ -230,9 +230,12 @@ public class World{
         loadGenerator(size, size, tiles -> {
             if(sector.preset != null){
                 sector.preset.generator.generate(tiles);
+                sector.preset.rules.get(state.rules); //apply extra rules
             }else{
                 sector.planet.generator.generate(tiles, sector);
             }
+            //just in case
+            state.rules.sector = sector;
         });
 
         //postgenerate for bases
@@ -254,13 +257,10 @@ public class World{
 
         state.rules.weather.clear();
 
-        if(sector.is(SectorAttribute.rainy)){
-            state.rules.weather.add(new WeatherEntry(Weathers.rain));
-        }
+        if(sector.is(SectorAttribute.rainy)) state.rules.weather.add(new WeatherEntry(Weathers.rain));
+        if(sector.is(SectorAttribute.snowy)) state.rules.weather.add(new WeatherEntry(Weathers.snow));
+        if(sector.is(SectorAttribute.desert)) state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
 
-        if(sector.is(SectorAttribute.snowy)){
-            state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        }
     }
 
     public Context filterContext(Map map){
@@ -317,7 +317,7 @@ public class World{
 
     public void notifyChanged(Tile tile){
         if(!generating){
-            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
+            Core.app.post(() -> Events.fire(new BuildinghangeEvent(tile)));
         }
     }
 
@@ -458,13 +458,13 @@ public class World{
             float prev = Mathf.round(angle, step);
             float next = prev + step;
             //raw line length to be translated
-            float length = tiles.width/2f;
+            float length = state.getSector().getSize()/2f;
             float rawDst = Intersector.distanceLinePoint(Tmp.v1.trns(prev, length), Tmp.v2.trns(next, length), Tmp.v3.set(x - tiles.width/2, y - tiles.height/2).rotate(offset)) / Mathf.sqrt3 - 1;
 
             //noise
             rawDst += Noise.noise(x, y, 11f, 7f) + Noise.noise(x, y, 22f, 15f);
 
-            int circleDst = (int)(rawDst - (tiles.width / 2 - circleBlend));
+            int circleDst = (int)(rawDst - (length - circleBlend));
             if(circleDst > 0){
                 dark = Math.max(circleDst / 1f, dark);
             }

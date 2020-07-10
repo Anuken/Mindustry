@@ -18,7 +18,7 @@ public class Shaders{
     public static BlockBuild blockbuild;
     public static @Nullable ShieldShader shield;
     public static UnitBuild build;
-    public static FogShader fog;
+    public static DarknessShader darkness;
     public static LightShader light;
     public static SurfaceShader water, tar, slag;
     public static PlanetShader planet;
@@ -38,7 +38,7 @@ public class Shaders{
             t.printStackTrace();
         }
         build = new UnitBuild();
-        fog = new FogShader();
+        darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
         tar = new SurfaceShader("tar");
@@ -131,9 +131,9 @@ public class Shaders{
 
     }
 
-    public static class FogShader extends LoadShader{
-        public FogShader(){
-            super("fog", "default");
+    public static class DarknessShader extends LoadShader{
+        public DarknessShader(){
+            super("darkness", "default");
         }
     }
 
@@ -178,7 +178,6 @@ public class Shaders{
     }
 
     public static class ShieldShader extends LoadShader{
-        public Color color = Pal.accent.cpy();
 
         public ShieldShader(){
             super("shield", "screenspace");
@@ -188,12 +187,11 @@ public class Shaders{
         public void apply(){
             setUniformf("u_dp", Scl.scl(1f));
             setUniformf("u_time", Time.time() / Scl.scl(1f));
-            setUniformf("u_shieldcolor", color);
             setUniformf("u_offset",
             Core.camera.position.x - Core.camera.width / 2,
             Core.camera.position.y - Core.camera.height / 2);
-            setUniformf("u_texsize", Core.camera.width,
-            Core.camera.height);
+            setUniformf("u_texsize", Core.camera.width, Core.camera.height);
+            setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
         }
     }
 
@@ -203,8 +201,8 @@ public class Shaders{
             super(frag, "screenspace");
 
             Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
-                ((Texture)t).setFilter(TextureFilter.Linear);
-                ((Texture)t).setWrap(TextureWrap.Repeat);
+                ((Texture)t).setFilter(TextureFilter.linear);
+                ((Texture)t).setWrap(TextureWrap.repeat);
             };
         }
 

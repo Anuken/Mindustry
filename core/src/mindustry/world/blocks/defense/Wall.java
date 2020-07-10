@@ -1,14 +1,28 @@
 package mindustry.world.blocks.defense;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class Wall extends Block{
     public int variants = 0;
+
+    public float lightningChance = -0.001f;
+    public float lightningDamage = 20f;
+    public int lightningLength = 17;
+
+    public float maxDamageDeflect = 10f;
+    public boolean flashWhite;
+    public boolean deflect;
 
     public Wall(String name){
         super(name);
@@ -39,10 +53,11 @@ public class Wall extends Block{
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) && health > other.health;
+        return super.canReplace(other) && health > other.health && size == other.size;
     }
 
-    public class WallEntity extends TileEntity{
+    public class WallEntity extends Building{
+        public float hit;
 
         @Override
         public void draw(){
@@ -51,6 +66,60 @@ public class Wall extends Block{
             }else{
                 Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], x, y);
             }
+
+            //draw flashing white overlay if enabled
+            if(flashWhite){
+                if(hit < 0.0001f) return;
+
+                Draw.color(Color.white);
+                Draw.alpha(hit * 0.5f);
+                Draw.blend(Blending.additive);
+                Fill.rect(x, y, tilesize * size, tilesize * size);
+                Draw.blend();
+                Draw.reset();
+
+                hit = Mathf.clamp(hit - Time.delta() / 10f);
+            }
+        }
+
+        @Override
+        public boolean collision(Bullet bullet){
+            super.collision(bullet);
+
+            hit = 1f;
+
+            //create lightning if necessary
+            if(lightningChance > 0){
+                if(Mathf.chance(lightningChance)){
+                    Lightning.create(team(), Pal.surge, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
+                }
+            }
+
+            //deflect bullets if necessary
+            if(deflect){
+                //doesn't reflect powerful bullets
+                if(bullet.damage() > maxDamageDeflect) return true;
+
+                //translate bullet back to where it was upon collision
+                bullet.trns(-bullet.vel().x, -bullet.vel().y);
+
+                float penX = Math.abs(x - bullet.x()), penY = Math.abs(y - bullet.y());
+
+                if(penX > penY){
+                    bullet.vel().x *= -1;
+                }else{
+                    bullet.vel().y *= -1;
+                }
+
+                bullet.owner(this);
+                bullet.team(team);
+                bullet.time(bullet.time() + 1f);
+
+                //disable bullet collision by returning false
+                return false;
+            }
+
+            return true;
         }
     }
 }
