@@ -345,9 +345,7 @@ public class SchematicsDialog extends BaseDialog{
                 for(Entry ent : blocks){
                     int v = ent.value;
                     t.image(Vars.content.block(ent.key).icon(Cicon.small)).left();
-                    t.label(() -> {
-                        return "[lightgray]" + v;
-                    }).left().padLeft(4).padRight(6).padTop(4).padBottom(4);
+                    t.add("[lightgray]" + v).left().padLeft(4).padRight(6).padTop(4).padBottom(4);
 
                     if(++i % 6 == 0){
                         t.row();
