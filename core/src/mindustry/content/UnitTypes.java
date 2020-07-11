@@ -294,8 +294,8 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
-            legCount = 4;
-            legLength = 9f;
+            legCount = 6;
+            legLength = 11f;
             legTrns = 0.6f;
             legMoveSpace = 1.4f;
 
