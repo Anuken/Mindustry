@@ -1535,7 +1535,7 @@ public class Blocks implements ContentList{
                 @Override
                 public void init(Bullet b){
                     for(int i = 0; i < rays; i++){
-                        Damage.collideLine(b, b.team(), hitEffect, b.x, b.y, b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
+                        Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
                     }
                 }
 
@@ -1689,7 +1689,7 @@ public class Blocks implements ContentList{
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.dagger, 200f, with(Items.silicon, 10, Items.lead, 10)),
                 new UnitPlan(UnitTypes.crawler, 200f, with(Items.silicon, 10, Items.blastCompound, 5)),
-                new UnitPlan(UnitTypes.nova, 200f, with(Items.silicon, 20, Items.lead, 10)),
+                new UnitPlan(UnitTypes.nova, 200f, with(Items.silicon, 20, Items.lead, 20, Items.titanium, 20)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1699,7 +1699,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.flare, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.mono, 200f, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.mono, 200f, with(Items.silicon, 15, Items.lead, 15)),
                 //new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
             };
             size = 3;

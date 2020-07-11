@@ -29,8 +29,8 @@ public class UnitTypes implements ContentList{
     //air (no special traits)
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
 
-    //air + building
-    public static @EntityDef({Unitc.class, Builderc.class}) UnitType mono;
+    //air + mining
+    public static @EntityDef({Unitc.class, Minerc.class}) UnitType mono;
 
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType poly;
@@ -363,7 +363,7 @@ public class UnitTypes implements ContentList{
         }};
 
         zenith = new UnitType("zenith"){{
-            health = 220;
+            health = 450;
             speed = 1.9f;
             accel = 0.04f;
             drag = 0.016f;
@@ -376,12 +376,15 @@ public class UnitTypes implements ContentList{
             engineSize = 3f;
 
             weapons.add(new Weapon("zenith-missiles"){{
-                reload = 70f;
+                reload = 32f;
                 x = 7f;
                 rotate = true;
                 shake = 1f;
+                shots = 2;
+                inaccuracy = 5f;
+                velocityRnd = 0.2f;
 
-                bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                bullet = new MissileBulletType(3f, 12){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
@@ -451,20 +454,28 @@ public class UnitTypes implements ContentList{
         mono = new UnitType("mono"){{
             flying = true;
             drag = 0.05f;
-            accel = 0.2f;
+            accel = 0.15f;
             speed = 2f;
-            range = 50f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
+
+            mineTier = 1;
+            mineSpeed = 2.5f;
+
             weapons.add(new Weapon(){{
                 y = 1.5f;
+                x = 0f;
+
                 reload = 40f;
-                x = 0.5f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                bullet = Bullets.healBulletBig;
                 shootSound = Sounds.pew;
+                mirror = false;
+
+                bullet = new HealBulletType(5.2f, 10){{
+                    healPercent = 4f;
+                }};
             }});
         }};
 
@@ -473,29 +484,63 @@ public class UnitTypes implements ContentList{
 
             flying = true;
             drag = 0.05f;
-            speed = 3f;
+            speed = 2f;
             rotateSpeed = 15f;
-            accel = 0.3f;
+            accel = 0.1f;
             range = 70f;
             itemCapacity = 70;
             health = 400;
             buildSpeed = 0.5f;
             engineOffset = 6.5f;
             hitsize = 8f;
+            lowAltitude = true;
+
+            mineTier = 2;
+            mineSpeed = 3.5f;
+
+            abilities.add(new HealFieldAbility(5f, 60f * 5, 50f));
+
+            weapons.add(new Weapon("heal-weapon-mount"){{
+                y = -2.5f;
+                x = 3.5f;
+                reload = 34f;
+                ejectEffect = Fx.none;
+                recoil = 2f;
+                shootSound = Sounds.pew;
+                shots = 1;
+                velocityRnd = 0.5f;
+                inaccuracy = 15f;
+                alternate = true;
+
+                bullet = new MissileBulletType(4f, 10){{
+                    homingPower = 0.08f;
+                    weaveMag = 4;
+                    weaveScale = 4;
+                    lifetime = 50f;
+                    keepVelocity = false;
+                    shootEffect = Fx.shootHeal;
+                    smokeEffect = Fx.hitLaser;
+                    frontColor = Color.white;
+
+                    backColor = Pal.heal;
+                    trailColor = Pal.heal;
+                }};
+            }});
         }};
 
         mega = new UnitType("mega"){{
 
             health = 500;
-            speed = 2f;
-            accel = 0.05f;
-            drag = 0.016f;
+            speed = 1.8f;
+            accel = 0.06f;
+            drag = 0.017f;
             lowAltitude = true;
             flying = true;
             engineOffset = 10.5f;
             rotateShooting = false;
             hitsize = 15f;
             engineSize = 3f;
+            payloadCapacity = 3;
 
             weapons.add(
             new Weapon("heal-weapon-mount"){{

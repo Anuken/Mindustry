@@ -2,12 +2,10 @@ package mindustry.entities.bullet;
 
 import arc.graphics.g2d.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 
 //TODO scale velocity depending on fslope()
 public class ArtilleryBulletType extends BasicBulletType{
-    protected Effect trailEffect = Fx.artilleryTrail;
 
     public ArtilleryBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
@@ -17,6 +15,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         scaleVelocity = true;
         hitShake = 1f;
         hitSound = Sounds.explosion;
+        trailEffect = Fx.artilleryTrail;
     }
 
     public ArtilleryBulletType(){

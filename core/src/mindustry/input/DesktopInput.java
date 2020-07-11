@@ -603,7 +603,7 @@ public class DesktopInput extends InputHandler{
             Payloadc pay = (Payloadc)unit;
 
             if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
-                Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 1.1f, u -> u.isAI() && u.isGrounded());
+                Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 1.1f, u -> u.isAI() && u.isGrounded() && u.mass() < unit.mass());
                 if(target != null){
                     Call.pickupUnitPayload(player, target);
                 }else if(!pay.hasPayload()){

@@ -75,6 +75,11 @@ public abstract class BulletType extends Content{
     public BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
+    public Color trailColor = Pal.missileYellowBack;
+    public float trailChance = -0.0001f;
+    public Effect trailEffect = Fx.missileTrail;
+    public float trailParam =  2f;
+
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
 
@@ -118,7 +123,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bullet b){
-        hit(b, b.getX(), b.getY());
+        hit(b, b.x, b.y);
     }
 
     public void hit(Bullet b, float x, float y){
@@ -140,20 +145,20 @@ public abstract class BulletType extends Content{
         }
 
         if(splashDamageRadius > 0){
-            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
             if(status != StatusEffects.none){
-                Damage.status(b.team(), x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b.team(), Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
+            Lightning.create(b.team, Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 
     public void despawned(Bullet b){
-        despawnEffect.at(b.getX(), b.getY(), b.rotation());
+        despawnEffect.at(b.x, b.y, b.rotation());
         hitSound.at(b);
 
         if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
@@ -165,7 +170,7 @@ public abstract class BulletType extends Content{
     }
 
     public void drawLight(Bullet b){
-        Drawf.light(b.team(), b, lightRadius, lightColor, lightOpacity);
+        Drawf.light(b.team, b, lightRadius, lightColor, lightOpacity);
     }
 
     public void init(Bullet b){
@@ -180,14 +185,20 @@ public abstract class BulletType extends Content{
 
     public void update(Bullet b){
         if(homingPower > 0.0001f){
-            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
+            Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
                 b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
             }
         }
 
         if(weaveMag > 0){
-            b.vel.rotate(Mathf.sin(Time.time() + b.id() * 3, weaveScale, weaveMag) * Time.delta());
+            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta());
+        }
+
+        if(trailChance > 0){
+            if(Mathf.chanceDelta(trailChance)){
+                trailEffect.at(b.x, b.y, trailParam, trailColor);
+            }
         }
     }
 
@@ -213,11 +224,11 @@ public abstract class BulletType extends Content{
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner(), parent.team(), x, y, angle);
+        return create(parent.owner(), parent.team, x, y, angle);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
-        return create(parent.owner(), parent.team(), x, y, angle, velocityScl);
+        return create(parent.owner(), parent.team, x, y, angle, velocityScl);
     }
 
     public Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){

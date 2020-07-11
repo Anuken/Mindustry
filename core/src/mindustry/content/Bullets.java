@@ -289,24 +289,6 @@ public class Bullets implements ContentList{
             lightningLength = 14;
         }};
 
-        missileJavelin = new MissileBulletType(5f, 10.5f, "missile"){{
-            width = 8f;
-            height = 8f;
-            shrinkY = 0f;
-            drag = -0.003f;
-            keepVelocity = false;
-            splashDamageRadius = 20f;
-            splashDamage = 1f;
-            lifetime = 90f;
-            trailColor = Color.valueOf("b6c6fd");
-            hitEffect = Fx.blastExplosion;
-            despawnEffect = Fx.blastExplosion;
-            backColor = Pal.bulletYellowBack;
-            frontColor = Pal.bulletYellow;
-            weaveScale = 8f;
-            weaveMag = 2f;
-        }};
-
         missileSwarm = new MissileBulletType(2.7f, 12, "missile"){{
             width = 8f;
             height = 8f;

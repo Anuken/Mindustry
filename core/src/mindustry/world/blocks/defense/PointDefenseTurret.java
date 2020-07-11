@@ -69,11 +69,11 @@ public class PointDefenseTurret extends Block{
 
             //retarget
             if(timer(timerTarget, retargetTime)){
-                target = Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team() == team || !b.type().hittable ? Float.MAX_VALUE : b.dst2(this));
+                target = Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team == team || !b.type().hittable ? Float.MAX_VALUE : b.dst2(this));
             }
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().hittable){
+            if(target != null && target.within(this, range) && target.team != team && target.type().hittable){
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 reload -= edelta();

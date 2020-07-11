@@ -32,6 +32,6 @@ public class LightningBulletType extends BulletType{
 
     @Override
     public void init(Bullet b){
-        Lightning.create(b.team(), lightningColor, damage, b.x, b.y, b.rotation(), lightningLength + Mathf.random(lightningLengthRand));
+        Lightning.create(b.team, lightningColor, damage, b.x, b.y, b.rotation(), lightningLength + Mathf.random(lightningLengthRand));
     }
 }
