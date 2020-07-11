@@ -230,9 +230,9 @@ public class UnitTypes implements ContentList{
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
 
-            speed = 0.8f;
+            speed = 0.85f;
             hitsize = 8f;
-            health = 140;
+            health = 170;
             sway = 0.25f;
             range = 40f;
 
@@ -247,7 +247,7 @@ public class UnitTypes implements ContentList{
                     speed = 1f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
-                    splashDamage = 30f;
+                    splashDamage = 40f;
                     killShooter = true;
                     hittable = false;
                 }};
@@ -255,7 +255,7 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            speed = 0.4f;
+            speed = 0.5f;
             drag = 0.4f;
             hitsize = 10f;
             rotateSpeed = 3f;
@@ -278,8 +278,9 @@ public class UnitTypes implements ContentList{
                 bullet = new LiquidBulletType(Liquids.slag){{
                     damage = 11;
                     speed = 2.3f;
-                    drag = 0.02f;
+                    drag = 0.01f;
                     shootEffect = Fx.shootSmall;
+                    lifetime = 56f;
                 }};
             }});
         }};

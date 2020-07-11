@@ -14,7 +14,7 @@ import static mindustry.Vars.*;
 
 public class LiquidBulletType extends BulletType{
     public @NonNull Liquid liquid;
-    public float puddleSize = 5f;
+    public float puddleSize = 6f;
 
     public LiquidBulletType(@Nullable Liquid liquid){
         super(3.5f, 0);
@@ -68,7 +68,8 @@ public class LiquidBulletType extends BulletType{
     public void despawned(Bullet b){
         super.despawned(b);
 
-        hit(b, b.x, b.y);
+        //don't create liquids when the projectile despawns
+        hitEffect.at(b.x, b.y, liquid.color);
     }
 
     @Override
