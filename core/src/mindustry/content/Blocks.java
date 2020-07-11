@@ -1453,6 +1453,7 @@ public class Blocks implements ContentList{
             shootType = new LightningBulletType(){{
                 damage = 21;
                 lightningLength = 25;
+                collidesAir = false;
             }};
             reloadTime = 35f;
             shootCone = 40f;
