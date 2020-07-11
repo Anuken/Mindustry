@@ -109,6 +109,10 @@ public abstract class BulletType extends Content{
         despawnEffect = Fx.hitBulletSmall;
     }
 
+    public BulletType(){
+        this(1f, 1f);
+    }
+
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
         return speed * lifetime * (1f - drag);
@@ -153,7 +157,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b.team, Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.create(b, Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 

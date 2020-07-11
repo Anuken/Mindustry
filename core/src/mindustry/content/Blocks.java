@@ -3,10 +3,7 @@ package mindustry.content;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.util.*;
 import mindustry.ctype.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -1426,7 +1423,6 @@ public class Blocks implements ContentList{
             chargeTime = 50f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
-            shootType = Bullets.lancerLaser;
             recoilAmount = 2f;
             reloadTime = 90f;
             cooldown = 0.03f;
@@ -1441,11 +1437,23 @@ public class Blocks implements ContentList{
             health = 280 * size * size;
             targetAir = false;
             shootSound = Sounds.laser;
+
+            shootType = new LaserBulletType(140){{
+                colors = new Color[]{Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+                hitEffect = Fx.hitLancer;
+                despawnEffect = Fx.none;
+                hitSize = 4;
+                lifetime = 16f;
+                drawSize = 400f;
+            }};
         }};
 
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, with(Items.copper, 35, Items.lead, 50));
-            shootType = Bullets.arc;
+            shootType = new LightningBulletType(){{
+                damage = 21;
+                lightningLength = 25;
+            }};
             reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
@@ -1519,42 +1527,11 @@ public class Blocks implements ContentList{
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
 
-            ammo(Items.thorium, new BulletType(0.01f, 105){
-                int rays = 1;
-                float rayLength = range + 10f;
-
-                {
-                    hitEffect = Fx.hitLancer;
-                    shootEffect = smokeEffect = Fx.lightningShoot;
-                    lifetime = 10f;
-                    despawnEffect = Fx.none;
-                    ammoMultiplier = 6f;
-                    pierce = true;
-                }
-
-                @Override
-                public void init(Bullet b){
-                    for(int i = 0; i < rays; i++){
-                        Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
-                    }
-                }
-
-                @Override
-                public void draw(Bullet b){
-                    super.draw(b);
-                    Draw.color(Color.white, Pal.lancerLaser, b.fin());
-                    //Draw.alpha(b.fout());
-                    for(int i = 0; i < 7; i++){
-                        Tmp.v1.trns(b.rotation(), i * 8f);
-                        float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
-                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rotation() + 90);
-                        Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, 4f, sl, b.rotation() - 90);
-                    }
-                    Drawf.tri(b.x, b.y, 20f * b.fout(), (rayLength + 50), b.rotation());
-                    Drawf.tri(b.x, b.y, 20f * b.fout(), 10f, b.rotation() + 180f);
-                    Draw.reset();
-                }
-            });
+            ammo(Items.thorium, new ShrapnelBulletType(){{
+                length = range + 10f;
+                damage = 105f;
+                ammoMultiplier = 6f;
+            }});
         }};
 
         ripple = new ItemTurret("ripple"){{
@@ -1635,7 +1612,6 @@ public class Blocks implements ContentList{
 
         meltdown = new LaserTurret("meltdown"){{
             requirements(Category.turret, with(Items.copper, 250, Items.lead, 350, Items.graphite, 300, Items.surgealloy, 325, Items.silicon, 325));
-            shootType = Bullets.meltdownLaser;
             shootEffect = Fx.shootBigSmoke2;
             shootCone = 40f;
             recoilAmount = 4f;
@@ -1649,6 +1625,16 @@ public class Blocks implements ContentList{
             shootSound = Sounds.laserbig;
             activeSound = Sounds.beam;
             activeSoundVolume = 2f;
+
+            shootType = new ContinuousLaserBulletType(70){{
+                length = 220f;
+                hitEffect = Fx.hitMeltdown;
+                drawSize = 420f;
+
+                incendChance = 0.4f;
+                incendSpread = 5f;
+                incendAmount = 1;
+            }};
 
             health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
@@ -1728,7 +1714,7 @@ public class Blocks implements ContentList{
             upgrades = new UnitType[][]{
                 {UnitTypes.nova, UnitTypes.quasar},
                 {UnitTypes.dagger, UnitTypes.mace},
-                {UnitTypes.crawler, UnitTypes.eruptor},
+                {UnitTypes.crawler, UnitTypes.atrax},
                 {UnitTypes.flare, UnitTypes.horizon},
                 {UnitTypes.mono, UnitTypes.poly},
                 {UnitTypes.risse, UnitTypes.minke},

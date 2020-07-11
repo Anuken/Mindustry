@@ -92,15 +92,17 @@ public class Damage{
             }
         };
 
-        world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
-            collider.get(cx, cy);
-            if(large){
-                for(Point2 p : Geometry.d4){
-                    collider.get(cx + p.x, cy + p.y);
+        if(hitter.type.collidesGround){
+            world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+                collider.get(cx, cy);
+                if(large){
+                    for(Point2 p : Geometry.d4){
+                        collider.get(cx + p.x, cy + p.y);
+                    }
                 }
-            }
-            return false;
-        });
+                return false;
+            });
+        }
 
         rect.setPosition(x, y).setSize(tr.x, tr.y);
         float x2 = tr.x + x, y2 = tr.y + y;
@@ -123,6 +125,8 @@ public class Damage{
         rect.height += expand * 2;
 
         Cons<Unit> cons = e -> {
+            if(!e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+
             e.hitbox(hitrect);
             Rect other = hitrect;
             other.y -= expand;

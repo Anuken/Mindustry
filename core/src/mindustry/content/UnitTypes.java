@@ -24,7 +24,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType pulsar, quasar;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType cix, eruptor;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType arkyid, atrax, spiroct;
 
     //air (no special traits)
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
@@ -254,7 +254,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        eruptor = new UnitType("eruptor"){{
+        atrax = new UnitType("atrax"){{
             speed = 0.4f;
             drag = 0.4f;
             hitsize = 10f;
@@ -284,7 +284,38 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        cix = new UnitType("cix"){{
+        //TODO this is just a clone
+        spiroct = new UnitType("spiroct"){{
+            speed = 0.4f;
+            drag = 0.4f;
+            hitsize = 10f;
+            rotateSpeed = 3f;
+            targetAir = false;
+            health = 600;
+            immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+            legCount = 4;
+            legLength = 9f;
+            legTrns = 0.6f;
+            legMoveSpace = 1.4f;
+
+            weapons.add(new Weapon("eruption"){{
+                shootY = 3f;
+                reload = 10f;
+                ejectEffect = Fx.none;
+                recoil = 1f;
+                x = 7f;
+                shootSound = Sounds.flame;
+
+                bullet = new LiquidBulletType(Liquids.slag){{
+                    damage = 11;
+                    speed = 2.3f;
+                    drag = 0.02f;
+                    shootEffect = Fx.shootSmall;
+                }};
+            }});
+        }};
+
+        arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
             speed = 0.5f;
             hitsize = 9f;

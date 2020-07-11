@@ -9,6 +9,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -26,20 +27,17 @@ public class Bullets implements ContentList{
     fragGlass, fragExplosive, fragPlastic, fragSurge, fragGlassFrag, fragPlasticFrag,
 
     //missiles
-    missileExplosive, missileIncendiary, missileSurge, missileJavelin, missileSwarm,
+    missileExplosive, missileIncendiary, missileSurge, missileSwarm,
 
     //standard
     standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
     standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
-    //electric
-    lancerLaser, meltdownLaser, arc, damageLightning,
-
     //liquid
     waterShot, cryoShot, slagShot, oilShot,
 
     //environment, misc.
-    fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag,
+    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag,
 
     //bombs
     bombExplosive, bombIncendiary, bombOil;
@@ -400,6 +398,12 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
+        //this is just a copy of the damage lightning bullet that doesn't damage air units
+        damageLightningGround = new BulletType(0.0001f, 0f){{
+            collidesAir = false;
+        }};
+        JsonIO.copy(damageLightning, damageLightningGround);
+
         healBullet = new HealBulletType(5.2f, 13){{
             healPercent = 3f;
         }};
@@ -494,25 +498,6 @@ public class Bullets implements ContentList{
             }
         };
 
-        lancerLaser = new LaserBulletType(140){{
-            colors = new Color[]{Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
-            hitEffect = Fx.hitLancer;
-            despawnEffect = Fx.none;
-            hitSize = 4;
-            lifetime = 16f;
-            drawSize = 400f;
-        }};
-
-        meltdownLaser = new ContinuousLaserBulletType(70){{
-            length = 220f;
-            hitEffect = Fx.hitMeltdown;
-            drawSize = 420f;
-
-            incendChance = 0.4f;
-            incendSpread = 5f;
-            incendAmount = 1;
-        }};
-
         waterShot = new LiquidBulletType(Liquids.water){{
             knockback = 0.7f;
         }};
@@ -528,11 +513,6 @@ public class Bullets implements ContentList{
 
         oilShot = new LiquidBulletType(Liquids.oil){{
             drag = 0.03f;
-        }};
-
-        arc = new LightningBulletType(){{
-            damage = 21;
-            lightningLength = 25;
         }};
 
         driverBolt = new MassDriverBolt();

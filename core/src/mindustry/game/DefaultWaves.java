@@ -150,7 +150,7 @@ public class DefaultWaves{
                 spacing = 4;
             }},
 
-            new SpawnGroup(UnitTypes.eruptor){{
+            new SpawnGroup(UnitTypes.atrax){{
                 begin = 31;
                 unitAmount = 4;
                 unitScaling = 1;
