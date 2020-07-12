@@ -19,6 +19,8 @@ public class StatusEffect extends MappableContent{
     public float speedMultiplier = 1f;
     /** Damage per frame. */
     public float damage;
+    /** Chance of effect appearing. */
+    public float effectChance = 0.15f;
     /** If true, the effect never disappears. */
     public boolean permanent;
     /** Tint color of effect. */
@@ -51,8 +53,8 @@ public class StatusEffect extends MappableContent{
             unit.heal(damage * Time.delta());
         }
 
-        if(effect != Fx.none && Mathf.chanceDelta(0.15f)){
-            effect.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
+        if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
+            effect.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
         }
     }
 

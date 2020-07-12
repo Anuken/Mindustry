@@ -257,6 +257,8 @@ public class Logic implements ApplicationListener{
 
     @Remote(called = Loc.both)
     public static void launchZone(){
+        if(!state.isCampaign()) return;
+
         if(!headless){
             ui.hudfrag.showLaunch();
         }

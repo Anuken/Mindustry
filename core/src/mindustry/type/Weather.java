@@ -124,7 +124,7 @@ public abstract class Weather extends MappableContent{
             if(life < fadeTime){
                 opacity = life / fadeTime;
             }else{
-                opacity = Mathf.lerpDelta(opacity, 1f, 0.01f);
+                opacity = Mathf.lerpDelta(opacity, 1f, 0.004f);
             }
 
             life -= Time.delta();

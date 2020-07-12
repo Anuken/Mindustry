@@ -17,6 +17,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -42,14 +43,15 @@ public class UnitType extends UnlockableContent{
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
     public boolean destructibleWreck = true;
-    public float wreckHealth = 15f;
     public float sway = 1f;
     public int payloadCapacity = 1;
     public int commandLimit = 24;
     public float baseElevation = 0f;
     public float deathShake = 2f;
+    public boolean hovering = false;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
+    public Seq<mindustry.entities.abilities.Ability> abilities = new Seq<>();
 
     //TODO document
     public int legCount = 4, legGroupSize = 2;
@@ -68,7 +70,7 @@ public class UnitType extends UnlockableContent{
     public float itemOffsetY = 3f;
     public float lightRadius = 60f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
-    public boolean drawCell = true, drawItems = true;
+    public boolean drawCell = true, drawItems = true, drawShields = true;
     public int parts = 0;
     public int trailLength = 5;
 
@@ -103,7 +105,13 @@ public class UnitType extends UnlockableContent{
         return weapons.size > 0;
     }
 
-    public void update(Unit unit){}
+    public void update(Unit unit){
+        if(abilities.size > 0){
+            for(mindustry.entities.abilities.Ability a : abilities){
+                a.update(unit);
+            }
+        }
+    }
 
     public void landed(Unit unit){}
 
@@ -248,12 +256,19 @@ public class UnitType extends UnlockableContent{
         if(drawItems) drawItems(unit);
         drawLight(unit);
 
-        if(unit.shieldAlpha > 0){
+        if(unit.shieldAlpha > 0 && drawShields){
             drawShield(unit);
         }
 
         if(legs != null){
             unit.trns(-legOffset.x, -legOffset.y);
+        }
+
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.draw(unit);
+                Draw.reset();
+            }
         }
     }
 

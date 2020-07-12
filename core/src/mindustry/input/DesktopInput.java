@@ -572,7 +572,7 @@ public class DesktopInput extends InputHandler{
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         movement.set(xa, ya).nor().scl(speed);
-        float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
+        float mouseAngle = Angles.mouseAngle(unit.x, unit.y);
         boolean aimCursor = omni && player.shooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
 
         if(aimCursor){
@@ -586,7 +586,7 @@ public class DesktopInput extends InputHandler{
         if(omni){
             unit.moveAt(movement);
         }else{
-            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()));
+            unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
             if(!movement.isZero() && legs){
                 unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
             }
@@ -603,7 +603,7 @@ public class DesktopInput extends InputHandler{
             Payloadc pay = (Payloadc)unit;
 
             if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
-                Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 1.1f, u -> u.isAI() && u.isGrounded());
+                Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 1.1f, u -> u.isAI() && u.isGrounded() && u.mass() < unit.mass());
                 if(target != null){
                     Call.pickupUnitPayload(player, target);
                 }else if(!pay.hasPayload()){
@@ -622,7 +622,6 @@ public class DesktopInput extends InputHandler{
         }
 
         if(unit instanceof Commanderc){
-
             if(Core.input.keyTap(Binding.command)){
                 Call.unitCommand(player);
             }
