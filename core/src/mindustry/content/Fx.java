@@ -291,6 +291,18 @@ public class Fx{
         Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
     }),
 
+    shieldWave = new Effect(22, e -> {
+        color(Pal.shield);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * 60f);
+    }),
+
+    shieldApply = new Effect(11, e -> {
+        color(Pal.shield);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
+    }),
+
     hitBulletSmall = new Effect(14, e -> {
         color(Color.white, Pal.lightOrange, e.fin());
 
@@ -616,6 +628,15 @@ public class Fx{
 
         randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+        });
+
+    }),
+
+    sapped = new Effect(40f, e -> {
+        color(Pal.sap);
+
+        randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, e.fslope() * 1.1f, 45f);
         });
 
     }),
@@ -1275,9 +1296,9 @@ public class Fx{
     }),
 
     shieldBreak = new Effect(40, e -> {
-        color(Pal.accent);
+        color(e.color);
         stroke(3f * e.fout());
-        Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
+        Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }),
 
     unitShieldBreak = new Effect(35, e -> {

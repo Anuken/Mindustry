@@ -34,7 +34,7 @@ abstract class ShieldComp implements Healthc, Posc{
             shieldAlpha = 1f;
         }
 
-        float shieldDamage = Math.min(shield, amount);
+        float shieldDamage = Math.min(Math.max(shield, 0), amount);
         shield -= shieldDamage;
         amount -= shieldDamage;
 

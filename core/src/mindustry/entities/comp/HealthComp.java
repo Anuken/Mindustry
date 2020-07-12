@@ -93,8 +93,14 @@ abstract class HealthComp implements Entityc{
         health = Mathf.clamp(health, 0, maxHealth);
     }
 
+    /** Heals by a flat amount. */
     void heal(float amount){
         health += amount;
         clampHealth();
+    }
+
+    /** Heals by a 0-1 fraction of max health. */
+    void healFract(float amount){
+        heal(amount * maxHealth);
     }
 }
