@@ -122,7 +122,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.type = type;
         this.maxHealth = type.health;
         this.drag = type.drag;
-        this.elevation = type.flying ? 1f : type.baseElevation;
+        this.elevation = type.flying ? 1f : 0;
         this.armor = type.armor;
         this.hitSize = type.hitsize;
         this.hovering = type.hovering;
@@ -214,15 +214,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         Tile tile = tileOn();
         Floor floor = floorOn();
 
-        if(tile != null && isGrounded()){
+        if(tile != null && isGrounded() && !type.hovering){
             //unit block update
             if(tile.build != null){
                 tile.build.unitOn(base());
-            }
-
-            //kill when stuck in wall
-            if(tile.solid()){
-                kill();
             }
 
             //apply damage

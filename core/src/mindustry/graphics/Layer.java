@@ -38,6 +38,9 @@ public class Layer{
     //power lines
     power = 70,
 
+    //certain multi-legged units
+    legUnit = 75f,
+
     //darkness over block clusters
     darkness = 80,
 

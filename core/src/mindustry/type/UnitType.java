@@ -43,15 +43,17 @@ public class UnitType extends UnlockableContent{
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
     public boolean destructibleWreck = true;
+    public float groundLayer = Layer.groundUnit;
     public float sway = 1f;
     public int payloadCapacity = 1;
     public int commandLimit = 24;
-    public float baseElevation = 0f;
+    public float visualElevation = -1f;
     public float deathShake = 2f;
+    public boolean allowLegStep = false;
     public boolean hovering = false;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
-    public Seq<mindustry.entities.abilities.Ability> abilities = new Seq<>();
+    public Seq<Ability> abilities = new Seq<>();
 
     //TODO document
     public int legCount = 4, legGroupSize = 2;
@@ -215,7 +217,7 @@ public class UnitType extends UnlockableContent{
 
     public void draw(Unit unit){
         Mechc legs = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
+        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer;
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
@@ -297,7 +299,8 @@ public class UnitType extends UnlockableContent{
 
     public void drawShadow(Unit unit){
         Draw.color(shadowColor);
-        Draw.rect(shadowRegion, unit.x + shadowTX * unit.elevation, unit.y + shadowTY * unit.elevation, unit.rotation - 90);
+        float e = Math.max(unit.elevation, visualElevation);
+        Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
         Draw.color();
     }
 
@@ -444,8 +447,8 @@ public class UnitType extends UnlockableContent{
 
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
-            if(leg.moving && baseElevation > 0){
-                float scl = baseElevation;
+            if(leg.moving && visualElevation > 0){
+                float scl = visualElevation;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
                 Draw.color(shadowColor);
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));

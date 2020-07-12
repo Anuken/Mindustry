@@ -24,7 +24,10 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType pulsar, quasar;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType arkyid, atrax, spiroct;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
+
+    //legs + building
+    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid;
 
     //air (no special traits)
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
@@ -269,6 +272,10 @@ public class UnitTypes implements ContentList{
             hovering = true;
             armor = 3f;
 
+            allowLegStep = true;
+            visualElevation = 0.2f;
+            groundLayer = Layer.legUnit - 1f;
+
             weapons.add(new Weapon("eruption"){{
                 shootY = 3f;
                 reload = 10f;
@@ -303,6 +310,12 @@ public class UnitTypes implements ContentList{
             hovering = true;
             armor = 3f;
 
+            buildSpeed = 0.75f;
+
+            allowLegStep = true;
+            visualElevation = 0.3f;
+            groundLayer = Layer.legUnit;
+
             weapons.add(new Weapon("spiroct-weapon"){{
                 shootY = 4f;
                 reload = 15f;
@@ -315,6 +328,7 @@ public class UnitTypes implements ContentList{
                 y = -1.5f;
 
                 bullet = new SapBulletType(){{
+                    sapStrength = 0.3f;
                     length = 75f;
                     damage = 15;
                     shootEffect = Fx.shootSmall;
@@ -333,8 +347,9 @@ public class UnitTypes implements ContentList{
                 y = 3f;
 
                 bullet = new SapBulletType(){{
+                    sapStrength = 0.65f;
                     length = 40f;
-                    damage = 10;
+                    damage = 12;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -350,7 +365,6 @@ public class UnitTypes implements ContentList{
             speed = 0.5f;
             hitsize = 9f;
             health = 140;
-            baseElevation = 0.51f;
 
             legCount = 6;
             legMoveSpace = 1f;

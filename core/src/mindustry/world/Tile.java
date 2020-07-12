@@ -468,6 +468,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return overlay == Blocks.air || overlay.itemDrop == null ? floor.itemDrop : overlay.itemDrop;
     }
 
+    public int staticDarkness(){
+        return block.solid && block.fillsTile && !block.synthetic() ? rotation : 0;
+    }
+
     public void updateOcclusion(){
         cost = 1;
         boolean occluded = false;

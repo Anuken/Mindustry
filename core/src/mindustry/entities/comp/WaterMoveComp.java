@@ -17,9 +17,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc{
     @Override
     public void move(float cx, float cy){
         if(isGrounded()){
-            if(!EntityCollisions.waterSolid(tileX(), tileY())){
-                collisions.move(this, cx, cy, EntityCollisions::waterSolid);
-            }
+            collisions.moveCheck(this, cx, cy, EntityCollisions::waterSolid);
         }else{
             x += cx;
             y += cy;
