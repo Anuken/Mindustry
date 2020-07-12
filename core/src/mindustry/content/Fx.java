@@ -632,6 +632,15 @@ public class Fx{
 
     }),
 
+    sapped = new Effect(40f, e -> {
+        color(Pal.sap);
+
+        randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, e.fslope() * 1.1f, 45f);
+        });
+
+    }),
+
     oily = new Effect(42f, e -> {
         color(Liquids.oil.color);
 

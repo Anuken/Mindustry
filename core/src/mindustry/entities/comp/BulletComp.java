@@ -19,6 +19,7 @@ import static mindustry.Vars.*;
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
     @Import Entityc owner;
+    @Import float x,y;
 
     IntSeq collided = new IntSeq(6);
     Object data;
@@ -91,7 +92,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
         if(other instanceof Unit){
             Unit unit = (Unit)other;
-            unit.vel.add(Tmp.v3.set(unit).sub(x, y).setLength(type.knockback / unit.mass()));
+            unit.impulse(Tmp.v3.set(unit).sub(this.x, this.y).nor().scl(type.knockback * 80f));
             unit.apply(type.status, type.statusDuration);
         }
 

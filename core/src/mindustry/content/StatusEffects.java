@@ -9,7 +9,7 @@ import mindustry.type.StatusEffect;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, blasted, corroded, boss;
+    public static StatusEffect none, burning, freezing, wet, melting, sapped, tarred, overdrive, shielded, shocked, blasted, corroded, boss;
 
     @Override
     public void load(){
@@ -72,6 +72,13 @@ public class StatusEffects implements ContentList{
                 trans(tarred, ((unit, time, newTime, result) -> result.set(this, Math.min(time + newTime / 2f, 140f))));
                 opposite(wet, freezing);
             });
+        }};
+
+        sapped = new StatusEffect("sapped"){{
+            speedMultiplier = 0.7f;
+            armorMultiplier = 0.8f;
+            effect = Fx.sapped;
+            effectChance = 0.1f;
         }};
 
         tarred = new StatusEffect("tarred"){{

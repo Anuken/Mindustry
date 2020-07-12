@@ -71,7 +71,7 @@ public class UnitTypes implements ContentList{
             hitsize = 9f;
             range = 10f;
             health = 500;
-            armor = 1f;
+            armor = 2f;
 
             immunities.add(StatusEffects.burning);
 
@@ -91,7 +91,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 3f;
             targetAir = false;
             health = 790;
-            armor = 4f;
+            armor = 5f;
 
             weapons.add(new Weapon("artillery"){{
                 y = 1f;
@@ -267,6 +267,7 @@ public class UnitTypes implements ContentList{
             legTrns = 0.6f;
             legMoveSpace = 1.4f;
             hovering = true;
+            armor = 3f;
 
             weapons.add(new Weapon("eruption"){{
                 shootY = 3f;
@@ -290,7 +291,7 @@ public class UnitTypes implements ContentList{
         spiroct = new UnitType("spiroct"){{
             speed = 0.4f;
             drag = 0.4f;
-            hitsize = 10f;
+            hitsize = 12f;
             rotateSpeed = 3f;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
@@ -300,6 +301,7 @@ public class UnitTypes implements ContentList{
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
+            armor = 3f;
 
             weapons.add(new Weapon("spiroct-weapon"){{
                 shootY = 4f;
@@ -314,12 +316,13 @@ public class UnitTypes implements ContentList{
 
                 bullet = new SapBulletType(){{
                     length = 75f;
-                    damage = 14;
+                    damage = 15;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
                     width = 0.54f;
                     lifetime = 35f;
+                    knockback = -1f;
                 }};
             }});
 
@@ -331,12 +334,13 @@ public class UnitTypes implements ContentList{
 
                 bullet = new SapBulletType(){{
                     length = 40f;
-                    damage = 9;
+                    damage = 10;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
                     width = 0.4f;
                     lifetime = 25f;
+                    knockback = -0.5f;
                 }};
             }});
         }};

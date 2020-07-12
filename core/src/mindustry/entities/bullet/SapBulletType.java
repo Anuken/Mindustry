@@ -23,6 +23,8 @@ public class SapBulletType extends BulletType{
         hitSize = 0f;
         hittable = false;
         hitEffect = Fx.hitLiquid;
+        status = StatusEffects.sapped;
+        statusDuration = 60f * 3f;
     }
 
     @Override
