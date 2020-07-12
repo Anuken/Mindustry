@@ -572,7 +572,7 @@ public class DesktopInput extends InputHandler{
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         movement.set(xa, ya).nor().scl(speed);
-        float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
+        float mouseAngle = Angles.mouseAngle(unit.x, unit.y);
         boolean aimCursor = omni && player.shooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
 
         if(aimCursor){
@@ -586,7 +586,7 @@ public class DesktopInput extends InputHandler{
         if(omni){
             unit.moveAt(movement);
         }else{
-            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()));
+            unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
             if(!movement.isZero() && legs){
                 unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
             }

@@ -26,6 +26,8 @@ public class Damage{
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
     private static IntSet collidedBlocks = new IntSet();
+    private static Building tmpBuilding;
+    private static Unit tmpUnit;
 
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
@@ -88,7 +90,7 @@ public class Damage{
             if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team() != team && tile.collide(hitter)){
                 tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
-                hitter.type().hit(hitter, tile.x, tile.y);
+                hitter.type.hit(hitter, tile.x, tile.y);
             }
         };
 
@@ -144,6 +146,73 @@ public class Damage{
         };
 
         Units.nearbyEnemies(team, rect, cons);
+    }
+
+    /**
+     * Casts forward in a line.
+     * @return the first encountered object.
+     */
+    public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
+        tr.trns(angle, length);
+
+        if(hitter.type.collidesGround){
+            tmpBuilding = null;
+
+            world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+                Building tile = world.ent(cx, cy);
+                if(tile != null && tile.team != hitter.team){
+                    tmpBuilding = tile;
+                    //TODO return tile
+                    return true;
+                }
+                return false;
+            });
+
+            if(tmpBuilding != null) return tmpBuilding;
+        }
+
+        rect.setPosition(x, y).setSize(tr.x, tr.y);
+        float x2 = tr.x + x, y2 = tr.y + y;
+
+        if(rect.width < 0){
+            rect.x += rect.width;
+            rect.width *= -1;
+        }
+
+        if(rect.height < 0){
+            rect.y += rect.height;
+            rect.height *= -1;
+        }
+
+        float expand = 3f;
+
+        rect.y -= expand;
+        rect.x -= expand;
+        rect.width += expand * 2;
+        rect.height += expand * 2;
+
+        tmpUnit = null;
+
+        Cons<Unit> cons = e -> {
+            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+
+            e.hitbox(hitrect);
+            Rect other = hitrect;
+            other.y -= expand;
+            other.x -= expand;
+            other.width += expand * 2;
+            other.height += expand * 2;
+
+            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
+
+            if(vec != null){
+                tmpUnit = e;
+            }
+        };
+
+        Units.nearbyEnemies(hitter.team, rect, cons);
+
+        return tmpUnit;
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */

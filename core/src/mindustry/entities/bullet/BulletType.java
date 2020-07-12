@@ -162,7 +162,7 @@ public abstract class BulletType extends Content{
     }
 
     public void despawned(Bullet b){
-        despawnEffect.at(b.x, b.y, b.rotation());
+        despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         hitSound.at(b);
 
         if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
@@ -237,16 +237,16 @@ public abstract class BulletType extends Content{
 
     public Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
         Bullet bullet = Bullet.create();
-        bullet.type(this);
-        bullet.owner(owner);
-        bullet.team(team);
+        bullet.type = this;
+        bullet.owner = owner;
+        bullet.team = team;
         bullet.vel.trns(angle, speed * velocityScl);
         bullet.set(x - bullet.vel.x * Time.delta(), y - bullet.vel.y * Time.delta());
-        bullet.lifetime(lifetime * lifetimeScl);
-        bullet.data(data);
-        bullet.drag(drag);
-        bullet.hitSize(hitSize);
-        bullet.damage(damage < 0 ? this.damage : damage);
+        bullet.lifetime = lifetime * lifetimeScl;
+        bullet.data = data;
+        bullet.drag = drag;
+        bullet.hitSize = hitSize;
+        bullet.damage = damage < 0 ? this.damage : damage;
         bullet.add();
 
         if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());

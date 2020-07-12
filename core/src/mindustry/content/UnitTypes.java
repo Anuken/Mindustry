@@ -266,6 +266,7 @@ public class UnitTypes implements ContentList{
             legLength = 9f;
             legTrns = 0.6f;
             legMoveSpace = 1.4f;
+            hovering = true;
 
             weapons.add(new Weapon("eruption"){{
                 shootY = 3f;
@@ -281,37 +282,61 @@ public class UnitTypes implements ContentList{
                     drag = 0.01f;
                     shootEffect = Fx.shootSmall;
                     lifetime = 56f;
+                    collidesAir = false;
                 }};
             }});
         }};
 
-        //TODO this is just a clone
         spiroct = new UnitType("spiroct"){{
             speed = 0.4f;
             drag = 0.4f;
             hitsize = 10f;
             rotateSpeed = 3f;
-            targetAir = false;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
-            legLength = 11f;
-            legTrns = 0.6f;
+            legLength = 13f;
+            legTrns = 0.7f;
             legMoveSpace = 1.4f;
+            legBaseOffset = 2f;
+            hovering = true;
 
-            weapons.add(new Weapon("eruption"){{
-                shootY = 3f;
-                reload = 10f;
+            weapons.add(new Weapon("spiroct-weapon"){{
+                shootY = 4f;
+                reload = 15f;
                 ejectEffect = Fx.none;
-                recoil = 1f;
-                x = 7f;
+                recoil = 2f;
+                rotate = true;
                 shootSound = Sounds.flame;
 
-                bullet = new LiquidBulletType(Liquids.slag){{
-                    damage = 11;
-                    speed = 2.3f;
-                    drag = 0.02f;
+                x = 8.5f;
+                y = -1.5f;
+
+                bullet = new SapBulletType(){{
+                    length = 75f;
+                    damage = 14;
                     shootEffect = Fx.shootSmall;
+                    hitColor = color = Color.valueOf("bf92f9");
+                    despawnEffect = Fx.none;
+                    width = 0.54f;
+                    lifetime = 35f;
+                }};
+            }});
+
+            weapons.add(new Weapon("mount-purple-weapon"){{
+                reload = 20f;
+                rotate = true;
+                x = 4f;
+                y = 3f;
+
+                bullet = new SapBulletType(){{
+                    length = 40f;
+                    damage = 9;
+                    shootEffect = Fx.shootSmall;
+                    hitColor = color = Color.valueOf("bf92f9");
+                    despawnEffect = Fx.none;
+                    width = 0.4f;
+                    lifetime = 25f;
                 }};
             }});
         }};

@@ -25,6 +25,7 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable{
 
+    @Import boolean hovering;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
     @Import boolean dead;
     @Import Team team;
@@ -124,6 +125,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.elevation = type.flying ? 1f : type.baseElevation;
         this.armor = type.armor;
         this.hitSize = type.hitsize;
+        this.hovering = type.hovering;
 
         if(controller == null) controller(type.createController());
         if(mounts().length != type.weapons.size) setupWeapons(type);

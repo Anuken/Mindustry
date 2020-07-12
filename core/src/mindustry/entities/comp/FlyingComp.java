@@ -19,6 +19,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
 
     @SyncLocal float elevation;
     private transient boolean wasFlying;
+    transient boolean hovering;
     transient float drownTime;
     transient float splashTimer;
 
@@ -35,7 +36,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     boolean canDrown(){
-        return isGrounded();
+        return isGrounded() && !hovering;
     }
 
     void landed(){
@@ -54,7 +55,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     float floorSpeedMultiplier(){
-        Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
+        Floor on = isFlying() || hovering ? Blocks.air.asFloor() : floorOn();
         return on.speedMultiplier;
     }
 
@@ -72,7 +73,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             wasFlying = isFlying();
         }
 
-        if(isGrounded() && floor.isLiquid){
+        if(!hovering && isGrounded() && floor.isLiquid){
             if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= 7f){
                 floor.walkEffect.at(x, y, 1f, floor.mapColor);
                 splashTimer = 0f;

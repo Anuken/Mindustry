@@ -17,7 +17,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @Import float x, y, rotation;
 
     /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
-    static final float minAimDst = 20f;
+    static final float minAimDst = 18f;
     /** temporary weapon sequence number */
     static int sequenceNum = 0;
 
@@ -93,11 +93,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
             //rotate if applicable
             if(weapon.rotate && (mount.rotate || mount.shoot)){
-                float axisXOffset = weapon.x;
-                float axisX = this.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
-                    axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
+                float axisX = this.x + Angles.trnsx(rotation - 90,  weapon.x, weapon.y),
+                    axisY = this.y + Angles.trnsy(rotation - 90,  weapon.x, weapon.y);
 
-                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation();
+                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation;
                 mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta());
             }else{
                 mount.rotation = 0;

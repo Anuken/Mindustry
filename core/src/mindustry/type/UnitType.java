@@ -48,6 +48,7 @@ public class UnitType extends UnlockableContent{
     public int commandLimit = 24;
     public float baseElevation = 0f;
     public float deathShake = 2f;
+    public boolean hovering = false;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Seq<mindustry.entities.abilities.Ability> abilities = new Seq<>();
