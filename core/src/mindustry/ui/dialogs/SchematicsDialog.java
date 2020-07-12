@@ -336,59 +336,60 @@ public class SchematicsDialog extends BaseDialog{
             cont.add(new SchematicImage(schem)).maxSize(800f);
             cont.row();
 
-            IntIntMap blocks = new IntIntMap();
-            schem.tiles.each(t -> blocks.increment(t.block.id));
-            cont.table(t -> {
-                int i = 0;
-                for(Entry ent : blocks){
-                    int v = ent.value;
-                    t.image(Vars.content.block(ent.key).icon(Cicon.small)).left();
-                    t.add("[lightgray]" + v).left().padLeft(4).padRight(6).padTop(4).padBottom(4);
+            cont.pane(p -> {
+                IntIntMap blocks = new IntIntMap();
+                schem.tiles.each(t -> blocks.increment(t.block.id));
+                p.table(t -> {
+                    int i = 0;
+                    for(Entry ent : blocks){
+                        int v = ent.value;
+                        t.image(Vars.content.block(ent.key).icon(Cicon.small)).size(Cicon.small.size).left();
+                        t.add("[lightgray]" + v).left().padLeft(4).padRight(20).padTop(4).padBottom(4);
 
-                    if(++i % 6 == 0){
-                        t.row();
-                    }
-                }
-
-            });
-            cont.row();
-
-            Seq<ItemStack> arr = schem.requirements();
-            cont.table(r -> {
-                int i = 0;
-                for(ItemStack s : arr){
-                    r.image(s.item.icon(Cicon.small)).left();
-                    r.label(() -> {
-                        Building core = player.core();
-                        if(core == null || state.rules.infiniteResources || core.items.has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
-                        return (core.items.has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items.get(s.item), s.amount) + "[lightgray]/" + s.amount;
-                    }).padLeft(2).left().padRight(4);
-
-                    if(++i % 4 == 0){
-                        r.row();
-                    }
-                }
-            });
-            cont.row();
-            float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
-            if(!Mathf.zero(cons) || !Mathf.zero(prod)){
-                cont.table(t -> {
-
-                    if(!Mathf.zero(prod)){
-                        t.image(Icon.powerSmall).color(Pal.powerLight).padRight(3);
-                        t.add("+" + Strings.autoFixed(prod, 2)).color(Pal.powerLight).left();
-
-                        if(!Mathf.zero(cons)){
-                            t.add().width(15);
+                        if(++i % (Core.graphics.getWidth() / 70) == 0){
+                            t.row();
                         }
                     }
+                });
+                p.row();
 
-                    if(!Mathf.zero(cons)){
-                        t.image(Icon.powerSmall).color(Pal.remove).padRight(3);
-                        t.add("-" + Strings.autoFixed(cons, 2)).color(Pal.remove).left();
+                Seq<ItemStack> arr = schem.requirements();
+                p.table(r -> {
+                    int i = 0;
+                    for(ItemStack s : arr){
+                        r.image(s.item.icon(Cicon.small)).left();
+                        r.label(() -> {
+                            Building core = player.core();
+                            if(core == null || state.rules.infiniteResources || core.items.has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
+                            return (core.items.has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items.get(s.item), s.amount) + "[lightgray]/" + s.amount;
+                        }).padLeft(2).left().padRight(4);
+
+                        if(++i % 4 == 0){
+                            r.row();
+                        }
                     }
                 });
-            }
+                p.row();
+                float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
+                if(!Mathf.zero(cons) || !Mathf.zero(prod)){
+                    p.table(t -> {
+
+                        if(!Mathf.zero(prod)){
+                            t.image(Icon.powerSmall).color(Pal.powerLight).padRight(3);
+                            t.add("+" + Strings.autoFixed(prod, 2)).color(Pal.powerLight).left();
+
+                            if(!Mathf.zero(cons)){
+                                t.add().width(15);
+                            }
+                        }
+
+                        if(!Mathf.zero(cons)){
+                            t.image(Icon.powerSmall).color(Pal.remove).padRight(3);
+                            t.add("-" + Strings.autoFixed(cons, 2)).color(Pal.remove).left();
+                        }
+                    });
+                }
+            }).growX().get().setScrollingDisabled(true, false);
 
             show();
         }
