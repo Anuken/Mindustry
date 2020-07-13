@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
@@ -18,7 +19,7 @@ import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 import mindustry.type.Sector.*;
 
-import static mindustry.Vars.universe;
+import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
@@ -97,10 +98,6 @@ public class Planet extends UnlockableContent{
                 }catch(Throwable t){
                     t.printStackTrace();
                 }
-            }
-
-            for(Sector sector : sectors){
-                sector.generate();
             }
         }else{
             sectors = new Seq<>();
@@ -183,6 +180,24 @@ public class Planet extends UnlockableContent{
         return in;
     }
 
+    /** Updates wave coverage of bases. */
+    public void updateBaseCoverage(){
+        for(Sector sector : sectors){
+            float sum = 1f;
+            for(Sector other : sector.inRange(2)){
+                if(other.is(SectorAttribute.base)){
+                    sum += 1f;
+                }
+            }
+
+            if(sector.hasEnemyBase()){
+                sum += 2f;
+            }
+
+            sector.baseCoverage = sum;
+        }
+    }
+
     /** @return the supplied matrix with transformation applied. */
     public Mat3D getTransform(Mat3D mat){
         return mat.setToTranslation(position).rotate(Vec3.Y, getRotation());
@@ -191,6 +206,21 @@ public class Planet extends UnlockableContent{
     @Override
     public void load(){
         mesh = meshLoader.get();
+    }
+
+    @Override
+    public void init(){
+
+        if(generator != null){
+            Noise.setSeed(id + 1);
+
+            for(Sector sector : sectors){
+                generator.generateSector(sector);
+            }
+
+            updateBaseCoverage();
+        }
+
     }
 
     @Override

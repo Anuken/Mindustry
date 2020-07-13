@@ -39,14 +39,14 @@ public class BasicBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
         float height = this.height * ((1f - shrinkY) + shrinkY * b.fout());
         float width = this.width * ((1f - shrinkX) + shrinkX * b.fout());
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x(), b.y(), width, height, b.rotation() - 90);
+        Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() - 90);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x(), b.y(), width, height, b.rotation() - 90);
+        Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() - 90);
         Draw.color();
     }
 }

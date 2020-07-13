@@ -40,7 +40,7 @@ public class ItemTurret extends Turret{
         stats.add(BlockStat.ammo, new AmmoListValue<>(ammoTypes));
         consumes.add(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
             @Override
-            public void build(Tilec tile, Table table){
+            public void build(Building tile, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
                     () -> tile != null && !((ItemTurretEntity)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretEntity)tile).ammo.peek()).item == item)));
@@ -49,7 +49,7 @@ public class ItemTurret extends Turret{
             }
 
             @Override
-            public boolean valid(Tilec entity){
+            public boolean valid(Building entity){
                 //valid when there's any ammo in the turret
                 return !((ItemTurretEntity)entity).ammo.isEmpty();
             }
@@ -103,7 +103,7 @@ public class ItemTurret extends Turret{
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
+        public void handleItem(Building source, Item item){
 
             if(item == Items.pyratite){
                 Events.fire(Trigger.flameAmmo);
@@ -134,7 +134,7 @@ public class ItemTurret extends Turret{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return ammoTypes.get(item) != null && totalAmmo + ammoTypes.get(item).ammoMultiplier <= maxAmmo;
         }
 

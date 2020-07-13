@@ -9,13 +9,13 @@ import java.util.*;
 
 /** Creates quadtrees per unit team. */
 public class TeamIndexProcess implements AsyncProcess{
-    private QuadTree<Unitc>[] trees = new QuadTree[Team.all.length];
+    private QuadTree<Unit>[] trees = new QuadTree[Team.all.length];
     private int[] counts = new int[Team.all.length];
 
-    public QuadTree<Unitc> tree(Team team){
-        if(trees[team.uid] == null) trees[team.uid] = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
+    public QuadTree<Unit> tree(Team team){
+        if(trees[team.id] == null) trees[team.id] = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
 
-        return trees[team.uid];
+        return trees[team.id];
     }
 
     public int count(Team team){
@@ -36,16 +36,16 @@ public class TeamIndexProcess implements AsyncProcess{
     public void begin(){
 
         for(Team team : Team.all){
-            if(trees[team.uid] != null){
-                trees[team.uid].clear();
+            if(trees[team.id] != null){
+                trees[team.id].clear();
             }
         }
 
         Arrays.fill(counts, 0);
 
-        for(Unitc unit : Groups.unit){
-            tree(unit.team()).insert(unit);
-            counts[unit.team().id] ++;
+        for(Unit unit : Groups.unit){
+            tree(unit.team).insert(unit);
+            counts[unit.team.id] ++;
         }
     }
 

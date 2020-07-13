@@ -51,7 +51,7 @@ public class Separator extends Block{
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
     }
 
-    public class SeparatorEntity extends TileEntity{
+    public class SeparatorEntity extends Building{
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -130,7 +130,7 @@ public class Separator extends Block{
         }
 
         @Override
-        public boolean canDump(Tilec to, Item item){
+        public boolean canDump(Building to, Item item){
             return !consumes.itemFilters.get(item.id);
         }
 

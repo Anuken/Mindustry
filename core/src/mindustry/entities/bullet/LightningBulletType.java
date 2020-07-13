@@ -1,6 +1,7 @@
 package mindustry.entities.bullet;
 
 import arc.graphics.*;
+import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -8,7 +9,7 @@ import mindustry.graphics.*;
 
 public class LightningBulletType extends BulletType{
     protected Color lightningColor = Pal.lancerLaser;
-    protected int lightningLength = 25;
+    protected int lightningLength = 25, lightningLengthRand = 0;
 
     public LightningBulletType(){
         super(0.0001f, 1f);
@@ -22,15 +23,15 @@ public class LightningBulletType extends BulletType{
 
     @Override
     public float range(){
-        return lightningLength * 2.33f;
+        return (lightningLength + lightningLengthRand/2f) * 6f;
     }
 
     @Override
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
     }
 
     @Override
-    public void init(Bulletc b){
-        Lightning.create(b.team(), lightningColor, damage, b.x(), b.y(), b.rotation(), lightningLength);
+    public void init(Bullet b){
+        Lightning.create(b, lightningColor, damage, b.x, b.y, b.rotation(), lightningLength + Mathf.random(lightningLengthRand));
     }
 }

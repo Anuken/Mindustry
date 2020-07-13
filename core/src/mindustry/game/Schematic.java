@@ -9,7 +9,10 @@ import mindustry.content.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -28,12 +31,22 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         this.height = height;
     }
 
+    public float powerProduction(){
+        return tiles.sumf(s -> s.block instanceof PowerGenerator ? ((PowerGenerator)s.block).powerProduction : 0f);
+    }
+
+    public float powerConsumption(){
+        return tiles.sumf(s -> s.block.consumes.has(ConsumeType.power) ? s.block.consumes.getPower().usage : 0f);
+    }
+
     public Seq<ItemStack> requirements(){
         IntIntMap amounts = new IntIntMap();
 
         tiles.each(t -> {
+            if(t.block.buildVisibility == BuildVisibility.hidden) return;
+
             for(ItemStack stack : t.block.requirements){
-                amounts.getAndIncrement(stack.item.id, 0, stack.amount);
+                amounts.increment(stack.item.id, stack.amount);
             }
         });
         Seq<ItemStack> stacks = new Seq<>();

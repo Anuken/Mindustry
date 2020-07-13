@@ -3,6 +3,7 @@ package mindustry.game;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -12,10 +13,13 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class SectorInfo{
-    /** export window size in seconds */
-    private static final int exportWindow = 60;
+    /** average window size in samples */
+    private static final int valueWindow = 60;
     /** refresh period of export in ticks */
     private static final float refreshPeriod = 60;
+
+    /** Core input statistics. */
+    public ObjectMap<Item, ExportStat> production = new ObjectMap<>();
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
     /** Items stored in all cores. */
@@ -26,6 +30,10 @@ public class SectorInfo{
     public int storageCapacity = 0;
     /** Whether a core is available here. */
     public boolean hasCore = true;
+    /** Sector that was launched from. */
+    public @Nullable Sector origin;
+    /** Time spent at this sector. Do not use unless you know what you're doing. */
+    public transient float internalTimeSpent;
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
@@ -68,20 +76,33 @@ public class SectorInfo{
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
+
+        //update sector's internal time spent counter1
+        state.rules.sector.setTimeSpent(internalTimeSpent);
     }
 
-    /** Update averages of various stats. */
+    /** Update averages of various stats.
+     * Called every frame. */
     public void update(){
+        internalTimeSpent += Time.delta();
+
+        //time spent exceeds turn duration!
+        if(internalTimeSpent >= turnDuration && internalTimeSpent - Time.delta() < turnDuration){
+            universe.displayTimeEnd();
+        }
+
         //create last stored core items
         if(lastCoreItems == null){
             lastCoreItems = new int[content.items().size];
             updateCoreDeltas();
         }
 
+        CoreEntity ent = state.rules.defaultTeam.core();
+
         //refresh throughput
         if(time.get(refreshPeriod)){
-            CoreEntity ent = state.rules.defaultTeam.core();
 
+            //refresh export
             export.each((item, stat) -> {
                 //initialize stat after loading
                 if(!stat.loaded){
@@ -98,8 +119,36 @@ public class SectorInfo{
                 stat.mean = stat.means.rawMean();
             });
 
+            //refresh core items
+            for(Item item : content.items()){
+                ExportStat stat = production.get(item, ExportStat::new);
+                if(!stat.loaded){
+                    stat.means.fill(stat.mean);
+                    stat.loaded = true;
+                }
+
+                //get item delta
+                //TODO is preventing negative production a good idea?
+                int delta = Math.max((ent == null ? 0 : ent.items.get(item)) - lastCoreItems[item.id], 0);
+
+                //store means
+                stat.means.add(delta);
+                stat.mean = stat.means.rawMean();
+            }
+
             updateCoreDeltas();
         }
+    }
+
+    /** @return the items in this sector now, taking into account production and items recieved. */
+    public ObjectIntMap<Item> getCurrentItems(Sector sector){
+        ObjectIntMap<Item> map = new ObjectIntMap<>();
+        map.putAll(coreItems);
+        long seconds = sector.getSecondsPassed();
+        production.each((item, stat) -> map.increment(item, (int)(stat.mean * seconds)));
+        //increment based on recieved items
+        sector.getRecievedItems().each(stack -> map.increment(stack.item, stack.amount));
+        return map;
     }
 
     private void updateCoreDeltas(){
@@ -117,8 +166,10 @@ public class SectorInfo{
 
     public static class ExportStat{
         public transient float counter;
-        public transient WindowedMean means = new WindowedMean(exportWindow);
+        public transient WindowedMean means = new WindowedMean(valueWindow);
         public transient boolean loaded;
+
+        /** mean in terms of items produced per refresh rate (currently, per second) */
         public float mean;
     }
 }

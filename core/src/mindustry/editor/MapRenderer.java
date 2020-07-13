@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -26,10 +25,6 @@ public class MapRenderer implements Disposable{
     public MapRenderer(MapEditor editor){
         this.editor = editor;
         this.texture = Core.atlas.find("clear-editor").getTexture();
-
-        Events.on(ContentReloadEvent.class, e -> {
-            texture = Core.atlas.find("clear-editor").getTexture();
-        });
     }
 
     public void resize(int width, int height){

@@ -13,16 +13,16 @@ import static mindustry.Vars.*;
 
 public class Fires{
     private static final float baseLifetime = 1000f;
-    private static final IntMap<Firec> map = new IntMap<>();
+    private static final IntMap<Fire> map = new IntMap<>();
 
     /** Start a fire on the tile. If there already is a file there, refreshes its lifetime. */
     public static void create(Tile tile){
         if(net.client() || tile == null) return; //not clientside.
 
-        Firec fire = map.get(tile.pos());
+        Fire fire = map.get(tile.pos());
 
         if(fire == null){
-            fire = FireEntity.create();
+            fire = Fire.create();
             fire.tile(tile);
             fire.lifetime(baseLifetime);
             fire.set(tile.worldx(), tile.worldy());
@@ -34,7 +34,7 @@ public class Fires{
         }
     }
 
-    public static Firec get(int x, int y){
+    public static Fire get(int x, int y){
         return map.get(Point2.pack(x, y));
     }
 
@@ -42,7 +42,7 @@ public class Fires{
         if(!Structs.inBounds(x, y, world.width(), world.height()) || !map.containsKey(Point2.pack(x, y))){
             return false;
         }
-        Firec fire = map.get(Point2.pack(x, y));
+        Fire fire = map.get(Point2.pack(x, y));
         return fire.isAdded() && fire.fin() < 1f && fire.tile() != null && fire.tile().x == x && fire.tile().y == y;
     }
 
@@ -51,7 +51,7 @@ public class Fires{
      */
     public static void extinguish(Tile tile, float intensity){
         if(tile != null && map.containsKey(tile.pos())){
-            Firec fire = map.get(tile.pos());
+            Fire fire = map.get(tile.pos());
             fire.time(fire.time() + intensity * Time.delta());
             Fx.steam.at(fire);
             if(fire.time() >= fire.lifetime()){
@@ -64,7 +64,7 @@ public class Fires{
         map.remove(tile.pos());
     }
 
-    public static void register(Firec fire){
-        map.put(fire.tile().pos(), fire);
+    public static void register(Fire fire){
+        map.put(fire.tile.pos(), fire);
     }
 }

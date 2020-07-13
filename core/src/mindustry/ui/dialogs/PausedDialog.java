@@ -34,6 +34,12 @@ public class PausedDialog extends BaseDialog{
         });
 
         if(!mobile){
+            //TODO localize
+            cont.label(() -> state.getSector() == null ? "" :
+            "[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining())
+            .visible(() -> state.getSector() != null).colspan(2);
+            cont.row();
+
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
@@ -45,7 +51,8 @@ public class PausedDialog extends BaseDialog{
             //}else{
             //    cont.button("$database", Icon.book, ui.database::show);
             //}
-            cont.button("placeholder", Icon.warning, () -> ui.showInfo("go away"));
+            //TODO remove
+            cont.button("nothing", Icon.warning, () -> ui.showInfo("no"));
             cont.button("$settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){

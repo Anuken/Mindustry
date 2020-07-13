@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 import static mindustry.entities.Puddles.*;
 
 @EntityDef(value = {Puddlec.class}, pooled = true)
-@Component
+@Component(base = true)
 abstract class PuddleComp implements Posc, Puddlec, Drawc{
     private static final int maxGeneration = 2;
     private static final Color tmp = new Color();
@@ -68,7 +68,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         //effects-only code
         if(amount >= maxLiquid / 2f && updateTime <= 0f){
             Units.nearby(rect.setSize(Mathf.clamp(amount / (maxLiquid / 1.5f)) * 10f).setCenter(x, y), unit -> {
-                if(unit.isGrounded()){
+                if(unit.isGrounded() && !unit.hovering){
                     unit.hitbox(rect2);
                     if(rect.overlaps(rect2)){
                         unit.apply(liquid.effect, 60 * 2);
@@ -80,11 +80,11 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
                 }
             });
 
-            if(liquid.temperature > 0.7f && (tile.entity != null) && Mathf.chance(0.3 * Time.delta())){
+            if(liquid.temperature > 0.7f && (tile.build != null) && Mathf.chance(0.5)){
                 Fires.create(tile);
             }
 
-            updateTime = 20f;
+            updateTime = 40f;
         }
 
         updateTime -= Time.delta();
@@ -128,6 +128,6 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Override
     public void afterRead(){
-        Puddles.register(this);
+        Puddles.register(base());
     }
 }

@@ -233,7 +233,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.draw(Layer.plans, overlays::drawBottom);
 
-        if(settings.getBool("animatedshields")){
+        if(settings.getBool("animatedshields") && Shaders.shield != null){
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();
                 effectBuffer.blit(Shaders.shield);
@@ -259,7 +259,7 @@ public class Renderer implements ApplicationListener{
     private void drawLanding(){
         if(landTime > 0 && player.closestCore() != null){
             float fract = landTime / Fx.coreLand.lifetime;
-            Tilec entity = player.closestCore();
+            Building entity = player.closestCore();
 
             TextureRegion reg = entity.block().icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;

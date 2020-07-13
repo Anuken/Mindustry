@@ -44,6 +44,7 @@ public class BaseGenerator{
             }
         }
 
+        //TODO limit base size
         float costBudget = 1000;
 
         Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1);
@@ -62,9 +63,9 @@ public class BaseGenerator{
             Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? ores.get((Item)coreschem.required) : Blocks.oreCopper);
 
             //fill core with every type of item (even non-material)
-            Tilec entity = tile.entity;
+            Building entity = tile.build;
             for(Item item : content.items()){
-                entity.items().add(item, entity.block().itemCapacity);
+                entity.items.add(item, entity.block().itemCapacity);
             }
         }
 
@@ -129,9 +130,11 @@ public class BaseGenerator{
     }
 
     public void postGenerate(){
+        if(tiles == null) return;
+
         for(Tile tile : tiles){
             if(tile.isCenter() && tile.block() instanceof PowerNode){
-                tile.entity.placed();
+                tile.build.placed();
             }
         }
     }

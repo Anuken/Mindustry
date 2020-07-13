@@ -28,7 +28,7 @@ abstract class BuilderComp implements Unitc{
 
     @Import float x, y, rotation;
 
-    Queue<BuildPlan> plans = new Queue<>();
+    @SyncLocal Queue<BuildPlan> plans = new Queue<>();
     transient boolean building = true;
 
     @Override
@@ -54,7 +54,7 @@ abstract class BuilderComp implements Unitc{
             }
         }
 
-        Tilec core = core();
+        Building core = core();
 
         //nothing to build.
         if(buildPlan() == null) return;
@@ -72,19 +72,19 @@ abstract class BuilderComp implements Unitc{
 
         BuildPlan current = buildPlan();
 
-        if(dst(current.tile()) > finalPlaceDst) return;
+        if(!within(current.tile(), finalPlaceDst)) return;
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(dst(tile) <= finalPlaceDst){
+        if(!within(tile, finalPlaceDst)){
             rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
         }
 
         if(!(tile.block() instanceof BuildBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
-                boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item));
+                boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
-                if(hasAll || infinite){
+                if(hasAll){
                     Build.beginPlace(current.block, team(), current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
@@ -100,25 +100,25 @@ abstract class BuilderComp implements Unitc{
             return;
         }
 
-        if(tile.entity instanceof BuildEntity && !current.initialized){
+        if(tile.build instanceof BuildEntity && !current.initialized){
             Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team(), (Builderc)this, current.breaking)));
             current.initialized = true;
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !infinite) || !(tile.entity instanceof BuildEntity)){
+        if((core == null && !infinite) || !(tile.build instanceof BuildEntity)){
             return;
         }
 
         //otherwise, update it.
-        BuildEntity entity = tile.ent();
+        BuildEntity entity = tile.bc();
 
         if(current.breaking){
-            entity.deconstruct(this, core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            if(entity.construct(this, core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
+            if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
-                    Call.onTileConfig(null, tile.entity, current.config);
+                    Call.tileConfig(null, tile.build, current.config);
                 }
             }
         }
@@ -147,11 +147,11 @@ abstract class BuilderComp implements Unitc{
     }
 
     /** @return whether this request should be skipped, in favor of the next one. */
-    boolean shouldSkip(BuildPlan request, @Nullable Tilec core){
+    boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
         if(state.rules.infiniteResources || team().rules().infiniteResources || request.breaking || core == null) return false;
         //TODO these are bad criteria
-        return (request.stuck && !core.items().has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items().has(i.item)) && !request.initialized);
+        return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item)) && !request.initialized);
     }
 
     void removeBuild(int x, int y, boolean breaking){
@@ -190,8 +190,8 @@ abstract class BuilderComp implements Unitc{
             plans.remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
-        if(tile != null && tile.entity instanceof BuildEntity){
-            place.progress = tile.<BuildEntity>ent().progress;
+        if(tile != null && tile.build instanceof BuildEntity){
+            place.progress = tile.<BuildEntity>bc().progress;
         }
         if(tail){
             plans.addLast(place);

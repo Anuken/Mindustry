@@ -45,7 +45,7 @@ public class PowerGenerator extends PowerDistributor{
         return false;
     }
 
-    public class GeneratorEntity extends TileEntity{
+    public class GeneratorEntity extends Building{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;

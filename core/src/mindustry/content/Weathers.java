@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -33,7 +34,7 @@ public class Weathers implements ContentList{
             }
 
             @Override
-            public void drawOver(Weatherc state){
+            public void drawOver(WeatherState state){
                 rand.setSeed(0);
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
                 Tmp.r1.grow(padding);
@@ -78,7 +79,7 @@ public class Weathers implements ContentList{
             }
 
             @Override
-            public void drawOver(Weatherc state){
+            public void drawOver(WeatherState state){
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
                 Tmp.r1.grow(padding);
                 Core.camera.bounds(Tmp.r2);
@@ -110,7 +111,7 @@ public class Weathers implements ContentList{
             }
 
             @Override
-            public void drawUnder(Weatherc state){
+            public void drawUnder(WeatherState state){
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
                 Tmp.r1.grow(padding);
                 Core.camera.bounds(Tmp.r2);
@@ -158,19 +159,44 @@ public class Weathers implements ContentList{
 
         sandstorm = new Weather("sandstorm"){
             TextureRegion region;
-            float yspeed = 0.3f, xspeed = 6f, padding = 110f, size = 110f, invDensity = 800f;
-            Vec2 force = new Vec2(0.4f, 0.01f);
+            float yspeed = 0.3f, xspeed = 6f, size = 140f, padding = size, invDensity = 1500f;
+            Vec2 force = new Vec2(0.45f, 0.01f);
             Color color = Color.valueOf("f7cba4");
+            Texture noise;
 
             @Override
             public void load(){
-                super.load();
-
                 region = Core.atlas.find("circle-shadow");
+                noise = new Texture("sprites/noiseAlpha.png");
+                noise.setWrap(TextureWrap.repeat);
+                noise.setFilter(TextureFilter.linear);
             }
 
             @Override
-            public void drawOver(Weatherc state){
+            public void dispose(){
+                noise.dispose();
+            }
+
+            @Override
+            public void update(WeatherState state){
+
+                for(Unit unit : Groups.unit){
+                    unit.impulse(force.x * state.intensity(), force.y * state.intensity());
+                }
+            }
+
+            @Override
+            public void drawOver(WeatherState state){
+                Draw.tint(color);
+
+                float scale = 1f / 2000f;
+                float scroll = Time.time() * scale;
+                Tmp.tr1.setTexture(noise);
+                Core.camera.bounds(Tmp.r1);
+                Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
+                Tmp.tr1.scroll(-xspeed * scroll, -yspeed * scroll);
+                Draw.rect(Tmp.tr1, Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+
                 rand.setSeed(0);
                 Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
                 Tmp.r1.grow(padding);
@@ -178,10 +204,6 @@ public class Weathers implements ContentList{
                 int total = (int)(Tmp.r1.area() / invDensity * state.intensity());
                 Draw.tint(color);
                 float baseAlpha = Draw.getColor().a;
-
-                for(Unitc unit : Groups.unit){
-                    unit.impulse(force.x * state.intensity(), force.y * state.intensity());
-                }
 
                 for(int i = 0; i < total; i++){
                     float scl = rand.random(0.5f, 1f);
@@ -202,7 +224,6 @@ public class Weathers implements ContentList{
 
                     if(Tmp.r3.setCentered(x, y, size * sscl).overlaps(Tmp.r2)){
                         Draw.alpha(alpha * baseAlpha);
-                        //Fill.circle(x, y, size * sscl / 2f);
                         Draw.rect(region, x, y, size * sscl, size * sscl);
                     }
                 }

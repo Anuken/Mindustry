@@ -25,7 +25,7 @@ public class ShockMine extends Block{
         rebuildable = false;
     }
 
-    public class ShockMineEntity extends TileEntity{
+    public class ShockMineEntity extends Building{
 
         @Override
         public void drawTeam(){
@@ -42,7 +42,7 @@ public class ShockMine extends Block{
         }
 
         @Override
-        public void unitOn(Unitc unit){
+        public void unitOn(Unit unit){
             if(unit.team() != team && timer(timerDamage, cooldown)){
                 for(int i = 0; i < tendrils; i++){
                     Lightning.create(team, Pal.lancerLaser, damage, x, y, Mathf.random(360f), length);

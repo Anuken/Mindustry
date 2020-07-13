@@ -26,7 +26,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
-    public void build(Tilec tile, Table table){
+    public void build(Building tile, Table table){
         table.add(new ReqImage(liquid.icon(Cicon.medium), () -> valid(tile))).size(8 * 4);
     }
 
@@ -36,13 +36,13 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
-    public void update(Tilec entity){
-        entity.liquids().remove(liquid, Math.min(use(entity), entity.liquids().get(liquid)));
+    public void update(Building entity){
+        entity.liquids.remove(liquid, Math.min(use(entity), entity.liquids.get(liquid)));
     }
 
     @Override
-    public boolean valid(Tilec entity){
-        return entity != null && entity.liquids() != null && entity.liquids().get(liquid) >= use(entity);
+    public boolean valid(Building entity){
+        return entity != null && entity.liquids != null && entity.liquids.get(liquid) >= use(entity);
     }
 
     @Override

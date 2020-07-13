@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class MinimapRenderer implements Disposable{
     private static final float baseSize = 16f;
-    private final Seq<Unitc> units = new Seq<>();
+    private final Seq<Unit> units = new Seq<>();
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
@@ -36,7 +36,7 @@ public class MinimapRenderer implements Disposable{
         });
 
         //make sure to call on the graphics thread
-        Events.on(TileChangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
+        Events.on(BuildinghangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
     }
 
     public Pixmap getPixmap(){
@@ -87,7 +87,7 @@ public class MinimapRenderer implements Disposable{
 
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
-        for(Unitc unit : units){
+        for(Unit unit : units){
             float rx = !withLabels ? (unit.x() - rect.x) / rect.width * w : unit.x() / (world.width() * tilesize) * w;
             float ry = !withLabels ? (unit.y() - rect.y) / rect.width * h : unit.y() / (world.height() * tilesize) * h;
 
@@ -97,9 +97,9 @@ public class MinimapRenderer implements Disposable{
             Draw.reset();
 
             //only disable player names in multiplayer
-            if(withLabels && unit instanceof Playerc && net.active()){
-                Playerc pl = (Playerc)unit;
-                drawLabel(x + rx, y + ry, pl.name(), unit.team().color);
+            if(withLabels && unit.isPlayer() && net.active()){
+                Player pl = unit.getPlayer();
+                drawLabel(x + rx, y + ry, pl.name, unit.team().color);
             }
         }
 

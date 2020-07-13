@@ -55,6 +55,7 @@ public class Schematics implements Loadable{
     private Seq<Schematic> all = new Seq<>();
     private OrderedMap<Schematic, FrameBuffer> previews = new OrderedMap<>();
     private ObjectSet<Schematic> errored = new ObjectSet<>();
+    private ObjectMap<CoreBlock, Seq<Schematic>> loadouts = new ObjectMap<>();
     private FrameBuffer shadowBuffer;
     private Texture errorTexture;
     private long lastClearTime;
@@ -67,12 +68,6 @@ public class Schematics implements Loadable{
             if(errorTexture != null){
                 errorTexture.dispose();
             }
-        });
-
-        Events.on(ContentReloadEvent.class, event -> {
-            previews.each((schem, m) -> m.dispose());
-            previews.clear();
-            load();
         });
 
         Events.on(ClientLoadEvent.class, event -> {
@@ -90,6 +85,8 @@ public class Schematics implements Loadable{
     /** Load all schematics in the folder immediately.*/
     public void load(){
         all.clear();
+
+        loadLoadouts();
 
         for(Fi file : schematicDirectory.list()){
             loadFile(file);
@@ -113,6 +110,10 @@ public class Schematics implements Loadable{
 
         //load base schematics
         bases.load();
+    }
+
+    private void loadLoadouts(){
+        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s,false));
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){
@@ -142,6 +143,7 @@ public class Schematics implements Loadable{
         try{
             Schematic s = read(file);
             all.add(s);
+            checkLoadout(s, true);
 
             //external file from workshop
             if(!s.file.parent().equals(schematicDirectory)){
@@ -281,6 +283,22 @@ public class Schematics implements Loadable{
             .removeAll(s -> !s.block.isVisible() || !s.block.unlockedNow());
     }
 
+    /** @return all the valid loadouts for a specific core type. */
+    public Seq<Schematic> getLoadouts(CoreBlock block){
+        return loadouts.get(block, Seq::new);
+    }
+
+    /** Checks a schematic for deployment validity and adds it to the cache. */
+    private void checkLoadout(Schematic s, boolean validate){
+        Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
+
+        //make sure a core exists, and that the schematic is small enough.
+        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2))) return;
+
+        //place in the cache
+        loadouts.get((CoreBlock)core.block, Seq::new).add(s);
+    }
+
     /** Adds a schematic to the list, also copying it into the files.*/
     public void add(Schematic schematic){
         all.add(schematic);
@@ -292,11 +310,14 @@ public class Schematics implements Loadable{
             ui.showException(e);
             Log.err(e);
         }
+
+        checkLoadout(schematic, true);
         all.sort();
     }
 
     public void remove(Schematic s){
         all.remove(s);
+        loadouts.each((block, seq) -> seq.remove(s));
         if(s.file != null){
             s.file.delete();
         }
@@ -324,7 +345,7 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Tilec linked = world.ent(cx, cy);
+                Building linked = world.ent(cx, cy);
 
                 if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof BuildBlock)){
                     int top = linked.block().size/2;
@@ -352,10 +373,10 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Tilec tile = world.ent(cx, cy);
+                Building tile = world.ent(cx, cy);
 
                 if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
-                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock && Core.settings.getBool("coreselect")))){
+                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
                     Object config = tile.config();
 
                     tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
@@ -378,6 +399,13 @@ public class Schematics implements Loadable{
         }
     }
 
+    /** Places the last launch loadout at the coordinates and fills it with the launch resources. */
+    public static void placeLaunchLoadout(int x, int y){
+        placeLoadout(universe.getLastLoadout(), x, y);
+        if(world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
+        world.tile(x, y).build.items.add(universe.getLaunchResources());
+    }
+
     public static void placeLoadout(Schematic schem, int x, int y){
         placeLoadout(schem, x, y, state.rules.defaultTeam, Blocks.oreCopper);
     }
@@ -394,8 +422,8 @@ public class Schematics implements Loadable{
             tile.rotation(st.rotation);
 
             Object config = st.config;
-            if(tile.entity != null){
-                tile.entity.configureAny(config);
+            if(tile.build != null){
+                tile.build.configureAny(config);
             }
 
             if(st.block instanceof Drill){
@@ -414,8 +442,8 @@ public class Schematics implements Loadable{
             tile.rotation(st.rotation);
 
             Object config = st.config;
-            if(tile.entity != null){
-                tile.entity.configureAny(config);
+            if(tile.build != null){
+                tile.build.configureAny(config);
             }
         });
     }

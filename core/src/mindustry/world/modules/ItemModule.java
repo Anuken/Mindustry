@@ -12,6 +12,8 @@ import java.util.*;
 import static mindustry.Vars.content;
 
 public class ItemModule extends BlockModule{
+    public static final ItemModule empty = new ItemModule();
+
     private static final int windowSize = 60 * 4;
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;
@@ -24,6 +26,18 @@ public class ItemModule extends BlockModule{
     protected int takeRotation;
 
     private @Nullable WindowedMean[] flow;
+
+    public ItemModule copy(){
+        ItemModule out = new ItemModule();
+        out.set(this);
+        return out;
+    }
+
+    public void set(ItemModule other){
+        total = other.total;
+        takeRotation = other.takeRotation;
+        System.arraycopy(other.items, 0, items, 0, items.length);
+    }
 
     public void update(boolean showFlow){
         if(showFlow){
@@ -116,6 +130,13 @@ public class ItemModule extends BlockModule{
         return true;
     }
 
+    public boolean has(Iterable<ItemStack> stacks){
+        for(ItemStack stack : stacks){
+            if(!has(stack.item, stack.amount)) return false;
+        }
+        return true;
+    }
+
     public boolean has(ItemStack[] stacks, float multiplier){
         for(ItemStack stack : stacks){
             if(!has(stack.item, Math.round(stack.amount * multiplier))) return false;
@@ -200,6 +221,12 @@ public class ItemModule extends BlockModule{
         items[item.id] = amount;
     }
 
+    public void add(Iterable<ItemStack> stacks){
+        for(ItemStack stack : stacks){
+            add(stack.item, stack.amount);
+        }
+    }
+
     public void add(Item item, int amount){
         add(item.id, amount);
     }
@@ -226,6 +253,10 @@ public class ItemModule extends BlockModule{
     }
 
     public void remove(ItemStack[] stacks){
+        for(ItemStack stack : stacks) remove(stack.item, stack.amount);
+    }
+
+    public void remove(Iterable<ItemStack> stacks){
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
     }
 

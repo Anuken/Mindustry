@@ -146,7 +146,7 @@ public interface Autotiler{
     }
 
     default boolean blends(Tile tile, int rotation, int direction){
-        Tilec other = tile.getNearbyEntity(Mathf.mod(rotation - direction, 4));
+        Building other = tile.getNearbyEntity(Mathf.mod(rotation - direction, 4));
         return other != null && other.team() == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation(), other.block());
     }
 

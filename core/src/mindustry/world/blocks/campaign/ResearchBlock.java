@@ -52,7 +52,7 @@ public class ResearchBlock extends Block{
         bars.add("progress", (ResearchBlockEntity e) -> new Bar("bar.progress", Pal.ammo, () -> e.researching == null ? 0f : e.researching.progress / e.researching.time));
     }
 
-    public class ResearchBlockEntity extends TileEntity{
+    public class ResearchBlockEntity extends Building{
         public @Nullable TechNode researching;
 
         public double[] accumulator;
@@ -162,7 +162,7 @@ public class ResearchBlock extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return items.get(item) < getMaximumAccepted(item);
         }
 
@@ -178,10 +178,11 @@ public class ResearchBlock extends Block{
         @Override
         public boolean configTapped(){
             //configure with tech node
-            ui.tech.show(node -> {
-                configure(node);
-                ui.tech.hide();
-            });
+            ui.showInfo("this does nothing");
+            //ui.research.show(node -> {
+            //    configure(node);
+            //    ui.research.hide();
+            //});
 
             return false;
         }

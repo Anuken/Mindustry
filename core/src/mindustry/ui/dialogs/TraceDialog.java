@@ -14,7 +14,7 @@ public class TraceDialog extends BaseDialog{
         setFillParent(false);
     }
 
-    public void show(Playerc player, TraceInfo info){
+    public void show(Player player, TraceInfo info){
         cont.clear();
 
         Table table = new Table(Tex.clear);
@@ -22,7 +22,7 @@ public class TraceDialog extends BaseDialog{
         table.defaults().pad(1);
 
         table.defaults().left();
-        table.add(Core.bundle.format("trace.playername", player.name()));
+        table.add(Core.bundle.format("trace.playername", player.name));
         table.row();
         table.add(Core.bundle.format("trace.ip", info.ip));
         table.row();

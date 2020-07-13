@@ -90,7 +90,7 @@ public class PlacementFragment extends Fragment{
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
         if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
-            Tilec tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Building tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
             Object tryConfig = tile == null ? null : tile.config();
 
@@ -224,8 +224,8 @@ public class PlacementFragment extends Fragment{
                         button.resizeImage(Cicon.medium.size);
 
                         button.update(() -> { //color unplacable things gray
-                            Tilec core = player.core();
-                            Color color = (state.rules.infiniteResources || (core != null && (core.items().has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
+                            Building core = player.core();
+                            Color color = (state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -317,10 +317,10 @@ public class PlacementFragment extends Fragment{
                                         line.image(stack.item.icon(Cicon.small)).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
                                         line.labelWrap(() -> {
-                                            Tilec core = player.core();
+                                            Building core = player.core();
                                             if(core == null || state.rules.infiniteResources) return "*/*";
 
-                                            int amount = core.items().get(stack.item);
+                                            int amount = core.items.get(stack.item);
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
 
@@ -442,7 +442,7 @@ public class PlacementFragment extends Fragment{
         if(Core.scene.hasMouse() || topTable.hit(v.x, v.y, false) != null) return null;
 
         //check for a unit
-        Unitc unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal());
+        Unit unit = Units.closestOverlap(player.team(), Core.input.mouseWorldX(), Core.input.mouseWorldY(), 5f, u -> !u.isLocal());
         //if cursor has a unit, display it
         if(unit != null) return unit;
 
@@ -450,9 +450,9 @@ public class PlacementFragment extends Fragment{
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null){
             //if the tile has an entity, display it
-            if(hoverTile.entity != null){
-                hoverTile.entity.updateFlow(true);
-                return hoverTile.entity;
+            if(hoverTile.build != null){
+                hoverTile.build.updateFlow(true);
+                return hoverTile.build;
             }
 
             //if the tile has a drop, display the drop

@@ -45,7 +45,6 @@ public class Mods implements Loadable{
 
     public Mods(){
         Events.on(ClientLoadEvent.class, e -> Core.app.post(this::checkWarnings));
-        Events.on(ContentReloadEvent.class, e -> Core.app.post(this::checkWarnings));
     }
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
@@ -70,7 +69,7 @@ public class Mods implements Loadable{
 
     /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
-        return mods.find(m -> m.enabled() && m.main != null && m.main.getClass() == type);//loaded.find(l -> l.mod != null && l.mod.getClass() == type);
+        return mods.find(m -> m.enabled() && m.main != null && m.main.getClass() == type);
     }
 
     /** Imports an external mod file.*/
@@ -335,7 +334,6 @@ public class Mods implements Loadable{
             for(Fi file : mod.root.list()){
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
-                    //TODO calling child/parent on these files will give you gibberish; create wrapper class.
                     file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) :
                         zipFolder ? f.path().substring(parentName.length() + 1) : f.path(), f));
                 }
@@ -424,42 +422,6 @@ public class Mods implements Loadable{
         return mods.contains(LoadedMod::hasContentErrors) || (scripts != null && scripts.hasErrored());
     }
 
-    /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
-    public void reloadContent(){
-        //epic memory leak
-        //TODO make it less epic
-        Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
-        createdAtlas = true;
-
-        mods.each(LoadedMod::dispose);
-        mods.clear();
-        Core.bundle =  I18NBundle.createBundle(Core.files.internal("bundles/bundle"), Core.bundle.getLocale());
-        load();
-        Sounds.dispose();
-        Sounds.load();
-        Core.assets.finishLoading();
-        if(scripts != null){
-            scripts.dispose();
-            scripts = null;
-        }
-        content.clear();
-        content.createBaseContent();
-        content.loadColors();
-        loadScripts();
-        content.createModContent();
-        loadAsync();
-        loadSync();
-        content.init();
-        content.load();
-        content.loadColors();
-        Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest));
-        requiresReload = false;
-
-        loadIcons();
-
-        Events.fire(new ContentReloadEvent());
-    }
-
     /** This must be run on the main thread! */
     public void loadScripts(){
         Time.mark();
@@ -497,6 +459,17 @@ public class Mods implements Loadable{
 
     /** Creates all the content found in mod files. */
     public void loadContent(){
+
+        //load class mod content first
+        for(LoadedMod mod : orderedMods()){
+            //hidden mods can't load content
+            if(mod.main != null && !mod.meta.hidden){
+                content.setCurrentMod(mod);
+                mod.main.loadContent();
+            }
+        }
+
+        content.setCurrentMod(null);
 
         class LoadRun implements Comparable<LoadRun>{
             final ContentType type;
@@ -621,7 +594,7 @@ public class Mods implements Loadable{
         Fi metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
         if(!metaf.exists()){
             Log.warn("Mod @ doesn't have a 'mod.json'/'mod.hjson'/'plugin.json' file, skipping.", sourceFile);
-            throw new IllegalArgumentException("No mod.json found.");
+            throw new IllegalArgumentException("Invalid file: No mod.json found.");
         }
 
         ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
@@ -645,9 +618,9 @@ public class Mods implements Loadable{
 
         //make sure the main class exists before loading it; if it doesn't just don't put it there
         if(mainFile.exists()){
-            //other platforms don't have standard java class loaders
-            if(!headless && Version.build != -1){
-                throw new IllegalArgumentException("Java class mods are currently unsupported outside of custom builds.");
+            //mobile versions don't support class mods
+            if(mobile){
+                throw new IllegalArgumentException("Java class mods are not supported on mobile.");
             }
 
             URLClassLoader classLoader = new URLClassLoader(new URL[]{sourceFile.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());

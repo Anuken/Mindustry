@@ -23,7 +23,7 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity);
 
         @Override
-        public void updateTransport(Tilec other){
+        public void updateTransport(Building other){
             if(buffer.accepts() && items.total() > 0){
                 buffer.accept(items.take());
             }

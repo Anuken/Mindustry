@@ -26,6 +26,8 @@ public class Damage{
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
     private static IntSet collidedBlocks = new IntSet();
+    private static Building tmpBuilding;
+    private static Unit tmpUnit;
 
     /** Creates a dynamic explosion based on specified parameters. */
     public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
@@ -72,7 +74,7 @@ public class Damage{
         }
     }
 
-    public static void collideLine(Bulletc hitter, Team team, Effect effect, float x, float y, float angle, float length){
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
         collideLine(hitter, team, effect, x, y, angle, length, false);
     }
 
@@ -80,27 +82,29 @@ public class Damage{
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bulletc hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
+    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
-            Tilec tile = world.ent(cx, cy);
+            Building tile = world.ent(cx, cy);
             if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team() != team && tile.collide(hitter)){
                 tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
-                hitter.type().hit(hitter, tile.x(), tile.y());
+                hitter.type.hit(hitter, tile.x, tile.y);
             }
         };
 
-        world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
-            collider.get(cx, cy);
-            if(large){
-                for(Point2 p : Geometry.d4){
-                    collider.get(cx + p.x, cy + p.y);
+        if(hitter.type.collidesGround){
+            world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+                collider.get(cx, cy);
+                if(large){
+                    for(Point2 p : Geometry.d4){
+                        collider.get(cx + p.x, cy + p.y);
+                    }
                 }
-            }
-            return false;
-        });
+                return false;
+            });
+        }
 
         rect.setPosition(x, y).setSize(tr.x, tr.y);
         float x2 = tr.x + x, y2 = tr.y + y;
@@ -122,7 +126,9 @@ public class Damage{
         rect.width += expand * 2;
         rect.height += expand * 2;
 
-        Cons<Unitc> cons = e -> {
+        Cons<Unit> cons = e -> {
+            if(!e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+
             e.hitbox(hitrect);
             Rect other = hitrect;
             other.y -= expand;
@@ -142,9 +148,76 @@ public class Damage{
         Units.nearbyEnemies(team, rect, cons);
     }
 
+    /**
+     * Casts forward in a line.
+     * @return the first encountered object.
+     */
+    public static Healthc linecast(Bullet hitter, float x, float y, float angle, float length){
+        tr.trns(angle, length);
+
+        if(hitter.type.collidesGround){
+            tmpBuilding = null;
+
+            world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
+                Building tile = world.ent(cx, cy);
+                if(tile != null && tile.team != hitter.team){
+                    tmpBuilding = tile;
+                    //TODO return tile
+                    return true;
+                }
+                return false;
+            });
+
+            if(tmpBuilding != null) return tmpBuilding;
+        }
+
+        rect.setPosition(x, y).setSize(tr.x, tr.y);
+        float x2 = tr.x + x, y2 = tr.y + y;
+
+        if(rect.width < 0){
+            rect.x += rect.width;
+            rect.width *= -1;
+        }
+
+        if(rect.height < 0){
+            rect.y += rect.height;
+            rect.height *= -1;
+        }
+
+        float expand = 3f;
+
+        rect.y -= expand;
+        rect.x -= expand;
+        rect.width += expand * 2;
+        rect.height += expand * 2;
+
+        tmpUnit = null;
+
+        Cons<Unit> cons = e -> {
+            if((tmpUnit != null && e.dst2(x, y) > tmpUnit.dst2(x, y)) || !e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
+
+            e.hitbox(hitrect);
+            Rect other = hitrect;
+            other.y -= expand;
+            other.x -= expand;
+            other.width += expand * 2;
+            other.height += expand * 2;
+
+            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
+
+            if(vec != null){
+                tmpUnit = e;
+            }
+        };
+
+        Units.nearbyEnemies(hitter.team, rect, cons);
+
+        return tmpUnit;
+    }
+
     /** Damages all entities and blocks in a radius that are enemies of the team. */
-    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unitc> predicate, Cons<Unitc> acceptor){
-        Cons<Unitc> cons = entity -> {
+    public static void damageUnits(Team team, float x, float y, float size, float damage, Boolf<Unit> predicate, Cons<Unit> acceptor){
+        Cons<Unit> cons = entity -> {
             if(!predicate.get(entity)) return;
 
             entity.hitbox(hitrect);
@@ -180,8 +253,8 @@ public class Damage{
 
     /** Applies a status effect to all enemy units in a range. */
     public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
-        Cons<Unitc> cons = entity -> {
-            if(entity.team() == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+        Cons<Unit> cons = entity -> {
+            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
 
@@ -203,15 +276,15 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground){
-        Cons<Unitc> cons = entity -> {
-            if(entity.team() == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
+        Cons<Unit> cons = entity -> {
+            if(entity.team == team || !entity.within(x, y, radius) || (entity.isFlying() && !air) || (entity.isGrounded() && !ground)){
                 return;
             }
             float amount = calculateDamage(x, y, entity.getX(), entity.getY(), radius, damage);
             entity.damage(amount);
             //TODO better velocity displacement
             float dst = tr.set(entity.getX() - x, entity.getY() - y).len();
-            entity.vel().add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
+            entity.vel.add(tr.setLength((1f - dst / radius) * 2f / entity.mass()));
 
             if(complete && damage >= 9999999f && entity.isPlayer()){
                 Events.fire(Trigger.exclusionDeath);
@@ -225,14 +298,16 @@ public class Damage{
             Units.nearby(rect, cons);
         }
 
-        if(!complete){
-            int trad = (int)(radius / tilesize);
-            Tile tile = world.tileWorld(x, y);
-            if(tile != null){
-                tileDamage(team, tile.x, tile.y, trad, damage);
+        if(ground){
+            if(!complete){
+                int trad = (int)(radius / tilesize);
+                Tile tile = world.tileWorld(x, y);
+                if(tile != null){
+                    tileDamage(team, tile.x, tile.y, trad, damage);
+                }
+            }else{
+                completeDamage(team, x, y, radius, damage);
             }
-        }else{
-            completeDamage(team, x, y, radius, damage);
         }
     }
 
@@ -265,10 +340,10 @@ public class Damage{
                 if(scaledDamage <= 0 || tile == null) continue;
 
                 //apply damage to entity if needed
-                if(tile.entity != null && tile.team() != team){
-                    int health = (int)tile.entity.health();
-                    if(tile.entity.health() > 0){
-                        tile.entity.damage(scaledDamage);
+                if(tile.build != null && tile.team() != team){
+                    int health = (int)tile.build.health();
+                    if(tile.build.health() > 0){
+                        tile.build.damage(scaledDamage);
                         scaledDamage -= health;
 
                         if(scaledDamage <= 0) continue;
@@ -290,8 +365,8 @@ public class Damage{
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
                 Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
-                if(tile != null && tile.entity != null && (team == null ||team.isEnemy(tile.team())) && Mathf.dst(dx, dy) <= trad){
-                    tile.entity.damage(damage);
+                if(tile != null && tile.build != null && (team == null ||team.isEnemy(tile.team())) && Mathf.dst(dx, dy) <= trad){
+                    tile.build.damage(damage);
                 }
             }
         }

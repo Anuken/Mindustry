@@ -56,7 +56,7 @@ public class BlockForge extends PayloadAcceptor{
         public float progress, time, heat;
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return items.get(item) < getMaximumAccepted(item);
         }
 
@@ -70,7 +70,7 @@ public class BlockForge extends PayloadAcceptor{
         }
 
         @Override
-        public boolean acceptPayload(Tilec source, Payload payload){
+        public boolean acceptPayload(Building source, Payload payload){
             return false;
         }
 

@@ -41,7 +41,7 @@ public class LaserTurret extends PowerTurret{
     }
 
     public class LaserTurretEntity extends PowerTurretEntity{
-        Bulletc bullet;
+        Bullet bullet;
         float bulletLife;
 
         @Override
@@ -101,7 +101,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void bullet(BulletType type, float angle){
-            bullet = type.create(tile.entity, team, x + tr.x, y + tr.y, angle);
+            bullet = type.create(tile.build, team, x + tr.x, y + tr.y, angle);
             bulletLife = shootDuration;
         }
 

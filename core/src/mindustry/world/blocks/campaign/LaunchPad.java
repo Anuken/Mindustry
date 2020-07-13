@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -18,6 +17,8 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class LaunchPad extends Block{
     public final int timerLaunch = timers++;
@@ -46,15 +47,15 @@ public class LaunchPad extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items().total()), () -> Pal.items, () -> (float)entity.items().total() / itemCapacity));
+        bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
-    public class LaunchPadEntity extends TileEntity{
+    public class LaunchPadEntity extends Building{
         @Override
         public void draw(){
             super.draw();
 
-            if(!Vars.state.isCampaign()) return;
+            if(!state.isCampaign()) return;
 
             if(lightRegion.found()){
                 Draw.color(lightColor);
@@ -85,17 +86,17 @@ public class LaunchPad extends Block{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return items.total() < itemCapacity;
         }
 
         @Override
         public void updateTile(){
-            if(!Vars.state.isCampaign()) return;
+            if(!state.isCampaign()) return;
 
             //launch when full and base conditions are met
             if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
-                LaunchPayloadc entity = LaunchPayloadEntity.create();
+                LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks().add(new ItemStack(item, amount)));
                 entity.set(this);
                 entity.lifetime(120f);
@@ -109,7 +110,7 @@ public class LaunchPad extends Block{
     }
 
     @EntityDef(LaunchPayloadc.class)
-    @Component
+    @Component(base = true)
     static abstract class LaunchPayloadComp implements Drawc, Timedc, Teamc{
         @Import float x,y;
 
@@ -175,12 +176,23 @@ public class LaunchPad extends Block{
         public void remove(){
 
             //actually launch the items upon removal
-            if(team() == Vars.state.rules.defaultTeam){
+            if(team() == state.rules.defaultTeam && state.secinfo.origin != null){
+                Seq<ItemStack> dest = state.secinfo.origin.getRecievedItems();
+
                 for(ItemStack stack : stacks){
-                    //TODO where do the items go?
-                    //Vars.data.addItem(stack.item, stack.amount);
+                    ItemStack sto = dest.find(i -> i.item == stack.item);
+                    if(sto != null){
+                        sto.amount += stack.amount;
+                    }else{
+                        dest.add(stack);
+                    }
+
+                    //update export
+                    state.secinfo.handleItemExport(stack);
                     Events.fire(new LaunchItemEvent(stack));
                 }
+
+                state.secinfo.origin.setRecievedItems(dest);
             }
         }
     }

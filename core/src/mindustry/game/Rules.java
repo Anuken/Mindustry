@@ -134,16 +134,16 @@ public class Rules{
         final TeamRule[] values = new TeamRule[Team.all.length];
 
         public TeamRule get(Team team){
-            TeamRule out = values[team.uid];
-            if(out == null) values[team.uid] = (out = new TeamRule());
+            TeamRule out = values[team.id];
+            if(out == null) values[team.id] = (out = new TeamRule());
             return out;
         }
 
         @Override
         public void write(Json json){
             for(Team team : Team.all){
-                if(values[team.uid] != null){
-                    json.writeValue(team.uid + "", values[team.uid], TeamRule.class);
+                if(values[team.id] != null){
+                    json.writeValue(team.id + "", values[team.id], TeamRule.class);
                 }
             }
         }

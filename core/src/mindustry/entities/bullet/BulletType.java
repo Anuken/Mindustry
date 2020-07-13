@@ -15,7 +15,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 
 public abstract class BulletType extends Content{
-    public float lifetime;
+    public float lifetime = 40f;
     public float speed;
     public float damage;
     public float hitSize = 4;
@@ -75,6 +75,11 @@ public abstract class BulletType extends Content{
     public BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
+    public Color trailColor = Pal.missileYellowBack;
+    public float trailChance = -0.0001f;
+    public Effect trailEffect = Fx.missileTrail;
+    public float trailParam =  2f;
+
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
 
@@ -100,9 +105,12 @@ public abstract class BulletType extends Content{
     public BulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
-        lifetime = 40f;
         hitEffect = Fx.hitBulletSmall;
         despawnEffect = Fx.hitBulletSmall;
+    }
+
+    public BulletType(){
+        this(1f, 1f);
     }
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
@@ -110,19 +118,19 @@ public abstract class BulletType extends Content{
         return speed * lifetime * (1f - drag);
     }
 
-    public boolean collides(Bulletc bullet, Tilec tile){
+    public boolean collides(Bullet bullet, Building tile){
         return true;
     }
 
-    public void hitTile(Bulletc b, Tilec tile){
+    public void hitTile(Bullet b, Building tile){
         hit(b);
     }
 
-    public void hit(Bulletc b){
-        hit(b, b.getX(), b.getY());
+    public void hit(Bullet b){
+        hit(b, b.x, b.y);
     }
 
-    public void hit(Bulletc b, float x, float y){
+    public void hit(Bullet b, float x, float y){
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
@@ -141,20 +149,20 @@ public abstract class BulletType extends Content{
         }
 
         if(splashDamageRadius > 0){
-            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
             if(status != StatusEffects.none){
-                Damage.status(b.team(), x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b.team(), Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
+            Lightning.create(b, Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 
-    public void despawned(Bulletc b){
-        despawnEffect.at(b.getX(), b.getY(), b.rotation());
+    public void despawned(Bullet b){
+        despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         hitSound.at(b);
 
         if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
@@ -162,14 +170,14 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void draw(Bulletc b){
+    public void draw(Bullet b){
     }
 
-    public void drawLight(Bulletc b){
-        Drawf.light(b.team(), b, lightRadius, lightColor, lightOpacity);
+    public void drawLight(Bullet b){
+        Drawf.light(b.team, b, lightRadius, lightColor, lightOpacity);
     }
 
-    public void init(Bulletc b){
+    public void init(Bullet b){
         if(killShooter && b.owner() instanceof Healthc){
             ((Healthc)b.owner()).kill();
         }
@@ -179,16 +187,22 @@ public abstract class BulletType extends Content{
         }
     }
 
-    public void update(Bulletc b){
+    public void update(Bullet b){
         if(homingPower > 0.0001f){
-            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
+            Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
-                b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
+                b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
             }
         }
 
         if(weaveMag > 0){
-            b.vel().rotate(Mathf.sin(Time.time() + b.id() * 3, weaveScale, weaveMag) * Time.delta());
+            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta());
+        }
+
+        if(trailChance > 0){
+            if(Mathf.chanceDelta(trailChance)){
+                trailEffect.at(b.x, b.y, trailParam, trailColor);
+            }
         }
     }
 
@@ -197,45 +211,45 @@ public abstract class BulletType extends Content{
         return ContentType.bullet;
     }
 
-    public Bulletc create(Teamc owner, float x, float y, float angle){
+    public Bullet create(Teamc owner, float x, float y, float angle){
         return create(owner, owner.team(), x, y, angle);
     }
 
-    public Bulletc create(Entityc owner, Team team, float x, float y, float angle){
+    public Bullet create(Entityc owner, Team team, float x, float y, float angle){
         return create(owner, team, x, y, angle, 1f);
     }
 
-    public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl){
+    public Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl){
         return create(owner, team, x, y, angle, -1, velocityScl, 1f, null);
     }
 
-    public Bulletc create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
+    public Bullet create(Entityc owner, Team team, float x, float y, float angle, float velocityScl, float lifetimeScl){
         return create(owner, team, x, y, angle, -1, velocityScl, lifetimeScl, null);
     }
 
-    public Bulletc create(Bulletc parent, float x, float y, float angle){
-        return create(parent.owner(), parent.team(), x, y, angle);
+    public Bullet create(Bullet parent, float x, float y, float angle){
+        return create(parent.owner(), parent.team, x, y, angle);
     }
 
-    public Bulletc create(Bulletc parent, float x, float y, float angle, float velocityScl){
-        return create(parent.owner(), parent.team(), x, y, angle, velocityScl);
+    public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
+        return create(parent.owner(), parent.team, x, y, angle, velocityScl);
     }
 
-    public Bulletc create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
-        Bulletc bullet = BulletEntity.create();
-        bullet.type(this);
-        bullet.owner(owner);
-        bullet.team(team);
-        bullet.vel().trns(angle, speed * velocityScl);
-        bullet.set(x - bullet.vel().x * Time.delta(), y - bullet.vel().y * Time.delta());
-        bullet.lifetime(lifetime * lifetimeScl);
-        bullet.data(data);
-        bullet.drag(drag);
-        bullet.hitSize(hitSize);
-        bullet.damage(damage < 0 ? this.damage : damage);
+    public Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
+        Bullet bullet = Bullet.create();
+        bullet.type = this;
+        bullet.owner = owner;
+        bullet.team = team;
+        bullet.vel.trns(angle, speed * velocityScl);
+        bullet.set(x - bullet.vel.x * Time.delta(), y - bullet.vel.y * Time.delta());
+        bullet.lifetime = lifetime * lifetimeScl;
+        bullet.data = data;
+        bullet.drag = drag;
+        bullet.hitSize = hitSize;
+        bullet.damage = damage < 0 ? this.damage : damage;
         bullet.add();
 
-        if(keepVelocity && owner instanceof Hitboxc) bullet.vel().add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
+        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
         return bullet;
 
     }

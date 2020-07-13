@@ -10,7 +10,7 @@ import mindustry.world.meta.*;
 public class FlyingAI extends AIController{
 
     @Override
-    public void update(){
+    public void updateUnit(){
         if(unit.moving()){
             unit.rotation(unit.vel().angle());
         }

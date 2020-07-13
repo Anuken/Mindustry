@@ -13,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -51,22 +52,30 @@ public class PointDefenseTurret extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class PointDefenseEntity extends TileEntity{
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
+        stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
+    }
+
+    public class PointDefenseEntity extends Building{
         public float rotation = 90, reload;
-        public @Nullable Bulletc target;
+        public @Nullable Bullet target;
 
         @Override
         public void updateTile(){
 
             //retarget
             if(timer(timerTarget, retargetTime)){
-                target = Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team() == team || !b.type().hittable ? Float.MAX_VALUE : b.dst2(this));
+                target = Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team == team || !b.type().hittable ? Float.MAX_VALUE : b.dst2(this));
             }
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().hittable){
+            if(target != null && target.within(this, range) && target.team != team && target.type().hittable){
                 float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation,dest, rotateSpeed * edelta());
+                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 reload -= edelta();
 
                 //shoot when possible
@@ -81,7 +90,7 @@ public class PointDefenseTurret extends Block{
 
                     beamEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color, new Vec2().set(target));
                     shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
-                    hitEffect.at(target.x(), target.y(), color);
+                    hitEffect.at(target.x, target.y, color);
                     reload = reloadTime;
                 }
             }else{

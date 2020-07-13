@@ -263,7 +263,7 @@ public class JoinDialog extends BaseDialog{
                     Core.settings.put("name", text);
                 }).grow().pad(8).get().setMaxLength(maxNameLength);
             }else{
-                t.add(player.name()).update(l -> l.setColor(player.color())).grow().pad(8);
+                t.add(player.name).update(l -> l.setColor(player.color())).grow().pad(8);
             }
 
             ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
@@ -379,7 +379,7 @@ public class JoinDialog extends BaseDialog{
     }
 
     public void connect(String ip, int port){
-        if(player.name().trim().isEmpty()){
+        if(player.name.trim().isEmpty()){
             ui.showInfo("$noname");
             return;
         }

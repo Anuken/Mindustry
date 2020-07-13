@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 
 @EntityDef(value = {Decalc.class}, pooled = true, serialize = false)
-@Component
+@Component(base = true)
 abstract class DecalComp implements Drawc, Timedc, Rotc, Posc{
     @Import float x, y, rotation;
 
@@ -19,10 +19,10 @@ abstract class DecalComp implements Drawc, Timedc, Rotc, Posc{
     public void draw(){
         Draw.z(Layer.scorch);
 
-        Draw.color(color);
+        Draw.mixcol(color, color.a);
         Draw.alpha(1f - Mathf.curve(fin(), 0.98f));
         Draw.rect(region, x, y, rotation);
-        Draw.color();
+        Draw.reset();
     }
 
     @Replace

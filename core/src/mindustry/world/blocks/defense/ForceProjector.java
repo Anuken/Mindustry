@@ -16,7 +16,7 @@ import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class ForceProjector extends Block{
     public final int timerUse = timers++;
@@ -32,8 +32,8 @@ public class ForceProjector extends Block{
     public @Load("@-top") TextureRegion topRegion;
 
     private static ForceProjectorEntity paramEntity;
-    private static Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramEntity.team() && Intersector.isInsideHexagon(paramEntity.x(), paramEntity.y(), paramEntity.realRadius() * 2f, trait.x(), trait.y())){
+    private static final Cons<Shielderc> shieldConsumer = trait -> {
+        if(trait.team() != paramEntity.team() && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
@@ -72,13 +72,13 @@ public class ForceProjector extends Block{
         Draw.color(Pal.gray);
         Lines.stroke(3f);
         Lines.poly(x * tilesize, y * tilesize, 6, radius);
-        Draw.color(Pal.accent);
+        Draw.color(player.team().color);
         Lines.stroke(1f);
         Lines.poly(x * tilesize, y * tilesize, 6, radius);
         Draw.color();
     }
 
-    public class ForceProjectorEntity extends TileEntity{
+    public class ForceProjectorEntity extends Building{
         boolean broken = true;
         float buildup = 0f;
         float radscl = 0f;
@@ -122,7 +122,7 @@ public class ForceProjector extends Block{
             if(buildup >= breakage && !broken){
                 broken = true;
                 buildup = breakage;
-                Fx.shieldBreak.at(x, y, radius);
+                Fx.shieldBreak.at(x, y, radius, team.color);
             }
 
             if(hit > 0f){
@@ -158,19 +158,10 @@ public class ForceProjector extends Block{
 
                 Draw.z(Layer.shields);
 
-                Draw.color(Pal.accent);
+                Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(x, y, 6, radius);
-
-                    Draw.z(Layer.shields + 0.01f);
-
-                    if(hit > 0){
-                        Draw.color(Color.white);
-                        Draw.alpha(1f);
-                        Fill.poly(x, y, 6, radius);
-                        Draw.color();
-                    }
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
