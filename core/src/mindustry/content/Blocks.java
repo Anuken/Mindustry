@@ -1687,7 +1687,6 @@ public class Blocks implements ContentList{
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.flare, 200f, with(Items.silicon, 10)),
                 new UnitPlan(UnitTypes.mono, 200f, with(Items.silicon, 15, Items.lead, 15)),
-                //new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1708,7 +1707,7 @@ public class Blocks implements ContentList{
 
             size = 3;
             consumes.power(3f);
-            consumes.items(with(Items.silicon, 40, Items.graphite, 30));
+            consumes.items(with(Items.silicon, 40, Items.graphite, 40));
 
             constructTime = 60f * 5f;
 
@@ -1727,7 +1726,7 @@ public class Blocks implements ContentList{
 
             size = 5;
             consumes.power(6f);
-            consumes.items(with(Items.silicon, 120, Items.titanium, 80));
+            consumes.items(with(Items.silicon, 130, Items.titanium, 80, Items.metaglass, 30));
 
             constructTime = 60f * 15f;
 
@@ -1737,6 +1736,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.poly, UnitTypes.mega},
                 {UnitTypes.minke, UnitTypes.bryde},
                 {UnitTypes.quasar, UnitTypes.pulsar},
+                {UnitTypes.atrax, UnitTypes.spiroct},
             };
         }};
 
@@ -1745,7 +1745,7 @@ public class Blocks implements ContentList{
 
             size = 7;
             consumes.power(12f);
-            consumes.items(with(Items.silicon, 200, Items.titanium, 200, Items.surgealloy, 200));
+            consumes.items(with(Items.silicon, 200, Items.titanium, 200, Items.surgealloy, 240));
             consumes.liquid(Liquids.cryofluid, 1f);
 
             constructTime = 60f * 60f;
