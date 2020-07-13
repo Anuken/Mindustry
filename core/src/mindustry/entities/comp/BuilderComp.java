@@ -29,17 +29,17 @@ abstract class BuilderComp implements Unitc{
     @Import float x, y, rotation;
 
     @SyncLocal Queue<BuildPlan> plans = new Queue<>();
-    transient boolean building = true;
+    transient boolean updateBuilding = true;
 
     @Override
     public void controller(UnitController next){
         //reset building state so AI controlled units will always start off building
-        building = true;
+        updateBuilding = true;
     }
 
     @Override
     public void update(){
-        if(!building) return;
+        if(!updateBuilding) return;
 
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
 
@@ -208,7 +208,7 @@ abstract class BuilderComp implements Unitc{
 
     @Override
     public void draw(){
-        if(!isBuilding()) return;
+        if(!isBuilding() || !updateBuilding) return;
 
         //TODO check correctness
         Draw.z(Layer.flyingUnit);
