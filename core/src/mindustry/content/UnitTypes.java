@@ -15,7 +15,7 @@ public class UnitTypes implements ContentList{
     //region definitions
 
     //ground
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, siegeArray, eradicator;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, vestige, cataclyst;
 
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova;

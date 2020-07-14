@@ -157,14 +157,14 @@ public class DefaultWaves{
                 spacing = 3;
             }},
 
-            new SpawnGroup(UnitTypes.siegeArray){{
+            new SpawnGroup(UnitTypes.vestige){{
                 begin = 41;
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 30;
             }},
 
-            new SpawnGroup(UnitTypes.eradicator){{
+            new SpawnGroup(UnitTypes.cataclyst){{
                 begin = 81;
                 unitAmount = 1;
                 unitScaling = 1;
