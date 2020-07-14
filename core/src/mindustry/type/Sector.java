@@ -148,12 +148,12 @@ public class Sector{
     }
 
     //TODO this should be stored in a more efficient structure, and be updated each turn
-    public Seq<ItemStack> getRecievedItems(){
-        return Core.settings.getJson(key("recieved-items"), Seq.class, ItemStack.class, Seq::new);
+    public Seq<ItemStack> getReceivedItems(){
+        return Core.settings.getJson(key("received-items"), Seq.class, ItemStack.class, Seq::new);
     }
 
-    public void setRecievedItems(Seq<ItemStack> stacks){
-        Core.settings.putJson(key("recieved-items"), ItemStack.class, stacks);
+    public void setReceivedItems(Seq<ItemStack> stacks){
+        Core.settings.putJson(key("received-items"), ItemStack.class, stacks);
     }
 
     //TODO these methods should maybe move somewhere else and/or be contained in a data object

@@ -29,7 +29,7 @@ public class MassDriver extends Block{
     public float bulletLifetime = 200f;
     public Effect shootEffect = Fx.shootBig2;
     public Effect smokeEffect = Fx.shootBigSmoke2;
-    public Effect recieveEffect = Fx.mineBig;
+    public Effect receiveEffect = Fx.mineBig;
     public float shake = 3f;
     public @Load("@-base") TextureRegion baseRegion;
 
@@ -281,7 +281,7 @@ public class MassDriver extends Block{
             }
 
             Effects.shake(shake, shake, this);
-            recieveEffect.at(bullet);
+            receiveEffect.at(bullet);
 
             reload = 1f;
             bullet.remove();

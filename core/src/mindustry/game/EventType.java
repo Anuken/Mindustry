@@ -48,9 +48,9 @@ public class EventType{
     public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/
     public static class LineConfirmEvent{}
-    /** Called when a turret recieves ammo, but only when the tutorial is active! */
+    /** Called when a turret receives ammo, but only when the tutorial is active! */
     public static class TurretAmmoDeliverEvent{}
-    /** Called when a core recieves ammo, but only when the tutorial is active! */
+    /** Called when a core receives ammo, but only when the tutorial is active! */
     public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
@@ -307,7 +307,7 @@ public class EventType{
         }
     }
 
-    /** Called after connecting; when a player recieves world data and is ready to play.*/
+    /** Called after connecting; when a player receives world data and is ready to play.*/
     public static class PlayerJoin{
         public final Player player;
 

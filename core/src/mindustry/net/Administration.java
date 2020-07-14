@@ -567,7 +567,10 @@ public class Administration{
         socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
         allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
         whitelist("Whether the whitelist is used.", false),
-        motd("The message displayed to people on connection.", "off");
+        motd("The message displayed to people on connection.", "off"),
+        autosave("Whether the periodically save the map when playing.", false),
+        autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
+        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5);
 
         public static final Config[] all = values();
 

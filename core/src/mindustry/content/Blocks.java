@@ -1141,7 +1141,7 @@ public class Blocks implements ContentList{
             itemDuration = 500f;
         }};
 
-        solarPanel = new SolarGenerator("solar-panel"){{
+        solarPanel = new SeamlessSolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
             powerProduction = 0.06f;
         }};
@@ -1824,10 +1824,10 @@ public class Blocks implements ContentList{
         }};
 
         illuminator = new LightBlock("illuminator"){{
-            requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 4, Items.silicon, 2));
+            requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
             brightness = 0.67f;
-            radius = 120f;
-            consumes.power(0.05f);
+            radius = 140f;
+            consumes.power(0.06f);
         }};
 
         //endregion

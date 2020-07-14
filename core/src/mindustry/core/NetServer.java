@@ -540,11 +540,11 @@ public class NetServer implements ApplicationListener{
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection con = player.con;
-        if(con == null || snapshotID < con.lastRecievedClientSnapshot) return;
+        if(con == null || snapshotID < con.lastReceivedClientSnapshot) return;
 
         boolean verifyPosition = !player.dead() && netServer.admins.getStrict() && headless;
 
-        if(con.lastRecievedClientTime == 0) con.lastRecievedClientTime = Time.millis() - 16;
+        if(con.lastReceivedClientTime == 0) con.lastReceivedClientTime = Time.millis() - 16;
 
         con.viewX = viewX;
         con.viewY = viewY;
@@ -606,7 +606,7 @@ public class NetServer implements ApplicationListener{
             Unit unit = player.unit();
 
             unit.vel.set(xVelocity, yVelocity).limit(unit.type().speed);
-            long elapsed = Time.timeSinceMillis(con.lastRecievedClientTime);
+            long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
             float maxSpeed = player.unit().type().speed;
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
@@ -663,8 +663,8 @@ public class NetServer implements ApplicationListener{
             player.y = y;
         }
 
-        con.lastRecievedClientSnapshot = snapshotID;
-        con.lastRecievedClientTime = Time.millis();
+        con.lastReceivedClientSnapshot = snapshotID;
+        con.lastReceivedClientTime = Time.millis();
     }
 
     @Remote(targets = Loc.client, called = Loc.server)

@@ -177,7 +177,7 @@ public class LaunchPad extends Block{
 
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam && state.secinfo.origin != null){
-                Seq<ItemStack> dest = state.secinfo.origin.getRecievedItems();
+                Seq<ItemStack> dest = state.secinfo.origin.getReceivedItems();
 
                 for(ItemStack stack : stacks){
                     ItemStack sto = dest.find(i -> i.item == stack.item);
@@ -192,7 +192,7 @@ public class LaunchPad extends Block{
                     Events.fire(new LaunchItemEvent(stack));
                 }
 
-                state.secinfo.origin.setRecievedItems(dest);
+                state.secinfo.origin.setReceivedItems(dest);
             }
         }
     }
