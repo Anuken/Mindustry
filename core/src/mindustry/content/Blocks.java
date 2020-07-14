@@ -1141,7 +1141,7 @@ public class Blocks implements ContentList{
             itemDuration = 500f;
         }};
 
-        solarPanel = new SolarGenerator("solar-panel"){{
+        solarPanel = new SeamlessSolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
             powerProduction = 0.06f;
         }};
