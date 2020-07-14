@@ -68,7 +68,6 @@ abstract class PayloadComp implements Posc, Rotc{
     }
 
     boolean dropUnit(UnitPayload payload){
-        //TODO create an effect here and/or make them be at a lower elevation
         Unit u = payload.unit;
 
         //can't drop ground units

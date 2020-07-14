@@ -1824,10 +1824,10 @@ public class Blocks implements ContentList{
         }};
 
         illuminator = new LightBlock("illuminator"){{
-            requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 4, Items.silicon, 2));
+            requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 10, Items.silicon, 8));
             brightness = 0.67f;
-            radius = 120f;
-            consumes.power(0.05f);
+            radius = 130f;
+            consumes.power(0.06f);
         }};
 
         //endregion
