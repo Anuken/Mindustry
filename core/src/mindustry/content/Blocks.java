@@ -57,7 +57,7 @@ public class Blocks implements ContentList{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
-    conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
+    conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, itemTeleport, sorter, invertedSorter, router,
     overflowGate, underflowGate, massDriver, massConveyor,
 
     //liquid
@@ -945,6 +945,15 @@ public class Blocks implements ContentList{
             canOverdrive = false;
             hasPower = true;
             consumes.power(0.30f);
+        }};
+        
+        itemTeleport = new itemTeleport("item-teleport"){{
+            requirements(Category.distribution, ItemStack.with(Items.phasefabric, 30, Items.surgelloy, 15, Items.plastanium, 25, Items.graphite, 65));
+            update = true;
+            hasItems = true;
+            itemCapacity = 20;
+            buildCostMultiplier = 4f;
+            consumes.power(4f);
         }};
 
         sorter = new Sorter("sorter"){{

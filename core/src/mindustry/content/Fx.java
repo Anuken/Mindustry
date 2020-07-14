@@ -1191,4 +1191,34 @@ public class Fx{
 
     coreLand = new Effect(120f, e -> {
     });
+    transSmoke = new Effect(15, e => {
+    
+    var foutpoww = 1-Interpolation.pow3In.apply(e.fin())
+    
+    Draw.color(Pal.lancerLaser)
+    Draw.alpha(foutpoww)
+    rand = new Rand()
+    rand.setSeed(e.id)
+    j = rand.random(1, 3)
+    for(k=0; k<j; k++){
+    x = rand.random(-10, 10)
+    y = rand.random(-10, 10)
+    Fill.rect(e.x+x*e.finpow(), e.y+y*e.finpow(), 2+e.finpow(), 2+e.finpow())
+    }
+    });
+    superExplo = new Effect(30, e => {
+
+    Draw.color(Color.valueOf("85CDFF"), Color.valueOf("9EF0FF"), Color.valueOf("C7FFFF"), e.fout())
+    Lines.stroke(4*e.fout())
+    Lines.circle(e.x, e.y, 25*e.fin())
+    rand = new Rand()
+    rand.setSeed(e.id)
+    for(i=0; i<10; i++){
+    x = rand.random(-15, 15)
+    y = rand.random(-15, 15)
+    Fill.rect(e.x+x*e.finpow(), e.y+y*e.finpow(), 2+2*e.fin(), 2+2*e.fin())
+    }
+    Effects.shake(6*e.fout(), 10, e.x, e.y)
+    
+})
 }
