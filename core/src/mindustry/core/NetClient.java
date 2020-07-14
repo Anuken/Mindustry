@@ -67,9 +67,7 @@ public class NetClient implements ApplicationListener{
 
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
-                connecting = false;
-                quiet = true;
-                net.disconnect();
+                disconnectQuietly();
             });
 
             ConnectPacket c = new ConnectPacket();
@@ -353,9 +351,8 @@ public class NetClient implements ApplicationListener{
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
-            netClient.connecting = false;
-            netClient.quiet = true;
-            net.disconnect();
+
+            netClient.disconnectQuietly();
         });
     }
 
@@ -506,7 +503,7 @@ public class NetClient implements ApplicationListener{
         net.setClientLoaded(true);
         Core.app.post(Call::connectConfirm);
         Time.runTask(40f, platform::updateRPC);
-        Core.app.post(() -> ui.loadfrag.hide());
+        Core.app.post(ui.loadfrag::hide);
     }
 
     private void reset(){
@@ -529,6 +526,7 @@ public class NetClient implements ApplicationListener{
     /** Disconnects, resetting state to the menu. */
     public void disconnectQuietly(){
         quiet = true;
+        connecting = false;
         net.disconnect();
     }
 
