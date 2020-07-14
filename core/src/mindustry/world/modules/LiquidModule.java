@@ -51,7 +51,7 @@ public class LiquidModule extends BlockModule{
         return total;
     }
 
-    /** Last recieved or loaded liquid. Only valid for liquid modules with 1 type of liquid. */
+    /** Last received or loaded liquid. Only valid for liquid modules with 1 type of liquid. */
     public Liquid current(){
         return current;
     }

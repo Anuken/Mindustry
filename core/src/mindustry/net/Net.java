@@ -85,7 +85,7 @@ public class Net{
     }
 
     /**
-     * Sets the client loaded status, or whether it will recieve normal packets from the server.
+     * Sets the client loaded status, or whether it will receive normal packets from the server.
      */
     public void setClientLoaded(boolean loaded){
         clientLoaded = loaded;
@@ -205,21 +205,21 @@ public class Net{
     }
 
     /**
-     * Registers a client listener for when an object is recieved.
+     * Registers a client listener for when an object is received.
      */
     public <T> void handleClient(Class<T> type, Cons<T> listener){
         clientListeners.put(type, listener);
     }
 
     /**
-     * Registers a server listener for when an object is recieved.
+     * Registers a server listener for when an object is received.
      */
     public <T> void handleServer(Class<T> type, Cons2<NetConnection, T> listener){
         serverListeners.put(type, (Cons2<NetConnection, Object>)listener);
     }
 
     /**
-     * Call to handle a packet being recieved for the client.
+     * Call to handle a packet being received for the client.
      */
     public void handleClientReceived(Object object){
 
@@ -231,7 +231,7 @@ public class Net{
             StreamChunk c = (StreamChunk)object;
             StreamBuilder builder = streams.get(c.id);
             if(builder == null){
-                throw new RuntimeException("Recieved stream chunk without a StreamBegin beforehand!");
+                throw new RuntimeException("Received stream chunk without a StreamBegin beforehand!");
             }
             builder.add(c.data);
             if(builder.isDone()){
@@ -256,7 +256,7 @@ public class Net{
     }
 
     /**
-     * Call to handle a packet being recieved for the server.
+     * Call to handle a packet being received for the server.
      */
     public void handleServerReceived(NetConnection connection, Object object){
 

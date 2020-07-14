@@ -118,7 +118,7 @@ public class NetClient implements ApplicationListener{
         });
 
         net.handleClient(WorldStream.class, data -> {
-            Log.info("Recieved world data: @ bytes.", data.stream.available());
+            Log.info("Received world data: @ bytes.", data.stream.available());
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();
@@ -172,7 +172,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    //called when a server recieves a chat message from a player
+    //called when a server receives a chat message from a player
     @Remote(called = Loc.server, targets = Loc.client)
     public static void sendChatMessage(Player player, String message){
         if(message.length() > maxTextLength){

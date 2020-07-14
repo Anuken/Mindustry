@@ -103,16 +103,16 @@ public class Logic implements ApplicationListener{
                 if(state.rules.sector.save != null && core != null){
 
                     //add produced items
-                    //TODO move to recieved items
+                    //TODO move to received items
                     state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
                         core.items.add(item, (int)(stat.mean * seconds));
                     });
 
-                    //add recieved items
-                    state.rules.sector.getRecievedItems().each(stack -> core.items.add(stack.item, stack.amount));
+                    //add received items
+                    state.rules.sector.getReceivedItems().each(stack -> core.items.add(stack.item, stack.amount));
 
-                    //clear recieved items
-                    state.rules.sector.setRecievedItems(new Seq<>());
+                    //clear received items
+                    state.rules.sector.setReceivedItems(new Seq<>());
 
                     //validation
                     for(Item item : content.items()){
@@ -274,15 +274,15 @@ public class Logic implements ApplicationListener{
         Time.runTask(30f, () -> {
             Sector origin = sector.save.meta.secinfo.origin;
             if(origin != null){
-                Seq<ItemStack> stacks = origin.getRecievedItems();
+                Seq<ItemStack> stacks = origin.getReceivedItems();
 
                 //add up all items into list
                 for(Building entity : state.teams.playerCores()){
                     entity.items.each((item, amount) -> ItemStack.insert(stacks, item, amount));
                 }
 
-                //save recieved items
-                origin.setRecievedItems(stacks);
+                //save received items
+                origin.setReceivedItems(stacks);
             }
 
             //remove all the cores
