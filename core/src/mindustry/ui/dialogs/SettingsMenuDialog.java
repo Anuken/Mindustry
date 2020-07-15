@@ -242,6 +242,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             game.checkPref("buildautopause", false);
         }
+        game.checkPref("mapcenter", true);
 
         if(steam){
             game.sliderPref("playerlimit", 16, 2, 32, i -> {
