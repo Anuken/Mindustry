@@ -452,7 +452,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(3f, 30f){
+        basicFlame = new BulletType(3f, 15f){
             {
                 ammoMultiplier = 3f;
                 hitSize = 7f;
@@ -472,31 +472,21 @@ public class Bullets implements ContentList{
             public float range(){
                 return 50f;
             }
-
-            @Override
-            public void draw(Bullet b){
-            }
         };
 
-        pyraFlame = new BulletType(3.3f, 45f){
-            {
-                ammoMultiplier = 4f;
-                hitSize = 7f;
-                lifetime = 42f;
-                pierce = true;
-                drag = 0.05f;
-                statusDuration = 60f * 6;
-                shootEffect = Fx.shootPyraFlame;
-                hitEffect = Fx.hitFlameSmall;
-                despawnEffect = Fx.none;
-                status = StatusEffects.burning;
-                hittable = false;
-            }
-
-            @Override
-            public void draw(Bullet b){
-            }
-        };
+        pyraFlame = new BulletType(3.3f, 22f){{
+            ammoMultiplier = 4f;
+            hitSize = 7f;
+            lifetime = 42f;
+            pierce = true;
+            drag = 0.05f;
+            statusDuration = 60f * 6;
+            shootEffect = Fx.shootPyraFlame;
+            hitEffect = Fx.hitFlameSmall;
+            despawnEffect = Fx.none;
+            status = StatusEffects.burning;
+            hittable = false;
+        }};
 
         waterShot = new LiquidBulletType(Liquids.water){{
             knockback = 0.7f;

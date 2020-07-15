@@ -1,21 +1,19 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 
 import java.util.*;
-
-import static mindustry.Vars.platform;
 
 public class FileChooser extends BaseDialog{
     private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
@@ -56,7 +54,7 @@ public class FileChooser extends BaseDialog{
 
         filefield = new TextField();
         filefield.setOnlyFontChars(false);
-        if(!open) platform.addDialog(filefield);
+        if(!open) filefield.addInputDialog();
         filefield.setDisabled(open);
 
         ok = new TextButton(open ? "$load" : "$save");

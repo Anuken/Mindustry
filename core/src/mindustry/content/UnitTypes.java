@@ -84,7 +84,20 @@ public class UnitTypes implements ContentList{
                 reload = 14f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = Bullets.basicFlame;
+                bullet = new BulletType(3f, 30f){{
+                    ammoMultiplier = 3f;
+                    hitSize = 7f;
+                    lifetime = 42f;
+                    pierce = true;
+                    drag = 0.05f;
+                    statusDuration = 60f * 4;
+                    shootEffect = Fx.shootSmallFlame;
+                    hitEffect = Fx.hitFlameSmall;
+                    despawnEffect = Fx.none;
+                    status = StatusEffects.burning;
+                    keepVelocity = false;
+                    hittable = false;
+                }};
             }});
         }};
 
@@ -640,15 +653,24 @@ public class UnitTypes implements ContentList{
         risse = new UnitType("risse"){{
             speed = 1.3f;
             drag = 0.1f;
-            hitsize = 8f;
+            hitsize = 10f;
             health = 130;
             immunities = ObjectSet.with(StatusEffects.wet);
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 10f;
-                x = 1.25f;
+                x = 4f;
                 rotate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
+            }});
+
+            weapons.add(new Weapon("missiles-mount"){{
+                mirror = false;
+                reload = 20f;
+                x = 0f;
+                rotate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.flakScrap;
             }});
         }};
 

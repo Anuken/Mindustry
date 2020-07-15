@@ -1369,8 +1369,8 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.pyraFlame
             );
             recoilAmount = 0f;
-            reloadTime = 5f;
-            coolantMultiplier = 2f;
+            reloadTime = 6f;
+            coolantMultiplier = 1.5f;
             range = 60f;
             shootCone = 50f;
             targetAir = false;

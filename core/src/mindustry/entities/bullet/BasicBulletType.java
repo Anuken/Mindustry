@@ -23,8 +23,7 @@ public class BasicBulletType extends BulletType{
         super(speed, damage);
         this.sprite = bulletSprite;
     }
-
-
+    
     public BasicBulletType(float speed, float damage){
         this(speed, damage, "bullet");
     }

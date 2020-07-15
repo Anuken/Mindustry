@@ -1,11 +1,9 @@
 package mindustry.core;
 
 import arc.*;
-import arc.Input.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
-import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -57,29 +55,6 @@ public interface Platform{
         Context c = Context.enter();
         c.setOptimizationLevel(9);
         return c;
-    }
-
-    /** Add a text input dialog that should show up after the field is tapped. */
-    default void addDialog(TextField field){
-        addDialog(field, 16);
-    }
-
-    /** See addDialog(). */
-    default void addDialog(TextField field, int maxLength){
-        if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
-
-        field.tapped(() -> {
-            TextInput input = new TextInput();
-            input.text = field.getText();
-            input.maxLength = maxLength;
-            input.accepted = text -> {
-                field.clearText();
-                field.appendText(text);
-                field.change();
-                Core.input.setOnscreenKeyboardVisible(false);
-            };
-            Core.input.getTextInput(input);
-        });
     }
 
     /** Update discord RPC. */
