@@ -228,6 +228,7 @@ public class TechTree implements ContentList{
                 });
 
                 node(combustionGenerator, () -> {
+
                     node(powerNode, () -> {
                         node(powerNodeLarge, () -> {
                             node(diode, () -> {
@@ -258,6 +259,8 @@ public class TechTree implements ContentList{
                         });
 
                         node(turbineGenerator, () -> {
+                                                (hydroPowerStation, () => {
+                        });
                             node(thermalGenerator, () -> {
                                 node(differentialGenerator, () -> {
                                     node(thoriumReactor, () -> {

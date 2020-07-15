@@ -64,7 +64,7 @@ public class Blocks implements ContentList{
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
 
     //power
-    combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
+    combustionGenerator, hydroPowerStation, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //production
@@ -1109,6 +1109,14 @@ public class Blocks implements ContentList{
             requirements(Category.power, ItemStack.with(Items.copper, 25, Items.lead, 15));
             powerProduction = 1f;
             itemDuration = 120f;
+        }};
+        
+        hydroPowerStation = new HydroPowerStation("hydro-power-station"){{
+            requirements(Category.power, ItemStack.with(Items.graphite, 54, Items.metaglass, 35, Items.titanium, 35));
+            powerProduction = 1f;
+            size = 2;
+            hasLiquids = true;
+            consumes.liquid(Liquids.water, 0.1f);
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
