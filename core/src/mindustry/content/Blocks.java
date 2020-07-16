@@ -589,10 +589,10 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, with(Items.lead, 30, Items.titanium, 20));
             hasItems = true;
             hasPower = true;
-            outputItem = new ItemStack(Items.blastCompound, 1);
+            outputItem = new ItemStack(Items.blastCompound, 2);
             size = 2;
 
-            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
+            consumes.items(new ItemStack(Items.pyratite, 2), new ItemStack(Items.sporePod, 2));
             consumes.power(0.40f);
         }};
 
@@ -601,7 +601,7 @@ public class Blocks implements ContentList{
             flameColor = Color.clear;
             hasItems = true;
             hasPower = true;
-            outputItem = new ItemStack(Items.pyratite, 1);
+            outputItem = new ItemStack(Items.pyratite, 2);
 
             size = 2;
 
