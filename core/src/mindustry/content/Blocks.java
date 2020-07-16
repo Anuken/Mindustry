@@ -870,8 +870,15 @@ public class Blocks implements ContentList{
         forceProjector = new ForceProjector("force-projector"){{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 125));
             size = 3;
+            phaseRadiusBoost = 80f;
+            radius = 101.7f;
+            breakage = 750f;
+            cooldownNormal = 1.5f;
+            cooldownLiquid = 1.2f;
+            cooldownBrokenBase = 0.35f;
+
             consumes.item(Items.phasefabric).boost();
-            consumes.power(3f);
+            consumes.power(4f);
         }};
 
         shockMine = new ShockMine("shock-mine"){{

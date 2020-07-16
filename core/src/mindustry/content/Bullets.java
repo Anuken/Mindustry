@@ -27,7 +27,7 @@ public class Bullets implements ContentList{
     fragGlass, fragExplosive, fragPlastic, fragSurge, fragGlassFrag, fragPlasticFrag,
 
     //missiles
-    missileExplosive, missileIncendiary, missileSurge, missileSwarm,
+    missileExplosive, missileIncendiary, missileSurge,
 
     //standard
     standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
@@ -285,25 +285,6 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.blastExplosion;
             lightning = 2;
             lightningLength = 14;
-        }};
-
-        missileSwarm = new MissileBulletType(2.7f, 12, "missile"){{
-            width = 8f;
-            height = 8f;
-            shrinkY = 0f;
-            drag = -0.003f;
-            homingRange = 60f;
-            keepVelocity = false;
-            splashDamageRadius = 25f;
-            splashDamage = 10f;
-            lifetime = 120f;
-            trailColor = Color.gray;
-            backColor = Pal.bulletYellowBack;
-            frontColor = Pal.bulletYellow;
-            hitEffect = Fx.blastExplosion;
-            despawnEffect = Fx.blastExplosion;
-            weaveScale = 8f;
-            weaveMag = 2f;
         }};
 
         standardCopper = new BasicBulletType(2.5f, 9, "bullet"){{

@@ -373,6 +373,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        //TODO implement
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
             speed = 0.5f;
@@ -400,7 +401,24 @@ public class UnitTypes implements ContentList{
                 x = 4f;
                 rotate = true;
                 shake = 1f;
-                bullet = Bullets.missileSwarm;
+                bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                    width = 8f;
+                    height = 8f;
+                    shrinkY = 0f;
+                    drag = -0.003f;
+                    homingRange = 60f;
+                    keepVelocity = false;
+                    splashDamageRadius = 25f;
+                    splashDamage = 10f;
+                    lifetime = 120f;
+                    trailColor = Color.gray;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 8f;
+                    weaveMag = 2f;
+                }};
             }});
         }};
 
@@ -670,7 +688,24 @@ public class UnitTypes implements ContentList{
                 x = 0f;
                 rotate = true;
                 ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.flakScrap;
+                bullet = new MissileBulletType(2.7f, 12, "missile"){{
+                    width = 8f;
+                    height = 8f;
+                    shrinkY = 0f;
+                    drag = -0.003f;
+                    homingRange = 60f;
+                    keepVelocity = false;
+                    splashDamageRadius = 25f;
+                    splashDamage = 10f;
+                    lifetime = 120f;
+                    trailColor = Color.gray;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 8f;
+                    weaveMag = 2f;
+                }};
             }});
         }};
 
