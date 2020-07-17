@@ -17,7 +17,7 @@ public class StatusEffects implements ContentList{
         none = new StatusEffect("none");
 
         burning = new StatusEffect("burning"){{
-            damage = 0.075f;
+            damage = 0.08f; //over 10 seconds, this would be 48 damage
             effect = Fx.burning;
 
             init(() -> {

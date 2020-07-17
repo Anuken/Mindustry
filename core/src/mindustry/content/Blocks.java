@@ -1131,14 +1131,14 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
             requirements(Category.power, with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
-            powerProduction = 16f;
-            itemDuration = 140f;
+            powerProduction = 17f;
+            itemDuration = 200f;
             hasLiquids = true;
             hasItems = true;
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 0.15f);
+            consumes.liquid(Liquids.cryofluid, 0.14f);
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{

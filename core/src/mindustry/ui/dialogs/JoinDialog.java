@@ -410,7 +410,7 @@ public class JoinDialog extends BaseDialog{
     }
 
     float targetWidth(){
-        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 500f);//Core.graphics.isPortrait() ? 350f : 500f;
+        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 500f);
     }
 
     @SuppressWarnings("unchecked")
