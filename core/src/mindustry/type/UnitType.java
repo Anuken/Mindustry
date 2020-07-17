@@ -381,10 +381,14 @@ public class UnitType extends UnlockableContent{
             float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
             float width = weapon.region.getWidth();
             float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
+            float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
+                wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
 
-            Draw.rect(weapon.region,
-            unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
-            unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
+            if(weapon.occlusion > 0){
+                Drawf.shadow(wx, wy, weapon.occlusion);
+            }
+
+            Draw.rect(weapon.region, wx, wy,
             width * Draw.scl * -Mathf.sign(weapon.flipSprite),
             weapon.region.getHeight() * Draw.scl,
             weaponRotation);

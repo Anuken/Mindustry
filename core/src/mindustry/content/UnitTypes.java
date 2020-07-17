@@ -672,7 +672,7 @@ public class UnitTypes implements ContentList{
             speed = 1.1f;
             drag = 0.13f;
             hitsize = 9f;
-            health = 220;
+            health = 280;
             accel = 0.4f;
             rotateSpeed = 3.3f;
             immunities = ObjectSet.with(StatusEffects.wet);
@@ -717,10 +717,10 @@ public class UnitTypes implements ContentList{
         }};
 
         minke = new UnitType("minke"){{
+            health = 600;
             speed = 0.9f;
             drag = 0.15f;
             hitsize = 11f;
-            health = 430;
             armor = 4f;
             accel = 0.3f;
             rotateSpeed = 2.6f;
@@ -758,12 +758,13 @@ public class UnitTypes implements ContentList{
         }};
 
         bryde = new UnitType("bryde"){{
+            health = 900;
             speed = 0.85f;
             accel = 0.2f;
             rotateSpeed = 1.8f;
             drag = 0.17f;
             hitsize = 14f;
-            health = 130;
+            armor = 6f;
             immunities = ObjectSet.with(StatusEffects.wet);
 
             trailLength = 22;
@@ -771,18 +772,19 @@ public class UnitTypes implements ContentList{
             trailY = -9f;
             trailScl = 1.5f;
 
-            abilities.add(new HealFieldAbility(22f, 60f * 5, 70f));
+            abilities.add(new HealFieldAbility(22f, 60f * 4, 70f), new ShieldFieldAbility(20f, 40f, 60f * 4, 60f));
 
             weapons.add(new Weapon("large-artillery"){{
-                reload = 60f;
+                reload = 65f;
                 mirror = false;
                 x = 0f;
-                y = -2.5f;
+                y = -3.5f;
                 rotateSpeed = 1.7f;
                 rotate = true;
                 shootY = 7f;
                 shake = 5f;
                 recoil = 4f;
+                occlusion = 17f;
 
                 shots = 1;
                 inaccuracy = 3f;
@@ -799,7 +801,7 @@ public class UnitTypes implements ContentList{
                     collidesTiles = false;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 60f;
-                    splashDamage = 75f;
+                    splashDamage = 85f;
                     backColor = Pal.missileYellowBack;
                     frontColor = Pal.missileYellow;
                     trailEffect = Fx.artilleryTrail;
@@ -817,6 +819,8 @@ public class UnitTypes implements ContentList{
                 reload = 20f;
                 x = 8.5f;
                 y = -9f;
+
+                occlusion = 6f;
 
                 rotateSpeed = 4f;
                 rotate = true;

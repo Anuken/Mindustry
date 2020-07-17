@@ -43,6 +43,8 @@ public class Weapon{
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
     public float x = 5f, y = 0f;
+    /** radius of occlusion drawn under the weapon; <0 to diable */
+    public float occlusion = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
     /** delay in ticks between shots */
