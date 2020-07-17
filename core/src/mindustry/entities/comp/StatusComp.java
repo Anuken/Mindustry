@@ -20,7 +20,7 @@ abstract class StatusComp implements Posc, Flyingc{
     private Seq<StatusEntry> statuses = new Seq<>();
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-    @ReadOnly transient float speedMultiplier, damageMultiplier, armorMultiplier;
+    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, armorMultiplier = 1, reloadMultiplier = 1;
 
     /** @return damage taken based on status armor multipliers */
     float getShieldDamage(float amount){
@@ -108,7 +108,7 @@ abstract class StatusComp implements Posc, Flyingc{
         }
 
         applied.clear();
-        speedMultiplier = damageMultiplier = armorMultiplier = 1f;
+        speedMultiplier = damageMultiplier = armorMultiplier = reloadMultiplier = 1f;
 
         if(statuses.isEmpty()) return;
 
@@ -128,6 +128,7 @@ abstract class StatusComp implements Posc, Flyingc{
                 speedMultiplier *= entry.effect.speedMultiplier;
                 armorMultiplier *= entry.effect.armorMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
+                reloadMultiplier *= entry.effect.reloadMultiplier;
                 entry.effect.update(base(), entry.time);
             }
         }

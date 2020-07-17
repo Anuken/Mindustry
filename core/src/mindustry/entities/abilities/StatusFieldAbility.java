@@ -11,7 +11,7 @@ public class StatusFieldAbility implements Ability{
     public @NonNull StatusEffect effect;
     public float duration = 60, reload = 100, range = 20;
     public Effect applyEffect = Fx.heal;
-    public Effect activeEffect = Fx.healWave;
+    public Effect activeEffect = Fx.overdriveWave;
 
     StatusFieldAbility(){}
 

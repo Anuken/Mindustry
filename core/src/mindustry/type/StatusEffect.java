@@ -15,8 +15,10 @@ public class StatusEffect extends MappableContent{
     public float damageMultiplier = 1f;
     /** Unit armor multiplier. */
     public float armorMultiplier = 1f;
-    /** Unit speed multiplier (buggy) */
+    /** Unit speed multiplier */
     public float speedMultiplier = 1f;
+    /** Unit speed multiplier */
+    public float reloadMultiplier = 1f;
     /** Damage per frame. */
     public float damage;
     /** Chance of effect appearing. */

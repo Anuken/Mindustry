@@ -74,6 +74,7 @@ public class UnitType extends UnlockableContent{
     public boolean drawCell = true, drawItems = true, drawShields = true;
     public int parts = 0;
     public int trailLength = 3;
+    public float trailX = 4f, trailY = -3f, trailScl = 1f;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -352,7 +353,7 @@ public class UnitType extends UnlockableContent{
 
         if(unit instanceof Trailc){
             Trail trail = ((Trailc)unit).trail();
-            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale));
+            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale) * trailScl);
         }
 
         Draw.color(unit.team.color);

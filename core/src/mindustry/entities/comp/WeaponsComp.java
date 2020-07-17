@@ -14,7 +14,7 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class WeaponsComp implements Teamc, Posc, Rotc{
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, reloadMultiplier;
 
     /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
     static final float minAimDst = 18f;
@@ -82,7 +82,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     public void update(){
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
-            mount.reload = Math.max(mount.reload - Time.delta(), 0);
+            mount.reload = Math.max(mount.reload - Time.delta() * reloadMultiplier, 0);
 
             //flip weapon shoot side for alternating weapons at half reload
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&

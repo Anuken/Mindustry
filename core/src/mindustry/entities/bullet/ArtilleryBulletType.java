@@ -15,6 +15,7 @@ public class ArtilleryBulletType extends BasicBulletType{
         scaleVelocity = true;
         hitShake = 1f;
         hitSound = Sounds.explosion;
+        shootEffect = Fx.shootBig;
         trailEffect = Fx.artilleryTrail;
     }
 

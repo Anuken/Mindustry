@@ -659,6 +659,12 @@ public class Fx{
 
     }),
 
+    overclocked = new Effect(50f, e -> {
+        color(Pal.accent);
+
+        Fill.square(e.x, e.y, e.fslope() * 2f, 45f);
+    }),
+
     dropItem = new Effect(20f, e -> {
         float length = 20f * e.finpow();
         float size = 7f * e.fout();

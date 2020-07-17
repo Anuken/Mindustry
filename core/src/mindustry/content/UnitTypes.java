@@ -674,6 +674,8 @@ public class UnitTypes implements ContentList{
             hitsize = 9f;
             health = 220;
             immunities = ObjectSet.with(StatusEffects.wet);
+            trailLength = 20;
+
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 12f;
                 x = 4f;
@@ -700,7 +702,7 @@ public class UnitTypes implements ContentList{
                     keepVelocity = false;
                     splashDamageRadius = 25f;
                     splashDamage = 10f;
-                    lifetime = 120f;
+                    lifetime = 80f;
                     trailColor = Color.gray;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
@@ -713,17 +715,40 @@ public class UnitTypes implements ContentList{
         }};
 
         minke = new UnitType("minke"){{
-            speed = 1.3f;
-            drag = 0.1f;
-            hitsize = 8f;
-            health = 400;
+            speed = 0.9f;
+            drag = 0.15f;
+            hitsize = 11f;
+            health = 430;
+            armor = 4f;
             immunities = ObjectSet.with(StatusEffects.wet);
+            trailLength = 20;
+            trailX = 5.5f;
+            trailY = -4f;
+            trailScl = 2f;
+
+            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 10, 60f * 10f, 60f));
+
             weapons.add(new Weapon("mount-weapon"){{
-                reload = 10f;
-                x = 1.25f;
+                reload = 15f;
+                x = 5f;
+                y = 3.5f;
                 rotate = true;
+                rotateSpeed = 5f;
+                inaccuracy = 10f;
                 ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
+                bullet = Bullets.flakLead;
+            }});
+
+            weapons.add(new Weapon("artillery-mount"){{
+                reload = 30f;
+                x = 5f;
+                y = -5f;
+                rotate = true;
+                inaccuracy = 2f;
+                rotateSpeed = 2f;
+                shake = 1.5f;
+                ejectEffect = Fx.shellEjectMedium;
+                bullet = Bullets.artilleryIncendiary;
             }});
         }};
 

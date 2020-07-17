@@ -73,8 +73,8 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
                     if(rect.overlaps(rect2)){
                         unit.apply(liquid.effect, 60 * 2);
 
-                        if(unit.vel().len() > 0.1){
-                            Fx.ripple.at(unit.x(), unit.y(), unit.type().rippleScale, liquid.color);
+                        if(unit.vel.len() > 0.1){
+                            Fx.ripple.at(unit.x, unit.y, unit.type().rippleScale, liquid.color);
                         }
                     }
                 }

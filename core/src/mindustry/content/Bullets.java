@@ -48,7 +48,7 @@ public class Bullets implements ContentList{
         artilleryDense = new ArtilleryBulletType(3f, 12, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
-            lifetime = 50f;
+            lifetime = 80f;
             width = height = 11f;
             collidesTiles = false;
             splashDamageRadius = 25f;
@@ -69,7 +69,7 @@ public class Bullets implements ContentList{
         artilleryPlastic = new ArtilleryBulletType(3.4f, 12, "shell"){{
             hitEffect = Fx.plasticExplosion;
             knockback = 1f;
-            lifetime = 55f;
+            lifetime = 80f;
             width = height = 13f;
             collidesTiles = false;
             splashDamageRadius = 35f;
@@ -83,7 +83,7 @@ public class Bullets implements ContentList{
         artilleryHoming = new ArtilleryBulletType(3f, 12, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
-            lifetime = 45f;
+            lifetime = 80f;
             width = height = 11f;
             collidesTiles = false;
             splashDamageRadius = 25f;
@@ -97,7 +97,7 @@ public class Bullets implements ContentList{
         artilleryIncendiary = new ArtilleryBulletType(3f, 12, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
-            lifetime = 60f;
+            lifetime = 80f;
             width = height = 13f;
             collidesTiles = false;
             splashDamageRadius = 25f;
@@ -111,7 +111,7 @@ public class Bullets implements ContentList{
         artilleryExplosive = new ArtilleryBulletType(2f, 12, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
-            lifetime = 70f;
+            lifetime = 80f;
             width = height = 14f;
             collidesTiles = false;
             ammoMultiplier = 4f;

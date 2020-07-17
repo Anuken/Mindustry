@@ -75,7 +75,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
 
         if(!hovering && isGrounded() && floor.isLiquid){
             if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= 7f){
-                floor.walkEffect.at(x, y, 1f, floor.mapColor);
+                floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
                 splashTimer = 0f;
             }
         }
