@@ -672,7 +672,7 @@ public class UnitTypes implements ContentList{
             speed = 1.1f;
             drag = 0.13f;
             hitsize = 9f;
-            health = 200;
+            health = 220;
             immunities = ObjectSet.with(StatusEffects.wet);
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 12f;

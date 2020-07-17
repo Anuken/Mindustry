@@ -112,7 +112,9 @@ public class ItemBridge extends Block{
             return false;
         }
 
-        return (other.block() == tile.block() || (!(tile.block() instanceof ItemBridge) && other.block() == this)) && (other.team() == tile.team() || tile.block() != this) && (!checkDouble || other.<ItemBridgeEntity>bc().link != tile.pos());
+        return ((other.block() == tile.block() && tile.block() == this) || (!(tile.block() instanceof ItemBridge) && other.block() == this))
+            && (other.team() == tile.team() || tile.block() != this)
+            && (!checkDouble || other.<ItemBridgeEntity>bc().link != tile.pos());
     }
 
     public Tile findLink(int x, int y){

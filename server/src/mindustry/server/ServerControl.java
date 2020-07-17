@@ -477,7 +477,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            if(Strings.canParsePostiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
+            if(Strings.canParsePositiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
                 int lim = Strings.parseInt(arg[0]);
                 netServer.admins.setPlayerLimit(lim);
                 info("Player limit is now &lc@.", lim);

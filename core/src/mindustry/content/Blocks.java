@@ -1702,7 +1702,7 @@ public class Blocks implements ContentList{
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.risse, 200f, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.risse, 200f, with(Items.silicon, 20, Items.metaglass, 25)),
             };
             size = 3;
             requiresWater = true;

@@ -82,7 +82,7 @@ public class LoadoutDialog extends BaseDialog{
                 }).size(bsize);
 
                 t.button(Icon.pencil, Styles.cleari, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
-                    if(Strings.canParsePostiveInt(str)){
+                    if(Strings.canParsePositiveInt(str)){
                         int amount = Strings.parseInt(str);
                         if(amount >= 0 && amount <= capacity){
                             stack.amount = amount;
