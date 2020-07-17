@@ -726,7 +726,7 @@ public class UnitTypes implements ContentList{
             trailY = -4f;
             trailScl = 2f;
 
-            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 10, 60f * 10f, 60f));
+            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 15f;

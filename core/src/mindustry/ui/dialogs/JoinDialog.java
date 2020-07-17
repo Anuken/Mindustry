@@ -415,7 +415,7 @@ public class JoinDialog extends BaseDialog{
 
     @SuppressWarnings("unchecked")
     private void loadServers(){
-        servers = Core.settings.getJson("servers", Seq.class, Seq::new);
+        servers = Core.settings.getJson("servers", Seq.class, Server.class, Seq::new);
 
         //load imported legacy data
         if(Core.settings.has("server-list")){
