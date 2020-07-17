@@ -1139,7 +1139,7 @@ public class Blocks implements ContentList{
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 1f);
+            consumes.liquid(Liquids.cryofluid, 0.15f);
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
