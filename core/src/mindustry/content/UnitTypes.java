@@ -669,14 +669,16 @@ public class UnitTypes implements ContentList{
         //region naval attack
 
         risse = new UnitType("risse"){{
-            speed = 1.3f;
-            drag = 0.1f;
-            hitsize = 10f;
-            health = 130;
+            speed = 1.1f;
+            drag = 0.13f;
+            hitsize = 9f;
+            health = 200;
             immunities = ObjectSet.with(StatusEffects.wet);
             weapons.add(new Weapon("mount-weapon"){{
-                reload = 10f;
+                reload = 12f;
                 x = 4f;
+                shootY = 4f;
+                y = 1.5f;
                 rotate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
@@ -686,6 +688,7 @@ public class UnitTypes implements ContentList{
                 mirror = false;
                 reload = 20f;
                 x = 0f;
+                y = -5f;
                 rotate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
