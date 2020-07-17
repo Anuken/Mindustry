@@ -17,7 +17,7 @@ public class StatusEffects implements ContentList{
         none = new StatusEffect("none");
 
         burning = new StatusEffect("burning"){{
-            damage = 0.075f;
+            damage = 0.5f;
             effect = Fx.burning;
 
             init(() -> {

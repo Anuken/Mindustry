@@ -96,12 +96,13 @@ public class Bullets implements ContentList{
 
         artilleryIncendiary = new ArtilleryBulletType(3f, 12, "shell"){{
             hitEffect = Fx.blastExplosion;
-            knockback = 0.8f;
+            knockback = 0.2f;
             lifetime = 60f;
             width = height = 13f;
             collidesTiles = false;
-            splashDamageRadius = 25f;
-            splashDamage = 35f;
+            ammoMultiplier = 3f;
+            splashDamageRadius = 40f;
+            splashDamage = 40f;
             status = StatusEffects.burning;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
@@ -258,7 +259,7 @@ public class Bullets implements ContentList{
             statusDuration = 60f;
         }};
 
-        missileIncendiary = new MissileBulletType(2.9f, 12, "missile"){{
+        missileIncendiary = new MissileBulletType(2.9f, 15, "missile"){{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             width = 7f;
@@ -268,6 +269,7 @@ public class Bullets implements ContentList{
             homingPower = 0.08f;
             splashDamageRadius = 20f;
             splashDamage = 20f;
+            ammoMultiplier = 3f;
             lifetime = 160f;
             hitEffect = Fx.blastExplosion;
             status = StatusEffects.burning;
@@ -322,12 +324,13 @@ public class Bullets implements ContentList{
             lifetime = 60f;
         }};
 
-        standardIncendiary = new BasicBulletType(3.2f, 11, "bullet"){{
+        standardIncendiary = new BasicBulletType(3.2f, 20, "bullet"){{
             width = 10f;
             height = 12f;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
+            ammoMultiplier = 3;
             inaccuracy = 3f;
             lifetime = 60f;
         }};
@@ -361,7 +364,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootBig;
         }};
 
-        standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
+        standardIncendiaryBig = new BasicBulletType(7f, 70, "bullet"){{
             width = 16f;
             height = 21f;
             frontColor = Pal.lightishOrange;

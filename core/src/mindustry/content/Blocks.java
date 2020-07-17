@@ -1131,14 +1131,14 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
             requirements(Category.power, with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
-            powerProduction = 16f;
-            itemDuration = 140f;
+            powerProduction = 20f;
+            itemDuration = 360f;
             hasLiquids = true;
             hasItems = true;
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 0.15f);
+            consumes.liquid(Liquids.cryofluid, 0.08f);
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
@@ -1329,8 +1329,8 @@ public class Blocks implements ContentList{
             ammo(
             Items.copper, Bullets.standardCopper,
             Items.graphite, Bullets.standardDense,
-            Items.pyratite, Bullets.standardIncendiary,
-            Items.silicon, Bullets.standardHoming
+            Items.silicon, Bullets.standardHoming, 
+            Items.pyratite, Bullets.standardIncendiary
             );
 
             spread = 4f;
@@ -1499,9 +1499,9 @@ public class Blocks implements ContentList{
             ammo(
             Items.copper, Bullets.standardCopper,
             Items.graphite, Bullets.standardDense,
-            Items.pyratite, Bullets.standardIncendiary,
             Items.silicon, Bullets.standardHoming,
-            Items.thorium, Bullets.standardThorium
+            Items.thorium, Bullets.standardThorium, 
+            Items.pyratite, Bullets.standardIncendiary
             );
 
             size = 2;
@@ -1547,9 +1547,9 @@ public class Blocks implements ContentList{
             ammo(
             Items.graphite, Bullets.artilleryDense,
             Items.silicon, Bullets.artilleryHoming,
-            Items.pyratite, Bullets.artilleryIncendiary,
             Items.blastCompound, Bullets.artilleryExplosive,
-            Items.plastanium, Bullets.artilleryPlastic
+            Items.plastanium, Bullets.artilleryPlastic, 
+            Items.pyratite, Bullets.artilleryIncendiary
             );
 
             targetAir = false;
@@ -1596,8 +1596,8 @@ public class Blocks implements ContentList{
             requirements(Category.turret, with(Items.copper, 350, Items.graphite, 300, Items.surgealloy, 250, Items.plastanium, 175, Items.thorium, 250));
             ammo(
             Items.graphite, Bullets.standardDenseBig,
-            Items.pyratite, Bullets.standardIncendiaryBig,
-            Items.thorium, Bullets.standardThoriumBig
+            Items.thorium, Bullets.standardThoriumBig, 
+            Items.pyratite, Bullets.standardIncendiaryBig
             );
             reloadTime = 6f;
             coolantMultiplier = 0.5f;
