@@ -1186,7 +1186,7 @@ public class Blocks implements ContentList{
             drillTime = 600;
             size = 2;
             drawMineItem = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.05f)).update(false).boost();
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.temperature >= 0.4f && liquid.flammability < 0.1f, 0.05f)).update(false).boost();
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
@@ -1195,7 +1195,7 @@ public class Blocks implements ContentList{
             drillTime = 400;
             size = 2;
             drawMineItem = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.06f)).update(false).boost();
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.temperature >= 0.4f && liquid.flammability < 0.1f, 0.05f)).update(false).boost();
         }};
 
         laserDrill = new Drill("laser-drill"){{
