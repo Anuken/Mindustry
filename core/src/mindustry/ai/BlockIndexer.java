@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 /** Class used for indexing special target blocks for AI. */
 public class BlockIndexer{
     /** Size of one quadrant. */
-    private final static int quadrantSize = 16;
+    private static final int quadrantSize = 16;
 
     /** Set of all ores that are being scanned. */
     private final ObjectSet<Item> scanOres = new ObjectSet<>();

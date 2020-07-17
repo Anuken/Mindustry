@@ -45,7 +45,10 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Trailc.class}) UnitType alpha, beta, gamma;
 
     //water
-    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risse, minke, bryde;
+    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risse, minke;
+
+    //water + payload
+    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class, Payloadc.class}) UnitType bryde;
 
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
@@ -678,6 +681,8 @@ public class UnitTypes implements ContentList{
             immunities = ObjectSet.with(StatusEffects.wet);
             trailLength = 20;
 
+            armor = 2f;
+
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 12f;
                 x = 4f;
@@ -771,6 +776,7 @@ public class UnitTypes implements ContentList{
             trailX = 7f;
             trailY = -9f;
             trailScl = 1.5f;
+            payloadCapacity = 4;
 
             abilities.add(new HealFieldAbility(22f, 60f * 4, 70f), new ShieldFieldAbility(20f, 40f, 60f * 4, 60f));
 
@@ -796,7 +802,7 @@ public class UnitTypes implements ContentList{
                     hitEffect = Fx.massiveExplosion;
                     knockback = 1.5f;
                     lifetime = 140f;
-                    height = 17f;
+                    height = 15.5f;
                     width = 15f;
                     collidesTiles = false;
                     ammoMultiplier = 4f;

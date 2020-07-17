@@ -20,9 +20,9 @@ import static arc.Core.camera;
 import static mindustry.Vars.*;
 
 public class BlockRenderer implements Disposable{
-    private final static int initialRequests = 32 * 32;
-    private final static int expandr = 9;
-    private final static Color shadowColor = new Color(0, 0, 0, 0.71f);
+    private static final int initialRequests = 32 * 32;
+    private static final int expandr = 9;
+    private static final Color shadowColor = new Color(0, 0, 0, 0.71f);
 
     public final FloorRenderer floor = new FloorRenderer();
 

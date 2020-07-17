@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends BaseDialog{
-    private final static int displayed = 20;
+    private static final int displayed = 20;
     private Seq<SpawnGroup> groups = new Seq<>();
 
     private Table table, preview;

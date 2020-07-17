@@ -113,7 +113,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(target.isAI() && target.isGrounded() && pay.payloads().size < unit.type().payloadCapacity
             && target.mass() < unit.mass()
-            && target.within(unit, unit.type().hitsize * 1.5f)){
+            && target.within(unit, unit.type().hitsize * 1.5f + target.type().hitsize)){
             pay.pickup(target);
         }
     }

@@ -21,7 +21,7 @@ import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class ChatFragment extends Table{
-    private final static int messagesShown = 10;
+    private static final int messagesShown = 10;
     private Seq<ChatMessage> messages = new Seq<>();
     private float fadetime;
     private boolean shown = false;

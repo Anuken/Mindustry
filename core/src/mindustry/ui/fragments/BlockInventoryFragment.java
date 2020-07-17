@@ -28,8 +28,8 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
-    private final static float holdWithdraw = 20f;
-    private final static float holdShrink = 120f;
+    private static final float holdWithdraw = 20f;
+    private static final float holdShrink = 120f;
 
     private Table table = new Table();
     private Building tile;

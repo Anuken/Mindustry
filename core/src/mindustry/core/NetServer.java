@@ -34,13 +34,13 @@ import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
-    private final static int maxSnapshotSize = 430, timerBlockSync = 0;
-    private final static float serverSyncTime = 12, blockSyncTime = 60 * 8;
-    private final static FloatBuffer fbuffer = FloatBuffer.allocate(20);
-    private final static Vec2 vector = new Vec2();
-    private final static Rect viewport = new Rect();
+    private static final int maxSnapshotSize = 430, timerBlockSync = 0;
+    private static final float serverSyncTime = 12, blockSyncTime = 60 * 8;
+    private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
+    private static final Vec2 vector = new Vec2();
+    private static final Rect viewport = new Rect();
     /** If a player goes away of their server-side coordinates by this distance, they get teleported back. */
-    private final static float correctDist = 16f;
+    private static final float correctDist = 16f;
 
     public final Administration admins = new Administration();
     public final CommandHandler clientCommands = new CommandHandler("/");

@@ -28,8 +28,8 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class NetClient implements ApplicationListener{
-    private final static float dataTimeout = 60 * 18;
-    private final static float playerSyncTime = 2;
+    private static final float dataTimeout = 60 * 18;
+    private static final float playerSyncTime = 2;
     public final static float viewScale = 2f;
 
     private long ping;
