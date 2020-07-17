@@ -41,7 +41,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
         Draw.z(Layer.debris);
 
         Floor floor = floorOn();
-        Color color = Tmp.c1.set(floor.mapColor).mul(1.7f);
+        Color color = Tmp.c1.set(floor.mapColor).mul(1.5f);
         trailColor.lerp(color, Mathf.clamp(Time.delta() * 0.04f));
 
         tleft.draw(trailColor, type.trailScl);

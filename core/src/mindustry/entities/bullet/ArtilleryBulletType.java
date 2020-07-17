@@ -6,6 +6,7 @@ import mindustry.gen.*;
 
 //TODO scale velocity depending on fslope()
 public class ArtilleryBulletType extends BasicBulletType{
+    public float trailMult = 1f, trailSize = 4f;
 
     public ArtilleryBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage, bulletSprite);
@@ -19,6 +20,10 @@ public class ArtilleryBulletType extends BasicBulletType{
         trailEffect = Fx.artilleryTrail;
     }
 
+    public ArtilleryBulletType(float speed, float damage){
+        this(speed, damage, "shell");
+    }
+
     public ArtilleryBulletType(){
         this(1f, 1f, "shell");
     }
@@ -27,8 +32,8 @@ public class ArtilleryBulletType extends BasicBulletType{
     public void update(Bullet b){
         super.update(b);
 
-        if(b.timer(0, 3 + b.fslope() * 2f)){
-            trailEffect.at(b.x, b.y, b.fslope() * 4f, backColor);
+        if(b.timer(0, (3 + b.fslope() * 2f) * trailMult)){
+            trailEffect.at(b.x, b.y, b.fslope() * trailSize, backColor);
         }
     }
 

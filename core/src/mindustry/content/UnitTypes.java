@@ -673,6 +673,8 @@ public class UnitTypes implements ContentList{
             drag = 0.13f;
             hitsize = 9f;
             health = 220;
+            accel = 0.4f;
+            rotateSpeed = 3.3f;
             immunities = ObjectSet.with(StatusEffects.wet);
             trailLength = 20;
 
@@ -720,11 +722,14 @@ public class UnitTypes implements ContentList{
             hitsize = 11f;
             health = 430;
             armor = 4f;
+            accel = 0.3f;
+            rotateSpeed = 2.6f;
             immunities = ObjectSet.with(StatusEffects.wet);
+
             trailLength = 20;
             trailX = 5.5f;
             trailY = -4f;
-            trailScl = 2f;
+            trailScl = 1.9f;
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
@@ -753,17 +758,92 @@ public class UnitTypes implements ContentList{
         }};
 
         bryde = new UnitType("bryde"){{
-            speed = 1.3f;
-            drag = 0.1f;
-            hitsize = 8f;
+            speed = 0.85f;
+            accel = 0.2f;
+            rotateSpeed = 1.8f;
+            drag = 0.17f;
+            hitsize = 14f;
             health = 130;
             immunities = ObjectSet.with(StatusEffects.wet);
-            weapons.add(new Weapon("mount-weapon"){{
-                reload = 10f;
-                x = 1.25f;
+
+            trailLength = 22;
+            trailX = 7f;
+            trailY = -9f;
+            trailScl = 1.5f;
+
+            abilities.add(new HealFieldAbility(22f, 60f * 5, 70f));
+
+            weapons.add(new Weapon("large-artillery"){{
+                reload = 60f;
+                mirror = false;
+                x = 0f;
+                y = -2.5f;
+                rotateSpeed = 1.7f;
                 rotate = true;
-                ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
+                shootY = 7f;
+                shake = 5f;
+                recoil = 4f;
+
+                shots = 1;
+                inaccuracy = 3f;
+
+                ejectEffect = Fx.shellEjectBig;
+
+                bullet = new ArtilleryBulletType(3.2f, 12){{
+                    trailMult = 0.8f;
+                    hitEffect = Fx.massiveExplosion;
+                    knockback = 1.5f;
+                    lifetime = 140f;
+                    height = 17f;
+                    width = 15f;
+                    collidesTiles = false;
+                    ammoMultiplier = 4f;
+                    splashDamageRadius = 60f;
+                    splashDamage = 75f;
+                    backColor = Pal.missileYellowBack;
+                    frontColor = Pal.missileYellow;
+                    trailEffect = Fx.artilleryTrail;
+                    trailSize = 6f;
+                    hitShake = 4f;
+
+                    shootEffect = Fx.shootBig2;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
+            }});
+
+            weapons.add(new Weapon("missiles-mount"){{
+                reload = 20f;
+                x = 8.5f;
+                y = -9f;
+
+                rotateSpeed = 4f;
+                rotate = true;
+                shots = 2;
+                shotDelay = 3f;
+                inaccuracy = 5f;
+                velocityRnd = 0.1f;
+
+                ejectEffect = Fx.none;
+                bullet = new MissileBulletType(2.7f, 12){{
+                    width = 8f;
+                    height = 8f;
+                    shrinkY = 0f;
+                    drag = -0.003f;
+                    homingRange = 60f;
+                    keepVelocity = false;
+                    splashDamageRadius = 25f;
+                    splashDamage = 10f;
+                    lifetime = 80f;
+                    trailColor = Color.gray;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 8f;
+                    weaveMag = 1f;
+                }};
             }});
         }};
 
