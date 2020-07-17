@@ -589,10 +589,11 @@ public class Blocks implements ContentList{
             requirements(Category.crafting, with(Items.lead, 30, Items.titanium, 20));
             hasItems = true;
             hasPower = true;
-            outputItem = new ItemStack(Items.blastCompound, 2);
+            outputItem = new ItemStack(Items.blastCompound, 1);
+            craftTime = 60f;
             size = 2;
 
-            consumes.items(new ItemStack(Items.pyratite, 2), new ItemStack(Items.sporePod, 2));
+            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
             consumes.power(0.40f);
         }};
 
@@ -601,8 +602,8 @@ public class Blocks implements ContentList{
             flameColor = Color.clear;
             hasItems = true;
             hasPower = true;
-            outputItem = new ItemStack(Items.pyratite, 2);
-
+            outputItem = new ItemStack(Items.pyratite, 1);
+            craftTime = 60f;
             size = 2;
 
             consumes.power(0.20f);
@@ -1132,13 +1133,13 @@ public class Blocks implements ContentList{
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
             requirements(Category.power, with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
             powerProduction = 20f;
-            itemDuration = 360f;
+            itemDuration = 240f;
             hasLiquids = true;
             hasItems = true;
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 0.08f);
+            consumes.liquid(Liquids.cryofluid, 1f);
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
