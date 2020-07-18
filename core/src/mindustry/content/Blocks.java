@@ -1013,7 +1013,7 @@ public class Blocks implements ContentList{
 
         thermalPump = new Pump("thermal-pump"){{
             requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 70, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
-            pumpAmount = 1.5f;
+            pumpAmount = 2.0f;
             consumes.power(0.30f);
             liquidCapacity = 40f;
             hasPower = true;
@@ -1217,7 +1217,7 @@ public class Blocks implements ContentList{
 
         blastDrill = new Drill("blast-drill"){{
             requirements(Category.production, with(Items.copper, 65, Items.silicon, 60, Items.titanium, 50, Items.thorium, 75));
-            drillTime = 280;
+            drillTime = 250;
             size = 4;
             drawRim = true;
             hasPower = true;
