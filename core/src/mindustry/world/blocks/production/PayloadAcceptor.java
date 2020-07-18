@@ -66,6 +66,11 @@ public class PayloadAcceptor extends Block{
         }
 
         @Override
+        public Payload getPayload(){
+            return payload;
+        }
+
+        @Override
         public Payload takePayload(){
             T t = payload;
             payload = null;

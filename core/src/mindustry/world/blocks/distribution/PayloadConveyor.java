@@ -89,6 +89,11 @@ public class PayloadConveyor extends Block{
         }
 
         @Override
+        public Payload getPayload(){
+            return item;
+        }
+
+        @Override
         public void updateTile(){
             progress = Time.time() % moveTime;
 

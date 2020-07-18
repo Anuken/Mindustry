@@ -539,6 +539,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return base();
     }
 
+    public @Nullable Payload getPayload(){
+        return null;
+    }
+
     /** Tries to take the payload. Returns null if no payload is present. */
     public @Nullable Payload takePayload(){
         return null;

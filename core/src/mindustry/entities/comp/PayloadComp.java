@@ -12,7 +12,7 @@ import mindustry.world.blocks.payloads.*;
 
 /** An entity that holds a payload. */
 @Component
-abstract class PayloadComp implements Posc, Rotc{
+abstract class PayloadComp implements Posc, Rotc, Hitboxc{
     @Import float x, y, rotation;
 
     Seq<Payload> payloads = new Seq<>();

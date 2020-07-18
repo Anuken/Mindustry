@@ -27,6 +27,11 @@ public interface Payload{
         return true;
     }
 
+    /** @return whether the unit can pick up this payload. */
+    default boolean canBeTaken(Payloadc picker){
+        return true;
+    }
+
     /** writes the payload for saving. */
     void write(Writes write);
 
