@@ -1,10 +1,10 @@
 package mindustry.annotations;
 
 import arc.files.*;
-import arc.struct.Array;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.Log;
 import arc.util.Log.*;
+import arc.util.*;
 import com.squareup.javapoet.*;
 import com.sun.source.util.*;
 import com.sun.tools.javac.model.*;
@@ -22,9 +22,8 @@ import javax.tools.Diagnostic.*;
 import javax.tools.*;
 import java.io.*;
 import java.lang.annotation.*;
-import java.lang.reflect.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public abstract class BaseProcessor extends AbstractProcessor{
@@ -100,10 +99,16 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return str.contains(".") ? str.substring(str.lastIndexOf('.') + 1) : str;
     }
 
-    public static TypeName tname(String name) throws Exception{
-        Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
-        cons.setAccessible(true);
-        return cons.newInstance(name);
+    public static TypeName tname(String pack, String simple){
+        return ClassName.get(pack, simple );
+    }
+
+    public static TypeName tname(String name){
+        if(!name.contains(".")) return ClassName.get(packageName, name);
+
+        String pack = name.substring(0, name.lastIndexOf("."));
+        String simple = name.substring(name.lastIndexOf(".") + 1);
+        return ClassName.get(pack, simple);
     }
 
     public static TypeName tname(Class<?> c){
@@ -126,12 +131,12 @@ public abstract class BaseProcessor extends AbstractProcessor{
         write(builder, null);
     }
 
-    public static void write(TypeSpec.Builder builder, Array<String> imports) throws Exception{
+    public static void write(TypeSpec.Builder builder, Seq<String> imports) throws Exception{
         JavaFile file = JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build();
 
         if(imports != null){
             String rawSource = file.toString();
-            Array<String> result = new Array<>();
+            Seq<String> result = new Seq<>();
             for (String s : rawSource.split("\n", -1)) {
                 result.add(s);
                 if (s.startsWith("package ")) {
@@ -152,22 +157,22 @@ public abstract class BaseProcessor extends AbstractProcessor{
         }
     }
 
-    public Array<Selement> elements(Class<? extends Annotation> type){
-        return Array.with(env.getElementsAnnotatedWith(type)).map(Selement::new);
+    public Seq<Selement> elements(Class<? extends Annotation> type){
+        return Seq.with(env.getElementsAnnotatedWith(type)).map(Selement::new);
     }
 
-    public Array<Stype> types(Class<? extends Annotation> type){
-        return Array.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof TypeElement)
+    public Seq<Stype> types(Class<? extends Annotation> type){
+        return Seq.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof TypeElement)
             .map(e -> new Stype((TypeElement)e));
     }
 
-    public Array<Svar> fields(Class<? extends Annotation> type){
-        return Array.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof VariableElement)
+    public Seq<Svar> fields(Class<? extends Annotation> type){
+        return Seq.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof VariableElement)
         .map(e -> new Svar((VariableElement)e));
     }
 
-    public Array<Smethod> methods(Class<? extends Annotation> type){
-        return Array.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof ExecutableElement)
+    public Seq<Smethod> methods(Class<? extends Annotation> type){
+        return Seq.with(env.getElementsAnnotatedWith(type)).select(e -> e instanceof ExecutableElement)
         .map(e -> new Smethod((ExecutableElement)e));
     }
 

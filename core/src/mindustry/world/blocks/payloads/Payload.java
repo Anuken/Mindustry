@@ -22,6 +22,16 @@ public interface Payload{
         return false;
     }
 
+    /** @return whether this payload fits on a standard 3x3 conveyor. */
+    default boolean fits(){
+        return true;
+    }
+
+    /** @return whether the unit can pick up this payload. */
+    default boolean canBeTaken(Payloadc picker){
+        return true;
+    }
+
     /** writes the payload for saving. */
     void write(Writes write);
 
@@ -49,7 +59,7 @@ public interface Payload{
             return (T)payload;
         }else if(type == payloadUnit){
             byte id = read.b();
-            Unitc unit = (Unitc)EntityMapping.map(id).get();
+            Unit unit = (Unit)EntityMapping.map(id).get();
             unit.read(read);
             return (T)new UnitPayload(unit);
         }

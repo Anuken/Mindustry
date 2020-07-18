@@ -7,7 +7,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
 public class RandomItemFilter extends GenerateFilter{
-    public Array<ItemStack> drops = new Array<>();
+    public Seq<ItemStack> drops = new Seq<>();
     public float chance = 0.3f;
 
     @Override
@@ -21,7 +21,7 @@ public class RandomItemFilter extends GenerateFilter{
             if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock)){
                 for(ItemStack stack : drops){
                     if(Mathf.chance(chance)){
-                        tile.entity.items().add(stack.item, Math.min(Mathf.random(stack.amount), tile.block().itemCapacity));
+                        tile.build.items.add(stack.item, Math.min(Mathf.random(stack.amount), tile.block().itemCapacity));
                     }
                 }
             }

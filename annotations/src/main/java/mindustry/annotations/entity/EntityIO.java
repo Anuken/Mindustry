@@ -19,18 +19,20 @@ public class EntityIO{
     final static Json json = new Json();
     //suffixes for sync fields
     final static String targetSuf = "_TARGET_", lastSuf = "_LAST_";
+    //replacements after refactoring
+    final static StringMap replacements = StringMap.of("mindustry.entities.units.BuildRequest", "mindustry.entities.units.BuildPlan");
 
     final ClassSerializer serializer;
     final String name;
     final TypeSpec.Builder type;
     final Fi directory;
-    final Array<Revision> revisions = new Array<>();
+    final Seq<Revision> revisions = new Seq<>();
 
     boolean write;
     MethodSpec.Builder method;
     ObjectSet<String> presentFields = new ObjectSet<>();
 
-    EntityIO(String name, TypeSpec.Builder type, ClassSerializer serializer, Fi directory){
+    EntityIO(String name, TypeSpec.Builder type, Seq<FieldSpec> typeFields, ClassSerializer serializer, Fi directory){
         this.directory = directory;
         this.type = type;
         this.serializer = serializer;
@@ -47,7 +49,7 @@ public class EntityIO{
         int nextRevision = revisions.isEmpty() ? 0 : revisions.max(r -> r.version).version + 1;
 
         //resolve preferred field order based on fields that fit
-        Array<FieldSpec> fields = Array.with(type.fieldSpecs).select(spec ->
+        Seq<FieldSpec> fields = typeFields.select(spec ->
             !spec.hasModifier(Modifier.TRANSIENT) &&
             !spec.hasModifier(Modifier.STATIC) &&
             !spec.hasModifier(Modifier.FINAL)/* &&
@@ -110,7 +112,7 @@ public class EntityIO{
         }
     }
 
-    void writeSync(MethodSpec.Builder method, boolean write, Array<Svar> syncFields, Array<Svar> allFields) throws Exception{
+    void writeSync(MethodSpec.Builder method, boolean write, Seq<Svar> syncFields, Seq<Svar> allFields) throws Exception{
         this.method = method;
         this.write = write;
 
@@ -140,14 +142,20 @@ public class EntityIO{
 
                 io(field.type, "this." + (sf ? field.name + targetSuf : field.name) + " = ");
 
-                if(sl) econt();
+                if(sl){
+                    ncont("else" );
+
+                    io(field.type, "");
+
+                    econt();
+                }
             }
 
             st("afterSync()");
         }
     }
 
-    void writeSyncManual(MethodSpec.Builder method, boolean write, Array<Svar> syncFields) throws Exception{
+    void writeSyncManual(MethodSpec.Builder method, boolean write, Seq<Svar> syncFields) throws Exception{
         this.method = method;
         this.write = write;
 
@@ -170,7 +178,7 @@ public class EntityIO{
         }
     }
 
-    void writeInterpolate(MethodSpec.Builder method, Array<Svar> fields) throws Exception{
+    void writeInterpolate(MethodSpec.Builder method, Seq<Svar> fields) throws Exception{
         this.method = method;
 
         cont("if(lastUpdated != 0 && updateSpacing != 0)");
@@ -185,7 +193,7 @@ public class EntityIO{
             st("$L = $L($T.$L($L, $L, alpha))", name, field.annotation(SyncField.class).clamped() ? "arc.math.Mathf.clamp" : "", Mathf.class, field.annotation(SyncField.class).value() ? "lerp" : "slerp", lastName, targetName);
         }
 
-        ncont("else"); //no meaningful data has arrived yet
+        ncont("else if(lastUpdated != 0)"); //check if no meaningful data has arrived yet
 
         //write values directly to targets
         for(Svar field : fields){
@@ -197,6 +205,9 @@ public class EntityIO{
     }
 
     private void io(String type, String field) throws Exception{
+        type = type.replace("mindustry.gen.", "");
+        type = replacements.get(type, type);
+
         if(BaseProcessor.isPrimitive(type)){
             s(type.equals("boolean") ? "bool" : type.charAt(0) + "", field);
         }else if(instanceOf(type, "mindustry.ctype.Content")){
@@ -234,7 +245,7 @@ public class EntityIO{
             String struct = type.substring(0, type.indexOf("<"));
             String generic = type.substring(type.indexOf("<") + 1, type.indexOf(">"));
 
-            if(struct.equals("arc.struct.Queue") || struct.equals("arc.struct.Array")){
+            if(struct.equals("arc.struct.Queue") || struct.equals("arc.struct.Seq")){
                 if(write){
                     s("i", field + ".size");
                     cont("for(int INDEX = 0; INDEX < $L.size; INDEX ++)", field);
@@ -289,9 +300,9 @@ public class EntityIO{
 
     public static class Revision{
         int version;
-        Array<RevisionField> fields;
+        Seq<RevisionField> fields;
 
-        Revision(int version, Array<RevisionField> fields){
+        Revision(int version, Seq<RevisionField> fields){
             this.version = version;
             this.fields = fields;
         }
@@ -299,7 +310,7 @@ public class EntityIO{
         Revision(){}
 
         /** @return whether these two revisions are compatible */
-        boolean equal(Array<FieldSpec> specs){
+        boolean equal(Seq<FieldSpec> specs){
             if(fields.size != specs.size) return false;
 
             for(int i = 0; i < fields.size; i++){

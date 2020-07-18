@@ -1,6 +1,5 @@
 package mindustry.world.blocks.liquid;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -25,21 +24,21 @@ public class LiquidJunction extends LiquidBlock{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region};
     }
 
-    public class LiquidJunctionEntity extends TileEntity{
+    public class LiquidJunctionEntity extends Building{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
         }
 
         @Override
-        public Tilec getLiquidDestination(Tilec source, Liquid liquid){
+        public Building getLiquidDestination(Building source, Liquid liquid){
             int dir = source.relativeTo(tile.x, tile.y);
             dir = (dir + 4) % 4;
-            Tilec next = nearby(dir);
+            Building next = nearby(dir);
             if(next == null || (!next.acceptLiquid(this, liquid, 0f) && !(next.block() instanceof LiquidJunction))){
                 return this;
             }

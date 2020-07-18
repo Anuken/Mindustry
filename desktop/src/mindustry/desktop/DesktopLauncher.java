@@ -16,10 +16,10 @@ import mindustry.*;
 import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
+import mindustry.gen.*;
 
 import java.io.*;
 import java.net.*;
@@ -29,12 +29,10 @@ import static mindustry.Vars.*;
 
 public class DesktopLauncher extends ClientLauncher{
     public final static String discordID = "610508934456934412";
-
-    boolean useDiscord = OS.is64Bit && !OS.hasProp("nodiscord"), loadError = false;
+    boolean useDiscord = OS.is64Bit && !OS.isARM && !OS.hasProp("nodiscord"), loadError = false;
     Throwable steamError;
 
     public static void main(String[] arg){
-
         try{
             Vars.loadLogger();
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
@@ -53,18 +51,17 @@ public class DesktopLauncher extends ClientLauncher{
     public DesktopLauncher(String[] args){
         Version.init();
         boolean useSteam = Version.modifier.contains("steam");
-        testMobile = Array.with(args).contains("-testMobile");
+        testMobile = Seq.with(args).contains("-testMobile");
 
         if(useDiscord){
             try{
-                DiscordEventHandlers handlers = new DiscordEventHandlers();
-                DiscordRPC.INSTANCE.Discord_Initialize(discordID, handlers, true, "1127400");
+                DiscordRPC.INSTANCE.Discord_Initialize(discordID, null, true, "1127400");
                 Log.info("Initialized Discord rich presence.");
-
                 Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC.INSTANCE::Discord_Shutdown));
             }catch(Throwable t){
                 useDiscord = false;
-                Log.err("Failed to initialize discord.", t);
+                Log.err("Failed to initialize discord. Enable debug logging for details.");
+                Log.debug("Discord init error: \n@\n", Strings.getStackTrace(t));
             }
         }
 
@@ -115,7 +112,7 @@ public class DesktopLauncher extends ClientLauncher{
         loadError = true;
         Log.err(e);
         try(OutputStream s = new FileOutputStream(new File("steam-error-log-" + System.nanoTime() + ".txt"))){
-            String log = Strings.parseException(e, true);
+            String log = Strings.neatError(e);
             s.write(log.getBytes());
         }catch(Exception e2){
             Log.err(e2);
@@ -132,7 +129,7 @@ public class DesktopLauncher extends ClientLauncher{
         Events.on(ClientLoadEvent.class, event -> {
             player.name(SVars.net.friends.getPersonaName());
             Core.settings.defaults("name", SVars.net.friends.getPersonaName());
-            Core.settings.put("name", player.name());
+            Core.settings.put("name", player.name);
             //update callbacks
             Core.app.addListener(new ApplicationListener(){
                 @Override
@@ -196,7 +193,7 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
+    public Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){
         return !steam ? super.getWorkshopContent(type) : SVars.workshop.getWorkshopFiles(type);
     }
 

@@ -55,14 +55,14 @@ public class MendProjector extends Block{
         Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
     }
 
-    public class MendEntity extends TileEntity{
+    public class MendEntity extends Building{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
 
         @Override
         public void updateTile(){
-            heat = Mathf.lerpDelta(heat, consValid() || tile.isEnemyCheat() ? 1f : 0f, 0.08f);
+            heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
@@ -77,7 +77,7 @@ public class MendProjector extends Block{
 
                 indexer.eachBlock(this, realRange, other -> other.damaged(), other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
-                    Fx.healBlockFull.at(other.x(), other.y(), other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
+                    Fx.healBlockFull.at(other.x, other.y, other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
                 });
             }
         }
@@ -110,7 +110,7 @@ public class MendProjector extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
+            Drawf.light(team, x, y, 50f * efficiency(), baseColor, 0.7f * efficiency());
         }
 
         @Override

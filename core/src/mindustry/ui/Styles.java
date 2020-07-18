@@ -23,14 +23,14 @@ import static mindustry.gen.Tex.*;
 
 @StyleDefaults
 public class Styles{
-    public static Drawable black, black9, black8, black6, black3, none, flatDown, flatOver;
+    public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver;
     public static ButtonStyle defaultb, waveb;
     public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt;
     public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
     public static SliderStyle defaultSlider, vSlider;
-    public static LabelStyle defaultLabel, outlineLabel;
+    public static LabelStyle defaultLabel, outlineLabel, techLabel;
     public static TextFieldStyle defaultField, areaField;
     public static CheckBoxStyle defaultCheck;
     public static DialogStyle defaultDialog, fullDialog;
@@ -40,6 +40,7 @@ public class Styles{
         black9 = whiteui.tint(0f, 0f, 0f, 0.9f);
         black8 = whiteui.tint(0f, 0f, 0f, 0.8f);
         black6 = whiteui.tint(0f, 0f, 0f, 0.6f);
+        black5 = whiteui.tint(0f, 0f, 0f, 0.5f);
         black3 = whiteui.tint(0f, 0f, 0f, 0.3f);
         none = whiteui.tint(0f, 0f, 0f, 0f);
         flatDown = createFlatDown();
@@ -193,6 +194,9 @@ public class Styles{
             down = flatDown;
             up = none;
             over = flatOver;
+            disabled = none;
+            imageDisabledColor = Color.gray;
+            imageUpColor = Color.white;
         }};
         clearPartial2i = new ImageButtonStyle(){{
             down = whiteui;
@@ -266,6 +270,10 @@ public class Styles{
         }};
         outlineLabel = new LabelStyle(){{
             font = Fonts.outline;
+            fontColor = Color.white;
+        }};
+        techLabel = new LabelStyle(){{
+            font = Fonts.tech;
             fontColor = Color.white;
         }};
 

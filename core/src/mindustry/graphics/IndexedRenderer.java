@@ -9,39 +9,31 @@ import arc.util.*;
 
 //TODO this class is a trainwreck, remove it
 public class IndexedRenderer implements Disposable{
-    private final static int vsize = 5;
+    private static final int vsize = 5;
 
     private Shader program = new Shader(
-    Strings.join("\n",
-    "attribute vec4 " + Shader.positionAttribute + ";",
-    "attribute vec4 " + Shader.colorAttribute + ";",
-    "attribute vec2 " + Shader.texcoordAttribute + "0;",
-    "uniform mat4 u_projTrans;",
-    "varying vec4 v_color;",
-    "varying vec2 v_texCoords;",
-    "",
-    "void main(){",
-    "   v_color = " + Shader.colorAttribute + ";",
-    "   v_color.a = v_color.a * (255.0/254.0);",
-    "   v_texCoords = " + Shader.texcoordAttribute + "0;",
-    "   gl_Position = u_projTrans * " + Shader.positionAttribute + ";",
-    "}"),
-    Strings.join("\n",
-    "#ifdef GL_ES",
-    "#define LOWP lowp",
-    "precision mediump float;",
-    "#else",
-    "#define LOWP ",
-    "#endif",
-    "",
-    "varying LOWP vec4 v_color;",
-    "varying vec2 v_texCoords;",
-    "uniform sampler2D u_texture;",
-    "",
-    "void main(){",
-    "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);",
+    "attribute vec4 a_position;\n" +
+    "attribute vec4 a_color;\n" +
+    "attribute vec2 a_texCoord0;\n" +
+    "uniform mat4 u_projTrans;\n" +
+    "varying vec4 v_color;\n" +
+    "varying vec2 v_texCoords;\n" +
+
+    "void main(){\n" +
+    "   v_color = a_color;\n" +
+    "   v_color.a = v_color.a * (255.0/254.0);\n" +
+    "   v_texCoords = a_texCoord0;\n" +
+    "   gl_Position = u_projTrans * a_position;\n" +
+    "}",
+
+    "varying lowp vec4 v_color;\n" +
+    "varying vec2 v_texCoords;\n" +
+    "uniform sampler2D u_texture;\n" +
+
+    "void main(){\n" +
+    "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n" +
     "}"
-    ));
+    );
     private Mesh mesh;
     private float[] tmpVerts = new float[vsize * 6];
     private float[] vertices;
@@ -63,7 +55,7 @@ public class IndexedRenderer implements Disposable{
         program.bind();
         texture.bind();
 
-        program.setUniformMatrix4("u_projTrans", BatchShader.copyTransform(combined));
+        program.setUniformMatrix4("u_projTrans", combined);
         program.setUniformi("u_texture", 0);
 
         mesh.render(program, Gl.triangles, 0, vertices.length / vsize);
@@ -74,14 +66,15 @@ public class IndexedRenderer implements Disposable{
     }
 
     public void draw(int index, TextureRegion region, float x, float y, float w, float h){
-        final float fx2 = x + w;
-        final float fy2 = y + h;
-        final float u = region.getU();
-        final float v = region.getV2();
-        final float u2 = region.getU2();
-        final float v2 = region.getV();
+        float fx2 = x + w;
+        float fy2 = y + h;
+        float u = region.getU();
+        float v = region.getV2();
+        float u2 = region.getU2();
+        float v2 = region.getV();
 
         float[] vertices = tmpVerts;
+        float color = this.color;
 
         int idx = 0;
         vertices[idx++] = x;
@@ -125,46 +118,35 @@ public class IndexedRenderer implements Disposable{
     }
 
     public void draw(int index, TextureRegion region, float x, float y, float w, float h, float rotation){
-        final float u = region.getU();
-        final float v = region.getV2();
-        final float u2 = region.getU2();
-        final float v2 = region.getV();
+        float u = region.getU();
+        float v = region.getV2();
+        float u2 = region.getU2();
+        float v2 = region.getV();
 
-        final float originX = w / 2, originY = h / 2;
+        float originX = w / 2, originY = h / 2;
 
-        final float cos = Mathf.cosDeg(rotation);
-        final float sin = Mathf.sinDeg(rotation);
+        float cos = Mathf.cosDeg(rotation);
+        float sin = Mathf.sinDeg(rotation);
 
         float fx = -originX;
         float fy = -originY;
         float fx2 = w - originX;
         float fy2 = h - originY;
 
-        final float worldOriginX = x + originX;
-        final float worldOriginY = y + originY;
+        float worldOriginX = x + originX;
+        float worldOriginY = y + originY;
 
-        float x1 = cos * fx - sin * fy;
-        float y1 = sin * fx + cos * fy;
-
-        float x2 = cos * fx - sin * fy2;
-        float y2 = sin * fx + cos * fy2;
-
-        float x3 = cos * fx2 - sin * fy2;
-        float y3 = sin * fx2 + cos * fy2;
-
+        float x1 = cos * fx - sin * fy + worldOriginX;
+        float y1 = sin * fx + cos * fy + worldOriginY;
+        float x2 = cos * fx - sin * fy2 + worldOriginX;
+        float y2 = sin * fx + cos * fy2 + worldOriginY;
+        float x3 = cos * fx2 - sin * fy2 + worldOriginX;
+        float y3 = sin * fx2 + cos * fy2 + worldOriginY;
         float x4 = x1 + (x3 - x2);
         float y4 = y3 - (y2 - y1);
 
-        x1 += worldOriginX;
-        y1 += worldOriginY;
-        x2 += worldOriginX;
-        y2 += worldOriginY;
-        x3 += worldOriginX;
-        y3 += worldOriginY;
-        x4 += worldOriginX;
-        y4 += worldOriginY;
-
         float[] vertices = tmpVerts;
+        float color = this.color;
 
         int idx = 0;
         vertices[idx++] = x1;

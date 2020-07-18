@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
@@ -29,7 +30,7 @@ public class SchematicsDialog extends BaseDialog{
     public SchematicsDialog(){
         super("$schematics");
         Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> {
-            ((Texture)t).setWrap(TextureWrap.Repeat);
+            ((Texture)t).setWrap(TextureWrap.repeat);
         };
 
         shouldPause = true;
@@ -69,7 +70,7 @@ public class SchematicsDialog extends BaseDialog{
             });
 
             rebuildPane[0] = () -> {
-                int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
+                int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(230)), 1);
 
                 t.clear();
                 int i = 0;
@@ -152,7 +153,7 @@ public class SchematicsDialog extends BaseDialog{
 
                     sel[0].getStyle().up = Tex.pane;
 
-                    if(++i % maxwidth == 0){
+                    if(++i % cols == 0){
                         t.row();
                     }
                 }
@@ -332,15 +333,15 @@ public class SchematicsDialog extends BaseDialog{
             cont.add(new SchematicImage(schem)).maxSize(800f);
             cont.row();
 
-            Array<ItemStack> arr = schem.requirements();
+            Seq<ItemStack> arr = schem.requirements();
             cont.table(r -> {
                 int i = 0;
                 for(ItemStack s : arr){
                     r.image(s.item.icon(Cicon.small)).left();
                     r.label(() -> {
-                        Tilec core = player.closestCore();
-                        if(core == null || state.rules.infiniteResources || core.items().has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
-                        return (core.items().has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items().get(s.item), s.amount) + "[lightgray]/" + s.amount;
+                        Building core = player.core();
+                        if(core == null || state.rules.infiniteResources || core.items.has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
+                        return (core.items.has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items.get(s.item), s.amount) + "[lightgray]/" + s.amount;
                     }).padLeft(2).left().padRight(4);
 
                     if(++i % 4 == 0){
@@ -348,6 +349,26 @@ public class SchematicsDialog extends BaseDialog{
                     }
                 }
             });
+            cont.row();
+            float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
+            if(!Mathf.zero(cons) || !Mathf.zero(prod)){
+                cont.table(t -> {
+
+                    if(!Mathf.zero(prod)){
+                        t.image(Icon.powerSmall).color(Pal.powerLight).padRight(3);
+                        t.add("+" + Strings.autoFixed(prod, 2)).color(Pal.powerLight).left();
+
+                        if(!Mathf.zero(cons)){
+                            t.add().width(15);
+                        }
+                    }
+
+                    if(!Mathf.zero(cons)){
+                        t.image(Icon.powerSmall).color(Pal.remove).padRight(3);
+                        t.add("-" + Strings.autoFixed(cons, 2)).color(Pal.remove).left();
+                    }
+                });
+            }
 
             show();
         }

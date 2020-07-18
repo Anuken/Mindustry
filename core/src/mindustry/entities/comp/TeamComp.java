@@ -13,11 +13,19 @@ abstract class TeamComp implements Posc{
 
     Team team = Team.derelict;
 
-    public @Nullable Tilec closestCore(){
+    public boolean cheating(){
+        return team.rules().cheat;
+    }
+
+    public @Nullable Building core(){
+        return team.core();
+    }
+
+    public @Nullable Building closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable Tilec closestEnemyCore(){
+    public @Nullable Building closestEnemyCore(){
         return state.teams.closestEnemyCore(x, y, team);
     }
 }

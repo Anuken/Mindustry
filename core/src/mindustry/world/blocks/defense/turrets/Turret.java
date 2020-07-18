@@ -70,12 +70,12 @@ public abstract class Turret extends Block{
     public @Load("block-$size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
 
-    public Cons<TurretEntity> drawer = tile -> Draw.rect(region, tile.x() + tr2.x, tile.y() + tr2.y, tile.rotation - 90);
+    public Cons<TurretEntity> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
     public Cons<TurretEntity> heatDrawer = tile -> {
         if(tile.heat <= 0.00001f) return;
         Draw.color(heatColor, tile.heat);
         Draw.blend(Blending.additive);
-        Draw.rect(heatRegion, tile.x() + tr2.x, tile.y() + tr2.y, tile.rotation - 90);
+        Draw.rect(heatRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
         Draw.blend();
         Draw.color();
     };
@@ -102,8 +102,7 @@ public abstract class Turret extends Block{
 
         stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
         stats.add(BlockStat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
-        stats.add(BlockStat.shots, shots, StatUnit.none);
+        stats.add(BlockStat.reload, 60f / reloadTime * shots, StatUnit.none);
         stats.add(BlockStat.targetsAir, targetAir);
         stats.add(BlockStat.targetsGround, targetGround);
 
@@ -123,8 +122,8 @@ public abstract class Turret extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find("block-" + size), Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{baseRegion, region};
     }
 
     @Override
@@ -138,8 +137,8 @@ public abstract class Turret extends Block{
         public abstract BulletType type();
     }
 
-    public class TurretEntity extends TileEntity implements ControlBlock{
-        public Array<AmmoEntry> ammo = new Array<>();
+    public class TurretEntity extends Building implements ControlBlock{
+        public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float reload, rotation = 90, recoil, heat;
         public int shotCounter;
@@ -154,8 +153,8 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public Unitc unit(){
-            return unit;
+        public Unit unit(){
+            return (Unit)unit;
         }
 
         @Override
@@ -237,7 +236,7 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public void handleLiquid(Tilec source, Liquid liquid, float amount){
+        public void handleLiquid(Building source, Liquid liquid, float amount){
             if(acceptCoolant && liquids.currentAmount() <= 0.001f){
                 Events.fire(Trigger.turretCool);
             }
@@ -281,7 +280,7 @@ public abstract class Turret extends Block{
 
         /** Consume ammo and return a type. */
         public BulletType useAmmo(){
-            if(tile.isEnemyCheat()) return peekAmmo();
+            if(cheating()) return peekAmmo();
 
             AmmoEntry entry = ammo.peek();
             entry.amount -= ammoPerShot;

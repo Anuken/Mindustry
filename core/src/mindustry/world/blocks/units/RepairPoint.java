@@ -1,6 +1,5 @@
 package mindustry.world.blocks.units;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -14,7 +13,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class RepairPoint extends Block{
     private static final Rect rect = new Rect();
@@ -28,6 +27,8 @@ public class RepairPoint extends Block{
     public @Load("@-base") TextureRegion baseRegion;
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
+
+    public Color laserColor = Color.valueOf("e8ffd7");
 
     public RepairPoint(String name){
         super(name);
@@ -56,12 +57,12 @@ public class RepairPoint extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-base"), Core.atlas.find(name)};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{baseRegion, region};
     }
 
-    public class RepairPointEntity extends TileEntity{
-        public Unitc target;
+    public class RepairPointEntity extends Building{
+        public Unit target;
         public float strength, rotation = 90;
 
         @Override
@@ -76,8 +77,8 @@ public class RepairPoint extends Block{
                 float ang = angleTo(target);
                 float len = 5f;
 
-                Draw.color(Color.valueOf("e8ffd7"));
-                Drawf.laser(laser, laserEnd,
+                Draw.color(laserColor);
+                Drawf.laser(team, laser, laserEnd,
                 x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),
                 target.x(), target.y(), strength);
                 Draw.color();
@@ -108,7 +109,7 @@ public class RepairPoint extends Block{
 
             if(timer(timerTarget, 20)){
                 rect.setSize(repairRadius * 2).setCenter(x, y);
-                target = Units.closest(team, x, y, repairRadius, Unitc::damaged);
+                target = Units.closest(team, x, y, repairRadius, Unit::damaged);
             }
         }
 

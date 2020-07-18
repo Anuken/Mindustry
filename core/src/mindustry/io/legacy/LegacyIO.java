@@ -8,8 +8,8 @@ import java.io.*;
 
 public class LegacyIO{
 
-    public static Array<Server> readServers(){
-        Array<Server> arr = new Array<>();
+    public static Seq<Server> readServers(){
+        Seq<Server> arr = new Seq<>();
 
         try{
             byte[] bytes = Core.settings.getBytes("server-list");

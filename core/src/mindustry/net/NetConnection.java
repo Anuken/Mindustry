@@ -18,16 +18,16 @@ public abstract class NetConnection{
     public final String address;
     public String uuid = "AAAAAAAA", usid = uuid;
     public boolean mobile, modclient;
-    public @Nullable Playerc player;
+    public @Nullable Player player;
     public @Nullable Unitc lastUnit;
     public Vec2 lastPosition = new Vec2();
 
-    /** ID of last recieved client snapshot. */
-    public int lastRecievedClientSnapshot = -1;
-    /** Timestamp of last recieved snapshot. */
-    public long lastRecievedClientTime;
+    /** ID of last received client snapshot. */
+    public int lastReceivedClientSnapshot = -1;
+    /** Timestamp of last received snapshot. */
+    public long lastReceivedClientTime;
     /** Build requests that have been recently rejected. This is cleared every snapshot. */
-    public Array<BuildRequest> rejectedRequests = new Array<>();
+    public Seq<BuildPlan> rejectedRequests = new Seq<>();
 
     public boolean hasConnected, hasBegunConnecting, hasDisconnected;
     public float viewWidth, viewHeight, viewX, viewY;
@@ -46,7 +46,7 @@ public abstract class NetConnection{
             info.lastKicked = Math.max(Time.millis() + 30 * 1000, info.lastKicked);
         }
 
-        Call.onKick(this, reason);
+        Call.kick(this, reason);
 
         Time.runTask(2f, this::close);
 
@@ -66,7 +66,7 @@ public abstract class NetConnection{
         info.timesKicked++;
         info.lastKicked = Math.max(Time.millis() + kickDuration, info.lastKicked);
 
-        Call.onKick(this, reason);
+        Call.kick(this, reason);
 
         Time.runTask(2f, this::close);
 

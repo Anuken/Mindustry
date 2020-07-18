@@ -8,25 +8,24 @@ import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
-import org.mozilla.javascript.*;
-import org.mozilla.javascript.commonjs.module.*;
-import org.mozilla.javascript.commonjs.module.provider.*;
+import rhino.*;
+import rhino.module.*;
+import rhino.module.provider.*;
 
 import java.io.*;
 import java.net.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private final static Object[] emptyObjects = {};
-    private final Array<String> blacklist = Array.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
+    private final Seq<String> blacklist = Seq.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
         ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");
-    private final Array<String> whitelist = Array.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
+    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
     private final Context context;
-    private Scriptable scope;
+    private final Scriptable scope;
     private boolean errored;
     private LoadedMod currentMod = null;
-    private Array<EventHandle> events = new Array<>();
+    private Seq<EventHandle> events = new Seq<>();
 
     public Scripts(){
         Time.mark();
@@ -34,6 +33,7 @@ public class Scripts implements Disposable{
         context = Vars.platform.getScriptContext();
         context.setClassShutter(type -> !blacklist.contains(type.toLowerCase()::contains) || whitelist.contains(type.toLowerCase()::contains));
         context.getWrapFactory().setJavaPrimitiveWrap(false);
+        context.setLanguageVersion(Context.VERSION_ES6);
 
         scope = new ImporterTopLevel(context);
 
@@ -54,12 +54,8 @@ public class Scripts implements Disposable{
     public String runConsole(String text){
         try{
             Object o = context.evaluateString(scope, text, "console.js", 1, null);
-            if(o instanceof NativeJavaObject){
-                o = ((NativeJavaObject)o).unwrap();
-            }
-            if(o instanceof Undefined){
-                o = "undefined";
-            }
+            if(o instanceof NativeJavaObject) o = ((NativeJavaObject)o).unwrap();
+            if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
         }catch(Throwable t){
             return getError(t);
@@ -96,7 +92,9 @@ public class Scripts implements Disposable{
                 //inject script info into file (TODO maybe rhino handles this?)
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
             }
-            context.evaluateString(scope, script, file, 1, null);
+            context.evaluateString(scope,
+            "(function(){\n" + script + "\n})();",
+            file, 0, null);
             return true;
         }catch(Throwable t){
             if(currentMod != null){

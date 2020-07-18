@@ -11,7 +11,7 @@ public class LegacyMechPad extends LegacyBlock{
         hasPower = true;
     }
 
-    public class LegacyMechPadEntity extends TileEntity{
+    public class LegacyMechPadEntity extends Building{
 
         @Override
         public void read(Reads read, byte revision){

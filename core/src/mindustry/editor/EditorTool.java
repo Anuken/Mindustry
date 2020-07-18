@@ -91,7 +91,7 @@ public enum EditorTool{
             edit = true;
         }
 
-        IntArray stack = new IntArray();
+        IntSeq stack = new IntSeq();
 
         @Override
         public void touched(MapEditor editor, int x, int y){
@@ -139,7 +139,7 @@ public enum EditorTool{
                 if(tile.synthetic()){
                     Team dest = tile.team();
                     if(dest == editor.drawTeam) return;
-                    fill(editor, x, y, false, t -> t.getTeamID() == (int)dest.id && t.synthetic(), t -> t.setTeam(editor.drawTeam));
+                    fill(editor, x, y, false, t -> t.getTeamID() == dest.id && t.synthetic(), t -> t.setTeam(editor.drawTeam));
                 }
             }
         }
@@ -200,7 +200,7 @@ public enum EditorTool{
                     stack = null;
                     System.gc();
                     e.printStackTrace();
-                    stack = new IntArray();
+                    stack = new IntSeq();
                 }
             }
         }

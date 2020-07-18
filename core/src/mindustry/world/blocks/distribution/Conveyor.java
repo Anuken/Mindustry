@@ -1,6 +1,5 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -57,7 +56,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         int[] bits = getTiling(req, list);
 
         if(bits == null) return;
@@ -68,12 +67,13 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
+        return (otherblock.outputsItems() || lookingAt(tile, rotation, otherx, othery, otherblock))
+            && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name + "-0-0")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{regions[0][0]};
     }
 
     @Override
@@ -82,7 +82,7 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conveyor || req.block instanceof Junction));
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
@@ -91,7 +91,7 @@ public class Conveyor extends Block implements Autotiler{
             Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
-    public class ConveyorEntity extends TileEntity{
+    public class ConveyorEntity extends Building{
         //parallel array data
         Item[] ids = new Item[capacity];
         float[] xs = new float[capacity];
@@ -99,7 +99,7 @@ public class Conveyor extends Block implements Autotiler{
         //amount of items, always < capacity
         int len = 0;
         //next entity
-        @Nullable Tilec next;
+        @Nullable Building next;
         @Nullable ConveyorEntity nextc;
         //whether the next conveyor's rotation == tile rotation
         boolean aligned;
@@ -169,7 +169,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public void unitOn(Unitc unit){
+        public void unitOn(Unit unit){
             if(clogHeat > 0.5f){
                 return;
             }
@@ -287,7 +287,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             if(len >= capacity) return false;
             Tile facing = Edges.getFacingEdge(source.tile(), tile);
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - tile.rotation());
@@ -295,7 +295,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
+        public void handleItem(Building source, Item item){
             if(len >= capacity) return;
 
             byte r = tile.rotation();
@@ -337,7 +337,7 @@ public class Conveyor extends Block implements Autotiler{
 
             for(int i = 0; i < amount; i++){
                 int val = read.i();
-                byte id = (byte)(val >> 24);
+                short id = (short)(((byte)(val >> 24)) & 0xff);
                 float x = (float)((byte)(val >> 16)) / 127f;
                 float y = ((float)((byte)(val >> 8)) + 128f) / 255f;
                 if(i < capacity){

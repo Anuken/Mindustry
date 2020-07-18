@@ -21,17 +21,21 @@ import static mindustry.Vars.*;
 public class BaseGenerator{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
-    private final static int range = 180;
+    private static final int range = 180;
 
     private Tiles tiles;
     private Team team;
     private ObjectMap<Item, OreBlock> ores = new ObjectMap<>();
-    private Array<Tile> cores;
+    private Seq<Tile> cores;
 
-    public void generate(Tiles tiles, Array<Tile> cores, Tile spawn, Team team, Sector sector){
+    public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector){
         this.tiles = tiles;
         this.team = team;
         this.cores = cores;
+
+        //don't generate bases when there are no loaded schematics
+        if(bases.cores.isEmpty()) return;
+
         Mathf.random.setSeed(sector.id);
 
         for(Block block : content.blocks()){
@@ -40,10 +44,11 @@ public class BaseGenerator{
             }
         }
 
+        //TODO limit base size
         float costBudget = 1000;
 
-        Array<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1);
-        Array<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2);
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1);
+        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2);
 
         float bracket = 0.1f;
         int wallAngle = 70; //180 for full coverage
@@ -58,9 +63,9 @@ public class BaseGenerator{
             Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? ores.get((Item)coreschem.required) : Blocks.oreCopper);
 
             //fill core with every type of item (even non-material)
-            Tilec entity = tile.entity;
+            Building entity = tile.build;
             for(Item item : content.items()){
-                entity.items().add(item, entity.block().itemCapacity);
+                entity.items.add(item, entity.block().itemCapacity);
             }
         }
 
@@ -69,7 +74,7 @@ public class BaseGenerator{
             if(!tile.block().alwaysReplace) return;
 
             if((tile.drop() != null || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
-                Array<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
+                Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
                 if(!parts.isEmpty()){
                     tryPlace(parts.random(), tile.x, tile.y);
                 }
@@ -125,9 +130,11 @@ public class BaseGenerator{
     }
 
     public void postGenerate(){
+        if(tiles == null) return;
+
         for(Tile tile : tiles){
             if(tile.isCenter() && tile.block() instanceof PowerNode){
-                tile.entity.placed();
+                tile.build.placed();
             }
         }
     }

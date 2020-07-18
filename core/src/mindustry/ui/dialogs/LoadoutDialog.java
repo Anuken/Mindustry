@@ -15,8 +15,8 @@ public class LoadoutDialog extends BaseDialog{
     private Runnable hider;
     private Runnable resetter;
     private Runnable updater;
-    private Array<ItemStack> stacks = new Array<>();
-    private Array<ItemStack> originalStacks = new Array<>();
+    private Seq<ItemStack> stacks = new Seq<>();
+    private Seq<ItemStack> originalStacks = new Seq<>();
     private Table items;
     private int capacity;
 
@@ -51,14 +51,13 @@ public class LoadoutDialog extends BaseDialog{
         }).size(210f, 64f);
     }
 
-    public void show(int capacity, Array<ItemStack> stacks, Runnable reseter, Runnable updater, Runnable hider){
+    public void show(int capacity, Seq<ItemStack> stacks, Runnable reseter, Runnable updater, Runnable hider){
         this.originalStacks = stacks;
         reseed();
         this.resetter = reseter;
         this.updater = updater;
         this.capacity = capacity;
         this.hider = hider;
-        //this.filter = filter;
         show();
     }
 
@@ -83,7 +82,7 @@ public class LoadoutDialog extends BaseDialog{
                 }).size(bsize);
 
                 t.button(Icon.pencil, Styles.cleari, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
-                    if(Strings.canParsePostiveInt(str)){
+                    if(Strings.canParsePositiveInt(str)){
                         int amount = Strings.parseInt(str);
                         if(amount >= 0 && amount <= capacity){
                             stack.amount = amount;
@@ -107,8 +106,7 @@ public class LoadoutDialog extends BaseDialog{
 
     private void reseed(){
         this.stacks = originalStacks.map(ItemStack::copy);
-        this.stacks.addAll(content.items().select(i -> i.type == ItemType.material &&
-                !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
+        this.stacks.addAll(content.items().select(i -> !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
         this.stacks.sort(Structs.comparingInt(s -> s.item.id));
     }
 

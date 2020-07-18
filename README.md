@@ -6,7 +6,8 @@
 A sandbox tower defense game written in Java.
 
 _[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
-_[Wiki](https://mindustrygame.github.io/wiki)_ 
+_[Wiki](https://mindustrygame.github.io/wiki)_  
+_[Javadoc](https://mindustrygame.github.io/docs/)_ 
 
 ### Contributing
 
@@ -17,7 +18,7 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 Bleeding-edge live builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases). Old builds might still be on [jenkins](https://jenkins.hellomouse.net/job/mindustry/).
 
 If you'd rather compile on your own, follow these instructions.
-First, make sure you have [JDK 8](https://adoptopenjdk.net/) installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
+First, make sure you have [JDK 14](https://adoptopenjdk.net/) installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
 
 #### Windows
 

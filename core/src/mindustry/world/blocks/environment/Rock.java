@@ -26,8 +26,8 @@ public class Rock extends Block{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return variants == 0 ? super.generateIcons() : new TextureRegion[]{Core.atlas.find(name + "1")};
+    public TextureRegion[] icons(){
+        return variants == 0 ? super.icons() : new TextureRegion[]{Core.atlas.find(name + "1")};
     }
 
     @Override

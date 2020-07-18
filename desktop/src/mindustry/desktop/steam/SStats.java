@@ -1,7 +1,6 @@
 package mindustry.desktop.steam;
 
 import arc.*;
-import arc.struct.*;
 import arc.util.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
@@ -56,16 +55,17 @@ public class SStats implements SteamUserStatsCallback{
         if(campaign()){
             SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
 
-            if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
-                active10Phantoms.complete();
-            }
+            //TODO
+            //if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
+           //     active10Phantoms.complete();
+            //}
 
             if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
-            for(Tilec entity : player.team().cores()){
-                if(!content.items().contains(i -> i.type == ItemType.material && entity.items().get(i) < entity.block().itemCapacity)){
+            for(Building entity : player.team().cores()){
+                if(!content.items().contains(i -> entity.items.get(i) < entity.block().itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }
@@ -79,7 +79,7 @@ public class SStats implements SteamUserStatsCallback{
                 if(e.unit.team() != Vars.player.team()){
                     SStat.unitsDestroyed.add();
 
-                    if(e.unit instanceof Unitc && ((Unitc)e.unit).isBoss()){
+                    if(e.unit instanceof Unit && ((Unit)e.unit).isBoss()){
                         SStat.bossesDefeated.add();
                     }
                 }
@@ -93,7 +93,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {
-            if(campaign() && player.closestCore() != null && player.closestCore().items().total() >= 10 * 1000){
+            if(campaign() && player.core() != null && player.core().items.total() >= 10 * 1000){
                 drop10kitems.complete();
             }
         }));
@@ -108,7 +108,7 @@ public class SStats implements SteamUserStatsCallback{
             if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){
                 SStat.blocksBuilt.add();
 
-                if(e.tile.block() == Blocks.router && e.tile.entity.proximity().contains(t -> t.block() == Blocks.router)){
+                if(e.tile.block() == Blocks.router && e.tile.build.proximity().contains(t -> t.block() == Blocks.router)){
                     chainRouters.complete();
                 }
 
@@ -283,9 +283,9 @@ public class SStats implements SteamUserStatsCallback{
         registerEvents();
 
         if(result != SteamResult.OK){
-            Log.err("Failed to recieve steam stats: @", result);
+            Log.err("Failed to receive steam stats: @", result);
         }else{
-            Log.info("Recieved steam stats.");
+            Log.info("Received steam stats.");
         }
     }
 

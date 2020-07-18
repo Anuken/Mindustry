@@ -31,8 +31,10 @@ import static mindustry.Vars.*;
 public class Maps{
     /** List of all built-in maps. Filenames only. */
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
+    /** Maps tagged as PvP */
+    private static final String[] pvpMaps = {"veins", "glacier"};
     /** All maps stored in an ordered array. */
-    private Array<Map> maps = new Array<>();
+    private Seq<Map> maps = new Seq<>();
     /** Serializer for meta. */
     private Json json = new Json();
 
@@ -56,22 +58,22 @@ public class Maps{
     }
 
     /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
-    public @Nullable Map getNextMap(@Nullable Map previous){
-        return shuffler != null ? shuffler.next(previous) : shuffleMode.next(previous);
+    public @Nullable Map getNextMap(Gamemode mode, @Nullable Map previous){
+        return shuffleMode.next(mode, previous);
     }
 
     /** Returns a list of all maps, including custom ones. */
-    public Array<Map> all(){
+    public Seq<Map> all(){
         return maps;
     }
 
     /** Returns a list of only custom maps. */
-    public Array<Map> customMaps(){
+    public Seq<Map> customMaps(){
         return maps.select(m -> m.custom);
     }
 
     /** Returns a list of only default maps. */
-    public Array<Map> defaultMaps(){
+    public Seq<Map> defaultMaps(){
         return maps.select(m -> !m.custom);
     }
 
@@ -82,18 +84,6 @@ public class Maps{
     public Maps(){
         Events.on(ClientLoadEvent.class, event -> {
             maps.sort();
-        });
-
-        Events.on(ContentReloadEvent.class, event -> {
-            reload();
-            for(Map map : maps){
-                try{
-                    map.texture = map.previewFile().exists() ? new Texture(map.previewFile()) : new Texture(MapIO.generatePreview(map));
-                    readCache(map);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
         });
 
         if(Core.assets != null){
@@ -298,10 +288,10 @@ public class Maps{
 
     /** Reads JSON of filters, returning a new default array if not found.*/
     @SuppressWarnings("unchecked")
-    public Array<GenerateFilter> readFilters(String str){
+    public Seq<GenerateFilter> readFilters(String str){
         if(str == null || str.isEmpty()){
             //create default filters list
-            Array<GenerateFilter> filters =  Array.with(
+            Seq<GenerateFilter> filters =  Seq.with(
                 new ScatterFilter(){{
                     flooronto = Blocks.stone;
                     block = Blocks.rock;
@@ -329,7 +319,7 @@ public class Maps{
             return filters;
         }else{
             try{
-                return JsonIO.read(Array.class, str);
+                return JsonIO.read(Seq.class, str);
             }catch(Throwable e){
                 e.printStackTrace();
                 return readFilters("");
@@ -337,8 +327,8 @@ public class Maps{
         }
     }
 
-    public void addDefaultOres(Array<GenerateFilter> filters){
-        Array<Block> ores = content.blocks().select(b -> b.isOverlay() && b.asFloor().oreDefault);
+    public void addDefaultOres(Seq<GenerateFilter> filters){
+        Seq<Block> ores = content.blocks().select(b -> b.isOverlay() && b.asFloor().oreDefault);
         for(Block block : ores){
             OreFilter filter = new OreFilter();
             filter.threshold = block.asFloor().oreThreshold;
@@ -348,7 +338,7 @@ public class Maps{
         }
     }
 
-    public String writeWaves(Array<SpawnGroup> groups){
+    public String writeWaves(Seq<SpawnGroup> groups){
         if(groups == null) return "[]";
 
         StringWriter buffer = new StringWriter();
@@ -364,8 +354,8 @@ public class Maps{
         return buffer.toString();
     }
 
-    public Array<SpawnGroup> readWaves(String str){
-        return str == null ? null : str.equals("[]") ? new Array<>() : Array.with(json.fromJson(SpawnGroup[].class, str));
+    public Seq<SpawnGroup> readWaves(String str){
+        return str == null ? null : str.equals("[]") ? new Seq<>() : Seq.with(json.fromJson(SpawnGroup[].class, str));
     }
 
     public void loadPreviews(){
@@ -467,26 +457,14 @@ public class Maps{
     }
 
     public interface MapProvider{
-        @Nullable Map next(@Nullable Map previous);
+        @Nullable Map next(Gamemode mode, @Nullable Map previous);
     }
 
     public enum ShuffleMode implements MapProvider{
-        none(map -> null),
-        all(prev -> {
-            Array<Map> maps = Array.withArrays(Vars.maps.defaultMaps(), Vars.maps.customMaps());
-            maps.shuffle();
-            return maps.find(m -> m != prev || maps.size == 1);
-        }),
-        custom(prev -> {
-            Array<Map> maps = Array.withArrays(Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps());
-            maps.shuffle();
-            return maps.find(m -> m != prev || maps.size == 1);
-        }),
-        builtin(prev -> {
-            Array<Map> maps = Array.withArrays(Vars.maps.defaultMaps());
-            maps.shuffle();
-            return maps.find(m -> m != prev || maps.size == 1);
-        });
+        none((mode, map) -> null),
+        all((mode, prev) -> next(mode, prev, Vars.maps.defaultMaps(), Vars.maps.customMaps())),
+        custom((mode, prev) -> next(mode, prev, Vars.maps.customMaps().isEmpty() ? Vars.maps.defaultMaps() : Vars.maps.customMaps())),
+        builtin((mode, prev) -> next(mode, prev, Vars.maps.defaultMaps()));
 
         private final MapProvider provider;
 
@@ -494,9 +472,24 @@ public class Maps{
             this.provider = provider;
         }
 
+        @SafeVarargs
+        private static Map next(Gamemode mode, Map prev, Seq<Map>... mapArray){
+            Seq<Map> maps = Seq.withArrays((Object[])mapArray);
+            maps.shuffle();
+
+            return maps.find(m -> (m != prev || maps.size == 1) && valid(mode, m));
+        }
+
+        private static boolean valid(Gamemode mode, Map map){
+            boolean pvp = !map.custom && Structs.contains(pvpMaps, map.file.nameWithoutExtension());
+            if(mode == Gamemode.survival || mode == Gamemode.attack || mode == Gamemode.sandbox) return !pvp;
+            if(mode == Gamemode.pvp) return map.custom || pvp;
+            return true;
+        }
+
         @Override
-        public Map next(@Nullable Map previous){
-            return provider.next(previous);
+        public Map next(Gamemode mode, @Nullable Map previous){
+            return provider.next(mode, previous);
         }
     }
 }

@@ -9,34 +9,47 @@ import mindustry.content.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class Schematic implements Publishable, Comparable<Schematic>{
-    public final Array<Stile> tiles;
+    public final Seq<Stile> tiles;
     public StringMap tags;
     public int width, height;
     public @Nullable Fi file;
     /** Associated mod. If null, no mod is associated with this schematic. */
     public @Nullable LoadedMod mod;
 
-    public Schematic(Array<Stile> tiles, @NonNull StringMap tags, int width, int height){
+    public Schematic(Seq<Stile> tiles, @NonNull StringMap tags, int width, int height){
         this.tiles = tiles;
         this.tags = tags;
         this.width = width;
         this.height = height;
     }
 
-    public Array<ItemStack> requirements(){
+    public float powerProduction(){
+        return tiles.sumf(s -> s.block instanceof PowerGenerator ? ((PowerGenerator)s.block).powerProduction : 0f);
+    }
+
+    public float powerConsumption(){
+        return tiles.sumf(s -> s.block.consumes.has(ConsumeType.power) ? s.block.consumes.getPower().usage : 0f);
+    }
+
+    public Seq<ItemStack> requirements(){
         IntIntMap amounts = new IntIntMap();
 
         tiles.each(t -> {
+            if(t.block.buildVisibility == BuildVisibility.hidden) return;
+
             for(ItemStack stack : t.block.requirements){
-                amounts.getAndIncrement(stack.item.id, 0, stack.amount);
+                amounts.increment(stack.item.id, stack.amount);
             }
         });
-        Array<ItemStack> stacks = new Array<>();
+        Seq<ItemStack> stacks = new Seq<>();
         for(Entry ent : amounts.entries()){
             stacks.add(new ItemStack(Vars.content.item(ent.key), ent.value));
         }

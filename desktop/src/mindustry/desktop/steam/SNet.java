@@ -67,7 +67,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                                     Connect c = new Connect();
                                     c.addressTCP = "steam:" + from.getAccountID();
 
-                                    Log.info("&bRecieved STEAM connection: @", c.addressTCP);
+                                    Log.info("&bReceived STEAM connection: @", c.addressTCP);
 
                                     steamConnections.put(from.getAccountID(), con);
                                     connections.add(con);
@@ -160,7 +160,9 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         smat.addRequestLobbyListResultCountFilter(32);
         smat.requestLobbyList();
         lobbyCallback = callback;
-        lobbyDoneCallback = done;
+
+        //after the steam lobby is done discovering, look for local network servers.
+        lobbyDoneCallback = () -> provider.discoverServers(callback, done);
     }
 
     @Override
@@ -298,7 +300,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Log.info("found @ matches @", matches, lobbyDoneCallback);
 
         if(lobbyDoneCallback != null){
-            Array<Host> hosts = new Array<>();
+            Seq<Host> hosts = new Seq<>();
             for(int i = 0; i < matches; i++){
                 try{
                     SteamID lobby = smat.getLobbyByIndex(i);
@@ -343,7 +345,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         if(result == SteamResult.OK){
             currentLobby = steamID;
 
-            smat.setLobbyData(steamID, "name", player.name());
+            smat.setLobbyData(steamID, "name", player.name);
             smat.setLobbyData(steamID, "mapname", state.map.name());
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);

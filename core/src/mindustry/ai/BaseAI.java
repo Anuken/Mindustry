@@ -10,11 +10,12 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.game.Teams.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -24,6 +25,7 @@ public class BaseAI{
     private static final float step = 5;
     private static final int attempts = 5;
     private static final float emptyChance = 0.01f;
+    private static final int timerStep = 0, timerSpawn = 1;
 
     private static int correct = 0, incorrect = 0;
 
@@ -31,16 +33,27 @@ public class BaseAI{
     private boolean triedWalls;
 
     TeamData data;
-    Interval timer = new Interval();
+    Interval timer = new Interval(4);
 
     public BaseAI(TeamData data){
         this.data = data;
     }
 
     public void update(){
+        if(timer.get(timerSpawn, 60) && data.hasCore()){
+            CoreBlock block = (CoreBlock)data.core().block;
+
+            //create AI core unit
+            if(!Groups.unit.contains(u -> u.team() == data.team && u.type() == block.unitType)){
+                Unit unit = block.unitType.create(data.team);
+                unit.set(data.core());
+                unit.add();
+                Fx.spawn.at(unit);
+            }
+        }
 
         //only schedule when there's something to build.
-        if(data.blocks.isEmpty() && timer.get(step)){
+        if(data.blocks.isEmpty() && timer.get(timerStep, step)){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;
@@ -48,13 +61,16 @@ public class BaseAI{
 
             for(int i = 0; i < attempts; i++){
                 int range = 150;
-                CoreEntity core = data.cores.random();
+
+                Position pos = randomPosition();
+                //when there are no random positions, do nothing.
+                if(pos == null) return;
 
                 Tmp.v1.rnd(Mathf.random(range));
-                int wx = (int)(core.tileX() + Tmp.v1.x), wy = (int)(core.tileY() + Tmp.v1.y);
+                int wx = (int)(world.toTile(pos.getX()) + Tmp.v1.x), wy = (int)(world.toTile(pos.getY()) + Tmp.v1.y);
                 Tile tile = world.tiles.getc(wx, wy);
 
-                Array<BasePart> parts = null;
+                Seq<BasePart> parts = null;
 
                 //pick a completely random base part, and place it a random location
                 //((yes, very intelligent))
@@ -74,7 +90,17 @@ public class BaseAI{
         }
     }
 
-    boolean tryPlace(BasePart part, int x, int y){
+    /** @return a random position from which to seed building. */
+    private Position randomPosition(){
+        if(data.hasCore()){
+            return data.cores.random();
+        }else if(data.team == state.rules.waveTeam){
+            return spawner.getSpawns().random();
+        }
+        return null;
+    }
+
+    private boolean tryPlace(BasePart part, int x, int y){
         int rotation = Mathf.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
         Schematic result = Schematics.rotate(part.schematic, rotation);
@@ -131,7 +157,7 @@ public class BaseAI{
         return true;
     }
 
-    void tryWalls(){
+    private void tryWalls(){
         Block wall = Blocks.copperWall;
         Tile spawn = state.rules.defaultTeam.core() != null ? state.rules.defaultTeam.core().tile : data.team.core().tile;
 

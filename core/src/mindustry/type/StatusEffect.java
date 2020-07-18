@@ -15,10 +15,14 @@ public class StatusEffect extends MappableContent{
     public float damageMultiplier = 1f;
     /** Unit armor multiplier. */
     public float armorMultiplier = 1f;
-    /** Unit speed multiplier (buggy) */
+    /** Unit speed multiplier */
     public float speedMultiplier = 1f;
+    /** Unit speed multiplier */
+    public float reloadMultiplier = 1f;
     /** Damage per frame. */
     public float damage;
+    /** Chance of effect appearing. */
+    public float effectChance = 0.15f;
     /** If true, the effect never disappears. */
     public boolean permanent;
     /** Tint color of effect. */
@@ -44,15 +48,15 @@ public class StatusEffect extends MappableContent{
     }
 
     /** Runs every tick on the affected unit while time is greater than 0. */
-    public void update(Unitc unit, float time){
+    public void update(Unit unit, float time){
         if(damage > 0){
             unit.damageContinuousPierce(damage);
         }else if(damage < 0){ //heal unit
             unit.heal(damage * Time.delta());
         }
 
-        if(effect != Fx.none && Mathf.chanceDelta(0.15f)){
-            effect.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
+        if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
+            effect.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
         }
     }
 
@@ -73,7 +77,7 @@ public class StatusEffect extends MappableContent{
         }
     }
 
-    public void draw(Unitc unit){
+    public void draw(Unit unit){
 
     }
 
@@ -87,7 +91,7 @@ public class StatusEffect extends MappableContent{
      * @param time The current status effect time
      * @param newTime The time that the new status effect will last
      */
-    public StatusEntry getTransition(Unitc unit, StatusEffect to, float time, float newTime, StatusEntry result){
+    public StatusEntry getTransition(Unit unit, StatusEffect to, float time, float newTime, StatusEntry result){
         if(transitions.containsKey(to)){
             transitions.get(to).handle(unit, time, newTime, result);
             return result;
@@ -102,6 +106,6 @@ public class StatusEffect extends MappableContent{
     }
 
     public interface TransitionHandler{
-        void handle(Unitc unit, float time, float newTime, StatusEntry result);
+        void handle(Unit unit, float time, float newTime, StatusEntry result);
     }
 }

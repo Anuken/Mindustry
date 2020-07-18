@@ -1,6 +1,5 @@
 package mindustry.world.blocks.production;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.world.meta.*;
@@ -30,8 +29,8 @@ public class Fracker extends SolidPump{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
     public class FrackerEntity extends SolidPumpEntity{

@@ -7,7 +7,7 @@ import arc.struct.*;
  * {@code BoundedSlotAssignmentStrategy} is an abstract implementation of {@link SlotAssignmentStrategy} that supports roles.
  * Generally speaking, there are hard and soft roles. Hard roles cannot be broken, soft roles can.
  * <p>
- * This abstract class provides an implementation of the {@link #calculateNumberOfSlots(Array) calculateNumberOfSlots} method that
+ * This abstract class provides an implementation of the {@link #calculateNumberOfSlots(Seq) calculateNumberOfSlots} method that
  * is more general (and costly) than the simplified implementation in {@link FreeSlotAssignmentStrategy}. It scans the assignment
  * list to find the number of filled slots, which is the highest slot number in the assignments.
  * @author davebaol
@@ -15,10 +15,10 @@ import arc.struct.*;
 public abstract class BoundedSlotAssignmentStrategy implements SlotAssignmentStrategy{
 
     @Override
-    public abstract void updateSlotAssignments(Array<SlotAssignment> assignments);
+    public abstract void updateSlotAssignments(Seq<SlotAssignment> assignments);
 
     @Override
-    public int calculateNumberOfSlots(Array<SlotAssignment> assignments){
+    public int calculateNumberOfSlots(Seq<SlotAssignment> assignments){
         // Find the number of filled slots: it will be the
         // highest slot number in the assignments
         int filledSlots = -1;
@@ -32,7 +32,7 @@ public abstract class BoundedSlotAssignmentStrategy implements SlotAssignmentStr
     }
 
     @Override
-    public void removeSlotAssignment(Array<SlotAssignment> assignments, int index){
+    public void removeSlotAssignment(Seq<SlotAssignment> assignments, int index){
         int sn = assignments.get(index).slotNumber;
         for(int i = 0; i < assignments.size; i++){
             SlotAssignment sa = assignments.get(i);

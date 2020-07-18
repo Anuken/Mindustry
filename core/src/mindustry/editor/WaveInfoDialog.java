@@ -25,8 +25,8 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends BaseDialog{
-    private final static int displayed = 20;
-    private Array<SpawnGroup> groups = new Array<>();
+    private static final int displayed = 20;
+    private Seq<SpawnGroup> groups = new Seq<>();
 
     private Table table, preview;
     private int start = 0;
@@ -87,7 +87,7 @@ public class WaveInfoDialog extends BaseDialog{
             main.pane(t -> table = t).growX().growY().padRight(8f).get().setScrollingDisabled(true, false);
             main.row();
             main.button("$add", () -> {
-                if(groups == null) groups = new Array<>();
+                if(groups == null) groups = new Seq<>();
                 groups.add(new SpawnGroup(lastType));
                 buildGroups();
             }).growX().height(70f);
@@ -149,14 +149,14 @@ public class WaveInfoDialog extends BaseDialog{
                     t.row();
                     t.table(spawns -> {
                         spawns.field("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.begin = Strings.parseInt(text) - 1;
                                 updateWaves();
                             }
                         }).width(100f);
                         spawns.add("$waves.to").padLeft(4).padRight(4);
                         spawns.field(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.end = Strings.parseInt(text) - 1;
                                 updateWaves();
                             }else if(text.isEmpty()){
@@ -169,7 +169,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.table(p -> {
                         p.add("$waves.every").padRight(4);
                         p.field(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text) && Strings.parseInt(text) > 0){
+                            if(Strings.canParsePositiveInt(text) && Strings.parseInt(text) > 0){
                                 group.spacing = Strings.parseInt(text);
                                 updateWaves();
                             }
@@ -180,7 +180,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.row();
                     t.table(a -> {
                         a.field(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.unitAmount = Strings.parseInt(text);
                                 updateWaves();
                             }
@@ -198,7 +198,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.row();
                     t.table(a -> {
                         a.field((int)group.shields + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.shields = Strings.parseInt(text);
                                 updateWaves();
                             }
@@ -206,7 +206,7 @@ public class WaveInfoDialog extends BaseDialog{
 
                         a.add(" + ");
                         a.field((int)group.shieldScaling + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.shieldScaling = Strings.parseInt(text);
                                 updateWaves();
                             }

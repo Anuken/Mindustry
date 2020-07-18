@@ -13,14 +13,14 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 @Component
 abstract class StatusComp implements Posc, Flyingc{
-    private Array<StatusEntry> statuses = new Array<>();
+    private Seq<StatusEntry> statuses = new Seq<>();
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-    @ReadOnly transient float speedMultiplier, damageMultiplier, armorMultiplier;
+    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, armorMultiplier = 1, reloadMultiplier = 1;
 
     /** @return damage taken based on status armor multipliers */
     float getShieldDamage(float amount){
@@ -46,7 +46,7 @@ abstract class StatusComp implements Posc, Flyingc{
                     return;
                 }else if(entry.effect.reactsWith(effect)){ //find opposite
                     StatusEntry.tmp.effect = entry.effect;
-                    entry.effect.getTransition((Unitc)this, effect, entry.time, duration, StatusEntry.tmp);
+                    entry.effect.getTransition(base(), effect, entry.time, duration, StatusEntry.tmp);
                     entry.time = StatusEntry.tmp.time;
 
                     if(StatusEntry.tmp.effect != entry.effect){
@@ -108,7 +108,7 @@ abstract class StatusComp implements Posc, Flyingc{
         }
 
         applied.clear();
-        speedMultiplier = damageMultiplier = armorMultiplier = 1f;
+        speedMultiplier = damageMultiplier = armorMultiplier = reloadMultiplier = 1f;
 
         if(statuses.isEmpty()) return;
 
@@ -128,15 +128,15 @@ abstract class StatusComp implements Posc, Flyingc{
                 speedMultiplier *= entry.effect.speedMultiplier;
                 armorMultiplier *= entry.effect.armorMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
-                //TODO ugly casting
-                entry.effect.update((Unitc)this, entry.time);
+                reloadMultiplier *= entry.effect.reloadMultiplier;
+                entry.effect.update(base(), entry.time);
             }
         }
     }
 
     public void draw(){
         for(StatusEntry e : statuses){
-            e.effect.draw((Unitc)this);
+            e.effect.draw(base());
         }
     }
 

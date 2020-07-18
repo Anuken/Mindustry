@@ -32,7 +32,7 @@ public class PayloadConveyor extends Block{
     }
 
     @Override
-    protected TextureRegion[] generateIcons(){
+    protected TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(name + "-icon")};
     }
 
@@ -41,17 +41,17 @@ public class PayloadConveyor extends Block{
         super.drawPlace(x, y, rotation, valid);
 
         for(int i = 0; i < 4; i++){
-            Tilec other = world.ent(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            Building other = world.ent(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
             if(other != null && other.block().outputsPayload && other.block().size == size){
                 Drawf.selected(other.tileX(), other.tileY(), other.block(), Pal.accent);
             }
         }
     }
 
-    public class PayloadConveyorEntity extends TileEntity{
+    public class PayloadConveyorEntity extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
-        public @Nullable Tilec next;
+        public @Nullable Building next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
 
@@ -66,10 +66,18 @@ public class PayloadConveyor extends Block{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            Tilec accept = nearby(Geometry.d4(rotation()).x * size, Geometry.d4(rotation()).y * size);
+            Building accept = nearby(Geometry.d4(rotation()).x * size, Geometry.d4(rotation()).y * size);
             //next block must be aligned and of the same size
-            if(accept != null && accept.block().size == size &&
-                tileX() + Geometry.d4(rotation()).x * size == accept.tileX() && tileY() + Geometry.d4(rotation()).y * size == accept.tileY()){
+            if(accept != null && (
+                //same size
+                (accept.block().size == size && tileX() + Geometry.d4(rotation()).x * size == accept.tileX() && tileY() + Geometry.d4(rotation()).y * size == accept.tileY()) ||
+
+                //differing sizes
+                (accept.block().size > size &&
+                    (rotation() % 2 == 0 ? //check orientation
+                    Math.abs(accept.y - y) <= (accept.block().size * tilesize - size * tilesize)/2f : //check Y alignment
+                    Math.abs(accept.x - x) <= (accept.block().size * tilesize - size * tilesize)/2f   //check X alignment
+                )))){
                 next = accept;
             }else{
                 next = null;
@@ -78,6 +86,11 @@ public class PayloadConveyor extends Block{
             int ntrns = 1 + size/2;
             Tile next = tile.getNearby(Geometry.d4(rotation()).x * ntrns, Geometry.d4(rotation()).y * ntrns);
             blocked = (next != null && next.solid()) || (this.next != null && (this.next.rotation() + 2)%4 == rotation());
+        }
+
+        @Override
+        public Payload getPayload(){
+            return item;
         }
 
         @Override
@@ -172,13 +185,13 @@ public class PayloadConveyor extends Block{
         }
 
         @Override
-        public boolean acceptPayload(Tilec source, Payload payload){
+        public boolean acceptPayload(Building source, Payload payload){
             //accepting payloads from units isn't supported
-            return this.item == null && progress <= 5f && source != this;
+            return this.item == null && progress <= 5f && source != this && payload.fits();
         }
 
         @Override
-        public void handlePayload(Tilec source, Payload payload){
+        public void handlePayload(Building source, Payload payload){
             this.item = payload;
             this.stepAccepted = curStep();
             this.itemRotation = source.angleTo(this);

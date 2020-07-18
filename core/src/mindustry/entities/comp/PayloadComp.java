@@ -12,10 +12,10 @@ import mindustry.world.blocks.payloads.*;
 
 /** An entity that holds a payload. */
 @Component
-abstract class PayloadComp implements Posc, Rotc{
+abstract class PayloadComp implements Posc, Rotc, Hitboxc{
     @Import float x, y, rotation;
 
-    Array<Payload> payloads = new Array<>();
+    Seq<Payload> payloads = new Seq<>();
 
     boolean hasPayload(){
         return payloads.size > 0;
@@ -25,13 +25,13 @@ abstract class PayloadComp implements Posc, Rotc{
         payloads.add(load);
     }
 
-    void pickup(Unitc unit){
+    void pickup(Unit unit){
         unit.remove();
         payloads.add(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
     }
 
-    void pickup(Tilec tile){
+    void pickup(Building tile){
         tile.tile().remove();
         payloads.add(new BlockPayload(tile));
         Fx.unitPickup.at(tile);
@@ -53,9 +53,9 @@ abstract class PayloadComp implements Posc, Rotc{
         Tile on = tileOn();
 
         //drop off payload on an acceptor if possible
-        if(on != null && on.entity != null && on.entity.acceptPayload(on.entity, payload)){
-            Fx.unitDrop.at(on.entity);
-            on.entity.handlePayload(on.entity, payload);
+        if(on != null && on.build != null && on.build.acceptPayload(on.build, payload)){
+            Fx.unitDrop.at(on.build);
+            on.build.handlePayload(on.build, payload);
             return true;
         }
 
@@ -68,11 +68,10 @@ abstract class PayloadComp implements Posc, Rotc{
     }
 
     boolean dropUnit(UnitPayload payload){
-        //TODO create an effect here and/or make them be at a lower elevation
-        Unitc u = payload.unit;
+        Unit u = payload.unit;
 
         //can't drop ground units
-        if((tileOn() == null || tileOn().solid()) && u.elevation() < 0.1f){
+        if((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f){
             return false;
         }
 
@@ -87,11 +86,11 @@ abstract class PayloadComp implements Posc, Rotc{
 
     /** @return whether the tile has been successfully placed. */
     boolean dropBlock(BlockPayload payload){
-        Tilec tile = payload.entity;
+        Building tile = payload.entity;
         int tx = Vars.world.toTile(x - tile.block().offset()), ty = Vars.world.toTile(y - tile.block().offset());
         Tile on = Vars.world.tile(tx, ty);
         if(on != null && Build.validPlace(tile.block(), tile.team(), tx, ty, tile.rotation())){
-            int rot = (int)((rotation() + 45f) / 90f) % 4;
+            int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
 
             Fx.unitDrop.at(tile);

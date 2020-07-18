@@ -85,7 +85,7 @@ public class ArcNetProvider implements NetProvider{
                 Connect c = new Connect();
                 c.addressTCP = ip;
 
-                Log.debug("&bRecieved connection: @", c.addressTCP);
+                Log.debug("&bReceived connection: @", c.addressTCP);
 
                 connections.add(kn);
                 Core.app.post(() -> net.handleServerReceived(kn, c));
@@ -198,7 +198,7 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void discoverServers(Cons<Host> callback, Runnable done){
-        Array<InetAddress> foundAddresses = new Array<>();
+        Seq<InetAddress> foundAddresses = new Seq<>();
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
             Core.app.post(() -> {
                 try{

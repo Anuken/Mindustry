@@ -25,7 +25,7 @@ public abstract class FormationMotionModerator{
      * @param pattern the pattern
      * @return the given location for chaining.
      */
-    public Vec3 calculateDriftOffset(Vec3 centerOfMass, Array<SlotAssignment> slotAssignments, FormationPattern pattern){
+    public Vec3 calculateDriftOffset(Vec3 centerOfMass, Seq<SlotAssignment> slotAssignments, FormationPattern pattern){
         // Clear the center of mass
         centerOfMass.x = centerOfMass.y = 0;
         float centerOfMassOrientation = 0;

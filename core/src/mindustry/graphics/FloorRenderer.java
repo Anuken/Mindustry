@@ -18,13 +18,13 @@ import static mindustry.Vars.*;
 
 public class FloorRenderer implements Disposable{
     //TODO find out number with best performance
-    private final static int chunksize = mobile ? 16 : 32;
+    private static final int chunksize = mobile ? 16 : 32;
 
     private Chunk[][] cache;
     private MultiCacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
     private IntSet recacheSet = new IntSet();
-    private IntArray drawnLayers = new IntArray();
+    private IntSeq drawnLayers = new IntSeq();
     private ObjectSet<CacheLayer> used = new ObjectSet<>();
 
     public FloorRenderer(){

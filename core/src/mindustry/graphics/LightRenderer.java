@@ -18,7 +18,7 @@ public class LightRenderer{
 
     private float[] vertices = new float[24];
     private FrameBuffer buffer = new FrameBuffer();
-    private Array<Runnable> lights = new Array<>();
+    private Seq<Runnable> lights = new Seq<>();
 
     public void add(Runnable run){
         if(!enabled()) return;
@@ -171,7 +171,7 @@ public class LightRenderer{
     }
 
     public boolean enabled(){
-        return state.rules.lighting;
+        return state.rules.lighting && state.rules.ambientLight.a > 0.00001f;
     }
 
     public void draw(){
@@ -195,9 +195,7 @@ public class LightRenderer{
 
         Draw.color();
         Shaders.light.ambient.set(state.rules.ambientLight);
-        Draw.shader(Shaders.light);
-        Draw.rect(buffer);
-        Draw.shader();
+        buffer.blit(Shaders.light);
 
         lights.clear();
     }

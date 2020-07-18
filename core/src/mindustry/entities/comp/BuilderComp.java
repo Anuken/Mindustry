@@ -28,62 +28,63 @@ abstract class BuilderComp implements Unitc{
 
     @Import float x, y, rotation;
 
-    Queue<BuildRequest> requests = new Queue<>();
-    transient float buildSpeed = 1f;
-    transient boolean building = true;
+    @SyncLocal Queue<BuildPlan> plans = new Queue<>();
+    transient boolean updateBuilding = true;
 
     @Override
     public void controller(UnitController next){
         //reset building state so AI controlled units will always start off building
-        building = true;
+        updateBuilding = true;
     }
 
     @Override
     public void update(){
-        if(!building) return;
+        if(!updateBuilding) return;
 
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
 
-        Iterator<BuildRequest> it = requests.iterator();
+        boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
+
+        Iterator<BuildPlan> it = plans.iterator();
         while(it.hasNext()){
-            BuildRequest req = it.next();
+            BuildPlan req = it.next();
             Tile tile = world.tile(req.x, req.y);
             if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && (tile.rotation() == req.rotation || !req.block.rotate) && tile.block() == req.block)){
                 it.remove();
             }
         }
 
-        Tilec core = closestCore();
+        Building core = core();
 
         //nothing to build.
-        if(buildRequest() == null) return;
+        if(buildPlan() == null) return;
 
         //find the next build request
-        if(requests.size > 1){
+        if(plans.size > 1){
             int total = 0;
-            BuildRequest req;
-            while((dst((req = buildRequest()).tile()) > finalPlaceDst || shouldSkip(req, core)) && total < requests.size){
-                requests.removeFirst();
-                requests.addLast(req);
+            BuildPlan req;
+            while((dst((req = buildPlan()).tile()) > finalPlaceDst || shouldSkip(req, core)) && total < plans.size){
+                plans.removeFirst();
+                plans.addLast(req);
                 total++;
             }
         }
 
-        BuildRequest current = buildRequest();
+        BuildPlan current = buildPlan();
 
-        if(dst(current.tile()) > finalPlaceDst) return;
+        if(!within(current.tile(), finalPlaceDst)) return;
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(dst(tile) <= finalPlaceDst){
+        if(!within(tile, finalPlaceDst)){
             rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
         }
 
         if(!(tile.block() instanceof BuildBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
-                boolean hasAll = !Structs.contains(current.block.requirements, i -> !core.items().has(i.item));
+                boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
-                if(hasAll || state.rules.infiniteResources){
+                if(hasAll){
                     Build.beginPlace(current.block, team(), current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
@@ -91,33 +92,33 @@ abstract class BuilderComp implements Unitc{
             }else if(!current.initialized && current.breaking && Build.validBreak(team(), current.x, current.y)){
                 Build.beginBreak(team(), current.x, current.y);
             }else{
-                requests.removeFirst();
+                plans.removeFirst();
                 return;
             }
         }else if(tile.team() != team()){
-            requests.removeFirst();
+            plans.removeFirst();
             return;
         }
 
-        if(tile.entity instanceof BuildEntity && !current.initialized){
+        if(tile.build instanceof BuildEntity && !current.initialized){
             Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team(), (Builderc)this, current.breaking)));
             current.initialized = true;
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !state.rules.infiniteResources) || !(tile.entity instanceof BuildEntity)){
+        if((core == null && !infinite) || !(tile.build instanceof BuildEntity)){
             return;
         }
 
         //otherwise, update it.
-        BuildEntity entity = tile.ent();
+        BuildEntity entity = tile.bc();
 
         if(current.breaking){
-            entity.deconstruct(this, core, 1f / entity.buildCost * Time.delta() * buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            if(entity.construct(this, core, 1f / entity.buildCost * Time.delta() * buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
+            if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
-                    Call.onTileConfig(null, tile.entity, current.config);
+                    Call.tileConfig(null, tile.build, current.config);
                 }
             }
         }
@@ -130,8 +131,8 @@ abstract class BuilderComp implements Unitc{
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     void drawBuildRequests(){
 
-        for(BuildRequest request : requests){
-            if(request.progress > 0.01f || (buildRequest() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= buildingRange || state.isEditor()))) continue;
+        for(BuildPlan request : plans){
+            if(request.progress > 0.01f || (buildPlan() == request && request.initialized && (dst(request.x * tilesize, request.y * tilesize) <= buildingRange || state.isEditor()))) continue;
 
             request.animScale = 1f;
             if(request.breaking){
@@ -146,80 +147,81 @@ abstract class BuilderComp implements Unitc{
     }
 
     /** @return whether this request should be skipped, in favor of the next one. */
-    boolean shouldSkip(BuildRequest request, @Nullable Tilec core){
+    boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
-        if(state.rules.infiniteResources || request.breaking || core == null) return false;
+        if(state.rules.infiniteResources || team().rules().infiniteResources || request.breaking || core == null) return false;
         //TODO these are bad criteria
-        return (request.stuck && !core.items().has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items().has(i.item)) && !request.initialized);
+        return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item)) && !request.initialized);
     }
 
     void removeBuild(int x, int y, boolean breaking){
         //remove matching request
-        int idx = requests.indexOf(req -> req.breaking == breaking && req.x == x && req.y == y);
+        int idx = plans.indexOf(req -> req.breaking == breaking && req.x == x && req.y == y);
         if(idx != -1){
-            requests.removeIndex(idx);
+            plans.removeIndex(idx);
         }
     }
 
     /** Return whether this builder's place queue contains items. */
     boolean isBuilding(){
-        return requests.size != 0;
+        return plans.size != 0;
     }
 
     /** Clears the placement queue. */
     void clearBuilding(){
-        requests.clear();
+        plans.clear();
     }
 
     /** Add another build requests to the tail of the queue, if it doesn't exist there yet. */
-    void addBuild(BuildRequest place){
+    void addBuild(BuildPlan place){
         addBuild(place, true);
     }
 
     /** Add another build requests to the queue, if it doesn't exist there yet. */
-    void addBuild(BuildRequest place, boolean tail){
-        BuildRequest replace = null;
-        for(BuildRequest request : requests){
+    void addBuild(BuildPlan place, boolean tail){
+        BuildPlan replace = null;
+        for(BuildPlan request : plans){
             if(request.x == place.x && request.y == place.y){
                 replace = request;
                 break;
             }
         }
         if(replace != null){
-            requests.remove(replace);
+            plans.remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
-        if(tile != null && tile.entity instanceof BuildEntity){
-            place.progress = tile.<BuildEntity>ent().progress;
+        if(tile != null && tile.build instanceof BuildEntity){
+            place.progress = tile.<BuildEntity>bc().progress;
         }
         if(tail){
-            requests.addLast(place);
+            plans.addLast(place);
         }else{
-            requests.addFirst(place);
+            plans.addFirst(place);
         }
     }
 
-    /** Return the build requests currently active, or the one at the top of the queue.*/
-    @Nullable BuildRequest buildRequest(){
-        return requests.size == 0 ? null : requests.first();
+    /** Return the build request currently active, or the one at the top of the queue.*/
+    @Nullable
+    BuildPlan buildPlan(){
+        return plans.size == 0 ? null : plans.first();
     }
 
     @Override
     public void draw(){
-        if(!isBuilding()) return;
+        if(!isBuilding() || !updateBuilding) return;
 
         //TODO check correctness
         Draw.z(Layer.flyingUnit);
 
-        BuildRequest request = buildRequest();
-        Tile tile = world.tile(request.x, request.y);
+        BuildPlan plan = buildPlan();
+        Tile tile = world.tile(plan.x, plan.y);
 
         if(dst(tile) > buildingRange && !state.isEditor()){
             return;
         }
 
-        int size = request.breaking ? tile.block().size : request.block.size;
-        float tx = request.drawx(), ty = request.drawy();
+        int size = plan.breaking ? tile.block().size : plan.block.size;
+        float tx = plan.drawx(), ty = plan.drawy();
 
         Lines.stroke(1f, Pal.accent);
         float focusLen = 3.8f + Mathf.absin(Time.time(), 1.1f, 0.6f);

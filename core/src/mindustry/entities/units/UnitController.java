@@ -2,24 +2,27 @@ package mindustry.entities.units;
 
 import mindustry.gen.*;
 
-//TODO rename
 public interface UnitController{
-    void unit(Unitc unit);
-    Unitc unit();
+    void unit(Unit unit);
+    Unit unit();
+
+    default boolean isValidController(){
+        return true;
+    }
 
     default void command(UnitCommand command){
 
     }
 
-    default void update(){
+    default void updateUnit(){
 
     }
 
-    default void removed(Unitc unit){
+    default void removed(Unit unit){
 
     }
 
-    default boolean isBeingControlled(Unitc player){
+    default boolean isBeingControlled(Unit player){
         return false;
     }
 }

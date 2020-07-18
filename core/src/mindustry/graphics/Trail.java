@@ -8,9 +8,15 @@ import arc.struct.*;
 import arc.util.pooling.*;
 
 public class Trail{
-    private static final int length = 20;
-    private Array<Vec3> points = new Array<>();
+    public int length;
+
+    private final Seq<Vec3> points;
     private float lastX = -1, lastY = -1;
+
+    public Trail(int length){
+        this.length = length;
+        points = new Seq<>(length);
+    }
 
     public void draw(Color color, float width){
         Draw.color(color);

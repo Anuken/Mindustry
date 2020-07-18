@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -42,11 +43,11 @@ public class SolidPump extends Pump{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("efficiency", entity -> new Bar(() ->
+        bars.add("efficiency", (SolidPumpEntity entity) -> new Bar(() ->
         Core.bundle.formatFloat("bar.pumpspeed",
-        ((SolidPumpEntity)entity).lastPump / Time.delta() * 60, 1),
+        entity.lastPump / Time.delta() * 60, 1),
         () -> Pal.ammo,
-        () -> ((SolidPumpEntity)entity).warmup));
+        () -> entity.warmup));
     }
 
     @Override
@@ -61,7 +62,7 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public boolean canPlaceOn(Tile tile){
+    public boolean canPlaceOn(Tile tile, Team team){
         if(isMultiblock()){
             for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
                 if(canPump(other)){
@@ -80,8 +81,8 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-rotator"), Core.atlas.find(name + "-top")};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
     public class SolidPumpEntity extends PumpEntity{
@@ -123,7 +124,6 @@ public class SolidPump extends Pump{
                 liquids.add(result, maxPump);
                 lastPump = maxPump;
                 warmup = Mathf.lerpDelta(warmup, 1f, 0.02f);
-                if(timer(timerContentCheck, 10)) useContent(result);
                 if(Mathf.chance(delta() * updateEffectChance))
                     updateEffect.at(getX() + Mathf.range(size * 2f), getY() + Mathf.range(size * 2f));
             }else{

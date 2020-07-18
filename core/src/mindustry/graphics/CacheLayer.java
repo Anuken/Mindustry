@@ -2,7 +2,6 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 
 import static mindustry.Vars.renderer;
@@ -79,9 +78,7 @@ public enum CacheLayer{
         renderer.blocks.floor.endc();
         renderer.effectBuffer.end();
 
-        Draw.shader(shader);
-        Draw.rect(renderer.effectBuffer);
-        Draw.shader();
+        renderer.effectBuffer.blit(shader);
 
         renderer.blocks.floor.beginc();
     }

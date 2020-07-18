@@ -32,17 +32,17 @@ public class PowerDiode extends Block{
     }
 
     @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(icon(Cicon.full), req.drawx(), req.drawy());
         Draw.rect(arrow, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
     }
 
     // battery % of the graph on either side, defaults to zero
-    public float bar(Tilec tile){
-        return (tile != null && tile.block().hasPower) ? tile.power().graph.getBatteryStored() / tile.power().graph.getTotalBatteryCapacity() : 0f;
+    public float bar(Building tile){
+        return (tile != null && tile.block().hasPower) ? tile.power.graph.getBatteryStored() / tile.power.graph.getTotalBatteryCapacity() : 0f;
     }
 
-    public class PowerDiodeEntity extends TileEntity{
+    public class PowerDiodeEntity extends Building{
         @Override
         public void draw(){
             Draw.rect(region, x, y, 0);

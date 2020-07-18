@@ -46,12 +46,12 @@ public class LiquidModule extends BlockModule{
         return smoothLiquid;
     }
 
-    /** Returns total amount of liquids. */
+    /** @return total amount of liquids. */
     public float total(){
         return total;
     }
 
-    /** Last recieved or loaded liquid. Only valid for liquid modules with 1 type of liquid. */
+    /** Last received or loaded liquid. Only valid for liquid modules with 1 type of liquid. */
     public Liquid current(){
         return current;
     }

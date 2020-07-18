@@ -22,8 +22,8 @@ import static mindustry.Vars.mods;
  */
 @SuppressWarnings("unchecked")
 public class ContentLoader{
-    private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.values().length];
-    private Array<Content>[] contentMap = new Array[ContentType.values().length];
+    private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.all.length];
+    private Seq<Content>[] contentMap = new Seq[ContentType.all.length];
     private MappableContent[][] temporaryMapper;
     private @Nullable LoadedMod currentMod;
     private @Nullable Content lastAdded;
@@ -48,12 +48,12 @@ public class ContentLoader{
 
     /** Clears all initialized content.*/
     public void clear(){
-        contentNameMap = new ObjectMap[ContentType.values().length];
-        contentMap = new Array[ContentType.values().length];
+        contentNameMap = new ObjectMap[ContentType.all.length];
+        contentMap = new Seq[ContentType.all.length];
         initialization = new ObjectSet<>();
 
-        for(ContentType type : ContentType.values()){
-            contentMap[type.ordinal()] = new Array<>();
+        for(ContentType type : ContentType.all){
+            contentMap[type.ordinal()] = new Seq<>();
             contentNameMap[type.ordinal()] = new ObjectMap<>();
         }
     }
@@ -76,7 +76,7 @@ public class ContentLoader{
     /** Logs content statistics.*/
     public void logContent(){
         //check up ID mapping, make sure it's linear (debug only)
-        for(Array<Content> arr : contentMap){
+        for(Seq<Content> arr : contentMap){
             for(int i = 0; i < arr.size; i++){
                 int id = arr.get(i).id;
                 if(id != i){
@@ -87,9 +87,9 @@ public class ContentLoader{
 
         Log.debug("--- CONTENT INFO ---");
         for(int k = 0; k < contentMap.length; k++){
-            Log.debug("[@]: loaded @", ContentType.values()[k].name(), contentMap[k].size);
+            Log.debug("[@]: loaded @", ContentType.all[k].name(), contentMap[k].size);
         }
-        Log.debug("Total content loaded: @", Array.with(ContentType.values()).mapInt(c -> contentMap[c.ordinal()].size).sum());
+        Log.debug("Total content loaded: @", Seq.with(ContentType.all).mapInt(c -> contentMap[c.ordinal()].size).sum());
         Log.debug("-------------------");
     }
 
@@ -107,7 +107,7 @@ public class ContentLoader{
     private void initialize(Cons<Content> callable){
         if(initialization.contains(callable)) return;
 
-        for(ContentType type : ContentType.values()){
+        for(ContentType type : ContentType.all){
             for(Content content : contentMap[type.ordinal()]){
                 try{
                     callable.get(content);
@@ -196,8 +196,14 @@ public class ContentLoader{
         this.temporaryMapper = temporaryMapper;
     }
 
-    public Array<Content>[] getContentMap(){
+    public Seq<Content>[] getContentMap(){
         return contentMap;
+    }
+
+    public void each(Cons<Content> cons){
+        for(Seq<Content> seq : contentMap){
+            seq.each(cons);
+        }
     }
 
     public <T extends MappableContent> T getByName(ContentType type, String name){
@@ -226,13 +232,13 @@ public class ContentLoader{
         return (T)contentMap[type.ordinal()].get(id);
     }
 
-    public <T extends Content> Array<T> getBy(ContentType type){
-        return (Array<T>)contentMap[type.ordinal()];
+    public <T extends Content> Seq<T> getBy(ContentType type){
+        return (Seq<T>)contentMap[type.ordinal()];
     }
 
     //utility methods, just makes things a bit shorter
 
-    public Array<Block> blocks(){
+    public Seq<Block> blocks(){
         return getBy(ContentType.block);
     }
 
@@ -244,7 +250,7 @@ public class ContentLoader{
         return (Block)getByName(ContentType.block, name);
     }
 
-    public Array<Item> items(){
+    public Seq<Item> items(){
         return getBy(ContentType.item);
     }
 
@@ -252,7 +258,7 @@ public class ContentLoader{
         return (Item)getByID(ContentType.item, id);
     }
 
-    public Array<Liquid> liquids(){
+    public Seq<Liquid> liquids(){
         return getBy(ContentType.liquid);
     }
 
@@ -260,7 +266,7 @@ public class ContentLoader{
         return (Liquid)getByID(ContentType.liquid, id);
     }
 
-    public Array<BulletType> bullets(){
+    public Seq<BulletType> bullets(){
         return getBy(ContentType.bullet);
     }
 
@@ -268,15 +274,15 @@ public class ContentLoader{
         return (BulletType)getByID(ContentType.bullet, id);
     }
 
-    public Array<SectorPreset> sectors(){
+    public Seq<SectorPreset> sectors(){
         return getBy(ContentType.sector);
     }
 
-    public Array<UnitType> units(){
+    public Seq<UnitType> units(){
         return getBy(ContentType.unit);
     }
 
-    public Array<Planet> planets(){
+    public Seq<Planet> planets(){
         return getBy(ContentType.planet);
     }
 }

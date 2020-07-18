@@ -11,11 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class IOTests{
 
     @Test
-    void writeEntities(){
-        //TODO
-    }
-
-    @Test
     void writeEnglish(){
         ByteBuffer buffer = ByteBuffer.allocate(500);
         TypeIO.writeString(buffer, "asd asd asd asd asdagagasasjakbgeah;jwrej 23424234");

@@ -9,7 +9,6 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.Array;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
@@ -19,6 +18,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
@@ -35,7 +35,7 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
-    public static final int crackRegions = 8, maxCrackSize = 5;
+    public static final int crackRegions = 8, maxCrackSize = 9;
 
     public boolean hasItems;
     public boolean hasLiquids;
@@ -146,6 +146,14 @@ public class Block extends UnlockableContent{
     public Sound breakSound = Sounds.boom;
     /** How reflective this block is. */
     public float albedo = 0f;
+    /** Environmental passive light color. */
+    public Color lightColor = Color.white.cpy();
+    /**
+     * Whether this environmental block passively emits light.
+     * Not valid for non-environmental blocks. */
+    public boolean emitLight = false;
+    /** Radius of the light emitted by this block. */
+    public float lightRadius = 60f;
 
     /** The sound that this block makes while active. One sound loop. Do not overuse.*/
     public Sound activeSound = Sounds.none;
@@ -172,23 +180,19 @@ public class Block extends UnlockableContent{
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
 
-    protected Prov<Tilec> entityType = null; //initialized later
-    //TODO move
+    protected Prov<Building> entityType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
-    //TODO move
     protected TextureRegion[] generatedIcons;
     protected TextureRegion[] variantRegions, editorVariantRegions;
+
     public TextureRegion region, editorIcon;
+    public @Load("@-team") TextureRegion teamRegion;
+    public TextureRegion[] teamRegions;
 
-    //TODO remove completely
-    protected TextureRegion[] cacheRegions = {};
-    protected Array<String> cacheRegionStrings = new Array<>();
-
-    //TODO move
     public static TextureRegion[][] cracks;
-    protected static final Array<Tile> tempTiles = new Array<>();
-    protected static final Array<Tilec> tempTileEnts = new Array<>();
+    protected static final Seq<Tile> tempTiles = new Seq<>();
+    protected static final Seq<Building> tempTileEnts = new Seq<>();
 
     /** Dump timer ID.*/
     protected final int timerDump = timers++;
@@ -200,11 +204,10 @@ public class Block extends UnlockableContent{
         initEntity();
     }
 
-    //TODO rename to draw() once class refactoring is done.
     public void drawBase(Tile tile){
         //delegates to entity unless it is null
-        if(tile.entity != null){
-            tile.entity.draw();
+        if(tile.build != null){
+            tile.build.draw();
         }else{
             Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation * 90 : 0);
         }
@@ -213,11 +216,12 @@ public class Block extends UnlockableContent{
     public float percentSolid(int x, int y){
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
-        float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            sum += !other.floor().isLiquid ? 1f : 0f;
-        }
-        return sum / size / size;
+        return tile.getLinkedTilesAs(this, tempTiles)
+            .sumf(other -> !other.floor().isLiquid ? 1f : 0f) / size / size;
+    }
+
+    public void drawEnvironmentLight(Tile tile){
+        Drawf.light(tile.worldx(), tile.worldy(), lightRadius, lightColor, lightColor.a);
     }
 
     /** Drawn when you are placing a block. */
@@ -258,19 +262,16 @@ public class Block extends UnlockableContent{
     public float sumAttribute(Attribute attr, int x, int y){
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
-        float sum = 0;
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            sum += other.floor().attributes.get(attr);
-        }
-        return sum;
+        return tile.getLinkedTilesAs(this, tempTiles)
+            .sumf(other -> other.floor().attributes.get(attr));
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
-        return tile.entity == null ? icon(Cicon.medium) : tile.entity.getDisplayIcon();
+        return tile.build == null ? icon(Cicon.medium) : tile.build.getDisplayIcon();
     }
 
     public String getDisplayName(Tile tile){
-        return tile.entity == null ? localizedName : tile.entity.getDisplayName();
+        return tile.build == null ? localizedName : tile.build.getDisplayName();
     }
 
     /** @return a custom minimap color for this or 0 to use default colors. */
@@ -283,7 +284,7 @@ public class Block extends UnlockableContent{
     }
 
     /** Returns whether ot not this block can be place on the specified  */
-    public boolean canPlaceOn(Tile tile){
+    public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
 
@@ -318,15 +319,15 @@ public class Block extends UnlockableContent{
         bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
-            Func<Tilec, Liquid> current;
+            Func<Building, Liquid> current;
             if(consumes.has(ConsumeType.liquid) && consumes.get(ConsumeType.liquid) instanceof ConsumeLiquid){
                 Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
             }else{
-                current = entity -> entity.liquids().current();
+                current = entity -> entity.liquids.current();
             }
-            bars.add("liquid", entity -> new Bar(() -> entity.liquids().get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
-            () -> current.get(entity).barColor(), () -> entity.liquids().get(current.get(entity)) / liquidCapacity));
+            bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
+            () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
@@ -334,25 +335,25 @@ public class Block extends UnlockableContent{
             boolean buffered = cons.buffered;
             float capacity = cons.capacity;
 
-            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power().status * capacity) ? "<ERROR>" : (int)(entity.power().status * capacity)) :
-            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power().graph.getPowerProduced() + entity.power().graph.getBatteryStored() > 0f ? 1f : entity.power().status));
+            bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : (int)(entity.power.status * capacity)) :
+            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
         }
 
         if(hasItems && configurable){
-            bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items().total()), () -> Pal.items, () -> (float)entity.items().total() / itemCapacity));
+            bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
         }
     }
 
     public boolean canReplace(Block other){
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size == other.size;
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
-    public Block getReplacement(BuildRequest req, Array<BuildRequest> requests){
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         return this;
     }
 
-    public void drawRequest(BuildRequest req, Eachable<BuildRequest> list, boolean valid){
+    public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
         Draw.alpha(1f);
@@ -363,7 +364,7 @@ public class Block extends UnlockableContent{
         Draw.reset();
     }
 
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
@@ -372,15 +373,15 @@ public class Block extends UnlockableContent{
         }
     }
 
-    public TextureRegion getRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public TextureRegion getRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         return icon(Cicon.full);
     }
 
-    public void drawRequestConfig(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfig(BuildPlan req, Eachable<BuildPlan> list){
 
     }
 
-    public void drawRequestConfigCenter(BuildRequest req, Object content, String region){
+    public void drawRequestConfigCenter(BuildPlan req, Object content, String region){
         Color color = content instanceof Item ? ((Item)content).color : content instanceof Liquid ? ((Liquid)content).color : null;
         if(color == null) return;
 
@@ -389,17 +390,17 @@ public class Block extends UnlockableContent{
         Draw.color();
     }
 
-    public void drawRequestConfigTop(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
 
     }
 
     /** Configure when a null value is passed.*/
-    public void configClear(Cons<Tilec> cons){
-        configurations.put(void.class, (tile, value) -> cons.get((Tilec)tile));
+    public <E extends Building> void configClear(Cons<E> cons){
+        configurations.put(void.class, (tile, value) -> cons.get((E)tile));
     }
 
     /** Listen for a config by class type. */
-    public <T> void config(Class<T> type, Cons2<Tilec, T> config){
+    public <T, E extends Building> void config(Class<T> type, Cons2<E, T> config){
         configurations.put(type, config);
     }
 
@@ -443,13 +444,13 @@ public class Block extends UnlockableContent{
         return editorVariantRegions;
     }
 
-    protected TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name)};
+    protected TextureRegion[] icons(){
+        return new TextureRegion[]{region};
     }
 
     public TextureRegion[] getGeneratedIcons(){
         if(generatedIcons == null){
-            generatedIcons = generateIcons();
+            generatedIcons = icons();
         }
         return generatedIcons;
     }
@@ -465,7 +466,7 @@ public class Block extends UnlockableContent{
         return destructible || update;
     }
 
-    public final Tilec newEntity(){
+    public final Building newEntity(){
         return entityType.get();
     }
 
@@ -488,6 +489,16 @@ public class Block extends UnlockableContent{
 
     public boolean isPlaceable(){
         return isVisible() && buildPlaceability.placeable() && !state.rules.bannedBlocks.contains(this);
+    }
+
+    /** Called when building of this block begins. */
+    public void placeBegan(Tile tile, Block previous){
+
+    }
+
+    /** Called right before building of this block begins. */
+    public void beforePlaceBegan(Tile tile, Block previous){
+
     }
 
     /** @return a message detailing why this block can't be placed. */
@@ -547,11 +558,11 @@ public class Block extends UnlockableContent{
             }
 
             while(entityType == null && Block.class.isAssignableFrom(current)){
-                //first class that is subclass of Tilec
-                Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Tilec.class.isAssignableFrom(t) && !t.isInterface());
+                //first class that is subclass of Building
+                Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Building.class.isAssignableFrom(t) && !t.isInterface());
                 if(type != null){
                     //these are inner classes, so they have an implicit parameter generated
-                    Constructor<? extends Tilec> cons = (Constructor<? extends Tilec>)type.getDeclaredConstructor(type.getDeclaringClass());
+                    Constructor<? extends Building> cons = (Constructor<? extends Building>)type.getDeclaredConstructor(type.getDeclaringClass());
                     entityType = () -> {
                         try{
                             return cons.newInstance(this);
@@ -570,21 +581,8 @@ public class Block extends UnlockableContent{
 
         if(entityType == null){
             //assign default value
-            entityType = TileEntity::create;
+            entityType = Building::create;
         }
-    }
-
-    /** Adds a region by name to be loaded, with the final name "{name}-suffix". Returns an ID to looks this region up by in {@link #re(int)}.
-     * DO NOT USE. This will eventually be removed. */
-    protected int re(String suffix){
-        cacheRegionStrings.add(name + suffix);
-        return cacheRegionStrings.size - 1;
-    }
-
-    /** Returns an internally cached region by ID.
-     * DO NOT USE. This will eventually be removed*/
-    protected TextureRegion re(int id){
-        return cacheRegions[id];
     }
 
     @Override
@@ -631,11 +629,6 @@ public class Block extends UnlockableContent{
     public void load(){
         region = Core.atlas.find(name);
 
-        cacheRegions = new TextureRegion[cacheRegionStrings.size];
-        for(int i = 0; i < cacheRegions.length; i++){
-            cacheRegions[i] = Core.atlas.find(cacheRegionStrings.get(i));
-        }
-
         if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];
             for(int size = 1; size <= maxCrackSize; size++){
@@ -646,6 +639,12 @@ public class Block extends UnlockableContent{
         }
 
         ContentRegions.loadRegions(this);
+
+        //load specific team regions
+        teamRegions = new TextureRegion[Team.all.length];
+        for(Team team : Team.all){
+            teamRegions[team.id] = teamRegion.found() ? Core.atlas.find(name + "-team-" + team.name, teamRegion) : teamRegion;
+        }
     }
 
     @Override
@@ -683,7 +682,7 @@ public class Block extends UnlockableContent{
                         outer:
                         for(int rx = -radius; rx <= radius; rx++){
                             for(int ry = -radius; ry <= radius; ry++){
-                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.dst2(rx, ry) <= radius*radius && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
+                                if(Structs.inBounds(rx + x, ry + y, region.width, region.height) && Mathf.within(rx, ry, radius) && color.set(region.getPixel(rx + x, ry + y)).a > 0.01f){
                                     found = true;
                                     break outer;
                                 }

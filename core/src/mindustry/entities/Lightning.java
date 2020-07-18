@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -14,29 +15,35 @@ import static mindustry.Vars.*;
 public class Lightning{
     private static final Rand random = new Rand();
     private static final Rect rect = new Rect();
-    private static final Array<Unitc> entities = new Array<>();
+    private static final Seq<Unitc> entities = new Seq<>();
     private static final IntSet hit = new IntSet();
     private static final int maxChain = 8;
     private static final float hitRange = 30f;
     private static boolean bhit = false;
     private static int lastSeed = 0;
 
-    /** Create a lighting branch at a location. Use Team.none to damage everyone. */
+    /** Create a lighting branch at a location. Use Team.derelict to damage everyone. */
     public static void create(Team team, Color color, float damage, float x, float y, float targetAngle, int length){
-        createLightingInternal(lastSeed++, team, color, damage, x, y, targetAngle, length);
+        createLightingInternal(null, lastSeed++, team, color, damage, x, y, targetAngle, length);
+    }
+
+    /** Create a lighting branch at a location. Uses bullet parameters. */
+    public static void create(Bullet bullet, Color color, float damage, float x, float y, float targetAngle, int length){
+        createLightingInternal(bullet, lastSeed++, bullet.team, color, damage, x, y, targetAngle, length);
     }
 
     //TODO remote method
     //@Remote(called = Loc.server, unreliable = true)
-    private static void createLightingInternal(int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
+    private static void createLightingInternal(Bullet hitter, int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
         random.setSeed(seed);
         hit.clear();
 
-        Array<Vec2> lines = new Array<>();
+        BulletType bulletType = hitter != null && !hitter.type.collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
+        Seq<Vec2> lines = new Seq<>();
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){
-            Bullets.damageLightning.create(null, team, x, y, 0f, damage, 1f, 1f, null);
+            bulletType.create(null, team, x, y, 0f, damage, 1f, 1f, hitter);
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             if(lines.size > 1){
@@ -61,7 +68,7 @@ public class Lightning{
             entities.clear();
             if(hit.size < maxChain){
                 Units.nearbyEnemies(team, rect, u -> {
-                    if(!hit.contains(u.id())){
+                    if(!hit.contains(u.id()) && (hitter == null || u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround))){
                         entities.add(u);
                     }
                 });

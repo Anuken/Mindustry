@@ -36,9 +36,15 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         loader = new LoadRenderer();
         Events.fire(new ClientCreateEvent());
 
-        Vars.loadFileLogger();
-        Vars.platform = this;
+        loadFileLogger();
+        platform = this;
         beginTime = Time.millis();
+
+        //debug GL information
+        Log.info("[GL] Version: @", graphics.getGLVersion());
+        Log.info("[GL] Max texture size: @", Gl.getInt(Gl.maxTextureSize));
+        Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
+        Log.info("[JAVA] Version: @", System.getProperty("java.version"));
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
@@ -65,7 +71,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         Fonts.loadDefaultFont();
 
-        assets.load(new AssetDescriptor<>("sprites/sprites.atlas", TextureAtlas.class)).loaded = t -> {
+        //load fallback atlas if max texture size is below 4096
+        assets.load(new AssetDescriptor<>(Gl.getInt(Gl.maxTextureSize) >= 4096 ? "sprites/sprites.atlas" : "sprites/fallback/sprites.atlas", TextureAtlas.class)).loaded = t -> {
             atlas = (TextureAtlas)t;
             Fonts.mergeFontAtlas(atlas);
         };

@@ -7,9 +7,9 @@ import mindustry.world.meta.*;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid, optionalValid;
-    private final Tilec entity;
+    private final Building entity;
 
-    public ConsumeModule(Tilec entity){
+    public ConsumeModule(Building entity){
         this.entity = entity;
     }
 
@@ -26,8 +26,8 @@ public class ConsumeModule extends BlockModule{
     }
 
     public void update(){
-        //everything is valid here
-        if(entity.tile().isEnemyCheat()){
+        //everything is valid when cheating
+        if(entity.cheating()){
             valid = optionalValid = true;
             return;
         }

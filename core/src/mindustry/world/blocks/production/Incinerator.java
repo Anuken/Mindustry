@@ -22,7 +22,7 @@ public class Incinerator extends Block{
         solid = true;
     }
 
-    public class IncineratorEntity extends TileEntity{
+    public class IncineratorEntity extends Building{
         public float heat;
 
         @Override
@@ -54,26 +54,26 @@ public class Incinerator extends Block{
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
+        public void handleItem(Building source, Item item){
             if(Mathf.chance(0.3)){
                 effect.at(x, y);
             }
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             return heat > 0.5f;
         }
 
         @Override
-        public void handleLiquid(Tilec source, Liquid liquid, float amount){
+        public void handleLiquid(Building source, Liquid liquid, float amount){
             if(Mathf.chance(0.02)){
                 effect.at(x, y);
             }
         }
 
         @Override
-        public boolean acceptLiquid(Tilec source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
             return heat > 0.5f;
         }
     }

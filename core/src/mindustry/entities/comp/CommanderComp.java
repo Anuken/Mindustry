@@ -11,12 +11,12 @@ import mindustry.gen.*;
 /** A unit that can command other units. */
 @Component
 abstract class CommanderComp implements Unitc{
-    private static final Array<FormationMember> members = new Array<>();
+    private static final Seq<FormationMember> members = new Seq<>();
 
     @Import float x, y, rotation;
 
     transient @Nullable Formation formation;
-    transient Array<Unitc> controlling = new Array<>();
+    transient Seq<Unit> controlling = new Seq<>();
 
     @Override
     public void update(){
@@ -42,12 +42,12 @@ abstract class CommanderComp implements Unitc{
         clearCommand();
     }
 
-    void command(Formation formation, Array<Unitc> units){
+    void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
         controlling.addAll(units);
-        for(Unitc unit : units){
-            unit.controller(new FormationAI(this, formation));
+        for(Unit unit : units){
+            unit.controller(new FormationAI(base(), formation));
         }
         this.formation = formation;
 
@@ -67,8 +67,8 @@ abstract class CommanderComp implements Unitc{
 
     void clearCommand(){
         //reset controlled units
-        for(Unitc unit : controlling){
-            if(unit.controller().isBeingControlled(this)){
+        for(Unit unit : controlling){
+            if(unit.controller().isBeingControlled(base())){
                 unit.controller(unit.type().createController());
             }
         }

@@ -52,10 +52,10 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(tile.entity instanceof StackConveyorEntity){
-            int state = ((StackConveyorEntity)tile.entity).state;
+        if(tile.build instanceof StackConveyorEntity){
+            int state = ((StackConveyorEntity)tile.build).state;
             if(state == stateLoad){ //standard conveyor mode
-                return otherblock.outputsItems() && lookingAt(tile, rotation, otherx, othery, otherrot, otherblock);
+                return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
                 return (otherblock.hasItems || otherblock.outputsItems() || otherblock.acceptsItems) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
@@ -67,7 +67,7 @@ public class StackConveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void drawRequestRegion(BuildRequest req, Eachable<BuildRequest> list){
+    public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         int[] bits = getTiling(req, list);
 
         if(bits == null) return;
@@ -84,14 +84,14 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean rotatedOutput(int x, int y){
-        Tilec tile = world.ent(x, y);
+        Building tile = world.ent(x, y);
         if(tile instanceof StackConveyorEntity){
             return ((StackConveyorEntity)tile).state != stateUnload;
         }
         return super.rotatedOutput(x, y);
     }
 
-    public class StackConveyorEntity extends TileEntity{
+    public class StackConveyorEntity extends Building{
         public int state, blendprox;
 
         public int link = -1;
@@ -155,7 +155,7 @@ public class StackConveyor extends Block implements Autotiler{
 
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
-                for(Tilec near : proximity){
+                for(Building near : proximity){
                     if(near instanceof StackConveyorEntity){
                         near.onProximityUpdate();
                     }
@@ -224,7 +224,7 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public void handleItem(Tilec source, Item item){
+        public void handleItem(Building source, Item item){
             if(items.empty()) poofIn();
             super.handleItem(source, item);
             lastItem = item;
@@ -247,7 +247,7 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean acceptItem(Tilec source, Item item){
+        public boolean acceptItem(Building source, Item item){
             if(this == source) return true;                 // player threw items
             if(cooldown > recharge - 1f) return false;      // still cooling down
             return !((state != stateLoad)                   // not a loading dock

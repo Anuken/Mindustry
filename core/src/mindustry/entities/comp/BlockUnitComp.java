@@ -1,18 +1,20 @@
 package mindustry.entities.comp;
 
+import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 @Component
 abstract class BlockUnitComp implements Unitc{
     @Import Team team;
 
-    @ReadOnly transient Tilec tile;
+    @ReadOnly transient Building tile;
 
-    public void tile(Tilec tile){
+    public void tile(Building tile){
         this.tile = tile;
 
         //sets up block stats
@@ -30,7 +32,13 @@ abstract class BlockUnitComp implements Unitc{
     }
 
     @Replace
-    public void kill(){
+    @Override
+    public TextureRegion icon(){
+        return tile.block.icon(Cicon.full);
+    }
+
+    @Override
+    public void killed(){
         tile.kill();
     }
 

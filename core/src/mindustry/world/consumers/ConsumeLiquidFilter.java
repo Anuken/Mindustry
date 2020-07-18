@@ -28,10 +28,10 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void build(Tilec tile, Table table){
-        Array<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
+    public void build(Building tile, Table table){
+        Seq<Liquid> list = content.liquids().select(l -> !l.isHidden() && filter.get(l));
         MultiReqImage image = new MultiReqImage();
-        list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () -> tile.liquids() != null && tile.liquids().get(liquid) >= use(tile))));
+        list.each(liquid -> image.add(new ReqImage(liquid.icon(Cicon.medium), () -> tile.liquids != null && tile.liquids.get(liquid) >= use(tile))));
 
         table.add(image).size(8 * 4);
     }
@@ -42,13 +42,13 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void update(Tilec entity){
-        entity.liquids().remove(entity.liquids().current(), use(entity));
+    public void update(Building entity){
+        entity.liquids.remove(entity.liquids.current(), use(entity));
     }
 
     @Override
-    public boolean valid(Tilec entity){
-        return entity != null && entity.liquids() != null && filter.get(entity.liquids().current()) && entity.liquids().currentAmount() >= use(entity);
+    public boolean valid(Building entity){
+        return entity != null && entity.liquids != null && filter.get(entity.liquids.current()) && entity.liquids.currentAmount() >= use(entity);
     }
 
     @Override

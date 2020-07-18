@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class NetworkIO{
 
-    public static void writeWorld(Playerc player, OutputStream os){
+    public static void writeWorld(Player player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(JsonIO.write(state.rules));
@@ -27,7 +27,7 @@ public class NetworkIO{
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
 
-            stream.writeInt(player.id());
+            stream.writeInt(player.id);
             player.write(Writes.get(stream));
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
@@ -47,11 +47,11 @@ public class NetworkIO{
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
 
-            Groups.all.clear();
+            Groups.clear();
             int id = stream.readInt();
             player.reset();
             player.read(Reads.get(stream));
-            player.id(id);
+            player.id = id;
             player.add();
 
             SaveIO.getSaveWriter().readContentHeader(stream);
@@ -64,7 +64,7 @@ public class NetworkIO{
     }
 
     public static ByteBuffer writeServerData(){
-        String name = (headless ? Config.name.string() : player.name());
+        String name = (headless ? Config.name.string() : player.name);
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
         String map = state.map.name();
 

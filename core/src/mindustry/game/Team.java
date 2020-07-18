@@ -4,18 +4,20 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
-    public final byte id;
-    public final int uid;
+    public final int id;
     public final Color color;
+    public final Color[] palette;
+    public boolean hasPalette;
     public String name;
 
     /** All 256 registered teams. */
@@ -25,8 +27,10 @@ public class Team implements Comparable<Team>{
 
     public final static Team
         derelict = new Team(0, "derelict", Color.valueOf("4d4e58")),
-        sharded = new Team(1, "sharded", Pal.accent.cpy()),
-        crux = new Team(2, "crux", Color.valueOf("f25555")),
+        sharded = new Team(1, "sharded", Pal.accent.cpy(),
+            Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
+        crux = new Team(2, "crux", Color.valueOf("f25555"),
+            Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
         green = new Team(3, "green", Color.valueOf("4dd98b")),
         purple = new Team(4, "purple", Color.valueOf("9a4bdf")),
         blue = new Team(5, "blue", Color.royal.cpy());
@@ -47,15 +51,39 @@ public class Team implements Comparable<Team>{
     protected Team(int id, String name, Color color){
         this.name = name;
         this.color = color;
-        this.id = (byte)id;
+        this.id = id;
 
-        int us = Pack.u(this.id);
-        uid = us;
-        if(us < 6) baseTeams[us] = this;
-        all[us] = this;
+        if(id < 6) baseTeams[id] = this;
+        all[id] = this;
+
+        palette = new Color[3];
+        palette[0] = color;
+        palette[1] = color.cpy().mul(0.75f);
+        palette[2] = color.cpy().mul(0.5f);
     }
 
-    public Array<Team> enemies(){
+    /** Specifies a 3-color team palette. */
+    protected Team(int id, String name, Color color, Color pal1, Color pal2, Color pal3){
+        this(id, name, color);
+
+        palette[0] = pal1;
+        palette[1] = pal2;
+        palette[2] = pal3;
+        hasPalette = true;
+    }
+
+    /** @return the core items for this team, or an empty item module.
+     * Never add to the resulting item module, as it is mutable. */
+    public @NonNull ItemModule items(){
+        return core() == null ? ItemModule.empty : core().items;
+    }
+
+    /** @return the team-specific rules. */
+    public TeamRule rules(){
+        return state.rules.teams.get(this);
+    }
+
+    public Team[] enemies(){
         return state.teams.enemiesOf(this);
     }
 
@@ -75,7 +103,7 @@ public class Team implements Comparable<Team>{
         return state.teams.areEnemies(this, other);
     }
 
-    public Array<CoreEntity> cores(){
+    public Seq<CoreEntity> cores(){
         return state.teams.cores(this);
     }
 

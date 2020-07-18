@@ -17,10 +17,15 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     @Import float x, y;
     @Import Vec2 vel;
 
-    @SyncField(value = true, clamped = true) @SyncLocal float elevation;
+    @SyncLocal float elevation;
     private transient boolean wasFlying;
+    transient boolean hovering;
     transient float drownTime;
     transient float splashTimer;
+
+    boolean checkTarget(boolean targetAir, boolean targetGround){
+        return (isGrounded() && targetGround) || (isFlying() && targetAir);
+    }
 
     boolean isGrounded(){
         return elevation < 0.001f;
@@ -31,7 +36,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     boolean canDrown(){
-        return isGrounded();
+        return isGrounded() && !hovering;
     }
 
     void landed(){
@@ -50,7 +55,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     float floorSpeedMultiplier(){
-        Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
+        Floor on = isFlying() || hovering ? Blocks.air.asFloor() : floorOn();
         return on.speedMultiplier;
     }
 
@@ -68,9 +73,9 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             wasFlying = isFlying();
         }
 
-        if(isGrounded() && floor.isLiquid){
+        if(!hovering && isGrounded() && floor.isLiquid){
             if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= 7f){
-                floor.walkEffect.at(x, y, 0, floor.mapColor);
+                floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
                 splashTimer = 0f;
             }
         }
@@ -79,7 +84,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             drownTime += Time.delta() * 1f / floor.drownTime;
             drownTime = Mathf.clamp(drownTime);
             if(Mathf.chanceDelta(0.05f)){
-                floor.drownUpdateEffect.at(x, y, 0f, floor.mapColor);
+                floor.drownUpdateEffect.at(x, y, 1f, floor.mapColor);
             }
 
             //TODO is the netClient check necessary?

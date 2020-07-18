@@ -12,7 +12,7 @@ import static mindustry.Vars.pathfinder;
 public class GroundAI extends AIController{
 
     @Override
-    public void update(){
+    public void updateUnit(){
 
         if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
             target = null;
@@ -22,7 +22,7 @@ public class GroundAI extends AIController{
             targetClosest();
         }
 
-        Tilec core = unit.closestEnemyCore();
+        Building core = unit.closestEnemyCore();
 
         if(core != null){
             if(unit.within(core,unit.range() / 1.1f)){
@@ -81,7 +81,7 @@ public class GroundAI extends AIController{
         Tile tile = unit.tileOn();
         if(tile == null) return;
         Tile targetTile = pathfinder.getTargetTile(tile, enemy, FlagTarget.enemyCores);
-        Tilec core = unit.closestCore();
+        Building core = unit.closestCore();
 
         if(tile == targetTile || core == null || unit.within(core, 120f)) return;
 

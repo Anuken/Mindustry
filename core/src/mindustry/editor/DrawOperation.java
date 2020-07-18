@@ -1,7 +1,7 @@
 package mindustry.editor;
 
 import mindustry.annotations.Annotations.*;
-import arc.struct.LongArray;
+import arc.struct.LongSeq;
 import mindustry.game.Team;
 import mindustry.gen.TileOp;
 import mindustry.world.Block;
@@ -12,7 +12,7 @@ import static mindustry.Vars.content;
 
 public class DrawOperation{
     private MapEditor editor;
-    private LongArray array = new LongArray();
+    private LongSeq array = new LongSeq();
 
     public DrawOperation(MapEditor editor) {
         this.editor = editor;
@@ -52,7 +52,7 @@ public class DrawOperation{
         }else if(type == OpType.rotation.ordinal()){
             return tile.rotation();
         }else if(type == OpType.team.ordinal()){
-            return tile.getTeamID();
+            return (byte)tile.getTeamID();
         }else if(type == OpType.overlay.ordinal()){
             return tile.overlayID();
         }

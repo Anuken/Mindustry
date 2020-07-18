@@ -4,13 +4,13 @@ import arc.struct.*;
 import mindustry.gen.*;
 
 public class Producers{
-    private Array<Produce> producers = new Array<>();
+    private Seq<Produce> producers = new Seq<>();
 
     public void add(Produce prod){
         producers.add(prod);
     }
 
     interface Produce{
-        void add(Tilec entity);
+        void add(Building entity);
     }
 }

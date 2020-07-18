@@ -31,10 +31,10 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void build(Tilec tile, Table table){
+    public void build(Building tile, Table table){
         MultiReqImage image = new MultiReqImage();
-        content.items().each(i -> filter.get(i) && (!state.isCampaign() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1),
-            () -> tile.items() != null && tile.items().has(item))));
+        content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1),
+            () -> tile.items != null && tile.items.has(item))));
 
         table.add(image).size(8 * 4);
     }
@@ -45,26 +45,26 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void update(Tilec entity){
+    public void update(Building entity){
 
     }
 
     @Override
-    public void trigger(Tilec entity){
+    public void trigger(Building entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items() != null && entity.items().has(item) && this.filter.get(item)){
-                entity.items().remove(item, 1);
+            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
+                entity.items.remove(item, 1);
                 break;
             }
         }
     }
 
     @Override
-    public boolean valid(Tilec entity){
+    public boolean valid(Building entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
-            if(entity.items() != null && entity.items().has(item) && this.filter.get(item)){
+            if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
                 return true;
             }
         }

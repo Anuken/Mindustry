@@ -1,9 +1,9 @@
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
 import arc.struct.*
 import arc.graphics.*
 import arc.packer.*
+import arc.util.Tmp
 
 import javax.imageio.ImageIO
 import java.awt.*
@@ -33,7 +33,7 @@ def transformColors = { List<List<String>> list ->
 
 
 //d4816b
-transformColors([["a387ea", "8a73c6", "5c5e9f"], ["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"], ["de9458", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"]])
+transformColors([["a387ea", "8a73c6", "5c5e9f"], ["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"], ["de9458", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"], ["d4816b", "eab678", "ffd37f"]])
 
 def antialias = { File file ->
     if(!doAntialias) return
@@ -114,7 +114,7 @@ def medianBlur = { File file ->
     def image = ImageIO.read(file)
     def result = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_ARGB)
     def radius = 4
-    IntArray array = new IntArray()
+    IntSeq array = new IntSeq()
 
     def getRGB = { int ix, int iy ->
         return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
@@ -234,30 +234,64 @@ task swapColors(){
             def carr = new File(getProperty("colors")).text.split("\n")
             def map = [:]
             def swaps = 0
-            carr.each{ str -> map[Color.argb8888(Color.valueOf(str.split("=")[0]))] = Color.argb8888(Color.valueOf(str.split("=")[1])) }
+            carr.each{ str -> map[Color.valueOf(str.split("=")[0]).argb8888()] = Color.valueOf(str.split("=")[1]).argb8888() }
             def tmpc = new Color()
 
             fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit{ file ->
                 if(file.isDirectory()) return
-                swaps++
+
+                boolean found = false
 
                 def img = ImageIO.read(file.file)
                 for(x in (0..img.getWidth() - 1)){
                     for(y in (0..img.getHeight() - 1)){
                         def c = img.getRGB(x, y)
-                        Color.argb8888ToColor(tmpc, c)
+                        tmpc.argb8888(c)
                         if(tmpc.a < 0.1f) continue
                         if(map.containsKey(c)){
                             img.setRGB(x, y, (int)map.get(c))
+                            found = true
                         }
                     }
                 }
-                ImageIO.write(img, "png", file.file)
+                if(found){
+                    swaps++
+                    ImageIO.write(img, "png", file.file)
+                }
             }
             println "Swapped $swaps images."
         }else{
             throw new InvalidUserDataException("No replacement colors specified. Use -Pcolors=\"<path to color file>\"")
         }
+    }
+}
+
+task genPalette(){
+    doLast{
+        def total = 0
+        def size = 32
+        def outImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
+        def colorsUsed = new IntSet()
+
+        fileTree(dir: '../core/assets-raw/sprites/blocks', include: "**/*.png").visit{ file ->
+            if(file.isDirectory()) return
+
+            def img = ImageIO.read(file.file)
+            for(x in (0..img.getWidth() - 1)){
+                for(y in (0..img.getHeight() - 1)){
+                    def c = img.getRGB(x, y)
+
+                    if(Tmp.c1.argb8888(c).a > 0.999f && colorsUsed.add(c)){
+                        outImage.setRGB((int)(total / size), total % size, c)
+                        total ++
+                    }
+                }
+            }
+        }
+
+        ImageIO.write(outImage, "png", new File("palette.png"))
+        println "Found $total colors."
+
     }
 }
 
@@ -323,7 +357,7 @@ task pack(dependsOn: classes){
 
         //antialias everything except UI elements
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-"))) return
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
 
             executor.submit{
                 antialias(file.file)
@@ -337,8 +371,20 @@ task pack(dependsOn: classes){
             e.printStackTrace()
         }
 
+        println("\n\nPacking normal 4096 sprites...\n\n")
+
         //pack normal sprites
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
+
+        println("\n\nPacking fallback 2048 sprites...\n\n")
+
+        //replace config file contents
+        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.json").visit{ file ->
+            if(!file.isDirectory()) file.file.text = file.file.text.replace("4096", "2048")
+        }
+
+        //pack fallback 2048x2048 sprites
+        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/fallback/", "sprites.atlas")
     }
 }
 

@@ -9,7 +9,6 @@ import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
 import java.io.*;
-import java.util.*;
 
 /** Generates code for writing remote invoke packets on the client and server. */
 public class RemoteWriteGenerator{
@@ -21,7 +20,7 @@ public class RemoteWriteGenerator{
     }
 
     /** Generates all classes in this list. */
-    public void generateFor(List<ClassEntry> entries, String packageName) throws IOException{
+    public void generateFor(Seq<ClassEntry> entries, String packageName) throws IOException{
 
         for(ClassEntry entry : entries){
             //create builder
@@ -66,7 +65,7 @@ public class RemoteWriteGenerator{
 
         //create builder
         MethodSpec.Builder method = MethodSpec.methodBuilder(elem.getSimpleName().toString() + (forwarded ? "__forward" : "")) //add except suffix when forwarding
-        .addModifiers(Modifier.STATIC, Modifier.SYNCHRONIZED)
+        .addModifiers(Modifier.STATIC)
         .returns(void.class);
 
         //forwarded methods aren't intended for use, and are not public
@@ -81,8 +80,8 @@ public class RemoteWriteGenerator{
                 return;
             }
 
-            if(!elem.getParameters().get(0).asType().toString().contains("Playerc")){
-                BaseProcessor.err("Client invoke methods should have a first parameter of type Playerc", elem);
+            if(!elem.getParameters().get(0).asType().toString().contains("Player")){
+                BaseProcessor.err("Client invoke methods should have a first parameter of type Player", elem);
                 return;
             }
         }
@@ -139,7 +138,7 @@ public class RemoteWriteGenerator{
         //reset stream
         method.addStatement("OUT.reset()");
 
-        method.addTypeVariables(Array.with(elem.getTypeParameters()).map(BaseProcessor::getTVN));
+        method.addTypeVariables(Seq.with(elem.getTypeParameters()).map(BaseProcessor::getTVN));
 
         for(int i = 0; i < elem.getParameters().size(); i++){
             //first argument is skipped as it is always the player caller
@@ -174,7 +173,7 @@ public class RemoteWriteGenerator{
                 method.addStatement("WRITE.$L($L)", typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "", varName);
             }else{
                 //else, try and find a serializer
-                String ser = serializers.writers.get(typeName, SerializerResolver.locate(elem, var.asType(), true));
+                String ser = serializers.writers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(elem, var.asType(), true));
 
                 if(ser == null){ //make sure a serializer exists!
                     BaseProcessor.err("No @WriteClass method to write class type: '" + typeName + "'", var);

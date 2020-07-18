@@ -36,6 +36,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
+        rhinoVersion = 'eeb327d141146663ff3924bd20d2a5da8a6439cc'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -171,27 +172,31 @@ allprojects{
         jcenter()
     }
 
-    tasks.withType(Javadoc).all{ enabled = false }
+    tasks.withType(JavaCompile){
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+        options.encoding = "UTF-8"
+        options.compilerArgs += ["-Xlint:deprecation"]
+    }
 }
 
 project(":desktop"){
     apply plugin: "java"
 
     compileJava.options.fork = true
-    compileJava.options.compilerArgs += ["-XDignore.symbol.file"]
 
     dependencies{
         implementation project(":core")
         implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
+        implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
 
         if(debugged()) implementation project(":debug")
 
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
         implementation arcModule("backends:backend-sdl")
-        implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
     }
 }
 
@@ -270,7 +275,7 @@ project(":core"){
         api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
-        api "org.mozilla:rhino-runtime:1.7.12"
+        api "com.github.Anuken:rhino:$rhinoVersion"
         if(localArc() && debugged()) api arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
@@ -320,7 +325,7 @@ project(":tools"){
         implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
 
-        implementation "org.reflections:reflections:0.9.12"
+        implementation "org.reflections:reflections:0.9.11"
     }
 }
 

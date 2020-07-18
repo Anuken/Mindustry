@@ -9,10 +9,20 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 
 public class UnitPayload implements Payload{
-    public Unitc unit;
+    public Unit unit;
 
-    public UnitPayload(Unitc unit){
+    public UnitPayload(Unit unit){
         this.unit = unit;
+    }
+
+    @Override
+    public boolean fits(){
+        return unit.hitSize <= 16f;
+    }
+
+    @Override
+    public boolean canBeTaken(Payloadc picker){
+        return unit.hitSize < picker.hitSize();
     }
 
     @Override
@@ -34,7 +44,7 @@ public class UnitPayload implements Payload{
         if(Vars.net.client()) return true;
 
         //prevents stacking
-        unit.vel().add(Mathf.range(0.5f), Mathf.range(0.5f));
+        unit.vel.add(Mathf.range(0.5f), Mathf.range(0.5f));
         unit.add();
 
         return true;
@@ -42,7 +52,7 @@ public class UnitPayload implements Payload{
 
     @Override
     public void draw(){
-        Drawf.shadow(unit.x(), unit.y(), 20);
-        Draw.rect(unit.type().icon(Cicon.full), unit.x(), unit.y(), unit.rotation() - 90);
+        Drawf.shadow(unit.x, unit.y, 20);
+        Draw.rect(unit.type().icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
     }
 }

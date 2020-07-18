@@ -58,18 +58,16 @@ public abstract class Consume{
 
     public abstract ConsumeType type();
 
-    public abstract void build(Tilec tile, Table table);
+    public abstract void build(Building tile, Table table);
 
     /** Called when a consumption is triggered manually. */
-    public void trigger(Tilec entity){
-
-    }
+    public void trigger(Building entity){}
 
     public abstract String getIcon();
 
-    public abstract void update(Tilec entity);
+    public abstract void update(Building entity);
 
-    public abstract boolean valid(Tilec entity);
+    public abstract boolean valid(Building entity);
 
     public abstract void display(BlockStats stats);
 }

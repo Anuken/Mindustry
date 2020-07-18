@@ -12,13 +12,13 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 
 public class Shaders{
     public static BlockBuild blockbuild;
-    public static @Nullable Shield shield;
+    public static @Nullable ShieldShader shield;
     public static UnitBuild build;
-    public static FogShader fog;
+    public static DarknessShader darkness;
     public static LightShader light;
     public static SurfaceShader water, tar, slag;
     public static PlanetShader planet;
@@ -26,18 +26,19 @@ public class Shaders{
     public static AtmosphereShader atmosphere;
     public static MeshShader mesh = new MeshShader();
     public static Shader unlit;
+    public static Shader screenspace;
 
     public static void init(){
         blockbuild = new BlockBuild();
         try{
-            shield = new Shield();
+            shield = new ShieldShader();
         }catch(Throwable t){
             //don't load shield shader
             shield = null;
             t.printStackTrace();
         }
         build = new UnitBuild();
-        fog = new FogShader();
+        darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
         tar = new SurfaceShader("tar");
@@ -46,6 +47,7 @@ public class Shaders{
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
         unlit = new LoadShader("planet", "unlit");
+        screenspace = new LoadShader("screenspace", "screenspace");
     }
 
     public static class AtmosphereShader extends LoadShader{
@@ -119,7 +121,7 @@ public class Shaders{
         public Color ambient = new Color(0.01f, 0.01f, 0.04f, 0.99f);
 
         public LightShader(){
-            super("light", "default");
+            super("light", "screenspace");
         }
 
         @Override
@@ -129,9 +131,9 @@ public class Shaders{
 
     }
 
-    public static class FogShader extends LoadShader{
-        public FogShader(){
-            super("fog", "default");
+    public static class DarknessShader extends LoadShader{
+        public DarknessShader(){
+            super("darkness", "default");
         }
     }
 
@@ -175,10 +177,10 @@ public class Shaders{
         }
     }
 
-    public static class Shield extends LoadShader{
+    public static class ShieldShader extends LoadShader{
 
-        public Shield(){
-            super("shield", "default");
+        public ShieldShader(){
+            super("shield", "screenspace");
         }
 
         @Override
@@ -188,19 +190,19 @@ public class Shaders{
             setUniformf("u_offset",
             Core.camera.position.x - Core.camera.width / 2,
             Core.camera.position.y - Core.camera.height / 2);
-            setUniformf("u_texsize", Core.camera.width,
-            Core.camera.height);
+            setUniformf("u_texsize", Core.camera.width, Core.camera.height);
+            setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
         }
     }
 
     public static class SurfaceShader extends LoadShader{
 
         public SurfaceShader(String frag){
-            super(frag, "default");
+            super(frag, "screenspace");
 
             Core.assets.load("sprites/noise.png", Texture.class).loaded = t -> {
-                ((Texture)t).setFilter(TextureFilter.Linear);
-                ((Texture)t).setWrap(TextureWrap.Repeat);
+                ((Texture)t).setFilter(TextureFilter.linear);
+                ((Texture)t).setWrap(TextureWrap.repeat);
             };
         }
 
@@ -220,8 +222,9 @@ public class Shaders{
     }
 
     public static class LoadShader extends Shader{
+
         public LoadShader(String frag, String vert){
-            super(Core.files.internal("shaders/" + vert + ".vert"), Core.files.internal("shaders/" + frag + ".frag"));
+            super(Core.files.internal("shaders/" + vert + ".vert").readString(), Core.files.internal("shaders/" + frag + ".frag").readString());
         }
     }
 }

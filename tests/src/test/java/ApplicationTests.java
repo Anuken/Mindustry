@@ -134,7 +134,7 @@ public class ApplicationTests{
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
                 assertEquals(world.tile(x, y).block(), Blocks.coreShard);
-                assertEquals(world.tile(x, y).entity, world.tile(bx, by).entity);
+                assertEquals(world.tile(x, y).build, world.tile(bx, by).build);
             }
         }
     }
@@ -143,12 +143,12 @@ public class ApplicationTests{
     void blockInventories(){
         multiblock();
         Tile tile = world.tile(4, 4);
-        tile.entity.items().add(Items.coal, 5);
-        tile.entity.items().add(Items.titanium, 50);
-        assertEquals(tile.entity.items().total(), 55);
-        tile.entity.items().remove(Items.phasefabric, 10);
-        tile.entity.items().remove(Items.titanium, 10);
-        assertEquals(tile.entity.items().total(), 45);
+        tile.build.items.add(Items.coal, 5);
+        tile.build.items.add(Items.titanium, 50);
+        assertEquals(tile.build.items.total(), 55);
+        tile.build.items.remove(Items.phasefabric, 10);
+        tile.build.items.remove(Items.titanium, 10);
+        assertEquals(tile.build.items.total(), 45);
     }
 
     @Test
@@ -216,16 +216,16 @@ public class ApplicationTests{
 
     void updateBlocks(int times){
         for(Tile tile : world.tiles){
-            if(tile.entity != null && tile.isCenter()){
-                tile.entity.updateProximity();
+            if(tile.build != null && tile.isCenter()){
+                tile.build.updateProximity();
             }
         }
 
         for(int i = 0; i < times; i++){
             Time.update();
             for(Tile tile : world.tiles){
-                if(tile.entity != null && tile.isCenter()){
-                    tile.entity.update();
+                if(tile.build != null && tile.isCenter()){
+                    tile.build.update();
                 }
             }
         }
@@ -237,14 +237,14 @@ public class ApplicationTests{
         state.set(State.playing);
 
         world.tile(0, 0).setBlock(Blocks.liquidSource);
-        world.tile(0, 0).entity.configureAny(Liquids.water);
+        world.tile(0, 0).build.configureAny(Liquids.water);
 
         world.tile(2, 1).setBlock(Blocks.liquidTank);
 
         updateBlocks(10);
 
-        assertTrue(world.tile(2, 1).entity.liquids().currentAmount() >= 1);
-        assertTrue(world.tile(2, 1).entity.liquids().current() == Liquids.water);
+        assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 1);
+        assertTrue(world.tile(2, 1).build.liquids.current() == Liquids.water);
     }
 
     @Test
@@ -255,7 +255,7 @@ public class ApplicationTests{
         Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
 
         source.setBlock(Blocks.liquidSource);
-        source.entity.configureAny(Liquids.water);
+        source.build.configureAny(Liquids.water);
 
         junction.setBlock(Blocks.liquidJunction);
 
@@ -265,8 +265,8 @@ public class ApplicationTests{
 
         updateBlocks(10);
 
-        assertTrue(tank.entity.liquids().currentAmount() >= 1, "Liquid not moved through junction");
-        assertTrue(tank.entity.liquids().current() == Liquids.water, "Tank has no water");
+        assertTrue(tank.build.liquids.currentAmount() >= 1, "Liquid not moved through junction");
+        assertTrue(tank.build.liquids.current() == Liquids.water, "Tank has no water");
     }
 
     @Test
@@ -290,7 +290,7 @@ public class ApplicationTests{
 
         world.tile(0, 0).setBlock(Blocks.conveyor);
         world.tile(0, 0).rotation(0);
-        world.tile(0, 0).entity.acceptStack(Items.copper, 1000, null);
+        world.tile(0, 0).build.acceptStack(Items.copper, 1000, null);
     }
 
     @Test
@@ -300,9 +300,9 @@ public class ApplicationTests{
 
         //test basic method.
         Rand r = new Rand(0);
-        Tilec[] res = {null};
+        Building[] res = {null};
 
-        Cons<Tilec> assigner = t -> res[0] = t;
+        Cons<Building> assigner = t -> res[0] = t;
 
         int iterations = 100;
 
@@ -367,42 +367,42 @@ public class ApplicationTests{
         state.set(State.playing);
         int length = 128;
         world.tile(0, 0).setBlock(Blocks.itemSource);
-        world.tile(0, 0).entity.configureAny(Items.copper);
+        world.tile(0, 0).build.configureAny(Items.copper);
 
-        Array<Tilec> entities = Array.with(world.tile(0, 0).entity);
+        Seq<Building> entities = Seq.with(world.tile(0, 0).build);
 
         for(int i = 0; i < length; i++){
             world.tile(i + 1, 0).setBlock(Blocks.conveyor);
             world.tile(i + 1, 0).rotation(0);
-            entities.add(world.tile(i + 1, 0).entity);
+            entities.add(world.tile(i + 1, 0).build);
         }
 
         world.tile(length + 1, 0).setBlock(new Block("___"){{
             hasItems = true;
             destructible = true;
-            entityType = () -> new TileEntity(){
+            entityType = () -> new Building(){
                 @Override
-                public void handleItem(Tilec source, Item item){
+                public void handleItem(Building source, Item item){
                     itemsa[0] ++;
                 }
 
                 @Override
-                public boolean acceptItem(Tilec source, Item item){
+                public boolean acceptItem(Building source, Item item){
                     return true;
                 }
             };
         }});
 
-        entities.each(Tilec::updateProximity);
+        entities.each(Building::updateProximity);
 
         //warmup
         for(int i = 0; i < 100000; i++){
-            entities.each(Tilec::update);
+            entities.each(Building::update);
         }
 
         Time.mark();
         for(int i = 0; i < 200000; i++){
-            entities.each(Tilec::update);
+            entities.each(Building::update);
         }
         Log.info(Time.elapsed() + "ms to process " + itemsa[0] + " items");
         assertNotEquals(0, itemsa[0]);
@@ -429,13 +429,13 @@ public class ApplicationTests{
 
     @Test
     void arrayIterators(){
-        Array<String> arr = Array.with("a", "b" , "c", "d", "e", "f");
-        Array<String> results = new Array<>();
+        Seq<String> arr = Seq.with("a", "b" , "c", "d", "e", "f");
+        Seq<String> results = new Seq<>();
 
         for(String s : arr);
         for(String s : results);
 
-        Array.iteratorsAllocated = 0;
+        Seq.iteratorsAllocated = 0;
 
         //simulate non-enhanced for loops, which should be correct
 
@@ -455,7 +455,7 @@ public class ApplicationTests{
         }
 
         assertEquals(results.size, index);
-        assertEquals(0, Array.iteratorsAllocated, "No new iterators must have been allocated.");
+        assertEquals(0, Seq.iteratorsAllocated, "No new iterators must have been allocated.");
     }
 
     @Test
@@ -481,8 +481,8 @@ public class ApplicationTests{
     void buildingOverlap(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.phantom.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.phantom.create(Team.sharded);
+        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
 
         //infinite build range
         state.rules.editor = true;
@@ -492,8 +492,8 @@ public class ApplicationTests{
         d1.set(0f, 0f);
         d2.set(20f, 20f);
 
-        d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
-        d2.addBuild(new BuildRequest(1, 1, 0, Blocks.copperWallLarge));
+        d1.addBuild(new BuildPlan(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuild(new BuildPlan(1, 1, 0, Blocks.copperWallLarge));
 
         d1.update();
         d2.update();
@@ -501,21 +501,21 @@ public class ApplicationTests{
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
         assertEquals(Blocks.copperWallLarge, world.tile(1, 1).block());
-        assertEquals(world.tile(1, 1).entity, world.tile(0, 0).entity);
+        assertEquals(world.tile(1, 1).build, world.tile(0, 0).build);
     }
 
     @Test
     void buildingDestruction(){
         initBuilding();
 
-        Builderc d1 = (Builderc)UnitTypes.phantom.create(Team.sharded);
-        Builderc d2 = (Builderc)UnitTypes.phantom.create(Team.sharded);
+        Builderc d1 = (Builderc)UnitTypes.poly.create(Team.sharded);
+        Builderc d2 = (Builderc)UnitTypes.poly.create(Team.sharded);
 
         d1.set(10f, 20f);
         d2.set(10f, 20f);
 
-        d1.addBuild(new BuildRequest(0, 0, 0, Blocks.copperWallLarge));
-        d2.addBuild(new BuildRequest(1, 1));
+        d1.addBuild(new BuildPlan(0, 0, 0, Blocks.copperWallLarge));
+        d2.addBuild(new BuildPlan(1, 1));
 
         Time.setDeltaProvider(() -> 3f);
         d1.update();
@@ -532,7 +532,7 @@ public class ApplicationTests{
         assertEquals(Blocks.copperWallLarge, world.tile(1, 1).block());
 
         d2.clearBuilding();
-        d2.addBuild(new BuildRequest(1, 1));
+        d2.addBuild(new BuildPlan(1, 1));
         d2.update();
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
@@ -542,7 +542,7 @@ public class ApplicationTests{
 
     @Test
     void allBlockTest(){
-        Tiles tiles = world.resize(256*2 + 20, 10);
+        Tiles tiles = world.resize(256*3 + 20, 10);
 
         world.beginMapLoad();
         for(int x = 0; x < tiles.width; x++){
@@ -565,14 +565,14 @@ public class ApplicationTests{
         for(int x = 0; x < tiles.width; x++){
             for(int y = 0; y < tiles.height; y++){
                 Tile tile = world.rawTile(x, y);
-                if(tile.entity != null){
+                if(tile.build != null){
                     try{
-                        tile.entity.update();
+                        tile.build.update();
                     }catch(Throwable t){
                         fail("Failed to update block '" + tile.block() + "'.", t);
                     }
-                    assertEquals(tile.block(), tile.entity.block());
-                    assertEquals(tile.block().health, tile.entity.health());
+                    assertEquals(tile.block(), tile.build.block());
+                    assertEquals(tile.block().health, tile.build.health());
                 }
             }
         }
@@ -584,29 +584,29 @@ public class ApplicationTests{
         Tile core = world.tile(5, 5);
         core.setBlock(Blocks.coreShard, Team.sharded, 0);
         for(Item item : content.items()){
-            core.entity.items().set(item, 3000);
+            core.build.items.set(item, 3000);
         }
 
-        assertEquals(core.entity, state.teams.get(Team.sharded).core());
+        assertEquals(core.build, state.teams.get(Team.sharded).core());
     }
 
     void depositTest(Block block, Item item){
-        Unitc unit = UnitTypes.spirit.create(Team.derelict);
+        Unit unit = UnitTypes.mono.create(Team.derelict);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
         int capacity = tile.block().itemCapacity;
 
-        assertNotNull(tile.entity, "Tile should have an entity, but does not: " + tile);
+        assertNotNull(tile.build, "Tile should have an entity, but does not: " + tile);
 
-        int deposited = tile.entity.acceptStack(item, capacity - 1, unit);
+        int deposited = tile.build.acceptStack(item, capacity - 1, unit);
         assertEquals(capacity - 1, deposited);
 
-        tile.entity.handleStack(item, capacity - 1, unit);
-        assertEquals(tile.entity.items().get(item), capacity - 1);
+        tile.build.handleStack(item, capacity - 1, unit);
+        assertEquals(tile.build.items.get(item), capacity - 1);
 
-        int overflow = tile.entity.acceptStack(item, 10, unit);
+        int overflow = tile.build.acceptStack(item, 10, unit);
         assertEquals(1, overflow);
 
-        tile.entity.handleStack(item, 1, unit);
-        assertEquals(capacity, tile.entity.items().get(item));
+        tile.build.handleStack(item, 1, unit);
+        assertEquals(capacity, tile.build.items.get(item));
     }
 }

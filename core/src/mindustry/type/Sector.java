@@ -1,21 +1,25 @@
 package mindustry.type;
 
 import arc.*;
+import arc.func.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.game.Saves.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 /** A small section of a planet. */
 public class Sector{
+    private static final Seq<Sector> tmpSeq1 = new Seq<>(), tmpSeq2 = new Seq<>(), tmpSeq3 = new Seq<>();
+    private static final ObjectSet<Sector> tmpSet = new ObjectSet<>();
+
     public final SectorRect rect;
     public final Plane plane;
     public final Planet planet;
@@ -27,8 +31,7 @@ public class Sector{
     public @Nullable SaveSlot save;
     public @Nullable SectorPreset preset;
 
-    /** Sector enemy hostility from 0 to 1 */
-    public float hostility;
+    public float baseCoverage;
 
     //TODO implement a dynamic launch period
     public int launchPeriod = 10;
@@ -40,6 +43,45 @@ public class Sector{
         this.rect = makeRect();
         this.id = tile.id;
         this.data = data;
+    }
+
+    public Seq<Sector> inRange(int range){
+        //TODO cleanup/remove
+        if(true){
+            tmpSeq1.clear();
+            neighbors(tmpSeq1::add);
+
+            return tmpSeq1;
+        }
+
+        tmpSeq1.clear();
+        tmpSeq2.clear();
+        tmpSet.clear();
+
+        tmpSeq1.add(this);
+        tmpSet.add(this);
+        for(int i = 0; i < range; i++){
+            while(!tmpSeq1.isEmpty()){
+                Sector sec = tmpSeq1.pop();
+                tmpSet.add(sec);
+                sec.neighbors(other -> {
+                    if(tmpSet.add(other)){
+                        tmpSeq2.add(other);
+                    }
+                });
+            }
+            tmpSeq1.clear();
+            tmpSeq1.addAll(tmpSeq2);
+        }
+
+        tmpSeq3.clear().addAll(tmpSeq2);
+        return tmpSeq3;
+    }
+
+    public void neighbors(Cons<Sector> cons){
+        for(Ptile tile : tile.tiles){
+            cons.get(planet.getSector(tile));
+        }
     }
 
     /** @return whether this sector can be landed on at all.
@@ -56,7 +98,7 @@ public class Sector{
 
     /** @return whether the enemy has a generated base here. */
     public boolean hasEnemyBase(){
-        return hostility >= 0.02f && (save == null || save.meta.rules.waves);
+        return is(SectorAttribute.base) && (save == null || save.meta.rules.waves);
     }
 
     public boolean isBeingPlayed(){
@@ -77,11 +119,6 @@ public class Sector{
         return save != null;
     }
 
-    public void generate(){
-        //TODO use simplex and a seed
-        hostility = Math.max(Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.5f, 0.4f), 0);
-    }
-
     public boolean locked(){
         return !unlocked();
     }
@@ -94,8 +131,10 @@ public class Sector{
         return (normal.dot(light) + 1f) / 2f;
     }
 
+    /** @return the sector size, in tiles */
     public int getSize(){
-        return (int)(rect.radius * 3200);
+        int res = (int)(rect.radius * 3200);
+        return res % 2 == 0 ? res : res + 1;
     }
 
     //TODO implement
@@ -108,6 +147,16 @@ public class Sector{
         return false;
     }
 
+    //TODO this should be stored in a more efficient structure, and be updated each turn
+    public Seq<ItemStack> getReceivedItems(){
+        return Core.settings.getJson(key("received-items"), Seq.class, ItemStack.class, Seq::new);
+    }
+
+    public void setReceivedItems(Seq<ItemStack> stacks){
+        Core.settings.putJson(key("received-items"), ItemStack.class, stacks);
+    }
+
+    //TODO these methods should maybe move somewhere else and/or be contained in a data object
     public void setSpawnPosition(int position){
         put("spawn-position", position);
     }
@@ -118,12 +167,45 @@ public class Sector{
         return Core.settings.getInt(key("spawn-position"), Point2.pack(world.width() / 2, world.height() / 2));
     }
 
-    public void setTurnsPassed(int number){
-        put("turns-passed", number);
+    /** @return time spent in this sector this turn in ticks. */
+    public float getTimeSpent(){
+        //return currently counting time spent if being played on
+        if(isBeingPlayed()) return state.secinfo.internalTimeSpent;
+
+        //else return the stored value
+        return getStoredTimeSpent();
     }
 
-    public int getTurnsPassed(){
-        return Core.settings.getInt(key("turns-passed"));
+    public void setTimeSpent(float time){
+        put("time-spent", time);
+
+        //update counting time
+        if(isBeingPlayed()){
+            state.secinfo.internalTimeSpent = time;
+        }
+    }
+
+    public String displayTimeRemaining(){
+        float amount = Vars.turnDuration - getTimeSpent();
+        int seconds = (int)(amount / 60);
+        int sf = seconds % 60;
+        return (seconds / 60) + ":" + (sf < 10 ? "0" : "") + sf;
+    }
+
+    /** @return the stored amount of time spent in this sector this turn in ticks.
+     * Do not use unless you know what you're doing. */
+    public float getStoredTimeSpent(){
+        return Core.settings.getFloat(key("time-spent"));
+    }
+
+    public void setSecondsPassed(long number){
+        put("seconds-passed", number);
+    }
+
+    /** @return how much time has passed in this sector without the player resuming here.
+     * Used for resource production calculations. */
+    public long getSecondsPassed(){
+        return Core.settings.getLong(key("seconds-passed"));
     }
 
     private String key(String key){
@@ -239,6 +321,10 @@ public class Sector{
         /** Has rain. */
         rainy,
         /** Has snow. */
-        snowy
+        snowy,
+        /** Has sandstorms. */
+        desert,
+        /** Has an enemy base. */
+        base
     }
 }

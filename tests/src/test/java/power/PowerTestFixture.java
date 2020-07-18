@@ -11,7 +11,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
-import mindustry.world.modules.*;
 import org.junit.jupiter.api.*;
 
 import static mindustry.Vars.*;
@@ -58,7 +57,7 @@ public class PowerTestFixture{
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
-            entityType = TileEntity::create;
+            entityType = Building::create;
             consumes.power(powerPerTick);
         }};
     }
@@ -87,21 +86,21 @@ public class PowerTestFixture{
             Reflect.set(Tile.class, tile, "floor", Blocks.sand);
 
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
-            tile.entity = block.newEntity().init(tile, Team.sharded, false);
+            tile.build = block.newEntity().init(tile, Team.sharded, false);
             if(block.hasPower){
-                tile.entity.power().graph = new PowerGraph(){
+                tile.build.power.graph = new PowerGraph(){
                     //assume there's always something consuming power
                     @Override
                     public float getUsageFraction(){
                         return 1f;
                     }
                 };
-                tile.entity.power().graph.add(tile.entity);
+                tile.build.power.graph.add(tile.build);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound
             block.health = 100000;
-            tile.entity.health(100000.0f);
+            tile.build.health(100000.0f);
 
             return tile;
         }catch(Exception ex){

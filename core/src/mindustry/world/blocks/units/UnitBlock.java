@@ -25,9 +25,9 @@ public class UnitBlock extends PayloadAcceptor{
     }
 
     @Remote(called = Loc.server)
-    public static void onUnitBlockSpawn(Tile tile){
-        if(!(tile.entity instanceof UnitBlockEntity)) return;
-        tile.<UnitBlockEntity>ent().spawned();
+    public static void unitBlockSpawn(Tile tile){
+        if(!(tile.build instanceof UnitBlockEntity)) return;
+        tile.<UnitBlockEntity>bc().spawned();
     }
 
     public class UnitBlockEntity extends PayloadAcceptorEntity<UnitPayload>{
@@ -40,7 +40,7 @@ public class UnitBlock extends PayloadAcceptor{
             Fx.smeltsmoke.at(x + Tmp.v1.x, y + Tmp.v1.y);
 
             if(!net.client() && payload != null){
-                Unitc unit = payload.unit;
+                Unit unit = payload.unit;
                 unit.set(x, y);
                 unit.rotation(rotdeg());
                 unit.vel().trns(rotdeg(), payloadSpeed * 2f).add(Mathf.range(0.3f), Mathf.range(0.3f));
@@ -55,7 +55,7 @@ public class UnitBlock extends PayloadAcceptor{
 
         @Override
         public void dumpPayload(){
-            Call.onUnitBlockSpawn(tile);
+            Call.unitBlockSpawn(tile);
         }
     }
 }

@@ -80,7 +80,6 @@ public class Map implements Comparable<Map>, Publishable{
 
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
-        Vars.data.modified();
     }
 
     /** Returns the result of applying this map's rules to the specified gamemode.*/
@@ -111,9 +110,9 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     /** Returns the generation filters that this map uses on load.*/
-    public Array<GenerateFilter> filters(){
+    public Seq<GenerateFilter> filters(){
         if(tags.getInt("build", -1) < 83 && tags.getInt("build", -1) != -1 && tags.get("genfilters", "").isEmpty()){
-            return Array.with();
+            return Seq.with();
         }
         return maps.readFilters(tags.get("genfilters", ""));
     }
@@ -196,14 +195,14 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     @Override
-    public Array<String> extraTags(){
+    public Seq<String> extraTags(){
         Gamemode mode = Gamemode.attack.valid(this) ? Gamemode.attack : Gamemode.survival;
-        return Array.with(mode.name());
+        return Seq.with(mode.name());
     }
 
     @Override
     public boolean prePublish(){
-        tags.put("author", player.name());
+        tags.put("author", player.name);
         ui.editor.editor.getTags().put("author", tags.get("author"));
         ui.editor.save();
 

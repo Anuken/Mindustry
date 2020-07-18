@@ -4,7 +4,6 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import arc.util.*;
 import mindustry.ai.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -16,20 +15,16 @@ public class Teams{
     /** Maps team IDs to team data. */
     private TeamData[] map = new TeamData[256];
     /** Active teams. */
-    private Array<TeamData> active = new Array<>();
+    private Seq<TeamData> active = new Seq<>();
 
     public Teams(){
         active.add(get(Team.crux));
     }
 
     public @Nullable CoreEntity closestEnemyCore(float x, float y, Team team){
-        for(TeamData data : active){
-            if(areEnemies(team, data.team)){
-                CoreEntity tile = Geometry.findClosest(x, y, data.cores);
-                if(tile != null){
-                    return tile;
-                }
-            }
+        for(Team enemy : team.enemies()){
+            CoreEntity tile = Geometry.findClosest(x, y, enemy.cores());
+            if(tile != null) return tile;
         }
         return null;
     }
@@ -38,7 +33,7 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
-    public Array<Team> enemiesOf(Team team){
+    public Team[] enemiesOf(Team team){
         return get(team).enemies;
     }
 
@@ -55,10 +50,10 @@ public class Teams{
         return false;
     }
 
-    public void eachEnemyCore(Team team, Cons<Tilec> ret){
+    public void eachEnemyCore(Team team, Cons<Building> ret){
         for(TeamData data : active){
             if(areEnemies(team, data.team)){
-                for(Tilec tile : data.cores){
+                for(Building tile : data.cores){
                     ret.get(tile);
                 }
             }
@@ -67,18 +62,18 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        if(map[Pack.u(team.id)] == null){
-            map[Pack.u(team.id)] = new TeamData(team);
+        if(map[team.id] == null){
+            map[team.id] = new TeamData(team);
         }
-        return map[Pack.u(team.id)];
+        return map[team.id];
     }
 
-    public Array<CoreEntity> playerCores(){
+    public Seq<CoreEntity> playerCores(){
         return get(state.rules.defaultTeam).cores;
     }
 
     /** Do not modify! */
-    public Array<CoreEntity> cores(Team team){
+    public Seq<CoreEntity> cores(Team team){
         return get(team).cores;
     }
 
@@ -98,7 +93,7 @@ public class Teams{
     }
 
     /** Do not modify. */
-    public Array<TeamData> getActive(){
+    public Seq<TeamData> getActive(){
         active.removeAll(t -> !t.active());
         return active;
     }
@@ -135,20 +130,23 @@ public class Teams{
         }
 
         for(TeamData data : active){
-            data.enemies.clear();
+            Seq<Team> enemies = new Seq<>();
+
             for(TeamData other : active){
                 if(areEnemies(data.team, other.team)){
-                    data.enemies.add(other.team);
+                    enemies.add(other.team);
                 }
             }
+
+            data.enemies = enemies.toArray(Team.class);
         }
     }
 
     public class TeamData{
-        public final Array<CoreEntity> cores = new Array<>();
-        public final Array<Team> enemies = new Array<>();
+        public final Seq<CoreEntity> cores = new Seq<>();
         public final Team team;
         public final BaseAI ai;
+        public Team[] enemies = {};
         public Queue<BlockPlan> blocks = new Queue<>();
 
         public TeamData(Team team){
@@ -174,7 +172,7 @@ public class Teams{
 
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
-            return state.rules.attackMode && team == state.rules.waveTeam && state.rules.buildAI;
+            return state.rules.attackMode && team.rules().ai;
         }
 
         @Override

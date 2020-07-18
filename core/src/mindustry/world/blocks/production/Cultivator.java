@@ -31,11 +31,11 @@ public class Cultivator extends GenericCrafter{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("multiplier", entity -> new Bar(() ->
+        bars.add("multiplier", (CultivatorEntity entity) -> new Bar(() ->
         Core.bundle.formatFloat("bar.efficiency",
-        ((((CultivatorEntity)entity).boost + 1f) * ((CultivatorEntity)entity).warmup) * 100f, 1),
+        ((entity.boost + 1f) * entity.warmup) * 100f, 1),
         () -> Pal.ammo,
-        () -> ((CultivatorEntity)entity).warmup));
+        () -> entity.warmup));
     }
 
     @Override
@@ -51,8 +51,8 @@ public class Cultivator extends GenericCrafter{
     }
 
     @Override
-    public TextureRegion[] generateIcons(){
-        return new TextureRegion[]{Core.atlas.find(name), Core.atlas.find(name + "-top"),};
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region, topRegion};
     }
 
     public class CultivatorEntity extends GenericCrafterEntity{

@@ -19,8 +19,8 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class ScriptConsoleFragment extends Table{
-    private final static int messagesShown = 30;
-    private Array<String> messages = new Array<>();
+    private static final int messagesShown = 30;
+    private Seq<String> messages = new Seq<>();
     private boolean open = false, shown;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
@@ -29,7 +29,7 @@ public class ScriptConsoleFragment extends Table{
     private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
     private float textspacing = Scl.scl(10);
-    private Array<String> history = new Array<>();
+    private Seq<String> history = new Seq<>();
     private int historyPos = 0;
     private int scrollPos = 0;
     private Fragment container = new Fragment(){

@@ -46,7 +46,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private Rules lastSavedRules;
     private boolean saved = false;
     private boolean shownWithMap = false;
-    private Array<Block> blocksOut = new Array<>();
+    private Seq<Block> blocksOut = new Seq<>();
 
     public MapEditorDialog(){
         super("");
@@ -156,7 +156,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
 
                 platform.publish(map);
-            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? editor.getTags().get("author").equals(player.name()) ? "$workshop.listing" : "$view.workshop" : "$editor.publish.workshop"));
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? editor.getTags().get("author").equals(player.name) ? "$workshop.listing" : "$view.workshop" : "$editor.publish.workshop"));
 
             menu.cont.row();
         }
@@ -234,6 +234,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         show();
         state.rules = (lastSavedRules == null ? new Rules() : lastSavedRules);
         lastSavedRules = null;
+        saved = false;
         editor.renderer().updateAll();
     }
 
@@ -248,15 +249,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
             state.rules.sector = null;
             state.map = new Map(StringMap.of(
-                    "name", "Editor Playtesting",
-                    "width", editor.width(),
-                    "height", editor.height()
-                ));
+                "name", "Editor Playtesting",
+                "width", editor.width(),
+                "height", editor.height()
+            ));
             world.endMapLoad();
             //add entities so they update. is this really needed?
             for(Tile tile : world.tiles){
-                if(tile.entity != null){
-                    tile.entity.add();
+                if(tile.build != null){
+                    tile.build.add();
                 }
             }
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
