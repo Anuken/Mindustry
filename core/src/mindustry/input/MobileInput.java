@@ -422,6 +422,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         lastSchematic = schem;
     }
 
+
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
         if(state.isMenu()) return false;
@@ -568,8 +569,16 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));
-        }else if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.build)){
-            tryBeginMine(cursor);
+        }else{
+            if(!canTapPlayer(worldx, worldy) && !tileTapped(linked.build)){
+                tryBeginMine(cursor);
+            }
+
+            //apply command on double tap
+            if(count == 2 && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 2f) &&
+                player.unit() instanceof Commanderc){
+                Call.unitCommand(player);
+            }
         }
 
         return false;

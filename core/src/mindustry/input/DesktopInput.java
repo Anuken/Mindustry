@@ -576,6 +576,10 @@ public class DesktopInput extends InputHandler{
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         movement.set(xa, ya).nor().scl(speed);
+        if(Core.input.keyDown(Binding.mouse_move)){
+            movement.add(input.mouseWorld().sub(player).scl(1f / 25f * speed)).limit(speed);
+        }
+
         float mouseAngle = Angles.mouseAngle(unit.x, unit.y);
         boolean aimCursor = omni && player.shooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
 
