@@ -95,7 +95,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Returns whether this block overlaps any selection requests. */
     boolean checkOverlapPlacement(int x, int y, Block block){
         r2.setSize(block.size * tilesize);
-        r2.setCenter(x * tilesize + block.offset(), y * tilesize + block.offset());
+        r2.setCenter(x * tilesize + block.offset, y * tilesize + block.offset);
 
         for(BuildPlan req : selectRequests){
             Tile other = req.tile();
@@ -103,7 +103,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(other == null || req.breaking) continue;
 
             r1.setSize(req.block.size * tilesize);
-            r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
+            r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
 
             if(r2.overlaps(r1)){
                 return true;
@@ -116,7 +116,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(other == null || req.breaking) continue;
 
             r1.setSize(req.block.size * tilesize);
-            r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
+            r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
 
             if(r2.overlaps(r1)){
                 return true;
@@ -137,11 +137,11 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(!req.breaking){
                 r1.setSize(req.block.size * tilesize);
-                r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
+                r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
 
             }else{
                 r1.setSize(other.block().size * tilesize);
-                r1.setCenter(other.worldx() + other.block().offset(), other.worldy() + other.block().offset());
+                r1.setCenter(other.worldx() + other.block().offset, other.worldy() + other.block().offset);
             }
 
             if(r2.overlaps(r1)) return req;
@@ -538,7 +538,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
             }else if(block != null){
                 updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
-                Fx.tapBlock.at(cursor.worldx() + block.offset(), cursor.worldy() + block.offset(), block.size);
+                Fx.tapBlock.at(cursor.worldx() + block.offset, cursor.worldy() + block.offset, block.size);
             }
         }
 

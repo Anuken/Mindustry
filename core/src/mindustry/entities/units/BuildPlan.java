@@ -117,11 +117,11 @@ public class BuildPlan{
     }
 
     public float drawx(){
-        return x*tilesize + block.offset();
+        return x*tilesize + block.offset;
     }
 
     public float drawy(){
-        return y*tilesize + block.offset();
+        return y*tilesize + block.offset;
     }
 
     public BuildPlan configure(Object config){

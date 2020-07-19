@@ -121,11 +121,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public float drawx(){
-        return block().offset() + worldx();
+        return block().offset + worldx();
     }
 
     public float drawy(){
-        return block().offset() + worldy();
+        return block().offset + worldy();
     }
 
     public boolean isDarkened(){

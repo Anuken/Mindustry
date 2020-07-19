@@ -601,7 +601,7 @@ public class Schematics implements Loadable{
             });
 
             //rotate actual request, centered on its multiblock position
-            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float wx = (req.x - ox) * tilesize + req.block.offset, wy = (req.y - oy) * tilesize + req.block.offset;
             float x = wx;
             if(direction >= 0){
                 wx = -wy;
@@ -610,8 +610,8 @@ public class Schematics implements Loadable{
                 wx = wy;
                 wy = -x;
             }
-            req.x = (short)(world.toTile(wx - req.block.offset()) + ox);
-            req.y = (short)(world.toTile(wy - req.block.offset()) + oy);
+            req.x = (short)(world.toTile(wx - req.block.offset) + ox);
+            req.y = (short)(world.toTile(wy - req.block.offset) + oy);
             req.rotation = (byte)Mathf.mod(req.rotation + direction, 4);
         });
 

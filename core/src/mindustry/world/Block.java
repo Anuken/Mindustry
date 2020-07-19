@@ -96,6 +96,8 @@ public class Block extends UnlockableContent{
     public boolean floating = false;
     /** multiblock size */
     public int size = 1;
+    /** multiblock offset */
+    public float offset = 0f;
     /** Whether to draw this block in the expanded draw range. */
     public boolean expanded = false;
     /** Max of timers used. */
@@ -242,7 +244,7 @@ public class Block extends UnlockableContent{
         float width = layout.width;
 
         font.setColor(color);
-        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
+        float dx = x * tilesize + offset, dy = y * tilesize + offset + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
         Lines.stroke(2f, Color.darkGray);
@@ -470,13 +472,8 @@ public class Block extends UnlockableContent{
         return entityType.get();
     }
 
-    /** Offset for placing and drawing multiblocks. */
-    public float offset(){
-        return ((size + 1) % 2) * tilesize / 2f;
-    }
-
     public Rect bounds(int x, int y, Rect rect){
-        return rect.setSize(size * tilesize).setCenter(x * tilesize + offset(), y * tilesize + offset());
+        return rect.setSize(size * tilesize).setCenter(x * tilesize + offset, y * tilesize + offset);
     }
 
     public boolean isMultiblock(){
@@ -603,6 +600,8 @@ public class Block extends UnlockableContent{
         if(health == -1){
             health = size * size * 40;
         }
+
+        offset = ((size + 1) % 2) * tilesize / 2f;
 
         buildCost = 0f;
         for(ItemStack stack : requirements){
