@@ -136,10 +136,10 @@ public class MusicControl{
             silenced = false;
         }else if(current == music && music != null){
             //fade in the playing track
-            fade = Mathf.clamp(fade + Time.delta()/finTime);
+            fade = Mathf.clamp(fade + Time.delta /finTime);
         }else if(current != null){
             //fade out the current track
-            fade = Mathf.clamp(fade - Time.delta()/foutTime);
+            fade = Mathf.clamp(fade - Time.delta /foutTime);
 
             if(fade <= 0.01f){
                 //stop current track when it hits 0 volume

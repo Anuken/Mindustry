@@ -159,7 +159,7 @@ public class NuclearReactor extends PowerGenerator{
 
             if(heat > flashThreshold){
                 float flash = 1f + ((heat - flashThreshold) / (1f - flashThreshold)) * 5.4f;
-                flash += flash * Time.delta();
+                flash += flash * Time.delta;
                 Draw.color(Color.red, Color.yellow, Mathf.absin(flash, 9f, 1f));
                 Draw.alpha(0.6f);
                 Draw.rect(lightsRegion, x, y);

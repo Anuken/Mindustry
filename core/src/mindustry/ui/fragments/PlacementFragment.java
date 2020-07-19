@@ -90,7 +90,7 @@ public class PlacementFragment extends Fragment{
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
         if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
-            Building tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
             Object tryConfig = tile == null ? null : tile.config();
 
@@ -449,7 +449,7 @@ public class PlacementFragment extends Fragment{
         //check tile being hovered over
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null){
-            //if the tile has an entity, display it
+            //if the tile has a building, display it
             if(hoverTile.build != null){
                 hoverTile.build.updateFlow(true);
                 return hoverTile.build;

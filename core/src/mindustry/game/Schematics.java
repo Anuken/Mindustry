@@ -345,7 +345,7 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Building linked = world.ent(cx, cy);
+                Building linked = world.build(cx, cy);
 
                 if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof BuildBlock)){
                     int top = linked.block().size/2;
@@ -373,7 +373,7 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Building tile = world.ent(cx, cy);
+                Building tile = world.build(cx, cy);
 
                 if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
                     && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){

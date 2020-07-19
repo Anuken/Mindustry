@@ -24,7 +24,7 @@ public class StatusFieldAbility implements Ability{
 
     @Override
     public void update(Unit unit){
-        unit.timer2 += Time.delta();
+        unit.timer2 += Time.delta;
 
         if(unit.timer2 >= reload){
 

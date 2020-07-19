@@ -159,7 +159,7 @@ public class TypeIO{
             Unit unit = Groups.unit.getByID(id);
             return unit == null ? Nulls.unit : unit;
         }else if(type == 1){ //block
-            Building tile = world.ent(id);
+            Building tile = world.build(id);
             return tile instanceof ControlBlock ? ((ControlBlock)tile).unit() : Nulls.unit;
         }
         return Nulls.unit;
@@ -178,7 +178,7 @@ public class TypeIO{
     }
 
     public static Building readBuilding(Reads read){
-        return world.ent(read.i());
+        return world.build(read.i());
     }
 
     public static void writeTile(Writes write, Tile tile){

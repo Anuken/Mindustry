@@ -41,7 +41,7 @@ public class PowerNode extends PowerBlock{
         outputsPower = false;
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
-            Building other = world.ent(value);
+            Building other = world.build(value);
             boolean contains = power.links.contains(value), valid = other != null && other.power() != null;
 
             if(contains){
@@ -183,7 +183,7 @@ public class PowerNode extends PowerBlock{
         }
 
         Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
-            Building other = world.ent(x, y);
+            Building other = world.build(x, y);
             if(valid.get(other) && !tempTileEnts.contains(other)){
                 tempTileEnts.add(other);
             }
@@ -252,7 +252,7 @@ public class PowerNode extends PowerBlock{
     public static void insulators(int x, int y, int x2, int y2, Cons<Building> iterator){
         world.raycastEach(x, y, x2, y2, (wx, wy) -> {
 
-            Building tile = world.ent(wx, wy);
+            Building tile = world.build(wx, wy);
             if(tile != null && tile.block().insulated){
                 iterator.get(tile);
             }
@@ -273,7 +273,7 @@ public class PowerNode extends PowerBlock{
 
             tempTileEnts.clear();
             Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
-                Building other = world.ent(x, y);
+                Building other = world.build(x, y);
                 if(valid.get(other)){
                     if(!insulated(this, other)){
                         tempTileEnts.add(other);
@@ -346,7 +346,7 @@ public class PowerNode extends PowerBlock{
 
             for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){
                 for(int y = (int)(tile.y - laserRange - 2); y <= tile.y + laserRange + 2; y++){
-                    Building link = world.ent(x, y);
+                    Building link = world.build(x, y);
 
                     if(link != this && linkValid(this, link, false)){
                         boolean linked = linked(link);
@@ -370,7 +370,7 @@ public class PowerNode extends PowerBlock{
             Draw.z(Layer.power);
 
             for(int i = 0; i < power.links.size; i++){
-                Building link = world.ent(power.links.get(i));
+                Building link = world.build(power.links.get(i));
 
                 if(!linkValid(this, link)) continue;
 

@@ -110,14 +110,14 @@ public class World{
     }
 
     @Nullable
-    public Building ent(int x, int y){
+    public Building build(int x, int y){
         Tile tile = tile(x, y);
         if(tile == null) return null;
         return tile.build;
     }
 
     @Nullable
-    public Building ent(int pos){
+    public Building build(int pos){
         Tile tile = tile(pos);
         if(tile == null) return null;
         return tile.build;
@@ -134,8 +134,8 @@ public class World{
     }
 
     @Nullable
-    public Building entWorld(float x, float y){
-        return ent(Math.round(x / tilesize), Math.round(y / tilesize));
+    public Building buildWorld(float x, float y){
+        return build(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
     public int toTile(float coord){

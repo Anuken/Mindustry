@@ -186,7 +186,7 @@ public class DesktopInput extends InputHandler{
             if(!(scene.getKeyboardFocus() instanceof TextField) && !scene.hasDialog()){
                 //move camera around
                 float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
-                Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
+                Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
 
                 if(Core.input.keyDown(Binding.mouse_move)){
                     Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
@@ -592,17 +592,18 @@ public class DesktopInput extends InputHandler{
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
             if(!movement.isZero() && legs){
-                unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
+                unit.vel.rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta);
             }
         }
 
-        unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
+        unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);
 
         player.boosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
         player.mouseX = unit.aimX();
         player.mouseY = unit.aimY();
 
+        //update payload input
         if(unit instanceof Payloadc){
             Payloadc pay = (Payloadc)unit;
 
@@ -611,7 +612,7 @@ public class DesktopInput extends InputHandler{
                 if(target != null){
                     Call.pickupUnitPayload(player, target);
                 }else if(!pay.hasPayload()){
-                    Building tile = world.entWorld(pay.x(), pay.y());
+                    Building tile = world.buildWorld(pay.x(), pay.y());
 
                     if(tile != null && tile.team() == unit.team){
                         Call.pickupBlockPayload(player, tile);
@@ -625,6 +626,7 @@ public class DesktopInput extends InputHandler{
             }
         }
 
+        //update commander inut
         if(unit instanceof Commanderc){
             if(Core.input.keyTap(Binding.command)){
                 Call.unitCommand(player);

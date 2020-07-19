@@ -416,7 +416,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.update(() -> {
             if(selected != null){
                 if(launching){
-                    stable.getColor().sub(0, 0, 0, 0.05f * Time.delta());
+                    stable.getColor().sub(0, 0, 0, 0.05f * Time.delta);
                 }else{
                     //fade out UI when not facing selected sector
                     Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planets.planet.getRotation()).scl(-1f).nor();

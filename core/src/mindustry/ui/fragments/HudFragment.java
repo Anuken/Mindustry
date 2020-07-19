@@ -257,7 +257,7 @@ public class HudFragment extends Fragment{
                     coreAttackOpacity[0] = Mathf.lerpDelta(coreAttackOpacity[0], 0f, 0.1f);
                 }
 
-                coreAttackTime[0] -= Time.delta();
+                coreAttackTime[0] -= Time.delta;
 
                 return coreAttackOpacity[0] > 0;
             });

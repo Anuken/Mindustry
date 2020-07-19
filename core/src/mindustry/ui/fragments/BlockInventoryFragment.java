@@ -110,13 +110,13 @@ public class BlockInventoryFragment extends Fragment{
                 hide();
             }else{
                 if(tile.items.total() == 0){
-                    emptyTime += Time.delta();
+                    emptyTime += Time.delta;
                 }else{
                     emptyTime = 0f;
                 }
 
                 if(holding && lastItem != null){
-                    holdTime += Time.delta();
+                    holdTime += Time.delta;
 
                     if(holdTime >= holdWithdraw){
                         int amount = Math.min(tile.items.get(lastItem), player.unit().maxAccepted(lastItem));
@@ -140,7 +140,7 @@ public class BlockInventoryFragment extends Fragment{
                             shrinkHoldTimes[i] = 0f;
                             dirty |= !had;
                         }else if(had){
-                            shrinkHoldTimes[i] += Time.delta();
+                            shrinkHoldTimes[i] += Time.delta;
                             dirty |= shrinkHoldTimes[i] >= holdShrink;
                         }
                     }

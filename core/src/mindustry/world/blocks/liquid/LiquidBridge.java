@@ -26,7 +26,7 @@ public class LiquidBridge extends ItemBridge{
 
             checkIncoming();
 
-            Building other = world.ent(link);
+            Building other = world.build(link);
             if(other == null || !linkValid(tile, other.tile())){
                 dumpLiquid(liquids.current());
             }else{

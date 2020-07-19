@@ -73,7 +73,7 @@ public class OverdriveProjector extends Block{
         @Override
         public void updateTile(){
             heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.08f);
-            charge += heat * Time.delta();
+            charge += heat * Time.delta;
 
             if(hasBoost){
                 phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);

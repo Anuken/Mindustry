@@ -103,7 +103,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void lookAt(float angle){
-        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta());
+        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta);
     }
 
     public void lookAt(Position pos){
@@ -176,7 +176,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             float relativeSize = state.rules.dropZoneRadius + bounds()/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
-                    vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
+                    vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
                 }
             }
         }
@@ -204,7 +204,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
 
             //move down
-            elevation -= type.fallSpeed * Time.delta();
+            elevation -= type.fallSpeed * Time.delta;
 
             if(isGrounded()){
                 destroy();

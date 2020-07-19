@@ -84,10 +84,10 @@ public class SectorInfo{
     /** Update averages of various stats.
      * Called every frame. */
     public void update(){
-        internalTimeSpent += Time.delta();
+        internalTimeSpent += Time.delta;
 
         //time spent exceeds turn duration!
-        if(internalTimeSpent >= turnDuration && internalTimeSpent - Time.delta() < turnDuration){
+        if(internalTimeSpent >= turnDuration && internalTimeSpent - Time.delta < turnDuration){
             universe.displayTimeEnd();
         }
 

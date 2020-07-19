@@ -119,7 +119,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }else if(core != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
             //(this is not for balance)
-            deathTimer += Time.delta();
+            deathTimer += Time.delta;
             if(deathTimer >= deathDelay){
                 //request spawn - this happens serverside only
                 core.requestSpawn(base());
@@ -127,7 +127,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             }
         }
 
-        textFadeTime -= Time.delta() / (60 * 5);
+        textFadeTime -= Time.delta / (60 * 5);
 
     }
 

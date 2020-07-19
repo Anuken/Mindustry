@@ -43,13 +43,13 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         //update code
         float addSpeed = accepting > 0 ? 3f : 0f;
 
-        amount -= Time.delta() * (1f - liquid.viscosity) / (5f + addSpeed);
+        amount -= Time.delta * (1f - liquid.viscosity) / (5f + addSpeed);
 
         amount += accepting;
         accepting = 0f;
 
         if(amount >= maxLiquid / 1.5f && generation < maxGeneration){
-            float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta();
+            float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f) * Time.delta;
             for(Point2 point : Geometry.d4){
                 Tile other = world.tile(tile.x + point.x, tile.y + point.y);
                 if(other != null && other.block() == Blocks.air){
@@ -87,7 +87,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
             updateTime = 40f;
         }
 
-        updateTime -= Time.delta();
+        updateTime -= Time.delta;
     }
 
     @Override

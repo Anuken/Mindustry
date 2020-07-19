@@ -61,8 +61,8 @@ public class PowerTests extends PowerTestFixture{
             powerGraph.add(producerTile.build);
             powerGraph.add(directConsumerTile.build);
 
-            assertEquals(producedPower * Time.delta(), powerGraph.getPowerProduced(), Mathf.FLOAT_ROUNDING_ERROR);
-            assertEquals(requiredPower * Time.delta(), powerGraph.getPowerNeeded(), Mathf.FLOAT_ROUNDING_ERROR);
+            assertEquals(producedPower * Time.delta, powerGraph.getPowerProduced(), Mathf.FLOAT_ROUNDING_ERROR);
+            assertEquals(requiredPower * Time.delta, powerGraph.getPowerNeeded(), Mathf.FLOAT_ROUNDING_ERROR);
 
             // Update and check for the expected power status of the consumer
             powerGraph.update();

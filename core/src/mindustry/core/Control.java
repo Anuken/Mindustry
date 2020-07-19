@@ -416,14 +416,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //just a regular reminder
         if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
-            if(mobile){
-                Runnable[] run = {null};
-                run[0] = () -> {
-                    ui.showInfo("[scarlet]6.0 doesn't work on mobile.[] Don't play it.", run[0]);
-                };
-            }else{
-                ui.showInfo("[scarlet]6.0 is not supposed to be played.[] Go do something else.");
-            }
+            ui.showInfo("[scarlet]6.0 is not supposed to be played.[] Go do something else.");
         }
 
         //play tutorial on stop
@@ -449,7 +442,7 @@ public class Control implements ApplicationListener, Loadable{
                     if(countdown[0] <= 0){
                         exit.run();
                     }
-                    return Core.bundle.format("uiscale.reset", (int)((countdown[0] -= Time.delta()) / 60f));
+                    return Core.bundle.format("uiscale.reset", (int)((countdown[0] -= Time.delta) / 60f));
                 }).pad(10f).expand().center();
 
                 dialog.buttons.defaults().size(200f, 60f);
@@ -486,7 +479,6 @@ public class Control implements ApplicationListener, Loadable{
 
         music.update();
         loops.update();
-        Time.updateGlobal();
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");
@@ -528,6 +520,7 @@ public class Control implements ApplicationListener, Loadable{
             }
 
         }else{
+            //this runs in the menu
             if(!state.isPaused()){
                 Time.update();
             }

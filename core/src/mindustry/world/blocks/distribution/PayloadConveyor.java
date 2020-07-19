@@ -41,7 +41,7 @@ public class PayloadConveyor extends Block{
         super.drawPlace(x, y, rotation, valid);
 
         for(int i = 0; i < 4; i++){
-            Building other = world.ent(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
             if(other != null && other.block().outputsPayload && other.block().size == size){
                 Drawf.selected(other.tileX(), other.tileY(), other.block(), Pal.accent);
             }

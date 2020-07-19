@@ -61,7 +61,7 @@ public class OverflowGate extends Block{
                     return;
                 }
 
-                time += 1f / speed * Time.delta();
+                time += 1f / speed * Time.delta;
                 Building target = getTileTarget(lastItem, lastInput, false);
 
                 if(target != null && (time >= 1f)){

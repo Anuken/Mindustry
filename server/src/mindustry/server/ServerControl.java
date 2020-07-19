@@ -40,7 +40,7 @@ public class ServerControl implements ApplicationListener{
 
     protected static String[] tags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
-        autosaveDate = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss");
+        autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
     private final CommandHandler handler = new CommandHandler("");
     private final Fi logFolder = Core.settings.getDataDirectory().child("logs/");

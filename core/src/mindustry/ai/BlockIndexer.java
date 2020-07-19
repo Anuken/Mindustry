@@ -181,7 +181,7 @@ public class BlockIndexer{
             for(int y = -tileRange + ty; y <= tileRange + ty; y++){
                 if(!Mathf.within(x * tilesize, y * tilesize, wx, wy, range)) continue;
 
-                Building other = world.ent(x, y);
+                Building other = world.build(x, y);
 
                 if(other == null) continue;
 
@@ -247,7 +247,7 @@ public class BlockIndexer{
 
                 for(int tx = rx * quadrantSize; tx < (rx + 1) * quadrantSize && tx < world.width(); tx++){
                     for(int ty = ry * quadrantSize; ty < (ry + 1) * quadrantSize && ty < world.height(); ty++){
-                        Building e = world.ent(tx, ty);
+                        Building e = world.build(tx, ty);
 
                         if(e == null) continue;
 
@@ -388,7 +388,7 @@ public class BlockIndexer{
             outer:
             for(int x = quadrantX * quadrantSize; x < world.width() && x < (quadrantX + 1) * quadrantSize; x++){
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
-                    Building result = world.ent(x, y);
+                    Building result = world.build(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
                     if(result != null && result.team() == team){
                         bits.set(quadrantX, quadrantY);

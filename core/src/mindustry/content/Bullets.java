@@ -416,18 +416,18 @@ public class Bullets implements ContentList{
 
             @Override
             public void update(Bullet b){
-                if(Mathf.chance(0.04 * Time.delta())){
+                if(Mathf.chance(0.04 * Time.delta)){
                     Tile tile = world.tileWorld(b.x, b.y);
                     if(tile != null){
                         Fires.create(tile);
                     }
                 }
 
-                if(Mathf.chance(0.1 * Time.delta())){
+                if(Mathf.chance(0.1 * Time.delta)){
                     Fx.fireballsmoke.at(b.x, b.y);
                 }
 
-                if(Mathf.chance(0.1 * Time.delta())){
+                if(Mathf.chance(0.1 * Time.delta)){
                     Fx.ballfire.at(b.x, b.y);
                 }
             }

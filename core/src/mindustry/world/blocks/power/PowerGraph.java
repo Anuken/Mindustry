@@ -197,7 +197,7 @@ public class PowerGraph{
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
 
-        powerBalance.add((lastPowerProduced - lastPowerNeeded) / Time.delta());
+        powerBalance.add((lastPowerProduced - lastPowerNeeded) / Time.delta);
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
 

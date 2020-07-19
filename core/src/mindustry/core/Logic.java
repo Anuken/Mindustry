@@ -244,7 +244,7 @@ public class Logic implements ApplicationListener{
 
         for(WeatherEntry entry : state.rules.weather){
             //update cooldown
-            entry.cooldown -= Time.delta();
+            entry.cooldown -= Time.delta;
 
             //create new event when not active
             if(entry.cooldown < 0 && !entry.weather.isActive()){
@@ -356,7 +356,7 @@ public class Logic implements ApplicationListener{
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
                     if(!isWaitingWave()){
-                        state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
+                        state.wavetime = Math.max(state.wavetime - Time.delta, 0);
                     }
                 }
 

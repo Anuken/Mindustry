@@ -18,6 +18,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
+import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -32,7 +33,7 @@ public class UnitType extends UnlockableContent{
     public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
     private static final Vec2 legOffset = new Vec2();
 
-    //TODO document
+    /** If true, the unit is always at elevation 1. */
     public boolean flying;
     public @NonNull Prov<? extends Unit> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
@@ -75,6 +76,8 @@ public class UnitType extends UnlockableContent{
     public int parts = 0;
     public int trailLength = 3;
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
+    /** Whether the unit can heal blocks. Initialized in init() */
+    public boolean canHeal = false;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -154,6 +157,8 @@ public class UnitType extends UnlockableContent{
                 range = Math.max(range, weapon.bullet.range());
             }
         }
+
+        canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
 
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();

@@ -60,7 +60,7 @@ public class StackConveyor extends Block implements Autotiler{
                 return (otherblock.hasItems || otherblock.outputsItems() || otherblock.acceptsItems) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
-                    !(world.ent(otherx, othery) instanceof StackConveyorEntity && ((StackConveyorEntity)world.ent(otherx, othery)).state == stateUnload);
+                    !(world.build(otherx, othery) instanceof StackConveyorEntity && ((StackConveyorEntity)world.build(otherx, othery)).state == stateUnload);
             }
         }
         return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor;
@@ -84,7 +84,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean rotatedOutput(int x, int y){
-        Building tile = world.ent(x, y);
+        Building tile = world.build(x, y);
         if(tile instanceof StackConveyorEntity){
             return ((StackConveyorEntity)tile).state != stateUnload;
         }

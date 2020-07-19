@@ -249,7 +249,7 @@ public abstract class Turret extends Block{
 
             Liquid liquid = liquids.current();
 
-            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
+            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
             reload += used * liquid.heatCapacity * coolantMultiplier;
             liquids.remove(liquid, used);
 

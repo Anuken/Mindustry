@@ -13,7 +13,7 @@ abstract class TimedComp implements Entityc, Scaled{
     @MethodPriority(100)
     @Override
     public void update(){
-        time = Math.min(time + Time.delta(), lifetime);
+        time = Math.min(time + Time.delta, lifetime);
 
         if(time >= lifetime){
             remove();

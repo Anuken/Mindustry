@@ -98,7 +98,7 @@ public class MassDriver extends Block{
 
         @Override
         public void updateTile(){
-            Building link = world.ent(this.link);
+            Building link = world.build(this.link);
             boolean hasLink = linkValid();
 
             //reload regardless of state

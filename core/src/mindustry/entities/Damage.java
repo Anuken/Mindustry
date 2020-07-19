@@ -86,7 +86,7 @@ public class Damage{
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
-            Building tile = world.ent(cx, cy);
+            Building tile = world.build(cx, cy);
             if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team() != team && tile.collide(hitter)){
                 tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
@@ -159,7 +159,7 @@ public class Damage{
             tmpBuilding = null;
 
             world.raycastEachWorld(x, y, x + tr.x, y + tr.y, (cx, cy) -> {
-                Building tile = world.ent(cx, cy);
+                Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
                     tmpBuilding = tile;
                     //TODO return tile

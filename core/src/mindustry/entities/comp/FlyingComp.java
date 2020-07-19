@@ -44,8 +44,8 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     }
 
     void wobble(){
-        x += Mathf.sin(Time.time() + id() * 99, 25f, 0.05f) * Time.delta() * elevation;
-        y += Mathf.cos(Time.time() + id() * 99, 25f, 0.05f) * Time.delta() * elevation;
+        x += Mathf.sin(Time.time() + id() * 99, 25f, 0.05f) * Time.delta * elevation;
+        y += Mathf.cos(Time.time() + id() * 99, 25f, 0.05f) * Time.delta * elevation;
     }
 
     void moveAt(Vec2 vector, float acceleration){
@@ -81,7 +81,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         }
 
         if(canDrown() && floor.isLiquid && floor.drownTime > 0){
-            drownTime += Time.delta() * 1f / floor.drownTime;
+            drownTime += Time.delta * 1f / floor.drownTime;
             drownTime = Mathf.clamp(drownTime);
             if(Mathf.chanceDelta(0.05f)){
                 floor.drownUpdateEffect.at(x, y, 1f, floor.mapColor);

@@ -476,7 +476,7 @@ public class NetClient implements ApplicationListener{
         }else if(!connecting){
             net.disconnect();
         }else{ //...must be connecting
-            timeoutTime += Time.delta();
+            timeoutTime += Time.delta;
             if(timeoutTime > dataTimeout){
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
