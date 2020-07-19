@@ -421,7 +421,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //play tutorial on stop
         if(!settings.getBool("playedtutorial", false)){
-            Core.app.post(() -> Core.app.post(this::playTutorial));
+            //Core.app.post(() -> Core.app.post(this::playTutorial));
         }
 
         //display UI scale changed dialog
