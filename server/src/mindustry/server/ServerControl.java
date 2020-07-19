@@ -39,7 +39,8 @@ public class ServerControl implements ApplicationListener{
     private static final int maxLogLength = 1024 * 512;
 
     protected static String[] tags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
-    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
+        autosaveDate = DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss");
 
     private final CommandHandler handler = new CommandHandler("");
     private final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
@@ -167,7 +168,7 @@ public class ServerControl implements ApplicationListener{
 
                     //use map file name to make sure it can be saved
                     String mapName = (state.map.file == null ? "unknown" : state.map.file.nameWithoutExtension()).replace(" ", "_");
-                    String date = dateTime.format(LocalDateTime.now()).replace(" ", "_");
+                    String date = autosaveDate.format(LocalDateTime.now());
 
                     Seq<Fi> autosaves = saveDirectory.findAll(f -> f.name().startsWith("auto_"));
                     autosaves.sort(f -> -f.lastModified());
