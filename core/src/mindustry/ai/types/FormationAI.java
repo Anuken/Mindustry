@@ -35,8 +35,10 @@ public class FormationAI extends AIController implements FormationMember{
         if(leader.isShooting){
             unit.aimLook(leader.aimX(), leader.aimY());
         }else{
-            if(!unit.moving()){
-                unit.lookAt(unit.vel.angle());
+            if(!leader.moving() || !unit.type().rotateShooting){
+                if(unit.moving()){
+                    unit.lookAt(unit.vel.angle());
+                }
             }else{
                 unit.lookAt(leader.rotation);
             }

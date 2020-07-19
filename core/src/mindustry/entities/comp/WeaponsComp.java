@@ -26,7 +26,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @ReadOnly transient float range, aimX, aimY;
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
-    int ammo;
+    float ammo;
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){

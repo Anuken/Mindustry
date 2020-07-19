@@ -42,6 +42,11 @@ public class LiquidTurret extends Turret{
             }
 
             @Override
+            public void update(Building entity){
+
+            }
+
+            @Override
             public void display(BlockStats stats){
 
             }

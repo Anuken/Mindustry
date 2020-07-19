@@ -266,10 +266,10 @@ public class TypeIO{
         //no real unit controller state is written, only the type
         if(control instanceof Player){
             write.b(0);
-            write.i(((Player)control).id());
+            write.i(((Player)control).id);
         }else if(control instanceof FormationAI){
             write.b(1);
-            write.i(((FormationAI)control).leader.id());
+            write.i(((FormationAI)control).leader.id);
         }else{
             write.b(2);
         }
