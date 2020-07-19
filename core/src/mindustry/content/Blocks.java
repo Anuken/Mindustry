@@ -52,7 +52,7 @@ public class Blocks implements ContentList{
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
-    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, largeOverdriveProjector, forceProjector, shockMine,
+    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriver, overdriveProjector, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
@@ -848,15 +848,14 @@ public class Blocks implements ContentList{
             consumes.item(Items.phasefabric).boost();
         }};
 
-        overdriveProjector = new OverdriveProjector("overdrive-projector"){{
+        overdriver = new OverdriveProjector("overdriver"){{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
             consumes.power(3.50f);
             size = 2;
             consumes.item(Items.phasefabric).boost();
         }};
 
-        //TODO better name
-        largeOverdriveProjector = new OverdriveProjector("large-overdrive-projector"){{
+        overdriveProjector = new OverdriveProjector("overdrive-projector"){{
             requirements(Category.effect, with(Items.lead, 200, Items.titanium, 130, Items.silicon, 130, Items.plastanium, 80, Items.surgealloy, 120));
             consumes.power(10f);
             size = 3;

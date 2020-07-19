@@ -74,14 +74,14 @@ force-projector-top
   orig: 96, 96
   offset: 0, 0
   index: -1
-large-overdrive-projector
+overdrive-projector
   rotate: false
   xy: 2137, 648
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
-large-overdrive-projector-top
+overdrive-projector-top
   rotate: false
   xy: 2235, 783
   size: 96, 96
@@ -116,14 +116,14 @@ mender-top
   orig: 32, 32
   offset: 0, 0
   index: -1
-overdrive-projector
+overdriver
   rotate: false
   xy: 3889, 537
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-overdrive-projector-top
+overdriver-top
   rotate: false
   xy: 3691, 517
   size: 64, 64
@@ -9430,7 +9430,7 @@ lancer-icon-editor
   orig: 64, 64
   offset: 0, 0
   index: -1
-large-overdrive-projector-icon-editor
+overdrive-projector-icon-editor
   rotate: false
   xy: 3443, 389
   size: 96, 96
@@ -9584,7 +9584,7 @@ oil-extractor-icon-editor
   orig: 96, 96
   offset: 0, 0
   index: -1
-overdrive-projector-icon-editor
+overdriver-icon-editor
   rotate: false
   xy: 2573, 323
   size: 64, 64
@@ -12777,35 +12777,35 @@ block-lancer-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-large-overdrive-projector-large
+block-overdrive-projector-large
   rotate: false
   xy: 2609, 368
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-large-overdrive-projector-medium
+block-overdrive-projector-medium
   rotate: false
   xy: 1958, 166
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-large-overdrive-projector-small
+block-overdrive-projector-small
   rotate: false
   xy: 3365, 230
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-large-overdrive-projector-tiny
+block-overdrive-projector-tiny
   rotate: false
   xy: 2027, 148
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-large-overdrive-projector-xlarge
+block-overdrive-projector-xlarge
   rotate: false
   xy: 345, 351
   size: 48, 48
@@ -14002,35 +14002,35 @@ block-ore-titanium-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-overdrive-projector-large
+block-overdriver-large
   rotate: false
   xy: 1195, 326
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-overdrive-projector-medium
+block-overdriver-medium
   rotate: false
   xy: 2815, 266
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-overdrive-projector-small
+block-overdriver-small
   rotate: false
   xy: 941, 88
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-overdrive-projector-tiny
+block-overdriver-tiny
   rotate: false
   xy: 2196, 188
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-overdrive-projector-xlarge
+block-overdriver-xlarge
   rotate: false
   xy: 609, 201
   size: 48, 48
