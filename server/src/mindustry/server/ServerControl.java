@@ -168,6 +168,7 @@ public class ServerControl implements ApplicationListener{
                     //use map file name to make sure it can be saved
                     String mapName = (state.map.file == null ? "unknown" : state.map.file.nameWithoutExtension()).replace(" ", "_");
                     String date = dateTime.format(LocalDateTime.now()).replace(" ", "_");
+                    String date = date.replace(":", "-");
 
                     Seq<Fi> autosaves = saveDirectory.findAll(f -> f.name().startsWith("auto_"));
                     autosaves.sort(f -> -f.lastModified());
