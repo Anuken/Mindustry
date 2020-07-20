@@ -139,7 +139,7 @@ public class Administration{
 
     /** @return whether this action is allowed by the action filters. */
     public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
-        //some actions are done by the server (null player) and thus are always alloed
+        //some actions are done by the server (null player) and thus are always allowed
         if(player == null) return true;
 
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
