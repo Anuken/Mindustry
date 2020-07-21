@@ -72,6 +72,14 @@ public class LiquidTurret extends Turret{
             return target != null && hasAmmo();
         }
 
+        protected void findTargetWithoutStatus(){
+            if(targetAir && !targetGround){
+                target = Units.closestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() &&!e.hasEffect(liquids.current().effect));
+            }else{
+                target = Units.closestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) &&!e.hasEffect(liquids.current().effect));
+            }
+        }
+
         @Override
         protected void findTarget(){
             if(liquids.current().canExtinguish()){
@@ -85,8 +93,10 @@ public class LiquidTurret extends Turret{
                     }
                 }
             }
-
-            super.findTarget();
+            findTargetWithoutStatus();
+            if(target == null) {
+                super.findTarget();
+            }
         }
 
         @Override

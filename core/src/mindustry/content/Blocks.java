@@ -1411,7 +1411,6 @@ public class Blocks implements ContentList{
             Liquids.cryofluid, Bullets.cryoShot,
             Liquids.oil, Bullets.oilShot
             );
-            targetAir = false;
             size = 2;
             recoilAmount = 0f;
             reloadTime = 2f;
