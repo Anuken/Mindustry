@@ -39,7 +39,7 @@ public class LiquidModule extends BlockModule{
 
     /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
     public float getFlowRate(){
-        return currentFlowRate;
+        return currentFlowRate * 60;
     }
 
     public float smoothAmount(){

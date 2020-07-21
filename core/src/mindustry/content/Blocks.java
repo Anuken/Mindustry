@@ -1004,17 +1004,17 @@ public class Blocks implements ContentList{
 
         rotaryPump = new Pump("rotary-pump"){{
             requirements(Category.liquid, with(Items.copper, 70, Items.metaglass, 50, Items.silicon, 20, Items.titanium, 35));
-            pumpAmount = 0.8f;
-            consumes.power(0.15f);
+            pumpAmount = 0.2f;
+            consumes.power(0.3f);
             liquidCapacity = 30f;
             hasPower = true;
             size = 2;
         }};
 
         thermalPump = new Pump("thermal-pump"){{
-            requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 70, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
-            pumpAmount = 1.5f;
-            consumes.power(0.30f);
+            requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 90, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
+            pumpAmount = 0.22f;
+            consumes.power(1f);
             liquidCapacity = 40f;
             hasPower = true;
             size = 3;
@@ -1227,6 +1227,9 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineHuge;
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
+
+            //more than the laser drill
+            liquidBoostIntensity = 1.8f;
 
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.1f).boost();

@@ -25,17 +25,16 @@ public class TeamIndexProcess implements AsyncProcess{
     }
 
     public int countType(Team team, UnitType type){
-        return typeCounts[team.id].length < type.id ? 0 : typeCounts[team.id][type.id];
+        return typeCounts[team.id].length <= type.id ? 0 : typeCounts[team.id][type.id];
     }
 
     public void updateCount(Team team, UnitType type, int amount){
-        int tid = type.id;
 
         counts[team.id] += amount;
-        if(typeCounts[team.id].length < tid){
+        if(typeCounts[team.id].length <= type.id){
             typeCounts[team.id] = new int[Vars.content.units().size];
         }
-        typeCounts[team.id][tid] += amount;
+        typeCounts[team.id][type.id] += amount;
     }
 
     @Override

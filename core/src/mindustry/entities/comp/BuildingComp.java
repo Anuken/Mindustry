@@ -977,7 +977,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                         l.left();
                         l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
                         l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
-                    });
+                    }).left();
                 }
             }
 
