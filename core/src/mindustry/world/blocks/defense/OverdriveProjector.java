@@ -102,6 +102,15 @@ public class OverdriveProjector extends Block{
             indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
 
             Drawf.dashCircle(x, y, realRange, baseColor);
+            if(!cons().optionalValid()) {
+                indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+
+                Drawf.dashCircle(x, y, realRange, baseColor);
+            } else {
+                indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(phaseColor).a(Mathf.absin(4f, 1f))));
+
+                Drawf.dashCircle(x, y, realRange, phaseColor);
+            }
         }
 
         @Override
