@@ -88,7 +88,7 @@ public class ItemModule extends BlockModule{
     public float getFlowRate(Item item){
         if(flow == null) return -1f;
 
-        return displayFlow[item.id] * 60;
+        return displayFlow[item.id] * 60 / Time.delta;
     }
 
     public boolean hasFlowItem(Item item){
