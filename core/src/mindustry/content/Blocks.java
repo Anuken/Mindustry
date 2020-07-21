@@ -1284,6 +1284,8 @@ public class Blocks implements ContentList{
             health = 1100;
             itemCapacity = 4000;
             size = 3;
+
+            unitCapModifier = 8;
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
@@ -1293,6 +1295,8 @@ public class Blocks implements ContentList{
             health = 2000;
             itemCapacity = 9000;
             size = 4;
+
+            unitCapModifier = 16;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -1302,6 +1306,8 @@ public class Blocks implements ContentList{
             health = 4000;
             itemCapacity = 13000;
             size = 5;
+
+            unitCapModifier = 24;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1411,7 +1417,6 @@ public class Blocks implements ContentList{
             Liquids.cryofluid, Bullets.cryoShot,
             Liquids.oil, Bullets.oilShot
             );
-            targetAir = false;
             size = 2;
             recoilAmount = 0f;
             reloadTime = 2f;

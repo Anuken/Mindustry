@@ -6,6 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -29,8 +30,8 @@ public class Units{
     }
 
     /** @return whether a new instance of a unit of this team can be created. */
-    public static boolean canCreate(Team team){
-        return teamIndex.count(team) < getCap(team);
+    public static boolean canCreate(Team team, UnitType type){
+        return teamIndex.countType(team, type) < getCap(team);
     }
 
     public static int getCap(Team team){

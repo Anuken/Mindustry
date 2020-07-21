@@ -147,12 +147,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void add(){
-        teamIndex.updateCount(team, 1);
+        teamIndex.updateCount(team, type, 1);
     }
 
     @Override
     public void remove(){
-        teamIndex.updateCount(team, -1);
+        teamIndex.updateCount(team, type, -1);
         controller.removed(base());
     }
 

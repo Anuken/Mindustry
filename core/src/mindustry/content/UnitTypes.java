@@ -349,7 +349,7 @@ public class UnitTypes implements ContentList{
                     despawnEffect = Fx.none;
                     width = 0.54f;
                     lifetime = 35f;
-                    knockback = -1f;
+                    knockback = -1.2f;
                 }};
             }});
 
@@ -368,7 +368,7 @@ public class UnitTypes implements ContentList{
                     despawnEffect = Fx.none;
                     width = 0.4f;
                     lifetime = 25f;
-                    knockback = -0.5f;
+                    knockback = -0.6f;
                 }};
             }});
         }};

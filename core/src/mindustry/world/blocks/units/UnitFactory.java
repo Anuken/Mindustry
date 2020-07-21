@@ -1,5 +1,6 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -7,6 +8,7 @@ import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.*;
@@ -19,6 +21,8 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+
+import static mindustry.Vars.*;
 
 public class UnitFactory extends UnitBlock{
     public int[] capacities;
@@ -61,7 +65,19 @@ public class UnitFactory extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", (UnitFactoryEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        bars.add("progress", (UnitFactoryEntity e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
+
+        bars.add("units", (UnitFactoryEntity e) ->
+        new Bar(
+            () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
+                Core.bundle.format("bar.unitcap",
+                    Fonts.getUnicodeStr(e.unit().name),
+                    teamIndex.countType(e.team, e.unit()),
+                    Units.getCap(e.team)
+                ),
+            () -> Pal.power,
+            () -> e.unit() == null ? 0f : (float)teamIndex.countType(e.team, e.unit()) / Units.getCap(e.team)
+        ));
     }
 
     @Override
@@ -129,13 +145,14 @@ public class UnitFactory extends UnitBlock{
 
             table.row();
             table.table(t -> {
+                t.left();
                 t.image().update(i -> {
                     i.setDrawable(currentPlan == -1 ? Icon.cancel : reg.set(plans[currentPlan].unit.icon(Cicon.medium)));
                     i.setScaling(Scaling.fit);
                     i.setColor(currentPlan == -1 ? Color.lightGray : Color.white);
                 }).size(32).padBottom(-4).padRight(2);
                 t.label(() -> currentPlan == -1 ? "$none" : plans[currentPlan].unit.localizedName).color(Color.lightGray);
-            });
+            }).left();
         }
 
         @Override
@@ -182,7 +199,7 @@ public class UnitFactory extends UnitBlock{
             if(currentPlan != -1 && payload == null){
                 UnitPlan plan = plans[currentPlan];
 
-                if(progress >= plan.time && Units.canCreate(team)){
+                if(progress >= plan.time && consValid()){
                     progress = 0f;
 
                     payload = new UnitPayload(plan.unit.create(team));
@@ -197,6 +214,15 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public boolean shouldConsume(){
+            //do not consume when cap reached
+            if(currentPlan != -1 && !Units.canCreate(team, plans[currentPlan].unit)){
+                return false;
+            }
+            return super.shouldConsume();
+        }
+
+        @Override
         public int getMaximumAccepted(Item item){
             return capacities[item.id];
         }
@@ -205,6 +231,10 @@ public class UnitFactory extends UnitBlock{
         public boolean acceptItem(Building source, Item item){
             return currentPlan != -1 && items.get(item) < getMaximumAccepted(item) &&
                 Structs.contains(plans[currentPlan].requirements, stack -> stack.item == item);
+        }
+
+        public @Nullable UnitType unit(){
+            return currentPlan == - 1 ? null : plans[currentPlan].unit;
         }
 
         @Override

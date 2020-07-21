@@ -28,6 +28,7 @@ import java.util.*;
 
 public class Fonts{
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
+    private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
 
     public static BitmapFont def;
     public static BitmapFont outline;
@@ -37,6 +38,10 @@ public class Fonts{
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
+    }
+
+    public static String getUnicodeStr(String content){
+        return stringIcons.get(content, "");
     }
 
     /** Called from a static context to make the cursor appear immediately upon startup.*/
@@ -86,6 +91,7 @@ public class Fonts{
                 }
 
                 unicodeIcons.put(nametex[0], ch);
+                stringIcons.put(nametex[0], ((char)ch) + "");
 
                 Glyph glyph = new Glyph();
                 glyph.id = ch;
