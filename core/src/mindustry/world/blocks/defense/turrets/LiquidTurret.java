@@ -74,9 +74,9 @@ public class LiquidTurret extends Turret{
 
         protected void findTargetWithoutStatus(){
             if(targetAir && !targetGround){
-                target = Units.closestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() &&!e.hasEffect(liquids.current().effect));
+                target = Units.closestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && !e.hasEffect(liquids.current().effect));
             }else{
-                target = Units.closestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) &&!e.hasEffect(liquids.current().effect));
+                target = Units.closestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && !e.hasEffect(liquids.current().effect));
             }
         }
 
