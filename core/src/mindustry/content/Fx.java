@@ -38,6 +38,14 @@ public class Fx{
 
     }),
 
+    unitCapKill = new Effect(80f, e -> {
+        color(Color.scarlet);
+        alpha(e.fout(Interp.pow4Out));
+
+        float size = 10f + e.fout(Interp.pow10In) * 25f;
+        Draw.rect(Icon.warning.getRegion(), e.x, e.y, size, size);
+    }),
+
     unitControl = new Effect(30f, e -> {
         if(!(e.data instanceof Unit)) return;
 

@@ -148,6 +148,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void add(){
         teamIndex.updateCount(team, type, 1);
+
+        //check if over unit cap
+        if(teamIndex.countType(team, type) > Units.getCap(team)
+        && !(team == state.rules.waveTeam && state.rules.waves) //can't be wave team on wave mode
+        && !(state.isCampaign() && team == state.rules.waveTeam)){ //can't be campaign wave team
+            Fx.unitCapKill.at(this);
+            kill();
+        }
     }
 
     @Override
@@ -167,6 +175,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void update(){
+
         type.update(base());
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
