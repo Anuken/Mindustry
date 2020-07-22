@@ -29,7 +29,7 @@ public class LiquidModule extends BlockModule{
             flow.add(lastAdded);
             lastAdded = 0;
             if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
-                currentFlowRate = flow.hasEnoughData() ? flow.mean() : -1f;
+                currentFlowRate = flow.hasEnoughData() ? flow.mean() / Time.delta : -1f;
             }
         }else{
             currentFlowRate = -1f;
@@ -39,7 +39,7 @@ public class LiquidModule extends BlockModule{
 
     /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
     public float getFlowRate(){
-        return currentFlowRate * 60 / Time.delta;
+        return currentFlowRate * 60;
     }
 
     public float smoothAmount(){

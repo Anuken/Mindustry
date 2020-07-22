@@ -569,6 +569,8 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             mineSpeed = 2.5f;
 
+            //no weapon, mining only
+            /*
             weapons.add(new Weapon(){{
                 y = 1.5f;
                 x = 0f;
@@ -582,7 +584,7 @@ public class UnitTypes implements ContentList{
                 bullet = new HealBulletType(5.2f, 10){{
                     healPercent = 4f;
                 }};
-            }});
+            }});*/
         }};
 
         poly = new UnitType("poly"){{
