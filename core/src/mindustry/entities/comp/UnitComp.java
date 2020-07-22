@@ -32,7 +32,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     private UnitController controller;
     private UnitType type;
-    boolean spawnedByCore;
+    boolean spawnedByCore, deactivated;
 
     transient float timer1, timer2;
 
@@ -118,6 +118,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return controller instanceof AIController;
     }
 
+    public int count(){
+        return teamIndex.countType(team, type);
+    }
+
+    public int cap(){
+        return Units.getCap(team);
+    }
+
     private void setStats(UnitType type){
         this.type = type;
         this.maxHealth = type.health;
@@ -150,11 +158,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         teamIndex.updateCount(team, type, 1);
 
         //check if over unit cap
-        if(teamIndex.countType(team, type) > Units.getCap(team)
-        && !(team == state.rules.waveTeam && state.rules.waves) //can't be wave team on wave mode
-        && !(state.isCampaign() && team == state.rules.waveTeam)){ //can't be campaign wave team
-            Fx.unitCapKill.at(this);
-            kill();
+        if(count() > cap() && !spawnedByCore){
+            deactivated = true;
+        }else{
+            teamIndex.updateActiveCount(team, type, 1);
         }
     }
 
@@ -175,8 +182,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void update(){
+        //activate the unit when possible
+        if(!net.client() && deactivated && teamIndex.countActive(team, type) < Units.getCap(team)){
+            teamIndex.updateActiveCount(team, type, 1);
+            deactivated = false;
+        }
 
-        type.update(base());
+        if(!deactivated) type.update(base());
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
 
@@ -236,8 +248,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //AI only updates on the server
-        if(!net.client() && !dead){
+        if(!net.client() && !dead && !deactivated){
             controller.updateUnit();
+        }
+
+        //do not control anything when deactivated
+        if(deactivated){
+            controlWeapons(false, false);
         }
 
         //remove units spawned by the core

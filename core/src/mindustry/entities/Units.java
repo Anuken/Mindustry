@@ -35,6 +35,10 @@ public class Units{
     }
 
     public static int getCap(Team team){
+        //wave team has no cap
+        if((team == state.rules.waveTeam && state.rules.waves) || (state.isCampaign() && team == state.rules.waveTeam)){
+            return Integer.MAX_VALUE;
+        }
         return state.rules.unitCap + indexer.getExtraUnits(team);
     }
 

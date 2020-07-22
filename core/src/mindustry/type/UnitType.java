@@ -112,7 +112,7 @@ public class UnitType extends UnlockableContent{
 
     public void update(Unit unit){
         if(abilities.size > 0){
-            for(mindustry.entities.abilities.Ability a : abilities){
+            for(Ability a : abilities){
                 a.update(unit);
             }
         }
@@ -135,10 +135,20 @@ public class UnitType extends UnlockableContent{
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)unit.ammo / ammoCapacity));
+                bars.add(new Bar("blocks.ammo", Pal.ammo, () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
         }).growX();
+        
+        table.row();
+        if(unit.deactivated){
+            table.table(d -> {
+                d.left();
+
+                d.label(() -> Core.bundle.format("bar.limitreached", unit.count(), unit.cap(), Fonts.getUnicodeStr(name)));
+            }).left().visible(() -> unit.deactivated);
+        }
+        
     }
 
     @Override
@@ -271,12 +281,26 @@ public class UnitType extends UnlockableContent{
             unit.trns(-legOffset.x, -legOffset.y);
         }
 
+        if(unit.deactivated){
+            drawDeactive(unit);
+        }
+
         if(abilities.size > 0){
             for(Ability a : abilities){
                 a.draw(unit);
                 Draw.reset();
             }
         }
+    }
+
+    public void drawDeactive(Unit unit){
+        Draw.color(Color.scarlet);
+        Draw.alpha(0.8f);
+
+        float size = 8f;
+        Draw.rect(Icon.warning.getRegion(), unit.x, unit.y, size, size);
+
+        Draw.reset();
     }
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
