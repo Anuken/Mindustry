@@ -1774,6 +1774,7 @@ public class Blocks implements ContentList{
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
 
+            liquidCapacity: 15;
             size = 9;
             consumes.power(25f);
             consumes.items(with(Items.silicon, 300, Items.plastanium, 300, Items.surgealloy, 300, Items.phasefabric, 250));
