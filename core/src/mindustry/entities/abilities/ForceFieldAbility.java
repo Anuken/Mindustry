@@ -50,7 +50,7 @@ public class ForceFieldAbility implements Ability{
     @Override
     public void update(Unit unit){
         if(unit.shield < max){
-            unit.shield += Time.delta() * regen;
+            unit.shield += Time.delta * regen;
         }
 
         if(unit.shield > 0){

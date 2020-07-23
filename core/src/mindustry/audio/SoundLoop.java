@@ -27,9 +27,9 @@ public class SoundLoop{
         }else{
             //fade the sound in or out
             if(play){
-                volume = Mathf.clamp(volume + fadeSpeed * Time.delta());
+                volume = Mathf.clamp(volume + fadeSpeed * Time.delta);
             }else{
-                volume = Mathf.clamp(volume - fadeSpeed * Time.delta());
+                volume = Mathf.clamp(volume - fadeSpeed * Time.delta);
                 if(volume <= 0.001f){
                     sound.stop(id);
                     id = -1;

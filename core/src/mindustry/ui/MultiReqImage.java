@@ -17,7 +17,7 @@ public class MultiReqImage extends Stack{
     public void act(float delta){
         super.act(delta);
 
-        time += Time.delta() / 60f;
+        time += Time.delta / 60f;
 
         displays.each(req -> req.visible(false));
 

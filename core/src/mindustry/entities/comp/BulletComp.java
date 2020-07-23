@@ -111,7 +111,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         if(type.collidesTiles && type.collides && type.collidesGround){
             world.raycastEach(world.toTile(lastX()), world.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
-                Building tile = world.ent(x, y);
+                Building tile = world.build(x, y);
                 if(tile == null) return false;
 
                 if(tile.collide(base()) && type.collides(base(), tile) && !tile.dead() && (type.collidesTeam || tile.team != team)){

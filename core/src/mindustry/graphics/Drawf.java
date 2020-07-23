@@ -68,8 +68,8 @@ public class Drawf{
             Point2 p = Geometry.d8edge[i];
             float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
             Draw.rect("block-select",
-            x*tilesize + block.offset() + offset * p.x,
-            y*tilesize + block.offset() + offset * p.y, i * 90);
+            x*tilesize + block.offset + offset * p.x,
+            y*tilesize + block.offset + offset * p.y, i * 90);
         }
         Draw.reset();
     }

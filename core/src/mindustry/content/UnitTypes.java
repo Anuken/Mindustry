@@ -349,7 +349,7 @@ public class UnitTypes implements ContentList{
                     despawnEffect = Fx.none;
                     width = 0.54f;
                     lifetime = 35f;
-                    knockback = -1f;
+                    knockback = -1.2f;
                 }};
             }});
 
@@ -368,7 +368,7 @@ public class UnitTypes implements ContentList{
                     despawnEffect = Fx.none;
                     width = 0.4f;
                     lifetime = 25f;
-                    knockback = -0.5f;
+                    knockback = -0.6f;
                 }};
             }});
         }};
@@ -569,6 +569,8 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             mineSpeed = 2.5f;
 
+            //no weapon, mining only
+            /*
             weapons.add(new Weapon(){{
                 y = 1.5f;
                 x = 0f;
@@ -582,7 +584,7 @@ public class UnitTypes implements ContentList{
                 bullet = new HealBulletType(5.2f, 10){{
                     healPercent = 4f;
                 }};
-            }});
+            }});*/
         }};
 
         poly = new UnitType("poly"){{
@@ -677,6 +679,8 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 3.3f;
             immunities = ObjectSet.with(StatusEffects.wet);
             trailLength = 20;
+
+            armor = 2f;
 
             weapons.add(new Weapon("mount-weapon"){{
                 reload = 12f;
@@ -796,7 +800,7 @@ public class UnitTypes implements ContentList{
                     hitEffect = Fx.massiveExplosion;
                     knockback = 1.5f;
                     lifetime = 140f;
-                    height = 17f;
+                    height = 15.5f;
                     width = 15f;
                     collidesTiles = false;
                     ammoMultiplier = 4f;

@@ -26,7 +26,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @ReadOnly transient float range, aimX, aimY;
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
-    int ammo;
+    float ammo;
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
@@ -45,6 +45,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             mounts[i] = new WeaponMount(def.weapons.get(i));
             range = Math.max(range, def.weapons.get(i).bullet.range());
         }
+    }
+
+    void controlWeapons(boolean rotateShoot){
+        controlWeapons(rotateShoot, rotateShoot);
     }
 
     void controlWeapons(boolean rotate, boolean shoot){
@@ -82,11 +86,11 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     public void update(){
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
-            mount.reload = Math.max(mount.reload - Time.delta() * reloadMultiplier, 0);
+            mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
 
             //flip weapon shoot side for alternating weapons at half reload
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&
-                mount.reload + Time.delta() > weapon.reload/2f && mount.reload <= weapon.reload/2f){
+                mount.reload + Time.delta > weapon.reload/2f && mount.reload <= weapon.reload/2f){
                 mounts[weapon.otherSide].side = !mounts[weapon.otherSide].side;
                 mount.side = !mount.side;
             }
@@ -97,7 +101,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
                     axisY = this.y + Angles.trnsy(rotation - 90,  weapon.x, weapon.y);
 
                 mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation;
-                mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta());
+                mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
             }else{
                 mount.rotation = 0;
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);

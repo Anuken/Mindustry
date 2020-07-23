@@ -117,7 +117,7 @@ abstract class StatusComp implements Posc, Flyingc{
         while(index < statuses.size){
             StatusEntry entry = statuses.get(index++);
 
-            entry.time = Math.max(entry.time - Time.delta(), 0);
+            entry.time = Math.max(entry.time - Time.delta, 0);
             applied.set(entry.effect.id);
 
             if(entry.time <= 0 && !entry.effect.permanent){

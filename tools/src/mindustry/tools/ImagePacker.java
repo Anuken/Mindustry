@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
@@ -121,7 +122,7 @@ public class ImagePacker{
         ObjectMap<String, String> content2id = new ObjectMap<>();
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
-        Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids());
+        Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids(), Vars.content.units());
         cont.removeAll(u -> u instanceof BuildBlock || u == Blocks.air);
 
         int minid = 0xF8FF;
@@ -146,6 +147,7 @@ public class ImagePacker{
 
     static String texname(UnlockableContent c){
         if(c instanceof Block) return "block-" + c.name + "-medium";
+        if(c instanceof UnitType) return "unit-" + c.name + "-medium";
         return c.getContentType() + "-" + c.name + "-icon";
     }
 

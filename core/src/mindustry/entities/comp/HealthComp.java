@@ -24,7 +24,7 @@ abstract class HealthComp implements Entityc{
 
     @Override
     public void update(){
-        hitTime -= Time.delta() / hitDuration;
+        hitTime -= Time.delta / hitDuration;
     }
 
     void killed(){
@@ -82,11 +82,11 @@ abstract class HealthComp implements Entityc{
     }
 
     void damageContinuous(float amount){
-        damage(amount * Time.delta(), hitTime <= -10 + hitDuration);
+        damage(amount * Time.delta, hitTime <= -10 + hitDuration);
     }
 
     void damageContinuousPierce(float amount){
-        damagePierce(amount * Time.delta(), hitTime <= -20 + hitDuration);
+        damagePierce(amount * Time.delta, hitTime <= -20 + hitDuration);
     }
 
     void clampHealth(){

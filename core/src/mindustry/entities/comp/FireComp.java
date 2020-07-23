@@ -26,19 +26,19 @@ abstract class FireComp implements Timedc, Posc, Firec{
 
     @Override
     public void update(){
-        if(Mathf.chance(0.1 * Time.delta())){
+        if(Mathf.chance(0.1 * Time.delta)){
             Fx.fire.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
-        if(Mathf.chance(0.05 * Time.delta())){
+        if(Mathf.chance(0.05 * Time.delta)){
             Fx.fireSmoke.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
-        if(Mathf.chance(0.001 * Time.delta())){
+        if(Mathf.chance(0.001 * Time.delta)){
             Sounds.fire.at(this);
         }
 
-        time = Mathf.clamp(time + Time.delta(), 0, lifetime());
+        time = Mathf.clamp(time + Time.delta, 0, lifetime());
 
         if(Vars.net.client()){
             return;
@@ -55,7 +55,7 @@ abstract class FireComp implements Timedc, Posc, Firec{
         float flammability = baseFlammability + puddleFlammability;
 
         if(!damage && flammability <= 0){
-            time += Time.delta() * 8;
+            time += Time.delta * 8;
         }
 
         if(baseFlammability < 0 || block != tile.block()){
@@ -64,20 +64,20 @@ abstract class FireComp implements Timedc, Posc, Firec{
         }
 
         if(damage){
-            lifetime += Mathf.clamp(flammability / 8f, 0f, 0.6f) * Time.delta();
+            lifetime += Mathf.clamp(flammability / 8f, 0f, 0.6f) * Time.delta;
         }
 
-        if(flammability > 1f && Mathf.chance(spreadChance * Time.delta() * Mathf.clamp(flammability / 5f, 0.3f, 2f))){
+        if(flammability > 1f && Mathf.chance(spreadChance * Time.delta * Mathf.clamp(flammability / 5f, 0.3f, 2f))){
             Point2 p = Geometry.d4[Mathf.random(3)];
             Tile other = world.tile(tile.x + p.x, tile.y + p.y);
             Fires.create(other);
 
-            if(Mathf.chance(fireballChance * Time.delta() * Mathf.clamp(flammability / 10f))){
+            if(Mathf.chance(fireballChance * Time.delta * Mathf.clamp(flammability / 10f))){
                 Bullets.fireball.createNet(Team.derelict, x, y, Mathf.random(360f), -1f, 1, 1);
             }
         }
 
-        if(Mathf.chance(0.1 * Time.delta())){
+        if(Mathf.chance(0.1 * Time.delta)){
             Puddlec p = Puddles.get(tile);
             puddleFlammability = p != null ? p.getFlammability() / 3f : 0;
 

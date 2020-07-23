@@ -32,7 +32,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     private UnitController controller;
     private UnitType type;
-    boolean spawnedByCore;
+    boolean spawnedByCore, deactivated;
 
     transient float timer1, timer2;
 
@@ -103,7 +103,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void lookAt(float angle){
-        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta());
+        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta);
     }
 
     public void lookAt(Position pos){
@@ -116,6 +116,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public boolean isAI(){
         return controller instanceof AIController;
+    }
+
+    public int count(){
+        return teamIndex.countType(team, type);
+    }
+
+    public int cap(){
+        return Units.getCap(team);
     }
 
     private void setStats(UnitType type){
@@ -147,12 +155,19 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void add(){
-        teamIndex.updateCount(team, 1);
+        teamIndex.updateCount(team, type, 1);
+
+        //check if over unit cap
+        if(count() > cap() && !spawnedByCore){
+            deactivated = true;
+        }else{
+            teamIndex.updateActiveCount(team, type, 1);
+        }
     }
 
     @Override
     public void remove(){
-        teamIndex.updateCount(team, -1);
+        teamIndex.updateCount(team, type, -1);
         controller.removed(base());
     }
 
@@ -167,7 +182,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void update(){
-        type.update(base());
+        //activate the unit when possible
+        if(!net.client() && deactivated && teamIndex.countActive(team, type) < Units.getCap(team)){
+            teamIndex.updateActiveCount(team, type, 1);
+            deactivated = false;
+        }
+
+        if(!deactivated) type.update(base());
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
 
@@ -176,7 +197,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             float relativeSize = state.rules.dropZoneRadius + bounds()/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
-                    vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta()));
+                    vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
                 }
             }
         }
@@ -204,7 +225,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             }
 
             //move down
-            elevation -= type.fallSpeed * Time.delta();
+            elevation -= type.fallSpeed * Time.delta;
 
             if(isGrounded()){
                 destroy();
@@ -227,8 +248,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //AI only updates on the server
-        if(!net.client() && !dead){
+        if(!net.client() && !dead && !deactivated){
             controller.updateUnit();
+        }
+
+        //do not control anything when deactivated
+        if(deactivated){
+            controlWeapons(false, false);
         }
 
         //remove units spawned by the core

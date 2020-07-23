@@ -83,7 +83,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         final float baseEfficiency = liquid.flammability;
         final float expectedEfficiency = Math.min(1.0f, availableLiquidAmount / maximumLiquidUsage) * baseEfficiency;
         final float expectedConsumptionPerTick = Math.min(maximumLiquidUsage, availableLiquidAmount);
-        final float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick * Time.delta());
+        final float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick * Time.delta);
 
         createGenerator(inputType);
         assertTrue(entity.acceptLiquid(null, liquid, availableLiquidAmount), inputType + " | " + parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
@@ -170,7 +170,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         float expectedEfficiency = entity.productionEfficiency;
 
         float currentDuration = 0.0f;
-        while((currentDuration += Time.delta()) <= fakeItemDuration){
+        while((currentDuration += Time.delta) <= fakeItemDuration){
             entity.updateTile();
             assertEquals(expectedEfficiency, entity.productionEfficiency, "Duration: " + currentDuration);
         }

@@ -400,7 +400,7 @@ public class Mods implements Loadable{
                                 d.button("$details", Icon.downOpen, Styles.transt, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
-                                        cont.pane(e -> e.add(c.minfo.error)).grow();
+                                        cont.pane(e -> e.add(c.minfo.error).wrap().grow()).grow();
                                         cont.row();
                                         cont.button("$ok", Icon.left, this::hide).size(240f, 60f);
                                     }}.show();

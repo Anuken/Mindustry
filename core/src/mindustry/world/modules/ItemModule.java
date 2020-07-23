@@ -72,7 +72,7 @@ public class ItemModule extends BlockModule{
                 cacheSums[i] = 0;
 
                 if(updateFlow){
-                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() : -1;
+                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / Time.delta : -1;
                 }
             }
         }else{

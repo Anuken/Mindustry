@@ -113,7 +113,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(target.isAI() && target.isGrounded() && pay.payloads().size < unit.type().payloadCapacity
             && target.mass() < unit.mass()
-            && target.within(unit, unit.type().hitsize * 1.5f)){
+            && target.within(unit, unit.type().hitsize * 1.5f + target.type().hitsize)){
             pay.pickup(target);
         }
     }
@@ -129,10 +129,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
                 pay.pickup(tile);
             }else{ //pick up block payload
-                Payload taken = tile.takePayload();
-                if(taken != null){
-                    pay.addPayload(taken);
-                    Fx.unitPickup.at(tile);
+                Payload current = tile.getPayload();
+                if(current != null && current.canBeTaken(pay)){
+                    Payload taken = tile.takePayload();
+                    if(taken != null){
+                        pay.addPayload(taken);
+                        Fx.unitPickup.at(tile);
+                    }
                 }
             }
         }
@@ -230,7 +233,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team == player.team()){
+        }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated){
             player.unit(unit);
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
@@ -307,7 +310,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead()){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated);
 
             if(unit != null){
                 Call.unitControl(player, unit);
@@ -317,9 +320,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void checkUnit(){
         if(controlledType != null){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated);
             if(unit == null && controlledType == UnitTypes.block){
-                unit = world.entWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.entWorld(player.x, player.y)).unit() : null;
+                unit = world.buildWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.buildWorld(player.x, player.y)).unit() : null;
             }
 
             if(unit != null){
@@ -428,7 +431,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             });
 
             //rotate actual request, centered on its multiblock position
-            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float wx = (req.x - ox) * tilesize + req.block.offset, wy = (req.y - oy) * tilesize + req.block.offset;
             float x = wx;
             if(direction >= 0){
                 wx = -wy;
@@ -437,8 +440,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 wx = wy;
                 wy = -x;
             }
-            req.x = world.toTile(wx - req.block.offset()) + ox;
-            req.y = world.toTile(wy - req.block.offset()) + oy;
+            req.x = world.toTile(wx - req.block.offset) + ox;
+            req.y = world.toTile(wy - req.block.offset) + oy;
             req.rotation = Mathf.mod(req.rotation + direction, 4);
         });
     }
@@ -447,12 +450,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
 
         requests.each(req -> {
-            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset()) + origin;
+            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset) + origin;
 
             if(x){
-                req.x = (int)((value - req.block.offset()) / tilesize);
+                req.x = (int)((value - req.block.offset) / tilesize);
             }else{
-                req.y = (int)((value - req.block.offset()) / tilesize);
+                req.y = (int)((value - req.block.offset) / tilesize);
             }
 
             req.pointConfig(p -> {
@@ -502,10 +505,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             if(!req.breaking){
                 r1.setSize(req.block.size * tilesize);
-                r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
+                r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
             }else{
                 r1.setSize(other.block().size * tilesize);
-                r1.setCenter(other.worldx() + other.block().offset(), other.worldy() + other.block().offset());
+                r1.setCenter(other.worldx() + other.block().offset, other.worldy() + other.block().offset);
             }
 
             return r2.overlaps(r1);
@@ -794,10 +797,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
     }
 
-    Building entAt(float x, float y){
-        return world.ent(tileX(x), tileY(y));
-    }
-
     /** Returns the tile at the specified MOUSE coordinates. */
     Tile tileAt(float x, float y){
         return world.tile(tileX(x), tileY(y));
@@ -814,7 +813,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     int tileX(float cursorX){
         Vec2 vec = Core.input.mouseWorld(cursorX, 0);
         if(selectedBlock()){
-            vec.sub(block.offset(), block.offset());
+            vec.sub(block.offset, block.offset);
         }
         return world.toTile(vec.x);
     }
@@ -822,7 +821,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     int tileY(float cursorY){
         Vec2 vec = Core.input.mouseWorld(0, cursorY);
         if(selectedBlock()){
-            vec.sub(block.offset(), block.offset());
+            vec.sub(block.offset, block.offset);
         }
         return world.toTile(vec.y);
     }
@@ -844,7 +843,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unit::isAI);
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && !u.deactivated);
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
@@ -853,7 +852,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        Building tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(tile instanceof ControlBlock && tile.team() == player.team()){
             return ((ControlBlock)tile).unit();
         }
@@ -986,15 +985,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
         Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset() + dx*trns,
-        y * tilesize + block.offset() - 1 + dy*trns,
+        x * tilesize + block.offset + dx*trns,
+        y * tilesize + block.offset - 1 + dy*trns,
         Core.atlas.find("place-arrow").getWidth() * Draw.scl,
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset() + dx*trns,
-        y * tilesize + block.offset() + dy*trns,
+        x * tilesize + block.offset + dx*trns,
+        y * tilesize + block.offset + dy*trns,
         Core.atlas.find("place-arrow").getWidth() * Draw.scl,
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
     }
@@ -1051,7 +1050,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int i = 0; i < points.size; i++){
             Point2 point = points.get(i);
 
-            if(block != null && Tmp.r2.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset()).overlaps(Tmp.r3)){
+            if(block != null && Tmp.r2.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset, point.y * tilesize + block.offset).overlaps(Tmp.r3)){
                 continue;
             }
 
@@ -1066,7 +1065,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             line.last = next == null;
             cons.get(line);
 
-            Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset());
+            Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset, point.y * tilesize + block.offset);
         }
     }
 

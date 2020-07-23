@@ -22,7 +22,7 @@ public class HealFieldAbility implements Ability{
 
     @Override
     public void update(Unit unit){
-        unit.timer1 += Time.delta();
+        unit.timer1 += Time.delta;
 
         if(unit.timer1 >= reload){
             wasHealed = false;

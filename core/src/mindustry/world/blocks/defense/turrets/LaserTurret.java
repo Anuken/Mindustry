@@ -60,7 +60,7 @@ public class LaserTurret extends PowerTurret{
                 bullet.time(0f);
                 heat = 1f;
                 recoil = recoilAmount;
-                bulletLife -= Time.delta() / Math.max(efficiency(), 0.00001f);
+                bulletLife -= Time.delta / Math.max(efficiency(), 0.00001f);
                 if(bulletLife <= 0f){
                     bullet = null;
                 }
@@ -68,7 +68,7 @@ public class LaserTurret extends PowerTurret{
                 Liquid liquid = liquids().current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
-                float used = (cheating() ? maxUsed * Time.delta() : Math.min(liquids.get(liquid), maxUsed * Time.delta())) * liquid.heatCapacity * coolantMultiplier;
+                float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier;
                 reload -= used;
                 liquids.remove(liquid, used);
 

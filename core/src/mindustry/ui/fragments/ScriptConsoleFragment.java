@@ -19,7 +19,7 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class ScriptConsoleFragment extends Table{
-    private final static int messagesShown = 30;
+    private static final int messagesShown = 30;
     private Seq<String> messages = new Seq<>();
     private boolean open = false, shown;
     private TextField chatfield;

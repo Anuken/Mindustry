@@ -63,7 +63,7 @@ public class Renderer implements ApplicationListener{
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
 
         if(landTime > 0){
-            landTime -= Time.delta();
+            landTime -= Time.delta;
             landscale = Interp.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
             camerascale = landscale;
             weatherAlpha = 0f;
@@ -172,8 +172,8 @@ public class Renderer implements ApplicationListener{
         if(shaketime > 0){
             float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
             camera.position.add(Mathf.range(intensity), Mathf.range(intensity));
-            shakeIntensity -= 0.25f * Time.delta();
-            shaketime -= Time.delta();
+            shakeIntensity -= 0.25f * Time.delta;
+            shaketime -= Time.delta;
             shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
         }else{
             shakeIntensity = 0f;

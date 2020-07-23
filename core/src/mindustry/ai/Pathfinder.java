@@ -167,12 +167,12 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    public Tile getTargetTile(Tile tile, Team team, Position target){
+    public @Nullable Tile getTargetTile(Tile tile, Team team, Position target){
         return getTargetTile(tile, team, getTarget(target));
     }
 
     /** Gets next tile to travel to. Main thread only. */
-    public Tile getTargetTile(Tile tile, Team team, PathTarget target){
+    public @Nullable Tile getTargetTile(Tile tile, Team team, PathTarget target){
         if(tile == null) return null;
 
         if(fieldMap[team.id] == null){

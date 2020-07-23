@@ -127,7 +127,7 @@ public abstract class Weather extends MappableContent{
                 opacity = Mathf.lerpDelta(opacity, 1f, 0.004f);
             }
 
-            life -= Time.delta();
+            life -= Time.delta;
 
             weather.update(base());
 

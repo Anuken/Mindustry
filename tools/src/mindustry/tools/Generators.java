@@ -381,7 +381,12 @@ public class Generators{
                     wrecks[i].save(type.name + "-wreck" + i);
                 }
 
-                //TODO GENERATE WRECKS
+                for(Cicon icon : Cicon.scaled){
+                    Image scaled = new Image(icon.size, icon.size);
+                    scaled.drawScaled(image);
+                    scaled.save("../ui/unit-" + type.name + "-" + icon.name());
+                }
+
             }catch(IllegalArgumentException e){
                 Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
             }

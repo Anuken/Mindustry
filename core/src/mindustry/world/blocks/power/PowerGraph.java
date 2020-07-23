@@ -8,10 +8,10 @@ import mindustry.gen.*;
 import mindustry.world.consumers.*;
 
 public class PowerGraph{
-    private final static Queue<Building> queue = new Queue<>();
-    private final static Seq<Building> outArray1 = new Seq<>();
-    private final static Seq<Building> outArray2 = new Seq<>();
-    private final static IntSet closedSet = new IntSet();
+    private static final Queue<Building> queue = new Queue<>();
+    private static final Seq<Building> outArray1 = new Seq<>();
+    private static final Seq<Building> outArray2 = new Seq<>();
+    private static final IntSet closedSet = new IntSet();
 
     private final ObjectSet<Building> producers = new ObjectSet<>();
     private final ObjectSet<Building> consumers = new ObjectSet<>();
@@ -197,7 +197,7 @@ public class PowerGraph{
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
 
-        powerBalance.add((lastPowerProduced - lastPowerNeeded) / Time.delta());
+        powerBalance.add((lastPowerProduced - lastPowerNeeded) / Time.delta);
 
         if(!(consumers.size == 0 && producers.size == 0 && batteries.size == 0)){
 

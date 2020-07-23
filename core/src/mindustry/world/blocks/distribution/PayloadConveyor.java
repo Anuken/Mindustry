@@ -41,7 +41,7 @@ public class PayloadConveyor extends Block{
         super.drawPlace(x, y, rotation, valid);
 
         for(int i = 0; i < 4; i++){
-            Building other = world.ent(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
             if(other != null && other.block().outputsPayload && other.block().size == size){
                 Drawf.selected(other.tileX(), other.tileY(), other.block(), Pal.accent);
             }
@@ -86,6 +86,11 @@ public class PayloadConveyor extends Block{
             int ntrns = 1 + size/2;
             Tile next = tile.getNearby(Geometry.d4(rotation()).x * ntrns, Geometry.d4(rotation()).y * ntrns);
             blocked = (next != null && next.solid()) || (this.next != null && (this.next.rotation() + 2)%4 == rotation());
+        }
+
+        @Override
+        public Payload getPayload(){
+            return item;
         }
 
         @Override

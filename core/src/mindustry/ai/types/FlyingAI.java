@@ -61,7 +61,7 @@ public class FlyingAI extends AIController{
             vec.rotate((circleLength - vec.len()) / circleLength * 180f);
         }
 
-        vec.setLength(speed * Time.delta());
+        vec.setLength(speed * Time.delta);
 
         unit.moveAt(vec);
     }
@@ -73,7 +73,7 @@ public class FlyingAI extends AIController{
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
 
-        vec.setLength(unit.type().speed * Time.delta() * length);
+        vec.setLength(unit.type().speed * Time.delta * length);
         if(length < -0.5f){
             vec.rotate(180f);
         }else if(length < 0){
@@ -95,7 +95,7 @@ public class FlyingAI extends AIController{
             vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.6f));
         }
 
-        vec.setLength(unit.type().speed * Time.delta());
+        vec.setLength(unit.type().speed * Time.delta);
 
         unit.moveAt(vec);
     }

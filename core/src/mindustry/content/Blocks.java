@@ -1004,17 +1004,17 @@ public class Blocks implements ContentList{
 
         rotaryPump = new Pump("rotary-pump"){{
             requirements(Category.liquid, with(Items.copper, 70, Items.metaglass, 50, Items.silicon, 20, Items.titanium, 35));
-            pumpAmount = 0.8f;
-            consumes.power(0.15f);
+            pumpAmount = 0.2f;
+            consumes.power(0.3f);
             liquidCapacity = 30f;
             hasPower = true;
             size = 2;
         }};
 
         thermalPump = new Pump("thermal-pump"){{
-            requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 70, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
-            pumpAmount = 1.5f;
-            consumes.power(0.30f);
+            requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 90, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
+            pumpAmount = 0.22f;
+            consumes.power(1.3f);
             liquidCapacity = 40f;
             hasPower = true;
             size = 3;
@@ -1228,6 +1228,9 @@ public class Blocks implements ContentList{
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
 
+            //more than the laser drill
+            liquidBoostIntensity = 1.8f;
+
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.1f).boost();
         }};
@@ -1284,6 +1287,8 @@ public class Blocks implements ContentList{
             health = 1100;
             itemCapacity = 4000;
             size = 3;
+
+            unitCapModifier = 8;
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
@@ -1293,6 +1298,8 @@ public class Blocks implements ContentList{
             health = 2000;
             itemCapacity = 9000;
             size = 4;
+
+            unitCapModifier = 16;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -1302,6 +1309,8 @@ public class Blocks implements ContentList{
             health = 4000;
             itemCapacity = 13000;
             size = 5;
+
+            unitCapModifier = 24;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1411,7 +1420,6 @@ public class Blocks implements ContentList{
             Liquids.cryofluid, Bullets.cryoShot,
             Liquids.oil, Bullets.oilShot
             );
-            targetAir = false;
             size = 2;
             recoilAmount = 0f;
             reloadTime = 2f;
@@ -1679,11 +1687,11 @@ public class Blocks implements ContentList{
         //region units
 
         groundFactory = new UnitFactory("ground-factory"){{
-            requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
+            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 200f, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 200f, with(Items.silicon, 10, Items.blastCompound, 10)),
-                new UnitPlan(UnitTypes.nova, 200f, with(Items.silicon, 20, Items.lead, 20, Items.titanium, 20)),
+                new UnitPlan(UnitTypes.dagger, 60f * 20, with(Items.silicon, 10, Items.lead, 10)),
+                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 10, Items.blastCompound, 10)),
+                new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1692,8 +1700,8 @@ public class Blocks implements ContentList{
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.flare, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.mono, 200f, with(Items.silicon, 15, Items.lead, 15)),
+                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1702,7 +1710,7 @@ public class Blocks implements ContentList{
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.risse, 200f, with(Items.silicon, 20, Items.metaglass, 25)),
+                new UnitPlan(UnitTypes.risse, 60f * 30f, with(Items.silicon, 20, Items.metaglass, 25)),
             };
             size = 3;
             requiresWater = true;
@@ -1716,7 +1724,7 @@ public class Blocks implements ContentList{
             consumes.power(3f);
             consumes.items(with(Items.silicon, 40, Items.graphite, 40));
 
-            constructTime = 60f * 5f;
+            constructTime = 60f * 10f;
 
             upgrades = new UnitType[][]{
                 {UnitTypes.nova, UnitTypes.quasar},
@@ -1735,7 +1743,7 @@ public class Blocks implements ContentList{
             consumes.power(6f);
             consumes.items(with(Items.silicon, 130, Items.titanium, 80, Items.metaglass, 30));
 
-            constructTime = 60f * 15f;
+            constructTime = 60f * 30f;
 
             upgrades = new UnitType[][]{
                 {UnitTypes.horizon, UnitTypes.zenith},
@@ -1755,7 +1763,8 @@ public class Blocks implements ContentList{
             consumes.items(with(Items.silicon, 200, Items.titanium, 200, Items.surgealloy, 240));
             consumes.liquid(Liquids.cryofluid, 1f);
 
-            constructTime = 60f * 60f;
+            constructTime = 60f * 60f * 1.5f;
+            liquidCapacity = 30f;
 
             upgrades = new UnitType[][]{
                 {UnitTypes.zenith, UnitTypes.antumbra},
@@ -1770,7 +1779,8 @@ public class Blocks implements ContentList{
             consumes.items(with(Items.silicon, 300, Items.plastanium, 300, Items.surgealloy, 300, Items.phasefabric, 250));
             consumes.liquid(Liquids.cryofluid, 3f);
 
-            constructTime = 60f * 60f * 3;
+            constructTime = 60f * 60f * 4;
+            liquidCapacity = 60f;
 
             upgrades = new UnitType[][]{
                 {UnitTypes.antumbra, UnitTypes.eclipse},

@@ -121,11 +121,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public float drawx(){
-        return block().offset() + worldx();
+        return block().offset + worldx();
     }
 
     public float drawy(){
-        return block().offset() + worldy();
+        return block().offset + worldy();
     }
 
     public boolean isDarkened(){
@@ -436,10 +436,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Building getNearbyEntity(int rotation){
-        if(rotation == 0) return world.ent(x + 1, y);
-        if(rotation == 1) return world.ent(x, y + 1);
-        if(rotation == 2) return world.ent(x - 1, y);
-        if(rotation == 3) return world.ent(x, y - 1);
+        if(rotation == 0) return world.build(x + 1, y);
+        if(rotation == 1) return world.build(x, y + 1);
+        if(rotation == 2) return world.build(x - 1, y);
+        if(rotation == 3) return world.build(x, y - 1);
         return null;
     }
 
@@ -558,7 +558,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             tileSet.clear();
 
             for(Point2 edge : Edges.getEdges(size)){
-                Building other = world.ent(x + edge.x, y + edge.y);
+                Building other = world.build(x + edge.x, y + edge.y);
                 if(other != null){
                     tileSet.add(other);
                 }
@@ -582,7 +582,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             }else{
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(Point2 p : Geometry.d4){
-                    Building tile = world.ent(x + p.x, y + p.y);
+                    Building tile = world.build(x + p.x, y + p.y);
                     if(tile != null && !tile.tile().changing){
                         tile.onProximityUpdate();
                     }

@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends BaseDialog{
-    private final static int displayed = 20;
+    private static final int displayed = 20;
     private Seq<SpawnGroup> groups = new Seq<>();
 
     private Table table, preview;
@@ -104,7 +104,7 @@ public class WaveInfoDialog extends BaseDialog{
             m.button("-", () -> {
             }).update(t -> {
                 if(t.getClickListener().isPressed()){
-                    updateTimer += Time.delta();
+                    updateTimer += Time.delta;
                     if(updateTimer >= updatePeriod){
                         start = Math.max(start - 1, 0);
                         updateTimer = 0f;
@@ -118,7 +118,7 @@ public class WaveInfoDialog extends BaseDialog{
             m.button("+", () -> {
             }).update(t -> {
                 if(t.getClickListener().isPressed()){
-                    updateTimer += Time.delta();
+                    updateTimer += Time.delta;
                     if(updateTimer >= updatePeriod){
                         start++;
                         updateTimer = 0f;

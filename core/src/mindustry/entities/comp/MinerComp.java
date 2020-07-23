@@ -58,7 +58,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         }else{
             Item item = mineTile.drop();
             rotation(Mathf.slerpDelta(rotation(), angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f));
-            mineTimer += Time.delta()*type.mineSpeed;
+            mineTimer += Time.delta *type.mineSpeed;
 
             if(mineTimer >= 50f + item.hardness*10f){
                 mineTimer = 0;
@@ -76,7 +76,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
                 }
             }
 
-            if(Mathf.chance(0.06 * Time.delta())){
+            if(Mathf.chance(0.06 * Time.delta)){
                 Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
             }
         }

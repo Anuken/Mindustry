@@ -12,7 +12,7 @@ import mindustry.world.blocks.payloads.*;
 
 /** An entity that holds a payload. */
 @Component
-abstract class PayloadComp implements Posc, Rotc{
+abstract class PayloadComp implements Posc, Rotc, Hitboxc{
     @Import float x, y, rotation;
 
     Seq<Payload> payloads = new Seq<>();
@@ -87,7 +87,7 @@ abstract class PayloadComp implements Posc, Rotc{
     /** @return whether the tile has been successfully placed. */
     boolean dropBlock(BlockPayload payload){
         Building tile = payload.entity;
-        int tx = Vars.world.toTile(x - tile.block().offset()), ty = Vars.world.toTile(y - tile.block().offset());
+        int tx = Vars.world.toTile(x - tile.block().offset), ty = Vars.world.toTile(y - tile.block().offset);
         Tile on = Vars.world.tile(tx, ty);
         if(on != null && Build.validPlace(tile.block(), tile.team(), tx, ty, tile.rotation())){
             int rot = (int)((rotation + 45f) / 90f) % 4;

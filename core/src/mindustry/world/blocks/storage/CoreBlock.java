@@ -81,13 +81,6 @@ public class CoreBlock extends StorageBlock{
                 () -> Pal.items,
             () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
             ));
-
-        bars.add("units", e ->
-            new Bar(
-                () -> Core.bundle.format("bar.units", teamIndex.count(e.team()), Units.getCap(e.team())),
-                () -> Pal.power,
-                () -> (float)teamIndex.count(e.team()) / Units.getCap(e.team())
-            ));
     }
 
     @Override

@@ -63,7 +63,7 @@ public class Universe{
 
     /** Update planet rotations, global time and relevant state. */
     public void update(){
-        secondCounter += Time.delta() / 60f;
+        secondCounter += Time.delta / 60f;
 
         if(secondCounter >= 1){
             seconds += (int)secondCounter;

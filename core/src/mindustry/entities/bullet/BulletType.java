@@ -196,7 +196,7 @@ public abstract class BulletType extends Content{
         }
 
         if(weaveMag > 0){
-            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta());
+            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta);
         }
 
         if(trailChance > 0){
@@ -241,7 +241,7 @@ public abstract class BulletType extends Content{
         bullet.owner = owner;
         bullet.team = team;
         bullet.vel.trns(angle, speed * velocityScl);
-        bullet.set(x - bullet.vel.x * Time.delta(), y - bullet.vel.y * Time.delta());
+        bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
         bullet.lifetime = lifetime * lifetimeScl;
         bullet.data = data;
         bullet.drag = drag;

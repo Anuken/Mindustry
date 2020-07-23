@@ -51,6 +51,9 @@
     "address": "mindustry.atannergaming.com:8000"
   },
   {
+    "address": "mindustry.atannergaming.com:6800"
+  },
+  {
     "address": "mindustry.kbni.net.au:6567"
   },
   {
@@ -61,6 +64,9 @@
   },
   {
     "address": "Chaotic-Neutral.ddns.net:1111"
+  },
+  {
+    "address": "Chaotic-Neutral.ddns.net:4444"
   },
   {
     "address": "Chaotic-Neutral.ddns.net:3333"

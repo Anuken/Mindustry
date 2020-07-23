@@ -126,7 +126,7 @@ public class ForceProjector extends Block{
             }
 
             if(hit > 0f){
-                hit -= 1f / 5f * Time.delta();
+                hit -= 1f / 5f * Time.delta;
             }
 
             float realRadius = realRadius();

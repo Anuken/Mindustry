@@ -86,7 +86,7 @@ public class Saves{
         }
 
         if(state.isGame() && !state.gameOver && current != null && current.isAutosave() && !state.rules.tutorial){
-            time += Time.delta();
+            time += Time.delta;
             if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
 

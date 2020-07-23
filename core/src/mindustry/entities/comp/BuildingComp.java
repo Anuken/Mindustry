@@ -201,14 +201,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public Building nearby(int dx, int dy){
-        return world.ent(tile.x + dx, tile.y + dy);
+        return world.build(tile.x + dx, tile.y + dy);
     }
 
     public Building nearby(int rotation){
-        if(rotation == 0) return world.ent(tile.x + 1, tile.y);
-        if(rotation == 1) return world.ent(tile.x, tile.y + 1);
-        if(rotation == 2) return world.ent(tile.x - 1, tile.y);
-        if(rotation == 3) return world.ent(tile.x, tile.y - 1);
+        if(rotation == 0) return world.build(tile.x + 1, tile.y);
+        if(rotation == 1) return world.build(tile.x, tile.y + 1);
+        if(rotation == 2) return world.build(tile.x - 1, tile.y);
+        if(rotation == 3) return world.build(tile.x, tile.y - 1);
         return null;
     }
 
@@ -290,7 +290,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Scaled delta. */
     public float delta(){
-        return Time.delta() * timeScale;
+        return Time.delta * timeScale;
     }
 
     /** Efficiency * delta. */
@@ -305,7 +305,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Call when nothing is happening to the entity. This increments the internal sleep timer. */
     public void sleep(){
-        sleepTime += Time.delta();
+        sleepTime += Time.delta;
         if(!sleeping && sleepTime >= timeToSleep){
             remove();
             sleeping = true;
@@ -518,14 +518,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
                     Liquid other = next.liquids().current();
                     if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                        damage(1 * Time.delta());
-                        next.damage(1 * Time.delta());
-                        if(Mathf.chance(0.1 * Time.delta())){
+                        damage(1 * Time.delta);
+                        next.damage(1 * Time.delta);
+                        if(Mathf.chance(0.1 * Time.delta)){
                             Fx.fire.at(fx, fy);
                         }
                     }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta()));
-                        if(Mathf.chance(0.2f * Time.delta())){
+                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
+                        if(Mathf.chance(0.2f * Time.delta)){
                             Fx.steam.at(fx, fy);
                         }
                     }
@@ -537,6 +537,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public Building getLiquidDestination(Building from, Liquid liquid){
         return base();
+    }
+
+    public @Nullable Payload getPayload(){
+        return null;
     }
 
     /** Tries to take the payload. Returns null if no payload is present. */
@@ -793,7 +797,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             int range = 10;
             tempTiles.clear();
             Geometry.circle(tileX(), tileY(), range, (x, y) -> {
-                Building other = world.ent(x, y);
+                Building other = world.build(x, y);
                 if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, base()) && !PowerNode.insulated(other, base())
                     && !other.proximity().contains(this.<Building>base()) &&
                 !(block.outputsPower && proximity.contains(p -> p.power() != null && p.power().graph == other.power().graph))){
@@ -922,60 +926,63 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         table.row();
 
-        table.table(bars -> {
-            bars.defaults().growX().height(18f).pad(4);
+        //only display everything else if the team is the same
+        if(team == player.team()){
+            table.table(bars -> {
+                bars.defaults().growX().height(18f).pad(4);
 
-            displayBars(bars);
-        }).growX();
-        table.row();
-        table.table(this::displayConsumption).growX();
+                displayBars(bars);
+            }).growX();
+            table.row();
+            table.table(this::displayConsumption).growX();
 
-        boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow");
+            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow");
 
-        if(displayFlow){
-            String ps = " " + StatUnit.perSecond.localized();
+            if(displayFlow){
+                String ps = " " + StatUnit.perSecond.localized();
 
-            if(items != null){
-                table.row();
-                table.left();
-                table.table(l -> {
-                    Bits current = new Bits();
+                if(items != null){
+                    table.row();
+                    table.left();
+                    table.table(l -> {
+                        Bits current = new Bits();
 
-                    Runnable rebuild = () -> {
-                        l.clearChildren();
+                        Runnable rebuild = () -> {
+                            l.clearChildren();
+                            l.left();
+                            for(Item item : content.items()){
+                                if(items.hasFlowItem(item)){
+                                    l.image(item.icon(Cicon.small)).padRight(3f);
+                                    l.label(() -> items.getFlowRate(item) < 0 ? "..." : Strings.fixed(items.getFlowRate(item), 1) + ps).color(Color.lightGray);
+                                    l.row();
+                                }
+                            }
+                        };
+
+                        rebuild.run();
+                        l.update(() -> {
+                            for(Item item : content.items()){
+                                if(items.hasFlowItem(item) && !current.get(item.id)){
+                                    current.set(item.id);
+                                    rebuild.run();
+                                }
+                            }
+                        });
+                    }).left();
+                }
+
+                if(liquids != null){
+                    table.row();
+                    table.table(l -> {
                         l.left();
-                        for(Item item : content.items()){
-                            if(items.hasFlowItem(item)){
-                                l.image(item.icon(Cicon.small)).padRight(3f);
-                                l.label(() -> items.getFlowRate(item) < 0 ? "..." : Strings.fixed(items.getFlowRate(item), 1) + ps).color(Color.lightGray);
-                                l.row();
-                            }
-                        }
-                    };
-
-                    rebuild.run();
-                    l.update(() -> {
-                        for(Item item : content.items()){
-                            if(items.hasFlowItem(item) && !current.get(item.id)){
-                                current.set(item.id);
-                                rebuild.run();
-                            }
-                        }
-                    });
-                }).left();
+                        l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
+                        l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                    }).left();
+                }
             }
 
-            if(liquids != null){
-                table.row();
-                table.table(l -> {
-                    l.left();
-                    l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
-                    l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
-                });
-            }
+            table.marginBottom(-5);
         }
-
-        table.marginBottom(-5);
     }
 
     public void displayConsumption(Table table){
@@ -1061,7 +1068,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
-            Building other = world.ent(tile.x + point.x, tile.y + point.y);
+            Building other = world.build(tile.x + point.x, tile.y + point.y);
             //remove this tile from all nearby tile's proximities
             if(other != null){
                 tmpTiles.add(other);
@@ -1080,7 +1087,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
-            Building other = world.ent(tile.x + point.x, tile.y + point.y);
+            Building other = world.build(tile.x + point.x, tile.y + point.y);
 
             if(other == null || !(other.tile.interactable(team))) continue;
 
@@ -1171,7 +1178,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Final
     @Override
     public void update(){
-        timeScaleDuration -= Time.delta();
+        timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;
         }
