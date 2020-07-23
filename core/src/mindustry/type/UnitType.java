@@ -144,7 +144,6 @@ public class UnitType extends UnlockableContent{
         if(unit.deactivated){
             table.table(d -> {
                 d.left();
-
                 d.label(() -> Core.bundle.format("bar.limitreached", unit.count(), unit.cap(), Fonts.getUnicodeStr(name)));
             }).left().visible(() -> unit.deactivated);
         }
