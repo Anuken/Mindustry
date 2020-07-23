@@ -37,9 +37,6 @@ public class BorderImage extends Image{
     public void draw(){
         super.draw();
 
-        float scaleX = this.scaleX;
-        float scaleY = this.scaleY;
-
         Draw.color(borderColor);
         Draw.alpha(parentAlpha);
         Lines.stroke(Scl.scl(thickness));
