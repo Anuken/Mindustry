@@ -158,6 +158,19 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
+        //delete save on campaign game over
+        Events.on(GameOverEvent.class, e -> {
+            if(state.isCampaign() && !net.client() && !headless){
+
+                //delete the save, it is gone.
+                if(saves.getCurrent() != null && !state.rules.tutorial){
+                    Sector sector = state.getSector();
+                    sector.save = null;
+                    saves.getCurrent().delete();
+                }
+            }
+        });
+
         Events.on(Trigger.newGame, () -> {
             Building core = player.closestCore();
 
