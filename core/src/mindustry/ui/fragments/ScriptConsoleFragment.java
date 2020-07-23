@@ -122,8 +122,8 @@ public class ScriptConsoleFragment extends Table{
 
         float spacing = chatspace;
 
-        chatfield.visible(open);
-        fieldlabel.visible(open);
+        chatfield.visible = open;
+        fieldlabel.visible = open;
 
         Draw.color(shadowColor);
         Draw.alpha(shadowColor.a * opacity);

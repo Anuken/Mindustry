@@ -475,7 +475,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     mode.setColor(Pal.remove);
                     mode.update(() -> mode.setText(tool.mode == -1 ? "" : "M" + (tool.mode + 1) + " "));
                     mode.setAlignment(Align.bottomRight, Align.bottomRight);
-                    mode.touchable(Touchable.disabled);
+                    mode.touchable = Touchable.disabled;
 
                     tools.stack(button, mode);
                 };

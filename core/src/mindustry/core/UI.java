@@ -182,10 +182,10 @@ public class UI implements ApplicationListener, Loadable{
         Group group = Core.scene.root;
 
         menuGroup.setFillParent(true);
-        menuGroup.touchable(Touchable.childrenOnly);
+        menuGroup.touchable = Touchable.childrenOnly;
         menuGroup.visible(() -> state.isMenu());
         hudGroup.setFillParent(true);
-        hudGroup.touchable(Touchable.childrenOnly);
+        hudGroup.touchable = Touchable.childrenOnly;
         hudGroup.visible(() -> state.isGame());
 
         Core.scene.add(menuGroup);
@@ -292,7 +292,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showInfoToast(String info, float duration){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -305,7 +305,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -318,7 +318,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showLabel(String info, float duration, float worldx, float worldy){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });

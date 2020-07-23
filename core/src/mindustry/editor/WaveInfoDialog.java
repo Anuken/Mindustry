@@ -93,7 +93,7 @@ public class WaveInfoDialog extends BaseDialog{
             }).growX().height(70f);
         }), new Label("$waves.none"){{
             visible(() -> groups.isEmpty());
-            touchable(Touchable.disabled);
+            this.touchable = Touchable.disabled;
             setWrap(true);
             setAlignment(Align.center, Align.center);
         }}).width(390f).growY();

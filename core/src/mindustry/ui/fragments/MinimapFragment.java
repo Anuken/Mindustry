@@ -54,7 +54,7 @@ public class MinimapFragment extends Fragment{
                 shown = false;
             }
         });
-        elem.touchable(Touchable.enabled);
+        elem.touchable = Touchable.enabled;
 
         elem.addListener(new ElementGestureListener(){
 

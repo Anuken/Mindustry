@@ -277,8 +277,8 @@ public class SchematicsDialog extends BaseDialog{
 
         @Override
         public void draw(){
-            boolean checked = getParent().getParent() instanceof Button
-                && ((Button)getParent().getParent()).isOver();
+            boolean checked = parent.parent instanceof Button
+                && ((Button)parent.parent).isOver();
 
             boolean wasSet = set;
             if(!set){

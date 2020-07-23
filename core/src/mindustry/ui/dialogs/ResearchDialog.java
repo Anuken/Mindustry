@@ -64,7 +64,7 @@ public class ResearchDialog extends BaseDialog{
         addListener(new InputListener(){
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                view.setScale(Mathf.clamp(view.getScaleX() - amountY / 10f * view.getScaleX(), 0.25f, 1f));
+                view.setScale(Mathf.clamp(view.scaleX - amountY / 10f * view.scaleX, 0.25f, 1f));
                 view.setOrigin(Align.center);
                 view.setTransform(true);
                 return true;
@@ -81,7 +81,7 @@ public class ResearchDialog extends BaseDialog{
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
                 if(view.lastZoom < 0){
-                    view.lastZoom = view.getScaleX();
+                    view.lastZoom = view.scaleX;
                 }
 
                 view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 0.25f, 1f));
@@ -91,13 +91,13 @@ public class ResearchDialog extends BaseDialog{
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                view.lastZoom = view.getScaleX();
+                view.lastZoom = view.scaleX;
             }
 
             @Override
             public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
-                view.panX += deltaX / view.getScaleX();
-                view.panY += deltaY / view.getScaleY();
+                view.panX += deltaX / view.scaleX;
+                view.panY += deltaY / view.scaleY;
                 view.moved = true;
                 view.clamp();
             }
@@ -180,7 +180,7 @@ public class ResearchDialog extends BaseDialog{
         Table table = new Table();
         table.actions(Actions.fadeOut(0.5f, Interp.fade), Actions.remove());
         table.top().add(info);
-        table.setName("toast");
+        table.name = "toast";
         table.update(() -> {
             table.toFront();
             table.setPosition(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() - 21, Align.top);
@@ -230,7 +230,7 @@ public class ResearchDialog extends BaseDialog{
         Table infoTable = new Table();
 
         {
-            infoTable.touchable(Touchable.enabled);
+            infoTable.touchable = Touchable.enabled;
 
             for(TechTreeNode node : nodes){
                 ImageButton button = new ImageButton(node.node.content.icon(Cicon.medium), Styles.nodei);
@@ -273,7 +273,7 @@ public class ResearchDialog extends BaseDialog{
                     }
                 });
                 button.touchable(() -> !node.visible ? Touchable.disabled : Touchable.enabled);
-                button.setUserObject(node.node);
+                button.userObject = node.node;
                 button.setSize(nodeSize);
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
@@ -335,7 +335,7 @@ public class ResearchDialog extends BaseDialog{
 
             if(button == null) return;
 
-            TechNode node = (TechNode)button.getUserObject();
+            TechNode node = (TechNode)button.userObject;
 
             infoTable.exited(() -> {
                 if(hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){

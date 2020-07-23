@@ -131,8 +131,8 @@ public class ChatFragment extends Table{
 
         float spacing = chatspace;
 
-        chatfield.visible(shown);
-        fieldlabel.visible(shown);
+        chatfield.visible = shown;
+        fieldlabel.visible = shown;
 
         Draw.color(shadowColor);
         Draw.alpha(shadowColor.a * opacity);

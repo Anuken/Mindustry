@@ -18,8 +18,8 @@ public class LoadingFragment extends Fragment{
     @Override
     public void build(Group parent){
         parent.fill(Styles.black8, t -> {
-            t.visible(false);
-            t.touchable(Touchable.enabled);
+            t.visible = false;
+            t.touchable = Touchable.enabled;
             t.add().height(133f).row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
@@ -37,12 +37,12 @@ public class LoadingFragment extends Fragment{
 
     public void setProgress(Floatp progress){
         bar.reset(0f);
-        bar.visible(true);
+        bar.visible = true;
         bar.set(() -> ((int)(progress.get() * 100) + "%"), progress, Pal.accent);
     }
 
     public void setButton(Runnable listener){
-        button.visible(true);
+        button.visible = true;
         button.getListeners().remove(button.getListeners().size - 1);
         button.clicked(listener);
     }
@@ -58,19 +58,19 @@ public class LoadingFragment extends Fragment{
 
     public void show(String text){
         table.<Label>find("namelabel").setColor(Color.white);
-        bar.visible(false);
+        bar.visible = false;
         table.clearActions();
-        table.touchable(Touchable.enabled);
+        table.touchable = Touchable.enabled;
         table.<Label>find("namelabel").setText(text);
-        table.visible(true);
-        table.getColor().a = 1f;
+        table.visible = true;
+        table.color.a = 1f;
         table.toFront();
     }
 
     public void hide(){
         table.clearActions();
         table.toFront();
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.actions(Actions.fadeOut(0.5f), Actions.visible(false));
     }
 }

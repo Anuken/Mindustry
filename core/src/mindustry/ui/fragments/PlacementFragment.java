@@ -80,7 +80,7 @@ public class PlacementFragment extends Fragment{
 
     void rebuild(){
         currentCategory = Category.turret;
-        Group group = toggler.getParent();
+        Group group = toggler.parent;
         int index = toggler.getZIndex();
         toggler.remove();
         build(group);

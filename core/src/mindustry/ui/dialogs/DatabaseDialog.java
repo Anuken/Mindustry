@@ -62,7 +62,7 @@ public class DatabaseDialog extends BaseDialog{
                     image.addListener(listener);
                     if(!Vars.mobile && unlocked(unlock)){
                         image.addListener(new HandCursorListener());
-                        image.update(() -> image.getColor().lerp(!listener.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
+                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
                     }
 
                     if(unlocked(unlock)){

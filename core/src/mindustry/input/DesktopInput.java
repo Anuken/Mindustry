@@ -49,11 +49,11 @@ public class DesktopInput extends InputHandler{
         group.fill(t -> {
             t.bottom();
             t.visible(() -> {
-                t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.builder().isBuilding() ? 1f : 0f, 0.15f);
+                t.color.a = Mathf.lerpDelta(t.color.a, player.builder().isBuilding() ? 1f : 0f, 0.15f);
 
-                return Core.settings.getBool("hints") && selectRequests.isEmpty() && t.getColor().a > 0.01f;
+                return Core.settings.getBool("hints") && selectRequests.isEmpty() && t.color.a > 0.01f;
             });
-            t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
+            t.touchable(() -> t.color.a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);

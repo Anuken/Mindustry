@@ -76,7 +76,7 @@ public class FileChooser extends BaseDialog{
         cancel.clicked(this::hide);
 
         navigation = new TextField("");
-        navigation.touchable(Touchable.disabled);
+        navigation.touchable = Touchable.disabled;
 
         files = new Table();
         files.marginRight(10);
