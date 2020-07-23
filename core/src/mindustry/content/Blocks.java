@@ -1764,7 +1764,7 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 1f);
 
             constructTime = 60f * 60f * 1.5f;
-            liquidCapacity = 30f;
+            liquidCapacity = 60f;
 
             upgrades = new UnitType[][]{
                 {UnitTypes.zenith, UnitTypes.antumbra},
@@ -1780,7 +1780,7 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;
-            liquidCapacity = 60f;
+            liquidCapacity = 180f;
 
             upgrades = new UnitType[][]{
                 {UnitTypes.antumbra, UnitTypes.eclipse},
