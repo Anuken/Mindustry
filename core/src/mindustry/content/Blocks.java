@@ -1711,7 +1711,7 @@ public class Blocks implements ContentList{
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.risse, 60f * 30f, with(Items.silicon, 20, Items.metaglass, 25)),
+                new UnitPlan(UnitTypes.risso, 60f * 30f, with(Items.silicon, 20, Items.metaglass, 25)),
             };
             size = 3;
             requiresWater = true;
@@ -1733,7 +1733,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.crawler, UnitTypes.atrax},
                 {UnitTypes.flare, UnitTypes.horizon},
                 {UnitTypes.mono, UnitTypes.poly},
-                {UnitTypes.risse, UnitTypes.minke},
+                {UnitTypes.risso, UnitTypes.minke},
             };
         }};
 
