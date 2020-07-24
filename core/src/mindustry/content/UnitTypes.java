@@ -45,7 +45,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Trailc.class}) UnitType alpha, beta, gamma;
 
     //water
-    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risse, minke, bryde;
+    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risso, minke, bryde;
 
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
@@ -674,7 +674,7 @@ public class UnitTypes implements ContentList{
         //endregion
         //region naval attack
 
-        risse = new UnitType("risse"){{
+        risso = new UnitType("risso"){{
             speed = 1.1f;
             drag = 0.13f;
             hitsize = 9f;

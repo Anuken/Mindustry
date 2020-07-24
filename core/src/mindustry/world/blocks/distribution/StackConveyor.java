@@ -187,8 +187,8 @@ public class StackConveyor extends Block implements Autotiler{
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
                     if(front() != null
-                    && front().team() == team()
-                    && front().block() instanceof StackConveyor){
+                    && front().team == team
+                    && front().block instanceof StackConveyor){
                         StackConveyorEntity e = (StackConveyorEntity)front();
 
                         // sleep if its occupied
