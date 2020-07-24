@@ -603,6 +603,10 @@ public class Block extends UnlockableContent{
             health = size * size * 40;
         }
 
+        if(group == BlockGroup.transportation || consumes.has(ConsumeType.item) || category == Category.distribution){
+            acceptsItems = true;
+        }
+
         offset = ((size + 1) % 2) * tilesize / 2f;
 
         buildCost = 0f;
