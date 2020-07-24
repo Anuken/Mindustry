@@ -445,7 +445,7 @@ public class UnitTypes implements ContentList{
         }};
 
         horizon = new UnitType("horizon"){{
-            health = 220;
+            health = 300;
             speed = 2f;
             accel = 0.08f;
             drag = 0.016f;
@@ -454,6 +454,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 7.8f;
             range = 140f;
             faceTarget = false;
+            armor = 2f;
 
             weapons.add(new Weapon(){{
                 x = 3f;
@@ -469,7 +470,7 @@ public class UnitTypes implements ContentList{
         }};
 
         zenith = new UnitType("zenith"){{
-            health = 450;
+            health = 1000;
             speed = 1.9f;
             accel = 0.04f;
             drag = 0.016f;
@@ -477,6 +478,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             hitsize = 18f;
             lowAltitude = true;
+            armor = 4f;
 
             engineOffset = 12f;
             engineSize = 3f;
@@ -512,15 +514,16 @@ public class UnitTypes implements ContentList{
         }};
 
         antumbra = new UnitType("antumbra"){{
-            speed = 1.1f;
-            accel = 0.02f;
+            speed = 1.25f;
+            accel = 0.035f;
             drag = 0.05f;
-            rotateSpeed = 2.5f;
+            rotateSpeed = 3.5f;
             flying = true;
             lowAltitude = true;
-            health = 75000;
-            engineOffset = 38;
-            engineSize = 7.3f;
+            health = 7000;
+            armor = 9f;
+            engineOffset = 21;
+            engineSize = 5.3f;
             hitsize = 58f;
 
             weapons.add(new Weapon(){{
@@ -539,11 +542,12 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 2.5f;
             flying = true;
             lowAltitude = true;
-            health = 75000;
+            health = 13000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitsize = 58f;
             destructibleWreck = false;
+            armor = 13f;
 
             weapons.add(new Weapon(){{
                 y = 1.5f;

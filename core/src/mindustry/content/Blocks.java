@@ -1760,7 +1760,7 @@ public class Blocks implements ContentList{
 
             size = 7;
             consumes.power(12f);
-            consumes.items(with(Items.silicon, 200, Items.titanium, 200, Items.surgealloy, 240));
+            consumes.items(with(Items.silicon, 250, Items.titanium, 500, Items.plastanium, 400));
             consumes.liquid(Liquids.cryofluid, 1f);
 
             constructTime = 60f * 60f * 1.5f;
@@ -1776,7 +1776,7 @@ public class Blocks implements ContentList{
 
             size = 9;
             consumes.power(25f);
-            consumes.items(with(Items.silicon, 300, Items.plastanium, 300, Items.surgealloy, 300, Items.phasefabric, 250));
+            consumes.items(with(Items.silicon, 350, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150));
             consumes.liquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;

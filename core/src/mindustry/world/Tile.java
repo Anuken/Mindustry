@@ -29,7 +29,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;
-    /** Rotation, 0-3. Not guaranteed to be in any specific range. */
+    /** Rotation of blocks, or other data. Not guaranteed to be in any specific range. */
     protected byte rotation;
     protected boolean changing = false;
 
