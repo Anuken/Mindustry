@@ -42,19 +42,19 @@ public class PowerNode extends PowerBlock{
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
             Building other = world.build(value);
-            boolean contains = power.links.contains(value), valid = other != null && other.power() != null;
+            boolean contains = power.links.contains(value), valid = other != null && other.power != null;
 
             if(contains){
                 //unlink
                 power.links.removeValue(value);
-                if(valid) other.power().links.removeValue(entity.pos());
+                if(valid) other.power.links.removeValue(entity.pos());
 
                 PowerGraph newgraph = new PowerGraph();
 
                 //reflow from this point, covering all tiles on this side
                 newgraph.reflow(entity);
 
-                if(valid && other.power().graph != newgraph){
+                if(valid && other.power.graph != newgraph){
                     //create new graph for other end
                     PowerGraph og = new PowerGraph();
                     //reflow from other end
@@ -68,8 +68,8 @@ public class PowerNode extends PowerBlock{
 
                 if(other.team() == entity.team()){
 
-                    if(!other.power().links.contains(entity.pos())){
-                        other.power().links.add(entity.pos());
+                    if(!other.power.links.contains(entity.pos())){
+                        other.power.links.add(entity.pos());
                     }
                 }
 
@@ -84,6 +84,7 @@ public class PowerNode extends PowerBlock{
                     tile.power.links.add(Point2.pack(p.x + tile.tileX(), p.y + tile.tileY()));
                 }
             }
+            tile.updatePowerGraph();
         });
     }
 
@@ -171,10 +172,10 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void getPotentialLinks(Tile tile, Cons<Building> others){
-        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.power() != null &&
+        Boolf<Building> valid = other -> other != null && other.tile() != tile && other.power != null &&
             ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
             overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team() == player.team()
-            && !other.proximity().contains(e -> e.tile() == tile) && !graphs.contains(other.power().graph);
+            && !other.proximity().contains(e -> e.tile() == tile) && !graphs.contains(other.power.graph);
 
         tempTileEnts.clear();
         graphs.clear();
@@ -196,7 +197,7 @@ public class PowerNode extends PowerBlock{
         });
 
         tempTileEnts.each(valid, t -> {
-            graphs.add(t.power().graph);
+            graphs.add(t.power.graph);
             others.get(t);
         });
     }
@@ -228,7 +229,7 @@ public class PowerNode extends PowerBlock{
 
         if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, ((PowerNode)link.block()).laserRange * tilesize))){
             if(checkMaxNodes && link.block() instanceof PowerNode){
-                return link.power().links.size < ((PowerNode)link.block()).maxNodes || link.power().links.contains(tile.pos());
+                return link.power.links.size < ((PowerNode)link.block()).maxNodes || link.power.links.contains(tile.pos());
             }
             return true;
         }
@@ -269,7 +270,7 @@ public class PowerNode extends PowerBlock{
 
             Boolf<Building> valid = other -> other != null && other != this && ((!other.block().outputsPower && other.block().consumesPower) ||
                 (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(this, other)
-                && !other.proximity().contains(this) && other.power().graph != power.graph;
+                && !other.proximity().contains(this) && other.power.graph != power.graph;
 
             tempTileEnts.clear();
             Geometry.circle(tile.x, tile.y, (int)(laserRange + 2), (x, y) -> {
@@ -308,7 +309,7 @@ public class PowerNode extends PowerBlock{
             }
 
             if(this == other){
-                if(other.power().links.size == 0){
+                if(other.power.links.size == 0){
                     int[] total = {0};
                     getPotentialLinks(tile, link -> {
                         if(!insulated(this, link) && total[0]++ < maxNodes){

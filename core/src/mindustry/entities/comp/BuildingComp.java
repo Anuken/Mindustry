@@ -663,8 +663,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void updatePowerGraph(){
 
         for(Building other : getPowerConnections(tempTileEnts)){
-            if(other.power() != null){
-                other.power().graph.addGraph(power.graph);
+            if(other.power != null){
+                other.power.graph.addGraph(power.graph);
             }
         }
     }
@@ -688,7 +688,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(power == null) return out;
 
         for(Building other : proximity){
-            if(other != null && other.power() != null
+            if(other != null && other.power != null
             && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower)
             && !power.links.contains(other.pos())){
                 out.add(other);
@@ -800,7 +800,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 Building other = world.build(x, y);
                 if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, base()) && !PowerNode.insulated(other, base())
                     && !other.proximity().contains(this.<Building>base()) &&
-                !(block.outputsPower && proximity.contains(p -> p.power() != null && p.power().graph == other.power().graph))){
+                !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
                     tempTiles.add(other.tile());
                 }
             });
