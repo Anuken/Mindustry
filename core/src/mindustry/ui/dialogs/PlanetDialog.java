@@ -14,14 +14,12 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
-import mindustry.type.Sector.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -184,7 +182,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             planets.drawPlane(hovered, () -> {
                 Draw.color(Color.white, Pal.accent, Mathf.absin(5f, 1f));
 
-                TextureRegion icon = hovered.locked() && !canLaunch(hovered) ? Icon.lock.getRegion() : hovered.is(SectorAttribute.naval) ? Liquids.water.icon(Cicon.large) : null;
+                TextureRegion icon = hovered.locked() && !canLaunch(hovered) ? Icon.lock.getRegion() : null;
 
                 if(icon != null){
                     Draw.rect(icon, 0, 0);
@@ -372,12 +370,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.row();
 
-        if((sector.hasBase() && mode == look) || canLaunch(sector) || sector.preset.alwaysUnlocked){
+        if((sector.hasBase() && mode == look) || canLaunch(sector) || (sector.preset != null && sector.preset.alwaysUnlocked)){
             stable.button(sector.hasBase() ? "Resume" : "Launch", Styles.transt, () -> {
-                if(sector.is(SectorAttribute.naval)){
-                    ui.showInfo("You need a naval loadout to launch here.");
-                    return;
-                }
 
                 boolean shouldHide = true;
 
