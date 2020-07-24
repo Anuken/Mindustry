@@ -55,8 +55,8 @@ public class PowerDiode extends Block{
 
             if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower || tile.back().team() != tile.front().team()) return;
 
-            PowerGraph backGraph = tile.back().power().graph;
-            PowerGraph frontGraph = tile.front().power().graph;
+            PowerGraph backGraph = tile.back().power.graph;
+            PowerGraph frontGraph = tile.front().power.graph;
             if(backGraph == frontGraph) return;
 
             // 0f - 1f of battery capacity in use

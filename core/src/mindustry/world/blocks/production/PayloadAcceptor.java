@@ -40,8 +40,8 @@ public class PayloadAcceptor extends Block{
             //if the other block is smaller, check alignment
             (accept.block().size < size &&
             (accept.rotation() % 2 == 0 ? //check orientation; make sure it's aligned properly with this block.
-                Math.abs(accept.y() - tile.y()) <= (size * tilesize - accept.block().size * tilesize)/2f : //check Y alignment
-                Math.abs(accept.x() - tile.x()) <= (size * tilesize - accept.block().size * tilesize)/2f   //check X alignment
+                Math.abs(accept.y - tile.y) <= (size * tilesize - accept.block().size * tilesize)/2f : //check Y alignment
+                Math.abs(accept.x - tile.x) <= (size * tilesize - accept.block().size * tilesize)/2f   //check X alignment
                 )) && (!accept.block().rotate || accept.front() == tile || !accept.block().outputFacing) //make sure it's facing this block
             );
     }
@@ -63,6 +63,11 @@ public class PayloadAcceptor extends Block{
             this.payRotation = source.angleTo(this);
 
             updatePayload();
+        }
+
+        @Override
+        public Payload getPayload(){
+            return payload;
         }
 
         @Override

@@ -159,7 +159,7 @@ public class TypeIO{
             Unit unit = Groups.unit.getByID(id);
             return unit == null ? Nulls.unit : unit;
         }else if(type == 1){ //block
-            Building tile = world.ent(id);
+            Building tile = world.build(id);
             return tile instanceof ControlBlock ? ((ControlBlock)tile).unit() : Nulls.unit;
         }
         return Nulls.unit;
@@ -170,7 +170,7 @@ public class TypeIO{
     }
 
     public static <T extends Entityc> T readEntity(Reads read){
-        return (T)Groups.all.getByID(read.i());
+        return (T)Groups.sync.getByID(read.i());
     }
 
     public static void writeBuilding(Writes write, Building tile){
@@ -178,7 +178,7 @@ public class TypeIO{
     }
 
     public static Building readBuilding(Reads read){
-        return world.ent(read.i());
+        return world.build(read.i());
     }
 
     public static void writeTile(Writes write, Tile tile){
@@ -266,10 +266,10 @@ public class TypeIO{
         //no real unit controller state is written, only the type
         if(control instanceof Player){
             write.b(0);
-            write.i(((Player)control).id());
+            write.i(((Player)control).id);
         }else if(control instanceof FormationAI){
             write.b(1);
-            write.i(((FormationAI)control).leader.id());
+            write.i(((FormationAI)control).leader.id);
         }else{
             write.b(2);
         }

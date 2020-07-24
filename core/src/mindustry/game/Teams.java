@@ -4,7 +4,6 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import arc.util.*;
 import mindustry.ai.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -23,13 +22,9 @@ public class Teams{
     }
 
     public @Nullable CoreEntity closestEnemyCore(float x, float y, Team team){
-        for(TeamData data : active){
-            if(areEnemies(team, data.team)){
-                CoreEntity tile = Geometry.findClosest(x, y, data.cores);
-                if(tile != null){
-                    return tile;
-                }
-            }
+        for(Team enemy : team.enemies()){
+            CoreEntity tile = Geometry.findClosest(x, y, enemy.cores());
+            if(tile != null) return tile;
         }
         return null;
     }
@@ -38,7 +33,7 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
-    public Seq<Team> enemiesOf(Team team){
+    public Team[] enemiesOf(Team team){
         return get(team).enemies;
     }
 
@@ -67,10 +62,10 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        if(map[Pack.u(team.id)] == null){
-            map[Pack.u(team.id)] = new TeamData(team);
+        if(map[team.id] == null){
+            map[team.id] = new TeamData(team);
         }
-        return map[Pack.u(team.id)];
+        return map[team.id];
     }
 
     public Seq<CoreEntity> playerCores(){
@@ -135,20 +130,23 @@ public class Teams{
         }
 
         for(TeamData data : active){
-            data.enemies.clear();
+            Seq<Team> enemies = new Seq<>();
+
             for(TeamData other : active){
                 if(areEnemies(data.team, other.team)){
-                    data.enemies.add(other.team);
+                    enemies.add(other.team);
                 }
             }
+
+            data.enemies = enemies.toArray(Team.class);
         }
     }
 
     public class TeamData{
         public final Seq<CoreEntity> cores = new Seq<>();
-        public final Seq<Team> enemies = new Seq<>();
         public final Team team;
         public final BaseAI ai;
+        public Team[] enemies = {};
         public Queue<BlockPlan> blocks = new Queue<>();
 
         public TeamData(Team team){

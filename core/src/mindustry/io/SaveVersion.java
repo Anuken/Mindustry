@@ -97,7 +97,7 @@ public abstract class SaveVersion extends SaveFileReader{
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
-            "playerteam", player == null ? state.rules.defaultTeam.uid : player.team().uid
+            "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id
         ).merge(tags));
     }
 
@@ -112,13 +112,18 @@ public abstract class SaveVersion extends SaveFileReader{
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
 
+        //load time spent on sector into state
+        if(state.rules.sector != null){
+            state.secinfo.internalTimeSpent = state.rules.sector.getStoredTimeSpent();
+        }
+
         if(!headless){
             Tmp.v1.tryFromString(map.get("viewpos"));
             Core.camera.position.set(Tmp.v1);
             player.set(Tmp.v1);
 
             control.input.controlledType = content.getByName(ContentType.unit, map.get("controlledType", "<none>"));
-            Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.uid));
+            Team team = Team.get(map.getInt("playerteam", state.rules.defaultTeam.id));
             if(!net.client() && team != Team.derelict){
                 player.team(team);
             }
@@ -326,10 +331,10 @@ public abstract class SaveVersion extends SaveFileReader{
     public void readContentHeader(DataInput stream) throws IOException{
         byte mapped = stream.readByte();
 
-        MappableContent[][] map = new MappableContent[ContentType.values().length][0];
+        MappableContent[][] map = new MappableContent[ContentType.all.length][0];
 
         for(int i = 0; i < mapped; i++){
-            ContentType type = ContentType.values()[stream.readByte()];
+            ContentType type = ContentType.all[stream.readByte()];
             short total = stream.readShort();
             map[type.ordinal()] = new MappableContent[total];
 

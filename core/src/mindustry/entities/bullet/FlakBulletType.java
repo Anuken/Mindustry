@@ -28,8 +28,8 @@ public class FlakBulletType extends BasicBulletType{
         if(b.data() instanceof Integer) return;
 
         if(b.timer(2, 6)){
-            Units.nearbyEnemies(b.team(), Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x(), b.y()), unit -> {
-                if(b.data() instanceof Float || (unit.isFlying() && !collidesAir) || (unit.isGrounded() && !collidesGround)) return;
+            Units.nearbyEnemies(b.team, Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
+                if(b.data() instanceof Float || !unit.checkTarget(collidesAir, collidesGround)) return;
 
                 if(unit.dst(b) < explodeRange){
                     b.data(0);

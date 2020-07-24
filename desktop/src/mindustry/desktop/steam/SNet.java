@@ -67,7 +67,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                                     Connect c = new Connect();
                                     c.addressTCP = "steam:" + from.getAccountID();
 
-                                    Log.info("&bRecieved STEAM connection: @", c.addressTCP);
+                                    Log.info("&bReceived STEAM connection: @", c.addressTCP);
 
                                     steamConnections.put(from.getAccountID(), con);
                                     connections.add(con);

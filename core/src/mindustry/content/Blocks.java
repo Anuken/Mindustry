@@ -3,10 +3,7 @@ package mindustry.content;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
-import arc.util.*;
 import mindustry.ctype.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -76,7 +73,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -228,6 +225,10 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.heat, 0.5f);
             attributes.set(Attribute.water, -0.2f);
             blendGroup = ignarock;
+
+            emitLight = true;
+            lightRadius = 30f;
+            lightColor = Color.orange.cpy().a(0.15f);
         }};
 
         magmarock = new Floor("magmarock"){{
@@ -235,6 +236,10 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.water, -0.5f);
             updateEffect = Fx.magmasmoke;
             blendGroup = ignarock;
+
+            emitLight = true;
+            lightRadius = 60f;
+            lightColor = Color.orange.cpy().a(0.3f);
         }};
 
         sand = new Floor("sand"){{
@@ -749,26 +754,30 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
-        phaseWall = new DeflectorWall("phase-wall"){{
+        phaseWall = new Wall("phase-wall"){{
             requirements(Category.defense, with(Items.phasefabric, 6));
             health = 150 * wallHealthMultiplier;
+            flashWhite = deflect = true;
         }};
 
-        phaseWallLarge = new DeflectorWall("phase-wall-large"){{
+        phaseWallLarge = new Wall("phase-wall-large"){{
             requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
+            flashWhite = deflect = true;
         }};
 
-        surgeWall = new SurgeWall("surge-wall"){{
+        surgeWall = new Wall("surge-wall"){{
             requirements(Category.defense, with(Items.surgealloy, 6));
             health = 230 * wallHealthMultiplier;
+            lightningChance = 0.05f;
         }};
 
-        surgeWallLarge = new SurgeWall("surge-wall-large"){{
+        surgeWallLarge = new Wall("surge-wall-large"){{
             requirements(Category.defense, ItemStack.mult(surgeWall.requirements, 4));
             health = 230 * 4 * wallHealthMultiplier;
             size = 2;
+            lightningChance = 0.05f;
         }};
 
         door = new Door("door"){{
@@ -861,8 +870,15 @@ public class Blocks implements ContentList{
         forceProjector = new ForceProjector("force-projector"){{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 125));
             size = 3;
+            phaseRadiusBoost = 80f;
+            radius = 101.7f;
+            breakage = 750f;
+            cooldownNormal = 1.5f;
+            cooldownLiquid = 1.2f;
+            cooldownBrokenBase = 0.35f;
+
             consumes.item(Items.phasefabric).boost();
-            consumes.power(3f);
+            consumes.power(4f);
         }};
 
         shockMine = new ShockMine("shock-mine"){{
@@ -895,8 +911,9 @@ public class Blocks implements ContentList{
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 75;
-            speed = 2.5f / 60f;
-            recharge = 2f;
+            speed = 3.5f / 60f;
+            itemCapacity = 10;
+            displayedSpeed = 30f;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
@@ -988,17 +1005,17 @@ public class Blocks implements ContentList{
 
         rotaryPump = new Pump("rotary-pump"){{
             requirements(Category.liquid, with(Items.copper, 70, Items.metaglass, 50, Items.silicon, 20, Items.titanium, 35));
-            pumpAmount = 0.8f;
-            consumes.power(0.15f);
+            pumpAmount = 0.2f;
+            consumes.power(0.3f);
             liquidCapacity = 30f;
             hasPower = true;
             size = 2;
         }};
 
         thermalPump = new Pump("thermal-pump"){{
-            requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 70, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
-            pumpAmount = 1.5f;
-            consumes.power(0.30f);
+            requirements(Category.liquid, with(Items.copper, 80, Items.metaglass, 90, Items.silicon, 30, Items.titanium, 40, Items.thorium, 35));
+            pumpAmount = 0.22f;
+            consumes.power(1.3f);
             liquidCapacity = 40f;
             hasPower = true;
             size = 3;
@@ -1115,14 +1132,14 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
             requirements(Category.power, with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
-            powerProduction = 16f;
-            itemDuration = 140f;
+            powerProduction = 17f;
+            itemDuration = 200f;
             hasLiquids = true;
             hasItems = true;
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 0.15f);
+            consumes.liquid(Liquids.cryofluid, 0.14f);
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
@@ -1212,6 +1229,9 @@ public class Blocks implements ContentList{
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
 
+            //more than the laser drill
+            liquidBoostIntensity = 1.8f;
+
             consumes.power(3f);
             consumes.liquid(Liquids.water, 0.1f).boost();
         }};
@@ -1264,25 +1284,34 @@ public class Blocks implements ContentList{
             requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 1000, Items.lead, 1000));
             alwaysUnlocked = true;
 
+            unitType = UnitTypes.alpha;
             health = 1100;
             itemCapacity = 4000;
             size = 3;
+
+            unitCapModifier = 8;
         }};
 
         coreFoundation = new CoreBlock("core-foundation"){{
             requirements(Category.effect, with(Items.copper, 3000, Items.lead, 3000, Items.silicon, 2000));
 
+            unitType = UnitTypes.beta;
             health = 2000;
             itemCapacity = 9000;
             size = 4;
+
+            unitCapModifier = 16;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
             requirements(Category.effect, with(Items.copper, 1000, Items.lead, 1000));
 
+            unitType = UnitTypes.gamma;
             health = 4000;
             itemCapacity = 13000;
             size = 5;
+
+            unitCapModifier = 24;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1335,7 +1364,7 @@ public class Blocks implements ContentList{
             Items.metaglass, Bullets.flakGlass
             );
             reloadTime = 18f;
-            range = 170f;
+            range = 160f;
             size = 2;
             burstSpacing = 5f;
             shots = 2;
@@ -1357,8 +1386,8 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.pyraFlame
             );
             recoilAmount = 0f;
-            reloadTime = 5f;
-            coolantMultiplier = 2f;
+            reloadTime = 6f;
+            coolantMultiplier = 1.5f;
             range = 60f;
             shootCone = 50f;
             targetAir = false;
@@ -1392,7 +1421,6 @@ public class Blocks implements ContentList{
             Liquids.cryofluid, Bullets.cryoShot,
             Liquids.oil, Bullets.oilShot
             );
-            targetAir = false;
             size = 2;
             recoilAmount = 0f;
             reloadTime = 2f;
@@ -1411,7 +1439,6 @@ public class Blocks implements ContentList{
             chargeTime = 50f;
             chargeMaxDelay = 30f;
             chargeEffects = 7;
-            shootType = Bullets.lancerLaser;
             recoilAmount = 2f;
             reloadTime = 90f;
             cooldown = 0.03f;
@@ -1426,11 +1453,24 @@ public class Blocks implements ContentList{
             health = 280 * size * size;
             targetAir = false;
             shootSound = Sounds.laser;
+
+            shootType = new LaserBulletType(140){{
+                colors = new Color[]{Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+                hitEffect = Fx.hitLancer;
+                despawnEffect = Fx.none;
+                hitSize = 4;
+                lifetime = 16f;
+                drawSize = 400f;
+            }};
         }};
 
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, with(Items.copper, 35, Items.lead, 50));
-            shootType = Bullets.arc;
+            shootType = new LightningBulletType(){{
+                damage = 21;
+                lightningLength = 25;
+                collidesAir = false;
+            }};
             reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
@@ -1504,42 +1544,11 @@ public class Blocks implements ContentList{
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
 
-            ammo(Items.thorium, new BulletType(0.01f, 105){
-                int rays = 1;
-                float rayLength = range + 10f;
-
-                {
-                    hitEffect = Fx.hitLancer;
-                    shootEffect = smokeEffect = Fx.lightningShoot;
-                    lifetime = 10f;
-                    despawnEffect = Fx.none;
-                    ammoMultiplier = 6f;
-                    pierce = true;
-                }
-
-                @Override
-                public void init(Bullet b){
-                    for(int i = 0; i < rays; i++){
-                        Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), rayLength - Math.abs(i - (rays / 2)) * 20f);
-                    }
-                }
-
-                @Override
-                public void draw(Bullet b){
-                    super.draw(b);
-                    Draw.color(Color.white, Pal.lancerLaser, b.fin());
-                    //Draw.alpha(b.fout());
-                    for(int i = 0; i < 7; i++){
-                        Tmp.v1.trns(b.rotation(), i * 8f);
-                        float sl = Mathf.clamp(b.fout() - 0.5f) * (80f - i * 10);
-                        Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 4f, sl, b.rotation() + 90);
-                        Drawf.tri(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 4f, sl, b.rotation() - 90);
-                    }
-                    Drawf.tri(b.x(), b.y(), 20f * b.fout(), (rayLength + 50), b.rotation());
-                    Drawf.tri(b.x(), b.y(), 20f * b.fout(), 10f, b.rotation() + 180f);
-                    Draw.reset();
-                }
-            });
+            ammo(Items.thorium, new ShrapnelBulletType(){{
+                length = range + 10f;
+                damage = 105f;
+                ammoMultiplier = 6f;
+            }});
         }};
 
         ripple = new ItemTurret("ripple"){{
@@ -1574,10 +1583,10 @@ public class Blocks implements ContentList{
         cyclone = new ItemTurret("cyclone"){{
             requirements(Category.turret, with(Items.copper, 200, Items.titanium, 125, Items.plastanium, 80));
             ammo(
-            Items.metaglass, Bullets.flakGlass,
-            Items.blastCompound, Bullets.flakExplosive,
-            Items.plastanium, Bullets.flakPlastic,
-            Items.surgealloy, Bullets.flakSurge
+            Items.metaglass, Bullets.fragGlass,
+            Items.blastCompound, Bullets.fragExplosive,
+            Items.plastanium, Bullets.fragPlastic,
+            Items.surgealloy, Bullets.fragSurge
             );
             xRand = 4f;
             reloadTime = 6f;
@@ -1620,7 +1629,6 @@ public class Blocks implements ContentList{
 
         meltdown = new LaserTurret("meltdown"){{
             requirements(Category.turret, with(Items.copper, 250, Items.lead, 350, Items.graphite, 300, Items.surgealloy, 325, Items.silicon, 325));
-            shootType = Bullets.meltdownLaser;
             shootEffect = Fx.shootBigSmoke2;
             shootCone = 40f;
             recoilAmount = 4f;
@@ -1634,6 +1642,16 @@ public class Blocks implements ContentList{
             shootSound = Sounds.laserbig;
             activeSound = Sounds.beam;
             activeSoundVolume = 2f;
+
+            shootType = new ContinuousLaserBulletType(70){{
+                length = 220f;
+                hitEffect = Fx.hitMeltdown;
+                drawSize = 420f;
+
+                incendChance = 0.4f;
+                incendSpread = 5f;
+                incendAmount = 1;
+            }};
 
             health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
@@ -1651,15 +1669,30 @@ public class Blocks implements ContentList{
             health = 190 * size * size;
         }};
 
+        parallax = new TractorBeamTurret("parallax"){{
+            requirements(Category.turret, with(Items.silicon, 120, Items.titanium, 90));
+
+            hasPower = true;
+            size = 2;
+            force = 2.5f;
+            scaledForce = 5f;
+            range = 170f;
+            damage = 0.08f;
+            health = 160 * size * size;
+            rotateSpeed = 10;
+
+            consumes.power(3f);
+        }};
+
         //endregion
         //region units
 
         groundFactory = new UnitFactory("ground-factory"){{
-            requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
+            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 200f, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 200f, with(Items.silicon, 10, Items.blastCompound, 5)),
-                new UnitPlan(UnitTypes.tau, 200f, with(Items.silicon, 20, Items.lead, 10)),
+                new UnitPlan(UnitTypes.dagger, 60f * 20, with(Items.silicon, 10, Items.lead, 10)),
+                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 10, Items.blastCompound, 10)),
+                new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1668,10 +1701,8 @@ public class Blocks implements ContentList{
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.wraith, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.spirit, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.draug, 200f, with(Items.silicon, 10)),
-                new UnitPlan(UnitTypes.phantom, 200f, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1680,7 +1711,7 @@ public class Blocks implements ContentList{
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.vanguard, 200f, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.risse, 60f * 30f, with(Items.silicon, 20, Items.metaglass, 25)),
             };
             size = 3;
             requiresWater = true;
@@ -1692,15 +1723,17 @@ public class Blocks implements ContentList{
 
             size = 3;
             consumes.power(3f);
-            consumes.items(with(Items.silicon, 40, Items.graphite, 30));
+            consumes.items(with(Items.silicon, 40, Items.graphite, 40));
 
-            constructTime = 60f * 5f;
+            constructTime = 60f * 10f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.tau, UnitTypes.oculon},
+                {UnitTypes.nova, UnitTypes.quasar},
                 {UnitTypes.dagger, UnitTypes.mace},
-                {UnitTypes.crawler, UnitTypes.eruptor},
-                {UnitTypes.wraith, UnitTypes.ghoul},
+                {UnitTypes.crawler, UnitTypes.atrax},
+                {UnitTypes.flare, UnitTypes.horizon},
+                {UnitTypes.mono, UnitTypes.poly},
+                {UnitTypes.risse, UnitTypes.minke},
             };
         }};
 
@@ -1709,13 +1742,17 @@ public class Blocks implements ContentList{
 
             size = 5;
             consumes.power(6f);
-            consumes.items(with(Items.silicon, 120, Items.titanium, 80));
+            consumes.items(with(Items.silicon, 130, Items.titanium, 80, Items.metaglass, 30));
 
-            constructTime = 60f * 15f;
+            constructTime = 60f * 30f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.ghoul, UnitTypes.revenant},
+                {UnitTypes.horizon, UnitTypes.zenith},
                 {UnitTypes.mace, UnitTypes.fortress},
+                {UnitTypes.poly, UnitTypes.mega},
+                {UnitTypes.minke, UnitTypes.bryde},
+                {UnitTypes.quasar, UnitTypes.pulsar},
+                {UnitTypes.atrax, UnitTypes.spiroct},
             };
         }};
 
@@ -1724,13 +1761,14 @@ public class Blocks implements ContentList{
 
             size = 7;
             consumes.power(12f);
-            consumes.items(with(Items.silicon, 200, Items.titanium, 200, Items.surgealloy, 200));
+            consumes.items(with(Items.silicon, 250, Items.titanium, 500, Items.plastanium, 400));
             consumes.liquid(Liquids.cryofluid, 1f);
 
-            constructTime = 60f * 60f;
+            constructTime = 60f * 60f * 1.5f;
+            liquidCapacity = 60f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.revenant, UnitTypes.lich},
+                {UnitTypes.zenith, UnitTypes.antumbra},
             };
         }};
 
@@ -1739,13 +1777,14 @@ public class Blocks implements ContentList{
 
             size = 9;
             consumes.power(25f);
-            consumes.items(with(Items.silicon, 300, Items.plastanium, 300, Items.surgealloy, 300, Items.phasefabric, 250));
+            consumes.items(with(Items.silicon, 350, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150));
             consumes.liquid(Liquids.cryofluid, 3f);
 
-            constructTime = 60f * 60f * 3;
+            constructTime = 60f * 60f * 4;
+            liquidCapacity = 180f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.lich, UnitTypes.reaper},
+                {UnitTypes.antumbra, UnitTypes.eclipse},
             };
         }};
 
@@ -1803,10 +1842,10 @@ public class Blocks implements ContentList{
         }};
 
         illuminator = new LightBlock("illuminator"){{
-            requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 4, Items.silicon, 2));
+            requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
             brightness = 0.67f;
-            radius = 120f;
-            consumes.power(0.05f);
+            radius = 140f;
+            consumes.power(0.06f);
         }};
 
         //endregion
@@ -1829,8 +1868,9 @@ public class Blocks implements ContentList{
             consumes.power(4f);
         }};
 
+        //TODO remove
         launchPadLarge = new LaunchPad("launch-pad-large"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
+            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
@@ -1839,7 +1879,7 @@ public class Blocks implements ContentList{
         }};
 
         dataProcessor = new ResearchBlock("data-processor"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 200, Items.lead, 100));
+            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 200, Items.lead, 100));
 
             size = 3;
             alwaysUnlocked = true;

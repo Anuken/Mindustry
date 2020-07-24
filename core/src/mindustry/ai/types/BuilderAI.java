@@ -69,7 +69,7 @@ public class BuilderAI extends AIController{
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
 
-        vec.setLength(unit.type().speed * Time.delta() * length);
+        vec.setLength(unit.type().speed * Time.delta * length);
         if(length < -0.5f){
             vec.rotate(180f);
         }else if(length < 0){

@@ -78,8 +78,10 @@ public class Vars implements Loadable{
     public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
-    /** duration of one turn in ticks */
-    public static final float turnDuration = 5 * Time.toMinutes;
+    /** duration of time between turns in ticks */
+    public static final float turnDuration = 20 * Time.toMinutes;
+    /** turns needed to destroy a sector completely */
+    public static final float sectorDestructionTurns = 3f;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.05f;
     /** launch animation duration */
@@ -286,7 +288,13 @@ public class Vars implements Loadable{
             if(!headless && (ui == null || ui.scriptfrag == null)){
                 logBuffer.add(result);
             }else if(!headless){
-                ui.scriptfrag.addMessage(result);
+                if(!OS.isWindows){
+                    for(String code : ColorCodes.values){
+                        result = result.replace(code, "");
+                    }
+                }
+
+                ui.scriptfrag.addMessage(Log.removeCodes(result));
             }
         });
 
@@ -327,6 +335,7 @@ public class Vars implements Loadable{
 
         settings.defaults("locale", "default", "blocksync", true);
         keybinds.setDefaults(Binding.values());
+        settings.setAutosave(false);
         settings.load();
 
         Scl.setProduct(settings.getInt("uiscale", 100) / 100f);

@@ -29,7 +29,7 @@ public class MassDriver extends Block{
     public float bulletLifetime = 200f;
     public Effect shootEffect = Fx.shootBig2;
     public Effect smokeEffect = Fx.shootBigSmoke2;
-    public Effect recieveEffect = Fx.mineBig;
+    public Effect receiveEffect = Fx.mineBig;
     public float shake = 3f;
     public @Load("@-base") TextureRegion baseRegion;
 
@@ -53,18 +53,18 @@ public class MassDriver extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize, y*tilesize, range, Pal.accent);
+        Drawf.dashCircle(x * tilesize, y * tilesize, range, Pal.accent);
 
         //check if a mass driver is selected while placing this driver
         if(!control.input.frag.config.isShown()) return;
         Building selected = control.input.frag.config.getSelectedTile();
-        if(selected == null || !(selected.block() instanceof MassDriver) || !(selected.dst(x * tilesize, y * tilesize) <= range)) return;
+        if(selected == null || !(selected.block() instanceof MassDriver) || !(selected.within(x * tilesize, y * tilesize, range))) return;
 
         //if so, draw a dotted line towards it while it is in range
         float sin = Mathf.absin(Time.time(), 6f, 1f);
-        Tmp.v1.set(x * tilesize + offset(), y * tilesize + offset()).sub(selected.x(), selected.y()).limit((size / 2f + 1) * tilesize + sin + 0.5f);
+        Tmp.v1.set(x * tilesize + offset, y * tilesize + offset).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
-        x1 = selected.x() + Tmp.v1.x, y1 = selected.y() + Tmp.v1.y;
+            x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
         int segs = (int)(selected.dst(x * tilesize, y * tilesize) / tilesize);
 
         Lines.stroke(4f, Pal.gray);
@@ -98,12 +98,12 @@ public class MassDriver extends Block{
 
         @Override
         public void updateTile(){
-            Building link = world.ent(this.link);
+            Building link = world.build(this.link);
             boolean hasLink = linkValid();
 
             //reload regardless of state
             if(reload > 0f){
-                reload = Mathf.clamp(reload - delta() / reloadTime * efficiency());
+                reload = Mathf.clamp(reload - edelta() / reloadTime);
             }
 
             //cleanup waiting shooters that are not valid
@@ -151,7 +151,7 @@ public class MassDriver extends Block{
 
                 if(
                 items.total() >= minDistribute && //must shoot minimum amount of items
-                link.block().itemCapacity - link.items().total() >= minDistribute //must have minimum amount of space
+                link.block().itemCapacity - link.items.total() >= minDistribute //must have minimum amount of space
                 ){
                     MassDriverEntity other = (MassDriverEntity)link;
                     other.waitingShooters.add(tile);
@@ -281,7 +281,7 @@ public class MassDriver extends Block{
             }
 
             Effects.shake(shake, shake, this);
-            recieveEffect.at(bullet);
+            receiveEffect.at(bullet);
 
             reload = 1f;
             bullet.remove();

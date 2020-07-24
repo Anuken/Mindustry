@@ -20,9 +20,9 @@ import static arc.Core.camera;
 import static mindustry.Vars.*;
 
 public class BlockRenderer implements Disposable{
-    private final static int initialRequests = 32 * 32;
-    private final static int expandr = 9;
-    private final static Color shadowColor = new Color(0, 0, 0, 0.71f);
+    private static final int initialRequests = 32 * 32;
+    private static final int expandr = 9;
+    private static final Color shadowColor = new Color(0, 0, 0, 0.71f);
 
     public final FloorRenderer floor = new FloorRenderer();
 
@@ -114,11 +114,11 @@ public class BlockRenderer implements Disposable{
         if(brokenFade > 0.001f){
             for(BlockPlan block : state.teams.get(player.team()).blocks){
                 Block b = content.block(block.block);
-                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
+                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
 
                 Draw.alpha(0.33f * brokenFade);
                 Draw.mixcol(Color.white, 0.2f + Mathf.absin(Time.globalTime(), 6f, 0.2f));
-                Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset(), block.y * tilesize + b.offset(), b.rotate ? block.rotation * 90 : 0f);
+                Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset, block.y * tilesize + b.offset, b.rotate ? block.rotation * 90 : 0f);
             }
             Draw.reset();
         }
@@ -201,7 +201,7 @@ public class BlockRenderer implements Disposable{
                     }
 
                     //lights are drawn even in the expanded range
-                    if(tile.build != null){
+                    if(tile.build != null || tile.block().emitLight){
                         lightview.add(tile);
                     }
 
@@ -212,6 +212,11 @@ public class BlockRenderer implements Disposable{
                             }
                         }
                     }
+                }
+
+                //special case for floors
+                if(block == Blocks.air && tile.floor().emitLight){
+                    lightview.add(tile);
                 }
             }
         }
@@ -257,15 +262,23 @@ public class BlockRenderer implements Disposable{
             }
         }
 
-        //draw lights
-        for(int i = 0; i < lightview.size; i++){
-            Tile tile = lightview.items[i];
-            Building entity = tile.build;
+        if(renderer.lights.enabled()){
+            //draw lights
+            for(int i = 0; i < lightview.size; i++){
+                Tile tile = lightview.items[i];
+                Building entity = tile.build;
 
-            if(entity != null){
-                entity.drawLight();
+                if(entity != null){
+                    entity.drawLight();
+                }else if(tile.block().emitLight){
+                    tile.block().drawEnvironmentLight(tile);
+                }else if(tile.floor().emitLight){
+                    tile.floor().drawEnvironmentLight(tile);
+                }
             }
         }
+
+
     }
 
     @Override

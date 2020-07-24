@@ -17,6 +17,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
+import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -31,21 +33,29 @@ public class UnitType extends UnlockableContent{
     public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
     private static final Vec2 legOffset = new Vec2();
 
+    /** If true, the unit is always at elevation 1. */
     public boolean flying;
     public @NonNull Prov<? extends Unit> constructor;
     public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
-    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f;
+    public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, armor = 0f;
+    public float crashDamageMultiplier = 4f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
+    public boolean destructibleWreck = true;
+    public float groundLayer = Layer.groundUnit;
     public float sway = 1f;
     public int payloadCapacity = 1;
     public int commandLimit = 24;
-    public float baseElevation = 0f;
+    public float visualElevation = -1f;
+    public boolean allowLegStep = false;
+    public boolean hovering = false;
+    public Effect fallEffect = Fx.fallSmoke;
+    public Effect fallThrusterEffect = Fx.fallSmoke;
+    public Seq<Ability> abilities = new Seq<>();
 
-    //TODO document
     public int legCount = 4, legGroupSize = 2;
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
@@ -53,7 +63,7 @@ public class UnitType extends UnlockableContent{
 
     public int itemCapacity = 30;
     public int ammoCapacity = 220;
-    public int drillTier = -1;
+    public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
     public float engineOffset = 5f, engineSize = 2.5f;
@@ -62,9 +72,12 @@ public class UnitType extends UnlockableContent{
     public float itemOffsetY = 3f;
     public float lightRadius = 60f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
-    public boolean drawCell = true, drawItems = true;
+    public boolean drawCell = true, drawItems = true, drawShields = true;
     public int parts = 0;
-    public int trailLength = 5;
+    public int trailLength = 3;
+    public float trailX = 4f, trailY = -3f, trailScl = 1f;
+    /** Whether the unit can heal blocks. Initialized in init() */
+    public boolean canHeal = false;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -72,8 +85,7 @@ public class UnitType extends UnlockableContent{
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
         occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion;
-    public TextureRegion[] partRegions;
-    public TextureRegion[] partCellRegions;
+    public TextureRegion[] partRegions, partCellRegions, wreckRegions;
 
     public UnitType(String name){
         super(name);
@@ -98,7 +110,13 @@ public class UnitType extends UnlockableContent{
         return weapons.size > 0;
     }
 
-    public void update(Unit unit){}
+    public void update(Unit unit){
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.update(unit);
+            }
+        }
+    }
 
     public void landed(Unit unit){}
 
@@ -117,10 +135,19 @@ public class UnitType extends UnlockableContent{
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)unit.ammo / ammoCapacity));
+                bars.add(new Bar("blocks.ammo", Pal.ammo, () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
         }).growX();
+        
+        table.row();
+        if(unit.deactivated){
+            table.table(d -> {
+                d.left();
+                d.label(() -> Core.bundle.format("bar.limitreached", unit.count(), unit.cap(), Fonts.getUnicodeStr(name)));
+            }).left().visible(() -> unit.deactivated);
+        }
+        
     }
 
     @Override
@@ -131,12 +158,39 @@ public class UnitType extends UnlockableContent{
     @CallSuper
     @Override
     public void init(){
+        if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
+
         //set up default range
         if(range < 0){
             for(Weapon weapon : weapons){
                 range = Math.max(range, weapon.bullet.range());
             }
         }
+
+        canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
+
+        //add mirrored weapon variants
+        Seq<Weapon> mapped = new Seq<>();
+        for(Weapon w : weapons){
+            mapped.add(w);
+
+            //mirrors are copies with X values negated
+            if(w.mirror){
+                Weapon copy = w.copy();
+                copy.x *= -1;
+                copy.shootX *= -1;
+                copy.flipSprite = !copy.flipSprite;
+                mapped.add(copy);
+
+                //since there are now two weapons, the reload time must be doubled
+                w.reload *= 2f;
+                copy.reload *= 2f;
+
+                w.otherSide = mapped.size - 1;
+                copy.otherSide = mapped.size - 2;
+            }
+        }
+        this.weapons = mapped;
     }
 
     @CallSuper
@@ -161,6 +215,11 @@ public class UnitType extends UnlockableContent{
             partRegions[i] = Core.atlas.find(name + "-part" + i);
             partCellRegions[i] = Core.atlas.find(name + "-cell" + i);
         }
+
+        wreckRegions = new TextureRegion[3];
+        for(int i = 0; i < wreckRegions.length; i++){
+            wreckRegions[i] = Core.atlas.find(name + "-wreck" + i);
+        }
     }
 
     @Override
@@ -172,7 +231,7 @@ public class UnitType extends UnlockableContent{
 
     public void draw(Unit unit){
         Mechc legs = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : Layer.groundUnit;
+        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer;
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
@@ -213,13 +272,34 @@ public class UnitType extends UnlockableContent{
         if(drawItems) drawItems(unit);
         drawLight(unit);
 
-        if(unit.shieldAlpha > 0){
+        if(unit.shieldAlpha > 0 && drawShields){
             drawShield(unit);
         }
 
         if(legs != null){
             unit.trns(-legOffset.x, -legOffset.y);
         }
+
+        if(unit.deactivated){
+            drawDeactive(unit);
+        }
+
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.draw(unit);
+                Draw.reset();
+            }
+        }
+    }
+
+    public void drawDeactive(Unit unit){
+        Draw.color(Color.scarlet);
+        Draw.alpha(0.8f);
+
+        float size = 8f;
+        Draw.rect(Icon.warning.getRegion(), unit.x, unit.y, size, size);
+
+        Draw.reset();
     }
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
@@ -247,7 +327,8 @@ public class UnitType extends UnlockableContent{
 
     public void drawShadow(Unit unit){
         Draw.color(shadowColor);
-        Draw.rect(shadowRegion, unit.x + shadowTX * unit.elevation, unit.y + shadowTY * unit.elevation, unit.rotation - 90);
+        float e = Math.max(unit.elevation, visualElevation);
+        Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
         Draw.color();
     }
 
@@ -300,7 +381,7 @@ public class UnitType extends UnlockableContent{
 
         if(unit instanceof Trailc){
             Trail trail = ((Trailc)unit).trail();
-            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale));
+            trail.draw(unit.team.color, (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f) * scale) * trailScl);
         }
 
         Draw.color(unit.team.color);
@@ -324,23 +405,21 @@ public class UnitType extends UnlockableContent{
         for(WeaponMount mount : unit.mounts){
             Weapon weapon = mount.weapon;
 
-            for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
-                i *= Mathf.sign(weapon.flipped);
+            float rotation = unit.rotation - 90;
+            float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
+            float width = weapon.region.getWidth();
+            float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
+            float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
+                wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
 
-                float rotation = unit.rotation - 90;
-                float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-                float width = i > 0 ? -weapon.region.getWidth() : weapon.region.getWidth();
-                float recoil = -(mount.reload / weapon.reload * weapon.recoil) * (weapon.alternate ? Mathf.num(i == Mathf.sign(mount.side)) : 1);
-
-                if(weapon.mirror) rotation = weaponRotation;
-
-                Draw.rect(weapon.region,
-                unit.x + Angles.trnsx(rotation, weapon.x * i, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
-                unit.y + Angles.trnsy(rotation, weapon.x * i, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil),
-                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.region.getHeight() * Draw.scl,
-                weaponRotation);
+            if(weapon.occlusion > 0){
+                Drawf.shadow(wx, wy, weapon.occlusion);
             }
+
+            Draw.rect(weapon.region, wx, wy,
+            width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+            weapon.region.getHeight() * Draw.scl,
+            weaponRotation);
         }
 
         Draw.reset();
@@ -400,8 +479,8 @@ public class UnitType extends UnlockableContent{
 
             Tmp.v1.set(leg.base).sub(leg.joint).inv().setLength(legExtension);
 
-            if(leg.moving && baseElevation > 0){
-                float scl = baseElevation;
+            if(leg.moving && visualElevation > 0){
+                float scl = visualElevation;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
                 Draw.color(shadowColor);
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));

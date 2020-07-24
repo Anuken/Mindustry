@@ -5,6 +5,7 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -23,9 +24,32 @@ import mindustry.world.blocks.legacy.*;
 import static mindustry.Vars.*;
 
 public class Generators{
+    //used for changing colors in the UI - testing only
+    static final IntIntMap paletteMap = IntIntMap.with(
+    //empty for now
+    0x454545ff, 0x00000000,//0x32394bff,
+    0x00000099, 0x00000000//0x000000ff
+    );
 
     public static void generate(){
         ObjectMap<Block, Image> gens = new ObjectMap<>();
+
+        if(!paletteMap.isEmpty()){
+            ImagePacker.generate("uipalette", () -> {
+                Fi.get("../ui").walk(fi -> {
+                    if(!fi.extEquals("png")) return;
+
+                    Pixmap pix = new Pixmap(fi);
+                    pix.setBlending(Pixmap.Blending.sourceOver);
+                    pix.each((x, y) -> {
+                        int value = pix.getPixel(x, y);
+                        pix.draw(x, y, paletteMap.get(value, value));
+                    });
+
+                    fi.writePNG(pix);
+                });
+            });
+        }
 
         ImagePacker.generate("splashes", () -> {
             ArcNativesLoader.load();
@@ -278,51 +302,95 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 
-            type.load();
+            try{
+                type.load();
+                type.init();
 
-            Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
-            for(int i = 1; i < type.parts; i++){
-                image.draw(ImagePacker.get(type.partRegions[i]));
-            }
-            if(type.parts > 0){
-                image.save(type.name);
-            }
+                Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
+                for(int i = 1; i < type.parts; i++){
+                    image.draw(ImagePacker.get(type.partRegions[i]));
+                }
+                if(type.parts > 0){
+                    image.save(type.name);
+                }
 
-            if(type.constructor.get() instanceof Mechc){
-                image.drawCenter(type.baseRegion);
-                image.drawCenter(type.legRegion);
-                image.drawCenter(type.legRegion, true, false);
-                image.draw(type.region);
-            }
+                if(type.constructor.get() instanceof Mechc){
+                    image.drawCenter(type.baseRegion);
+                    image.drawCenter(type.legRegion);
+                    image.drawCenter(type.legRegion, true, false);
+                    image.draw(type.region);
+                }
 
-            Image baseCell = ImagePacker.get(type.parts > 0 ? type.partCellRegions[0] : type.cellRegion);
-            for(int i = 1; i < type.parts; i++){
-                baseCell.draw(ImagePacker.get(type.partCellRegions[i]));
-            }
+                Image baseCell = ImagePacker.get(type.parts > 0 ? type.partCellRegions[0] : type.cellRegion);
+                for(int i = 1; i < type.parts; i++){
+                    baseCell.draw(ImagePacker.get(type.partCellRegions[i]));
+                }
 
-            if(type.parts > 0){
-                image.save(type.name + "-cell");
-            }
+                if(type.parts > 0){
+                    image.save(type.name + "-cell");
+                }
 
-            Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
-            cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
+                Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
+                cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
 
-            image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
+                image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
 
-            for(Weapon weapon : type.weapons){
-                weapon.load();
-
-                for(int i : (weapon.mirror ? Mathf.signs : Mathf.one)){
-                    i *= Mathf.sign(weapon.flipped);
+                for(Weapon weapon : type.weapons){
+                    weapon.load();
 
                     image.draw(weapon.region,
-                    (int)(i * weapon.x / Draw.scl + image.width / 2 - weapon.region.getWidth() / 2),
+                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.getWidth() / 2f),
                     (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
-                    i > 0, false);
+                    weapon.flipSprite, false);
                 }
+
+                image.save("unit-" + type.name + "-full");
+
+                Rand rand = new Rand();
+                rand.setSeed(type.name.hashCode());
+
+                //generate random wrecks
+
+                int splits = 3;
+                float degrees = rand.random(360f);
+                float offsetRange = Math.max(image.width, image.height) * 0.15f;
+                Vec2 offset = new Vec2(1, 1).rotate(rand.random(360f)).setLength(rand.random(0, offsetRange)).add(image.width/2f, image.height/2f);
+
+                Image[] wrecks = new Image[splits];
+                for(int i = 0; i < wrecks.length; i++){
+                    wrecks[i] = new Image(image.width, image.height);
+                }
+
+                RidgedPerlin r = new RidgedPerlin(1, 3);
+                VoronoiNoise vn = new VoronoiNoise(type.id, true);
+
+                image.each((x, y) -> {
+                    //add darker cracks on top
+                    boolean rValue = Math.max(r.getValue(x, y, 1f / (20f + image.width/8f)), 0) > 0.16f;
+                    //cut out random chunks with voronoi
+                    boolean vval = vn.noise(x, y, 1f / (14f + image.width/40f)) > 0.47;
+
+                    float dst =  offset.dst(x, y);
+                    //distort edges with random noise
+                    float noise = (float)Noise.rawNoise(dst / (9f + image.width/70f)) * (60 + image.width/30f);
+                    int section = (int)Mathf.clamp(Mathf.mod(offset.angleTo(x, y) + noise + degrees, 360f) / 360f * splits, 0, splits - 1);
+                    if(!vval) wrecks[section].draw(x, y, image.getColor(x, y).mul(rValue ? 0.7f : 1f));
+                });
+
+                for(int i = 0; i < wrecks.length; i++){
+                    wrecks[i].save(type.name + "-wreck" + i);
+                }
+
+                for(Cicon icon : Cicon.scaled){
+                    Image scaled = new Image(icon.size, icon.size);
+                    scaled.drawScaled(image);
+                    scaled.save("../ui/unit-" + type.name + "-" + icon.name());
+                }
+
+            }catch(IllegalArgumentException e){
+                Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
             }
 
-            image.save("unit-" + type.name + "-full");
         }));
 
         ImagePacker.generate("ore-icons", () -> {

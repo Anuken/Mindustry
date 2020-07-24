@@ -4,7 +4,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
 class GroupDefs<G>{
-    @GroupDef(value = Entityc.class, mapping = true) G all;
+    @GroupDef(value = Entityc.class) G all;
     @GroupDef(value = Playerc.class, mapping = true) G player;
     @GroupDef(value = Bulletc.class, spatial = true, collide = true) G bullet;
     @GroupDef(value = Unitc.class, spatial = true, mapping = true) G unit;

@@ -70,12 +70,12 @@ public abstract class Turret extends Block{
     public @Load("block-$size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
 
-    public Cons<TurretEntity> drawer = tile -> Draw.rect(region, tile.x() + tr2.x, tile.y() + tr2.y, tile.rotation - 90);
+    public Cons<TurretEntity> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
     public Cons<TurretEntity> heatDrawer = tile -> {
         if(tile.heat <= 0.00001f) return;
         Draw.color(heatColor, tile.heat);
         Draw.blend(Blending.additive);
-        Draw.rect(heatRegion, tile.x() + tr2.x, tile.y() + tr2.y, tile.rotation - 90);
+        Draw.rect(heatRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
         Draw.blend();
         Draw.color();
     };
@@ -102,8 +102,7 @@ public abstract class Turret extends Block{
 
         stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
         stats.add(BlockStat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
-        stats.add(BlockStat.shots, shots, StatUnit.none);
+        stats.add(BlockStat.reload, 60f / reloadTime * shots, StatUnit.none);
         stats.add(BlockStat.targetsAir, targetAir);
         stats.add(BlockStat.targetsGround, targetGround);
 
@@ -129,7 +128,7 @@ public abstract class Turret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.placing);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.placing);
     }
 
     public static abstract class AmmoEntry{
@@ -250,7 +249,7 @@ public abstract class Turret extends Block{
 
             Liquid liquid = liquids.current();
 
-            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta()), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
+            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
             reload += used * liquid.heatCapacity * coolantMultiplier;
             liquids.remove(liquid, used);
 

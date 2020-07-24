@@ -16,6 +16,9 @@ import java.util.concurrent.TimeUnit
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
 def colorMap = new IntMap<List<Color>>(), colorIndexMap = new IntIntMap()
+//on my machine, I have a native Nim AA implementation that is ~10x faster
+//it's not compiled for other platforms so they don't get it
+def useFastAA = System.getProperty("user.name") == "anuke"
 
 def transformColors = { List<List<String>> list ->
     list.each{ colors ->
@@ -37,6 +40,11 @@ transformColors([["a387ea", "8a73c6", "5c5e9f"], ["6e7080", "989aa4", "b0bac0"],
 
 def antialias = { File file ->
     if(!doAntialias) return
+
+    if(useFastAA){
+        "antialias ${file.absolutePath}".execute().waitFor()
+        return
+    }
 
     def image = ImageIO.read(file)
     def out = ImageIO.read(file)
@@ -354,10 +362,11 @@ task pack(dependsOn: classes){
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(16)
+        long ms = System.currentTimeMillis()
 
         //antialias everything except UI elements
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-"))) return
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
 
             executor.submit{
                 antialias(file.file)
@@ -370,6 +379,8 @@ task pack(dependsOn: classes){
         }catch(InterruptedException e){
             e.printStackTrace()
         }
+
+        println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
 
         println("\n\nPacking normal 4096 sprites...\n\n")
 

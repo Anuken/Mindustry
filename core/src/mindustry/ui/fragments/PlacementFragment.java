@@ -34,6 +34,7 @@ public class PlacementFragment extends Fragment{
     ObjectMap<Category,Block> selectedBlocks = new ObjectMap<>();
     ObjectFloatMap<Category> scrollPositions = new ObjectFloatMap<>();
     Block menuHoverBlock;
+    Displayable hover;
     Object lastDisplayState;
     boolean wasHovered;
     Table blockTable, toggler, topTable;
@@ -79,7 +80,7 @@ public class PlacementFragment extends Fragment{
 
     void rebuild(){
         currentCategory = Category.turret;
-        Group group = toggler.getParent();
+        Group group = toggler.parent;
         int index = toggler.getZIndex();
         toggler.remove();
         build(group);
@@ -90,7 +91,7 @@ public class PlacementFragment extends Fragment{
         scrollPositions.put(currentCategory, blockPane.getScrollY());
 
         if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
-            Building tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+            Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
             Block tryRecipe = tile == null ? null : tile.block();
             Object tryConfig = tile == null ? null : tile.config();
 
@@ -262,7 +263,7 @@ public class PlacementFragment extends Fragment{
                     top.add(new Table()).growX().update(topTable -> {
 
                         //find current hovered thing
-                        Displayable hovered = hovered();
+                        Displayable hovered = hover;
                         Block displayBlock = menuHoverBlock != null ? menuHoverBlock : control.input.block;
                         Object displayState = displayBlock != null ? displayBlock : hovered;
                         boolean isHovered = displayBlock == null; //use hovered thing if displayblock is null
@@ -430,7 +431,8 @@ public class PlacementFragment extends Fragment{
     }
 
     boolean hasInfoBox(){
-        return control.input.block != null || menuHoverBlock != null || hovered() != null;
+        hover = hovered();
+        return control.input.block != null || menuHoverBlock != null || hover != null;
     }
 
     /** Returns the thing being hovered over. */
@@ -449,9 +451,9 @@ public class PlacementFragment extends Fragment{
         //check tile being hovered over
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null){
-            //if the tile has an entity, display it
+            //if the tile has a building, display it
             if(hoverTile.build != null){
-                hoverTile.build.updateFlow(true);
+                hoverTile.build.updateFlow = true;
                 return hoverTile.build;
             }
 

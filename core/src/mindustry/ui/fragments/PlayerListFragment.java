@@ -98,7 +98,7 @@ public class PlayerListFragment extends Fragment{
                 }
             };
             table.margin(8);
-            table.add(new Image(user.icon()).setScaling(Scaling.none)).grow();
+            table.add(new Image(user.icon()).setScaling(Scaling.bounded)).grow();
 
             button.add(table).size(h);
             button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);
@@ -116,11 +116,11 @@ public class PlayerListFragment extends Fragment{
 
                     t.button(Icon.hammer, Styles.clearPartiali,
                     () -> {
-                        ui.showConfirm("$confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.onAdminRequest(user, AdminAction.ban));
+                        ui.showConfirm("$confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban));
                     });
                     t.button(Icon.cancel, Styles.clearPartiali,
                     () -> {
-                        ui.showConfirm("$confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.onAdminRequest(user, AdminAction.kick));
+                        ui.showConfirm("$confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick));
                     });
 
                     t.row();
@@ -140,7 +140,7 @@ public class PlayerListFragment extends Fragment{
                         .touchable(() -> net.client() ? Touchable.disabled : Touchable.enabled)
                         .checked(user.admin);
 
-                    t.button(Icon.zoom, Styles.clearPartiali, () -> Call.onAdminRequest(user, AdminAction.trace));
+                    t.button(Icon.zoom, Styles.clearPartiali, () -> Call.adminRequest(user, AdminAction.trace));
 
                 }).padRight(12).size(bs + 10f, bs);
             }else if(!user.isLocal() && !user.admin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick

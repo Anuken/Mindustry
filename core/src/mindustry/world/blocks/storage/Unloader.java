@@ -51,19 +51,19 @@ public class Unloader extends Block{
             if(timer(timerUnload, speed / timeScale())){
                 for(Building other : proximity){
                     if(other.interactable(team) && other.block().unloadable && other.block().hasItems
-                        && ((sortItem == null && other.items().total() > 0) || (sortItem != null && other.items().has(sortItem)))){
+                        && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
                         //make sure the item can't be dumped back into this block
                         dumpingTo = other;
 
                         //get item to be taken
-                        Item item = sortItem == null ? other.items().beginTake() : sortItem;
+                        Item item = sortItem == null ? other.items.beginTake() : sortItem;
 
                         //remove item if it's dumped correctly
                         if(put(item)){
                             if(sortItem == null){
-                                other.items().endTake(item);
+                                other.items.endTake(item);
                             }else{
-                                other.items().remove(item, 1);
+                                other.items.remove(item, 1);
                             }
                         }
                     }

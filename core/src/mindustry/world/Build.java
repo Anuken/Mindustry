@@ -56,6 +56,8 @@ public class Build{
         Block previous = tile.block();
         Block sub = BuildBlock.get(result.size);
 
+        result.beforePlaceBegan(tile, previous);
+
         tile.setBlock(sub, team, rotation);
         tile.<BuildEntity>bc().setConstruct(previous, result);
 
@@ -71,11 +73,11 @@ public class Build{
             return false;
         }
 
-        if((type.solid || type.solidifes) && Units.anyEntities(x * tilesize + type.offset() - type.size*tilesize/2f, y * tilesize + type.offset() - type.size*tilesize/2f, type.size * tilesize, type.size*tilesize)){
+        if((type.solid || type.solidifes) && Units.anyEntities(x * tilesize + type.offset - type.size*tilesize/2f, y * tilesize + type.offset - type.size*tilesize/2f, type.size * tilesize, type.size*tilesize)){
             return false;
         }
 
-        if(state.teams.eachEnemyCore(team, core -> Mathf.dst(x * tilesize + type.offset(), y * tilesize + type.offset(), core.x(), core.y()) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f)){
+        if(state.teams.eachEnemyCore(team, core -> Mathf.dst(x * tilesize + type.offset, y * tilesize + type.offset, core.x, core.y) < state.rules.enemyCoreBuildRadius + type.size * tilesize / 2f)){
             return false;
         }
 
@@ -112,8 +114,7 @@ public class Build{
                 return type.bounds(x, y, Tmp.r1).grow(0.01f).contains(tile.block.bounds(tile.centerX(), tile.centerY(), Tmp.r2));
             }
 
-            //TODO should water blocks be placeable here?
-            if(/*!type.requiresWater && */!contactsShallows(tile.x, tile.y, type)){
+            if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
                 return false;
             }
 
@@ -130,7 +131,7 @@ public class Build{
                         other == null ||
                         !other.block().alwaysReplace ||
                         !other.floor().placeableOn ||
-                        (other.floor().isDeep() && !type.floating && !type.requiresWater) ||
+                        (other.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) ||
                         (type.requiresWater && tile.floor().liquidDrop != Liquids.water)
                     ){
                         return false;
@@ -140,8 +141,8 @@ public class Build{
             return true;
         }else{
             return tile.interactable(team)
-                && contactsShallows(tile.x, tile.y, type)
-                && (!tile.floor().isDeep() || type.floating || type.requiresWater)
+                && (contactsShallows(tile.x, tile.y, type) || type.requiresWater || type.placeableLiquid)
+                && (!tile.floor().isDeep() || type.floating || type.requiresWater || type.placeableLiquid)
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
                 && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type))

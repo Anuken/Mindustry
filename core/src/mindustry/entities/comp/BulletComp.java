@@ -19,6 +19,7 @@ import static mindustry.Vars.*;
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
     @Import Entityc owner;
+    @Import float x,y;
 
     IntSeq collided = new IntSeq(6);
     Object data;
@@ -27,7 +28,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
-        for(Team team : state.teams.enemiesOf(team)){
+        for(Team team : team.enemies()){
             consumer.get(teamIndex.tree(team));
         }
     }
@@ -75,7 +76,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public boolean collides(Hitboxc other){
         return type.collides && (other instanceof Teamc && ((Teamc)other).team() != team)
-            && !(other instanceof Flyingc && ((((Flyingc)other).isFlying() && !type.collidesAir) || (((Flyingc)other).isGrounded() && !type.collidesGround)))
+            && !(other instanceof Flyingc && !((Flyingc)other).checkTarget(type.collidesAir, type.collidesGround))
             && !(type.pierce && collided.contains(other.id())); //prevent multiple collisions
     }
 
@@ -91,7 +92,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
         if(other instanceof Unit){
             Unit unit = (Unit)other;
-            unit.vel.add(Tmp.v3.set(unit).sub(x, y).setLength(type.knockback / unit.mass()));
+            unit.impulse(Tmp.v3.set(unit).sub(this.x, this.y).nor().scl(type.knockback * 80f));
             unit.apply(type.status, type.statusDuration);
         }
 
@@ -107,20 +108,20 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public void update(){
         type.update(base());
 
-        if(type.collidesTiles && type.collides){
+        if(type.collidesTiles && type.collides && type.collidesGround){
             world.raycastEach(world.toTile(lastX()), world.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
-                Building tile = world.ent(x, y);
+                Building tile = world.build(x, y);
                 if(tile == null) return false;
 
-                if(tile.collide(base()) && type.collides(base(), tile) && !tile.dead() && (type.collidesTeam || tile.team() != team())){
+                if(tile.collide(base()) && type.collides(base(), tile) && !tile.dead() && (type.collidesTeam || tile.team != team)){
                     boolean remove = false;
 
-                    if(tile.team() != team()){
+                    if(tile.team != team){
                         remove = tile.collision(base());
                     }
 
-                    if(remove){
+                    if(remove || type.collidesTeam){
                         type.hitTile(base(), tile);
                         remove();
                     }

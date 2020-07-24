@@ -193,7 +193,7 @@ public class EntityIO{
             st("$L = $L($T.$L($L, $L, alpha))", name, field.annotation(SyncField.class).clamped() ? "arc.math.Mathf.clamp" : "", Mathf.class, field.annotation(SyncField.class).value() ? "lerp" : "slerp", lastName, targetName);
         }
 
-        ncont("else"); //no meaningful data has arrived yet
+        ncont("else if(lastUpdated != 0)"); //check if no meaningful data has arrived yet
 
         //write values directly to targets
         for(Svar field : fields){

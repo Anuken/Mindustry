@@ -4,6 +4,7 @@ import arc.math.geom.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
 import java.util.*;
 
@@ -11,19 +12,40 @@ import java.util.*;
 public class TeamIndexProcess implements AsyncProcess{
     private QuadTree<Unit>[] trees = new QuadTree[Team.all.length];
     private int[] counts = new int[Team.all.length];
+    private int[][] typeCounts = new int[Team.all.length][0];
+    private int[][] activeCounts = new int[Team.all.length][0];
 
     public QuadTree<Unit> tree(Team team){
-        if(trees[team.uid] == null) trees[team.uid] = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
+        if(trees[team.id] == null) trees[team.id] = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
 
-        return trees[team.uid];
+        return trees[team.id];
     }
 
     public int count(Team team){
         return counts[team.id];
     }
 
-    public void updateCount(Team team, int amount){
+    public int countType(Team team, UnitType type){
+        return typeCounts[team.id].length <= type.id ? 0 : typeCounts[team.id][type.id];
+    }
+
+    public int countActive(Team team, UnitType type){
+        return activeCounts[team.id].length <= type.id ? 0 : activeCounts[team.id][type.id];
+    }
+
+    public void updateCount(Team team, UnitType type, int amount){
         counts[team.id] += amount;
+        if(typeCounts[team.id].length <= type.id){
+            typeCounts[team.id] = new int[Vars.content.units().size];
+        }
+        typeCounts[team.id][type.id] += amount;
+    }
+
+    public void updateActiveCount(Team team, UnitType type, int amount){
+        if(activeCounts[team.id].length <= type.id){
+            activeCounts[team.id] = new int[Vars.content.units().size];
+        }
+        activeCounts[team.id][type.id] += amount;
     }
 
     @Override
@@ -36,16 +58,21 @@ public class TeamIndexProcess implements AsyncProcess{
     public void begin(){
 
         for(Team team : Team.all){
-            if(trees[team.uid] != null){
-                trees[team.uid].clear();
+            if(trees[team.id] != null){
+                trees[team.id].clear();
             }
+
+            Arrays.fill(typeCounts[team.id], 0);
+            Arrays.fill(activeCounts[team.id], 0);
         }
 
         Arrays.fill(counts, 0);
 
         for(Unit unit : Groups.unit){
             tree(unit.team).insert(unit);
-            counts[unit.team.id] ++;
+
+            updateCount(unit.team, unit.type(), 1);
+            if(!unit.deactivated) updateActiveCount(unit.team, unit.type(), 1);
         }
     }
 

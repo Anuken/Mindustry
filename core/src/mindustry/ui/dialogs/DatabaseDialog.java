@@ -37,7 +37,7 @@ public class DatabaseDialog extends BaseDialog{
         Seq<Content>[] allContent = Vars.content.getContentMap();
 
         for(int j = 0; j < allContent.length; j++){
-            ContentType type = ContentType.values()[j];
+            ContentType type = ContentType.all[j];
 
             Seq<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
             if(array.size == 0) continue;
@@ -62,7 +62,7 @@ public class DatabaseDialog extends BaseDialog{
                     image.addListener(listener);
                     if(!Vars.mobile && unlocked(unlock)){
                         image.addListener(new HandCursorListener());
-                        image.update(() -> image.getColor().lerp(!listener.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta()));
+                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
                     }
 
                     if(unlocked(unlock)){

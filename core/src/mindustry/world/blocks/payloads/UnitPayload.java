@@ -21,6 +21,11 @@ public class UnitPayload implements Payload{
     }
 
     @Override
+    public boolean canBeTaken(Payloadc picker){
+        return unit.hitSize < picker.hitSize();
+    }
+
+    @Override
     public void write(Writes write){
         write.b(payloadUnit);
         write.b(unit.classId());

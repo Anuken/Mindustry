@@ -21,25 +21,25 @@ Créez des chaînes d'approvisionnement complexes pour alimenter vos tourelles e
 [*] Missions et objectifs variés.
 [*] Invitez vos amis pour terminer les missions ensemble.
 [*] 120+ blocs technologiques à maîtriser.
-[*] 19 types de drones, mechs et vaisseau.
+[*] 19 types de drones, mechs et vaisseaux.
 [*] 50+ succès à débloquer.
 [/list]
 
 [h2]Modes de jeu[/h2]
 
 [list]
-[*] [b]Survie[/b]: Construisez des tourelles pour défendre votre base des ennemis dans un style de jeu inspiré des tower-defense. Survivez aussi longtemps que possible, avant de faire décoller votre noyau. Utiliser les ressources récoltées pour débloquer de nouvelles technologies. Préparez votre base pour les attaques de puissants boss aériens.
+[*] [b]Survie[/b]: Construisez des tourelles pour défendre votre base des ennemis dans un style de jeu inspiré des tower-defense. Survivez aussi longtemps que possible, avant de faire décoller votre noyau. Utilisez les ressources récoltées pour débloquer de nouvelles technologies. Préparez votre base pour les attaques de puissants boss aériens.
 [*] [b]Attaque[/b]: Construisez des usines et produisez des unités pour détruire les noyaux ennemis, tout en défendant votre base contre les vagues d'attaque. Créez une grande variété d'unités offensives et de support pour vous aider dans vos objectifs.
 [*] [b]PvP[/b]: Affrontez d'autres joueurs. Constituez jusqu'à 4 équipes différentes et tentez de détruire les noyaux adverses. Créez des unités d'assaut ou attaquez directement les autres bases avec vos mechs.
-[*] [b]Bac à sable[/b]: Jouez avec des ressources infinies et aucune menace ennemie. Utilisez des objets et des blocs spécifiques à ce mode de jeu comme les sources de liquides. Testez vos designs et faites apparaître les ennemis à la demande.
+[*] [b]Bac à sable[/b]: Jouez avec des ressources infinies et aucune menace ennemie. Utilisez des objets et des blocs spécifiques à ce mode de jeu tels que les sources de liquides. Testez vos designs et faites apparaître les ennemis à la demande.
 [/list]
 
 [h2]Parties Multijoueurs Cross-Platformes Personnalisées[/h2]
 
 [list]
 [*] 12 cartes supplémentaires pour vos parties personnalisées en plus des cartes de la campagne.
-[*] Jouer en Co-op, en PvP ou en mode Bac à sable.
-[*] Rejoignez un serveur public dédié, ou invitez vos amis dans vos propres sessions privées.
+[*] Jouez en Co-op, en PvP ou en mode Bac à sable.
+[*] Rejoignez un serveur dédié public, ou invitez vos amis dans vos propres sessions privées.
 [*] Personnalisez les règles de jeu: changez les coûts des blocs, les stats des ennemis, les ressources de départs, le timing des vagues...
 [*] Mixez les modes de jeux: combinez PvP et PvE dans la même partie.
 [/list]
@@ -47,14 +47,14 @@ Créez des chaînes d'approvisionnement complexes pour alimenter vos tourelles e
 [h2]Éditeur de carte[/h2]
 
 [list]
-[*] Peignez le terrain grace à une interface d'édition.
+[*] Peignez le terrain grâce à une interface d'édition.
 [*] Éditez and prévisualisez les structures en jeu.
 [*] Outils d'édition configurables: choisissez comment chaque outil fonctionne.
 [*] Générateur de carte puissant, disposant d'un grand nombre de filtres permettant la manipulation procédurale du terrain.
 [*] Appliquez les effets bruit, distortion, lissage, erosion, symétrie, génération de minerais et terrain aléatoire.
 [*] Randomisez et configurez la génération des minerais ainsi que le placement des rivières et des tuiles de ressources.
 [*] Configurez la disposition des vagues d'ennemis.
-[*] Partagez vos cartes le Workshop Steam.
+[*] Partagez vos cartes sur le Workshop Steam.
 [*] Personnalisez les règles de base de vos cartes.
 [*] 75+ blocs environnementaux différents.
 [/list]

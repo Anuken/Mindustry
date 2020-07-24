@@ -28,6 +28,8 @@ public class RepairPoint extends Block{
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
 
+    public Color laserColor = Color.valueOf("e8ffd7");
+
     public RepairPoint(String name){
         super(name);
         update = true;
@@ -51,7 +53,7 @@ public class RepairPoint extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), repairRadius, Pal.accent);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, repairRadius, Pal.accent);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class RepairPoint extends Block{
     }
 
     public class RepairPointEntity extends Building{
-        public Unitc target;
+        public Unit target;
         public float strength, rotation = 90;
 
         @Override
@@ -75,7 +77,7 @@ public class RepairPoint extends Block{
                 float ang = angleTo(target);
                 float len = 5f;
 
-                Draw.color(Color.valueOf("e8ffd7"));
+                Draw.color(laserColor);
                 Drawf.laser(team, laser, laserEnd,
                 x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),
                 target.x(), target.y(), strength);
@@ -94,15 +96,15 @@ public class RepairPoint extends Block{
             if(target != null && (target.dead() || target.dst(tile) > repairRadius || target.health() >= target.maxHealth())){
                 target = null;
             }else if(target != null && consValid()){
-                target.heal(repairSpeed * Time.delta() * strength * efficiency());
+                target.heal(repairSpeed * Time.delta * strength * efficiency());
                 rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.5f);
                 targetIsBeingRepaired = true;
             }
 
             if(target != null && targetIsBeingRepaired){
-                strength = Mathf.lerpDelta(strength, 1f, 0.08f * Time.delta());
+                strength = Mathf.lerpDelta(strength, 1f, 0.08f * Time.delta);
             }else{
-                strength = Mathf.lerpDelta(strength, 0f, 0.07f * Time.delta());
+                strength = Mathf.lerpDelta(strength, 0f, 0.07f * Time.delta);
             }
 
             if(timer(timerTarget, 20)){

@@ -162,7 +162,7 @@ public class Tutorial{
         },
         withdraw(() -> event("withdraw")){
             void begin(){
-                state.teams.playerCores().first().items().add(Items.copper, 10);
+                state.teams.playerCores().first().items.add(Items.copper, 10);
             }
         },
         deposit(() -> event("deposit")),
@@ -270,7 +270,7 @@ public class Tutorial{
         }
 
         static int item(Item item){
-            return state.rules.defaultTeam.data().noCores() ? 0 : state.rules.defaultTeam.core().items().get(item);
+            return state.rules.defaultTeam.data().noCores() ? 0 : state.rules.defaultTeam.core().items.get(item);
         }
 
         static boolean toggled(String name){

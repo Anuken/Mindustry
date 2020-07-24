@@ -279,7 +279,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
+        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
@@ -288,6 +288,16 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         }
 
         state.rules.waves = true;
+
+        float difficulty = sector.baseCoverage;
+
+        //scale up the spawning base on difficulty (this is just for testing)
+        for(SpawnGroup group : state.rules.spawns){
+            group.unitAmount *= difficulty;
+            if(group.unitScaling != SpawnGroup.never){
+                group.unitScaling *= difficulty;
+            }
+        }
     }
 
     @Override

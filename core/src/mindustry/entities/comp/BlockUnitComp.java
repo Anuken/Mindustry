@@ -1,10 +1,12 @@
 package mindustry.entities.comp;
 
+import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 @Component
 abstract class BlockUnitComp implements Unitc{
@@ -27,6 +29,12 @@ abstract class BlockUnitComp implements Unitc{
         if(tile != null){
             team = tile.team();
         }
+    }
+
+    @Replace
+    @Override
+    public TextureRegion icon(){
+        return tile.block.icon(Cicon.full);
     }
 
     @Override

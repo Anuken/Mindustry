@@ -22,7 +22,7 @@ public class DefaultWaves{
                 unitScaling = 1.5f;
             }},
 
-            new SpawnGroup(UnitTypes.wraith){{
+            new SpawnGroup(UnitTypes.flare){{
                 begin = 12;
                 end = 16;
                 unitScaling = 1f;
@@ -72,7 +72,7 @@ public class DefaultWaves{
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.wraith){{
+            new SpawnGroup(UnitTypes.flare){{
                 begin = 16;
                 unitScaling = 1;
                 spacing = 2;
@@ -120,14 +120,14 @@ public class DefaultWaves{
                 end = 130;
             }},
 
-            new SpawnGroup(UnitTypes.ghoul){{
+            new SpawnGroup(UnitTypes.horizon){{
                 begin = 40;
                 unitAmount = 2;
                 spacing = 2;
                 unitScaling = 2;
             }},
 
-            new SpawnGroup(UnitTypes.wraith){{
+            new SpawnGroup(UnitTypes.flare){{
                 begin = 50;
                 unitAmount = 4;
                 unitScaling = 3;
@@ -135,7 +135,7 @@ public class DefaultWaves{
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.revenant){{
+            new SpawnGroup(UnitTypes.zenith){{
                 begin = 50;
                 unitAmount = 2;
                 unitScaling = 3;
@@ -143,42 +143,42 @@ public class DefaultWaves{
                 max = 16;
             }},
 
-            new SpawnGroup(UnitTypes.ghoul){{
+            new SpawnGroup(UnitTypes.horizon){{
                 begin = 53;
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
             }},
 
-            new SpawnGroup(UnitTypes.eruptor){{
+            new SpawnGroup(UnitTypes.atrax){{
                 begin = 31;
                 unitAmount = 4;
                 unitScaling = 1;
                 spacing = 3;
             }},
 
-            new SpawnGroup(UnitTypes.chaosArray){{
+            new SpawnGroup(UnitTypes.vestige){{
                 begin = 41;
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 30;
             }},
 
-            new SpawnGroup(UnitTypes.eradicator){{
+            new SpawnGroup(UnitTypes.cataclyst){{
                 begin = 81;
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
             }},
 
-            new SpawnGroup(UnitTypes.lich){{
+            new SpawnGroup(UnitTypes.antumbra){{
                 begin = 131;
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
             }},
 
-            new SpawnGroup(UnitTypes.ghoul){{
+            new SpawnGroup(UnitTypes.horizon){{
                 begin = 90;
                 unitAmount = 2;
                 unitScaling = 3;

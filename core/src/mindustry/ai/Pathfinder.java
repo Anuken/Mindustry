@@ -68,7 +68,7 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        return PathTile.get(tile.cost, tile.getTeamID(), !tile.solid() && tile.floor().drownTime <= 0f, !tile.solid() && tile.floor().isLiquid);
+        return PathTile.get(tile.cost, (byte)tile.getTeamID(), !tile.solid() && tile.floor().drownTime <= 0f, !tile.solid() && tile.floor().isLiquid);
     }
 
     /** Starts or restarts the pathfinding thread. */
@@ -85,11 +85,6 @@ public class Pathfinder implements Runnable{
         }
         queue.clear();
     }
-
-    //public int debugValue(Team team, int x, int y){
-    //    if(pathMap[team.id][FlagTarget.enemyCores.ordinal()] == null) return 0;
-    //    return pathMap[team.id][FlagTarget.enemyCores.ordinal()].weights[x][y];
-    //}
 
     /** Update a tile in the internal pathfinding grid.
      * Causes a complete pathfinding reclaculation. Main thread only. */
@@ -144,9 +139,9 @@ public class Pathfinder implements Runnable{
 
                             Core.app.post(() -> {
                                 //remove its used state
-                                if(fieldMap[team.uid] != null){
-                                    fieldMap[team.uid].remove(data.target);
-                                    fieldMapUsed[team.uid].remove(data.target);
+                                if(fieldMap[team.id] != null){
+                                    fieldMap[team.id].remove(data.target);
+                                    fieldMapUsed[team.id].remove(data.target);
                                 }
                                 //remove from main thread list
                                 mainList.remove(data);
@@ -172,24 +167,24 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    public Tile getTargetTile(Tile tile, Team team, Position target){
+    public @Nullable Tile getTargetTile(Tile tile, Team team, Position target){
         return getTargetTile(tile, team, getTarget(target));
     }
 
     /** Gets next tile to travel to. Main thread only. */
-    public Tile getTargetTile(Tile tile, Team team, PathTarget target){
+    public @Nullable Tile getTargetTile(Tile tile, Team team, PathTarget target){
         if(tile == null) return null;
 
-        if(fieldMap[team.uid] == null){
-            fieldMap[team.uid] = new ObjectMap<>();
-            fieldMapUsed[team.uid] = new ObjectSet<>();
+        if(fieldMap[team.id] == null){
+            fieldMap[team.id] = new ObjectMap<>();
+            fieldMapUsed[team.id] = new ObjectSet<>();
         }
 
-        Flowfield data = fieldMap[team.uid].get(target);
+        Flowfield data = fieldMap[team.id].get(target);
 
         if(data == null){
             //if this combination is not found, create it on request
-            if(fieldMapUsed[team.uid].add(target)){
+            if(fieldMapUsed[team.id].add(target)){
                 //grab targets since this is run on main thread
                 IntSeq targets = target.getPositions(team, new IntSeq());
                 queue.post(() -> createPath(team, target, targets));
@@ -311,8 +306,8 @@ public class Pathfinder implements Runnable{
         //add to main thread's list of paths
         Core.app.post(() -> {
             mainList.add(path);
-            if(fieldMap[team.uid] != null){
-                fieldMap[team.uid].put(target, path);
+            if(fieldMap[team.id] != null){
+                fieldMap[team.id].put(target, path);
             }
         });
 

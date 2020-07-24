@@ -10,8 +10,8 @@ import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -25,6 +25,9 @@ import mindustry.world.modules.*;
 import static mindustry.Vars.*;
 
 public class CoreBlock extends StorageBlock{
+    //hacky way to pass item modules between methods
+    private static ItemModule nextItems;
+
     public UnitType unitType = UnitTypes.alpha;
 
     public final int timerResupply = timers++;
@@ -50,7 +53,7 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Remote(called = Loc.server)
-    public static void onPlayerSpawn(Tile tile, Player player){
+    public static void playerSpawn(Tile tile, Player player){
         if(player == null || tile == null) return;
 
         CoreEntity entity = tile.bc();
@@ -76,14 +79,7 @@ public class CoreBlock extends StorageBlock{
             new Bar(
                 () -> Core.bundle.format("bar.capacity", ui.formatAmount(e.storageCapacity)),
                 () -> Pal.items,
-                () -> e.items().total() / ((float)e.storageCapacity * content.items().count(i -> i.type == ItemType.material))
-            ));
-
-        bars.add("units", e ->
-            new Bar(
-                () -> Core.bundle.format("bar.units", teamIndex.count(e.team()), Units.getCap(e.team())),
-                () -> Pal.power,
-                () -> (float)teamIndex.count(e.team()) / Units.getCap(e.team())
+            () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
             ));
     }
 
@@ -100,6 +96,9 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team){
+        CoreEntity core = team.core();
+        //must have all requirements
+        if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements))) return false;
         return canReplace(tile.block());
     }
 
@@ -110,6 +109,41 @@ public class CoreBlock extends StorageBlock{
             tile.setBlock(this, tile.team());
             Fx.placeBlock.at(tile, tile.block().size);
             Fx.upgradeCore.at(tile, tile.block().size);
+
+            //set up the correct items
+            if(nextItems != null){
+                //force-set the total items
+                if(tile.team().core() != null){
+                    tile.team().core().items.set(nextItems);
+                }
+
+                nextItems = null;
+            }
+        }
+    }
+
+    @Override
+    public void beforePlaceBegan(Tile tile, Block previous){
+        if(tile.build instanceof CoreEntity){
+            //right before placing, create a "destination" item array which is all the previous items minus core requirements
+            ItemModule items = tile.build.items.copy();
+            if(!state.rules.infiniteResources){
+                items.remove(requirements);
+            }
+
+            nextItems = items;
+        }
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        if(!canPlaceOn(world.tile(x, y),player.team())){
+
+            drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements) && !state.rules.infiniteResources) ?
+                "bar.corereq" :
+                "bar.noresources"
+            ), x, y, valid);
+
         }
     }
 
@@ -130,7 +164,7 @@ public class CoreBlock extends StorageBlock{
         }
 
         public void requestSpawn(Player player){
-            Call.onPlayerSpawn(tile, player);
+            Call.playerSpawn(tile, player);
         }
 
         @Override
@@ -154,21 +188,21 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            return item.type == ItemType.material ? storageCapacity : 0;
+            return storageCapacity;
         }
 
         @Override
         public void onProximityUpdate(){
             for(Building other : state.teams.cores(team)){
                 if(other.tile() != tile){
-                    items(other.items());
+                    this.items = other.items;
                 }
             }
             state.teams.registerCore(this);
 
             storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) && owns(e) ? e.block().itemCapacity : 0);
             proximity.each(e -> isContainer(e) && owns(e), t -> {
-                t.items(items);
+                t.items = items;
                 ((StorageBlockEntity)t).linkedCore = this;
             });
 
@@ -195,13 +229,13 @@ public class CoreBlock extends StorageBlock{
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
                     float offset = -Math.max(t.block().size - 1, 0) / 2f * tilesize;
-                    Draw.rect("block-select", t.x() + offset * p.x, t.y() + offset * p.y, i * 90);
+                    Draw.rect("block-select", t.x + offset * p.x, t.y + offset * p.y, i * 90);
                 }
             };
-            if(proximity.contains(e -> isContainer(e) && e.items() == items)){
+            if(proximity.contains(e -> isContainer(e) && e.items == items)){
                 outline.get(this);
             }
-            proximity.each(e -> isContainer(e) && e.items() == items, outline);
+            proximity.each(e -> isContainer(e) && e.items == items, outline);
             Draw.reset();
         }
 
@@ -228,15 +262,15 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void onRemoved(){
-            int total = proximity.count(e -> e.items() != null && e.items() == items);
+            int total = proximity.count(e -> e.items != null && e.items == items);
             float fract = 1f / total / state.teams.cores(team).size;
 
-            proximity.each(e -> isContainer(e) && e.items() == items && owns(e), t -> {
+            proximity.each(e -> isContainer(e) && e.items == items && owns(e), t -> {
                 StorageBlockEntity ent = (StorageBlockEntity)t;
                 ent.linkedCore = null;
-                ent.items(new ItemModule());
+                ent.items = new ItemModule();
                 for(Item item : content.items()){
-                    ent.items().set(item, (int)(fract * items.get(item)));
+                    ent.items.set(item, (int)(fract * items.get(item)));
                 }
             });
 

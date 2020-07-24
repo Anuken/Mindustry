@@ -8,7 +8,7 @@ import arc.input.*;
 public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.a, KeyCode.d), "general"),
     move_y(new Axis(KeyCode.s, KeyCode.w)),
-    mouse_move(KeyCode.mouseBack),
+    mouse_move(KeyCode.mouseForward),
 
     boost(KeyCode.shiftLeft),
     control(KeyCode.controlLeft),
@@ -34,7 +34,7 @@ public enum Binding implements KeyBind{
     schematic_flip_y(KeyCode.x),
     schematic_menu(KeyCode.t),
 
-    category_prev(KeyCode.comma),
+    category_prev(KeyCode.comma, "blocks"),
     category_next(KeyCode.period),
 
     block_select_left(KeyCode.left),

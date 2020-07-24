@@ -139,6 +139,9 @@ public class Administration{
 
     /** @return whether this action is allowed by the action filters. */
     public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
+        //some actions are done by the server (null player) and thus are always allowed
+        if(player == null) return true;
+
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
         setter.get(act.set(player, type, tile));
         for(ActionFilter filter : actionFilters){
@@ -567,7 +570,10 @@ public class Administration{
         socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
         allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
         whitelist("Whether the whitelist is used.", false),
-        motd("The message displayed to people on connection.", "off");
+        motd("The message displayed to people on connection.", "off"),
+        autosave("Whether the periodically save the map when playing.", false),
+        autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
+        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5);
 
         public static final Config[] all = values();
 

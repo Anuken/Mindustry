@@ -139,5 +139,4 @@ const ResizeEvent = Packages.mindustry.game.EventType.ResizeEvent
 const LaunchEvent = Packages.mindustry.game.EventType.LaunchEvent
 const LoseEvent = Packages.mindustry.game.EventType.LoseEvent
 const WinEvent = Packages.mindustry.game.EventType.WinEvent
-const TurnEvent = Packages.mindustry.game.EventType.TurnEvent
 const Trigger = Packages.mindustry.game.EventType.Trigger

@@ -116,7 +116,7 @@ public class LoadRenderer implements Disposable{
 
         //preview : no frametime
         if(preview){
-            testprogress += Time.delta() / (60f * 3);
+            testprogress += Time.delta / (60f * 3);
             progress = testprogress;
             if(input.keyTap(KeyCode.space)){
                 testprogress = 0;

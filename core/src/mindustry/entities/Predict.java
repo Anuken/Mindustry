@@ -24,8 +24,8 @@ public class Predict{
      * @return the intercept location
      */
     public static Vec2 intercept(float srcx, float srcy, float dstx, float dsty, float dstvx, float dstvy, float v){
-        dstvx /= Time.delta();
-        dstvy /= Time.delta();
+        dstvx /= Time.delta;
+        dstvy /= Time.delta;
         float tx = dstx - srcx,
         ty = dsty - srcy;
 
@@ -58,8 +58,8 @@ public class Predict{
             ddy += ((Hitboxc)dst).deltaY();
         }
         if(src instanceof Hitboxc){
-            ddx -= ((Hitboxc)src).deltaX()/(Time.delta());
-            ddy -= ((Hitboxc)src).deltaY()/(Time.delta());
+            ddx -= ((Hitboxc)src).deltaX()/(Time.delta);
+            ddy -= ((Hitboxc)src).deltaY()/(Time.delta);
         }
         return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), ddx, ddy, v);
     }
@@ -68,7 +68,7 @@ public class Predict{
      * See {@link #intercept(float, float, float, float, float, float, float)}.
      */
     public static Vec2 intercept(Hitboxc src, Hitboxc dst, float v){
-        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.deltaX() - src.deltaX()/(2f*Time.delta()), dst.deltaY() - src.deltaX()/(2f*Time.delta()), v);
+        return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), dst.deltaX() - src.deltaX()/(2f* Time.delta), dst.deltaY() - src.deltaX()/(2f* Time.delta), v);
     }
 
     private static Vec2 quad(float a, float b, float c){

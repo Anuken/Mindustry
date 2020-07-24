@@ -214,7 +214,7 @@ public class MapGenerateDialog extends BaseDialog{
     }
 
     void rebuildFilters(){
-        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Scl.scl(290f)), 1);
+        int cols = Math.max((int)(Math.max(filterTable.parent.getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Scl.scl(290f)), 1);
         filterTable.clearChildren();
         filterTable.top().left();
         int i = 0;
@@ -409,7 +409,7 @@ public class MapGenerateDialog extends BaseDialog{
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
-            this.team = team.id;
+            this.team = (byte)team.id;
             this.rotation = (byte)rotation;
         }
 

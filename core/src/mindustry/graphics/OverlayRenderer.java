@@ -107,9 +107,9 @@ public class OverlayRenderer{
                 float dst = core.dst(player);
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
                     Draw.color(Color.darkGray);
-                    Lines.circle(core.x(), core.y() - 2, state.rules.enemyCoreBuildRadius);
+                    Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
                     Draw.color(Pal.accent, core.team().color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
-                    Lines.circle(core.x(), core.y(), state.rules.enemyCoreBuildRadius);
+                    Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 }
             });
         }
@@ -129,7 +129,7 @@ public class OverlayRenderer{
         //draw selected block
         if(input.block == null && !Core.scene.hasMouse()){
             Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
-            Building tile = world.entWorld(vec.x, vec.y);
+            Building tile = world.buildWorld(vec.x, vec.y);
 
             if(tile != null && tile.team() == player.team()){
                 tile.drawSelect();
@@ -137,7 +137,7 @@ public class OverlayRenderer{
                 if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.team())){
                     control.input.drawArrow(tile.block(), tile.tileX(), tile.tileY(), tile.rotation(), true);
                     Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
-                    Fill.square(tile.x(), tile.y(), tile.block().size * tilesize/2f);
+                    Fill.square(tile.x, tile.y, tile.block().size * tilesize/2f);
                     Draw.color();
                 }
             }
@@ -152,12 +152,12 @@ public class OverlayRenderer{
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
             Draw.reset();
 
-            Building tile = world.entWorld(v.x, v.y);
+            Building tile = world.buildWorld(v.x, v.y);
             if(tile != null && tile.interactable(player.team()) && tile.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0){
                 Lines.stroke(3f, Pal.gray);
-                Lines.square(tile.x(), tile.y(), tile.block().size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
+                Lines.square(tile.x, tile.y, tile.block().size * tilesize / 2f + 3 + Mathf.absin(Time.time(), 5f, 1f));
                 Lines.stroke(1f, Pal.place);
-                Lines.square(tile.x(), tile.y(), tile.block().size * tilesize / 2f + 2 + Mathf.absin(Time.time(), 5f, 1f));
+                Lines.square(tile.x, tile.y, tile.block().size * tilesize / 2f + 2 + Mathf.absin(Time.time(), 5f, 1f));
                 Draw.reset();
 
             }

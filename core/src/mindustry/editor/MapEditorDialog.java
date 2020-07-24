@@ -234,6 +234,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         show();
         state.rules = (lastSavedRules == null ? new Rules() : lastSavedRules);
         lastSavedRules = null;
+        saved = false;
         editor.renderer().updateAll();
     }
 
@@ -248,10 +249,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
             state.rules.sector = null;
             state.map = new Map(StringMap.of(
-                    "name", "Editor Playtesting",
-                    "width", editor.width(),
-                    "height", editor.height()
-                ));
+                "name", "Editor Playtesting",
+                "width", editor.width(),
+                "height", editor.height()
+            ));
             world.endMapLoad();
             //add entities so they update. is this really needed?
             for(Tile tile : world.tiles){
@@ -474,7 +475,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     mode.setColor(Pal.remove);
                     mode.update(() -> mode.setText(tool.mode == -1 ? "" : "M" + (tool.mode + 1) + " "));
                     mode.setAlignment(Align.bottomRight, Align.bottomRight);
-                    mode.touchable(Touchable.disabled);
+                    mode.touchable = Touchable.disabled;
 
                     tools.stack(button, mode);
                 };

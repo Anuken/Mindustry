@@ -44,6 +44,11 @@ public class Router extends Block{
         }
 
         @Override
+        public int acceptStack(Item item, int amount, Teamc source){
+            return 0;
+        }
+
+        @Override
         public boolean acceptItem(Building source, Item item){
             return team == source.team() && lastItem == null && items.total() == 0;
         }

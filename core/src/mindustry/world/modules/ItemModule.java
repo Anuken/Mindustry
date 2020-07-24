@@ -12,12 +12,15 @@ import java.util.*;
 import static mindustry.Vars.content;
 
 public class ItemModule extends BlockModule{
-    private static final int windowSize = 60 * 4;
+    public static final ItemModule empty = new ItemModule();
+
+    private static final int windowSize = 6;
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;
     private static float[] displayFlow;
-    private static Bits cacheBits = new Bits();
-    private static Interval flowTimer = new Interval(1);
+    private static final Bits cacheBits = new Bits();
+    private static final Interval flowTimer = new Interval(2);
+    private static final float pollScl = 20f;
 
     protected int[] items = new int[content.items().size];
     protected int total;
@@ -25,40 +28,56 @@ public class ItemModule extends BlockModule{
 
     private @Nullable WindowedMean[] flow;
 
+    public ItemModule copy(){
+        ItemModule out = new ItemModule();
+        out.set(this);
+        return out;
+    }
+
+    public void set(ItemModule other){
+        total = other.total;
+        takeRotation = other.takeRotation;
+        System.arraycopy(other.items, 0, items, 0, items.length);
+    }
+
     public void update(boolean showFlow){
         if(showFlow){
-            if(flow == null){
-                if(cacheFlow == null || cacheFlow.length != items.length){
-                    cacheFlow = new WindowedMean[items.length];
-                    for(int i = 0; i < items.length; i++){
-                        cacheFlow[i] = new WindowedMean(windowSize);
+            //update the flow at 30fps at most
+            if(flowTimer.get(1, pollScl)){
+
+                if(flow == null){
+                    if(cacheFlow == null || cacheFlow.length != items.length){
+                        cacheFlow = new WindowedMean[items.length];
+                        for(int i = 0; i < items.length; i++){
+                            cacheFlow[i] = new WindowedMean(windowSize);
+                        }
+                        cacheSums = new float[items.length];
+                        displayFlow = new float[items.length];
+                    }else{
+                        for(int i = 0; i < items.length; i++){
+                            cacheFlow[i].reset();
+                        }
+                        Arrays.fill(cacheSums, 0);
+                        cacheBits.clear();
                     }
-                    cacheSums = new float[items.length];
-                    displayFlow = new float[items.length];
-                }else{
-                    for(int i = 0; i < items.length; i++){
-                        cacheFlow[i].reset();
-                    }
-                    Arrays.fill(cacheSums, 0);
-                    cacheBits.clear();
+
+                    Arrays.fill(displayFlow, -1);
+
+                    flow = cacheFlow;
                 }
 
-                Arrays.fill(displayFlow, -1);
+                boolean updateFlow = flowTimer.get(30);
 
-                flow = cacheFlow;
-            }
+                for(int i = 0; i < items.length; i++){
+                    flow[i].add(cacheSums[i]);
+                    if(cacheSums[i] > 0){
+                        cacheBits.set(i);
+                    }
+                    cacheSums[i] = 0;
 
-            boolean updateFlow = flowTimer.get(30);
-
-            for(int i = 0; i < items.length; i++){
-                flow[i].add(cacheSums[i]);
-                if(cacheSums[i] > 0){
-                    cacheBits.set(i);
-                }
-                cacheSums[i] = 0;
-
-                if(updateFlow){
-                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() : -1;
+                    if(updateFlow){
+                        displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / pollScl : -1;
+                    }
                 }
             }
         }else{
@@ -205,6 +224,12 @@ public class ItemModule extends BlockModule{
     public void set(Item item, int amount){
         total += (amount - items[item.id]);
         items[item.id] = amount;
+    }
+
+    public void add(Iterable<ItemStack> stacks){
+        for(ItemStack stack : stacks){
+            add(stack.item, stack.amount);
+        }
     }
 
     public void add(Item item, int amount){

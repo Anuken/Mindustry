@@ -32,7 +32,6 @@ public class EventType{
         update
     }
 
-    public static class TurnEvent{}
     public static class WinEvent{}
     public static class LoseEvent{}
     public static class LaunchEvent{}
@@ -46,11 +45,12 @@ public class EventType{
     public static class PlayEvent{}
     public static class ResetEvent{}
     public static class WaveEvent{}
+    public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/
     public static class LineConfirmEvent{}
-    /** Called when a turret recieves ammo, but only when the tutorial is active! */
+    /** Called when a turret receives ammo, but only when the tutorial is active! */
     public static class TurretAmmoDeliverEvent{}
-    /** Called when a core recieves ammo, but only when the tutorial is active! */
+    /** Called when a core receives ammo, but only when the tutorial is active! */
     public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
@@ -58,6 +58,15 @@ public class EventType{
     public static class ClientLoadEvent{}
     /** Called when a game begins and the world is loaded. */
     public static class WorldLoadEvent{}
+
+    /** Called when a sector is destroyed by waves when you're not there. */
+    public static class SectorLoseEvent{
+        public final Sector sector;
+
+        public SectorLoseEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
 
     public static class LaunchItemEvent{
         public final ItemStack stack;
@@ -298,7 +307,7 @@ public class EventType{
         }
     }
 
-    /** Called after connecting; when a player recieves world data and is ready to play.*/
+    /** Called after connecting; when a player receives world data and is ready to play.*/
     public static class PlayerJoin{
         public final Player player;
 

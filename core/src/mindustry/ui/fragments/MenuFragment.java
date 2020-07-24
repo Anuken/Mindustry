@@ -89,7 +89,7 @@ public class MenuFragment extends Fragment{
 
             Fonts.def.setColor(Color.white);
             Fonts.def.draw(versionText, fx, fy - logoh/2f, Align.center);
-        }).touchable(Touchable.disabled);
+        }).touchable = Touchable.disabled;
     }
 
     private void buildMobile(){
@@ -184,7 +184,7 @@ public class MenuFragment extends Fragment{
 
         container.table(background, t -> {
             submenu = t;
-            t.getColor().a = 0f;
+            t.color.a = 0f;
             t.top();
             t.defaults().width(width).height(70f);
             t.visible(() -> !t.getChildren().isEmpty());

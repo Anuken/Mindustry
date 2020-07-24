@@ -25,8 +25,8 @@ public class StackConveyor extends Block implements Autotiler{
     public @Load("@-stack") TextureRegion stackRegion;
 
     public float speed = 0f;
-    public float recharge = 4f;
     public boolean splitOut = true;
+    public float displayedSpeed = 30f;
 
     public StackConveyor(String name){
         super(name);
@@ -47,7 +47,7 @@ public class StackConveyor extends Block implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
+        stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
     }
 
     @Override
@@ -57,10 +57,10 @@ public class StackConveyor extends Block implements Autotiler{
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
-                return (otherblock.hasItems || otherblock.outputsItems() || otherblock.acceptsItems) &&
+                return (otherblock.acceptsItems) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
-                    !(world.ent(otherx, othery) instanceof StackConveyorEntity && ((StackConveyorEntity)world.ent(otherx, othery)).state == stateUnload);
+                    !(world.build(otherx, othery) instanceof StackConveyorEntity && ((StackConveyorEntity)world.build(otherx, othery)).state == stateUnload);
             }
         }
         return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor;
@@ -84,7 +84,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean rotatedOutput(int x, int y){
-        Building tile = world.ent(x, y);
+        Building tile = world.build(x, y);
         if(tile instanceof StackConveyorEntity){
             return ((StackConveyorEntity)tile).state != stateUnload;
         }
@@ -166,7 +166,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void updateTile(){
             // reel in crater
-            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta(), 0f, recharge);
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta());
 
             if(link == -1){
                 return;
@@ -200,7 +200,7 @@ public class StackConveyor extends Block implements Autotiler{
                             link = -1;
                             items.clear();
 
-                            cooldown = recharge;
+                            cooldown = 1f;
                             e.cooldown = 1;
                         }
                     }
@@ -249,7 +249,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Building source, Item item){
             if(this == source) return true;                 // player threw items
-            if(cooldown > recharge - 1f) return false;      // still cooling down
+            if(cooldown > 0) return false;                  // still cooling down
             return !((state != stateLoad)                   // not a loading dock
             ||  (items.total() > 0 && !items.has(item))     // incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity

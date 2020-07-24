@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
+import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
@@ -28,14 +29,14 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
+    private static final float dsize = 47.2f;
+
     public final PlacementFragment blockfrag = new PlacementFragment();
 
     private ImageButton flip;
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
     private boolean shown = true;
-    private float dsize = 47.2f;
-    //TODO implement
     private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
@@ -45,15 +46,16 @@ public class HudFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        Events.on(TurnEvent.class, e -> {
-            //TODO localize, clean up, etc
-            int attacked = universe.getSectorsAttacked();
-            showToast("New turn: [accent]" + universe.getTurn() + "[]" + (attacked > 0 ? "\n[scarlet]" + Iconc.warning + " " + attacked + " sectors attacked!": ""));
-        });
 
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
+            //TODO localize
             showToast("Sector[accent] captured[]!");
+        });
+
+        //TODO localize
+        Events.on(SectorLoseEvent.class, e -> {
+            showToast(Icon.warning, "Sector " + e.sector.id + " [scarlet]lost!");
         });
 
         //TODO full implementation
@@ -61,10 +63,20 @@ public class HudFragment extends Fragment{
             coreItems.resetUsed();
         });
 
+        Events.on(TurnEvent.class, e -> {
+            ui.announce("[accent][[ Turn " + universe.turn() + " ]");
+        });
+
+        //paused table
+        parent.fill(t -> {
+            t.top().visible(() -> state.isPaused() && !state.isOutOfTime()).touchable = Touchable.disabled;
+            t.table(Styles.black5, top -> top.add("$paused").style(Styles.outlineLabel).pad(8f)).growX();
+        });
+
         //TODO tear this all down
         //menu at top left
         parent.fill(cont -> {
-            cont.setName("overlaymarker");
+            cont.name = "overlaymarker";
             cont.top().left();
 
             if(mobile){
@@ -102,7 +114,7 @@ public class HudFragment extends Fragment{
                                 ui.chatfrag.toggle();
                             }
                         }else if(state.isCampaign()){
-                            ui.tech.show();
+                            ui.research.show();
                         }else{
                             ui.database.show();
                         }
@@ -121,13 +133,6 @@ public class HudFragment extends Fragment{
                 cont.image().height(4f).color(Pal.gray).fillX();
                 cont.row();
             }
-
-            //TODO BUTTONS FOR VIEWING EXPORTS/IMPORTS/RESEARCH/MAP/ETC
-            /*
-            cont.table(t -> {
-
-            });
-            cont.row();*/
 
             cont.update(() -> {
                 if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
@@ -184,7 +189,7 @@ public class HudFragment extends Fragment{
 
             //fps display
             cont.table(info -> {
-                info.touchable(Touchable.disabled);
+                info.touchable = Touchable.disabled;
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
                 info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
@@ -208,9 +213,15 @@ public class HudFragment extends Fragment{
             t.top().right();
         });
 
+        //core items
+        parent.fill(t -> {
+            t.top().add(coreItems);
+            t.visible(() -> Core.settings.getBool("coreitems") && !mobile);
+        });
+
         //spawner warning
         parent.fill(t -> {
-            t.touchable(Touchable.disabled);
+            t.touchable = Touchable.disabled;
             t.table(Styles.black, c -> c.add("$nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
@@ -224,7 +235,7 @@ public class HudFragment extends Fragment{
 
         //'core is under attack' table
         parent.fill(t -> {
-            t.touchable(Touchable.disabled);
+            t.touchable = Touchable.disabled;
             float notifDuration = 240f;
             float[] coreAttackTime = {0};
             float[] coreAttackOpacity = {0};
@@ -239,19 +250,40 @@ public class HudFragment extends Fragment{
                     return false;
                 }
 
-                t.getColor().a = coreAttackOpacity[0];
+                t.color.a = coreAttackOpacity[0];
                 if(coreAttackTime[0] > 0){
                     coreAttackOpacity[0] = Mathf.lerpDelta(coreAttackOpacity[0], 1f, 0.1f);
                 }else{
                     coreAttackOpacity[0] = Mathf.lerpDelta(coreAttackOpacity[0], 0f, 0.1f);
                 }
 
-                coreAttackTime[0] -= Time.delta();
+                coreAttackTime[0] -= Time.delta;
 
                 return coreAttackOpacity[0] > 0;
             });
             t.table(Tex.button, top -> top.add("$coreattack").pad(2)
-            .update(label -> label.getColor().set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
+            .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
+        });
+
+        //paused table for when the player is out of time
+        parent.fill(t -> {
+            t.top().visible(() -> state.isOutOfTime());
+            t.table(Styles.black5, top -> {
+                //TODO localize when done
+                top.add("Out of sector time.").style(Styles.outlineLabel).color(Pal.accent).update(l -> l.color.a = Mathf.absin(Time.globalTime(), 7f, 1f)).colspan(2);
+                top.row();
+
+                top.defaults().pad(2).size(150f, 54f);
+                top.button("Next Turn", () -> {
+                    universe.runTurn();
+                    state.set(State.playing);
+                });
+
+                top.button("Back to Planet", () -> {
+                    ui.paused.runExitSave();
+                    ui.planet.show();
+                });
+            }).margin(8).growX();
         });
 
         //tutorial text
@@ -276,12 +308,6 @@ public class HudFragment extends Fragment{
             Events.on(ResizeEvent.class, e -> resize.run());
         });
 
-        //paused table
-        parent.fill(t -> {
-            t.top().visible(() -> state.isPaused()).touchable(Touchable.disabled);
-            t.table(Tex.buttonTrans, top -> top.add("$paused").pad(5f));
-        });
-
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> control.saves.isSaving());
@@ -298,7 +324,7 @@ public class HudFragment extends Fragment{
                     showHudText = false;
                 }
             });
-            p.touchable(Touchable.disabled);
+            p.touchable = Touchable.disabled;
         });
 
         //TODO DEBUG: rate table
@@ -335,14 +361,6 @@ public class HudFragment extends Fragment{
             }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
         });
 
-        //TODO move, select loadout, consume resources
-        parent.fill(t -> {
-            t.bottom().visible(() -> state.isCampaign() && player.team().core() != null);
-
-            t.button("test launch", Icon.warning, () -> ui.planet.show(state.getSector(), player.team().core()))
-            .width(150f).disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)); //disable core when missing resources for launch
-        });
-
         blockfrag.build(parent);
     }
 
@@ -375,6 +393,10 @@ public class HudFragment extends Fragment{
     }
 
     public void showToast(String text){
+        showToast(Icon.ok, text);
+    }
+
+    public void showToast(Drawable icon, String text){
         if(state.isMenu()) return;
 
         scheduleToast(() -> {
@@ -387,7 +409,7 @@ public class HudFragment extends Fragment{
                 }
             });
             table.margin(12);
-            table.image(Icon.ok).pad(3);
+            table.image(icon).pad(3);
             table.add(text).wrap().width(280f).get().setAlignment(Align.center, Align.center);
             table.pack();
 
@@ -497,7 +519,7 @@ public class HudFragment extends Fragment{
 
     public void showLaunchDirect(){
         Image image = new Image();
-        image.getColor().a = 0f;
+        image.color.a = 0f;
         image.setFillParent(true);
         image.actions(Actions.fadeIn(launchDuration / 60f, Interp.pow2In), Actions.delay(8f / 60f), Actions.remove());
         Core.scene.add(image);
@@ -505,7 +527,7 @@ public class HudFragment extends Fragment{
 
     public void showLaunch(){
         Image image = new Image();
-        image.getColor().a = 0f;
+        image.color.a = 0f;
         image.setFillParent(true);
         image.actions(Actions.fadeIn(40f / 60f));
         image.update(() -> {
@@ -518,8 +540,8 @@ public class HudFragment extends Fragment{
 
     public void showLand(){
         Image image = new Image();
-        image.getColor().a = 1f;
-        image.touchable(Touchable.disabled);
+        image.color.a = 1f;
+        image.touchable = Touchable.disabled;
         image.setFillParent(true);
         image.actions(Actions.fadeOut(0.8f), Actions.remove());
         image.update(() -> {
@@ -592,11 +614,11 @@ public class HudFragment extends Fragment{
         });
 
         table.clearChildren();
-        table.touchable(Touchable.enabled);
+        table.touchable = Touchable.enabled;
 
         StringBuilder builder = new StringBuilder();
 
-        table.setName("waves");
+        table.name = "waves";
         table.labelWrap(() -> {
             builder.setLength(0);
             builder.append(wavef.get(state.wave));
@@ -652,11 +674,11 @@ public class HudFragment extends Fragment{
     private void addPlayButton(Table table){
         table.right().button(Icon.play, Styles.righti, 30f, () -> {
             if(net.client() && player.admin){
-                Call.onAdminRequest(player, AdminAction.wave);
+                Call.adminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
-                ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> state.wavetime = 0f);
+                ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
             }else{
-                state.wavetime = 0f;
+                logic.skipWave();
             }
         }).growY().fillX().right().width(40f)
         .visible(this::canSkipWave);

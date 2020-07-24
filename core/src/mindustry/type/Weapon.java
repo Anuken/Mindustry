@@ -8,6 +8,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 
 public class Weapon{
     /** displayed weapon region */
@@ -16,12 +17,12 @@ public class Weapon{
     public @NonNull BulletType bullet;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
-    /** whether to mirror the weapon (draw two of them, which is the default) */
+    /** whether to create a flipped copy of this weapon upon initialization. default: true */
     public boolean mirror = true;
-    /** whether to flip the weapon's position/side on the ship (only valid when mirror is false) */
-    public boolean flipped = false, flipSprite = false;
+    /** whether to flip the weapon's sprite when rendering */
+    public boolean flipSprite = false;
     /** whether to shoot the weapons in different arms one after another, rather than all at once; only valid when mirror = true */
-    public boolean alternate = false;
+    public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
@@ -31,7 +32,7 @@ public class Weapon{
     /** amount of shots per fire */
     public int shots = 1;
     /** spacing in degrees between multiple shots, if applicable */
-    public float spacing = 12f;
+    public float spacing = 0;
     /** inaccuracy of degrees of each shot */
     public float inaccuracy = 0f;
     /** intensity and duration of each shot's screen shake */
@@ -42,6 +43,8 @@ public class Weapon{
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
     public float x = 5f, y = 0f;
+    /** radius of occlusion drawn under the weapon; <0 to diable */
+    public float occlusion = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
     /** delay in ticks between shots */
@@ -50,6 +53,8 @@ public class Weapon{
     public float shootCone = 5f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
+    /** internal value used for alternation - do not change! */
+    public int otherSide = -1;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
     /** displayed region (autoloaded) */
@@ -61,6 +66,12 @@ public class Weapon{
 
     public Weapon(){
         this("");
+    }
+
+    public Weapon copy(){
+        Weapon out = new Weapon();
+        JsonIO.json().copyFields(this, out);
+        return out;
     }
 
     public void load(){

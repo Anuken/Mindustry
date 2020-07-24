@@ -2,6 +2,7 @@ package mindustry.core;
 
 import arc.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -16,6 +17,7 @@ import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
 
@@ -86,23 +88,50 @@ public class Logic implements ApplicationListener{
 
         //when loading a 'damaged' sector, propagate the damage
         Events.on(WorldLoadEvent.class, e -> {
-            if(state.isCampaign() && state.rules.sector.hasWaves() && state.rules.sector.getTurnsPassed() > 0){
-                SectorDamage.apply(state.rules.sector.getTurnsPassed());
-                state.rules.sector.setTurnsPassed(0);
+            if(state.isCampaign() && state.rules.sector.getSecondsPassed() > 0 && state.rules.sector.hasBase()){
+                long seconds = state.rules.sector.getSecondsPassed();
+                CoreEntity core = state.rules.defaultTeam.core();
+
+                //apply fractional damage based on how many turns have passed for this sector
+                float turnsPassed = seconds / (turnDuration / 60f);
+
+                if(state.rules.sector.hasWaves()){
+                    SectorDamage.apply(turnsPassed / sectorDestructionTurns);
+                }
+
+                //add resources based on turns passed
+                if(state.rules.sector.save != null && core != null){
+
+                    //add produced items
+                    //TODO move to received items
+                    state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
+                        core.items.add(item, (int)(stat.mean * seconds));
+                    });
+
+                    //add received items
+                    state.rules.sector.getReceivedItems().each(stack -> core.items.add(stack.item, stack.amount));
+
+                    //clear received items
+                    state.rules.sector.setReceivedItems(new Seq<>());
+
+                    //validation
+                    for(Item item : content.items()){
+                        //ensure positive items
+                        if(core.items.get(item) < 0) core.items.set(item, 0);
+                        //cap the items
+                        if(core.items.get(item) > core.storageCapacity) core.items.set(item, core.storageCapacity);
+                    }
+                }
+
+                state.rules.sector.setSecondsPassed(0);
             }
 
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
-        });
 
-        //TODO dying takes up a turn (?)
-        /*
-        Events.on(GameOverEvent.class, e -> {
-            //simulate a turn on a normal non-launch gameover
-            if(state.isCampaign() && !state.launched){
-                universe.runTurn();
-            }
-        });*/
+            //save settings
+            Core.settings.manualSave();
+        });
 
     }
 
@@ -134,9 +163,21 @@ public class Logic implements ApplicationListener{
         //fire change event, since it was technically changed
         Events.fire(new StateChangeEvent(prev, State.menu));
 
-        Groups.all.clear();
+        Groups.clear();
         Time.clear();
         Events.fire(new ResetEvent());
+
+        //save settings on reset
+        Core.settings.manualSave();
+    }
+
+    public void skipWave(){
+        if(state.isCampaign()){
+            //warp time spent forward because the wave was just skipped.
+            state.secinfo.internalTimeSpent += state.wavetime;
+        }
+
+        state.wavetime = 0;
     }
 
     public void runWave(){
@@ -203,7 +244,7 @@ public class Logic implements ApplicationListener{
 
         for(WeatherEntry entry : state.rules.weather){
             //update cooldown
-            entry.cooldown -= Time.delta();
+            entry.cooldown -= Time.delta;
 
             //create new event when not active
             if(entry.cooldown < 0 && !entry.weather.isActive()){
@@ -216,32 +257,37 @@ public class Logic implements ApplicationListener{
 
     @Remote(called = Loc.both)
     public static void launchZone(){
+        if(!state.isCampaign()) return;
+
         if(!headless){
             ui.hudfrag.showLaunch();
         }
 
-        //TODO core launch effect
+        //TODO better core launch effect
         for(Building tile : state.teams.playerCores()){
             Fx.launch.at(tile);
-        }
-
-        if(state.isCampaign()){
-            //TODO implement?
-            //state.getSector().setLaunched();
         }
 
         Sector sector = state.rules.sector;
 
         //TODO containers must be launched too
         Time.runTask(30f, () -> {
-            for(Building entity : state.teams.playerCores()){
-                for(Item item : content.items()){
-                    //TODO where do the items go?
-                    //data.addItem(item, entity.items.get(item));
-                    //Events.fire(new LaunchItemEvent(new ItemStack(item, entity.items.get(item))));
+            Sector origin = sector.save.meta.secinfo.origin;
+            if(origin != null){
+                Seq<ItemStack> stacks = origin.getReceivedItems();
+
+                //add up all items into list
+                for(Building entity : state.teams.playerCores()){
+                    entity.items.each((item, amount) -> ItemStack.insert(stacks, item, amount));
                 }
-                entity.tile().remove();
+
+                //save received items
+                origin.setReceivedItems(stacks);
             }
+
+            //remove all the cores
+            state.teams.playerCores().each(b -> b.tile.remove());
+
             state.launched = true;
             state.gameOver = true;
 
@@ -250,8 +296,11 @@ public class Logic implements ApplicationListener{
 
             //run a turn, since launching takes up a turn
             universe.runTurn();
-            sector.setTurnsPassed(sector.getTurnsPassed() + 3);
 
+            //TODO apply extra damage to sector
+            //sector.setTurnsPassed(sector.getTurnsPassed() + 3);
+
+            //TODO load the sector that was launched from
             Events.fire(new LaunchEvent());
             //manually fire game over event now
             Events.fire(new GameOverEvent(state.rules.defaultTeam));
@@ -259,10 +308,16 @@ public class Logic implements ApplicationListener{
     }
 
     @Remote(called = Loc.both)
-    public static void onGameOver(Team winner){
+    public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);
         netClient.setQuiet();
+    }
+
+    @Override
+    public void dispose(){
+        //save the settings before quitting
+        Core.settings.manualSave();
     }
 
     @Override
@@ -273,6 +328,11 @@ public class Logic implements ApplicationListener{
         if(state.isGame()){
             if(!net.client()){
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
+            }
+
+            //force pausing when the player is out of sector time
+            if(state.isOutOfTime()){
+                state.set(State.paused);
             }
 
             if(!state.isPaused()){
@@ -296,7 +356,7 @@ public class Logic implements ApplicationListener{
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
                     if(!isWaitingWave()){
-                        state.wavetime = Math.max(state.wavetime - Time.delta(), 0);
+                        state.wavetime = Math.max(state.wavetime - Time.delta, 0);
                     }
                 }
 

@@ -29,7 +29,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;
-    /** Rotation, 0-3. Not guaranteed to be in any specific range. */
+    /** Rotation of blocks, or other data. Not guaranteed to be in any specific range. */
     protected byte rotation;
     protected boolean changing = false;
 
@@ -121,11 +121,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public float drawx(){
-        return block().offset() + worldx();
+        return block().offset + worldx();
     }
 
     public float drawy(){
-        return block().offset() + worldy();
+        return block().offset + worldy();
     }
 
     public boolean isDarkened(){
@@ -171,7 +171,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return build == null ? y : build.tile.y;
     }
 
-    public byte getTeamID(){
+    public int getTeamID(){
         return team().id;
     }
 
@@ -360,8 +360,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     /**
-     * Returns the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
-     * This array contains all linked tiles, including this tile itself.
+     * Iterates through the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
+     * The result contains all linked tiles, including this tile itself.
      */
     public void getLinkedTiles(Cons<Tile> cons){
         if(block.isMultiblock()){
@@ -391,7 +391,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /**
      * Returns the list of all tiles linked to this multiblock if it were this block.
-     * This array contains all linked tiles, including this tile itself.
+     * The result contains all linked tiles, including this tile itself.
      */
     public Seq<Tile> getLinkedTilesAs(Block block, Seq<Tile> tmpArray){
         tmpArray.clear();
@@ -436,10 +436,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Building getNearbyEntity(int rotation){
-        if(rotation == 0) return world.ent(x + 1, y);
-        if(rotation == 1) return world.ent(x, y + 1);
-        if(rotation == 2) return world.ent(x - 1, y);
-        if(rotation == 3) return world.ent(x, y - 1);
+        if(rotation == 0) return world.build(x + 1, y);
+        if(rotation == 1) return world.build(x, y + 1);
+        if(rotation == 2) return world.build(x - 1, y);
+        if(rotation == 3) return world.build(x, y - 1);
         return null;
     }
 
@@ -466,6 +466,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public @Nullable Item drop(){
         return overlay == Blocks.air || overlay.itemDrop == null ? floor.itemDrop : overlay.itemDrop;
+    }
+
+    public int staticDarkness(){
+        return block.solid && block.fillsTile && !block.synthetic() ? rotation : 0;
     }
 
     public void updateOcclusion(){
@@ -554,7 +558,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             tileSet.clear();
 
             for(Point2 edge : Edges.getEdges(size)){
-                Building other = world.ent(x + edge.x, y + edge.y);
+                Building other = world.build(x + edge.x, y + edge.y);
                 if(other != null){
                     tileSet.add(other);
                 }
@@ -578,7 +582,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             }else{
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(Point2 p : Geometry.d4){
-                    Building tile = world.ent(x + p.x, y + p.y);
+                    Building tile = world.build(x + p.x, y + p.y);
                     if(tile != null && !tile.tile().changing){
                         tile.onProximityUpdate();
                     }
@@ -641,19 +645,19 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void onTileDamage(Tile tile, float health){
-        if(tile.build != null){
-            tile.build.health = health;
+    public static void tileDamage(Building build, float health){
+        if(build == null) return;
 
-            if(tile.build.damaged()){
-                indexer.notifyTileDamaged(tile.build);
-            }
+        build.health = health;
+
+        if(build.damaged()){
+            indexer.notifyTileDamaged(build);
         }
     }
 
     @Remote(called = Loc.server)
-    public static void onTileDestroyed(Tile tile){
-        if(tile.build == null) return;
-        tile.build.killed();
+    public static void tileDestroyed(Building build){
+        if(build == null) return;
+        build.killed();
     }
 }

@@ -85,7 +85,7 @@ public class ArcNetProvider implements NetProvider{
                 Connect c = new Connect();
                 c.addressTCP = ip;
 
-                Log.debug("&bRecieved connection: @", c.addressTCP);
+                Log.debug("&bReceived connection: @", c.addressTCP);
 
                 connections.add(kn);
                 Core.app.post(() -> net.handleServerReceived(kn, c));

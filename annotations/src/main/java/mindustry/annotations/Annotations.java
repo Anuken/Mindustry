@@ -227,7 +227,7 @@ public class Annotations{
         /** The local locations where this method is called locally, when invoked. */
         Loc called() default Loc.none;
 
-        /** Whether to forward this packet to all other clients upon recieval. Client only. */
+        /** Whether to forward this packet to all other clients upon receival. Client only. */
         boolean forward() default false;
 
         /**

@@ -28,8 +28,8 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class NetClient implements ApplicationListener{
-    private final static float dataTimeout = 60 * 18;
-    private final static float playerSyncTime = 2;
+    private static final float dataTimeout = 60 * 18;
+    private static final float playerSyncTime = 2;
     public final static float viewScale = 2f;
 
     private long ping;
@@ -67,9 +67,7 @@ public class NetClient implements ApplicationListener{
 
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
-                connecting = false;
-                quiet = true;
-                net.disconnect();
+                disconnectQuietly();
             });
 
             ConnectPacket c = new ConnectPacket();
@@ -118,7 +116,7 @@ public class NetClient implements ApplicationListener{
         });
 
         net.handleClient(WorldStream.class, data -> {
-            Log.info("Recieved world data: @ bytes.", data.stream.available());
+            Log.info("Received world data: @ bytes.", data.stream.available());
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
 
             finishConnecting();
@@ -172,7 +170,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    //called when a server recieves a chat message from a player
+    //called when a server receives a chat message from a player
     @Remote(called = Loc.server, targets = Loc.client)
     public static void sendChatMessage(Player player, String message){
         if(message.length() > maxTextLength){
@@ -230,7 +228,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(called = Loc.client, variants = Variant.one)
-    public static void onConnect(String ip, int port){
+    public static void connect(String ip, int port){
         netClient.disconnectQuietly();
         logic.reset();
 
@@ -238,24 +236,24 @@ public class NetClient implements ApplicationListener{
     }
     
     @Remote(targets = Loc.client)
-    public static void onPing(Player player, long time){
-        Call.onPingResponse(player.con, time);
+    public static void ping(Player player, long time){
+        Call.pingResponse(player.con, time);
     }
 
     @Remote(variants = Variant.one)
-    public static void onPingResponse(long time){
+    public static void pingResponse(long time){
         netClient.ping = Time.timeSinceMillis(time);
     }
 
     @Remote(variants = Variant.one)
-    public static void onTraceInfo(Player player, TraceInfo info){
+    public static void traceInfo(Player player, TraceInfo info){
         if(player != null){
             ui.traces.show(player, info);
         }
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.high)
-    public static void onKick(KickReason reason){
+    public static void kick(KickReason reason){
         netClient.disconnectQuietly();
         logic.reset();
 
@@ -270,7 +268,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.high)
-    public static void onKick(String reason){
+    public static void kick(String reason){
         netClient.disconnectQuietly();
         logic.reset();
         ui.showText("$disconnect", reason, Align.left);
@@ -296,21 +294,21 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both)
-    public static void onInfoMessage(String message){
+    public static void infoMessage(String message){
         if(message == null) return;
 
         ui.showText("", message);
     }
 
     @Remote(variants = Variant.both)
-    public static void onInfoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
+    public static void infoPopup(String message, float duration, int align, int top, int left, int bottom, int right){
         if(message == null) return;
 
         ui.showInfoPopup(message, duration, align, top, left, bottom, right);
     }
 
     @Remote(variants = Variant.both)
-    public static void onLabel(String message, float duration, float worldx, float worldy){
+    public static void label(String message, float duration, float worldx, float worldy){
         if(message == null) return;
 
         ui.showLabel(message, duration, worldx, worldy);
@@ -330,20 +328,20 @@ public class NetClient implements ApplicationListener{
     }*/
 
     @Remote(variants = Variant.both)
-    public static void onInfoToast(String message, float duration){
+    public static void infoToast(String message, float duration){
         if(message == null) return;
 
         ui.showInfoToast(message, duration);
     }
 
     @Remote(variants = Variant.both)
-    public static void onSetRules(Rules rules){
+    public static void setRules(Rules rules){
         state.rules = rules;
     }
 
     @Remote(variants = Variant.both)
-    public static void onWorldDataBegin(){
-        Groups.all.clear();
+    public static void worldDataBegin(){
+        Groups.clear();
         netClient.removed.clear();
         logic.reset();
 
@@ -353,24 +351,24 @@ public class NetClient implements ApplicationListener{
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
-            netClient.connecting = false;
-            netClient.quiet = true;
-            net.disconnect();
+
+            netClient.disconnectQuietly();
         });
     }
 
     @Remote(variants = Variant.one)
-    public static void onPositionSet(float x, float y){
+    public static void setPosition(float x, float y){
+        player.unit().set(x, y);
         player.set(x, y);
     }
 
     @Remote
-    public static void onPlayerDisconnect(int playerid){
+    public static void playerDisconnect(int playerid){
         Groups.player.removeByID(playerid);
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void onEntitySnapshot(short amount, short dataLen, byte[] data){
+    public static void entitySnapshot(short amount, short dataLen, byte[] data){
         try{
             netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
@@ -417,7 +415,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both, priority = PacketPriority.low, unreliable = true)
-    public static void onBlockSnapshot(short amount, short dataLen, byte[] data){
+    public static void blockSnapshot(short amount, short dataLen, byte[] data){
         try{
             netClient.byteStream.setBytes(net.decompressSnapshot(data, dataLen));
             DataInputStream input = netClient.dataStream;
@@ -437,7 +435,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void onStateSnapshot(float waveTime, int wave, int enemies, boolean paused, short coreDataLen, byte[] coreData){
+    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, short coreDataLen, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
@@ -478,7 +476,7 @@ public class NetClient implements ApplicationListener{
         }else if(!connecting){
             net.disconnect();
         }else{ //...must be connecting
-            timeoutTime += Time.delta();
+            timeoutTime += Time.delta;
             if(timeoutTime > dataTimeout){
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
@@ -505,7 +503,7 @@ public class NetClient implements ApplicationListener{
         net.setClientLoaded(true);
         Core.app.post(Call::connectConfirm);
         Time.runTask(40f, platform::updateRPC);
-        Core.app.post(() -> ui.loadfrag.hide());
+        Core.app.post(ui.loadfrag::hide);
     }
 
     private void reset(){
@@ -517,7 +515,7 @@ public class NetClient implements ApplicationListener{
         quiet = false;
         lastSent = 0;
 
-        Groups.all.clear();
+        Groups.clear();
         ui.chatfrag.clearMessages();
     }
 
@@ -528,6 +526,7 @@ public class NetClient implements ApplicationListener{
     /** Disconnects, resetting state to the menu. */
     public void disconnectQuietly(){
         quiet = true;
+        connecting = false;
         net.disconnect();
     }
 
@@ -565,21 +564,22 @@ public class NetClient implements ApplicationListener{
 
             Unit unit = player.dead() ? Nulls.unit : player.unit();
 
-            Call.onClientShapshot(lastSent++,
+            Call.clientShapshot(lastSent++,
+            player.dead(),
             unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
             unit.rotation,
             unit instanceof Mechc ? ((Mechc)unit).baseRotation() : 0,
             unit.vel.x, unit.vel.y,
             player.miner().mineTile(),
-            control.input.isBoosting, control.input.isShooting, ui.chatfrag.shown(),
+            player.boosting, player.shooting, ui.chatfrag.shown(),
             requests,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width * viewScale, Core.camera.height * viewScale);
         }
 
         if(timer.get(1, 60)){
-            Call.onPing(Time.millis());
+            Call.ping(Time.millis());
         }
     }
 

@@ -28,18 +28,18 @@ abstract class BuilderComp implements Unitc{
 
     @Import float x, y, rotation;
 
-    Queue<BuildPlan> plans = new Queue<>();
-    transient boolean building = true;
+    @SyncLocal Queue<BuildPlan> plans = new Queue<>();
+    transient boolean updateBuilding = true;
 
     @Override
     public void controller(UnitController next){
         //reset building state so AI controlled units will always start off building
-        building = true;
+        updateBuilding = true;
     }
 
     @Override
     public void update(){
-        if(!building) return;
+        if(!updateBuilding) return;
 
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
 
@@ -72,11 +72,11 @@ abstract class BuilderComp implements Unitc{
 
         BuildPlan current = buildPlan();
 
-        if(dst(current.tile()) > finalPlaceDst) return;
+        if(!within(current.tile(), finalPlaceDst)) return;
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(dst(tile) <= finalPlaceDst){
+        if(!within(tile, finalPlaceDst)){
             rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
         }
 
@@ -114,11 +114,11 @@ abstract class BuilderComp implements Unitc{
         BuildEntity entity = tile.bc();
 
         if(current.breaking){
-            entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta() * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
+            if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
                 if(current.hasConfig){
-                    Call.onTileConfig(null, tile.build, current.config);
+                    Call.tileConfig(null, tile.build, current.config);
                 }
             }
         }
@@ -208,7 +208,7 @@ abstract class BuilderComp implements Unitc{
 
     @Override
     public void draw(){
-        if(!isBuilding()) return;
+        if(!isBuilding() || !updateBuilding) return;
 
         //TODO check correctness
         Draw.z(Layer.flyingUnit);

@@ -3,30 +3,42 @@ package mindustry.entities;
 import arc.func.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 /** Utility class for unit and team interactions.*/
 public class Units{
-    private static Rect hitrect = new Rect();
+    private static final Rect hitrect = new Rect();
     private static Unit result;
     private static float cdist;
     private static boolean boolResult;
 
     @Remote(called = Loc.server)
-    public static void onUnitDeath(Unit unit){
+    public static void unitDeath(Unit unit){
         unit.killed();
     }
 
+    @Remote(called = Loc.server)
+    public static void unitDespawn(Unit unit){
+        Fx.unitDespawn.at(unit.x, unit.y, 0, unit);
+        unit.remove();
+    }
+
     /** @return whether a new instance of a unit of this team can be created. */
-    public static boolean canCreate(Team team){
-        return teamIndex.count(team) < getCap(team);
+    public static boolean canCreate(Team team, UnitType type){
+        return teamIndex.countType(team, type) < getCap(team);
     }
 
     public static int getCap(Team team){
+        //wave team has no cap
+        if((team == state.rules.waveTeam && state.rules.waves) || (state.isCampaign() && team == state.rules.waveTeam)){
+            return Integer.MAX_VALUE;
+        }
         return state.rules.unitCap + indexer.getExtraUnits(team);
     }
 
@@ -92,8 +104,7 @@ public class Units{
 
     /** Returns the neareset damaged tile. */
     public static Building findDamagedTile(Team team, float x, float y){
-        Tile tile = Geometry.findClosest(x, y, indexer.getDamaged(team));
-        return tile == null ? null : tile.build;
+        return Geometry.findClosest(x, y, indexer.getDamaged(team));
     }
 
     /** Returns the neareset ally tile in a range. */

@@ -14,10 +14,10 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class WeaponsComp implements Teamc, Posc, Rotc{
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, reloadMultiplier;
 
     /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
-    static final float minAimDst = 20f;
+    static final float minAimDst = 18f;
     /** temporary weapon sequence number */
     static int sequenceNum = 0;
 
@@ -26,7 +26,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @ReadOnly transient float range, aimX, aimY;
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
-    int ammo;
+    float ammo;
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
@@ -45,6 +45,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             mounts[i] = new WeaponMount(def.weapons.get(i));
             range = Math.max(range, def.weapons.get(i).bullet.range());
         }
+    }
+
+    void controlWeapons(boolean rotateShoot){
+        controlWeapons(rotateShoot, rotateShoot);
     }
 
     void controlWeapons(boolean rotate, boolean shoot){
@@ -82,46 +86,52 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
     public void update(){
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
-            mount.reload = Math.max(mount.reload - Time.delta(), 0);
+            mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
+
+            //flip weapon shoot side for alternating weapons at half reload
+            if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&
+                mount.reload + Time.delta > weapon.reload/2f && mount.reload <= weapon.reload/2f){
+                mounts[weapon.otherSide].side = !mounts[weapon.otherSide].side;
+                mount.side = !mount.side;
+            }
 
             //rotate if applicable
             if(weapon.rotate && (mount.rotate || mount.shoot)){
-                float axisXOffset = weapon.mirror ? 0f : weapon.x;
-                float axisX = this.x + Angles.trnsx(rotation, axisXOffset, weapon.y),
-                axisY = this.y + Angles.trnsy(rotation, axisXOffset, weapon.y);
+                float axisX = this.x + Angles.trnsx(rotation - 90,  weapon.x, weapon.y),
+                    axisY = this.y + Angles.trnsy(rotation - 90,  weapon.x, weapon.y);
 
-                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation();
-                mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta());
+                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation;
+                mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
             }else{
                 mount.rotation = 0;
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
 
-            if(mount.shoot && (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo)){
+            //shoot if applicable
+            if(mount.shoot && //must be shooting
+                (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && //check ammo
+                (!weapon.alternate || mount.side == weapon.flipSprite) &&
+                mount.reload <= 0.0001f && //reload has to be 0
+                Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
+            ){
+
                 float rotation = this.rotation - 90;
+                float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
 
-                //shoot if applicable
-                if(mount.reload <= 0.0001f && Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone)){
-                    for(int i : (weapon.mirror && !weapon.alternate ? Mathf.signs : Mathf.one)){
-                        i *= Mathf.sign(weapon.flipped) * (mount.weapon.mirror ? Mathf.sign(mount.side) : 1);
+                //m a t h
 
-                        //m a t h
-                        float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
-                        float mountX = this.x + Angles.trnsx(rotation, weapon.x * i, weapon.y),
-                            mountY = this.y + Angles.trnsy(rotation, weapon.x * i, weapon.y);
-                        float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX * i, weapon.shootY),
-                            shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX * i, weapon.shootY);
-                        float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
+                float mountX = this.x + Angles.trnsx(rotation, weapon.x, weapon.y),
+                    mountY = this.y + Angles.trnsy(rotation, weapon.x, weapon.y);
+                float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY),
+                    shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX, weapon.shootY);
+                float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
 
-                        shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, -i);
-                    }
+                shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
 
-                    if(mount.weapon.mirror) mount.side = !mount.side;
-                    mount.reload = weapon.reload;
+                mount.reload = weapon.reload;
 
-                    ammo --;
-                    if(ammo < 0) ammo = 0;
-                }
+                ammo--;
+                if(ammo < 0) ammo = 0;
             }
         }
     }
@@ -145,24 +155,18 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
         }
 
-        Tmp.v1.trns(rotation + 180f, ammo.recoil);
-
         if(this instanceof Velc){
-            //TODO apply force?
-            ((Velc)this).vel().add(Tmp.v1);
+            ((Velc)this).vel().add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
         }
-
-        Tmp.v1.trns(rotation, 3f);
         boolean parentize = ammo.keepVelocity;
 
         Effects.shake(weapon.shake, weapon.shake, x, y);
         weapon.ejectEffect.at(x, y, rotation * side);
-        ammo.shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
-        ammo.smokeEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, parentize ? this : null);
+        ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
+        ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);
     }
 
     private void bullet(Weapon weapon, float x, float y, float angle, float lifescl){
-        Tmp.v1.trns(angle, 3f);
-        weapon.bullet.create(this, team(), x + Tmp.v1.x, y + Tmp.v1.y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
+        weapon.bullet.create(this, team(), x, y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
     }
 }

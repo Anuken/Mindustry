@@ -80,6 +80,8 @@ public class Block extends UnlockableContent{
     public boolean rebuildable = true;
     /** whether this water can only be placed on water */
     public boolean requiresWater = false;
+    /** whether this water can be placed on any liquids, anywhere */
+    public boolean placeableLiquid = false;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
@@ -96,6 +98,8 @@ public class Block extends UnlockableContent{
     public boolean floating = false;
     /** multiblock size */
     public int size = 1;
+    /** multiblock offset */
+    public float offset = 0f;
     /** Whether to draw this block in the expanded draw range. */
     public boolean expanded = false;
     /** Max of timers used. */
@@ -146,6 +150,14 @@ public class Block extends UnlockableContent{
     public Sound breakSound = Sounds.boom;
     /** How reflective this block is. */
     public float albedo = 0f;
+    /** Environmental passive light color. */
+    public Color lightColor = Color.white.cpy();
+    /**
+     * Whether this environmental block passively emits light.
+     * Not valid for non-environmental blocks. */
+    public boolean emitLight = false;
+    /** Radius of the light emitted by this block. */
+    public float lightRadius = 60f;
 
     /** The sound that this block makes while active. One sound loop. Do not overuse.*/
     public Sound activeSound = Sounds.none;
@@ -212,6 +224,10 @@ public class Block extends UnlockableContent{
             .sumf(other -> !other.floor().isLiquid ? 1f : 0f) / size / size;
     }
 
+    public void drawEnvironmentLight(Tile tile){
+        Drawf.light(tile.worldx(), tile.worldy(), lightRadius, lightColor, lightColor.a);
+    }
+
     /** Drawn when you are placing a block. */
     public void drawPlace(int x, int y, int rotation, boolean valid){
     }
@@ -230,7 +246,7 @@ public class Block extends UnlockableContent{
         float width = layout.width;
 
         font.setColor(color);
-        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
+        float dx = x * tilesize + offset, dy = y * tilesize + offset + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
         Lines.stroke(2f, Color.darkGray);
@@ -458,13 +474,8 @@ public class Block extends UnlockableContent{
         return entityType.get();
     }
 
-    /** Offset for placing and drawing multiblocks. */
-    public float offset(){
-        return ((size + 1) % 2) * tilesize / 2f;
-    }
-
     public Rect bounds(int x, int y, Rect rect){
-        return rect.setSize(size * tilesize).setCenter(x * tilesize + offset(), y * tilesize + offset());
+        return rect.setSize(size * tilesize).setCenter(x * tilesize + offset, y * tilesize + offset);
     }
 
     public boolean isMultiblock(){
@@ -481,6 +492,11 @@ public class Block extends UnlockableContent{
 
     /** Called when building of this block begins. */
     public void placeBegan(Tile tile, Block previous){
+
+    }
+
+    /** Called right before building of this block begins. */
+    public void beforePlaceBegan(Tile tile, Block previous){
 
     }
 
@@ -587,6 +603,12 @@ public class Block extends UnlockableContent{
             health = size * size * 40;
         }
 
+        if(group == BlockGroup.transportation || consumes.has(ConsumeType.item) || category == Category.distribution){
+            acceptsItems = true;
+        }
+
+        offset = ((size + 1) % 2) * tilesize / 2f;
+
         buildCost = 0f;
         for(ItemStack stack : requirements){
             buildCost += stack.amount * stack.item.cost;
@@ -626,7 +648,7 @@ public class Block extends UnlockableContent{
         //load specific team regions
         teamRegions = new TextureRegion[Team.all.length];
         for(Team team : Team.all){
-            teamRegions[team.uid] = teamRegion.found() ? Core.atlas.find(name + "-team-" + team.name, teamRegion) : teamRegion;
+            teamRegions[team.id] = teamRegion.found() ? Core.atlas.find(name + "-team-" + team.name, teamRegion) : teamRegion;
         }
     }
 

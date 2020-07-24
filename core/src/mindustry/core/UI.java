@@ -63,7 +63,7 @@ public class UI implements ApplicationListener, Loadable{
     public DatabaseDialog database;
     public ContentInfoDialog content;
     public PlanetDialog planet;
-    public TechTreeDialog tech;
+    public ResearchDialog research;
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
@@ -175,17 +175,17 @@ public class UI implements ApplicationListener, Loadable{
         maps = new MapsDialog();
         content = new ContentInfoDialog();
         planet = new PlanetDialog();
-        tech = new TechTreeDialog();
+        research = new ResearchDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
 
         Group group = Core.scene.root;
 
         menuGroup.setFillParent(true);
-        menuGroup.touchable(Touchable.childrenOnly);
+        menuGroup.touchable = Touchable.childrenOnly;
         menuGroup.visible(() -> state.isMenu());
         hudGroup.setFillParent(true);
-        hudGroup.touchable(Touchable.childrenOnly);
+        hudGroup.touchable = Touchable.childrenOnly;
         hudGroup.visible(() -> state.isGame());
 
         Core.scene.add(menuGroup);
@@ -292,7 +292,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showInfoToast(String info, float duration){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -305,7 +305,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -318,7 +318,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showLabel(String info, float duration, float worldx, float worldy){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -465,6 +465,15 @@ public class UI implements ApplicationListener, Loadable{
         dialog.keyDown(KeyCode.escape, dialog::hide);
         dialog.keyDown(KeyCode.back, dialog::hide);
         dialog.show();
+    }
+
+    public void announce(String text){
+        Table t = new Table();
+        t.background(Styles.black3).margin(8f)
+        .add(text).style(Styles.outlineLabel);
+        t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
+        t.actions(Actions.fadeOut(3, Interp.pow4In));
+        Core.scene.add(t);
     }
 
     public void showOkText(String title, String text, Runnable confirmed){

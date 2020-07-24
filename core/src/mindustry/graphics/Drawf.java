@@ -17,29 +17,6 @@ import static mindustry.Vars.*;
 
 public class Drawf{
 
-    //an experiment, to be removed
-    public static void runes(float x, float y, int[] text){
-        int height = 6, width = 5;
-        float scale = 3;
-        float th = height * scale, tw = width * scale;
-        float skewx = width * scale, skewy = 0;
-
-        Draw.color(Pal.accent);
-
-        for(int i = 0; i < text.length; i++){
-            float ox = x + i*tw*width;
-
-            for(int j = 0; j < width * height; j++){
-                int cx = j % width, cy = j / width;
-                float rx = ox + cx * tw + skewx * cy, ry = y + cy * th;
-
-                if((text[i] & (1 << j)) != 0){
-                    Fill.quad(rx, ry, rx + tw, ry, rx + tw + skewx, ry + th + skewy, rx + skewx, ry + th + skewy);
-                }
-            }
-        }
-    }
-
     public static float text(){
         float z = Draw.z();
         if(renderer.pixelator.enabled()){
@@ -47,6 +24,10 @@ public class Drawf{
         }
 
         return z;
+    }
+
+    public static void light(float x, float y, float radius, Color color, float opacity){
+        renderer.lights.add(x, y, radius, color, opacity);
     }
 
     public static void light(Team team, float x, float y, float radius, Color color, float opacity){
@@ -87,8 +68,8 @@ public class Drawf{
             Point2 p = Geometry.d8edge[i];
             float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
             Draw.rect("block-select",
-            x*tilesize + block.offset() + offset * p.x,
-            y*tilesize + block.offset() + offset * p.y, i * 90);
+            x*tilesize + block.offset + offset * p.x,
+            y*tilesize + block.offset + offset * p.y, i * 90);
         }
         Draw.reset();
     }
@@ -200,13 +181,13 @@ public class Drawf{
         Shaders.build.time = -time / 20f;
 
         Draw.shader(Shaders.build);
-        Draw.rect(region, t.x(), t.y(), rotation);
+        Draw.rect(region, t.x, t.y, rotation);
         Draw.shader();
 
         Draw.color(Pal.accent);
         Draw.alpha(speed);
 
-        Lines.lineAngleCenter(t.x() + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block().size - 2f), t.y(), 90, t.block().size * Vars.tilesize - 4f);
+        Lines.lineAngleCenter(t.x + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block().size - 2f), t.y, 90, t.block().size * Vars.tilesize - 4f);
 
         Draw.reset();
     }

@@ -52,9 +52,9 @@ public class Fires{
     public static void extinguish(Tile tile, float intensity){
         if(tile != null && map.containsKey(tile.pos())){
             Fire fire = map.get(tile.pos());
-            fire.time(fire.time() + intensity * Time.delta());
+            fire.time(fire.time + intensity * Time.delta);
             Fx.steam.at(fire);
-            if(fire.time() >= fire.lifetime()){
+            if(fire.time >= fire.lifetime){
                 Events.fire(Trigger.fireExtinguish);
             }
         }

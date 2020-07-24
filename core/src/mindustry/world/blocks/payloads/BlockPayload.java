@@ -34,6 +34,11 @@ public class BlockPayload implements Payload{
     }
 
     @Override
+    public boolean canBeTaken(Payloadc picker){
+        return entity.block.size <= 2;
+    }
+
+    @Override
     public boolean fits(){
         return entity.block().size < 3;
     }
@@ -53,7 +58,7 @@ public class BlockPayload implements Payload{
 
     @Override
     public void draw(){
-        Drawf.shadow(entity.x(), entity.y(), entity.block().size * tilesize * 2f);
-        Draw.rect(entity.block().icon(Cicon.full), entity.x(), entity.y());
+        Drawf.shadow(entity.x, entity.y, entity.block().size * tilesize * 2f);
+        Draw.rect(entity.block().icon(Cicon.full), entity.x, entity.y);
     }
 }

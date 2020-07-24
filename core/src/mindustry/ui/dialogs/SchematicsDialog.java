@@ -277,8 +277,8 @@ public class SchematicsDialog extends BaseDialog{
 
         @Override
         public void draw(){
-            boolean checked = getParent().getParent() instanceof Button
-                && ((Button)getParent().getParent()).isOver();
+            boolean checked = parent.parent instanceof Button
+                && ((Button)parent.parent).isOver();
 
             boolean wasSet = set;
             if(!set){
@@ -350,7 +350,7 @@ public class SchematicsDialog extends BaseDialog{
                 }
             });
             cont.row();
-            float cons = schem.powerConsumption(), prod = schem.powerProduction();
+            float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
             if(!Mathf.zero(cons) || !Mathf.zero(prod)){
                 cont.table(t -> {
 

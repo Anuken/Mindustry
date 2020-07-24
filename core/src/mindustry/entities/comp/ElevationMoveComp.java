@@ -19,4 +19,5 @@ abstract class ElevationMoveComp implements Velc, Posc, Flyingc, Hitboxc{
             collisions.move(this, cx, cy);
         }
     }
+
 }

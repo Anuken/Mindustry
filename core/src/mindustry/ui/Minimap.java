@@ -15,7 +15,7 @@ public class Minimap extends Table{
     public Minimap(){
         background(Tex.pane);
         float margin = 5f;
-        touchable(Touchable.enabled);
+        this.touchable = Touchable.enabled;
 
         add(new Element(){
             {

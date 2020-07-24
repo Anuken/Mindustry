@@ -12,8 +12,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.Administration.*;
@@ -37,10 +37,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient @Nullable NetConnection con;
 
     @ReadOnly Team team = Team.sharded;
+    @SyncLocal boolean admin, typing, shooting, boosting;
+    @SyncLocal float mouseX, mouseY;
     String name = "noname";
-    boolean admin, typing, shooting, boosting;
     Color color = new Color();
-    float mouseX, mouseY;
 
     transient float deathTimer;
     transient String lastText = "";
@@ -63,9 +63,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     public TextureRegion icon(){
+        //display default icon for dead players
         if(dead()) return core() == null ? UnitTypes.alpha.icon(Cicon.full) : ((CoreBlock)core().block).unitType.icon(Cicon.full);
 
-        return unit.type().icon(Cicon.full);
+        return unit.icon();
     }
 
     public void reset(){
@@ -76,6 +77,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             unit.controller(unit.type().createController());
             unit = Nulls.unit;
         }
+    }
+
+    @Override
+    public boolean isValidController(){
+        return isAdded();
     }
 
     @Replace
@@ -113,7 +119,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }else if(core != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
             //(this is not for balance)
-            deathTimer += Time.delta();
+            deathTimer += Time.delta;
             if(deathTimer >= deathDelay){
                 //request spawn - this happens serverside only
                 core.requestSpawn(base());
@@ -121,8 +127,16 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             }
         }
 
-        textFadeTime -= Time.delta() / (60 * 5);
+        textFadeTime -= Time.delta / (60 * 5);
 
+    }
+
+    @Override
+    public void remove(){
+        //clear unit upon removal
+        if(!unit.isNull()){
+            clearUnit();
+        }
     }
 
     public void team(Team team){

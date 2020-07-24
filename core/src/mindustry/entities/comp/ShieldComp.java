@@ -34,7 +34,7 @@ abstract class ShieldComp implements Healthc, Posc{
             shieldAlpha = 1f;
         }
 
-        float shieldDamage = Math.min(shield, amount);
+        float shieldDamage = Math.min(Math.max(shield, 0), amount);
         shield -= shieldDamage;
         amount -= shieldDamage;
 
@@ -52,7 +52,7 @@ abstract class ShieldComp implements Healthc, Posc{
 
     @Override
     public void update(){
-        shieldAlpha -= Time.delta() / 15f;
+        shieldAlpha -= Time.delta / 15f;
         if(shieldAlpha < 0) shieldAlpha = 0f;
     }
 }

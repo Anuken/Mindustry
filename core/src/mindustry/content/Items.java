@@ -1,9 +1,8 @@
 package mindustry.content;
 
-import arc.graphics.Color;
-import mindustry.ctype.ContentList;
-import mindustry.type.Item;
-import mindustry.type.ItemType;
+import arc.graphics.*;
+import mindustry.ctype.*;
+import mindustry.type.*;
 
 public class Items implements ContentList{
     public static Item scrap, copper, lead, graphite, coal, titanium, thorium, silicon, plastanium, phasefabric, surgealloy,
@@ -12,26 +11,22 @@ public class Items implements ContentList{
     @Override
     public void load(){
         copper = new Item("copper", Color.valueOf("d99d73")){{
-            type = ItemType.material;
             hardness = 1;
             cost = 0.5f;
             alwaysUnlocked = true;
         }};
 
         lead = new Item("lead", Color.valueOf("8c7fa9")){{
-            type = ItemType.material;
             hardness = 1;
             cost = 0.7f;
             alwaysUnlocked = true;
         }};
 
         metaglass = new Item("metaglass", Color.valueOf("ebeef5")){{
-            type = ItemType.material;
             cost = 1.5f;
         }};
 
         graphite = new Item("graphite", Color.valueOf("b2c6d2")){{
-            type = ItemType.material;
             cost = 1f;
         }};
 
@@ -46,13 +41,11 @@ public class Items implements ContentList{
         }};
 
         titanium = new Item("titanium", Color.valueOf("8da1e3")){{
-            type = ItemType.material;
             hardness = 3;
             cost = 1f;
         }};
 
         thorium = new Item("thorium", Color.valueOf("f9a3c7")){{
-            type = ItemType.material;
             explosiveness = 0.2f;
             hardness = 4;
             radioactivity = 1f;
@@ -64,25 +57,21 @@ public class Items implements ContentList{
         }};
 
         silicon = new Item("silicon", Color.valueOf("53565c")){{
-            type = ItemType.material;
             cost = 0.8f;
         }};
 
         plastanium = new Item("plastanium", Color.valueOf("cbd97f")){{
-            type = ItemType.material;
             flammability = 0.1f;
             explosiveness = 0.2f;
             cost = 1.3f;
         }};
 
         phasefabric = new Item("phase-fabric", Color.valueOf("f4ba6e")){{
-            type = ItemType.material;
             cost = 1.3f;
             radioactivity = 0.6f;
         }};
 
         surgealloy = new Item("surge-alloy", Color.valueOf("f3e979")){{
-            type = ItemType.material;
         }};
 
         sporePod = new Item("spore-pod", Color.valueOf("7457ce")){{
@@ -95,7 +84,7 @@ public class Items implements ContentList{
         }};
 
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
-            flammability = 1.4f;
+            flammability = 1.5f;
             explosiveness = 0.4f;
         }};
     }

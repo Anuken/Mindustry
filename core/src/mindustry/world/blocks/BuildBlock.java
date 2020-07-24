@@ -48,7 +48,7 @@ public class BuildBlock extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void onDeconstructFinish(Tile tile, Block block, int builderID){
+    public static void deconstructFinish(Tile tile, Block block, int builderID){
         Team team = tile.team();
         Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
         Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, true));
@@ -57,11 +57,11 @@ public class BuildBlock extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void onConstructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
+    public static void constructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
         if(tile == null) return;
-        float healthf = tile.build.healthf();
+        float healthf = tile.build == null ? 1f : tile.build.healthf();
         tile.setBlock(block, team, rotation);
-        tile.build.health(block.health * healthf);
+        tile.build.health = block.health * healthf;
         //last builder was this local client player, call placed()
         if(!headless && builderID == player.unit().id()){
             if(!skipConfig){
@@ -96,7 +96,7 @@ public class BuildBlock extends Block{
     }
 
     public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
-        Call.onConstructFinish(tile, block, builderID, rotation, team, skipConfig);
+        Call.constructFinish(tile, block, builderID, rotation, team, skipConfig);
         tile.build.placed();
 
         Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
@@ -256,7 +256,7 @@ public class BuildBlock extends Block{
             builderID = builder.id();
 
             if(progress <= 0 || state.rules.infiniteResources){
-                Call.onDeconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);
+                Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);
             }
         }
 

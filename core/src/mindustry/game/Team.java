@@ -4,18 +4,17 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
-    public final byte id;
-    public final int uid;
+    public final int id;
     public final Color color;
     public final Color[] palette;
     public boolean hasPalette;
@@ -52,12 +51,10 @@ public class Team implements Comparable<Team>{
     protected Team(int id, String name, Color color){
         this.name = name;
         this.color = color;
-        this.id = (byte)id;
+        this.id = id;
 
-        int us = Pack.u(this.id);
-        uid = us;
-        if(us < 6) baseTeams[us] = this;
-        all[us] = this;
+        if(id < 6) baseTeams[id] = this;
+        all[id] = this;
 
         palette = new Color[3];
         palette[0] = color;
@@ -75,12 +72,18 @@ public class Team implements Comparable<Team>{
         hasPalette = true;
     }
 
+    /** @return the core items for this team, or an empty item module.
+     * Never add to the resulting item module, as it is mutable. */
+    public @NonNull ItemModule items(){
+        return core() == null ? ItemModule.empty : core().items;
+    }
+
     /** @return the team-specific rules. */
     public TeamRule rules(){
         return state.rules.teams.get(this);
     }
 
-    public Seq<Team> enemies(){
+    public Team[] enemies(){
         return state.teams.enemiesOf(this);
     }
 

@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.never;
 
 public class WaveInfoDialog extends BaseDialog{
-    private final static int displayed = 20;
+    private static final int displayed = 20;
     private Seq<SpawnGroup> groups = new Seq<>();
 
     private Table table, preview;
@@ -93,7 +93,7 @@ public class WaveInfoDialog extends BaseDialog{
             }).growX().height(70f);
         }), new Label("$waves.none"){{
             visible(() -> groups.isEmpty());
-            touchable(Touchable.disabled);
+            this.touchable = Touchable.disabled;
             setWrap(true);
             setAlignment(Align.center, Align.center);
         }}).width(390f).growY();
@@ -104,7 +104,7 @@ public class WaveInfoDialog extends BaseDialog{
             m.button("-", () -> {
             }).update(t -> {
                 if(t.getClickListener().isPressed()){
-                    updateTimer += Time.delta();
+                    updateTimer += Time.delta;
                     if(updateTimer >= updatePeriod){
                         start = Math.max(start - 1, 0);
                         updateTimer = 0f;
@@ -118,7 +118,7 @@ public class WaveInfoDialog extends BaseDialog{
             m.button("+", () -> {
             }).update(t -> {
                 if(t.getClickListener().isPressed()){
-                    updateTimer += Time.delta();
+                    updateTimer += Time.delta;
                     if(updateTimer >= updatePeriod){
                         start++;
                         updateTimer = 0f;
@@ -149,14 +149,14 @@ public class WaveInfoDialog extends BaseDialog{
                     t.row();
                     t.table(spawns -> {
                         spawns.field("" + (group.begin + 1), TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.begin = Strings.parseInt(text) - 1;
                                 updateWaves();
                             }
                         }).width(100f);
                         spawns.add("$waves.to").padLeft(4).padRight(4);
                         spawns.field(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.end = Strings.parseInt(text) - 1;
                                 updateWaves();
                             }else if(text.isEmpty()){
@@ -169,7 +169,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.table(p -> {
                         p.add("$waves.every").padRight(4);
                         p.field(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text) && Strings.parseInt(text) > 0){
+                            if(Strings.canParsePositiveInt(text) && Strings.parseInt(text) > 0){
                                 group.spacing = Strings.parseInt(text);
                                 updateWaves();
                             }
@@ -180,7 +180,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.row();
                     t.table(a -> {
                         a.field(group.unitAmount + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.unitAmount = Strings.parseInt(text);
                                 updateWaves();
                             }
@@ -198,7 +198,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.row();
                     t.table(a -> {
                         a.field((int)group.shields + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.shields = Strings.parseInt(text);
                                 updateWaves();
                             }
@@ -206,7 +206,7 @@ public class WaveInfoDialog extends BaseDialog{
 
                         a.add(" + ");
                         a.field((int)group.shieldScaling + "", TextFieldFilter.digitsOnly, text -> {
-                            if(Strings.canParsePostiveInt(text)){
+                            if(Strings.canParsePositiveInt(text)){
                                 group.shieldScaling = Strings.parseInt(text);
                                 updateWaves();
                             }

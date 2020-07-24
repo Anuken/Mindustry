@@ -1,11 +1,9 @@
 package mindustry.core;
 
 import arc.*;
-import arc.Input.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
-import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -57,29 +55,6 @@ public interface Platform{
         Context c = Context.enter();
         c.setOptimizationLevel(9);
         return c;
-    }
-
-    /** Add a text input dialog that should show up after the field is tapped. */
-    default void addDialog(TextField field){
-        addDialog(field, 16);
-    }
-
-    /** See addDialog(). */
-    default void addDialog(TextField field, int maxLength){
-        if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
-
-        field.tapped(() -> {
-            TextInput input = new TextInput();
-            input.text = field.getText();
-            input.maxLength = maxLength;
-            input.accepted = text -> {
-                field.clearText();
-                field.appendText(text);
-                field.change();
-                Core.input.setOnscreenKeyboardVisible(false);
-            };
-            Core.input.getTextInput(input);
-        });
     }
 
     /** Update discord RPC. */
@@ -136,13 +111,26 @@ public interface Platform{
      * @param extension File extension to filter
      */
     default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-        new FileChooser(open ? "$open" : "$save", file -> file.extension().toLowerCase().equals(extension), open, file -> {
+        new FileChooser(open ? "$open" : "$save", file -> file.extEquals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
             }else{
                 cons.get(file);
             }
         }).show();
+    }
+
+    /**
+     * Show a file chooser for multiple file types. Only supported on desktop.
+     * @param cons Selection listener
+     * @param extensions File extensions to filter
+     */
+    default void showMultiFileChooser(Cons<Fi> cons, String... extensions){
+        if(mobile){
+            showFileChooser(true, extensions[0], cons);
+        }else{
+            new FileChooser("$open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+        }
     }
 
     /** Hide the app. Android only. */

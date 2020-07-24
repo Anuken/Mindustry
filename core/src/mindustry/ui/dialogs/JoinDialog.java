@@ -49,9 +49,7 @@ public class JoinDialog extends BaseDialog{
 
         TextField field = add.cont.field(Core.settings.getString("ip"), text -> {
             Core.settings.put("ip", text);
-        }).size(320f, 54f).get();
-
-        platform.addDialog(field, 100);
+        }).size(320f, 54f).maxTextLength(100).addInputDialog().get();
 
         add.cont.row();
         add.buttons.defaults().size(140f, 60f).pad(4f);
@@ -261,7 +259,7 @@ public class JoinDialog extends BaseDialog{
                 t.field(Core.settings.getString("name"), text -> {
                     player.name(text);
                     Core.settings.put("name", text);
-                }).grow().pad(8).get().setMaxLength(maxNameLength);
+                }).grow().pad(8).addInputDialog(maxNameLength);
             }else{
                 t.add(player.name).update(l -> l.setColor(player.color())).grow().pad(8);
             }
@@ -288,12 +286,12 @@ public class JoinDialog extends BaseDialog{
                 pad = 6;
             }
 
-            Cell cell = ((Table)pane.getParent()).getCell(button);
+            Cell cell = ((Table)pane.parent).getCell(button);
 
             if(!Mathf.equal(cell.minWidth(), pw)){
                 cell.width(pw);
                 cell.padLeft(pad);
-                pane.getParent().invalidateHierarchy();
+                pane.parent.invalidateHierarchy();
             }
         });
     }
@@ -412,12 +410,12 @@ public class JoinDialog extends BaseDialog{
     }
 
     float targetWidth(){
-        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 500f);//Core.graphics.isPortrait() ? 350f : 500f;
+        return Math.min(Core.graphics.getWidth() / Scl.scl() * 0.9f, 500f);
     }
 
     @SuppressWarnings("unchecked")
     private void loadServers(){
-        servers = Core.settings.getJson("servers", Seq.class, Seq::new);
+        servers = Core.settings.getJson("servers", Seq.class, Server.class, Seq::new);
 
         //load imported legacy data
         if(Core.settings.has("server-list")){

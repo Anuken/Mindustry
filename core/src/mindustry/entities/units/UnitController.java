@@ -6,6 +6,10 @@ public interface UnitController{
     void unit(Unit unit);
     Unit unit();
 
+    default boolean isValidController(){
+        return true;
+    }
+
     default void command(UnitCommand command){
 
     }

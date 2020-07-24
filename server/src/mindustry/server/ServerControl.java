@@ -39,7 +39,8 @@ public class ServerControl implements ApplicationListener{
     private static final int maxLogLength = 1024 * 512;
 
     protected static String[] tags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
-    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy | HH:mm:ss");
+    protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
+        autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
     private final CommandHandler handler = new CommandHandler("");
     private final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
@@ -49,6 +50,7 @@ public class ServerControl implements ApplicationListener{
     private Task lastTask;
     private Gamemode lastMode = Gamemode.survival;
     private @Nullable Map nextMapOverride;
+    private Interval autosaveCount = new Interval();
 
     private Thread socketThread;
     private ServerSocket serverSocket;
@@ -137,7 +139,7 @@ public class ServerControl implements ApplicationListener{
             Map map = nextMapOverride != null ? nextMapOverride : maps.getNextMap(lastMode, state.map);
             nextMapOverride = null;
             if(map != null){
-                Call.onInfoMessage((state.rules.pvp
+                Call.infoMessage((state.rules.pvp
                 ? "[yellow]The " + event.winner.name + " team is victorious![]" : "[scarlet]Game over![]")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
@@ -153,12 +155,52 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        //reset autosave on world load
+        Events.on(WorldLoadEvent.class, e -> {
+            autosaveCount.reset(0, Config.autosaveSpacing.num() * 60);
+        });
+
+        //autosave periodically
+        Events.on(Trigger.update, () -> {
+            if(state.isPlaying() && Config.autosave.bool()){
+                if(autosaveCount.get(Config.autosaveSpacing.num() * 60)){
+                    int max = Config.autosaveAmount.num();
+
+                    //use map file name to make sure it can be saved
+                    String mapName = (state.map.file == null ? "unknown" : state.map.file.nameWithoutExtension()).replace(" ", "_");
+                    String date = autosaveDate.format(LocalDateTime.now());
+
+                    Seq<Fi> autosaves = saveDirectory.findAll(f -> f.name().startsWith("auto_"));
+                    autosaves.sort(f -> -f.lastModified());
+
+                    //delete older saves
+                    if(autosaves.size >= max){
+                        for(int i = max - 1; i < autosaves.size; i++){
+                            autosaves.get(i).delete();
+                        }
+                    }
+
+                    String fileName = "auto_" + mapName + "_" + date + "." + saveExtension;
+                    Fi file = saveDirectory.child(fileName);
+                    info("&lbAutosaving...");
+
+                    try{
+                        SaveIO.save(file);
+                        info("&lbAutosave completed.");
+                    }catch(Throwable e){
+                        err("Autosave failed.", e);
+                    }
+                }
+            }
+        });
+
         Events.on(Trigger.socketConfigChanged, () -> {
             toggleSocket(false);
             toggleSocket(Config.socketInput.bool());
         });
 
         Events.on(PlayEvent.class, e -> {
+
             try{
                 JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
                 JsonIO.json().readFields(state.rules, value);
@@ -395,7 +437,7 @@ public class ServerControl implements ApplicationListener{
                 }
 
                 Core.settings.put("globalrules", base.toString());
-                Call.onSetRules(state.rules);
+                Call.setRules(state.rules);
             }
         });
 
@@ -418,9 +460,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(Item item : content.items()){
-                if(item.type == ItemType.material){
-                    state.teams.cores(team).first().items().set(item, state.teams.cores(team).first().block().itemCapacity);
-                }
+                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block().itemCapacity);
             }
 
             info("Core filled.");
@@ -438,7 +478,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            if(Strings.canParsePostiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
+            if(Strings.canParsePositiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
                 int lim = Strings.parseInt(arg[0]);
                 netServer.admins.setPlayerLimit(lim);
                 info("Player limit is now &lc@.", lim);
@@ -887,7 +927,7 @@ public class ServerControl implements ApplicationListener{
             
             logic.reset();
 
-            Call.onWorldDataBegin();
+            Call.worldDataBegin();
             run.run();
             state.rules = state.map.applyRules(lastMode);
             logic.play();
@@ -950,7 +990,7 @@ public class ServerControl implements ApplicationListener{
                     serverSocket.bind(new InetSocketAddress(Config.socketInputAddress.string(), Config.socketInputPort.num()));
                     while(true){
                         Socket client = serverSocket.accept();
-                        info("&lmRecieved command socket connection: &lb@", serverSocket.getLocalSocketAddress());
+                        info("&lmReceived command socket connection: &lb@", serverSocket.getLocalSocketAddress());
                         BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                         socketOutput = new PrintWriter(client.getOutputStream(), true);
                         String line;

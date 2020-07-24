@@ -62,7 +62,7 @@ public class BaseRegistry{
 
                     //calculate averages
                     if(tile.block instanceof Drill || tile.block instanceof Pump){
-                        Tmp.v1.add(tile.x*tilesize + tile.block.offset(), tile.y*tilesize + tile.block.offset());
+                        Tmp.v1.add(tile.x*tilesize + tile.block.offset, tile.y*tilesize + tile.block.offset);
                         drills ++;
                     }
                 }

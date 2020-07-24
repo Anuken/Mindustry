@@ -55,16 +55,17 @@ public class SStats implements SteamUserStatsCallback{
         if(campaign()){
             SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
 
-            if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
-                active10Phantoms.complete();
-            }
+            //TODO
+            //if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
+           //     active10Phantoms.complete();
+            //}
 
             if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
             for(Building entity : player.team().cores()){
-                if(!content.items().contains(i -> i.type == ItemType.material && entity.items.get(i) < entity.block().itemCapacity)){
+                if(!content.items().contains(i -> entity.items.get(i) < entity.block().itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }
@@ -92,7 +93,7 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {
-            if(campaign() && player.core() != null && player.core().items().total() >= 10 * 1000){
+            if(campaign() && player.core() != null && player.core().items.total() >= 10 * 1000){
                 drop10kitems.complete();
             }
         }));
@@ -282,9 +283,9 @@ public class SStats implements SteamUserStatsCallback{
         registerEvents();
 
         if(result != SteamResult.OK){
-            Log.err("Failed to recieve steam stats: @", result);
+            Log.err("Failed to receive steam stats: @", result);
         }else{
-            Log.info("Recieved steam stats.");
+            Log.info("Received steam stats.");
         }
     }
 

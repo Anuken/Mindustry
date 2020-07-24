@@ -43,9 +43,8 @@ public class SolidPump extends Pump{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("efficiency", (SolidPumpEntity entity) -> new Bar(() ->
-        Core.bundle.formatFloat("bar.pumpspeed",
-        entity.lastPump / Time.delta() * 60, 1),
+        bars.add("efficiency", (SolidPumpEntity entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
+        entity.lastPump / Time.delta * 60, 1),
         () -> Pal.ammo,
         () -> entity.warmup));
     }
