@@ -27,6 +27,7 @@ public class StackConveyor extends Block implements Autotiler{
     public float speed = 0f;
     public boolean splitOut = true;
     public float displayedSpeed = 30f;
+    public float recharge = 2f;
 
     public StackConveyor(String name){
         super(name);
@@ -47,7 +48,7 @@ public class StackConveyor extends Block implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
+        stats.add(BlockStat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
     }
 
     @Override
@@ -166,7 +167,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void updateTile(){
             // reel in crater
-            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta());
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * edelta(), 0f, recharge);
 
             if(link == -1){
                 return;
@@ -200,7 +201,7 @@ public class StackConveyor extends Block implements Autotiler{
                             link = -1;
                             items.clear();
 
-                            cooldown = 1f;
+                            cooldown = recharge;
                             e.cooldown = 1;
                         }
                     }
@@ -249,7 +250,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Building source, Item item){
             if(this == source) return true;                 // player threw items
-            if(cooldown > 0) return false;                  // still cooling down
+            if(cooldown > recharge - 1f) return false;                  // still cooling down
             return !((state != stateLoad)                   // not a loading dock
             ||  (items.total() > 0 && !items.has(item))     // incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity
