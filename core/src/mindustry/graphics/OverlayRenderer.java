@@ -35,32 +35,35 @@ public class OverlayRenderer{
 
     public void drawTop(){
 
-        if(Core.settings.getBool("playerindicators")){
-            for(Player player : Groups.player){
-                if(Vars.player != player && Vars.player.team() == player.team()){
-                    if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
-                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
+        if(!player.dead()){
+            if(Core.settings.getBool("playerindicators")){
+                for(Player player : Groups.player){
+                    if(Vars.player != player && Vars.player.team() == player.team()){
+                        if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
+                        .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
 
-                        Tmp.v1.set(player.x, player.y).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+                            Tmp.v1.set(player.x, player.y).sub(player).setLength(indicatorLength);
 
-                        Lines.stroke(2f, player.team().color);
-                        Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
-                        Draw.reset();
+                            Lines.stroke(2f, player.team().color);
+                            Lines.lineAngle(player.x + Tmp.v1.x, player.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
+                            Draw.reset();
+                        }
                     }
                 }
             }
-        }
 
-        if(Core.settings.getBool("indicators")){
-            Groups.unit.each(unit -> {
-                if(!unit.isLocal() && unit.team() != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f).setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x(), unit.y())){
-                    Tmp.v1.set(unit.x(), unit.y()).sub(Core.camera.position.x, Core.camera.position.y).setLength(indicatorLength);
+            if(Core.settings.getBool("indicators")){
+                Groups.unit.each(unit -> {
+                    if(!unit.isLocal() && unit.team != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
+                    .setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
+                        Tmp.v1.set(unit.x, unit.y).sub(player).setLength(indicatorLength);
 
-                    Lines.stroke(1f, unit.team().color);
-                    Lines.lineAngle(Core.camera.position.x + Tmp.v1.x, Core.camera.position.y + Tmp.v1.y, Tmp.v1.angle(), 3f);
-                    Draw.reset();
-                }
-            });
+                        Lines.stroke(1f, unit.team().color);
+                        Lines.lineAngle(player.x + Tmp.v1.x, player.y + Tmp.v1.y, Tmp.v1.angle(), 3f);
+                        Draw.reset();
+                    }
+                });
+            }
         }
 
         if(player.dead()) return; //dead players don't draw
