@@ -30,9 +30,6 @@ public class TechTree implements ContentList{
                 node(junction, () -> {
                     node(router, () -> {
                         node(launchPad, () -> {
-                            node(launchPadLarge, () -> {
-
-                            });
                         });
 
                         node(distributor);
@@ -58,12 +55,16 @@ public class TechTree implements ContentList{
                                     });
                                 });
 
-                                node(plastaniumConveyor, () -> {
+                                node(payloadConveyor, () -> {
+                                    node(payloadRouter, () -> {
 
+                                    });
                                 });
 
                                 node(armoredConveyor, () -> {
+                                    node(plastaniumConveyor, () -> {
 
+                                    });
                                 });
                             });
                         });
@@ -102,7 +103,11 @@ public class TechTree implements ContentList{
                 node(scorch, () -> {
                     node(arc, () -> {
                         node(wave, () -> {
+                            node(parallax, () -> {
+                                node(segment, () -> {
 
+                                });
+                            });
                         });
 
                         node(lancer, () -> {
@@ -207,11 +212,13 @@ public class TechTree implements ContentList{
 
                             node(sporePress, () -> {
                                 node(coalCentrifuge, () -> {
+                                    node(multiPress, () -> {
+                                        node(siliconCrucible, () -> {
 
+                                        });
+                                    });
                                 });
-                                node(multiPress, () -> {
 
-                                });
 
                                 node(plastaniumCompressor, () -> {
                                     node(phaseWeaver, () -> {
@@ -229,7 +236,9 @@ public class TechTree implements ContentList{
 
                                         node(separator, () -> {
                                             node(pulverizer, () -> {
+                                                node(disassembler, () -> {
 
+                                                });
                                             });
                                         });
 
@@ -262,7 +271,9 @@ public class TechTree implements ContentList{
                                 node(mendProjector, () -> {
                                     node(forceProjector, () -> {
                                         node(overdriveProjector, () -> {
+                                            node(overdriveDome, () -> {
 
+                                            });
                                         });
                                     });
 
@@ -291,6 +302,23 @@ public class TechTree implements ContentList{
                             node(solarPanel, () -> {
                                 node(largeSolarPanel, () -> {
 
+                                });
+                            });
+
+                            node(groundFactory, () -> {
+                                node(airFactory, () -> {
+                                    node(navalFactory, () -> {
+
+                                    });
+
+                                    node(additiveReconstructor, () -> {
+                                        node(multiplicativeReconstructor, () -> {
+                                            node(exponentialReconstructor, () -> {
+                                                node(tetrativeReconstructor, () -> {
+                                                });
+                                            });
+                                        });
+                                    });
                                 });
                             });
                         });

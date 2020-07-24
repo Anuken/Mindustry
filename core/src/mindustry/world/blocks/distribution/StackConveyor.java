@@ -26,7 +26,6 @@ public class StackConveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public boolean splitOut = true;
-    public float displayedSpeed = 30f;
     public float recharge = 2f;
 
     public StackConveyor(String name){
