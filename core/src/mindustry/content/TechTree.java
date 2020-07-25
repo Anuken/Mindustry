@@ -10,6 +10,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
+import static mindustry.content.UnitTypes.*;
 
 public class TechTree implements ContentList{
     private static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
@@ -64,6 +65,260 @@ public class TechTree implements ContentList{
                                 node(armoredConveyor, () -> {
                                     node(plastaniumConveyor, () -> {
 
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(mechanicalDrill, () -> {
+
+                node(mechanicalPump, () -> {
+                    node(conduit, () -> {
+                        node(liquidJunction, () -> {
+                            node(liquidRouter, () -> {
+                                node(liquidTank);
+
+                                node(bridgeConduit);
+
+                                node(pulseConduit, () -> {
+                                    node(phaseConduit, () -> {
+
+                                    });
+
+                                    node(platedConduit, () -> {
+
+                                    });
+                                });
+
+                                node(rotaryPump, () -> {
+                                    node(thermalPump, () -> {
+
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+
+                node(Items.coal, () -> {
+                    node(Items.graphite, () -> {
+                        node(graphitePress, () -> {
+                            node(Items.titanium, () -> {
+                                node(pneumaticDrill, () -> {
+                                    node(Items.sporePod, () -> {
+                                        node(cultivator, () -> {
+
+                                        });
+                                    });
+
+                                    node(Items.thorium, () -> {
+                                        node(laserDrill, () -> {
+                                            node(blastDrill, () -> {
+
+                                            });
+
+                                            node(waterExtractor, () -> {
+                                                node(oilExtractor, () -> {
+
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+
+                            node(Items.pyratite, () -> {
+                                node(pyratiteMixer, () -> {
+                                    node(Items.blastCompound, () -> {
+                                        node(blastMixer, () -> {
+
+                                        });
+                                    });
+                                });
+                            });
+
+                            node(Items.silicon, () -> {
+                                node(siliconSmelter, () -> {
+
+                                    node(Liquids.oil, () -> {
+                                        node(sporePress, () -> {
+                                            node(coalCentrifuge, () -> {
+                                                node(multiPress, () -> {
+                                                    node(siliconCrucible, () -> {
+
+                                                    });
+                                                });
+                                            });
+
+                                            node(Items.plastanium, () -> {
+                                                node(plastaniumCompressor, () -> {
+                                                    node(Items.phasefabric, () -> {
+                                                        node(phaseWeaver, () -> {
+
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+
+                                    node(Items.metaglass, () -> {
+                                        node(kiln, () -> {
+                                            node(incinerator, () -> {
+                                                node(Items.scrap, () -> {
+                                                    node(Liquids.slag, () -> {
+                                                        node(melter, () -> {
+                                                            node(Items.surgealloy, () -> {
+                                                                node(surgeSmelter, () -> {
+
+                                                                });
+                                                            });
+
+                                                            node(separator, () -> {
+                                                                node(pulverizer, () -> {
+                                                                    node(disassembler, () -> {
+
+                                                                    });
+                                                                });
+                                                            });
+
+                                                            node(Liquids.cryofluid, () -> {
+                                                                node(cryofluidMixer, () -> {
+
+                                                                });
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+
+
+                    node(combustionGenerator, () -> {
+                        node(powerNode, () -> {
+                            node(powerNodeLarge, () -> {
+                                node(diode, () -> {
+                                    node(surgeTower, () -> {
+
+                                    });
+                                });
+                            });
+
+                            node(battery, () -> {
+                                node(batteryLarge, () -> {
+
+                                });
+                            });
+
+                            node(mender, () -> {
+                                node(mendProjector, () -> {
+                                    node(forceProjector, () -> {
+                                        node(overdriveProjector, () -> {
+                                            node(overdriveDome, () -> {
+
+                                            });
+                                        });
+                                    });
+
+                                    node(repairPoint, () -> {
+
+                                    });
+                                });
+                            });
+
+                            node(turbineGenerator, () -> {
+                                node(thermalGenerator, () -> {
+                                    node(differentialGenerator, () -> {
+                                        node(thoriumReactor, () -> {
+                                            node(impactReactor, () -> {
+
+                                            });
+
+                                            node(rtgGenerator, () -> {
+
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+
+                            node(solarPanel, () -> {
+                                node(largeSolarPanel, () -> {
+
+                                });
+                            });
+
+                            node(groundFactory, () -> {
+                                node(dagger, () -> {
+                                    node(mace, () -> {
+                                        node(fortress, () -> {
+
+                                        });
+                                    });
+
+                                    node(nova, () -> {
+                                        node(pulsar, () -> {
+                                            node(quasar, () -> {
+
+                                            });
+                                        });
+                                    });
+
+                                    node(crawler, () -> {
+                                        node(atrax, () -> {
+                                            node(spiroct, () -> {
+
+                                            });
+                                        });
+                                    });
+                                });
+
+                                node(airFactory, () -> {
+                                    node(flare, () -> {
+                                        node(horizon, () -> {
+                                            node(zenith, () -> {
+                                                node(antumbra, () -> {
+                                                    node(eclipse, () -> {
+
+                                                    });
+                                                });
+                                            });
+                                        });
+
+                                        node(mono, () -> {
+                                            node(poly, () -> {
+                                                node(mega, () -> {
+
+                                                });
+                                            });
+                                        });
+                                    });
+
+                                    node(navalFactory, () -> {
+                                        node(risso, () -> {
+                                            node(minke, () -> {
+                                                node(bryde, () -> {
+
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+
+                                node(additiveReconstructor, () -> {
+                                    node(multiplicativeReconstructor, () -> {
+                                        node(exponentialReconstructor, () -> {
+                                            node(tetrativeReconstructor, () -> {
+                                            });
+                                        });
                                     });
                                 });
                             });
@@ -142,182 +397,6 @@ public class TechTree implements ContentList{
                                     node(surgeWallLarge);
                                     node(phaseWall, () -> {
                                         node(phaseWallLarge);
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-
-            node(mechanicalDrill, () -> {
-
-                node(Liquids.water, () -> {
-                    node(mechanicalPump, () -> {
-                        node(conduit, () -> {
-                            node(liquidJunction, () -> {
-                                node(liquidRouter, () -> {
-                                    node(liquidTank);
-
-                                    node(bridgeConduit);
-
-                                    node(pulseConduit, () -> {
-                                        node(phaseConduit, () -> {
-
-                                        });
-
-                                        node(platedConduit, () -> {
-
-                                        });
-                                    });
-
-                                    node(rotaryPump, () -> {
-                                        node(thermalPump, () -> {
-
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-
-                node(Items.coal, () -> {
-                    node(graphitePress, () -> {
-                        node(pneumaticDrill, () -> {
-                            node(cultivator, () -> {
-
-                            });
-
-                            node(laserDrill, () -> {
-                                node(blastDrill, () -> {
-
-                                });
-
-                                node(waterExtractor, () -> {
-                                    node(oilExtractor, () -> {
-
-                                    });
-                                });
-                            });
-                        });
-
-                        node(pyratiteMixer, () -> {
-                            node(blastMixer, () -> {
-
-                            });
-                        });
-
-                        node(siliconSmelter, () -> {
-
-                            node(sporePress, () -> {
-                                node(coalCentrifuge, () -> {
-                                    node(multiPress, () -> {
-                                        node(siliconCrucible, () -> {
-
-                                        });
-                                    });
-                                });
-
-
-                                node(plastaniumCompressor, () -> {
-                                    node(phaseWeaver, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(kiln, () -> {
-                                node(incinerator, () -> {
-                                    node(melter, () -> {
-                                        node(surgeSmelter, () -> {
-
-                                        });
-
-                                        node(separator, () -> {
-                                            node(pulverizer, () -> {
-                                                node(disassembler, () -> {
-
-                                                });
-                                            });
-                                        });
-
-                                        node(cryofluidMixer, () -> {
-
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-
-                    node(combustionGenerator, () -> {
-                        node(powerNode, () -> {
-                            node(powerNodeLarge, () -> {
-                                node(diode, () -> {
-                                    node(surgeTower, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(battery, () -> {
-                                node(batteryLarge, () -> {
-
-                                });
-                            });
-
-                            node(mender, () -> {
-                                node(mendProjector, () -> {
-                                    node(forceProjector, () -> {
-                                        node(overdriveProjector, () -> {
-                                            node(overdriveDome, () -> {
-
-                                            });
-                                        });
-                                    });
-
-                                    node(repairPoint, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(turbineGenerator, () -> {
-                                node(thermalGenerator, () -> {
-                                    node(differentialGenerator, () -> {
-                                        node(thoriumReactor, () -> {
-                                            node(impactReactor, () -> {
-
-                                            });
-
-                                            node(rtgGenerator, () -> {
-
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-
-                            node(solarPanel, () -> {
-                                node(largeSolarPanel, () -> {
-
-                                });
-                            });
-
-                            node(groundFactory, () -> {
-                                node(airFactory, () -> {
-                                    node(navalFactory, () -> {
-
-                                    });
-
-                                    node(additiveReconstructor, () -> {
-                                        node(multiplicativeReconstructor, () -> {
-                                            node(exponentialReconstructor, () -> {
-                                                node(tetrativeReconstructor, () -> {
-                                                });
-                                            });
-                                        });
                                     });
                                 });
                             });
