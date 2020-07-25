@@ -416,13 +416,16 @@ public class ResearchDialog extends BaseDialog{
         public void drawChildren(){
             clamp();
             float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
+            Draw.sort(true);
 
             for(TechTreeNode node : nodes){
                 if(!node.visible) continue;
                 for(TechTreeNode child : node.children){
                     if(!child.visible) continue;
+                    boolean lock = locked(node.node) || locked(child.node);
+                    Draw.z(lock ? 1f : 2f);
 
-                    Lines.stroke(Scl.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
+                    Lines.stroke(Scl.scl(4f), lock ? Pal.gray : Pal.accent);
                     Draw.alpha(parentAlpha);
                     if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width*3){
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
@@ -433,6 +436,7 @@ public class ResearchDialog extends BaseDialog{
                 }
             }
 
+            Draw.sort(false);
             Draw.reset();
             super.drawChildren();
         }

@@ -73,6 +73,12 @@ public class TechTree implements ContentList{
                 });
             });
 
+            node(coreFoundation, () -> {
+                node(coreNucleus, () -> {
+
+                });
+            });
+
             node(mechanicalDrill, () -> {
 
                 node(mechanicalPump, () -> {
@@ -255,85 +261,38 @@ public class TechTree implements ContentList{
 
                                 });
                             });
+                        });
+                    });
+                });
+            });
 
-                            node(groundFactory, () -> {
-                                node(dagger, () -> {
-                                    node(mace, () -> {
-                                        node(fortress, () -> {
+            node(duo, () -> {
+                node(copperWall, () -> {
+                    node(copperWallLarge, () -> {
+                        node(titaniumWall, () -> {
+                            node(titaniumWallLarge);
 
-                                        });
-                                    });
+                            node(door, () -> {
+                                node(doorLarge);
+                            });
+                            node(plastaniumWall, () -> {
+                                node(plastaniumWallLarge, () -> {
 
-                                    node(nova, () -> {
-                                        node(pulsar, () -> {
-                                            node(quasar, () -> {
-
-                                            });
-                                        });
-                                    });
-
-                                    node(crawler, () -> {
-                                        node(atrax, () -> {
-                                            node(spiroct, () -> {
-
-                                            });
-                                        });
-                                    });
                                 });
-
-                                node(airFactory, () -> {
-                                    node(flare, () -> {
-                                        node(horizon, () -> {
-                                            node(zenith, () -> {
-                                                node(antumbra, () -> {
-                                                    node(eclipse, () -> {
-
-                                                    });
-                                                });
-                                            });
-                                        });
-
-                                        node(mono, () -> {
-                                            node(poly, () -> {
-                                                node(mega, () -> {
-
-                                                });
-                                            });
-                                        });
-                                    });
-
-                                    node(navalFactory, () -> {
-                                        node(risso, () -> {
-                                            node(minke, () -> {
-                                                node(bryde, () -> {
-
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-
-                                node(additiveReconstructor, () -> {
-                                    node(multiplicativeReconstructor, () -> {
-                                        node(exponentialReconstructor, () -> {
-                                            node(tetrativeReconstructor, () -> {
-                                            });
-                                        });
+                            });
+                            node(thoriumWall, () -> {
+                                node(thoriumWallLarge);
+                                node(surgeWall, () -> {
+                                    node(surgeWallLarge);
+                                    node(phaseWall, () -> {
+                                        node(phaseWallLarge);
                                     });
                                 });
                             });
                         });
                     });
                 });
-            });
 
-            node(coreFoundation, () -> {
-                node(coreNucleus, () -> {
-
-                });
-            });
-
-            node(duo, () -> {
                 node(scatter, () -> {
                     node(hail, () -> {
 
@@ -376,29 +335,69 @@ public class TechTree implements ContentList{
                         });
                     });
                 });
+            });
 
+            node(groundFactory, () -> {
+                node(dagger, () -> {
+                    node(mace, () -> {
+                        node(fortress, () -> {
 
-                node(copperWall, () -> {
-                    node(copperWallLarge, () -> {
-                        node(titaniumWall, () -> {
-                            node(titaniumWallLarge);
+                        });
+                    });
 
-                            node(door, () -> {
-                                node(doorLarge);
+                    node(nova, () -> {
+                        node(pulsar, () -> {
+                            node(quasar, () -> {
+
                             });
-                            node(plastaniumWall, () -> {
-                                node(plastaniumWallLarge, () -> {
+                        });
+                    });
 
-                                });
+                    node(crawler, () -> {
+                        node(atrax, () -> {
+                            node(spiroct, () -> {
+
                             });
-                            node(thoriumWall, () -> {
-                                node(thoriumWallLarge);
-                                node(surgeWall, () -> {
-                                    node(surgeWallLarge);
-                                    node(phaseWall, () -> {
-                                        node(phaseWallLarge);
+                        });
+                    });
+                });
+
+                node(airFactory, () -> {
+                    node(flare, () -> {
+                        node(horizon, () -> {
+                            node(zenith, () -> {
+                                node(antumbra, () -> {
+                                    node(eclipse, () -> {
+
                                     });
                                 });
+                            });
+                        });
+
+                        node(mono, () -> {
+                            node(poly, () -> {
+                                node(mega, () -> {
+
+                                });
+                            });
+                        });
+                    });
+
+                    node(navalFactory, () -> {
+                        node(risso, () -> {
+                            node(minke, () -> {
+                                node(bryde, () -> {
+
+                                });
+                            });
+                        });
+                    });
+                });
+
+                node(additiveReconstructor, () -> {
+                    node(multiplicativeReconstructor, () -> {
+                        node(exponentialReconstructor, () -> {
+                            node(tetrativeReconstructor, () -> {
                             });
                         });
                     });
