@@ -74,6 +74,8 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
+    /** for static blocks only: if true, rotation is saved in world data. */
+    public boolean saveRotation;
     /** whether you can break this with rightclick */
     public boolean breakable;
     /** whether to add this block to brokenblocks */
