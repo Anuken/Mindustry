@@ -472,6 +472,8 @@ public class TechTree implements ContentList{
             this.depth = parent == null ? 0 : parent.depth + 1;
             this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
 
+            objectives = Seq.with(requirements).select(i -> !i.item.alwaysUnlocked).map(i -> new Research(i.item)).toArray(Objective.class);
+
             map.put(content, this);
             context = this;
             children.run();

@@ -42,6 +42,10 @@ public abstract class UnlockableContent extends MappableContent{
 
     }
 
+    public String emoji(){
+        return Fonts.getUnicodeStr(name);
+    }
+
     /** Returns a specific content icon, or the region {contentType}-{name} if not found.*/
     public TextureRegion icon(Cicon icon){
         if(cicons[icon.ordinal()] == null){

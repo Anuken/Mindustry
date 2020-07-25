@@ -150,7 +150,8 @@ public class Reconstructor extends UnitBlock{
         }
 
         public boolean hasUpgrade(UnitType type){
-            return upgrade(type) != null;
+            UnitType t = upgrade(type);
+            return t != null && t.unlockedNow();
         }
 
         public UnitType upgrade(UnitType type){

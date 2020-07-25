@@ -256,7 +256,7 @@ public class ResearchDialog extends BaseDialog{
                                 }
                             });
                         }
-                    }else if(items().has(node.node.requirements) && locked(node.node)){
+                    }else if(canUnlock(node.node) && locked(node.node)){
                         unlock(node.node);
                     }
                 });
@@ -311,6 +311,10 @@ public class ResearchDialog extends BaseDialog{
             ry = Mathf.clamp(ry, -rh + pad, Core.graphics.getHeight() - pad);
             panX = rx - bounds.x - ox;
             panY = ry - bounds.y - oy;
+        }
+
+        boolean canUnlock(TechNode node){
+            return items().has(node.requirements) && !Structs.contains(node.objectives, o -> !o.complete());
         }
 
         void unlock(TechNode node){
@@ -378,8 +382,7 @@ public class ResearchDialog extends BaseDialog{
                                     r.add("$complete").colspan(2).left();
                                     r.row();
                                     for(Objective o : node.objectives){
-                                        r.image(Icon.right).padRight(4);
-                                        r.add(o.display()).color(Color.lightGray);
+                                        r.add(o.display()).color(Color.lightGray).left().padLeft(15f);
                                         r.image(o.complete() ? Icon.ok : Icon.cancel, o.complete() ? Color.lightGray : Color.scarlet).padLeft(3);
                                         r.row();
                                     }
@@ -395,7 +398,7 @@ public class ResearchDialog extends BaseDialog{
                 if(mobile && locked(node)){
                     b.row();
                     b.button("$research", Icon.ok, Styles.nodet, () -> unlock(node))
-                    .disabled(i -> !items().has(node.requirements)).growX().height(44f).colspan(3);
+                    .disabled(i -> !canUnlock(node)).growX().height(44f).colspan(3);
                 }
             });
 
