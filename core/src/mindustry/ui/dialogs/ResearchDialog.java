@@ -189,7 +189,7 @@ public class ResearchDialog extends BaseDialog{
     }
 
     boolean locked(TechNode node){
-        return node.content.locked();
+        return node.content.locked() || Structs.contains(node.requirements, i -> i.item.locked());
     }
 
     class LayoutNode extends TreeNode<LayoutNode>{

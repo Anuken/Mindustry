@@ -28,6 +28,7 @@ public class ContinuousLaserBulletType extends BulletType{
         pierce = true;
         hittable = false;
         hitColor = colors[2];
+        collidesTiles = false;
         incendAmount = 1;
         incendSpread = 5;
         incendChance = 0.4f;
