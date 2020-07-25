@@ -401,6 +401,19 @@ public class TechTree implements ContentList{
                     });
                 });
             });
+
+            //TODO research sectors
+            /*
+            node(SectorPresets.groundZero, () -> {
+                node(SectorPresets.nuclearComplex, () -> {
+                    node(SectorPresets.craters, () -> {
+                        node(SectorPresets.saltFlats, () -> {
+
+                        });
+                    });
+                });
+            });
+             */
         });
     }
 
@@ -458,7 +471,7 @@ public class TechTree implements ContentList{
         /** Extra objectives needed to research this. TODO implement */
         public Seq<Objective> objectives = new Seq<>();
         /** Time required to research this content, in seconds. */
-        public float time = 60;
+        public float time;
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
         /** Research progress, in seconds. */
@@ -474,6 +487,7 @@ public class TechTree implements ContentList{
             this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
             this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
+            this.time = Seq.with(requirements).mapFloat(i -> i.item.cost * i.amount).sum() * 10;
 
             //add dependencies as objectives.
             content.getDependencies(d -> objectives.add(new Research(d)));

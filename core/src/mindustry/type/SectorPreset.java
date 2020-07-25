@@ -2,6 +2,7 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -9,7 +10,9 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.maps.generators.*;
+import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
@@ -80,6 +83,11 @@ public class SectorPreset extends UnlockableContent{
 
     public boolean canConfigure(){
         return true;
+    }
+
+    @Override
+    public TextureRegion icon(Cicon c){
+        return Icon.terrain.getRegion();
     }
 
     @Override
