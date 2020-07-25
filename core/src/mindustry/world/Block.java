@@ -585,6 +585,14 @@ public class Block extends UnlockableContent{
     }
 
     @Override
+    public void getDependencies(Cons<UnlockableContent> cons){
+        //just requires items
+        for(ItemStack stack : requirements){
+            cons.get(stack.item);
+        }
+    }
+
+    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
     }

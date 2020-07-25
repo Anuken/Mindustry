@@ -20,9 +20,7 @@ public class TechTree implements ContentList{
 
     @Override
     public void load(){
-        TechNode.context = null;
-        map = new ObjectMap<>();
-        all = new Seq<>();
+        setup();
 
         root = node(coreShard, () -> {
 
@@ -406,6 +404,12 @@ public class TechTree implements ContentList{
         });
     }
 
+    private static void setup(){
+        TechNode.context = null;
+        map = new ObjectMap<>();
+        all = new Seq<>();
+    }
+
     private static TechNode node(UnlockableContent content, Runnable children){
         ItemStack[] requirements;
 
@@ -452,7 +456,7 @@ public class TechTree implements ContentList{
         /** Item requirements for this content. */
         public ItemStack[] requirements;
         /** Extra objectives needed to research this. TODO implement */
-        public Objective[] objectives = {};
+        public Seq<Objective> objectives = new Seq<>();
         /** Time required to research this content, in seconds. */
         public float time = 60;
         /** Nodes that depend on this node. */
@@ -471,7 +475,8 @@ public class TechTree implements ContentList{
             this.depth = parent == null ? 0 : parent.depth + 1;
             this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
 
-            objectives = Seq.with(requirements).select(i -> !i.item.alwaysUnlocked).map(i -> new Research(i.item)).toArray(Objective.class);
+            //add dependencies as objectives.
+            content.getDependencies(d -> objectives.add(new Research(d)));
 
             map.put(content, this);
             context = this;

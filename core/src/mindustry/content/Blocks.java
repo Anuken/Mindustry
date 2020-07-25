@@ -1717,7 +1717,7 @@ public class Blocks implements ContentList{
         }};
 
         additiveReconstructor = new Reconstructor("additive-reconstructor"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+            requirements(Category.units, with(Items.copper, 200, Items.lead, 120, Items.silicon, 90));
 
             size = 3;
             consumes.power(3f);
@@ -1736,7 +1736,7 @@ public class Blocks implements ContentList{
         }};
 
         multiplicativeReconstructor = new Reconstructor("multiplicative-reconstructor"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+            requirements(Category.units, with(Items.lead, 650, Items.silicon, 350, Items.titanium, 350, Items.thorium, 650));
 
             size = 5;
             consumes.power(6f);
@@ -1755,7 +1755,7 @@ public class Blocks implements ContentList{
         }};
 
         exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+            requirements(Category.units, with(Items.lead, 2000, Items.silicon, 750, Items.titanium, 950, Items.thorium, 450, Items.plastanium, 350, Items.phasefabric, 250));
 
             size = 7;
             consumes.power(12f);
@@ -1771,7 +1771,7 @@ public class Blocks implements ContentList{
         }};
 
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+            requirements(Category.units, with(Items.lead, 4000, Items.silicon, 1500, Items.thorium, 500, Items.plastanium, 50, Items.phasefabric, 600, Items.surgealloy, 500));
 
             size = 9;
             consumes.power(25f);
