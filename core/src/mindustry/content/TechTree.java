@@ -4,6 +4,7 @@ import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
@@ -431,7 +432,9 @@ public class TechTree implements ContentList{
 
             requirements = new ItemStack[block.requirements.length];
             for(int i = 0; i < requirements.length; i++){
-                requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 20, 10));
+                int quantity = 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 20, 10);
+
+                requirements[i] = new ItemStack(block.requirements[i].item, UI.roundAmount(quantity));
             }
         }else{
             requirements = ItemStack.empty;

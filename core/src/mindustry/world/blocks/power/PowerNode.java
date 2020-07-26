@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -99,7 +100,7 @@ public class PowerNode extends PowerBlock{
 
         bars.add("batteries", entity -> new Bar(() ->
         Core.bundle.format("bar.powerstored",
-            (ui.formatAmount((int)entity.power.graph.getBatteryStored())), ui.formatAmount((int)entity.power.graph.getTotalBatteryCapacity())),
+            (UI.formatAmount((int)entity.power.graph.getBatteryStored())), UI.formatAmount((int)entity.power.graph.getTotalBatteryCapacity())),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getBatteryStored() / entity.power.graph.getTotalBatteryCapacity())));
     }

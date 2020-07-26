@@ -16,6 +16,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -381,7 +382,7 @@ public class ResearchDialog extends BaseDialog{
                                         list.left();
                                         list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
                                         list.add(req.item.localizedName).color(Color.lightGray);
-                                        list.label(() -> " " + (player.team().core() != null ? Math.min(player.team().core().items.get(req.item), req.amount) + " / " : "") + req.amount)
+                                        list.label(() -> " " + (player.team().core() != null ? UI.formatAmount(Math.min(player.team().core().items.get(req.item), req.amount)) + " / " : "") + UI.formatAmount(req.amount))
                                         .update(l -> l.setColor(items().has(req.item, req.amount) ? Color.lightGray : Color.scarlet));//TODO
                                     }).fillX().left();
                                     t.row();

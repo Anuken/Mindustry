@@ -3,6 +3,7 @@ package mindustry.ui;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -52,10 +53,10 @@ public class ItemsDisplay extends Table{
     private String format(Item item){
         builder.setLength(0);
         builder.append("[TODO implement]");
-        //builder.append(ui.formatAmount(data.getItem(item)));
+        //builder.append(UI.formatAmount(data.getItem(item)));
         if(state.isGame() && player.team().data().hasCore() && player.team().core().items.get(item) > 0){
             builder.append(" [unlaunched]+ ");
-            builder.append(ui.formatAmount(state.teams.get(player.team()).core().items.get(item)));
+            builder.append(UI.formatAmount(state.teams.get(player.team()).core().items.get(item)));
         }
         return builder.toString();
     }

@@ -114,6 +114,11 @@ public class Pump extends LiquidBlock{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return liquidDrop != null && liquids.get(liquidDrop) < liquidCapacity - 0.01f;
+        }
+
+        @Override
         public void updateTile(){
             if(consValid() && liquidDrop != null){
                 float maxPump = Math.min(liquidCapacity - liquids.total(), tiles * pumpAmount * edelta());

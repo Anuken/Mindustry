@@ -81,7 +81,7 @@ public class SectorInfo{
         state.rules.sector.setTimeSpent(internalTimeSpent);
     }
 
-    /** Update averages of various stats.
+    /** Update averages of various stats, updates some special sector logic.
      * Called every frame. */
     public void update(){
         internalTimeSpent += Time.delta;
