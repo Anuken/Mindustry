@@ -16,6 +16,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -170,10 +171,15 @@ public class ResearchDialog extends BaseDialog{
     void checkNodes(TechTreeNode node){
         boolean locked = locked(node.node);
         if(!locked) node.visible = true;
+        node.selectable = selectable(node.node);
         for(TechTreeNode l : node.children){
             l.visible = !locked;
             checkNodes(l);
         }
+    }
+
+    boolean selectable(TechNode node){
+        return !node.objectives.contains(i -> !i.complete());
     }
 
     void showToast(String info){
@@ -207,7 +213,7 @@ public class ResearchDialog extends BaseDialog{
 
     class TechTreeNode extends TreeNode<TechTreeNode>{
         final TechNode node;
-        boolean visible = true;
+        boolean visible = true, selectable = true;
 
         TechTreeNode(TechNode node, TechTreeNode parent){
             this.node = node;
@@ -256,7 +262,7 @@ public class ResearchDialog extends BaseDialog{
                                 }
                             });
                         }
-                    }else if(items().has(node.node.requirements) && locked(node.node)){
+                    }else if(canUnlock(node.node) && locked(node.node)){
                         unlock(node.node);
                     }
                 });
@@ -278,10 +284,10 @@ public class ResearchDialog extends BaseDialog{
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !items().has(node.node.requirements) ? Tex.buttonRed : Tex.button;
-                    ((TextureRegionDrawable)button.getStyle().imageUp)
-                    .setRegion(node.visible ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
-                    button.getImage().setColor(!locked(node.node) ? Color.white : Color.gray);
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : selectable(node.node) && !items().has(node.node.requirements) ? Tex.buttonRed : Tex.button;
+
+                    ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
+                    button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
                 });
                 addChild(button);
             }
@@ -311,6 +317,10 @@ public class ResearchDialog extends BaseDialog{
             ry = Mathf.clamp(ry, -rh + pad, Core.graphics.getHeight() - pad);
             panX = rx - bounds.x - ox;
             panY = ry - bounds.y - oy;
+        }
+
+        boolean canUnlock(TechNode node){
+            return items().has(node.requirements) && selectable(node);
         }
 
         void unlock(TechNode node){
@@ -349,37 +359,42 @@ public class ResearchDialog extends BaseDialog{
             infoTable.left();
             infoTable.background(Tex.button).margin(8f);
 
+            boolean selectable = selectable(node);
+
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
+                if(selectable){
+                    b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
+                }
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
-                    desc.add(node.content.localizedName);
+                    desc.add(selectable ? node.content.localizedName : "[accent]???");
                     desc.row();
                     if(locked(node)){
+
                         desc.table(t -> {
                             t.left();
-                            for(ItemStack req : node.requirements){
-                                t.table(list -> {
-                                    list.left();
-                                    list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
-                                    list.add(req.item.localizedName).color(Color.lightGray);
-                                    list.label(() -> " " + (player.team().core() != null ? Math.min(player.team().core().items.get(req.item), req.amount) + " / " : "") + req.amount)
-                                    .update(l -> l.setColor(items().has(req.item, req.amount) ? Color.lightGray : Color.scarlet));//TODO
-                                }).fillX().left();
-                                t.row();
-                            }
-
-                            //TODO test if this works
-                            if(node.objectives.length > 0){
+                            if(selectable){
+                                for(ItemStack req : node.requirements){
+                                    t.table(list -> {
+                                        list.left();
+                                        list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
+                                        list.add(req.item.localizedName).color(Color.lightGray);
+                                        list.label(() -> " " + (player.team().core() != null ? UI.formatAmount(Math.min(player.team().core().items.get(req.item), req.amount)) + " / " : "") + UI.formatAmount(req.amount))
+                                        .update(l -> l.setColor(items().has(req.item, req.amount) ? Color.lightGray : Color.scarlet));//TODO
+                                    }).fillX().left();
+                                    t.row();
+                                }
+                            }else if(node.objectives.size > 0){
                                 t.table(r -> {
                                     r.add("$complete").colspan(2).left();
                                     r.row();
                                     for(Objective o : node.objectives){
-                                        r.image(Icon.right).padRight(4);
-                                        r.add(o.display()).color(Color.lightGray);
+                                        if(o.complete()) continue;
+
+                                        r.add("> " + o.display()).color(Color.lightGray).left();
                                         r.image(o.complete() ? Icon.ok : Icon.cancel, o.complete() ? Color.lightGray : Color.scarlet).padLeft(3);
                                         r.row();
                                     }
@@ -395,12 +410,12 @@ public class ResearchDialog extends BaseDialog{
                 if(mobile && locked(node)){
                     b.row();
                     b.button("$research", Icon.ok, Styles.nodet, () -> unlock(node))
-                    .disabled(i -> !items().has(node.requirements)).growX().height(44f).colspan(3);
+                    .disabled(i -> !canUnlock(node)).growX().height(44f).colspan(3);
                 }
             });
 
             infoTable.row();
-            if(node.content.description != null){
+            if(node.content.description != null && selectable){
                 infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray).growX()).fillX();
             }
 
@@ -413,13 +428,16 @@ public class ResearchDialog extends BaseDialog{
         public void drawChildren(){
             clamp();
             float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
+            Draw.sort(true);
 
             for(TechTreeNode node : nodes){
                 if(!node.visible) continue;
                 for(TechTreeNode child : node.children){
                     if(!child.visible) continue;
+                    boolean lock = locked(node.node) || locked(child.node);
+                    Draw.z(lock ? 1f : 2f);
 
-                    Lines.stroke(Scl.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
+                    Lines.stroke(Scl.scl(4f), lock ? Pal.gray : Pal.accent);
                     Draw.alpha(parentAlpha);
                     if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width*3){
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
@@ -430,6 +448,7 @@ public class ResearchDialog extends BaseDialog{
                 }
             }
 
+            Draw.sort(false);
             Draw.reset();
             super.drawChildren();
         }

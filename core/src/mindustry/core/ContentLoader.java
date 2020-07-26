@@ -36,10 +36,10 @@ public class ContentLoader{
         new UnitTypes(),
         new Blocks(),
         new Loadouts(),
-        new TechTree(),
         new Weathers(),
         new Planets(),
-        new SectorPresets()
+        new SectorPresets(),
+        new TechTree(),
     };
 
     public ContentLoader(){

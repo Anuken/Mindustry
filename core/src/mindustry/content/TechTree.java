@@ -4,12 +4,14 @@ import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
+import static mindustry.content.UnitTypes.*;
 
 public class TechTree implements ContentList{
     private static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
@@ -19,9 +21,7 @@ public class TechTree implements ContentList{
 
     @Override
     public void load(){
-        TechNode.context = null;
-        map = new ObjectMap<>();
-        all = new Seq<>();
+        setup();
 
         root = node(coreShard, () -> {
 
@@ -30,9 +30,6 @@ public class TechTree implements ContentList{
                 node(junction, () -> {
                     node(router, () -> {
                         node(launchPad, () -> {
-                            node(launchPadLarge, () -> {
-
-                            });
                         });
 
                         node(distributor);
@@ -58,12 +55,16 @@ public class TechTree implements ContentList{
                                     });
                                 });
 
-                                node(plastaniumConveyor, () -> {
+                                node(payloadConveyor, () -> {
+                                    node(payloadRouter, () -> {
 
+                                    });
                                 });
 
                                 node(armoredConveyor, () -> {
+                                    node(plastaniumConveyor, () -> {
 
+                                    });
                                 });
                             });
                         });
@@ -77,99 +78,29 @@ public class TechTree implements ContentList{
                 });
             });
 
-            node(duo, () -> {
-                node(scatter, () -> {
-                    node(hail, () -> {
-
-                        node(salvo, () -> {
-                            node(swarmer, () -> {
-                                node(cyclone, () -> {
-                                    node(spectre, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(ripple, () -> {
-                                node(fuse, () -> {
-
-                                });
-                            });
-                        });
-                    });
-                });
-
-                node(scorch, () -> {
-                    node(arc, () -> {
-                        node(wave, () -> {
-
-                        });
-
-                        node(lancer, () -> {
-                            node(meltdown, () -> {
-
-                            });
-
-                            node(shockMine, () -> {
-
-                            });
-                        });
-                    });
-                });
-
-
-                node(copperWall, () -> {
-                    node(copperWallLarge, () -> {
-                        node(titaniumWall, () -> {
-                            node(titaniumWallLarge);
-
-                            node(door, () -> {
-                                node(doorLarge);
-                            });
-                            node(plastaniumWall, () -> {
-                                node(plastaniumWallLarge, () -> {
-
-                                });
-                            });
-                            node(thoriumWall, () -> {
-                                node(thoriumWallLarge);
-                                node(surgeWall, () -> {
-                                    node(surgeWallLarge);
-                                    node(phaseWall, () -> {
-                                        node(phaseWallLarge);
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-
             node(mechanicalDrill, () -> {
 
-                node(Liquids.water, () -> {
-                    node(mechanicalPump, () -> {
-                        node(conduit, () -> {
-                            node(liquidJunction, () -> {
-                                node(liquidRouter, () -> {
-                                    node(liquidTank);
+                node(mechanicalPump, () -> {
+                    node(conduit, () -> {
+                        node(liquidJunction, () -> {
+                            node(liquidRouter, () -> {
+                                node(liquidTank);
 
-                                    node(bridgeConduit);
+                                node(bridgeConduit);
 
-                                    node(pulseConduit, () -> {
-                                        node(phaseConduit, () -> {
+                                node(pulseConduit, () -> {
+                                    node(phaseConduit, () -> {
 
-                                        });
-
-                                        node(platedConduit, () -> {
-
-                                        });
                                     });
 
-                                    node(rotaryPump, () -> {
-                                        node(thermalPump, () -> {
+                                    node(platedConduit, () -> {
 
-                                        });
+                                    });
+                                });
+
+                                node(rotaryPump, () -> {
+                                    node(thermalPump, () -> {
+
                                     });
                                 });
                             });
@@ -178,69 +109,103 @@ public class TechTree implements ContentList{
                 });
 
                 node(Items.coal, () -> {
-                    node(graphitePress, () -> {
-                        node(pneumaticDrill, () -> {
-                            node(cultivator, () -> {
-
-                            });
-
-                            node(laserDrill, () -> {
-                                node(blastDrill, () -> {
-
-                                });
-
-                                node(waterExtractor, () -> {
-                                    node(oilExtractor, () -> {
-
-                                    });
-                                });
-                            });
-                        });
-
-                        node(pyratiteMixer, () -> {
-                            node(blastMixer, () -> {
-
-                            });
-                        });
-
-                        node(siliconSmelter, () -> {
-
-                            node(sporePress, () -> {
-                                node(coalCentrifuge, () -> {
-
-                                });
-                                node(multiPress, () -> {
-
-                                });
-
-                                node(plastaniumCompressor, () -> {
-                                    node(phaseWeaver, () -> {
-
-                                    });
-                                });
-                            });
-
-                            node(kiln, () -> {
-                                node(incinerator, () -> {
-                                    node(melter, () -> {
-                                        node(surgeSmelter, () -> {
+                    node(Items.graphite, () -> {
+                        node(graphitePress, () -> {
+                            node(Items.titanium, () -> {
+                                node(pneumaticDrill, () -> {
+                                    node(Items.sporePod, () -> {
+                                        node(cultivator, () -> {
 
                                         });
+                                    });
 
-                                        node(separator, () -> {
-                                            node(pulverizer, () -> {
+                                    node(Items.thorium, () -> {
+                                        node(laserDrill, () -> {
+                                            node(blastDrill, () -> {
 
                                             });
+
+                                            node(waterExtractor, () -> {
+                                                node(oilExtractor, () -> {
+
+                                                });
+                                            });
                                         });
+                                    });
+                                });
+                            });
 
-                                        node(cryofluidMixer, () -> {
+                            node(Items.pyratite, () -> {
+                                node(pyratiteMixer, () -> {
+                                    node(Items.blastCompound, () -> {
+                                        node(blastMixer, () -> {
 
+                                        });
+                                    });
+                                });
+                            });
+
+                            node(Items.silicon, () -> {
+                                node(siliconSmelter, () -> {
+
+                                    node(Liquids.oil, () -> {
+                                        node(sporePress, () -> {
+                                            node(coalCentrifuge, () -> {
+                                                node(multiPress, () -> {
+                                                    node(siliconCrucible, () -> {
+
+                                                    });
+                                                });
+                                            });
+
+                                            node(Items.plastanium, () -> {
+                                                node(plastaniumCompressor, () -> {
+                                                    node(Items.phasefabric, () -> {
+                                                        node(phaseWeaver, () -> {
+
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+
+                                    node(Items.metaglass, () -> {
+                                        node(kiln, () -> {
+                                            node(incinerator, () -> {
+                                                node(Items.scrap, () -> {
+                                                    node(Liquids.slag, () -> {
+                                                        node(melter, () -> {
+                                                            node(Items.surgealloy, () -> {
+                                                                node(surgeSmelter, () -> {
+
+                                                                });
+                                                            });
+
+                                                            node(separator, () -> {
+                                                                node(pulverizer, () -> {
+                                                                    node(disassembler, () -> {
+
+                                                                    });
+                                                                });
+                                                            });
+
+                                                            node(Liquids.cryofluid, () -> {
+                                                                node(cryofluidMixer, () -> {
+
+                                                                });
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
                                         });
                                     });
                                 });
                             });
                         });
                     });
+
 
                     node(combustionGenerator, () -> {
                         node(powerNode, () -> {
@@ -262,7 +227,9 @@ public class TechTree implements ContentList{
                                 node(mendProjector, () -> {
                                     node(forceProjector, () -> {
                                         node(overdriveProjector, () -> {
+                                            node(overdriveDome, () -> {
 
+                                            });
                                         });
                                     });
 
@@ -297,7 +264,164 @@ public class TechTree implements ContentList{
                     });
                 });
             });
+
+            node(duo, () -> {
+                node(copperWall, () -> {
+                    node(copperWallLarge, () -> {
+                        node(titaniumWall, () -> {
+                            node(titaniumWallLarge);
+
+                            node(door, () -> {
+                                node(doorLarge);
+                            });
+                            node(plastaniumWall, () -> {
+                                node(plastaniumWallLarge, () -> {
+
+                                });
+                            });
+                            node(thoriumWall, () -> {
+                                node(thoriumWallLarge);
+                                node(surgeWall, () -> {
+                                    node(surgeWallLarge);
+                                    node(phaseWall, () -> {
+                                        node(phaseWallLarge);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+
+                node(scatter, () -> {
+                    node(hail, () -> {
+
+                        node(salvo, () -> {
+                            node(swarmer, () -> {
+                                node(cyclone, () -> {
+                                    node(spectre, () -> {
+
+                                    });
+                                });
+                            });
+
+                            node(ripple, () -> {
+                                node(fuse, () -> {
+
+                                });
+                            });
+                        });
+                    });
+                });
+
+                node(scorch, () -> {
+                    node(arc, () -> {
+                        node(wave, () -> {
+                            node(parallax, () -> {
+                                node(segment, () -> {
+
+                                });
+                            });
+                        });
+
+                        node(lancer, () -> {
+                            node(meltdown, () -> {
+
+                            });
+
+                            node(shockMine, () -> {
+
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(groundFactory, () -> {
+                node(dagger, () -> {
+                    node(mace, () -> {
+                        node(fortress, () -> {
+
+                        });
+                    });
+
+                    node(nova, () -> {
+                        node(pulsar, () -> {
+                            node(quasar, () -> {
+
+                            });
+                        });
+                    });
+
+                    node(crawler, () -> {
+                        node(atrax, () -> {
+                            node(spiroct, () -> {
+
+                            });
+                        });
+                    });
+                });
+
+                node(airFactory, () -> {
+                    node(flare, () -> {
+                        node(horizon, () -> {
+                            node(zenith, () -> {
+                                node(antumbra, () -> {
+                                    node(eclipse, () -> {
+
+                                    });
+                                });
+                            });
+                        });
+
+                        node(mono, () -> {
+                            node(poly, () -> {
+                                node(mega, () -> {
+
+                                });
+                            });
+                        });
+                    });
+
+                    node(navalFactory, () -> {
+                        node(risso, () -> {
+                            node(minke, () -> {
+                                node(bryde, () -> {
+
+                                });
+                            });
+                        });
+                    });
+                });
+
+                node(additiveReconstructor, () -> {
+                    node(multiplicativeReconstructor, () -> {
+                        node(exponentialReconstructor, () -> {
+                            node(tetrativeReconstructor, () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            //TODO research sectors
+            /*
+            node(SectorPresets.groundZero, () -> {
+                node(SectorPresets.nuclearComplex, () -> {
+                    node(SectorPresets.craters, () -> {
+                        node(SectorPresets.saltFlats, () -> {
+
+                        });
+                    });
+                });
+            });
+             */
         });
+    }
+
+    private static void setup(){
+        TechNode.context = null;
+        map = new ObjectMap<>();
+        all = new Seq<>();
     }
 
     private static TechNode node(UnlockableContent content, Runnable children){
@@ -308,7 +432,9 @@ public class TechTree implements ContentList{
 
             requirements = new ItemStack[block.requirements.length];
             for(int i = 0; i < requirements.length; i++){
-                requirements[i] = new ItemStack(block.requirements[i].item, 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 20, 10));
+                int quantity = 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 20, 10);
+
+                requirements[i] = new ItemStack(block.requirements[i].item, UI.roundAmount(quantity));
             }
         }else{
             requirements = ItemStack.empty;
@@ -346,9 +472,9 @@ public class TechTree implements ContentList{
         /** Item requirements for this content. */
         public ItemStack[] requirements;
         /** Extra objectives needed to research this. TODO implement */
-        public Objective[] objectives = {};
+        public Seq<Objective> objectives = new Seq<>();
         /** Time required to research this content, in seconds. */
-        public float time = 60;
+        public float time;
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
         /** Research progress, in seconds. */
@@ -364,6 +490,10 @@ public class TechTree implements ContentList{
             this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
             this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
+            this.time = Seq.with(requirements).mapFloat(i -> i.item.cost * i.amount).sum() * 10;
+
+            //add dependencies as objectives.
+            content.getDependencies(d -> objectives.add(new Research(d)));
 
             map.put(content, this);
             context = this;

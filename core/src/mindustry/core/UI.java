@@ -488,15 +488,37 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    public String formatAmount(int number){
-        if(number >= 1000000){
-            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
-        }else if(number >= 10000){
+    //TODO move?
+
+    public static String formatAmount(long number){
+        if(number >= 1_000_000_000){
+            return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
+        }else if(number >= 1_000_000){
+            return Strings.fixed(number / 1_000_000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
+        }else if(number >= 10_000){
             return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else if(number >= 1000){
             return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else{
             return number + "";
+        }
+    }
+
+    public static int roundAmount(int number){
+        if(number >= 1_000_000_000){
+            return Mathf.round(number, 100_000_000);
+        }else if(number >= 1_000_000){
+            return Mathf.round(number, 100_000);
+        }else if(number >= 10_000){
+            return Mathf.round(number, 1000);
+        }else if(number >= 1000){
+            return Mathf.round(number, 100);
+        }else if(number >= 100){
+            return Mathf.round(number, 100);
+        }else if(number >= 10){
+            return Mathf.round(number, 10);
+        }else{
+            return number;
         }
     }
 }

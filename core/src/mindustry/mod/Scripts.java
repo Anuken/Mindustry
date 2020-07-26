@@ -41,7 +41,7 @@ public class Scripts implements Disposable{
             .setModuleScriptProvider(new SoftCachingModuleScriptProvider(new ScriptModuleProvider()))
             .setSandboxed(true).createRequire(context, scope).install(scope);
 
-        if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
+        if(!run(Core.files.internal("scripts/global.js").readString(), "global.js", false)){
             errored = true;
         }
         Log.debug("Time to load script engine: @", Time.elapsed());
@@ -82,18 +82,18 @@ public class Scripts implements Disposable{
 
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;
-        run(file.readString(), file.name());
+        run(file.readString(), file.name(), true);
         currentMod = null;
     }
 
-    private boolean run(String script, String file){
+    private boolean run(String script, String file, boolean wrap){
         try{
             if(currentMod != null){
-                //inject script info into file (TODO maybe rhino handles this?)
+                //inject script info into file
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
             }
             context.evaluateString(scope,
-            "(function(){\n" + script + "\n})();",
+            wrap ? "(function(){\n" + script + "\n})();" : script,
             file, 0, null);
             return true;
         }catch(Throwable t){

@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -77,10 +78,10 @@ public class CoreBlock extends StorageBlock{
 
         bars.add("capacity", (CoreEntity e) ->
             new Bar(
-                () -> Core.bundle.format("bar.capacity", ui.formatAmount(e.storageCapacity)),
+                () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
                 () -> Pal.items,
             () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
-            ));
+        ));
     }
 
     @Override

@@ -102,6 +102,11 @@ public class SolidPump extends Pump{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return liquids.get(result) < liquidCapacity - 0.01f;
+        }
+
+        @Override
         public void updateTile(){
             float fraction = 0f;
 

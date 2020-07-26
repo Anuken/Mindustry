@@ -52,7 +52,7 @@ public class Blocks implements ContentList{
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
-    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, largeOverdriveProjector, forceProjector, shockMine,
+    phaseWall, phaseWallLarge, surgeWall, surgeWallLarge, mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
@@ -121,6 +121,7 @@ public class Blocks implements ContentList{
 
         cliff = new Cliff("cliff"){{
             inEditor = false;
+            saveRotation = true;
         }};
 
         //Registers build blocks
@@ -855,8 +856,7 @@ public class Blocks implements ContentList{
             consumes.item(Items.phasefabric).boost();
         }};
 
-        //TODO better name
-        largeOverdriveProjector = new OverdriveProjector("large-overdrive-projector"){{
+        overdriveDome = new OverdriveProjector("overdrive-dome"){{
             requirements(Category.effect, with(Items.lead, 200, Items.titanium, 130, Items.silicon, 130, Items.plastanium, 80, Items.surgealloy, 120));
             consumes.power(10f);
             size = 3;
@@ -911,9 +911,8 @@ public class Blocks implements ContentList{
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 75;
-            speed = 3.5f / 60f;
+            speed = 3f / 60f;
             itemCapacity = 10;
-            displayedSpeed = 30f;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
@@ -1485,6 +1484,21 @@ public class Blocks implements ContentList{
             shootSound = Sounds.spark;
         }};
 
+        parallax = new TractorBeamTurret("parallax"){{
+            requirements(Category.turret, with(Items.silicon, 120, Items.titanium, 90, Items.graphite, 30));
+
+            hasPower = true;
+            size = 2;
+            force = 2.5f;
+            scaledForce = 5f;
+            range = 170f;
+            damage = 0.08f;
+            health = 160 * size * size;
+            rotateSpeed = 10;
+
+            consumes.power(3f);
+        }};
+
         swarmer = new ItemTurret("swarmer"){{
             requirements(Category.turret, with(Items.graphite, 35, Items.titanium, 35, Items.plastanium, 45, Items.silicon, 30));
             ammo(
@@ -1526,6 +1540,18 @@ public class Blocks implements ContentList{
             ammoUseEffect = Fx.shellEjectBig;
             health = 240 * size * size;
             shootSound = Sounds.shootBig;
+        }};
+
+        segment = new PointDefenseTurret("segment"){{
+            requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 50));
+
+            hasPower = true;
+            consumes.power(3f);
+            size = 2;
+            shootLength = 5f;
+            bulletDamage = 12f;
+            reloadTime = 25f;
+            health = 190 * size * size;
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -1657,33 +1683,6 @@ public class Blocks implements ContentList{
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
-        segment = new PointDefenseTurret("segment"){{
-            requirements(Category.turret, with(Items.silicon, 80, Items.thorium, 80, Items.surgealloy, 50));
-
-            hasPower = true;
-            consumes.power(3f);
-            size = 2;
-            shootLength = 5f;
-            bulletDamage = 12f;
-            reloadTime = 25f;
-            health = 190 * size * size;
-        }};
-
-        parallax = new TractorBeamTurret("parallax"){{
-            requirements(Category.turret, with(Items.silicon, 120, Items.titanium, 90));
-
-            hasPower = true;
-            size = 2;
-            force = 2.5f;
-            scaledForce = 5f;
-            range = 170f;
-            damage = 0.08f;
-            health = 160 * size * size;
-            rotateSpeed = 10;
-
-            consumes.power(3f);
-        }};
-
         //endregion
         //region units
 
@@ -1719,7 +1718,7 @@ public class Blocks implements ContentList{
         }};
 
         additiveReconstructor = new Reconstructor("additive-reconstructor"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+            requirements(Category.units, with(Items.copper, 200, Items.lead, 120, Items.silicon, 90));
 
             size = 3;
             consumes.power(3f);
@@ -1728,7 +1727,7 @@ public class Blocks implements ContentList{
             constructTime = 60f * 10f;
 
             upgrades = new UnitType[][]{
-                {UnitTypes.nova, UnitTypes.quasar},
+                {UnitTypes.nova, UnitTypes.pulsar},
                 {UnitTypes.dagger, UnitTypes.mace},
                 {UnitTypes.crawler, UnitTypes.atrax},
                 {UnitTypes.flare, UnitTypes.horizon},
@@ -1738,7 +1737,7 @@ public class Blocks implements ContentList{
         }};
 
         multiplicativeReconstructor = new Reconstructor("multiplicative-reconstructor"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+            requirements(Category.units, with(Items.lead, 650, Items.silicon, 350, Items.titanium, 350, Items.thorium, 650));
 
             size = 5;
             consumes.power(6f);
@@ -1751,13 +1750,13 @@ public class Blocks implements ContentList{
                 {UnitTypes.mace, UnitTypes.fortress},
                 {UnitTypes.poly, UnitTypes.mega},
                 {UnitTypes.minke, UnitTypes.bryde},
-                {UnitTypes.quasar, UnitTypes.pulsar},
+                {UnitTypes.pulsar, UnitTypes.quasar},
                 {UnitTypes.atrax, UnitTypes.spiroct},
             };
         }};
 
         exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+            requirements(Category.units, with(Items.lead, 2000, Items.silicon, 750, Items.titanium, 950, Items.thorium, 450, Items.plastanium, 350, Items.phasefabric, 250));
 
             size = 7;
             consumes.power(12f);
@@ -1773,7 +1772,7 @@ public class Blocks implements ContentList{
         }};
 
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
-            requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 230));
+            requirements(Category.units, with(Items.lead, 4000, Items.silicon, 1500, Items.thorium, 500, Items.plastanium, 50, Items.phasefabric, 600, Items.surgealloy, 500));
 
             size = 9;
             consumes.power(25f);

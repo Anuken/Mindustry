@@ -3,29 +3,29 @@ package mindustry.game;
 import arc.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.ctype.*;
 import mindustry.type.*;
-import mindustry.world.*;
 
 /** Holds objective classes. */
 public class Objectives{
 
-    public static class Unlock implements Objective{
-        public @NonNull Block block;
+    public static class Research implements Objective{
+        public @NonNull UnlockableContent content;
 
-        public Unlock(Block block){
-            this.block = block;
+        public Research(UnlockableContent content){
+            this.content = content;
         }
 
-        protected Unlock(){}
+        protected Research(){}
 
         @Override
         public boolean complete(){
-            return block.unlocked();
+            return content.unlocked();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.unlock", block.localizedName);
+            return Core.bundle.format("requirement.research", content.emoji() + " " + content.localizedName);
         }
     }
 

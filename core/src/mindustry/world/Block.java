@@ -74,6 +74,8 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
+    /** for static blocks only: if true, rotation is saved in world data. */
+    public boolean saveRotation;
     /** whether you can break this with rightclick */
     public boolean breakable;
     /** whether to add this block to brokenblocks */
@@ -581,6 +583,14 @@ public class Block extends UnlockableContent{
         if(entityType == null){
             //assign default value
             entityType = Building::create;
+        }
+    }
+
+    @Override
+    public void getDependencies(Cons<UnlockableContent> cons){
+        //just requires items
+        for(ItemStack stack : requirements){
+            cons.get(stack.item);
         }
     }
 

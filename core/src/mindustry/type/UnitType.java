@@ -24,8 +24,10 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
+import mindustry.world.blocks.units.*;
 
 import static mindustry.Vars.*;
 
@@ -149,6 +151,23 @@ public class UnitType extends UnlockableContent{
         }
         
     }
+
+    @Override
+    public void getDependencies(Cons<UnlockableContent> cons){
+        //units require reconstructors being researched
+        for(Block block : content.blocks()){
+            if(block instanceof Reconstructor){
+                Reconstructor r = (Reconstructor)block;
+                for(UnitType[] recipe : r.upgrades){
+                    //result of reconstruction is this, so it must be a dependency
+                    if(recipe[1] == this){
+                        cons.get(block);
+                    }
+                }
+            }
+        }
+    }
+
 
     @Override
     public void displayInfo(Table table){

@@ -14,6 +14,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -327,7 +328,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     int total = (int)(stat.mean * 60);
                     if(total > 1){
                         t.image(item.icon(Cicon.small)).padRight(3);
-                        t.add(ui.formatAmount(total) + " /min").color(Color.lightGray);
+                        t.add(UI.formatAmount(total) + " /min").color(Color.lightGray);
                         t.row();
                     }
                 });
@@ -348,7 +349,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         int amount = Math.min(map.get(item), sector.save.meta.secinfo.storageCapacity);
                         if(amount > 0){
                             res.image(item.icon(Cicon.small)).padRight(3);
-                            res.add(ui.formatAmount(amount)).color(Color.lightGray);
+                            res.add(UI.formatAmount(amount)).color(Color.lightGray);
                             if(++i % 2 == 0){
                                 res.row();
                             }

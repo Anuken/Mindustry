@@ -33,8 +33,8 @@ public class SectorPresets implements ContentList{
             new SectorWave(groundZero, 60),
             //new Unlock(Blocks.daggerFactory),
             //new Unlock(Blocks.draugFactory),
-            new Unlock(Blocks.door),
-            new Unlock(Blocks.waterExtractor)
+            new Research(Blocks.door),
+            new Research(Blocks.waterExtractor)
             );
         }};
 
@@ -42,8 +42,8 @@ public class SectorPresets implements ContentList{
             conditionWave = 10;
             requirements = with(
             new SectorWave(groundZero, 10),
-            new Unlock(Blocks.junction),
-            new Unlock(Blocks.router)
+            new Research(Blocks.junction),
+            new Research(Blocks.router)
             );
         }};
 
@@ -51,8 +51,8 @@ public class SectorPresets implements ContentList{
             conditionWave = 10;
             requirements = with(
             new SectorWave(frozenForest, 10),
-            new Unlock(Blocks.mender),
-            new Unlock(Blocks.combustionGenerator)
+            new Research(Blocks.mender),
+            new Research(Blocks.combustionGenerator)
             );
         }};
 
@@ -62,10 +62,10 @@ public class SectorPresets implements ContentList{
             requirements = with(
             new SectorWave(groundZero, 20),
             new SectorWave(craters, 15),
-            new Unlock(Blocks.graphitePress),
-            new Unlock(Blocks.combustionGenerator),
-            new Unlock(Blocks.kiln),
-            new Unlock(Blocks.mechanicalPump)
+            new Research(Blocks.graphitePress),
+            new Research(Blocks.combustionGenerator),
+            new Research(Blocks.kiln),
+            new Research(Blocks.mechanicalPump)
             );
         }};
 
@@ -74,9 +74,9 @@ public class SectorPresets implements ContentList{
             launchPeriod = 10;
             requirements = with(
             new SectorWave(frozenForest, 15),
-            new Unlock(Blocks.pneumaticDrill),
-            new Unlock(Blocks.powerNode),
-            new Unlock(Blocks.turbineGenerator)
+            new Research(Blocks.pneumaticDrill),
+            new Research(Blocks.powerNode),
+            new Research(Blocks.turbineGenerator)
             );
         }};
 
@@ -85,8 +85,8 @@ public class SectorPresets implements ContentList{
             new SectorWave(stainedMountains, 15),
             //new Unlock(Blocks.daggerFactory),
             //new Unlock(Blocks.crawlerFactory),
-            new Unlock(Blocks.door),
-            new Unlock(Blocks.siliconSmelter)
+            new Research(Blocks.door),
+            new Research(Blocks.siliconSmelter)
             );
         }};
 
@@ -96,8 +96,8 @@ public class SectorPresets implements ContentList{
             requirements = with(
             new SectorWave(craters, 40),
             new Launched(fungalPass),
-            new Unlock(Blocks.cultivator),
-            new Unlock(Blocks.sporePress)
+            new Research(Blocks.cultivator),
+            new Research(Blocks.sporePress)
             //new Unlock(Blocks.titanFactory),
             //new Unlock(Blocks.wraithFactory)
             );
@@ -108,9 +108,9 @@ public class SectorPresets implements ContentList{
             launchPeriod = 10;
             requirements = with(
             new SectorWave(ruinousShores, 20),
-            new Unlock(Blocks.coalCentrifuge),
-            new Unlock(Blocks.conduit),
-            new Unlock(Blocks.wave)
+            new Research(Blocks.coalCentrifuge),
+            new Research(Blocks.conduit),
+            new Research(Blocks.wave)
             );
         }};
 
@@ -119,8 +119,8 @@ public class SectorPresets implements ContentList{
             launchPeriod = 2;
             requirements = with(
             new SectorWave(tarFields, 20),
-            new Unlock(Blocks.thermalGenerator),
-            new Unlock(Blocks.thoriumReactor)
+            new Research(Blocks.thermalGenerator),
+            new Research(Blocks.thoriumReactor)
             );
         }};
 
@@ -130,8 +130,8 @@ public class SectorPresets implements ContentList{
             launchPeriod = 15;
             requirements = with(
             new Launched(fungalPass),
-            new Unlock(Blocks.thermalGenerator),
-            new Unlock(Blocks.laserDrill)
+            new Research(Blocks.thermalGenerator),
+            new Research(Blocks.laserDrill)
             );
         }};
 
