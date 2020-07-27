@@ -14,6 +14,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
@@ -262,8 +263,8 @@ public class ResearchDialog extends BaseDialog{
                                 }
                             });
                         }
-                    }else if(canUnlock(node.node) && locked(node.node)){
-                        unlock(node.node);
+                    }else if(canSpend(node.node) && locked(node.node)){
+                        spend(node.node);
                     }
                 });
                 button.hovered(() -> {
@@ -284,7 +285,7 @@ public class ResearchDialog extends BaseDialog{
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : selectable(node.node) && !items().has(node.node.requirements) ? Tex.buttonRed : Tex.button;
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : selectable(node.node) && !canSpend(node.node) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
@@ -323,6 +324,40 @@ public class ResearchDialog extends BaseDialog{
             return items().has(node.requirements) && selectable(node);
         }
 
+        boolean canSpend(TechNode node){
+            //can spend when there's at least 1 item that can be spent
+            return selectable(node) && (node.requirements.length == 0 || Structs.contains(node.requirements, i -> items().has(i.item)));
+        }
+
+        void spend(TechNode node){
+            boolean complete = true;
+
+            boolean[] shine = new boolean[node.requirements.length];
+
+            for(int i = 0; i < node.requirements.length; i++){
+                ItemStack req = node.requirements[i];
+                ItemStack completed = node.finishedRequirements[i];
+
+                //amount actually taken from inventory
+                int used = Math.min(req.amount - completed.amount, items().get(req.item));
+                completed.amount += used;
+
+                if(used > 0) shine[i] = true;
+
+                //disable completion if the completed amount has not reached requirements
+                if(completed.amount < req.amount){
+                    complete = false;
+                }
+            }
+
+            if(complete){
+                unlock(node);
+            }
+
+            node.save();
+            rebuild(shine);
+        }
+
         void unlock(TechNode node){
             node.content.unlock();
             items().remove(node.requirements);
@@ -337,6 +372,11 @@ public class ResearchDialog extends BaseDialog{
         }
 
         void rebuild(){
+            rebuild(null);
+        }
+
+        //pass an array of stack indexes that should shine here
+        void rebuild(@Nullable boolean[] shine){
             ImageButton button = hoverNode;
 
             infoTable.remove();
@@ -377,13 +417,35 @@ public class ResearchDialog extends BaseDialog{
                         desc.table(t -> {
                             t.left();
                             if(selectable){
-                                for(ItemStack req : node.requirements){
+                                for(int i = 0; i < node.requirements.length; i++){
+                                    ItemStack req = node.requirements[i];
+                                    ItemStack completed = node.finishedRequirements[i];
+
+                                    //skip finished stacks
+                                    if(req.amount <= completed.amount) continue;
+                                    boolean shiny = shine != null && shine[i];
+
                                     t.table(list -> {
+                                        int reqAmount = req.amount - completed.amount;
+
                                         list.left();
                                         list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
                                         list.add(req.item.localizedName).color(Color.lightGray);
-                                        list.label(() -> " " + (player.team().core() != null ? UI.formatAmount(Math.min(player.team().core().items.get(req.item), req.amount)) + " / " : "") + UI.formatAmount(req.amount))
-                                        .update(l -> l.setColor(items().has(req.item, req.amount) ? Color.lightGray : Color.scarlet));//TODO
+                                        Label label = list.label(() -> " " +
+                                            (player.team().core() != null ?
+                                                UI.formatAmount(Math.min(player.team().core().items.get(req.item), reqAmount)) + " / " :
+                                                "")
+                                            + UI.formatAmount(reqAmount)).get();
+
+                                        Color targetColor = items().has(req.item) ? Color.lightGray : Color.scarlet;
+
+                                        if(shiny){
+                                            label.setColor(Pal.accent);
+                                            label.actions(Actions.color(targetColor, 0.75f, Interp.fade));
+                                        }else{
+                                            label.setColor(targetColor);
+                                        }
+
                                     }).fillX().left();
                                     t.row();
                                 }
@@ -409,8 +471,8 @@ public class ResearchDialog extends BaseDialog{
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.button("$research", Icon.ok, Styles.nodet, () -> unlock(node))
-                    .disabled(i -> !canUnlock(node)).growX().height(44f).colspan(3);
+                    b.button("$research", Icon.ok, Styles.nodet, () -> spend(node))
+                    .disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
             });
 

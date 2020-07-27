@@ -471,6 +471,8 @@ public class TechTree implements ContentList{
         public UnlockableContent content;
         /** Item requirements for this content. */
         public ItemStack[] requirements;
+        /** Requirements that have been fulfilled. Always the same length as the requirement array. */
+        public final ItemStack[] finishedRequirements;
         /** Extra objectives needed to research this. TODO implement */
         public Seq<Objective> objectives = new Seq<>();
         /** Time required to research this content, in seconds. */
@@ -491,6 +493,12 @@ public class TechTree implements ContentList{
             this.depth = parent == null ? 0 : parent.depth + 1;
             this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
             this.time = Seq.with(requirements).mapFloat(i -> i.item.cost * i.amount).sum() * 10;
+            this.finishedRequirements = new ItemStack[requirements.length];
+
+            //load up the requirements that have been finished if settings are available
+            for(int i = 0; i < requirements.length; i++){
+                finishedRequirements[i] = new ItemStack(requirements[i].item, Core.settings == null ? 0 : Core.settings.getInt("req-" + content.name + "-" + requirements[i].item.name));
+            }
 
             //add dependencies as objectives.
             content.getDependencies(d -> objectives.add(new Research(d)));
@@ -509,6 +517,11 @@ public class TechTree implements ContentList{
         /** Flushes research progress to settings. */
         public void save(){
             Core.settings.put("research-" + content.name, progress);
+
+            //save finished requirements by item type
+            for(ItemStack stack : finishedRequirements){
+                Core.settings.put("req-" + content.name + "-" + stack.item.name, stack.amount);
+            }
         }
     }
 }
