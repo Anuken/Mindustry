@@ -417,6 +417,31 @@ public class ResearchDialog extends BaseDialog{
                         desc.table(t -> {
                             t.left();
                             if(selectable){
+
+                                //check if there is any progress, add research progress text
+                                if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
+                                    float sum = 0f, used = 0f;
+                                    boolean shiny = false;
+
+                                    for(int i = 0; i < node.requirements.length; i++){
+                                        sum += node.requirements[i].item.cost * node.requirements[i].amount;
+                                        used += node.finishedRequirements[i].item.cost * node.finishedRequirements[i].amount;
+                                        if(shine != null) shiny |= shine[i];
+                                    }
+
+                                    int percent = (int)(used / sum * 100);
+                                    Label label = t.add(Core.bundle.format("research.progress", percent)).left().get();
+
+                                    if(shiny){
+                                        label.setColor(Pal.accent);
+                                        label.actions(Actions.color(Color.lightGray, 0.75f, Interp.fade));
+                                    }else{
+                                        label.setColor(Color.lightGray);
+                                    }
+
+                                    t.row();
+                                }
+
                                 for(int i = 0; i < node.requirements.length; i++){
                                     ItemStack req = node.requirements[i];
                                     ItemStack completed = node.finishedRequirements[i];
