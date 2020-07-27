@@ -93,7 +93,7 @@ public class Scripts implements Disposable{
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
             }
             context.evaluateString(scope,
-            wrap ? "(function(){\n" + script + "\n})();" : script,
+            wrap ? "(function(){'use strict'\n" + script + "\n})();" : script,
             file, 0, null);
             return true;
         }catch(Throwable t){
