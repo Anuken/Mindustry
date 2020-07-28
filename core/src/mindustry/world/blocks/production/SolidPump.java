@@ -120,7 +120,7 @@ public class SolidPump extends Pump{
                 if(canPump(tile)) fraction = 1f;
             }
 
-            fraction += boost;
+            fraction += boost + (attribute == null ? 0 : attribute.env());
             fraction = Math.max(fraction, 0);
 
             if(cons.valid() && typeLiquid() < liquidCapacity - 0.001f){

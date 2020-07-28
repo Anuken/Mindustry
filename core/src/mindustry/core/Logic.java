@@ -352,6 +352,10 @@ public class Logic implements ApplicationListener{
                     runWave();
                 }
 
+                //apply weather attributes
+                state.envAttrs.clear();
+                Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
+
                 Groups.update();
             }
 

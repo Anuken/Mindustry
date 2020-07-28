@@ -390,6 +390,8 @@ public class Sector{
         /** Has sandstorms. */
         desert,
         /** Has an enemy base. */
-        base
+        base,
+        /** Has spore weather. */
+        spores
     }
 }

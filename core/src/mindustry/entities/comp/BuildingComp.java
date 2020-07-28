@@ -703,7 +703,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float getProgressIncrease(float baseTime){
-        return 1f / baseTime * delta() * efficiency();
+        return 1f / baseTime * edelta();
+    }
+
+    public float getDisplayEfficiency(){
+        return getProgressIncrease(1f) / edelta();
     }
 
     /** @return whether this block should play its active sound.*/

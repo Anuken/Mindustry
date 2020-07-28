@@ -8,12 +8,14 @@ import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.renderer;
 
 public abstract class Weather extends MappableContent{
     /** Default duration of this weather event in ticks. */
     public float duration = 15f * Time.toMinutes;
+    public Attributes attrs = new Attributes();
 
     //internals
     public Rand rand = new Rand();

@@ -11,6 +11,7 @@ import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -18,13 +19,18 @@ public class Weathers implements ContentList{
     public static Weather
     rain,
     snow,
-    sandstorm;
+    sandstorm,
+    sporestorm;
 
     @Override
     public void load(){
         snow = new Weather("snow"){
             TextureRegion region;
             float yspeed = 2f, xspeed = 0.25f, padding = 16f, size = 12f, density = 1200f;
+
+            {
+                attrs.set(Attribute.light, -0.15f);
+            }
 
             @Override
             public void load(){
@@ -68,6 +74,11 @@ public class Weathers implements ContentList{
         rain = new Weather("rain"){
             float yspeed = 5f, xspeed = 1.5f, padding = 16f, size = 40f, density = 1200f;
             TextureRegion[] splashes = new TextureRegion[12];
+
+            {
+                attrs.set(Attribute.light, -0.2f);
+                attrs.set(Attribute.water, 0.2f);
+            }
 
             @Override
             public void load(){
@@ -164,6 +175,10 @@ public class Weathers implements ContentList{
             Color color = Color.valueOf("f7cba4");
             Texture noise;
 
+            {
+                attrs.set(Attribute.light, -0.1f);
+            }
+
             @Override
             public void load(){
                 region = Core.atlas.find("circle-shadow");
@@ -225,6 +240,77 @@ public class Weathers implements ContentList{
                     if(Tmp.r3.setCentered(x, y, size * sscl).overlaps(Tmp.r2)){
                         Draw.alpha(alpha * baseAlpha);
                         Draw.rect(region, x, y, size * sscl, size * sscl);
+                    }
+                }
+            }
+        };
+
+        sporestorm = new Weather("sporestorm"){
+            TextureRegion region;
+            float yspeed = 1f, xspeed = 4f, size = 5f, padding = size, invDensity = 2000f;
+            Color color = Color.valueOf("7457ce");
+            Texture noise;
+
+            {
+                attrs.set(Attribute.spores, 0.5f);
+                attrs.set(Attribute.light, -0.1f);
+            }
+
+            @Override
+            public void load(){
+                region = Core.atlas.find("circle-shadow");
+                noise = new Texture("sprites/noiseAlpha.png");
+                noise.setWrap(TextureWrap.repeat);
+                noise.setFilter(TextureFilter.linear);
+            }
+
+            @Override
+            public void dispose(){
+                noise.dispose();
+            }
+
+            @Override
+            public void drawOver(WeatherState state){
+                Draw.alpha(state.opacity * 0.8f);
+                Draw.tint(color);
+
+                float scale = 1f / 2000f;
+                float scroll = Time.time() * scale;
+                Tmp.tr1.setTexture(noise);
+                Core.camera.bounds(Tmp.r1);
+                Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
+                Tmp.tr1.scroll(-xspeed * scroll, -yspeed * scroll);
+                Draw.rect(Tmp.tr1, Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+
+                rand.setSeed(0);
+                Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
+                Tmp.r1.grow(padding);
+                Core.camera.bounds(Tmp.r2);
+                int total = (int)(Tmp.r1.area() / invDensity * state.intensity());
+                Draw.tint(color);
+                float baseAlpha = state.opacity;
+                Draw.alpha(baseAlpha);
+
+                for(int i = 0; i < total; i++){
+                    float scl = rand.random(0.5f, 1f);
+                    float scl2 = rand.random(0.5f, 1f);
+                    float sscl = rand.random(0.5f, 1f);
+                    float x = (rand.random(0f, world.unitWidth()) + Time.time() * xspeed * scl2);
+                    float y = (rand.random(0f, world.unitHeight()) - Time.time() * yspeed * scl);
+                    float alpha = rand.random(0.1f, 0.8f);
+
+                    x += Mathf.sin(y, rand.random(30f, 80f), rand.random(1f, 7f));
+
+                    x -= Tmp.r1.x;
+                    y -= Tmp.r1.y;
+                    x = Mathf.mod(x, Tmp.r1.width);
+                    y = Mathf.mod(y, Tmp.r1.height);
+                    x += Tmp.r1.x;
+                    y += Tmp.r1.y;
+
+                    if(Tmp.r3.setCentered(x, y, size * sscl).overlaps(Tmp.r2)){
+                        Draw.alpha(alpha * baseAlpha);
+                        Fill.circle(x, y, size * sscl / 2f);
                     }
                 }
             }
