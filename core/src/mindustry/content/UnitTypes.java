@@ -520,7 +520,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 3.5f;
             flying = true;
             lowAltitude = true;
-            health = 7000;
+            health = 9000;
             armor = 9f;
             engineOffset = 21;
             engineSize = 5.3f;
@@ -542,7 +542,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 2.5f;
             flying = true;
             lowAltitude = true;
-            health = 13000;
+            health = 18000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitsize = 58f;

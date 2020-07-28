@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
-    private static final int displayed = 20;
+    private int displayed = 20;
     private Seq<SpawnGroup> groups = new Seq<>();
 
     private Table table;
@@ -47,28 +47,6 @@ public class WaveInfoDialog extends BaseDialog{
 
         onResize(this::setup);
         addCloseButton();
-        buttons.button("<<", () -> {
-        }).update(t -> {
-            if(t.getClickListener().isPressed()){
-                updateTimer += Time.delta;
-                if(updateTimer >= updatePeriod){
-                    start = Math.max(start - 1, 0);
-                    updateTimer = 0f;
-                    updateWaves();
-                }
-            }
-        });
-        buttons.button(">>", () -> {
-        }).update(t -> {
-            if(t.getClickListener().isPressed()){
-                updateTimer += Time.delta;
-                if(updateTimer >= updatePeriod){
-                    start++;
-                    updateTimer = 0f;
-                    updateWaves();
-                }
-            }
-        });
 
         buttons.button("$waves.edit", () -> {
             BaseDialog dialog = new BaseDialog("$waves.edit");
@@ -99,6 +77,50 @@ public class WaveInfoDialog extends BaseDialog{
             }));
             dialog.show();
         }).size(270f, 64f);
+
+        buttons.defaults().width(60f);
+
+        buttons.button("<", () -> {}).update(t -> {
+            if(t.getClickListener().isPressed()){
+                shift(-1);
+            }
+        });
+        buttons.button(">", () -> {}).update(t -> {
+            if(t.getClickListener().isPressed()){
+                shift(1);
+            }
+        });
+
+        buttons.button("-", () -> {}).update(t -> {
+            if(t.getClickListener().isPressed()){
+                view(-1);
+            }
+        });
+        buttons.button("+", () -> {}).update(t -> {
+            if(t.getClickListener().isPressed()){
+                view(1);
+            }
+        });
+    }
+
+    void view(int amount){
+        updateTimer += Time.delta;
+        if(updateTimer >= updatePeriod){
+            displayed += amount;
+            if(displayed < 5) displayed = 5;
+            updateTimer = 0f;
+            updateWaves();
+        }
+    }
+
+    void shift(int amount){
+        updateTimer += Time.delta;
+        if(updateTimer >= updatePeriod){
+            start += amount;
+            if(start < 0) start = 0;
+            updateTimer = 0f;
+            updateWaves();
+        }
     }
 
     void setup(){
@@ -120,7 +142,7 @@ public class WaveInfoDialog extends BaseDialog{
             setAlignment(Align.center, Align.center);
         }}).width(390f).growY();
 
-        cont.add(graph).grow();
+        cont.add(graph = new WaveGraph()).grow();
 
         buildGroups();
     }
