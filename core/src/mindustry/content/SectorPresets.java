@@ -22,7 +22,7 @@ public class SectorPresets implements ContentList{
             conditionWave = 5;
             launchPeriod = 5;
             rules = r -> {
-                r.winWave = 30;
+                r.winWave = 20;
             };
         }};
 

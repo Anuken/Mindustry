@@ -1,3 +1,5 @@
+"use strict";
+
 const log = function(context, obj){
     Vars.mods.getScripts().log(context, String(obj))
 }

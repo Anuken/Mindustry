@@ -1,37 +1,35 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.struct.*;
-import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.ContentType;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.type.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
-import static mindustry.game.SpawnGroup.never;
+import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
     private static final int displayed = 20;
     private Seq<SpawnGroup> groups = new Seq<>();
 
-    private Table table, preview;
+    private Table table;
     private int start = 0;
     private UnitType lastType = UnitTypes.dagger;
     private float updateTimer, updatePeriod = 1f;
+    private WaveGraph graph = new WaveGraph();
 
     public WaveInfoDialog(MapEditor editor){
         super("$waves.title");
@@ -47,7 +45,31 @@ public class WaveInfoDialog extends BaseDialog{
             }
         });
 
+        onResize(this::setup);
         addCloseButton();
+        buttons.button("<<", () -> {
+        }).update(t -> {
+            if(t.getClickListener().isPressed()){
+                updateTimer += Time.delta;
+                if(updateTimer >= updatePeriod){
+                    start = Math.max(start - 1, 0);
+                    updateTimer = 0f;
+                    updateWaves();
+                }
+            }
+        });
+        buttons.button(">>", () -> {
+        }).update(t -> {
+            if(t.getClickListener().isPressed()){
+                updateTimer += Time.delta;
+                if(updateTimer >= updatePeriod){
+                    start++;
+                    updateTimer = 0f;
+                    updateWaves();
+                }
+            }
+        });
+
         buttons.button("$waves.edit", () -> {
             BaseDialog dialog = new BaseDialog("$waves.edit");
             dialog.addCloseButton();
@@ -98,35 +120,7 @@ public class WaveInfoDialog extends BaseDialog{
             setAlignment(Align.center, Align.center);
         }}).width(390f).growY();
 
-        cont.table(Tex.clear, m -> {
-            m.add("$waves.preview").color(Color.lightGray).wrap().growX().center().get().setAlignment(Align.center, Align.center);
-            m.row();
-            m.button("-", () -> {
-            }).update(t -> {
-                if(t.getClickListener().isPressed()){
-                    updateTimer += Time.delta;
-                    if(updateTimer >= updatePeriod){
-                        start = Math.max(start - 1, 0);
-                        updateTimer = 0f;
-                        updateWaves();
-                    }
-                }
-            }).growX().height(70f);
-            m.row();
-            m.pane(t -> preview = t).grow().get().setScrollingDisabled(true, true);
-            m.row();
-            m.button("+", () -> {
-            }).update(t -> {
-                if(t.getClickListener().isPressed()){
-                    updateTimer += Time.delta;
-                    if(updateTimer >= updatePeriod){
-                        start++;
-                        updateTimer = 0f;
-                        updateWaves();
-                    }
-                }
-            }).growX().height(70f);
-        }).growY().width(180f).growY();
+        cont.add(graph).grow();
 
         buildGroups();
     }
@@ -137,6 +131,7 @@ public class WaveInfoDialog extends BaseDialog{
         table.margin(10f);
 
         if(groups != null){
+
             for(SpawnGroup group : groups){
                 table.table(Tex.button, t -> {
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
@@ -225,6 +220,7 @@ public class WaveInfoDialog extends BaseDialog{
                         updateWaves();
                     }).growX().pad(-6f).padTop(5);
                 }).width(340f).pad(16);
+
                 table.row();
             }
         }else{
@@ -243,7 +239,7 @@ public class WaveInfoDialog extends BaseDialog{
                 if(type.isHidden()) continue;
                 p.button(t -> {
                     t.left();
-                    t.image(type.icon(mindustry.ui.Cicon.medium)).size(40f).padRight(2f);
+                    t.image(type.icon(Cicon.medium)).size(40f).padRight(2f);
                     t.add(type.localizedName);
                 }, () -> {
                     lastType = type;
@@ -258,36 +254,9 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     void updateWaves(){
-        preview.clear();
-        preview.top();
-
-        for(int i = start; i < displayed + start; i++){
-            int wave = i;
-            preview.table(Tex.underline, table -> {
-                table.add((wave + 1) + "").color(Pal.accent).center().colspan(2).get().setAlignment(Align.center, Align.center);
-                table.row();
-
-                int[] spawned = new int[Vars.content.getBy(ContentType.unit).size];
-
-                for(SpawnGroup spawn : groups){
-                    spawned[spawn.type.id] += spawn.getUnitsSpawned(wave);
-                }
-
-                for(int j = 0; j < spawned.length; j++){
-                    if(spawned[j] > 0){
-                        UnitType type = content.getByID(ContentType.unit, j);
-                        table.image(type.icon(Cicon.medium)).size(8f * 4f).padRight(4);
-                        table.add(spawned[j] + "x").color(Color.lightGray).padRight(6);
-                        table.row();
-                    }
-                }
-
-                if(table.getChildren().size == 1){
-                    table.add("$none").color(Pal.remove);
-                }
-            }).width(110f).pad(2f);
-
-            preview.row();
-        }
+        graph.groups = groups;
+        graph.from = start;
+        graph.to = start + displayed;
+        graph.rebuild();
     }
 }

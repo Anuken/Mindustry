@@ -81,11 +81,11 @@ public class Scripts implements Disposable{
     }
 
     public String readString(String path){
-        return Vars.tree.get(path).readString();
+        return Vars.tree.get(path, true).readString();
     }
 
     public byte[] readBytes(String path){
-        return Vars.tree.get(path).readBytes();
+        return Vars.tree.get(path, true).readBytes();
     }
 
     public void run(LoadedMod mod, Fi file){
@@ -126,7 +126,7 @@ public class Scripts implements Disposable{
         }
 
         @Override
-        public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws IOException, URISyntaxException{
+        public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws URISyntaxException{
             if(currentMod == null) return null;
             return loadSource(moduleId, currentMod.root.child("scripts"), validator);
         }

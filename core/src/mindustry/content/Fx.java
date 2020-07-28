@@ -96,7 +96,7 @@ public class Fx{
         Fill.square(x, y, 1f * size, 45f);
     }),
 
-    itemTransfer = new Effect(30f, e -> {
+    itemTransfer = new Effect(10f, e -> {
         if(!(e.data instanceof Position)) return;
         Position to = e.data();
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)

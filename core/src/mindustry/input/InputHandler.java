@@ -195,13 +195,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         tile.getStackOffset(item, stackTrns);
+        tile.handleStack(item, accepted, player.unit());
 
         createItemTransfer(
             item,
             amount,
             player.x + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y + Angles.trnsy(player.unit().rotation + 180f, backTrns),
             new Vec2(tile.x + stackTrns.x, tile.y + stackTrns.y),
-            () -> tile.handleStack(item, accepted, player.unit())
+            () -> {}
         );
     }
 
