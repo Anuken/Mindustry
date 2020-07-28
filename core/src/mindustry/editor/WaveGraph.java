@@ -139,7 +139,7 @@ public class WaveGraph extends Table{
             for(Mode m : Mode.all){
                 t.button("$wavemode." + m.name(), Styles.fullTogglet, () -> {
                     mode = m;
-                }).group(group).height(32f).update(b -> b.setChecked(m == mode)).width(130f);
+                }).group(group).height(35f).update(b -> b.setChecked(m == mode)).width(130f);
             }
         }).growX();
     }
