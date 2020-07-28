@@ -19,13 +19,12 @@ import java.util.regex.*;
 public class Scripts implements Disposable{
     private final Seq<String> blacklist = Seq.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");
+        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream");
     private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
     private LoadedMod currentMod = null;
-    private Seq<EventHandle> events = new Seq<>();
 
     public Scripts(){
         Time.mark();
@@ -75,9 +74,18 @@ public class Scripts implements Disposable{
         Log.log(level, "[@]: @", source, message);
     }
 
+    //utility mod functions
+
     public <T> void onEvent(Class<T> type, Cons<T> listener){
         Events.on(type, listener);
-        events.add(new EventHandle(type, listener));
+    }
+
+    public String readString(String path){
+        return Vars.tree.get(path).readString();
+    }
+
+    public byte[] readBytes(String path){
+        return Vars.tree.get(path).readBytes();
     }
 
     public void run(LoadedMod mod, Fi file){
@@ -107,21 +115,7 @@ public class Scripts implements Disposable{
 
     @Override
     public void dispose(){
-        for(EventHandle e : events){
-            Events.remove(e.type, e.listener);
-        }
-        events.clear();
         Context.exit();
-    }
-
-    private static class EventHandle{
-        Class type;
-        Cons listener;
-
-        public EventHandle(Class type, Cons listener){
-            this.type = type;
-            this.listener = listener;
-        }
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{

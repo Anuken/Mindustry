@@ -26,7 +26,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
 import mindustry.ui.layout.TreeLayout.*;
-import mindustry.world.modules.*;
 
 import java.util.*;
 
@@ -37,20 +36,69 @@ public class ResearchDialog extends BaseDialog{
     private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
     private TechTreeNode root = new TechTreeNode(TechTree.root, null);
     private Rect bounds = new Rect();
+    private ItemsDisplay itemDisplay;
     private View view;
+
+    private ItemSeq items;
 
     public ResearchDialog(){
         super("");
 
         titleTable.remove();
         margin(0f).marginBottom(8);
-        cont.add(view = new View()).grow().get();
+        cont.stack(view = new View(), itemDisplay = new ItemsDisplay()).grow();
 
         shouldPause = true;
 
         shown(() -> {
+
+            items = new ItemSeq(){
+                //store sector item amounts for modifications
+                ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
+
+                {
+                    //add global counts of each sector
+                    for(Planet planet : content.planets()){
+                        for(Sector sector : planet.sectors){
+                            if(sector.hasSave()){
+                                ItemSeq cached = sector.calculateItems();
+                                add(cached);
+                                cache.put(sector, cached);
+                            }
+                        }
+                    }
+                }
+
+                //this is the only method that actually modifies the sequence itself.
+                @Override
+                public void add(Item item, int amount){
+                    //only have custom removal logic for when the sequence gets items taken out of it (e.g. research)
+                    if(amount < 0){
+                        //remove items from each sector's storage, one by one
+
+                        //% that gets removed from each sector
+                        double percentage = (double)amount / get(item);
+                        int[] counter = {amount};
+                        cache.each((sector, seq) -> {
+                            if(counter[0] == 0) return;
+
+                            //amount that will be removed
+                            int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
+
+                            //actually remove it from the sector
+                            sector.removeItem(item, toRemove);
+                            seq.remove(item, toRemove);
+                            counter[0] -= toRemove;
+                        });
+                    }
+
+                    super.add(item, amount);
+                }
+            };
+
             checkNodes(root);
             treeLayout();
+
         });
 
         hidden(ui.planet::setup);
@@ -104,10 +152,6 @@ public class ResearchDialog extends BaseDialog{
                 view.clamp();
             }
         });
-    }
-
-    ItemModule items(){
-        return state.rules.defaultTeam.items();
     }
 
     void treeLayout(){
@@ -177,6 +221,8 @@ public class ResearchDialog extends BaseDialog{
             l.visible = !locked;
             checkNodes(l);
         }
+
+        itemDisplay.rebuild(items);
     }
 
     boolean selectable(TechNode node){
@@ -320,29 +366,30 @@ public class ResearchDialog extends BaseDialog{
             panY = ry - bounds.y - oy;
         }
 
-        boolean canUnlock(TechNode node){
-            return items().has(node.requirements) && selectable(node);
-        }
-
         boolean canSpend(TechNode node){
             //can spend when there's at least 1 item that can be spent
-            return selectable(node) && (node.requirements.length == 0 || Structs.contains(node.requirements, i -> items().has(i.item)));
+            return selectable(node) && (node.requirements.length == 0 || Structs.contains(node.requirements, i -> items.has(i.item)));
         }
 
         void spend(TechNode node){
             boolean complete = true;
 
             boolean[] shine = new boolean[node.requirements.length];
+            boolean[] usedShine = new boolean[content.items().size];
 
             for(int i = 0; i < node.requirements.length; i++){
                 ItemStack req = node.requirements[i];
                 ItemStack completed = node.finishedRequirements[i];
 
                 //amount actually taken from inventory
-                int used = Math.min(req.amount - completed.amount, items().get(req.item));
+                int used = Math.min(req.amount - completed.amount, items.get(req.item));
+                items.remove(req.item, used);
                 completed.amount += used;
 
-                if(used > 0) shine[i] = true;
+                if(used > 0){
+                    shine[i] = true;
+                    usedShine[req.item.id] = true;
+                }
 
                 //disable completion if the completed amount has not reached requirements
                 if(completed.amount < req.amount){
@@ -356,11 +403,11 @@ public class ResearchDialog extends BaseDialog{
 
             node.save();
             rebuild(shine);
+            itemDisplay.rebuild(items, usedShine);
         }
 
         void unlock(TechNode node){
             node.content.unlock();
-            items().remove(node.requirements);
             showToast(Core.bundle.format("researched", node.content.localizedName));
             checkNodes(root);
             hoverNode = null;
@@ -462,7 +509,7 @@ public class ResearchDialog extends BaseDialog{
                                                 "")
                                             + UI.formatAmount(reqAmount)).get();
 
-                                        Color targetColor = items().has(req.item) ? Color.lightGray : Color.scarlet;
+                                        Color targetColor = items.has(req.item) ? Color.lightGray : Color.scarlet;
 
                                         if(shiny){
                                             label.setColor(Pal.accent);

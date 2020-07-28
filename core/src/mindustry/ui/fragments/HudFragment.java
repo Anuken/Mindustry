@@ -573,11 +573,14 @@ public class HudFragment extends Fragment{
         dialog.show();
     }
 
+    //TODO launching is disabled, possibly forever
     private boolean inLaunchWave(){
+        return false;
+        /*
         return state.hasSector() &&
             state.getSector().metCondition() &&
             !net.client() &&
-            state.wave % state.getSector().launchPeriod == 0 && !spawner.isSpawning();
+            state.wave % state.getSector().launchPeriod == 0 && !spawner.isSpawning();*/
     }
 
     private boolean canLaunch(){

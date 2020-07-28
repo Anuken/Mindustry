@@ -11,7 +11,6 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.core.*;
@@ -342,17 +341,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 t.left();
 
                 t.table(res -> {
-                    ObjectIntMap<Item> map = sector.save.meta.secinfo.getCurrentItems(sector);
+                    ItemSeq items = sector.calculateItems();
 
                     int i = 0;
-                    for(Item item : content.items()){
-                        int amount = Math.min(map.get(item), sector.save.meta.secinfo.storageCapacity);
-                        if(amount > 0){
-                            res.image(item.icon(Cicon.small)).padRight(3);
-                            res.add(UI.formatAmount(amount)).color(Color.lightGray);
-                            if(++i % 2 == 0){
-                                res.row();
-                            }
+                    for(ItemStack stack : items){
+                        res.image(stack.item.icon(Cicon.small)).padRight(3);
+                        res.add(UI.formatAmount(stack.amount)).color(Color.lightGray);
+                        if(++i % 2 == 0){
+                            res.row();
                         }
                     }
                 });

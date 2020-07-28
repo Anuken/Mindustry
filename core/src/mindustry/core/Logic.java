@@ -92,6 +92,9 @@ public class Logic implements ApplicationListener{
                 long seconds = state.rules.sector.getSecondsPassed();
                 CoreEntity core = state.rules.defaultTeam.core();
 
+                //update correct storage capacity
+                state.rules.sector.save.meta.secinfo.storageCapacity = core.storageCapacity;
+
                 //apply fractional damage based on how many turns have passed for this sector
                 float turnsPassed = seconds / (turnDuration / 60f);
 
@@ -101,26 +104,11 @@ public class Logic implements ApplicationListener{
 
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){
-
-                    //add produced items
-                    //TODO move to received items
-                    state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
-                        core.items.add(item, (int)(stat.mean * seconds));
-                    });
-
-                    //add received items
-                    state.rules.sector.getReceivedItems().each(stack -> core.items.add(stack.item, stack.amount));
+                    //add new items recieved
+                    state.rules.sector.calculateRecievedItems().each((item, amount) -> core.items.add(item, amount));
 
                     //clear received items
                     state.rules.sector.setReceivedItems(new Seq<>());
-
-                    //validation
-                    for(Item item : content.items()){
-                        //ensure positive items
-                        if(core.items.get(item) < 0) core.items.set(item, 0);
-                        //cap the items
-                        if(core.items.get(item) > core.storageCapacity) core.items.set(item, core.storageCapacity);
-                    }
                 }
 
                 state.rules.sector.setSecondsPassed(0);

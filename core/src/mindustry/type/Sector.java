@@ -3,6 +3,7 @@ package mindustry.type;
 import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
+import arc.struct.ObjectIntMap.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -154,6 +155,70 @@ public class Sector{
 
     public void setReceivedItems(Seq<ItemStack> stacks){
         Core.settings.putJson(key("received-items"), ItemStack.class, stacks);
+    }
+
+    public void removeItem(Item item, int amount){
+        if(isBeingPlayed()){
+            if(state.rules.defaultTeam.core() != null){
+                state.rules.defaultTeam.items().remove(item, amount);
+            }
+        }else{
+            Seq<ItemStack> recv = getReceivedItems();
+
+            ItemStack fit = recv.find(i -> i.item == item);
+            if(fit != null){
+                fit.amount -= amount;
+            }else{
+                recv.add(new ItemStack(item, amount));
+            }
+
+            setReceivedItems(recv);
+        }
+    }
+
+    public ItemSeq calculateItems(){
+        ItemSeq count = new ItemSeq();
+
+        //for sectors being played on, add items directly
+        if(isBeingPlayed()){
+            count.add(state.rules.defaultTeam.items());
+        }else if(save != null){
+            //add items already present
+            for(Entry<Item> ent : save.meta.secinfo.coreItems){
+                count.add(ent.key, ent.value);
+            }
+
+            count.add(calculateRecievedItems());
+        }
+
+        return count;
+    }
+
+    public ItemSeq calculateRecievedItems(){
+        ItemSeq count = new ItemSeq();
+
+        if(save != null){
+            int capacity = save.meta.secinfo.storageCapacity;
+            long seconds = state.rules.sector.getSecondsPassed();
+
+            //add produced items
+            state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
+                count.add(item, (int)(stat.mean * seconds));
+            });
+
+            //add received items
+            state.rules.sector.getReceivedItems().each(stack -> count.add(stack.item, stack.amount));
+
+            //validation
+            for(Item item : content.items()){
+                //ensure positive items
+                if(count.get(item) < 0) count.set(item, 0);
+                //cap the items
+                if(count.get(item) > capacity) count.set(item, capacity);
+            }
+        }
+
+        return count;
     }
 
     //TODO these methods should maybe move somewhere else and/or be contained in a data object

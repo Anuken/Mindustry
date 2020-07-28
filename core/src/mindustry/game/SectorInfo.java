@@ -140,17 +140,6 @@ public class SectorInfo{
         }
     }
 
-    /** @return the items in this sector now, taking into account production and items received. */
-    public ObjectIntMap<Item> getCurrentItems(Sector sector){
-        ObjectIntMap<Item> map = new ObjectIntMap<>();
-        map.putAll(coreItems);
-        long seconds = sector.getSecondsPassed();
-        production.each((item, stat) -> map.increment(item, (int)(stat.mean * seconds)));
-        //increment based on received items
-        sector.getReceivedItems().each(stack -> map.increment(stack.item, stack.amount));
-        return map;
-    }
-
     private void updateCoreDeltas(){
         CoreEntity ent = state.rules.defaultTeam.core();
         for(int i = 0; i < lastCoreItems.length; i++){
