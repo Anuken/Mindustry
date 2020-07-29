@@ -655,7 +655,7 @@ public class UnitTypes implements ContentList{
             rotateShooting = false;
             hitsize = 15f;
             engineSize = 3f;
-            payloadCapacity = 3;
+            payloadCapacity = 4;
 
             weapons.add(
             new Weapon("heal-weapon-mount"){{

@@ -161,7 +161,16 @@ public class WaveInfoDialog extends BaseDialog{
                         b.left();
                         b.image(group.type.icon(mindustry.ui.Cicon.medium)).size(32f).padRight(3);
                         b.add(group.type.localizedName).color(Pal.accent);
-                    }, () -> showUpdate(group)).pad(-6f).padBottom(0f);
+
+                        b.add().growX();
+
+                        b.button(Icon.cancel, () -> {
+                            groups.remove(group);
+                            table.getCell(t).pad(0f);
+                            t.remove();
+                            updateWaves();
+                        }).pad(-6).size(46f).padRight(-12f);
+                    }, () -> showUpdate(group)).height(46f).pad(-6f).padBottom(0f);
 
                     t.row();
                     t.table(spawns -> {
@@ -232,16 +241,8 @@ public class WaveInfoDialog extends BaseDialog{
                     });
 
                     t.row();
-                    t.check("$waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss));
-
-                    t.row();
-                    t.button("$waves.remove", () -> {
-                        groups.remove(group);
-                        table.getCell(t).pad(0f);
-                        t.remove();
-                        updateWaves();
-                    }).growX().pad(-6f).padTop(5);
-                }).width(340f).pad(16);
+                    t.check("$waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
+                }).width(340f).pad(8);
 
                 table.row();
             }

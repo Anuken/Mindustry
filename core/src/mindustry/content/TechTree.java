@@ -12,6 +12,7 @@ import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
 import static mindustry.content.UnitTypes.*;
+import static mindustry.type.ItemStack.*;
 
 public class TechTree implements ContentList{
     private static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
@@ -108,18 +109,18 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(Items.coal, () -> {
-                    node(Items.graphite, () -> {
+                node(Items.coal, with(Items.lead, 3000), () -> {
+                    node(Items.graphite, with(Items.coal, 3000), () -> {
                         node(graphitePress, () -> {
-                            node(Items.titanium, () -> {
+                            node(Items.titanium, with(Items.graphite, 6000, Items.copper, 10000, Items.lead, 10000), () -> {
                                 node(pneumaticDrill, () -> {
-                                    node(Items.sporePod, () -> {
+                                    node(Items.sporePod, with(Items.coal, 5000, Items.graphite, 5000, Items.lead, 5000), () -> {
                                         node(cultivator, () -> {
 
                                         });
                                     });
 
-                                    node(Items.thorium, () -> {
+                                    node(Items.thorium, with(Items.titanium, 10000, Items.lead, 15000, Items.copper, 30000), () -> {
                                         node(laserDrill, () -> {
                                             node(blastDrill, () -> {
 
@@ -135,9 +136,9 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(Items.pyratite, () -> {
+                            node(Items.pyratite, with(Items.coal, 6000, Items.lead, 10000, Items.sand, 5000), () -> {
                                 node(pyratiteMixer, () -> {
-                                    node(Items.blastCompound, () -> {
+                                    node(Items.blastCompound, with(Items.pyratite, 3000, Items.sporePod, 3000), () -> {
                                         node(blastMixer, () -> {
 
                                         });
@@ -145,10 +146,10 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(Items.silicon, () -> {
+                            node(Items.silicon, with(Items.coal, 4000, Items.sand, 4000), () -> {
                                 node(siliconSmelter, () -> {
 
-                                    node(Liquids.oil, () -> {
+                                    node(Liquids.oil, with(Items.coal, 8000, Items.pyratite, 6000, Items.sand, 20000), () -> {
                                         node(sporePress, () -> {
                                             node(coalCentrifuge, () -> {
                                                 node(multiPress, () -> {
@@ -158,9 +159,9 @@ public class TechTree implements ContentList{
                                                 });
                                             });
 
-                                            node(Items.plastanium, () -> {
+                                            node(Items.plastanium, with(Items.titanium, 10000, Items.silicon, 10000), () -> {
                                                 node(plastaniumCompressor, () -> {
-                                                    node(Items.phasefabric, () -> {
+                                                    node(Items.phasefabric, with(Items.thorium, 15000, Items.sand, 30000, Items.silicon, 5000), () -> {
                                                         node(phaseWeaver, () -> {
 
                                                         });
@@ -170,13 +171,13 @@ public class TechTree implements ContentList{
                                         });
                                     });
 
-                                    node(Items.metaglass, () -> {
+                                    node(Items.metaglass, with(Items.sand, 6000, Items.lead, 10000), () -> {
                                         node(kiln, () -> {
                                             node(incinerator, () -> {
-                                                node(Items.scrap, () -> {
-                                                    node(Liquids.slag, () -> {
+                                                node(Items.scrap, with(Items.copper, 20000, Items.sand, 10000), () -> {
+                                                    node(Liquids.slag, with(Items.scrap, 4000), () -> {
                                                         node(melter, () -> {
-                                                            node(Items.surgealloy, () -> {
+                                                            node(Items.surgealloy, with(Items.thorium, 20000, Items.silicon, 30000, Items.lead, 40000), () -> {
                                                                 node(surgeSmelter, () -> {
 
                                                                 });
@@ -190,7 +191,7 @@ public class TechTree implements ContentList{
                                                                 });
                                                             });
 
-                                                            node(Liquids.cryofluid, () -> {
+                                                            node(Liquids.cryofluid, with(Items.titanium, 8000, Items.metaglass, 5000), () -> {
                                                                 node(cryofluidMixer, () -> {
 
                                                                 });
@@ -440,6 +441,10 @@ public class TechTree implements ContentList{
             requirements = ItemStack.empty;
         }
 
+        return node(content, requirements, children);
+    }
+
+    private static TechNode node(UnlockableContent content, ItemStack[] requirements, Runnable children){
         return new TechNode(content, requirements, children);
     }
 
