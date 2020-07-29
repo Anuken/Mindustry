@@ -1,7 +1,6 @@
 package mindustry.android;
 
 import android.*;
-import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
@@ -25,6 +24,7 @@ import mindustry.ui.dialogs.*;
 
 import java.io.*;
 import java.lang.System;
+import java.lang.Thread.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -38,7 +38,19 @@ public class AndroidLauncher extends AndroidApplication{
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
-        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> CrashSender.log(error));
+        UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
+
+        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
+            CrashSender.log(error);
+
+            //try to forward exception to system handler
+            if(handler != null){
+                handler.uncaughtException(thread, error);
+            }else{
+                error.printStackTrace();
+                System.exit(1);
+            }
+        });
 
         super.onCreate(savedInstanceState);
         if(doubleScaleTablets && isTablet(this.getContext())){
