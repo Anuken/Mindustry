@@ -108,6 +108,14 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.row();
 
+            t.button("$settings.clearsaves", Icon.trash, style, () -> {
+                ui.showConfirm("$confirm", "$settings.clearsaves.confirm", () -> {
+                    control.saves.deleteAll();
+                });
+            });
+
+            t.row();
+
             t.button("$data.export", Icon.upload, style, () -> {
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
