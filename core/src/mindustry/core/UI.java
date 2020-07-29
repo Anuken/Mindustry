@@ -347,6 +347,14 @@ public class UI implements ApplicationListener, Loadable{
         }}.show();
     }
 
+    public void showStartupInfo(String info){
+        new Dialog(""){{
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.left);
+            buttons.button("$ok", this::hide).size(110, 50).pad(4);
+        }}.show();
+    }
+
     public void showErrorMessage(String text){
         new Dialog(""){{
             setFillParent(true);

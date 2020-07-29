@@ -429,7 +429,16 @@ public class Control implements ApplicationListener, Loadable{
 
         //just a regular reminder
         if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
-            ui.showInfo("[scarlet]6.0 is not supposed to be played.[] Go do something else.");
+            app.post(() -> app.post(() -> {
+                ui.showStartupInfo("[accent]v6[] is currently in [accent]pre-alpha[].\n" +
+                "[lightgray]This means:[]\n" +
+                "- Content is missing\n" +
+                "- Most [scarlet]Unit AI[] does not work\n" +
+                "- Many units are [scarlet]missing[] or unfinished\n" +
+                "- The campaign is completely unfinished\n" +
+                "- Everything you see is subject to change or removal." +
+                "\n\nReport bugs or crashes on [accent]Github[].");
+            }));
         }
 
         //play tutorial on stop
