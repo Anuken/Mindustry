@@ -265,7 +265,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void rotation(int rotation){
-        tile.rotation(rotation);
+        if(tile != null) tile.rotation(rotation);
     }
 
     public Floor floor(){

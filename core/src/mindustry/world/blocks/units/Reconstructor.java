@@ -1,5 +1,6 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -41,7 +42,19 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
+
         bars.add("progress", (ReconstructorEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        bars.add("units", (ReconstructorEntity e) ->
+        new Bar(
+            () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
+                Core.bundle.format("bar.unitcap",
+                Fonts.getUnicodeStr(e.unit().name),
+                teamIndex.countType(e.team, e.unit()),
+                Units.getCap(e.team)
+            ),
+            () -> Pal.power,
+            () -> e.unit() == null ? 0f : (float)teamIndex.countType(e.team, e.unit()) / Units.getCap(e.team)
+        ));
     }
 
     @Override
@@ -143,6 +156,22 @@ public class Reconstructor extends UnitBlock{
 
             speedScl = Mathf.lerpDelta(speedScl, Mathf.num(valid), 0.05f);
             time += edelta() * speedScl * state.rules.unitBuildSpeedMultiplier;
+        }
+
+        @Override
+        public boolean shouldConsume(){
+            //do not consume when cap reached
+            if(constructing()){
+                return Units.canCreate(team, upgrade(payload.unit.type()));
+            }
+            return false;
+        }
+
+        public UnitType unit(){
+            if(payload == null) return null;
+
+            UnitType t = upgrade(payload.unit.type());
+            return t != null && t.unlockedNow() ? t : null;
         }
 
         public boolean constructing(){

@@ -215,7 +215,7 @@ public class Block extends UnlockableContent{
         if(tile.build != null){
             tile.build.draw();
         }else{
-            Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy());
         }
     }
 

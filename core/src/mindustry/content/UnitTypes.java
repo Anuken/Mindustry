@@ -74,7 +74,7 @@ public class UnitTypes implements ContentList{
             hitsize = 9f;
             range = 10f;
             health = 500;
-            armor = 3f;
+            armor = 4f;
 
             immunities.add(StatusEffects.burning);
 
@@ -107,7 +107,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 3f;
             targetAir = false;
             health = 790;
-            armor = 8f;
+            armor = 9f;
 
             weapons.add(new Weapon("artillery"){{
                 y = 1f;
@@ -478,7 +478,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             hitsize = 18f;
             lowAltitude = true;
-            armor = 4f;
+            armor = 6f;
 
             engineOffset = 12f;
             engineSize = 3f;

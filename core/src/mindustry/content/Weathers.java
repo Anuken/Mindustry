@@ -249,6 +249,7 @@ public class Weathers implements ContentList{
             TextureRegion region;
             float yspeed = 1f, xspeed = 4f, size = 5f, padding = size, invDensity = 2000f;
             Color color = Color.valueOf("7457ce");
+            Vec2 force = new Vec2(0.25f, 0.01f);
             Texture noise;
 
             {
@@ -262,6 +263,14 @@ public class Weathers implements ContentList{
                 noise = new Texture("sprites/noiseAlpha.png");
                 noise.setWrap(TextureWrap.repeat);
                 noise.setFilter(TextureFilter.linear);
+            }
+
+            @Override
+            public void update(WeatherState state){
+
+                for(Unit unit : Groups.unit){
+                    unit.impulse(force.x * state.intensity(), force.y * state.intensity());
+                }
             }
 
             @Override

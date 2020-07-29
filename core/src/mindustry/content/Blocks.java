@@ -1615,7 +1615,7 @@ public class Blocks implements ContentList{
             Items.surgealloy, Bullets.fragSurge
             );
             xRand = 4f;
-            reloadTime = 6f;
+            reloadTime = 8f;
             range = 200f;
             size = 3;
             recoilAmount = 3f;
