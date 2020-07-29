@@ -110,7 +110,6 @@ public class ApplicationTests{
         Time.setDeltaProvider(() -> 1000f);
         Time.update();
         Time.update();
-        Time.setDeltaProvider(() -> 1f);
         Groups.unit.update();
         assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
@@ -289,7 +288,6 @@ public class ApplicationTests{
         state.set(State.playing);
 
         world.tile(0, 0).setBlock(Blocks.conveyor);
-        world.tile(0, 0).rotation(0);
         world.tile(0, 0).build.acceptStack(Items.copper, 1000, null);
     }
 
@@ -372,8 +370,7 @@ public class ApplicationTests{
         Seq<Building> entities = Seq.with(world.tile(0, 0).build);
 
         for(int i = 0; i < length; i++){
-            world.tile(i + 1, 0).setBlock(Blocks.conveyor);
-            world.tile(i + 1, 0).rotation(0);
+            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.derelict, 0);
             entities.add(world.tile(i + 1, 0).build);
         }
 

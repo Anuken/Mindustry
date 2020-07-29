@@ -266,6 +266,7 @@ public class UnitTypes implements ContentList{
                     splashDamage = 40f;
                     killShooter = true;
                     hittable = false;
+                    collidesAir = true;
                 }};
             }});
         }};

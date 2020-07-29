@@ -108,12 +108,12 @@ public class OverflowGate extends Block{
                 }else if(bc && !ac){
                     to = b;
                 }else{
-                    if(tile.rotation() == 0){
+                    if(rotation == 0){
                         to = a;
-                        if(flip) tile.rotation((byte) 1);
+                        if(flip) rotation =1;
                     }else{
                         to = b;
-                        if(flip) tile.rotation((byte) 0);
+                        if(flip) rotation = 0;
                     }
                 }
             }

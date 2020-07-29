@@ -86,7 +86,7 @@ public class Reconstructor extends UnitBlock{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null
-                && relativeTo(source) != rotation()
+                && relativeTo(source) != rotation
                 && payload instanceof UnitPayload
                 && hasUpgrade(((UnitPayload)payload).unit.type());
         }
@@ -102,7 +102,7 @@ public class Reconstructor extends UnitBlock{
 
             //draw input
             for(int i = 0; i < 4; i++){
-                if(blends(i) && i != rotation()){
+                if(blends(i) && i != rotation){
                     Draw.rect(inRegion, x, y, i * 90);
                 }
             }

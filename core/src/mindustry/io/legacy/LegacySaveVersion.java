@@ -72,12 +72,12 @@ public abstract class LegacySaveVersion extends SaveVersion{
                             byte rotation = Pack.rightByte(packedrot);
 
                             tile.setTeam(Team.get(team));
-                            tile.rotation(rotation);
+                            tile.build.rotation = rotation;
 
                             if(tile.build.items != null) tile.build.items.read(Reads.get(stream));
                             if(tile.build.power != null) tile.build.power.read(Reads.get(stream));
                             if(tile.build.liquids != null) tile.build.liquids.read(Reads.get(stream));
-                            if(tile.build.cons() != null) tile.build.cons().read(Reads.get(stream));
+                            if(tile.build.cons != null) tile.build.cons.read(Reads.get(stream));
 
                             //read only from subclasses!
                             tile.build.read(Reads.get(in), version);

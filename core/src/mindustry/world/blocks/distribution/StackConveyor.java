@@ -104,25 +104,26 @@ public class StackConveyor extends Block implements Autotiler{
 
             for(int i = 0; i < 4; i++){
                 if((blendprox & (1 << i)) == 0){
-                    Draw.rect(edgeRegion, x, y, (rotation() - i) * 90);
+                    Draw.rect(edgeRegion, x, y, (rotation - i) * 90);
                 }
             }
 
             Draw.z(Layer.blockOver);
 
-            if(link == -1) return;
+            Building from = world.build(link);
+
+            if(link == -1 || from == null) return;
 
             //offset
-            Tile from = world.tile(link);
             Tmp.v1.set(from);
             Tmp.v2.set(tile);
             Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interp.linear);
 
             //rotation
-            float a = (from.rotation()%4) * 90;
-            float b = (tile.rotation()%4) * 90;
-            if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
-            if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a =  4 * 90;
+            float a = (from.rotation%4) * 90;
+            float b = (rotation%4) * 90;
+            if((from.rotation%4) == 3 && (rotation%4) == 0) a = -1 * 90;
+            if((from.rotation%4) == 0 && (rotation%4) == 3) a =  4 * 90;
 
             //stack
             Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
@@ -141,14 +142,14 @@ public class StackConveyor extends Block implements Autotiler{
 
             state = stateMove;
 
-            int[] bits = buildBlending(tile, tile.rotation(), null, true);
-            if(bits[0] == 0 &&  blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
-            if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
+            int[] bits = buildBlending(tile, rotation, null, true);
+            if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
+            if(bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
             
             blendprox = 0;
 
             for(int i = 0; i < 4; i++){
-                if(blends(tile, rotation(), i)){
+                if(blends(tile, rotation, i)){
                     blendprox |= (1 << i);
                 }
             }
@@ -253,7 +254,7 @@ public class StackConveyor extends Block implements Autotiler{
             return !((state != stateLoad)                   // not a loading dock
             ||  (items.total() > 0 && !items.has(item))     // incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity
-            ||  (tile.front()  == source));
+            ||  (front()  == source));
         }
 
         @Override

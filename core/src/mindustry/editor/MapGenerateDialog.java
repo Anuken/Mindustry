@@ -51,7 +51,7 @@ public class MapGenerateDialog extends BaseDialog{
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
-        protected void changeEntity(Team team, Prov<Building> entityprov){
+        protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
 
         }
     };
@@ -123,7 +123,7 @@ public class MapGenerateDialog extends BaseDialog{
                     Tile tile = editor.tile(x, y);
                     input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
                     filter.apply(input);
-                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.team(), tile.rotation());
+                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.team());
                 }
             }
 
@@ -134,7 +134,6 @@ public class MapGenerateDialog extends BaseDialog{
                         Tile tile = editor.tile(x, y);
                         GenTile write = writeTiles[x][y];
 
-                        tile.rotation(write.rotation);
                         tile.setFloor((Floor)content.block(write.floor));
                         tile.setBlock(content.block(write.block));
                         tile.setTeam(Team.get(write.team));
@@ -365,7 +364,7 @@ public class MapGenerateDialog extends BaseDialog{
                         GenTile tile = buffer1[px][py];
                         input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
                         filter.apply(input);
-                        buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team), tile.rotation);
+                        buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team));
                     });
 
                     pixmap.each((px, py) -> buffer1[px][py].set(buffer2[px][py]));
@@ -402,15 +401,14 @@ public class MapGenerateDialog extends BaseDialog{
     }
 
     private class GenTile{
-        public byte team, rotation;
+        public byte team;
         public short block, floor, ore;
 
-        public void set(Block floor, Block wall, Block ore, Team team, int rotation){
+        public void set(Block floor, Block wall, Block ore, Team team){
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
             this.team = (byte)team.id;
-            this.rotation = (byte)rotation;
         }
 
         public void set(GenTile other){
@@ -418,11 +416,10 @@ public class MapGenerateDialog extends BaseDialog{
             this.block = other.block;
             this.ore = other.ore;
             this.team = other.team;
-            this.rotation = other.rotation;
         }
 
         public GenTile set(Tile other){
-            set(other.floor(), other.block(), other.overlay(), other.team(), other.rotation());
+            set(other.floor(), other.block(), other.overlay(), other.team());
             return this;
         }
 
@@ -430,7 +427,6 @@ public class MapGenerateDialog extends BaseDialog{
             ctile.setFloor((Floor)content.block(floor));
             ctile.setBlock(content.block(block));
             ctile.setOverlay(content.block(ore));
-            ctile.rotation(rotation);
             ctile.setTeam(Team.get(team));
             return ctile;
         }

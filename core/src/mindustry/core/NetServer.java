@@ -582,7 +582,7 @@ public class NetServer implements ApplicationListener{
                 //auto-skip done requests
                 if(req.breaking && tile.block() == Blocks.air){
                     continue;
-                }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
+                }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || (tile.build != null && tile.build.rotation == req.rotation))){
                     continue;
                 }else if(con.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
                     continue;

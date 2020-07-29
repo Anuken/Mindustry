@@ -199,15 +199,15 @@ public class Sector{
 
         if(save != null){
             int capacity = save.meta.secinfo.storageCapacity;
-            long seconds = state.rules.sector.getSecondsPassed();
+            long seconds = getSecondsPassed();
 
             //add produced items
-            state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
+            save.meta.secinfo.production.each((item, stat) -> {
                 count.add(item, (int)(stat.mean * seconds));
             });
 
             //add received items
-            state.rules.sector.getReceivedItems().each(stack -> count.add(stack.item, stack.amount));
+            getReceivedItems().each(stack -> count.add(stack.item, stack.amount));
 
             //validation
             for(Item item : content.items()){

@@ -46,17 +46,17 @@ public class PowerDiode extends Block{
         @Override
         public void draw(){
             Draw.rect(region, x, y, 0);
-            Draw.rect(arrow, x, y, rotate ? tile.rotdeg() : 0);
+            Draw.rect(arrow, x, y, rotate ? rotdeg() : 0);
         }
 
         @Override
         public void updateTile(){
             super.updateTile();
 
-            if(tile.front() == null || tile.back() == null || !tile.back().block().hasPower || !tile.front().block().hasPower || tile.back().team() != tile.front().team()) return;
+            if(front() == null || back() == null || !back().block().hasPower || !front().block().hasPower || back().team() != front().team()) return;
 
-            PowerGraph backGraph = tile.back().power.graph;
-            PowerGraph frontGraph = tile.front().power.graph;
+            PowerGraph backGraph = back().power.graph;
+            PowerGraph frontGraph = front().power.graph;
             if(backGraph == frontGraph) return;
 
             // 0f - 1f of battery capacity in use

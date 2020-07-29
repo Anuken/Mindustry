@@ -379,7 +379,7 @@ public class Schematics implements Loadable{
                     && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
                     Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
+                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }
@@ -418,8 +418,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, team, 0);
-            tile.rotation(st.rotation);
+            tile.setBlock(st.block, team, st.rotation);
 
             Object config = st.config;
             if(tile.build != null){
@@ -438,8 +437,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, team, 0);
-            tile.rotation(st.rotation);
+            tile.setBlock(st.block, team, st.rotation);
 
             Object config = st.config;
             if(tile.build != null){

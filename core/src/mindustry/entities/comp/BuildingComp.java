@@ -53,6 +53,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient Seq<Building> proximity = new Seq<>(8);
     transient boolean updateFlow;
     transient byte dump;
+    transient int rotation;
 
     PowerModule power;
     ItemModule items;
@@ -68,10 +69,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     private transient boolean initialized;
 
     /** Sets this tile entity data to this and adds it if necessary. */
-    public Building init(Tile tile, Team team, boolean shouldAdd){
+    public Building init(Tile tile, Team team, boolean shouldAdd, int rotation){
         if(!initialized){
             create(tile.block(), team);
         }
+        this.rotation = rotation;
         this.tile = tile;
 
         set(tile.drawx(), tile.drawy());
@@ -129,7 +131,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public final void writeBase(Writes write){
         write.f(health);
-        write.b(rotation());
+        write.b(rotation);
         write.b(team.id);
         if(items != null) items.write(write);
         if(power != null) power.write(write);
@@ -231,25 +233,25 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Multiblock front. */
     public @Nullable Building front(){
         int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
+        return nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
     }
 
     /** Multiblock back. */
     public @Nullable Building back(){
         int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation() + 2).x * trns, Geometry.d4(rotation() + 2).y * trns);
+        return nearby(Geometry.d4(rotation + 2).x * trns, Geometry.d4(rotation + 2).y * trns);
     }
 
     /** Multiblock left. */
     public @Nullable Building left(){
         int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation() + 1).x * trns, Geometry.d4(rotation() + 1).y * trns);
+        return nearby(Geometry.d4(rotation + 1).x * trns, Geometry.d4(rotation + 1).y * trns);
     }
 
     /** Multiblock right. */
     public @Nullable Building right(){
         int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation() + 3).x * trns, Geometry.d4(rotation() + 3).y * trns);
+        return nearby(Geometry.d4(rotation + 3).x * trns, Geometry.d4(rotation + 3).y * trns);
     }
 
     public int pos(){
@@ -257,15 +259,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float rotdeg(){
-        return tile.rotdeg();
-    }
-
-    public int rotation(){
-        return tile.rotation();
-    }
-
-    public void rotation(int rotation){
-        if(tile != null) tile.rotation(rotation);
+        return rotation * 90;
     }
 
     public Floor floor(){
@@ -398,7 +392,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      */
     public boolean movePayload(@NonNull Payload todump){
         int trns = block.size/2 + 1;
-        Tile next = tile.getNearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
+        Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
         if(next != null && next.build != null && next.build.team() == team && next.build.acceptPayload(base(), todump)){
             next.build.handlePayload(base(), todump);
@@ -481,7 +475,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float moveLiquidForward(float leakResistance, Liquid liquid){
-        Tile next = tile.getNearby(rotation());
+        Tile next = tile.getNearby(rotation);
 
         if(next == null) return 0;
 

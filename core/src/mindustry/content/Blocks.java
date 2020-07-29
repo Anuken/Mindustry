@@ -121,7 +121,7 @@ public class Blocks implements ContentList{
 
         cliff = new Cliff("cliff"){{
             inEditor = false;
-            saveRotation = true;
+            saveData = true;
         }};
 
         //Registers build blocks

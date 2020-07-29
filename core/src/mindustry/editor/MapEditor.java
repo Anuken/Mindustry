@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.editor.DrawOperation.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -140,8 +141,9 @@ public class MapEditor{
                     if(drawBlock.synthetic()){
                         tile.setTeam(drawTeam);
                     }
-                    if(drawBlock.rotate){
-                        tile.rotation((byte)rotation);
+                    if(drawBlock.rotate && tile.build != null && tile.build.rotation != rotation){
+                        addTileOp(TileOp.get(tile.x, tile.y, (byte)OpType.rotation.ordinal(), (byte)rotation));
+                        tile.build.rotation = (byte)rotation;
                     }
                 }
             };

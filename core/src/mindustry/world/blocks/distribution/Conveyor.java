@@ -88,7 +88,7 @@ public class Conveyor extends Block implements Autotiler{
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conveyor &&
-            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.junction : this;
+            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
     public class ConveyorEntity extends Building{
@@ -114,7 +114,6 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            byte rotation = tile.rotation();
             int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
@@ -155,16 +154,16 @@ public class Conveyor extends Block implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            int[] bits = buildBlending(tile, rotation(), null, true);
+            int[] bits = buildBlending(tile, rotation, null, true);
             blendbits = bits[0];
             blendsclx = bits[1];
             blendscly = bits[2];
             blending = bits[4];
 
-            if(tile.front() != null && tile.front() != null){
-                next = tile.front();
+            if(front() != null && front() != null){
+                next = front();
                 nextc = next instanceof ConveyorEntity && next.team() == team ? (ConveyorEntity)next : null;
-                aligned = nextc != null && tile.rotation() == next.tile().rotation();
+                aligned = nextc != null && rotation == next.rotation;
             }
         }
 
@@ -179,7 +178,7 @@ public class Conveyor extends Block implements Autotiler{
             float mspeed = speed * tilesize / 2.4f;
             float centerSpeed = 0.1f;
             float centerDstScl = 3f;
-            float tx = Geometry.d4[tile.rotation()].x, ty = Geometry.d4[tile.rotation()].y;
+            float tx = Geometry.d4[rotation].x, ty = Geometry.d4[rotation].y;
 
             float centerx = 0f, centery = 0f;
 
@@ -263,7 +262,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void getStackOffset(Item item, Vec2 trns){
-            trns.trns(tile.rotdeg() + 180f, tilesize / 2f);
+            trns.trns(rotdeg() + 180f, tilesize / 2f);
         }
 
         @Override
@@ -290,15 +289,15 @@ public class Conveyor extends Block implements Autotiler{
         public boolean acceptItem(Building source, Item item){
             if(len >= capacity) return false;
             Tile facing = Edges.getFacingEdge(source.tile(), tile);
-            int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - tile.rotation());
-            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block().rotate && (source.rotation() + 2) % 4 == tile.rotation());
+            int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
+            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block().rotate && (source.rotation + 2) % 4 == rotation);
         }
 
         @Override
         public void handleItem(Building source, Item item){
             if(len >= capacity) return;
 
-            byte r = tile.rotation();
+            int r = rotation;
             Tile facing = Edges.getFacingEdge(source.tile(), tile);
             int ang = ((facing.relativeTo(tile.x, tile.y) - r));
             float x = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;

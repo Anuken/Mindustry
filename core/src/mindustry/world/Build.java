@@ -22,7 +22,7 @@ public class Build{
             return;
         }
 
-        Tile tile = world.Building(x, y);
+        Tile tile = world.tileBuilding(x, y);
         //this should never happen, but it doesn't hurt to check for links
         float prevPercent = 1f;
 
@@ -30,7 +30,7 @@ public class Build{
             prevPercent = tile.build.healthf();
         }
 
-        int rotation = tile.rotation();
+        int rotation = tile.build != null ? tile.build.rotation : 0;
         Block previous = tile.block();
         Block sub = BuildBlock.get(previous.size);
 
@@ -146,7 +146,7 @@ public class Build{
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
                 && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type))
-                && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
+                && !(type == tile.block() && (tile.build != null && rotation == tile.build.rotation) && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                 && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile, team);
         }
     }

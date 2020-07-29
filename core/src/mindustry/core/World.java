@@ -102,7 +102,7 @@ public class World{
     }
 
     @Nullable
-    public Tile Building(int x, int y){
+    public Tile tileBuilding(int x, int y){
         Tile tile = tiles.get(x, y);
         if(tile == null) return null;
         if(tile.build != null) return tile.build.tile();
@@ -418,7 +418,7 @@ public class World{
             int idx = tile.y * tiles.width + tile.x;
 
             if(tile.isDarkened()){
-                tile.rotation(dark[idx]);
+                tile.data = dark[idx];
             }
 
             if(dark[idx] == 4){
@@ -432,7 +432,7 @@ public class World{
                     }
                 }
 
-                if(full) tile.rotation(5);
+                if(full) tile.data = 5;
             }
         }
     }
@@ -472,7 +472,7 @@ public class World{
 
         Tile tile = world.tile(x, y);
         if(tile != null && tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
-            dark = Math.max(dark, tile.rotation());
+            dark = Math.max(dark, tile.data);
         }
 
         return dark;
