@@ -38,6 +38,8 @@ public class AndroidLauncher extends AndroidApplication{
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> CrashSender.log(error));
+
         super.onCreate(savedInstanceState);
         if(doubleScaleTablets && isTablet(this.getContext())){
             Scl.setAddition(0.5f);
@@ -146,7 +148,6 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
-            errorHandler = CrashSender::log;
             stencil = 8;
         }});
         checkFiles(getIntent());
