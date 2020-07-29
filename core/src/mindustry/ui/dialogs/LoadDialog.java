@@ -164,6 +164,13 @@ public class LoadDialog extends BaseDialog{
                 }
             });
         }).fillX().margin(10f);
+
+        buttons.button("$save.clear", Icon.trash, () -> {
+            ui.showConfirm("$confirm", "$save.clear.confirm", () -> {
+                control.saves.deleteAll();
+                setup();
+            });
+        }).fillX().margin(10f);
     }
 
     public void runLoadSave(SaveSlot slot){
