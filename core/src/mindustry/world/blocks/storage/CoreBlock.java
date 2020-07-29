@@ -97,6 +97,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team){
+        if(tile == null) return false;
         CoreEntity core = team.core();
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements))) return false;
@@ -138,7 +139,9 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        if(!canPlaceOn(world.tile(x, y),player.team())){
+        if(world.tile(x, y) == null) return;
+
+        if(!canPlaceOn(world.tile(x, y), player.team())){
 
             drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements) && !state.rules.infiniteResources) ?
                 "bar.corereq" :

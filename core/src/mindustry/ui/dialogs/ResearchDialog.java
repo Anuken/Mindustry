@@ -76,6 +76,9 @@ public class ResearchDialog extends BaseDialog{
                     if(amount < 0){
                         //remove items from each sector's storage, one by one
 
+                        //negate amount since it's being *removed*
+                        amount = -amount;
+
                         //% that gets removed from each sector
                         double percentage = (double)amount / get(item);
                         int[] counter = {amount};
@@ -90,6 +93,9 @@ public class ResearchDialog extends BaseDialog{
                             seq.remove(item, toRemove);
                             counter[0] -= toRemove;
                         });
+
+                        //negate again to display correct number
+                        amount = -amount;
                     }
 
                     super.add(item, amount);
@@ -402,6 +408,9 @@ public class ResearchDialog extends BaseDialog{
             }
 
             node.save();
+
+            //??????
+            Core.scene.act();
             rebuild(shine);
             itemDisplay.rebuild(items, usedShine);
         }

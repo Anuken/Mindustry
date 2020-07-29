@@ -575,23 +575,6 @@ public class UnitTypes implements ContentList{
 
             mineTier = 1;
             mineSpeed = 2.5f;
-
-            //no weapon, mining only
-            /*
-            weapons.add(new Weapon(){{
-                y = 1.5f;
-                x = 0f;
-
-                reload = 40f;
-                ejectEffect = Fx.none;
-                recoil = 2f;
-                shootSound = Sounds.pew;
-                mirror = false;
-
-                bullet = new HealBulletType(5.2f, 10){{
-                    healPercent = 4f;
-                }};
-            }});*/
         }};
 
         poly = new UnitType("poly"){{
