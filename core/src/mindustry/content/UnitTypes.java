@@ -272,6 +272,7 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
+            itemCapacity = 80;
             speed = 0.5f;
             drag = 0.4f;
             hitsize = 10f;
@@ -310,6 +311,7 @@ public class UnitTypes implements ContentList{
         }};
 
         spiroct = new UnitType("spiroct"){{
+            itemCapacity = 200;
             speed = 0.4f;
             drag = 0.4f;
             hitsize = 12f;
