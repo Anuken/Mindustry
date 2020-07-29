@@ -164,6 +164,13 @@ public class Saves{
         return saves;
     }
 
+    public void deleteAll(){
+        saves.clear();
+        for(Fi file : saveDirectory.list()){
+            file.delete();
+        }
+    }
+
     public class SaveSlot{
         public final Fi file;
         boolean requestedPreview;
