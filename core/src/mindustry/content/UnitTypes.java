@@ -872,12 +872,12 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 15f;
             accel = 0.1f;
             itemCapacity = 30;
-            health = 80f;
+            health = 120f;
             engineOffset = 6f;
             hitsize = 8f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
-                reload = 20f;
+                reload = 17f;
                 x = 2.75f;
                 y = 1f;
 
@@ -887,7 +887,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.1f;
+                    tileDamageMultiplier = 0.95f;
                 }};
             }});
         }};
@@ -906,7 +906,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 17f;
             accel = 0.1f;
             itemCapacity = 50;
-            health = 120f;
+            health = 150f;
             engineOffset = 6f;
             hitsize = 9f;
             rotateShooting = false;
@@ -946,7 +946,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 19f;
             accel = 0.11f;
             itemCapacity = 70;
-            health = 160f;
+            health = 190f;
             engineOffset = 6f;
             hitsize = 10f;
 

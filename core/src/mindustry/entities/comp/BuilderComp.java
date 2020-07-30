@@ -200,6 +200,10 @@ abstract class BuilderComp implements Unitc{
         }
     }
 
+    boolean activelyBuilding(){
+        return isBuilding() && updateBuilding;
+    }
+
     /** Return the build request currently active, or the one at the top of the queue.*/
     @Nullable
     BuildPlan buildPlan(){

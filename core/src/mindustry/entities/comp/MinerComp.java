@@ -51,7 +51,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         }
 
         if(mineTile == null || core == null || mineTile.block() != Blocks.air || dst(mineTile.worldx(), mineTile.worldy()) > miningRange
-        || (((Object)this) instanceof Builderc && ((Builderc)(Object)this).isBuilding())
+        || (((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding())
         || mineTile.drop() == null || !acceptsItem(mineTile.drop()) || !canMine(mineTile.drop())){
             mineTile = null;
             mineTimer = 0f;

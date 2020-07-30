@@ -57,6 +57,7 @@ public class Predict{
             ddx += ((Hitboxc)dst).deltaX();
             ddy += ((Hitboxc)dst).deltaY();
         }
+        Log.info("attach dst = @, @ @", dst, ddx, ddy);
         if(src instanceof Hitboxc){
             ddx -= ((Hitboxc)src).deltaX()/(Time.delta);
             ddy -= ((Hitboxc)src).deltaY()/(Time.delta);
