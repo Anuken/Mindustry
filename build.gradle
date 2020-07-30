@@ -324,8 +324,6 @@ project(":tools"){
         implementation arcModule("natives:natives-freetype-desktop")
         implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
-
-        implementation "org.reflections:reflections:0.9.11"
     }
 }
 

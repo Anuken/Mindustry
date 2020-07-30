@@ -395,6 +395,7 @@ public abstract class Turret extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+
             if(revision == 1){
                 reload = read.f();
                 rotation = read.f();
