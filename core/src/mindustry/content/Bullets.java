@@ -37,10 +37,7 @@ public class Bullets implements ContentList{
     waterShot, cryoShot, slagShot, oilShot,
 
     //environment, misc.
-    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag,
-
-    //bombs
-    bombExplosive, bombIncendiary, bombOil;
+    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag;
 
     @Override
     public void load(){
@@ -495,47 +492,5 @@ public class Bullets implements ContentList{
             lifetime = 50f;
             drag = 0.04f;
         }};
-
-        bombExplosive = new BombBulletType(18f, 25f, "shell"){{
-            width = 10f;
-            height = 14f;
-            hitEffect = Fx.flakExplosion;
-            shootEffect = Fx.none;
-            smokeEffect = Fx.none;
-
-            status = StatusEffects.blasted;
-            statusDuration = 60f;
-        }};
-
-        bombIncendiary = new BombBulletType(7f, 10f, "shell"){{
-            width = 8f;
-            height = 12f;
-            hitEffect = Fx.flakExplosion;
-            backColor = Pal.lightOrange;
-            frontColor = Pal.lightishOrange;
-            incendChance = 1f;
-            incendAmount = 3;
-            incendSpread = 10f;
-        }};
-
-        bombOil = new BombBulletType(2f, 3f, "shell"){
-            {
-                width = 8f;
-                height = 12f;
-                hitEffect = Fx.pulverize;
-                backColor = new Color(0x4f4f4fff);
-                frontColor = Color.gray;
-            }
-
-            @Override
-            public void hit(Bullet b, float x, float y){
-                super.hit(b, x, y);
-
-                for(int i = 0; i < 3; i++){
-                    Tile tile = world.tileWorld(x + Mathf.range(8f), y + Mathf.range(8f));
-                    Puddles.deposit(tile, Liquids.oil, 5f);
-                }
-            }
-        };
     }
 }

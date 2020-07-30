@@ -13,8 +13,9 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class WeaponsComp implements Teamc, Posc, Rotc{
+abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     @Import float x, y, rotation, reloadMultiplier;
+    @Import Vec2 vel;
 
     /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
     static final float minAimDst = 18f;
@@ -111,6 +112,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             if(mount.shoot && //must be shooting
                 (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && //check ammo
                 (!weapon.alternate || mount.side == weapon.flipSprite) &&
+                vel.len() >= mount.weapon.minShootVelocity && //check velocity requirements
                 mount.reload <= 0.0001f && //reload has to be 0
                 Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
             ){

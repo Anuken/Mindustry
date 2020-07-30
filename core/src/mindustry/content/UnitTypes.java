@@ -460,6 +460,7 @@ public class UnitTypes implements ContentList{
             armor = 2f;
 
             weapons.add(new Weapon(){{
+                minShootVelocity = 0.75f;
                 x = 3f;
                 shootY = 0f;
                 reload = 12f;
@@ -467,8 +468,17 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 inaccuracy = 15f;
                 ignoreRotation = true;
-                bullet = Bullets.bombExplosive;
                 shootSound = Sounds.none;
+                bullet = new BombBulletType(23f, 25f){{
+                    width = 10f;
+                    height = 14f;
+                    hitEffect = Fx.flakExplosion;
+                    shootEffect = Fx.none;
+                    smokeEffect = Fx.none;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
             }});
         }};
 

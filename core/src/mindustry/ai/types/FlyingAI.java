@@ -33,7 +33,12 @@ public class FlyingAI extends AIController{
         boolean shoot = false;
 
         if(target != null && unit.hasWeapons()){
-            attack(80f);
+            if(unit.type().weapons.first().rotate){
+                moveTo(unit.range() * 0.85f);
+                unit.lookAt(target);
+            }else{
+                attack(80f);
+            }
 
             shoot = unit.inRange(target);
 
