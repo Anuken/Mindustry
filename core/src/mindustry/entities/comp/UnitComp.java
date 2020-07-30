@@ -130,7 +130,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.type = type;
         this.maxHealth = type.health;
         this.drag = type.drag;
-        this.elevation = type.flying ? 1f : 0;
         this.armor = type.armor;
         this.hitSize = type.hitsize;
         this.hovering = type.hovering;

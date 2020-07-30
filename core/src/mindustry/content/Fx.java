@@ -63,15 +63,15 @@ public class Fx{
     }),
 
     unitDespawn = new Effect(100f, e -> {
-        if(!(e.data instanceof Unitc)) return;
+        if(!(e.data instanceof Unit) || e.<Unit>data().type() == null) return;
 
-        Unitc select = (Unitc)e.data;
+        Unit select = e.data();
         float scl = e.fout(Interp.pow2Out);
         float p = Draw.scl;
         Draw.scl *= scl;
 
         mixcol(Pal.accent, 1f);
-        rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90f);
+        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
         reset();
 
         Draw.scl = p;

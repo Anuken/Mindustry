@@ -101,9 +101,10 @@ public class UnitType extends UnlockableContent{
 
     public Unit create(Team team){
         Unit unit = constructor.get();
-        unit.team(team);
+        unit.team = team;
         unit.type(this);
-        unit.ammo(ammoCapacity); //fill up on ammo upon creation
+        unit.ammo = ammoCapacity; //fill up on ammo upon creation
+        unit.elevation = flying ? 1f : 0;
         unit.heal();
         return unit;
     }
