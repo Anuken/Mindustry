@@ -83,6 +83,7 @@ public class LoadingFragment extends Fragment{
         CharSequence realText = nameLabel.getText();
 
         //fallback to the default font if characters are missing
+        //TODO this should happen everywhere
         for(int i = 0; i < realText.length(); i++){
             if(Fonts.tech.getData().getGlyph(realText.charAt(i)) == null){
                 nameLabel.setStyle(Styles.defaultLabel);
