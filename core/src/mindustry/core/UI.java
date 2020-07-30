@@ -85,7 +85,7 @@ public class UI implements ApplicationListener, Loadable{
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
 
-        Core.assets.getAll(BitmapFont.class, new Seq<>()).each(font -> font.setUseIntegerPositions(true));
+        Core.assets.getAll(Font.class, new Seq<>()).each(font -> font.setUseIntegerPositions(true));
         Core.scene = new Scene();
         Core.input.addProcessor(Core.scene);
 
@@ -118,7 +118,7 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public Seq<AssetDescriptor> getDependencies(){
-        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", BitmapFont.class), new AssetDescriptor<>("default", BitmapFont.class), new AssetDescriptor<>("chat", BitmapFont.class));
+        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", Font.class), new AssetDescriptor<>("default", Font.class), new AssetDescriptor<>("chat", Font.class));
     }
 
     @Override

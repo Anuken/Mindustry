@@ -205,7 +205,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         Draw.z(Layer.playerName);
         float z = Drawf.text();
 
-        BitmapFont font = Fonts.def;
+        Font font = Fonts.def;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;

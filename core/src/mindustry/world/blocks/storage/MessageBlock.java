@@ -62,7 +62,7 @@ public class MessageBlock extends Block{
         public void drawSelect(){
             if(renderer.pixelator.enabled()) return;
 
-            BitmapFont font = Fonts.outline;
+            Font font = Fonts.outline;
             GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
             boolean ints = font.usesIntegerPositions();
             font.getData().setScale(1 / 4f / Scl.scl(1f));

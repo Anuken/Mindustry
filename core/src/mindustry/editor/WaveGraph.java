@@ -35,7 +35,7 @@ public class WaveGraph extends Table{
             Lines.precise(true);
 
             GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
-            BitmapFont font = Fonts.outline;
+            Font font = Fonts.outline;
 
             lay.setText(font, "1");
 

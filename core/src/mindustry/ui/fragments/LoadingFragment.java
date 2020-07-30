@@ -14,6 +14,7 @@ public class LoadingFragment extends Fragment{
     private Table table;
     private TextButton button;
     private Bar bar;
+    private Label nameLabel;
 
     @Override
     public void build(Group parent){
@@ -23,10 +24,12 @@ public class LoadingFragment extends Fragment{
             t.add().height(133f).row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
-            t.add("$loading").name("namelabel").pad(10f).style(Styles.techLabel);
+            nameLabel = t.add("$loading").pad(10f).style(Styles.techLabel).get();
             t.row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
+
+            text("$loading");
 
             bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();
             t.row();
@@ -48,8 +51,8 @@ public class LoadingFragment extends Fragment{
     }
 
     public void setText(String text){
-        table.<Label>find("namelabel").setText(text);
-        table.<Label>find("namelabel").setColor(Pal.accent);
+        text(text);
+        nameLabel.setColor(Pal.accent);
     }
 
     public void show(){
@@ -57,11 +60,11 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(String text){
-        table.<Label>find("namelabel").setColor(Color.white);
+        nameLabel.setColor(Color.white);
         bar.visible = false;
         table.clearActions();
         table.touchable = Touchable.enabled;
-        table.<Label>find("namelabel").setText(text);
+        text(text);
         table.visible = true;
         table.color.a = 1f;
         table.toFront();
@@ -72,5 +75,20 @@ public class LoadingFragment extends Fragment{
         table.toFront();
         table.touchable = Touchable.disabled;
         table.actions(Actions.fadeOut(0.5f), Actions.visible(false));
+    }
+
+    private void text(String text){
+        nameLabel.setText(text);
+
+        CharSequence realText = nameLabel.getText();
+
+        //fallback to the default font if characters are missing
+        for(int i = 0; i < realText.length(); i++){
+            if(Fonts.tech.getData().getGlyph(realText.charAt(i)) == null){
+                nameLabel.setStyle(Styles.defaultLabel);
+                return;
+            }
+        }
+        nameLabel.setStyle(Styles.techLabel);
     }
 }
