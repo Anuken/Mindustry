@@ -17,7 +17,7 @@ public class SectorPresets implements ContentList{
     @Override
     public void load(){
 
-        groundZero = new SectorPreset("groundZero", starter, 15){{
+        groundZero = new SectorPreset("groundZero", serpulo, 15){{
             alwaysUnlocked = true;
             conditionWave = 5;
             launchPeriod = 5;
@@ -26,7 +26,7 @@ public class SectorPresets implements ContentList{
             };
         }};
 
-        saltFlats = new SectorPreset("saltFlats", starter, 101){{
+        saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
             conditionWave = 10;
             launchPeriod = 5;
             requirements = with(
@@ -38,7 +38,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        frozenForest = new SectorPreset("frozenForest", starter, 86){{
+        frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
             conditionWave = 10;
             requirements = with(
             new SectorWave(groundZero, 10),
@@ -47,7 +47,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        craters = new SectorPreset("craters", starter, 18){{
+        craters = new SectorPreset("craters", serpulo, 18){{
             conditionWave = 10;
             requirements = with(
             new SectorWave(frozenForest, 10),
@@ -56,7 +56,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        ruinousShores = new SectorPreset("ruinousShores", starter, 19){{
+        ruinousShores = new SectorPreset("ruinousShores", serpulo, 19){{
             conditionWave = 20;
             launchPeriod = 20;
             requirements = with(
@@ -69,7 +69,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        stainedMountains = new SectorPreset("stainedMountains", starter, 20){{
+        stainedMountains = new SectorPreset("stainedMountains", serpulo, 20){{
             conditionWave = 10;
             launchPeriod = 10;
             requirements = with(
@@ -80,7 +80,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        fungalPass = new SectorPreset("fungalPass", starter, 21){{
+        fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
             requirements = with(
             new SectorWave(stainedMountains, 15),
             //new Unlock(Blocks.daggerFactory),
@@ -90,7 +90,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        overgrowth = new SectorPreset("overgrowth", starter, 22){{
+        overgrowth = new SectorPreset("overgrowth", serpulo, 22){{
             conditionWave = 12;
             launchPeriod = 4;
             requirements = with(
@@ -103,7 +103,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        tarFields = new SectorPreset("tarFields", starter, 23){{
+        tarFields = new SectorPreset("tarFields", serpulo, 23){{
             conditionWave = 15;
             launchPeriod = 10;
             requirements = with(
@@ -114,7 +114,7 @@ public class SectorPresets implements ContentList{
             );
         }};
 
-        desolateRift = new SectorPreset("desolateRift", starter, 123){{
+        desolateRift = new SectorPreset("desolateRift", serpulo, 123){{
             conditionWave = 3;
             launchPeriod = 2;
             requirements = with(
@@ -125,7 +125,7 @@ public class SectorPresets implements ContentList{
         }};
 
 
-        nuclearComplex = new SectorPreset("nuclearComplex", starter, 130){{
+        nuclearComplex = new SectorPreset("nuclearComplex", serpulo, 130){{
             conditionWave = 30;
             launchPeriod = 15;
             requirements = with(

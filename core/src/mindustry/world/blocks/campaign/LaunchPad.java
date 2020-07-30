@@ -174,7 +174,6 @@ public class LaunchPad extends Block{
 
         @Override
         public void remove(){
-
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam && state.secinfo.origin != null){
                 ItemSeq dest = state.secinfo.origin.getExtraItems();
