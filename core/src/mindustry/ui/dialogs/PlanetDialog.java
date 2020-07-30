@@ -84,7 +84,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public Dialog show(){
         mode = look;
         selected = hovered = launchSector = null;
-        launching= false;
+        launching = false;
+        if(planets.planet.getLastSector() != null){
+            lookAt(planets.planet.getLastSector());
+        }
         return super.show();
     }
 
@@ -95,7 +98,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         launching = false;
 
         //update view to sector
-        planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
+        lookAt(sector);
         zoom = 1f;
         planets.zoom = 2f;
         selectAlpha = 0f;
@@ -105,6 +108,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         mode = launch;
 
         super.show();
+    }
+
+    private void lookAt(Sector sector){
+        planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
     }
 
     boolean canLaunch(Sector sector){

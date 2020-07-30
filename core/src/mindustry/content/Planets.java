@@ -36,6 +36,7 @@ public class Planets implements ContentList{
             generator = new TODOPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             atmosphereColor = Color.valueOf("3c1b8f");
+            startSector = 15;
         }};
     }
 }
