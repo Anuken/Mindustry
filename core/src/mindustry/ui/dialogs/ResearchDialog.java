@@ -76,7 +76,7 @@ public class ResearchDialog extends BaseDialog{
                     if(amount < 0){
                         //remove items from each sector's storage, one by one
 
-                        //negate amount since it's being *removed*
+                        //negate amount since it's being *removed* - this makes it positive
                         amount = -amount;
 
                         //% that gets removed from each sector
@@ -91,6 +91,7 @@ public class ResearchDialog extends BaseDialog{
                             //actually remove it from the sector
                             sector.removeItem(item, toRemove);
                             seq.remove(item, toRemove);
+
                             counter[0] -= toRemove;
                         });
 
@@ -513,9 +514,7 @@ public class ResearchDialog extends BaseDialog{
                                         list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
                                         list.add(req.item.localizedName).color(Color.lightGray);
                                         Label label = list.label(() -> " " +
-                                            (player.team().core() != null ?
-                                                UI.formatAmount(Math.min(player.team().core().items.get(req.item), reqAmount)) + " / " :
-                                                "")
+                                                UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "
                                             + UI.formatAmount(reqAmount)).get();
 
                                         Color targetColor = items.has(req.item) ? Color.lightGray : Color.scarlet;

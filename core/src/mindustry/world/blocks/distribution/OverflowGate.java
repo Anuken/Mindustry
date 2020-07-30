@@ -128,12 +128,15 @@ public class OverflowGate extends Block{
 
         @Override
         public void write(Writes write){
+            super.write(write);
+
             write.i(lastInput == null ? -1 : lastInput.pos());
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+
             if(revision == 1){
                 new DirectionalItemBuffer(25).read(read);
             }else if(revision == 3){

@@ -61,6 +61,7 @@ public class HudFragment extends Fragment{
         //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
+            coreItems.clear();
         });
 
         Events.on(TurnEvent.class, e -> {
@@ -216,7 +217,7 @@ public class HudFragment extends Fragment{
         //core items
         parent.fill(t -> {
             t.top().add(coreItems);
-            t.visible(() -> Core.settings.getBool("coreitems") && !mobile);
+            t.visible(() -> Core.settings.getBool("coreitems") && !mobile && !state.isPaused());
         });
 
         //spawner warning

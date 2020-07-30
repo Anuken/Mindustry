@@ -134,6 +134,8 @@ public class ItemBridge extends Block{
 
         @Override
         public void playerPlaced(){
+            super.playerPlaced();
+
             Tile link = findLink(tile.x, tile.y);
             if(linkValid(tile, link)){
                 link.build.configure(tile.pos());
