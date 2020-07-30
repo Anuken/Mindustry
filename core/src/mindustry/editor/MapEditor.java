@@ -137,14 +137,11 @@ public class MapEditor{
                 if(isFloor){
                     tile.setFloor(drawBlock.asFloor());
                 }else{
-                    tile.setBlock(drawBlock);
-                    if(drawBlock.synthetic()){
-                        tile.setTeam(drawTeam);
-                    }
                     if(drawBlock.rotate && tile.build != null && tile.build.rotation != rotation){
                         addTileOp(TileOp.get(tile.x, tile.y, (byte)OpType.rotation.ordinal(), (byte)rotation));
-                        tile.build.rotation = (byte)rotation;
                     }
+
+                    tile.setBlock(drawBlock, drawTeam, rotation);
                 }
             };
 
