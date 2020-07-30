@@ -104,7 +104,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
 
                 Core.app.exit();
-            }));
+            })).marginLeft(4);
 
             t.row();
 
@@ -112,7 +112,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 ui.showConfirm("$confirm", "$settings.clearsaves.confirm", () -> {
                     control.saves.deleteAll();
                 });
-            });
+            }).marginLeft(4);
 
             t.row();
 
@@ -136,7 +136,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                         }
                     });
                 }
-            });
+            }).marginLeft(4);
 
             t.row();
 
@@ -154,11 +154,11 @@ public class SettingsMenuDialog extends SettingsDialog{
                         ui.showErrorMessage("$data.invalid");
                     }
                 }
-            })));
+            }))).marginLeft(4);
 
             if(!mobile){
                 t.row();
-                t.button("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
+                t.button("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath())).marginLeft(4);
             }
         });
 
