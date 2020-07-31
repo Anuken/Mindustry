@@ -143,7 +143,7 @@ public class ModsDialog extends BaseDialog{
 
                     t.button("$mod.featured.title", Icon.github, bstyle, () -> {
                         try {
-                            //Keep this until mods work
+                            //Remove this until mods work
                             ui.showErrorMessage("This feature doesnt work completely due to mods not working in v6. Wait for this to be fixed. If you decide to use it anyways, mods will not let you enter the game.");
                             //Until here
                             dialog.hide();
@@ -162,7 +162,7 @@ public class ModsDialog extends BaseDialog{
                                             btn.margin(12f);
                                             btn.table(con -> {
                                                 con.left();
-                                                con.add("[lightgray]Name:[] " + modsbrolist.name + "\n[lightgray]Author:[] " + modsbrolist.author + "\n[]Stars: " + modsbrolist.stars + "\n[]" + modsbrolist.description).wrap().width(380f).growX();
+                                                con.add("[lightgray]Name:[] " + modsbrolist.name + "\n[lightgray]Author:[] " + modsbrolist.author + "\n[]Stars: " + modsbrolist.stars + "\n" + modsbrolist.description).wrap().width(380f).growX();
                                                 con.add().growX();
                                             }).fillY();
                                         }, Styles.clearPartialt, () -> {
@@ -173,7 +173,7 @@ public class ModsDialog extends BaseDialog{
                                                         ui.loadfrag.hide();
                                                     }else{
                                                         try{
-                                                            Fi file = tmpDirectory.child(modsbrolist.repo.replace("/", "") + ".zip");
+                                                            Fi file = tmpDirectory.child((modsbrolist.repo).replace("/", "") + ".zip");
                                                             Streams.copy(result.getResultAsStream(), file.write(false));
                                                             mods.importMod(file);
                                                             file.delete();
