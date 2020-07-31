@@ -422,7 +422,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         lastSchematic = schem;
     }
 
-
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
         if(state.isMenu()) return false;
@@ -497,9 +496,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Tile tile = tileAt(screenX, screenY);
 
-            if(tile == null || tile.build == null) return false;
-
-            tryDropItems(tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+            tryDropItems(tile == null ? null : tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
@@ -755,7 +752,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 shiftDeltaX %= tilesize;
                 shiftDeltaY %= tilesize;
             }
-        }else{
+        }else if(!renderer.isLanding()){
             //pan player
             Core.camera.position.x -= deltaX;
             Core.camera.position.y -= deltaY;

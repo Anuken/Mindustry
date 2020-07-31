@@ -87,6 +87,10 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    public boolean isLanding(){
+        return landTime > 0;
+    }
+
     public float weatherAlpha(){
         return weatherAlpha;
     }

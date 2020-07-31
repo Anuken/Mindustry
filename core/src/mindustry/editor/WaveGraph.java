@@ -173,22 +173,25 @@ public class WaveGraph extends Table{
 
         colors.clear();
         colors.left();
-        for(UnitType type : used){
-            colors.button(b -> {
-                Color tcolor = color(type).cpy();
-                b.image().size(32f).update(i -> i.setColor(b.isChecked() ? Tmp.c1.set(tcolor).mul(0.5f) : tcolor)).get().act(1);
-                b.image(type.icon(Cicon.medium)).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
-                b.margin(0f);
-            }, Styles.fullTogglet, () -> {
-                if(!hidden.add(type)){
-                    hidden.remove(type);
-                }
+        colors.pane(t -> {
+            t.left();
+            for(UnitType type : used){
+                t.button(b -> {
+                    Color tcolor = color(type).cpy();
+                    b.image().size(32f).update(i -> i.setColor(b.isChecked() ? Tmp.c1.set(tcolor).mul(0.5f) : tcolor)).get().act(1);
+                    b.image(type.icon(Cicon.medium)).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
+                    b.margin(0f);
+                }, Styles.fullTogglet, () -> {
+                    if(!hidden.add(type)){
+                        hidden.remove(type);
+                    }
 
-                used.clear();
-                used.addAll(usedCopy);
-                for(UnitType o : hidden) used.remove(o);
-            }).update(b -> b.setChecked(hidden.contains(type)));
-        }
+                    used.clear();
+                    used.addAll(usedCopy);
+                    for(UnitType o : hidden) used.remove(o);
+                }).update(b -> b.setChecked(hidden.contains(type)));
+            }
+        }).get().setScrollingDisabled(false, true);
 
         for(UnitType type : hidden){
             used.remove(type);
