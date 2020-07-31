@@ -120,8 +120,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean canLaunch(Sector sector){
         return mode == launch &&
             (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
-            //TODO completely untested
-            || (sector.preset != null && sector.preset.unlocked() && TechTree.get(sector.preset) != null && TechTree.get(sector.preset).objectives.contains(r -> r.zone() != null && r.zone() == sector.preset))); //is an unlocked preset
+            || (sector.preset != null && sector.preset.unlocked() && TechTree.get(sector.preset) != null && TechTree.get(sector.preset).objectives.contains(r -> r.zone() != null && r.zone() == launchSector.preset))); //is an unlocked preset
     }
 
     @Override

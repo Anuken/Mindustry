@@ -89,7 +89,7 @@ public class Sector{
      * Only sectors adjacent to non-wave sectors can be landed on.
      * TODO also preset sectors*/
     public boolean unlocked(){
-        return hasBase() || Structs.contains(tile.tiles, p -> planet.getSector(p).isCaptured()) || (preset != null && preset.unlocked());
+        return hasBase();
     }
 
     /** @return whether the player has a base here. */

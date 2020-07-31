@@ -36,7 +36,8 @@ public class PausedDialog extends BaseDialog{
         if(!mobile){
             //TODO localize
             cont.label(() -> state.getSector() == null ? "" :
-            "[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining())
+            ("[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining() +
+                (state.rules.winWave > 0 && !state.getSector().isCaptured() ? "\n[lightgray]Reach wave[accent] " + state.rules.winWave + "[] to capture" : "")))
             .visible(() -> state.getSector() != null).colspan(2);
             cont.row();
 

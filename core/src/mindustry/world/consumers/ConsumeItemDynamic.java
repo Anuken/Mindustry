@@ -31,17 +31,21 @@ public class ConsumeItemDynamic extends Consume{
     public void build(Building tile, Table table){
         ItemStack[][] current = {items.get(tile)};
 
-        table.update(() -> {
-            if(current[0] != items.get(tile)){
-                rebuild(tile, table);
-                current[0] = items.get(tile);
-            }
-        });
+        table.table(cont -> {
+            table.update(() -> {
+                if(current[0] != items.get(tile)){
+                    rebuild(tile, cont);
+                    current[0] = items.get(tile);
+                }
+            });
 
-        rebuild(tile, table);
+            rebuild(tile, cont);
+        });
     }
 
     private void rebuild(Building tile, Table table){
+        table.clear();
+
         for(ItemStack stack : items.get(tile)){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
             () -> tile.items != null && tile.items.has(stack.item, stack.amount))).size(8 * 4).padRight(6 * Mathf.digits(stack.amount));

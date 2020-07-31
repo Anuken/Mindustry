@@ -112,7 +112,7 @@ public class TechTree implements ContentList{
                 });
 
                 node(Items.coal, with(Items.lead, 3000), () -> {
-                    node(Items.graphite, with(Items.coal, 3000), () -> {
+                    node(Items.graphite, with(Items.coal, 1000), () -> {
                         node(graphitePress, () -> {
                             node(Items.titanium, with(Items.graphite, 6000, Items.copper, 10000, Items.lead, 10000), () -> {
                                 node(pneumaticDrill, () -> {

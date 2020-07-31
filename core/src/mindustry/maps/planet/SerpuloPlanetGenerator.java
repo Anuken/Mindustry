@@ -281,15 +281,17 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
+        float difficulty = sector.baseCoverage;
+
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
 
             state.rules.attackMode = true;
+        }else{
+            state.rules.winWave = 15 * (int)Math.max(difficulty, 1);
         }
 
         state.rules.waves = true;
-
-        float difficulty = sector.baseCoverage;
 
         //scale up the spawning base on difficulty (this is just for testing)
         for(SpawnGroup group : state.rules.spawns){
