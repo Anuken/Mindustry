@@ -160,7 +160,7 @@ public class PlacementFragment extends Fragment{
                         blockSelectEnd = true;
                     }
                     Seq<Block> blocks = getByCategory(currentCategory);
-                    if(!unlocked(blocks.get(i))) return true;
+                    if(i >= blocks.size || !unlocked(blocks.get(i))) return true;
                     input.block = (i < blocks.size) ? blocks.get(i) : null;
                     selectedBlocks.put(currentCategory, input.block);
                     blockSelectSeqMillis = Time.millis();

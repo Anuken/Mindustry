@@ -171,7 +171,7 @@ public class ChatFragment extends Table{
         String message = chatfield.getText();
         clearChatInput();
 
-        if(message.replaceAll(" ", "").isEmpty()) return;
+        if(message.replace(" ", "").isEmpty()) return;
 
         history.insert(1, message);
 

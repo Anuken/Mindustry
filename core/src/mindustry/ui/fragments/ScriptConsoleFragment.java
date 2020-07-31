@@ -159,7 +159,7 @@ public class ScriptConsoleFragment extends Table{
         String message = chatfield.getText();
         clearChatInput();
 
-        if(message.replaceAll(" ", "").isEmpty()) return;
+        if(message.replace(" ", "").isEmpty()) return;
 
         //special case for 'clear' command
         if(message.equals("clear")){
