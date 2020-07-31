@@ -191,7 +191,7 @@ public class ModsDialog extends BaseDialog{
                                                     }
                                                 }, t2 -> Core.app.post(() -> modError(t2)));
                                             }, t2 -> Core.app.post(() -> modError(t2)));
-                                        }).width(380f).margin(8f).growX().left().fillY();
+                                        }).width(380f).margin(20f).growX().left().fillY();
                                         tablebrow.row();
                                     }
                                 }, error -> {
