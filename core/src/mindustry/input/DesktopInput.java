@@ -330,20 +330,20 @@ public class DesktopInput extends InputHandler{
 
         table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
-        });
+        }).tooltip("Schematics");
 
         table.button(Icon.tree, Styles.clearPartiali, () -> {
             ui.research.show();
-        }).visible(() -> state.isCampaign());
+        }).visible(() -> state.isCampaign()).tooltip("Research");
 
         table.button(Icon.map, Styles.clearPartiali, () -> {
             ui.planet.show();
-        }).visible(() -> state.isCampaign());
+        }).visible(() -> state.isCampaign()).tooltip("Planet Map");
 
         table.button(Icon.up, Styles.clearPartiali, () -> {
             ui.planet.show(state.getSector(), player.team().core());
         }).visible(() -> state.isCampaign())
-        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements));
+        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)).tooltip("Launch Core");
     }
 
     void pollInput(){
