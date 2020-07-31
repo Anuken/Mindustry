@@ -44,6 +44,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public PlanetDialog(){
         super("", Styles.fullDialog);
 
+        shouldPause = true;
+
         getCell(buttons).padBottom(-4);
         buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
 

@@ -65,24 +65,6 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public String getUUID(){
-                try{
-                    String s = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
-                    int len = s.length();
-                    byte[] data = new byte[len / 2];
-                    for(int i = 0; i < len; i += 2){
-                        data[i / 2] = (byte)((Character.digit(s.charAt(i), 16) << 4)
-                        + Character.digit(s.charAt(i + 1), 16));
-                    }
-                    String result = new String(Base64Coder.encode(data));
-                    if(result.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
-                    return result;
-                }catch(Exception e){
-                    return super.getUUID();
-                }
-            }
-
-            @Override
             public rhino.Context getScriptContext(){
                 return AndroidRhinoContext.enter(getContext().getCacheDir());
             }

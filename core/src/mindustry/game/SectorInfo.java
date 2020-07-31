@@ -79,6 +79,8 @@ public class SectorInfo{
 
         //update sector's internal time spent counter1
         state.rules.sector.setTimeSpent(internalTimeSpent);
+
+        Log.info(production);
     }
 
     /** Update averages of various stats, updates some special sector logic.
@@ -160,5 +162,9 @@ public class SectorInfo{
 
         /** mean in terms of items produced per refresh rate (currently, per second) */
         public float mean;
+
+        public String toString(){
+            return mean + "";
+        }
     }
 }
