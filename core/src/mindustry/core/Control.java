@@ -434,6 +434,7 @@ public class Control implements ApplicationListener, Loadable{
                 ui.showStartupInfo("[accent]v6[] is currently in [accent]pre-alpha[].\n" +
                 "[lightgray]This means:[]\n" +
                 "- Content is missing\n" +
+                "- [scarlet]Mobile[] is not supported.\n" +
                 "- Most [scarlet]Unit AI[] does not work\n" +
                 "- Many units are [scarlet]missing[] or unfinished\n" +
                 "- The campaign is completely unfinished\n" +
