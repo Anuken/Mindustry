@@ -152,47 +152,49 @@ public class ModsDialog extends BaseDialog{
                                 tablebrow.margin(10f).top();
                                 Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
                                     if (response.getStatus() != HttpStatus.OK) {
-                                        return;
-                                    }
-                                    Json json = new Json();
-                                    Seq<ModListing> listings = json.fromJson(Seq.class, ModListing.class, response.getResultAsString());
-                                    for (ModListing modsbrolist : listings) {
-                                        tablebrow.button(btn -> {
-                                            btn.top().left();
-                                            btn.margin(12f);
-                                            btn.table(con -> {
-                                                con.left();
-                                                con.add("[lightgray]Name:[] " + modsbrolist.name + "\n[lightgray]Author:[] " + modsbrolist.author + "\n[]Stars: " + modsbrolist.stars + "\n" + modsbrolist.description).wrap().width(380f).growX();
-                                                con.add().growX();
-                                            }).fillY();
-                                        }, Styles.clearPartialt, () -> {
-                                            Core.net.httpGet("http://api.github.com/repos/" + modsbrolist.repo + "/zipball/master", loc -> {
-                                                Core.net.httpGet(loc.getHeader("Location"), result -> {
-                                                    if(result.getStatus() != HttpStatus.OK){
-                                                        ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
-                                                        ui.loadfrag.hide();
-                                                    }else{
-                                                        try{
-                                                            Fi file = tmpDirectory.child((modsbrolist.repo).replace("/", "") + ".zip");
-                                                            Streams.copy(result.getResultAsStream(), file.write(false));
-                                                            mods.importMod(file);
-                                                            file.delete();
-                                                            Core.app.post(() -> {
-                                                                try{
-                                                                    setup();
-                                                                    ui.loadfrag.hide();
-                                                                }catch(Throwable e){
-                                                                    ui.showException(e);
-                                                                }
-                                                            });
-                                                        }catch(Throwable e){
-                                                            modError(e);
+                                        ui.showErrorMessage(Core.bundle.format("connectfail", response.getStatus()));
+                                    } else {
+                                        Json json = new Json();
+                                        Seq<ModListing> listings = json.fromJson(Seq.class, ModListing.class, response.getResultAsString());
+                                        for (ModListing modsbrolist : listings) {
+                                            tablebrow.button(btn -> {
+                                                btn.top().left();
+                                                btn.margin(12f);
+                                                btn.table(con -> {
+                                                    con.left();
+                                                    con.add("[lightgray]Name:[] " + modsbrolist.name + "\n[lightgray]Author:[] " + modsbrolist.author + "\n[]Stars: " + modsbrolist.stars + "\n" + modsbrolist.description).wrap().width(380f).growX().get().setWrap(true);
+                                                    con.add().growX();
+                                                }).fillY();
+                                            }, Styles.clearPartialt, () -> {
+                                                ui.loadfrag.show();
+                                                Core.net.httpGet("http://api.github.com/repos/" + modsbrolist.repo + "/zipball/master", loc -> {
+                                                    Core.net.httpGet(loc.getHeader("Location"), result -> {
+                                                        if (result.getStatus() != HttpStatus.OK) {
+                                                            ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                                                            ui.loadfrag.hide();
+                                                        } else {
+                                                            try {
+                                                                Fi file = tmpDirectory.child((modsbrolist.repo).replace("/", "") + ".zip");
+                                                                Streams.copy(result.getResultAsStream(), file.write(false));
+                                                                mods.importMod(file);
+                                                                file.delete();
+                                                                Core.app.post(() -> {
+                                                                    try {
+                                                                        setup();
+                                                                        ui.loadfrag.hide();
+                                                                    } catch (Throwable e) {
+                                                                        ui.showException(e);
+                                                                    }
+                                                                });
+                                                            } catch (Throwable e) {
+                                                                modError(e);
+                                                            }
                                                         }
-                                                    }
+                                                    }, t2 -> Core.app.post(() -> modError(t2)));
                                                 }, t2 -> Core.app.post(() -> modError(t2)));
-                                            }, t2 -> Core.app.post(() -> modError(t2)));
-                                        }).width(380f).margin(15f).growX().left().fillY();
-                                        tablebrow.row();
+                                            }).width(380f).margin(15f).growX().left().fillY();
+                                            tablebrow.row();
+                                        }
                                     }
                                 }, error -> {
                                     ui.showErrorMessage(error.toString());
@@ -201,7 +203,9 @@ public class ModsDialog extends BaseDialog{
                             });
                             dialog2.addCloseButton();
                             dialog2.show();
-                        }catch (Exception ignored){ }
+                        }catch (Exception e){
+                            //ignore
+                        }
                     }).margin(12f);
 
 
