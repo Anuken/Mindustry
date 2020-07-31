@@ -16,9 +16,7 @@ public class SectorPreset extends UnlockableContent{
     public @NonNull Sector sector;
 
     public int captureWave = 0;
-    public Cons<Rules> rules = rules -> {
-        rules.winWave = captureWave;
-    };
+    public Cons<Rules> rules = rules -> rules.winWave = captureWave;
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);
