@@ -13,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -120,7 +121,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         return mode == launch &&
             (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
             //TODO completely untested
-            || (sector.preset != null && sector.preset.unlocked() && sector.preset.requirements.contains(r -> r.zone() != null && r.zone() == sector.preset))); //is an unlocked preset
+            || (sector.preset != null && sector.preset.unlocked() && TechTree.get(sector.preset) != null && TechTree.get(sector.preset).objectives.contains(r -> r.zone() != null && r.zone() == sector.preset))); //is an unlocked preset
     }
 
     @Override

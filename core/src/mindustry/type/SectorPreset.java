@@ -4,11 +4,8 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.ctype.*;
-import mindustry.game.EventType.*;
-import mindustry.game.Objectives.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.generators.*;
@@ -20,7 +17,6 @@ public class SectorPreset extends UnlockableContent{
     public @NonNull FileMapGenerator generator;
     public @NonNull Planet planet;
     public @NonNull Sector sector;
-    public Seq<Objective> requirements = new Seq<>();
 
     public Cons<Rules> rules = rules -> {};
     public int conditionWave = Integer.MAX_VALUE;
@@ -43,26 +39,9 @@ public class SectorPreset extends UnlockableContent{
         return metCondition() && wave % launchPeriod == 0;
     }
 
-    public boolean canUnlock(){
-        return unlocked() || !requirements.contains(r -> !r.complete());
-    }
-
     public boolean hasLaunched(){
         //TODO implement
         return Core.settings.getBool(name + "-launched", false);
-    }
-
-    public void updateObjectives(Runnable closure){
-        Seq<SectorObjective> incomplete = content.sectors()
-            .flatMap(z -> z.requirements)
-            .filter(o -> o.zone() == this && !o.complete()).as();
-
-        closure.run();
-        for(SectorObjective objective : incomplete){
-            if(objective.complete()){
-                Events.fire(new ZoneRequireCompleteEvent(objective.preset, content.sectors().find(z -> z.requirements.contains(objective)), objective));
-            }
-        }
     }
 
     public int bestWave(){

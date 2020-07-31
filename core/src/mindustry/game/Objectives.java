@@ -50,6 +50,25 @@ public class Objectives{
         }
     }
 
+    public static class SectorComplete extends SectorObjective{
+
+        public SectorComplete(SectorPreset zone){
+            this.preset = zone;
+        }
+
+        protected SectorComplete(){}
+
+        @Override
+        public boolean complete(){
+            return preset.sector.isCaptured();
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.capture",preset.localizedName);
+        }
+    }
+
     public static class Launched extends SectorObjective{
 
         public Launched(SectorPreset zone){
