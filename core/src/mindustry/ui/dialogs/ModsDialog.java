@@ -3,17 +3,22 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.Net.*;
 import arc.files.*;
+import arc.func.Cons;
+import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.TextButton.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.serialization.Json;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.mod.ModListing;
 import mindustry.mod.Mods.*;
 import mindustry.ui.*;
 
 import java.io.*;
+
 
 import static mindustry.Vars.*;
 
@@ -133,11 +138,78 @@ public class ModsDialog extends BaseDialog{
                             }, t2 -> Core.app.post(() -> modError(t2)));
                         });
                     }).margin(12f);
-                });
 
+                    t.row();
+
+                    t.button("$mod.featured.title", Icon.github, bstyle, () -> {
+                        try {
+                            //Keep this until mods work
+                            ui.showErrorMessage("This feature doesnt work completely due to mods not working in v6. Wait for this to be fixed. If you decide to use it anyways, mods will not let you enter the game.");
+                            //Until here
+                            dialog.hide();
+                            BaseDialog dialog2 = new BaseDialog("$mod.featured.dialog.title");
+                            dialog2.cont.pane(tablebrow -> {
+                                tablebrow.margin(10f).top();
+                                Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
+                                    if (response.getStatus() != HttpStatus.OK) {
+                                        return;
+                                    }
+                                    Json json = new Json();
+                                    Seq<ModListing> listings = json.fromJson(Seq.class, ModListing.class, response.getResultAsString());
+                                    for (ModListing modsbrolist : listings) {
+                                        tablebrow.button(btn -> {
+                                            btn.top().left();
+                                            btn.margin(12f);
+                                            btn.table(con -> {
+                                                con.left();
+                                                con.add("[lightgray]Name:[] " + modsbrolist.name + "\n[lightgray]Author:[] " + modsbrolist.author + "\n[]Stars: " + modsbrolist.stars + "\n[]" + modsbrolist.description).wrap().width(380f).growX();
+                                                con.add().growX();
+                                            }).fillY();
+                                        }, Styles.clearPartialt, () -> {
+                                            Core.net.httpGet("http://api.github.com/repos/" + modsbrolist.repo + "/zipball/master", loc -> {
+                                                Core.net.httpGet(loc.getHeader("Location"), result -> {
+                                                    if(result.getStatus() != HttpStatus.OK){
+                                                        ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                                                        ui.loadfrag.hide();
+                                                    }else{
+                                                        try{
+                                                            Fi file = tmpDirectory.child(modsbrolist.repo.replace("/", "") + ".zip");
+                                                            Streams.copy(result.getResultAsStream(), file.write(false));
+                                                            mods.importMod(file);
+                                                            file.delete();
+                                                            Core.app.post(() -> {
+                                                                try{
+                                                                    setup();
+                                                                    ui.loadfrag.hide();
+                                                                }catch(Throwable e){
+                                                                    ui.showException(e);
+                                                                }
+                                                            });
+                                                        }catch(Throwable e){
+                                                            modError(e);
+                                                        }
+                                                    }
+                                                }, t2 -> Core.app.post(() -> modError(t2)));
+                                            }, t2 -> Core.app.post(() -> modError(t2)));
+                                        }).width(380f).growX().left().fillY();
+                                        tablebrow.row();
+                                    }
+                                }, error -> {
+                                    ui.showErrorMessage(error.toString());
+                                });
+
+                            });
+                            dialog2.addCloseButton();
+                            dialog2.show();
+                        }catch (Exception ignored){ }
+                    }).margin(12f);
+
+
+                });
                 dialog.addCloseButton();
 
                 dialog.show();
+
             }).margin(margin);
 
             if(!mobile){
