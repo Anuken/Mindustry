@@ -79,8 +79,6 @@ public class SectorInfo{
 
         //update sector's internal time spent counter1
         state.rules.sector.setTimeSpent(internalTimeSpent);
-
-        Log.info(production);
     }
 
     /** Update averages of various stats, updates some special sector logic.

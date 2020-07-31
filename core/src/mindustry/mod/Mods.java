@@ -598,6 +598,7 @@ public class Mods implements Loadable{
         }
 
         ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
+        meta.cleanup();
         String camelized = meta.name.replace(" ", "");
         String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
         String baseName = meta.name.toLowerCase().replace(" ", "-");
@@ -782,6 +783,13 @@ public class Mods implements Loadable{
 
         public String displayName(){
             return displayName == null ? name : displayName;
+        }
+
+        //removes all colors
+        public void cleanup(){
+            if(displayName != null) displayName = Strings.stripColors(displayName);
+            if(author != null) author = Strings.stripColors(author);
+            if(description != null) description = Strings.stripColors(description);
         }
     }
 
