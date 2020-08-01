@@ -4,6 +4,7 @@ import arc.*;
 import arc.Net.*;
 import arc.files.*;
 import arc.func.Cons;
+import arc.scene.ui.TextField;
 import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -23,7 +24,8 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class ModsDialog extends BaseDialog{
-
+    private String searchtxt = "";
+    private TextField searchBar;
     public ModsDialog(){
         super("$mods");
         addCloseButton();
@@ -56,6 +58,7 @@ public class ModsDialog extends BaseDialog{
     }
 
     void setup(){
+        Runnable[] rebuildBrowser = {null};
         float h = 110f;
         float w = mobile ? 430f : 524f;
 
@@ -143,66 +146,86 @@ public class ModsDialog extends BaseDialog{
 
                     t.button("$mod.featured.title", Icon.star, bstyle, () -> {
                         try {
-                            //Keep this until mods work
-                            ui.showErrorMessage("This feature doesnt work completely due to mods not working in v6. Wait for this to be fixed. If you decide to use it anyways, mods will not let you enter the game.");
-                            //Until here
                             dialog.hide();
                             BaseDialog dialog2 = new BaseDialog("$mod.featured.dialog.title");
+                            dialog2.cont.table(table -> {
+                                table.left();
+                                table.image(Icon.zoom);
+                                searchBar = table.field(searchtxt, res -> {
+                                    searchtxt = res;
+                                    rebuildBrowser[0].run();
+                                }).growX().get();
+                            }).fillX().padBottom(4);
+
+                            dialog2.cont.row();
+
                             dialog2.cont.pane(tablebrow -> {
                                 tablebrow.margin(10f).top();
-                                Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
-                                    if (response.getStatus() != HttpStatus.OK) {
-                                        ui.showErrorMessage(Core.bundle.format("connectfail", response.getStatus()));
-                                    } else {
-                                        Json json = new Json();
-                                        Seq<ModListing> listings = json.fromJson(Seq.class, ModListing.class, response.getResultAsString());
-                                        for (ModListing modsbrolist : listings) {
-                                            tablebrow.button(btn -> {
-                                                btn.top().left();
-                                                btn.margin(12f);
-                                                btn.table(con -> {
-                                                    con.left();
-                                                    con.add("[lightgray]Name:[] " + modsbrolist.name + "\n[lightgray]Author:[] " + modsbrolist.author + "\n[]Stars: " + modsbrolist.stars + "\n" + modsbrolist.description).wrap().width(380f).growX().get().setWrap(true);
-                                                    con.add().growX();
-                                                }).fillY();
-                                            }, Styles.clearPartialt, () -> {
-                                                ui.loadfrag.show();
-                                                Core.net.httpGet("http://api.github.com/repos/" + modsbrolist.repo + "/zipball/master", loc -> {
-                                                    Core.net.httpGet(loc.getHeader("Location"), result -> {
-                                                        if (result.getStatus() != HttpStatus.OK) {
-                                                            ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
-                                                            ui.loadfrag.hide();
-                                                        } else {
-                                                            try {
-                                                                Fi file = tmpDirectory.child((modsbrolist.repo).replace("/", "") + ".zip");
-                                                                Streams.copy(result.getResultAsStream(), file.write(false));
-                                                                mods.importMod(file);
-                                                                file.delete();
-                                                                Core.app.post(() -> {
+                                rebuildBrowser[0] = () -> {
+                                    tablebrow.clear();
+                                    String searchString = searchtxt.toLowerCase();
+                                    Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
+                                        if (response.getStatus() != HttpStatus.OK) {
+                                            ui.showErrorMessage(Core.bundle.format("connectfail", response.getStatus()));
+                                        } else {
+                                            Json json = new Json();
+                                            Seq<ModListing> listings = json.fromJson(Seq.class, ModListing.class, response.getResultAsString());
+                                            for (ModListing modsbrolist : listings) {
+                                                if((!searchtxt.isEmpty() && !modsbrolist.repo.contains(searchtxt))||searchtxt==null) continue;
+                                                tablebrow.button(btn -> {
+                                                    btn.top().left();
+                                                    btn.margin(12f);
+                                                    btn.table(con -> {
+                                                        con.left();
+                                                        con.add("[lightgray]Name:[] " + modsbrolist.name + "\n[lightgray]Author:[] " + modsbrolist.author + "\n[accent]\uE809: " + modsbrolist.stars).wrap().growX().pad(0f,6f,0f,6f);
+                                                        con.add().growX().pad(0f,6f,0f,6f);
+                                                    }).fillY().growX().pad(0f,6f,0f,6f);
+                                                }, Styles.clearPartialt, () -> {
+                                                    ui.showCustomConfirm("$mods.browser.selected" + ": " + modsbrolist.name, modsbrolist.description, "$mods.browser.add", "$mods.github.open", () -> {
+                                                        ui.loadfrag.show();
+                                                        Core.net.httpGet("http://api.github.com/repos/" + modsbrolist.repo + "/zipball/master", loc -> {
+                                                            Core.net.httpGet(loc.getHeader("Location"), result -> {
+                                                                if (result.getStatus() != HttpStatus.OK) {
+                                                                    ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                                                                    ui.loadfrag.hide();
+                                                                } else {
                                                                     try {
-                                                                        setup();
-                                                                        ui.loadfrag.hide();
+                                                                        Fi file = tmpDirectory.child((modsbrolist.repo).replace("/", "") + ".zip");
+                                                                        Streams.copy(result.getResultAsStream(), file.write(false));
+                                                                        mods.importMod(file);
+                                                                        file.delete();
+                                                                        Core.app.post(() -> {
+                                                                            try {
+                                                                                setup();
+                                                                                ui.loadfrag.hide();
+                                                                            } catch (Throwable e) {
+                                                                                ui.showException(e);
+                                                                            }
+                                                                        });
                                                                     } catch (Throwable e) {
-                                                                        ui.showException(e);
+                                                                        modError(e);
                                                                     }
-                                                                });
-                                                            } catch (Throwable e) {
-                                                                modError(e);
-                                                            }
-                                                        }
-                                                    }, t2 -> Core.app.post(() -> modError(t2)));
-                                                }, t2 -> Core.app.post(() -> modError(t2)));
-                                            }).width(380f).margin(15f).growX().left().fillY();
-                                            tablebrow.row();
+                                                                }
+                                                            }, t2 -> Core.app.post(() -> modError(t2)));
+                                                        }, t2 -> Core.app.post(() -> modError(t2)));
+                                                    }, () -> {
+                                                        Core.app.openURI("https://github.com/" + modsbrolist.repo);
+                                                    });
+                                                }).width(480f).margin(15f).growX().left().fillY();
+                                                tablebrow.row();
+                                            }
                                         }
-                                    }
-                                }, error -> {
-                                    ui.showErrorMessage(error.toString());
-                                });
-
+                                    }, error -> {
+                                        ui.showErrorMessage(error.toString());
+                                    });
+                                };
+                                rebuildBrowser[0].run();
                             });
                             dialog2.addCloseButton();
                             dialog2.show();
+                            //Keep this until mods work
+                            ui.showErrorMessage("This feature doesnt work completely due to mods not working in v6. Wait for this to be fixed. If you decide to use it anyways, mods will not let you enter the game.");
+                            //Until here
                         }catch (Exception e){
                             //ignore
                         }
