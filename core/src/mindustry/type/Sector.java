@@ -89,7 +89,7 @@ public class Sector{
      * Only sectors adjacent to non-wave sectors can be landed on.
      * TODO also preset sectors*/
     public boolean unlocked(){
-        return hasBase();
+        return hasBase() || (preset != null && preset.alwaysUnlocked);
     }
 
     /** @return whether the player has a base here. */

@@ -365,15 +365,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }).row();
         }
 
-        //display how many turns this sector has been attacked
-        //TODO implement properly
-        /*
-        if(sector.getTurnsPassed() > 0 && sector.hasBase()){
-            stable.row();
-
-            stable.add("[scarlet]" + Iconc.warning + " " + sector.getTurnsPassed() + "x attacks");
-        }*/
-
         stable.row();
 
         if((sector.hasBase() && mode == look) || canLaunch(sector) || (sector.preset != null && sector.preset.alwaysUnlocked)){
