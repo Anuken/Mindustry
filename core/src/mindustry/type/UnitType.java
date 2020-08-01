@@ -381,7 +381,7 @@ public class UnitType extends UnlockableContent{
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime);
 
-            if(unit.isLocal()){
+            if(unit.isLocal() && !Core.settings.getBool("pixelate")){
                 Fonts.outline.draw(unit.stack.amount + "",
                 unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
                 unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,
