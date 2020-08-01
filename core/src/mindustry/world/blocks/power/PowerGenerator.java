@@ -36,7 +36,7 @@ public class PowerGenerator extends PowerDistributor{
             Core.bundle.format("bar.poweroutput",
             Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
             () -> Pal.powerBar,
-            () -> entity.productionEfficiency));
+            () -> entity.productionEfficiency * entity.efficiency()));
         }
     }
 
@@ -52,7 +52,7 @@ public class PowerGenerator extends PowerDistributor{
 
         @Override
         public float getPowerProduction(){
-            return powerProduction * productionEfficiency;
+            return powerProduction * productionEfficiency * efficiency();
         }
 
         @Override

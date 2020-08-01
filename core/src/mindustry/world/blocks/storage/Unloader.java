@@ -48,7 +48,7 @@ public class Unloader extends Block{
 
         @Override
         public void updateTile(){
-            if(timer(timerUnload, speed / timeScale())){
+            if(timer(timerUnload, speed / efficiency() / timeScale())){
                 for(Building other : proximity){
                     if(other.interactable(team) && other.block().unloadable && other.block().hasItems
                         && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){

@@ -42,7 +42,7 @@ public class ResupplyPoint extends Block{
 
         @Override
          public void updateTile(){
-             if(consValid() && timer(timerResupply, resupplyRate / timeScale) && resupply(this, range, ammoAmount, ammoColor)){
+             if(consValid() && timer(timerResupply, resupplyRate * efficiency() / timeScale) && resupply(this, range, ammoAmount, ammoColor)){
                  consume();
              }
          }

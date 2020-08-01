@@ -32,7 +32,7 @@ public class ExtendingItemBridge extends ItemBridge{
                 ey = other.worldy() - y - Geometry.d4[i].y * tilesize / 2f;
 
             float uptime = state.isEditor() ? 1f : this.uptime;
-
+            uptime = efficiency() < 1f ? 1f : uptime;
             ex *= uptime;
             ey *= uptime;
 

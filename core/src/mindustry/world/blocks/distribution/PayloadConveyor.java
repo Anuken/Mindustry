@@ -95,7 +95,7 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void updateTile(){
-            progress = Time.time() % moveTime;
+            progress = Time.time() % moveTime * efficiency();
 
             updatePayload();
 
@@ -274,11 +274,11 @@ public class PayloadConveyor extends Block{
         }
 
         int curStep(){
-            return (int)((Time.time()) / moveTime);
+            return (int)((Time.time()) / moveTime * efficiency());
         }
 
         float fract(){
-            return interp.apply(progress / moveTime);
+            return interp.apply(progress / moveTime * efficiency());
         }
     }
 

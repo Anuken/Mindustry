@@ -114,7 +114,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
+            int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * efficiency() * 8f * timeScale())) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -175,7 +175,7 @@ public class Conveyor extends Block implements Autotiler{
 
             noSleep();
 
-            float mspeed = speed * tilesize / 2.4f;
+            float mspeed = speed * tilesize * efficiency() / 2.4f;
             float centerSpeed = 0.1f;
             float centerDstScl = 3f;
             float tx = Geometry.d4[rotation].x, ty = Geometry.d4[rotation].y;
@@ -211,13 +211,13 @@ public class Conveyor extends Block implements Autotiler{
 
             for(int i = len - 1; i >= 0; i--){
                 float nextpos = (i == len - 1 ? 100f : ys[i + 1]) - itemSpace;
-                float maxmove = Mathf.clamp(nextpos - ys[i], 0, speed * delta());
+                float maxmove = Mathf.clamp(nextpos - ys[i], 0, speed * efficiency() * delta());
 
                 ys[i] += maxmove;
 
                 if(ys[i] > nextMax) ys[i] = nextMax;
                 if(ys[i] > 0.5 && i > 0) mid = i - 1;
-                xs[i] = Mathf.approachDelta(xs[i], 0, speed*2);
+                xs[i] = Mathf.approachDelta(xs[i], 0, speed*2*efficiency());
 
                 if(ys[i] >= 1f && moveForward(ids[i])){
                     //align X position if passing forwards

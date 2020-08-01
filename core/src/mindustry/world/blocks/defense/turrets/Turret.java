@@ -382,7 +382,7 @@ public abstract class Turret extends Block{
         }
 
         protected float baseReloadSpeed(){
-            return 1f;
+            return efficiency();
         }
 
         @Override

@@ -38,7 +38,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
                     uptime = Mathf.lerpDelta(uptime, 0f, 0.02f);
                 }
 
-                if(uptime >= 0.5f){
+                if(uptime * efficiency() == 1f){
                     if(moveLiquid(other, liquids.current()) > 0.1f){
                         cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
                     }else{
