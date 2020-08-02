@@ -9,6 +9,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.world;
 
 public class LiquidExtendingBridge extends ExtendingItemBridge{
+    public final int timerFlow = timers++;
 
     public LiquidExtendingBridge(String name){
         super(name);
@@ -38,7 +39,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
                     uptime = Mathf.lerpDelta(uptime, 0f, 0.02f);
                 }
 
-                if(uptime * efficiency() == 1f){
+                if(uptime >= 0.5f && timer(timerFlow, 1 / efficiency())){
                     if(moveLiquid(other, liquids.current()) > 0.1f){
                         cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
                     }else{

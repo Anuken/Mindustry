@@ -28,8 +28,8 @@ public class BufferedItemBridge extends ExtendingItemBridge{
                 buffer.accept(items.take());
             }
 
-            Item item = buffer.poll(speed / timeScale);
-            if(uptime >= 0.5f && timer(timerAccept, 4) && item != null && other.acceptItem(this, item)){
+            Item item = buffer.poll(speed / efficiency() / timeScale);
+            if(timer(timerAccept, 4) && item != null && other.acceptItem(this, item)){
                 cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
                 other.handleItem(this, item);
                 buffer.remove();
