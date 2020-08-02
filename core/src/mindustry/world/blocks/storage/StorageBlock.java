@@ -3,14 +3,11 @@ package mindustry.world.blocks.storage;
 import arc.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-
-import static mindustry.Vars.*;
 
 public abstract class StorageBlock extends Block{
 
