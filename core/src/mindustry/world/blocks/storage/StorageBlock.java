@@ -1,9 +1,16 @@
 package mindustry.world.blocks.storage;
 
+import arc.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
+
+import static mindustry.Vars.*;
 
 public abstract class StorageBlock extends Block{
 
@@ -18,6 +25,18 @@ public abstract class StorageBlock extends Block{
     @Override
     public boolean outputsItems(){
         return false;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        bars.add("capacity", (StorageBlockEntity e) ->
+            new Bar(
+                () -> Core.bundle.format("bar.capacity", UI.formatAmount(itemCapacity)),
+                () -> Pal.items,
+            () -> e.items.total() / (float)itemCapacity
+        ));
     }
 
     public class StorageBlockEntity extends Building{
