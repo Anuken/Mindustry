@@ -3,11 +3,14 @@ package mindustry.world.blocks.storage;
 import arc.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+
+import static mindustry.Vars.*;
 
 public abstract class StorageBlock extends Block{
 
@@ -28,11 +31,13 @@ public abstract class StorageBlock extends Block{
     public void setStats(){
         super.setStats();
 
+        int totalCapacity = content.items().count(UnlockableContent::unlockedNow);
+
         bars.add("capacity", (StorageBlockEntity e) ->
             new Bar(
-                () -> Core.bundle.format("bar.capacity", UI.formatAmount(itemCapacity)),
+                () -> Core.bundle.format("bar.capacity", UI.formatAmount(itemCapacity * totalCapacity)),
                 () -> Pal.items,
-            () -> e.items.total() / (float)itemCapacity
+            () -> e.items.total() / ((float)itemCapacity * totalCapacity)
         ));
     }
 
