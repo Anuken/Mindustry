@@ -161,6 +161,9 @@ public class StackConveyor extends Block implements Autotiler{
                 for(Building near : proximity){
                     if(near instanceof StackConveyorEntity){
                         near.onProximityUpdate();
+                        for(Building other : near.proximity){
+                            if(!(other instanceof StackConveyorEntity)) other.onProximityUpdate();
+                        }
                     }
                 }
             }

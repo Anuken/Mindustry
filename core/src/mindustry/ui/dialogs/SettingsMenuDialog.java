@@ -363,7 +363,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.checkPref("linear", true, b -> {
+        graphics.checkPref("linear", !mobile, b -> {
             for(Texture tex : Core.atlas.getTextures()){
                 TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
                 tex.setFilter(filter, filter);
