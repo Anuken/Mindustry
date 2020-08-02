@@ -267,6 +267,11 @@ public class Damage{
         }else{
             Units.nearby(rect, cons);
         }
+        if(effect == StatusEffects.burning) {
+            indexer.eachBlock(null, x, y, radius, other -> other.team != team, other -> {
+                Damage.createIncend(x, y, 1f, (int) duration/50);
+            });
+        }
     }
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */

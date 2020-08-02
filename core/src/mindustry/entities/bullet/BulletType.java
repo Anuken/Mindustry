@@ -131,6 +131,9 @@ public abstract class BulletType extends Content{
     }
 
     public void hitTile(Bullet b, Building tile){
+        if(status == StatusEffects.burning) {
+            Damage.createIncend(b.x, b.y, damage/10f, (int) damage/10);
+        }
         hit(b);
     }
 

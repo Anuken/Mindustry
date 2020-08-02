@@ -185,7 +185,7 @@ public class BlockIndexer{
 
                 if(other == null) continue;
 
-                if(other.team() == team && pred.get(other) && intSet.add(other.pos())){
+                if((other.team() == team || team == null) && pred.get(other) && intSet.add(other.pos())){
                     cons.get(other);
                     any = true;
                 }
