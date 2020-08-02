@@ -530,7 +530,7 @@ public class UnitTypes implements ContentList{
             speed = 1.25f;
             accel = 0.035f;
             drag = 0.05f;
-            rotateSpeed = 3.5f;
+            rotateSpeed = 2f;
             flying = true;
             lowAltitude = true;
             health = 9000;
@@ -539,20 +539,50 @@ public class UnitTypes implements ContentList{
             engineSize = 5.3f;
             hitsize = 58f;
 
-            weapons.add(new Weapon(){{
-                y = 1.5f;
+            weapons.add(
+            new Weapon("missiles-mount"){{
+                y = 8f;
+                x = 17f;
                 reload = 28f;
                 ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
+                rotateSpeed = 8f;
+                bullet = Bullets.missileExplosive;
                 shootSound = Sounds.shoot;
-            }});
+                rotate = true;
+                occlusion = 6f;
+            }},
+            new Weapon("missiles-mount"){{
+                y = -8f;
+                x = 17f;
+                reload = 42;
+                rotateSpeed = 8f;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.missileExplosive;
+                shootSound = Sounds.shoot;
+                rotate = true;
+                occlusion = 6f;
+            }},
+            new Weapon("large-bullet-mount"){{
+                y = 2f;
+                x = 10f;
+                shootY = 12f;
+                reload = 10;
+                shake = 1f;
+                rotateSpeed = 2f;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardDenseBig;
+                shootSound = Sounds.shootBig;
+                rotate = true;
+                occlusion = 8f;
+            }}
+            );
         }};
 
         eclipse = new UnitType("eclipse"){{
             speed = 1.1f;
             accel = 0.02f;
             drag = 0.05f;
-            rotateSpeed = 2.5f;
+            rotateSpeed = 1.5f;
             flying = true;
             lowAltitude = true;
             health = 18000;
