@@ -188,7 +188,7 @@ public class ModsDialog extends BaseDialog{
                                                     modSelected.cont.add(modsbrolist.description).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
                                                     modSelected.buttons.defaults().size(200f, 54f).pad(2f);
                                                     modSelected.setFillParent(false);
-                                                    modSelected.buttons.button("$mods.browser.add", () -> {
+                                                    modSelected.buttons.button("$mods.browser.add", Icon.download, () -> {
                                                         modSelected.hide();
                                                         installMod[0] = () -> {
                                                             ui.loadfrag.show();
@@ -220,7 +220,7 @@ public class ModsDialog extends BaseDialog{
                                                         };
                                                         installMod[0].run();
                                                     });
-                                                    modSelected.buttons.button("$mods.github.open", () -> {
+                                                    modSelected.buttons.button("$mods.github.open", Icon.github, () -> {
                                                         openGithubPage[0] = () -> {
                                                             Core.app.openURI("https://github.com/" + modsbrolist.repo);
                                                         };
@@ -233,39 +233,7 @@ public class ModsDialog extends BaseDialog{
                                                     modSelected.keyDown(KeyCode.escape, modSelected::hide);
                                                     modSelected.keyDown(KeyCode.back, modSelected::hide);
                                                     modSelected.show();
-                                                    /*
-                                                    ui.showCustomConfirm("$mods.browser.selected" + ": " + modsbrolist.name, modsbrolist.description, "$mods.browser.add", "$mods.github.open", () -> {
-                                                        ui.loadfrag.show();
-                                                        Core.net.httpGet("http://api.github.com/repos/" + modsbrolist.repo + "/zipball/master", loc -> {
-                                                            Core.net.httpGet(loc.getHeader("Location"), result -> {
-                                                                if (result.getStatus() != HttpStatus.OK) {
-                                                                    ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
-                                                                    ui.loadfrag.hide();
-                                                                } else {
-                                                                    try {
-                                                                        Fi file = tmpDirectory.child((modsbrolist.repo).replace("/", "") + ".zip");
-                                                                        Streams.copy(result.getResultAsStream(), file.write(false));
-                                                                        mods.importMod(file);
-                                                                        file.delete();
-                                                                        Core.app.post(() -> {
-                                                                            try {
-                                                                                setup();
-                                                                                ui.loadfrag.hide();
-                                                                            } catch (Throwable e) {
-                                                                                ui.showException(e);
-                                                                            }
-                                                                        });
-                                                                    } catch (Throwable e) {
-                                                                        modError(e);
-                                                                    }
-                                                                }
-                                                            }, t2 -> Core.app.post(() -> modError(t2)));
-                                                        }, t2 -> Core.app.post(() -> modError(t2)));
-                                                    }, () -> {
-                                                        Core.app.openURI("https://github.com/" + modsbrolist.repo);
-                                                    });
-                                                    */
-                                                }).width(480f)/*.margin(15f)*/.growX().left().fillY();
+                                                }).width(480f).growX().left().fillY();
                                                 tablebrow.row();
                                             }
                                         }
