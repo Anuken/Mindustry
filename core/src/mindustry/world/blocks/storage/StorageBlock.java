@@ -35,7 +35,7 @@ public abstract class StorageBlock extends Block{
 
         bars.add("capacity", (StorageBlockEntity e) ->
             new Bar(
-                () -> Core.bundle.format("bar.capacity", UI.formatAmount(itemCapacity * totalCapacity)),
+                () -> Core.bundle.format("bar.capacity", UI.formatAmount(itemCapacity)),
                 () -> Pal.items,
             () -> e.items.total() / ((float)itemCapacity * totalCapacity)
         ));
