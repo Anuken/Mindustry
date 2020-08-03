@@ -530,7 +530,7 @@ public class UnitTypes implements ContentList{
             speed = 1.25f;
             accel = 0.035f;
             drag = 0.05f;
-            rotateSpeed = 2f;
+            rotateSpeed = 1.9f;
             flying = true;
             lowAltitude = true;
             health = 9000;
@@ -570,7 +570,11 @@ public class UnitTypes implements ContentList{
                 shake = 1f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardDenseBig;
+                bullet = new BasicBulletType(7f, 35){{
+                    width = 12f;
+                    height = 18f;
+                    shootEffect = Fx.shootBig;
+                }};
                 shootSound = Sounds.shootBig;
                 rotate = true;
                 occlusion = 8f;
@@ -582,7 +586,7 @@ public class UnitTypes implements ContentList{
             speed = 1.1f;
             accel = 0.02f;
             drag = 0.05f;
-            rotateSpeed = 1.5f;
+            rotateSpeed = 1f;
             flying = true;
             lowAltitude = true;
             health = 18000;
@@ -592,12 +596,74 @@ public class UnitTypes implements ContentList{
             destructibleWreck = false;
             armor = 13f;
 
-            weapons.add(new Weapon(){{
-                y = 1.5f;
-                reload = 28f;
+            weapons.add(
+            new Weapon("large-laser-mount"){{
+                shake = 4f;
+                shootY = 9f;
+                x = 18f;
+                y = 5f;
+                rotateSpeed = 2f;
+                reload = 50f;
+                recoil = 4f;
+                shootSound = Sounds.laser;
+                occlusion = 18f;
+                rotate = true;
+
+                bullet = new LaserBulletType(){{
+                    damage = 40f;
+                    sideAngle = 20f;
+                    sideWidth = 1.5f;
+                    sideLength = 80f;
+                    width = 25f;
+                    length = 200f;
+                    shootEffect = Fx.shockwave;
+                    colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
+                }};
+            }},
+            new Weapon("missiles-mount"){{
+                x = 11f;
+                y = 27f;
+                rotateSpeed = 2f;
+                reload = 5f;
+                shootSound = Sounds.flame;
+                occlusion = 7f;
+                rotate = true;
+                recoil = 0.5f;
+
+                bullet = Bullets.pyraFlame;
+            }},
+            new Weapon("large-artillery"){{
+                y = -13f;
+                x = 20f;
+                reload = 18f;
                 ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.standardCopper;
+                rotateSpeed = 7f;
+                shake = 1f;
                 shootSound = Sounds.shoot;
+                rotate = true;
+                occlusion = 12f;
+                bullet = new ArtilleryBulletType(3.2f, 12){{
+                    trailMult = 0.8f;
+                    hitEffect = Fx.massiveExplosion;
+                    knockback = 1.5f;
+                    lifetime = 140f;
+                    height = 12f;
+                    width = 12f;
+                    collidesTiles = false;
+                    ammoMultiplier = 4f;
+                    splashDamageRadius = 45f;
+                    splashDamage = 70f;
+                    backColor = Pal.missileYellowBack;
+                    frontColor = Pal.missileYellow;
+                    trailEffect = Fx.artilleryTrail;
+                    trailSize = 6f;
+                    hitShake = 4f;
+
+                    shootEffect = Fx.shootBig2;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 60f;
+                }};
             }});
         }};
 
@@ -889,7 +955,6 @@ public class UnitTypes implements ContentList{
         //region core
 
         alpha = new UnitType("alpha"){{
-            //TODO maybe these should be changed
             defaultController = BuilderAI::new;
             isCounted = false;
 
@@ -923,7 +988,6 @@ public class UnitTypes implements ContentList{
         }};
 
         beta = new UnitType("beta"){{
-            //TODO maybe these should be changed
             defaultController = BuilderAI::new;
             isCounted = false;
 
@@ -963,7 +1027,6 @@ public class UnitTypes implements ContentList{
         }};
 
         gamma = new UnitType("gamma"){{
-            //TODO maybe these should be changed
             defaultController = BuilderAI::new;
             isCounted = false;
 

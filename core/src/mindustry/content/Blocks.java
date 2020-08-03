@@ -1460,6 +1460,7 @@ public class Blocks implements ContentList{
                 hitSize = 4;
                 lifetime = 16f;
                 drawSize = 400f;
+                collidesAir = false;
             }};
         }};
 
