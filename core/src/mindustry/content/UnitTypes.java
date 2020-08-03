@@ -539,14 +539,30 @@ public class UnitTypes implements ContentList{
             engineSize = 5.3f;
             hitsize = 58f;
 
+            BulletType missiles = new MissileBulletType(2.7f, 10){{
+                width = 8f;
+                height = 8f;
+                shrinkY = 0f;
+                drag = -0.01f;
+                splashDamageRadius = 40f;
+                splashDamage = 40f;
+                ammoMultiplier = 4f;
+                lifetime = 80f;
+                hitEffect = Fx.blastExplosion;
+                despawnEffect = Fx.blastExplosion;
+
+                status = StatusEffects.blasted;
+                statusDuration = 60f;
+            }};
+
             weapons.add(
             new Weapon("missiles-mount"){{
                 y = 8f;
                 x = 17f;
-                reload = 28f;
+                reload = 20f;
                 ejectEffect = Fx.shellEjectSmall;
                 rotateSpeed = 8f;
-                bullet = Bullets.missileExplosive;
+                bullet = missiles;
                 shootSound = Sounds.shoot;
                 rotate = true;
                 occlusion = 6f;
@@ -554,10 +570,10 @@ public class UnitTypes implements ContentList{
             new Weapon("missiles-mount"){{
                 y = -8f;
                 x = 17f;
-                reload = 42;
+                reload = 35;
                 rotateSpeed = 8f;
                 ejectEffect = Fx.shellEjectSmall;
-                bullet = Bullets.missileExplosive;
+                bullet = missiles;
                 shootSound = Sounds.shoot;
                 rotate = true;
                 occlusion = 6f;
@@ -570,14 +586,14 @@ public class UnitTypes implements ContentList{
                 shake = 1f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.shellEjectSmall;
-                bullet = new BasicBulletType(7f, 35){{
+                shootSound = Sounds.shootBig;
+                rotate = true;
+                occlusion = 8f;
+                bullet = new BasicBulletType(7f, 60){{
                     width = 12f;
                     height = 18f;
                     shootEffect = Fx.shootBig;
                 }};
-                shootSound = Sounds.shootBig;
-                rotate = true;
-                occlusion = 8f;
             }}
             );
         }};
@@ -606,11 +622,11 @@ public class UnitTypes implements ContentList{
                 reload = 50f;
                 recoil = 4f;
                 shootSound = Sounds.laser;
-                occlusion = 18f;
+                occlusion = 20f;
                 rotate = true;
 
                 bullet = new LaserBulletType(){{
-                    damage = 40f;
+                    damage = 75f;
                     sideAngle = 20f;
                     sideWidth = 1.5f;
                     sideLength = 80f;
@@ -624,7 +640,7 @@ public class UnitTypes implements ContentList{
                 x = 11f;
                 y = 27f;
                 rotateSpeed = 2f;
-                reload = 5f;
+                reload = 4f;
                 shootSound = Sounds.flame;
                 occlusion = 7f;
                 rotate = true;
@@ -651,8 +667,8 @@ public class UnitTypes implements ContentList{
                     width = 12f;
                     collidesTiles = false;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 45f;
-                    splashDamage = 70f;
+                    splashDamageRadius = 60f;
+                    splashDamage = 80f;
                     backColor = Pal.missileYellowBack;
                     frontColor = Pal.missileYellow;
                     trailEffect = Fx.artilleryTrail;
