@@ -13,6 +13,10 @@ _[Javadoc](https://mindustrygame.github.io/docs/)_
 
 See [CONTRIBUTING](CONTRIBUTING.md).
 
+### Maps
+6.0 maps are stored in `core/assets/maps/`.
+They are **not compatible** with 5.0 builds, for the 5.0 maps check out the `v104.6` branch.
+
 ### Building
 
 Bleeding-edge live builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases). Old builds might still be on [jenkins](https://jenkins.hellomouse.net/job/mindustry/).
