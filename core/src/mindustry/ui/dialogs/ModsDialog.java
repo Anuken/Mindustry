@@ -231,7 +231,7 @@ public class ModsDialog extends BaseDialog{
                             t.labelWrap("$mod.erroredcontent").growX();
                             t.row();
                         }
-                    }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).pad(4f);
+                    }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
                     table.row();
                 }
             });
