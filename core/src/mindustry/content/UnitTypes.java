@@ -904,7 +904,6 @@ public class UnitTypes implements ContentList{
 
                 shots = 1;
                 inaccuracy = 3f;
-
                 ejectEffect = Fx.shellEjectBig;
 
                 bullet = new ArtilleryBulletType(3.2f, 12){{
