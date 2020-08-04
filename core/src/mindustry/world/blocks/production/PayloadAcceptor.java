@@ -16,9 +16,9 @@ import static mindustry.Vars.tilesize;
 public class PayloadAcceptor extends Block{
     public float payloadSpeed = 0.5f;
 
-    public @Load(value = "@-top", fallback = "factory-top-$size") TextureRegion topRegion;
-    public @Load(value = "@-out", fallback = "factory-out-$size") TextureRegion outRegion;
-    public @Load(value = "@-in", fallback = "factory-in-$size") TextureRegion inRegion;
+    public @Load(value = "@-top", fallback = "factory-top-@size") TextureRegion topRegion;
+    public @Load(value = "@-out", fallback = "factory-out-@size") TextureRegion outRegion;
+    public @Load(value = "@-in", fallback = "factory-in-@size") TextureRegion inRegion;
 
     public PayloadAcceptor(String name){
         super(name);
