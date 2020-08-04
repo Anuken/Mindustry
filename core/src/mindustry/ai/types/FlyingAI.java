@@ -1,54 +1,45 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.world.meta.*;
 
 public class FlyingAI extends AIController{
 
     @Override
-    public void updateUnit(){
+    public void updateMovement(){
         if(unit.moving()){
-            unit.rotation(unit.vel().angle());
+            unit.lookAt(unit.vel.angle());
         }
 
         if(unit.isFlying()){
             unit.wobble();
         }
 
-        if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y())){
-            target = null;
-        }
-
-        if(retarget()){
-            targetClosest();
-
-            if(target == null) targetClosestEnemyFlag(BlockFlag.producer);
-            if(target == null) targetClosestEnemyFlag(BlockFlag.turret);
-        }
-
-        boolean shoot = false;
-
         if(target != null && unit.hasWeapons()){
             if(unit.type().weapons.first().rotate){
-                moveTo(unit.range() * 0.85f);
+                moveTo(unit.range() * 0.8f);
                 unit.lookAt(target);
             }else{
                 attack(80f);
             }
-
-            shoot = unit.inRange(target);
-
-            if(shoot && unit.type().hasWeapons()){
-                Vec2 to = Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed);
-                unit.aim(to);
-            }
         }
+    }
 
-        unit.controlWeapons(shoot, shoot);
+    @Override
+    protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
+        Teamc result = target(x, y, range, air, ground);
+        if(result != null) return result;
+
+        if(ground) result = targetFlag(x, y, BlockFlag.producer, true);
+        if(result != null) return result;
+
+        if(ground) result = targetFlag(x, y, BlockFlag.turret, true);
+        if(result != null) return result;
+
+        return null;
     }
 
     //TODO clean up

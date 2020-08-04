@@ -80,6 +80,7 @@ public class UnitType extends UnlockableContent{
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
     public boolean canHeal = false;
+    public boolean singleTarget = false;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -180,10 +181,13 @@ public class UnitType extends UnlockableContent{
     public void init(){
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
 
+        singleTarget = weapons.size <= 1;
+
         //set up default range
         if(range < 0){
+            range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                range = Math.max(range, weapon.bullet.range());
+                range = Math.min(range, weapon.bullet.range() + hitsize/2f);
             }
         }
 

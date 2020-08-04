@@ -668,7 +668,7 @@ public class UnitTypes implements ContentList{
                     collidesTiles = false;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 60f;
-                    splashDamage = 80f;
+                    splashDamage = 60f;
                     backColor = Pal.missileYellowBack;
                     frontColor = Pal.missileYellow;
                     trailEffect = Fx.artilleryTrail;

@@ -430,34 +430,25 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(3f, 15f){
-            {
-                ammoMultiplier = 3f;
-                hitSize = 7f;
-                lifetime = 42f;
-                pierce = true;
-                drag = 0.05f;
-                statusDuration = 60f * 4;
-                shootEffect = Fx.shootSmallFlame;
-                hitEffect = Fx.hitFlameSmall;
-                despawnEffect = Fx.none;
-                status = StatusEffects.burning;
-                keepVelocity = false;
-                hittable = false;
-            }
+        basicFlame = new BulletType(3.35f, 15f){{
+            ammoMultiplier = 3f;
+            hitSize = 7f;
+            lifetime = 18f;
+            pierce = true;
+            statusDuration = 60f * 4;
+            shootEffect = Fx.shootSmallFlame;
+            hitEffect = Fx.hitFlameSmall;
+            despawnEffect = Fx.none;
+            status = StatusEffects.burning;
+            keepVelocity = false;
+            hittable = false;
+        }};
 
-            @Override
-            public float range(){
-                return 50f;
-            }
-        };
-
-        pyraFlame = new BulletType(3.3f, 22f){{
+        pyraFlame = new BulletType(3.35f, 22f){{
             ammoMultiplier = 4f;
             hitSize = 7f;
-            lifetime = 42f;
+            lifetime = 18f;
             pierce = true;
-            drag = 0.05f;
             statusDuration = 60f * 6;
             shootEffect = Fx.shootPyraFlame;
             hitEffect = Fx.hitFlameSmall;

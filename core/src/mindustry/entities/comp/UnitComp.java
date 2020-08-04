@@ -50,8 +50,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         lookAt(x, y);
     }
 
+    public boolean inRange(Position other){
+        return within(other, type.range);
+    }
+
     public boolean hasWeapons(){
         return type.hasWeapons();
+    }
+
+    public float range(){
+        return type.range;
     }
 
     @Replace
