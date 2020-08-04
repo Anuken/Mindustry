@@ -134,6 +134,8 @@ public class ItemBridge extends Block{
 
         @Override
         public void playerPlaced(){
+            super.playerPlaced();
+
             Tile link = findLink(tile.x, tile.y);
             if(linkValid(tile, link)){
                 link.build.configure(tile.pos());
@@ -316,7 +318,7 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(team != source.team()) return false;
+            if(team != source.team) return false;
 
             Tile other = world.tile(link);
 
@@ -326,7 +328,7 @@ public class ItemBridge extends Block{
 
                 if(rel == rel2) return false;
             }else{
-                return source.block() instanceof ItemBridge && linkValid(source.tile(), tile) && items.total() < itemCapacity;
+                return linked(source) && items.total() < itemCapacity;
             }
 
             return items.total() < itemCapacity;
@@ -348,11 +350,15 @@ public class ItemBridge extends Block{
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
                 if(rel == rel2) return false;
-            }else if(!(source.block() instanceof ItemBridge && linkValid(source.tile(), tile))){
+            }else if(!(linked(source))){
                 return false;
             }
 
             return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
+        }
+
+        private boolean linked(Building source){
+            return source instanceof ItemBridgeEntity && linkValid(source.tile(), tile) && ((ItemBridgeEntity)source).link == pos();
         }
 
         @Override

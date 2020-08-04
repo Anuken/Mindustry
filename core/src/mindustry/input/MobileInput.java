@@ -243,7 +243,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
             t.bottom().left();
-            t.button("$cancel", Icon.cancel, () -> {
+            t.button("@cancel", Icon.cancel, () -> {
                 player.builder().clearBuilding();
                 selectRequests.clear();
                 mode = none;
@@ -422,7 +422,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         lastSchematic = schem;
     }
 
-
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
         if(state.isMenu()) return false;
@@ -497,9 +496,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Tile tile = tileAt(screenX, screenY);
 
-            if(tile == null || tile.build == null) return false;
-
-            tryDropItems(tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+            tryDropItems(tile == null ? null : tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
         }
         return false;
     }
@@ -755,7 +752,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 shiftDeltaX %= tilesize;
                 shiftDeltaY %= tilesize;
             }
-        }else{
+        }else if(!renderer.isLanding()){
             //pan player
             Core.camera.position.x -= deltaX;
             Core.camera.position.y -= deltaY;
@@ -806,7 +803,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         targetPos.set(Core.camera.position);
         float attractDst = 15f;
         float strafePenalty = legs ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(unit.vel.angle(), unit.rotation) / 180f);
-        float speed = type.speed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation()) * strafePenalty;
+        float speed = type.speed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());

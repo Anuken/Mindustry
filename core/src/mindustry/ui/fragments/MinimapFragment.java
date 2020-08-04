@@ -98,11 +98,11 @@ public class MinimapFragment extends Fragment{
             t.visible(() -> shown);
             t.update(() -> t.setBounds(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight()));
 
-            t.add("$minimap").style(Styles.outlineLabel).pad(10f);
+            t.add("@minimap").style(Styles.outlineLabel).pad(10f);
             t.row();
             t.add().growY();
             t.row();
-            t.button("$back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
+            t.button("@back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
         });
     }
 

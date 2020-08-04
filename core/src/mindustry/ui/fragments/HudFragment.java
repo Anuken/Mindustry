@@ -61,6 +61,7 @@ public class HudFragment extends Fragment{
         //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
+            coreItems.clear();
         });
 
         Events.on(TurnEvent.class, e -> {
@@ -70,7 +71,7 @@ public class HudFragment extends Fragment{
         //paused table
         parent.fill(t -> {
             t.top().visible(() -> state.isPaused() && !state.isOutOfTime()).touchable = Touchable.disabled;
-            t.table(Styles.black5, top -> top.add("$paused").style(Styles.outlineLabel).pad(8f)).growX();
+            t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
         //TODO tear this all down
@@ -166,7 +167,7 @@ public class HudFragment extends Fragment{
             {
                 editorMain.table(Tex.buttonEdge4, t -> {
                     //t.margin(0f);
-                    t.add("$editor.teams").growX().left();
+                    t.add("@editor.teams").growX().left();
                     t.row();
                     t.table(teams -> {
                         teams.left();
@@ -216,13 +217,13 @@ public class HudFragment extends Fragment{
         //core items
         parent.fill(t -> {
             t.top().add(coreItems);
-            t.visible(() -> Core.settings.getBool("coreitems") && !mobile);
+            t.visible(() -> Core.settings.getBool("coreitems") && !mobile && !state.isPaused());
         });
 
         //spawner warning
         parent.fill(t -> {
             t.touchable = Touchable.disabled;
-            t.table(Styles.black, c -> c.add("$nearpoint")
+            t.table(Styles.black, c -> c.add("@nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(spawner.playerNear()), 0.1f)).get().color.a = 0f;
@@ -230,7 +231,7 @@ public class HudFragment extends Fragment{
 
         parent.fill(t -> {
             t.visible(() -> netServer.isWaitingForPlayers());
-            t.table(Tex.button, c -> c.add("$waiting.players"));
+            t.table(Tex.button, c -> c.add("@waiting.players"));
         });
 
         //'core is under attack' table
@@ -261,7 +262,7 @@ public class HudFragment extends Fragment{
 
                 return coreAttackOpacity[0] > 0;
             });
-            t.table(Tex.button, top -> top.add("$coreattack").pad(2)
+            t.table(Tex.button, top -> top.add("@coreattack").pad(2)
             .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
@@ -311,7 +312,7 @@ public class HudFragment extends Fragment{
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> control.saves.isSaving());
-            t.add("$saving").style(Styles.outlineLabel);
+            t.add("@saving").style(Styles.outlineLabel);
         });
 
         parent.fill(p -> {
@@ -458,7 +459,7 @@ public class HudFragment extends Fragment{
 
                 //add to table
                 table.add(in).padRight(8);
-                table.add("$unlocked");
+                table.add("@unlocked");
                 table.pack();
 
                 //create container table which will align and move
@@ -554,17 +555,17 @@ public class HudFragment extends Fragment{
     }
 
     private void showLaunchConfirm(){
-        BaseDialog dialog = new BaseDialog("$launch");
+        BaseDialog dialog = new BaseDialog("@launch");
         dialog.update(() -> {
             if(!inLaunchWave()){
                 dialog.hide();
             }
         });
-        dialog.cont.add("$launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+        dialog.cont.add("@launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.button("$cancel", dialog::hide);
-        dialog.buttons.button("$ok", () -> {
+        dialog.buttons.button("@cancel", dialog::hide);
+        dialog.buttons.button("@ok", () -> {
             dialog.hide();
             Call.launchZone();
         });
@@ -679,7 +680,7 @@ public class HudFragment extends Fragment{
             if(net.client() && player.admin){
                 Call.adminRequest(player, AdminAction.wave);
             }else if(inLaunchWave()){
-                ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
+                ui.showConfirm("@confirm", "@launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
             }else{
                 logic.skipWave();
             }

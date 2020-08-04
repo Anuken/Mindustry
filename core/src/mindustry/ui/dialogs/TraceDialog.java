@@ -8,7 +8,7 @@ import mindustry.net.Administration.TraceInfo;
 public class TraceDialog extends BaseDialog{
 
     public TraceDialog(){
-        super("$trace");
+        super("@trace");
 
         addCloseButton();
         setFillParent(false);

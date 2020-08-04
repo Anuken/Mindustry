@@ -114,7 +114,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             //update some basic state to sync things
             if(unit.type().canBoost){
                 Tile tile = unit.tileOn();
-                unit.elevation(Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f));
+                unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
         }else if(core != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
@@ -205,7 +205,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         Draw.z(Layer.playerName);
         float z = Drawf.text();
 
-        BitmapFont font = Fonts.def;
+        Font font = Fonts.def;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;

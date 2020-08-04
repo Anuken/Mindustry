@@ -86,10 +86,11 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
+        //TODO achievement invalid
         Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            if(!content.sectors().contains(z -> !z.canConfigure())){
-                configAllZones.complete();
-            }
+            //if(!content.sectors().contains(z -> !z.canConfigure())){
+            //    configAllZones.complete();
+            //}
         });
 
         Events.on(Trigger.newGame, () -> Core.app.post(() -> {

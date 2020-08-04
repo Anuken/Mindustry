@@ -76,7 +76,7 @@ abstract class BuilderComp implements Unitc{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(!within(tile, finalPlaceDst)){
+        if(within(tile, finalPlaceDst)){
             rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
         }
 
@@ -198,6 +198,10 @@ abstract class BuilderComp implements Unitc{
         }else{
             plans.addFirst(place);
         }
+    }
+
+    boolean activelyBuilding(){
+        return isBuilding() && updateBuilding;
     }
 
     /** Return the build request currently active, or the one at the top of the queue.*/

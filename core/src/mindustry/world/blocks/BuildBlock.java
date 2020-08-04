@@ -190,7 +190,7 @@ public class BuildBlock extends Block{
             });
         }
 
-        public boolean construct(Unitc builder, @Nullable Building core, float amount, boolean configured){
+        public boolean construct(Unit builder, @Nullable Building core, float amount, boolean configured){
             if(cblock == null){
                 kill();
                 return false;
@@ -211,10 +211,10 @@ public class BuildBlock extends Block{
             maxProgress = core == null || team.rules().infiniteResources ? maxProgress : checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-            builderID = builder.id();
+            builderID = builder.id;
 
             if(progress >= 1f || state.rules.infiniteResources){
-                constructed(tile, cblock, builderID, (byte)rotation, builder.team(), configured);
+                constructed(tile, cblock, builderID, (byte)rotation, builder.team, configured);
                 return true;
             }
             return false;

@@ -36,7 +36,7 @@ public class BaseGenerator{
         //don't generate bases when there are no loaded schematics
         if(bases.cores.isEmpty()) return;
 
-        Mathf.random.setSeed(sector.id);
+        Mathf.rand.setSeed(sector.id);
 
         for(Block block : content.blocks()){
             if(block instanceof OreBlock && block.asFloor().itemDrop != null){

@@ -14,7 +14,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class TODOPlanetGenerator extends PlanetGenerator{
+public class SerpuloPlanetGenerator extends PlanetGenerator{
     Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
     BaseGenerator basegen = new BaseGenerator();
@@ -92,7 +92,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
         position = Tmp.v33.set(position).scl(scl);
         float rad = scl;
         float temp = Mathf.clamp(Math.abs(position.y * 2f) / (rad));
-        float tnoise = (float)noise.octaveNoise3D(7, 0.5f, 1f/3f, position.x, position.y + 999f, position.z);
+        float tnoise = (float)noise.octaveNoise3D(7, 0.56, 1f/3f, position.x, position.y + 999f, position.z);
         temp = Mathf.lerp(temp, tnoise, 0.5f);
         height *= 1.2f;
         height = Mathf.clamp(height);
@@ -242,7 +242,7 @@ public class TODOPlanetGenerator extends PlanetGenerator{
             for(int i = ores.size - 1; i >= 0; i--){
                 Block entry = ores.get(i);
                 float freq = frequencies.get(i);
-                if(Math.abs(0.5f - noise(offsetX, offsetY + i*999, 2, 0.7, (40 + i * 2))) > 0.25f &&
+                if(Math.abs(0.5f - noise(offsetX, offsetY + i*999, 2, 0.7, (40 + i * 2))) > 0.22f + i*0.01 &&
                     Math.abs(0.5f - noise(offsetX, offsetY - i*999, 1, 1, (30 + i * 4))) > 0.37f + freq){
                     ore = entry;
                     break;
@@ -281,15 +281,17 @@ public class TODOPlanetGenerator extends PlanetGenerator{
 
         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
+        float difficulty = sector.baseCoverage;
+
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
 
             state.rules.attackMode = true;
+        }else{
+            state.rules.winWave = 15 * (int)Math.max(difficulty, 1);
         }
 
         state.rules.waves = true;
-
-        float difficulty = sector.baseCoverage;
 
         //scale up the spawning base on difficulty (this is just for testing)
         for(SpawnGroup group : state.rules.spawns){

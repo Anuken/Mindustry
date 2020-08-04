@@ -172,7 +172,7 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void drawLabel(float x, float y, String text, Color color){
-        BitmapFont font = Fonts.outline;
+        Font font = Fonts.outline;
         GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.getData().setScale(1 / 1.5f / Scl.scl(1f));

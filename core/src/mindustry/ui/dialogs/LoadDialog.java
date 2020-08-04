@@ -24,7 +24,7 @@ public class LoadDialog extends BaseDialog{
     Table slots;
 
     public LoadDialog(){
-        this("$loadgame");
+        this("@loadgame");
     }
 
     public LoadDialog(String title){
@@ -80,14 +80,14 @@ public class LoadDialog extends BaseDialog{
                     }).checked(slot.isAutosave()).right();
 
                     t.button(Icon.trash, Styles.emptyi, () -> {
-                        ui.showConfirm("$confirm", "$save.delete.confirm", () -> {
+                        ui.showConfirm("@confirm", "@save.delete.confirm", () -> {
                             slot.delete();
                             setup();
                         });
                     }).right();
 
                     t.button(Icon.pencil, Styles.emptyi, () -> {
-                        ui.showTextInput("$save.rename", "$save.rename.text", slot.getName(), text -> {
+                        ui.showTextInput("@save.rename", "@save.rename.text", slot.getName(), text -> {
                             slot.setName(text);
                             setup();
                         });
@@ -141,7 +141,7 @@ public class LoadDialog extends BaseDialog{
         }
 
         if(!any){
-            slots.button("$save.none", () -> {}).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
+            slots.button("@save.none", () -> {}).disabled(true).fillX().margin(20f).minWidth(340f).height(80f).pad(4f);
         }
 
         cont.add(pane);
@@ -149,7 +149,7 @@ public class LoadDialog extends BaseDialog{
 
     public void addSetup(){
 
-        buttons.button("$save.import", Icon.add, () -> {
+        buttons.button("@save.import", Icon.add, () -> {
             platform.showFileChooser(true, saveExtension, file -> {
                 if(SaveIO.isSaveValid(file)){
                     try{
@@ -157,10 +157,10 @@ public class LoadDialog extends BaseDialog{
                         setup();
                     }catch(IOException e){
                         e.printStackTrace();
-                        ui.showException("$save.import.fail", e);
+                        ui.showException("@save.import.fail", e);
                     }
                 }else{
-                    ui.showErrorMessage("$save.import.invalid");
+                    ui.showErrorMessage("@save.import.invalid");
                 }
             });
         }).fillX().margin(10f);
@@ -180,7 +180,7 @@ public class LoadDialog extends BaseDialog{
                 }catch(SaveException e){
                     Log.err(e);
                     logic.reset();
-                    ui.showErrorMessage("$save.corrupted");
+                    ui.showErrorMessage("@save.corrupted");
                 }
             });
         });

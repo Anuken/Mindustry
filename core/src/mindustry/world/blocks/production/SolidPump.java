@@ -23,6 +23,7 @@ public class SolidPump extends Pump{
     public Effect updateEffect = Fx.none;
     public float updateEffectChance = 0.02f;
     public float rotateSpeed = 1f;
+    public float baseEfficiency = 1f;
     /** Attribute that is checked when calculating output. */
     public @Nullable Attribute attribute;
 
@@ -36,7 +37,7 @@ public class SolidPump extends Pump{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         if(attribute != null){
-            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", Math.max(sumAttribute(attribute, x, y) + 1f, 0f) * 100 * percentSolid(x, y), 1), x, y, valid);
+            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", Math.max(sumAttribute(attribute, x, y) / size / size + baseEfficiency, 0f) * 100 * percentSolid(x, y), 1), x, y, valid);
         }
     }
 
@@ -56,22 +57,14 @@ public class SolidPump extends Pump{
         stats.remove(BlockStat.output);
         stats.add(BlockStat.output, result, 60f * pumpAmount, true);
         if(attribute != null){
-            stats.add(BlockStat.affinities, attribute);
+            stats.add(baseEfficiency > 0.0001f ? BlockStat.affinities : BlockStat.tiles, attribute);
         }
     }
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team){
-        if(isMultiblock()){
-            for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-                if(canPump(other)){
-                    return true;
-                }
-            }
-            return false;
-        }else{
-            return canPump(tile);
-        }
+        float sum = tile.getLinkedTilesAs(this, tempTiles).sumf(t -> canPump(t) ? baseEfficiency + (attribute != null ? t.floor().attributes.get(attribute) : 0f) : 0f);
+        return sum > 0.00001f;
     }
 
     @Override
@@ -88,6 +81,7 @@ public class SolidPump extends Pump{
         public float warmup;
         public float pumpTime;
         public float boost;
+        public float validTiles;
         public float lastPump;
 
         @Override
@@ -108,20 +102,7 @@ public class SolidPump extends Pump{
 
         @Override
         public void updateTile(){
-            float fraction = 0f;
-
-            if(isMultiblock()){
-                for(Tile other : tile.getLinkedTiles(tempTiles)){
-                    if(canPump(other)){
-                        fraction += 1f / (size * size);
-                    }
-                }
-            }else{
-                if(canPump(tile)) fraction = 1f;
-            }
-
-            fraction += boost + (attribute == null ? 0 : attribute.env());
-            fraction = Math.max(fraction, 0);
+            float fraction = Math.max(validTiles + boost + (attribute == null ? 0 : attribute.env()), 0);
 
             if(cons.valid() && typeLiquid() < liquidCapacity - 0.001f){
                 float maxPump = Math.min(liquidCapacity - typeLiquid(), pumpAmount * delta() * fraction * efficiency());
@@ -144,8 +125,12 @@ public class SolidPump extends Pump{
         public void onProximityUpdate(){
             super.onProximityAdded();
 
-            if(attribute != null){
-                boost = sumAttribute(attribute, tile.x, tile.y);
+            boost = sumAttribute(attribute, tile.x, tile.y) / size / size;
+            validTiles = 0f;
+            for(Tile other : tile.getLinkedTiles(tempTiles)){
+                if(canPump(other)){
+                    validTiles += baseEfficiency / (size * size);
+                }
             }
         }
 

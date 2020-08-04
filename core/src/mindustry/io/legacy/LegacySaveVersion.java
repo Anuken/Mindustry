@@ -66,7 +66,7 @@ public abstract class LegacySaveVersion extends SaveVersion{
                         readChunk(stream, true, in -> {
                             byte version = in.readByte();
                             //legacy impl of Building#read()
-                            tile.build.health(stream.readUnsignedShort());
+                            tile.build.health = stream.readUnsignedShort();
                             byte packedrot = stream.readByte();
                             byte team = Pack.leftByte(packedrot) == 8 ? stream.readByte() : Pack.leftByte(packedrot);
                             byte rotation = Pack.rightByte(packedrot);

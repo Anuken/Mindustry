@@ -246,11 +246,13 @@ public class Blocks implements ContentList{
         sand = new Floor("sand"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
+            attributes.set(Attribute.oil, 0.7f);
         }};
 
         darksand = new Floor("darksand"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
+            attributes.set(Attribute.oil, 1.5f);
         }};
 
         ((ShallowLiquid)darksandTaintedWater).set(Blocks.taintedWater, Blocks.darksand);
@@ -267,7 +269,8 @@ public class Blocks implements ContentList{
 
         salt = new Floor("salt"){{
             variants = 0;
-            attributes.set(Attribute.water, -0.2f);
+            attributes.set(Attribute.water, -0.25f);
+            attributes.set(Attribute.oil, 0.3f);
         }};
 
         snow = new Floor("snow"){{
@@ -355,7 +358,7 @@ public class Blocks implements ContentList{
 
         shale = new Floor("shale"){{
             variants = 3;
-            attributes.set(Attribute.oil, 0.15f);
+            attributes.set(Attribute.oil, 1f);
         }};
 
         shaleRocks = new StaticWall("shalerocks"){{
@@ -1270,6 +1273,8 @@ public class Blocks implements ContentList{
             size = 3;
             liquidCapacity = 30f;
             attribute = Attribute.oil;
+            baseEfficiency = 0f;
+            itemUseTime = 60f;
 
             consumes.item(Items.sand);
             consumes.power(3f);
@@ -1460,6 +1465,7 @@ public class Blocks implements ContentList{
                 hitSize = 4;
                 lifetime = 16f;
                 drawSize = 400f;
+                collidesAir = false;
             }};
         }};
 

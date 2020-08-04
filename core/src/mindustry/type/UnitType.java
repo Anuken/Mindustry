@@ -80,6 +80,7 @@ public class UnitType extends UnlockableContent{
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
     public boolean canHeal = false;
+    public boolean singleTarget = false;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -101,9 +102,10 @@ public class UnitType extends UnlockableContent{
 
     public Unit create(Team team){
         Unit unit = constructor.get();
-        unit.team(team);
+        unit.team = team;
         unit.type(this);
-        unit.ammo(ammoCapacity); //fill up on ammo upon creation
+        unit.ammo = ammoCapacity; //fill up on ammo upon creation
+        unit.elevation = flying ? 1f : 0;
         unit.heal();
         return unit;
     }
@@ -179,10 +181,13 @@ public class UnitType extends UnlockableContent{
     public void init(){
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
 
+        singleTarget = weapons.size <= 1;
+
         //set up default range
         if(range < 0){
+            range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                range = Math.max(range, weapon.bullet.range());
+                range = Math.min(range, weapon.bullet.range() + hitsize/2f);
             }
         }
 
@@ -380,7 +385,7 @@ public class UnitType extends UnlockableContent{
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime);
 
-            if(unit.isLocal()){
+            if(unit.isLocal() && !renderer.pixelator.enabled()){
                 Fonts.outline.draw(unit.stack.amount + "",
                 unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
                 unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,

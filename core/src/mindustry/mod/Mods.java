@@ -217,7 +217,7 @@ public class Mods implements Loadable{
         boolean deleted = mod.file.isDirectory() ? mod.file.deleteDirectory() : mod.file.delete();
 
         if(!deleted){
-            ui.showErrorMessage("$mod.delete.error");
+            ui.showErrorMessage("@mod.delete.error");
             return;
         }
         mods.remove(mod);
@@ -371,7 +371,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           ui.showErrorMessage("$mod.scripts.disable");
+           ui.showErrorMessage("@mod.scripts.disable");
         }
 
         //show list of errored content
@@ -381,11 +381,11 @@ public class Mods implements Loadable{
 
                 setFillParent(true);
                 cont.margin(15);
-                cont.add("$error.title");
+                cont.add("@error.title");
                 cont.row();
                 cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
                 cont.row();
-                cont.add("$mod.errors").wrap().growX().center().get().setAlignment(Align.center);
+                cont.add("@mod.errors").wrap().growX().center().get().setAlignment(Align.center);
                 cont.row();
                 cont.pane(p -> {
                     mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
@@ -397,12 +397,12 @@ public class Mods implements Loadable{
                             d.left().marginLeft(15f);
                             for(Content c : m.erroredContent){
                                 d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.button("$details", Icon.downOpen, Styles.transt, () -> {
+                                d.button("@details", Icon.downOpen, Styles.transt, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
                                         cont.pane(e -> e.add(c.minfo.error).wrap().grow()).grow();
                                         cont.row();
-                                        cont.button("$ok", Icon.left, this::hide).size(240f, 60f);
+                                        cont.button("@ok", Icon.left, this::hide).size(240f, 60f);
                                     }}.show();
                                 }).size(190f, 50f).left().marginLeft(6);
                                 d.row();
@@ -413,7 +413,7 @@ public class Mods implements Loadable{
                 });
 
                 cont.row();
-                cont.button("$ok", this::hide).size(300, 50);
+                cont.button("@ok", this::hide).size(300, 50);
             }}.show();
         }
     }
@@ -598,6 +598,7 @@ public class Mods implements Loadable{
         }
 
         ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
+        meta.cleanup();
         String camelized = meta.name.replace(" ", "");
         String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
         String baseName = meta.name.toLowerCase().replace(" ", "-");
@@ -751,12 +752,12 @@ public class Mods implements Loadable{
         @Override
         public boolean prePublish(){
             if(!file.isDirectory()){
-                ui.showErrorMessage("$mod.folder.missing");
+                ui.showErrorMessage("@mod.folder.missing");
                 return false;
             }
 
             if(!file.child("preview.png").exists()){
-                ui.showErrorMessage("$mod.preview.missing");
+                ui.showErrorMessage("@mod.preview.missing");
                 return false;
             }
 
@@ -782,6 +783,13 @@ public class Mods implements Loadable{
 
         public String displayName(){
             return displayName == null ? name : displayName;
+        }
+
+        //removes all colors
+        public void cleanup(){
+            if(displayName != null) displayName = Strings.stripColors(displayName);
+            if(author != null) author = Strings.stripColors(author);
+            if(description != null) description = Strings.stripColors(description);
         }
     }
 

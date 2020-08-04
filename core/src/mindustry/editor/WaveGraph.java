@@ -35,7 +35,7 @@ public class WaveGraph extends Table{
             Lines.precise(true);
 
             GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
-            BitmapFont font = Fonts.outline;
+            Font font = Fonts.outline;
 
             lay.setText(font, "1");
 
@@ -137,7 +137,7 @@ public class WaveGraph extends Table{
             ButtonGroup<Button> group = new ButtonGroup<>();
 
             for(Mode m : Mode.all){
-                t.button("$wavemode." + m.name(), Styles.fullTogglet, () -> {
+                t.button("@wavemode." + m.name(), Styles.fullTogglet, () -> {
                     mode = m;
                 }).group(group).height(35f).update(b -> b.setChecked(m == mode)).width(130f);
             }
@@ -173,22 +173,25 @@ public class WaveGraph extends Table{
 
         colors.clear();
         colors.left();
-        for(UnitType type : used){
-            colors.button(b -> {
-                Color tcolor = color(type).cpy();
-                b.image().size(32f).update(i -> i.setColor(b.isChecked() ? Tmp.c1.set(tcolor).mul(0.5f) : tcolor)).get().act(1);
-                b.image(type.icon(Cicon.medium)).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
-                b.margin(0f);
-            }, Styles.fullTogglet, () -> {
-                if(!hidden.add(type)){
-                    hidden.remove(type);
-                }
+        colors.pane(t -> {
+            t.left();
+            for(UnitType type : used){
+                t.button(b -> {
+                    Color tcolor = color(type).cpy();
+                    b.image().size(32f).update(i -> i.setColor(b.isChecked() ? Tmp.c1.set(tcolor).mul(0.5f) : tcolor)).get().act(1);
+                    b.image(type.icon(Cicon.medium)).padRight(20).update(i -> i.setColor(b.isChecked() ? Color.gray : Color.white)).get().act(1);
+                    b.margin(0f);
+                }, Styles.fullTogglet, () -> {
+                    if(!hidden.add(type)){
+                        hidden.remove(type);
+                    }
 
-                used.clear();
-                used.addAll(usedCopy);
-                for(UnitType o : hidden) used.remove(o);
-            }).update(b -> b.setChecked(hidden.contains(type)));
-        }
+                    used.clear();
+                    used.addAll(usedCopy);
+                    for(UnitType o : hidden) used.remove(o);
+                }).update(b -> b.setChecked(hidden.contains(type)));
+            }
+        }).get().setScrollingDisabled(false, true);
 
         for(UnitType type : hidden){
             used.remove(type);

@@ -160,5 +160,9 @@ public class SectorInfo{
 
         /** mean in terms of items produced per refresh rate (currently, per second) */
         public float mean;
+
+        public String toString(){
+            return mean + "";
+        }
     }
 }
