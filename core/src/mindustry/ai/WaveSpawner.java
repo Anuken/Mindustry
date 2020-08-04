@@ -41,6 +41,8 @@ public class WaveSpawner{
         spawning = true;
 
         for(SpawnGroup group : state.rules.spawns){
+            if(group.type == null) continue;
+
             int spawned = group.getUnitsSpawned(state.wave - 1);
 
             if(group.type.flying){
