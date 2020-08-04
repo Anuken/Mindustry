@@ -265,7 +265,8 @@ public class Block extends UnlockableContent{
         return width;
     }
 
-    public float sumAttribute(Attribute attr, int x, int y){
+    public float sumAttribute(@Nullable Attribute attr, int x, int y){
+        if(attr == null) return 0;
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
