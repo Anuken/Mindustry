@@ -41,6 +41,7 @@ public class ScriptStubGenerator{
         classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
         || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()));
         classes.distinct();
+        classes.sortComparing(Class::getName);
         ObjectSet<String> used = ObjectSet.with();
 
         StringBuilder result = new StringBuilder("//Generated class. Do not modify.\n");

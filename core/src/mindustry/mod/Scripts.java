@@ -2,7 +2,6 @@ package mindustry.mod;
 
 import arc.*;
 import arc.files.*;
-import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -75,10 +74,6 @@ public class Scripts implements Disposable{
     }
 
     //utility mod functions
-
-    public <T> void onEvent(Class<T> type, Cons<T> listener){
-        Events.on(type, listener);
-    }
 
     public String readString(String path){
         return Vars.tree.get(path, true).readString();

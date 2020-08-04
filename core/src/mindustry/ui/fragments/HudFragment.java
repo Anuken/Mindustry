@@ -241,7 +241,7 @@ public class HudFragment extends Fragment{
             float[] coreAttackTime = {0};
             float[] coreAttackOpacity = {0};
 
-            Events.on(Trigger.teamCoreDamage, () -> {
+            Events.run(Trigger.teamCoreDamage, () -> {
                 coreAttackTime[0] = notifDuration;
             });
 

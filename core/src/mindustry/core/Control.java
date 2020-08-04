@@ -171,7 +171,7 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(Trigger.newGame, () -> {
+        Events.run(Trigger.newGame, () -> {
             Building core = player.closestCore();
 
             if(core == null) return;
