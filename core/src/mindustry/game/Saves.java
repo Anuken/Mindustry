@@ -270,7 +270,7 @@ public class Saves{
             mods.removeAll(Vars.mods.getModStrings());
 
             if(!mods.isEmpty()){
-                ui.showConfirm("$warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
+                ui.showConfirm("@warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
             }else{
                 run.run();
             }

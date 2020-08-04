@@ -111,7 +111,7 @@ public interface Platform{
      * @param extension File extension to filter
      */
     default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-        new FileChooser(open ? "$open" : "$save", file -> file.extEquals(extension), open, file -> {
+        new FileChooser(open ? "@open" : "@save", file -> file.extEquals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
             }else{
@@ -129,7 +129,7 @@ public interface Platform{
         if(mobile){
             showFileChooser(true, extensions[0], cons);
         }else{
-            new FileChooser("$open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+            new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
         }
     }
 

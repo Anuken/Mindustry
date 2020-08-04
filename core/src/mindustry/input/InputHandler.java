@@ -396,18 +396,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
 
-        ui.showTextInput("$schematic.add", "$name", "", text -> {
+        ui.showTextInput("@schematic.add", "@name", "", text -> {
             Schematic replacement = schematics.all().find(s -> s.name().equals(text));
             if(replacement != null){
-                ui.showConfirm("$confirm", "$schematic.replace", () -> {
+                ui.showConfirm("@confirm", "@schematic.replace", () -> {
                     schematics.overwrite(replacement, lastSchematic);
-                    ui.showInfoFade("$schematic.saved");
+                    ui.showInfoFade("@schematic.saved");
                     ui.schematics.showInfo(replacement);
                 });
             }else{
                 lastSchematic.tags.put("name", text);
                 schematics.add(lastSchematic);
-                ui.showInfoFade("$schematic.saved");
+                ui.showInfoFade("@schematic.saved");
                 ui.schematics.showInfo(lastSchematic);
             }
         });

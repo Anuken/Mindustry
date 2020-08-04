@@ -122,7 +122,7 @@ public class Control implements ApplicationListener, Loadable{
                     net.host(port);
                     player.admin(true);
                 }catch(IOException e){
-                    ui.showException("$server.error", e);
+                    ui.showException("@server.error", e);
                     state.set(State.menu);
                 }
             }
@@ -312,7 +312,7 @@ public class Control implements ApplicationListener, Loadable{
                 }catch(SaveException e){
                     Log.err(e);
                     sector.save = null;
-                    Time.runTask(10f, () -> ui.showErrorMessage("$save.corrupted"));
+                    Time.runTask(10f, () -> ui.showErrorMessage("@save.corrupted"));
                     slot.delete();
                     playSector(origin, sector);
                 }
@@ -451,7 +451,7 @@ public class Control implements ApplicationListener, Loadable{
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             Core.app.post(() -> Core.app.post(() -> {
-                BaseDialog dialog = new BaseDialog("$confirm");
+                BaseDialog dialog = new BaseDialog("@confirm");
                 dialog.setFillParent(true);
 
                 float[] countdown = {60 * 11};
@@ -470,9 +470,9 @@ public class Control implements ApplicationListener, Loadable{
                 }).pad(10f).expand().center();
 
                 dialog.buttons.defaults().size(200f, 60f);
-                dialog.buttons.button("$uiscale.cancel", exit);
+                dialog.buttons.button("@uiscale.cancel", exit);
 
-                dialog.buttons.button("$ok", () -> {
+                dialog.buttons.button("@ok", () -> {
                     Core.settings.put("uiscalechanged", false);
                     dialog.hide();
                 });

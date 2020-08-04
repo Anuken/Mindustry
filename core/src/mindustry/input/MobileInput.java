@@ -243,7 +243,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         group.fill(t -> {
             t.visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
             t.bottom().left();
-            t.button("$cancel", Icon.cancel, () -> {
+            t.button("@cancel", Icon.cancel, () -> {
                 player.builder().clearBuilding();
                 selectRequests.clear();
                 mode = none;

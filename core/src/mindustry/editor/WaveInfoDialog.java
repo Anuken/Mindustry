@@ -32,7 +32,7 @@ public class WaveInfoDialog extends BaseDialog{
     private WaveGraph graph = new WaveGraph();
 
     public WaveInfoDialog(MapEditor editor){
-        super("$waves.title");
+        super("@waves.title");
 
         shown(this::setup);
         hidden(() -> {
@@ -48,29 +48,29 @@ public class WaveInfoDialog extends BaseDialog{
         onResize(this::setup);
         addCloseButton();
 
-        buttons.button("$waves.edit", () -> {
-            BaseDialog dialog = new BaseDialog("$waves.edit");
+        buttons.button("@waves.edit", () -> {
+            BaseDialog dialog = new BaseDialog("@waves.edit");
             dialog.addCloseButton();
             dialog.setFillParent(false);
             dialog.cont.defaults().size(210f, 64f);
-            dialog.cont.button("$waves.copy", () -> {
-                ui.showInfoFade("$waves.copied");
+            dialog.cont.button("@waves.copy", () -> {
+                ui.showInfoFade("@waves.copied");
                 Core.app.setClipboardText(maps.writeWaves(groups));
                 dialog.hide();
             }).disabled(b -> groups == null);
             dialog.cont.row();
-            dialog.cont.button("$waves.load", () -> {
+            dialog.cont.button("@waves.load", () -> {
                 try{
                     groups = maps.readWaves(Core.app.getClipboardText());
                     buildGroups();
                 }catch(Exception e){
                     e.printStackTrace();
-                    ui.showErrorMessage("$waves.invalid");
+                    ui.showErrorMessage("@waves.invalid");
                 }
                 dialog.hide();
             }).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty());
             dialog.cont.row();
-            dialog.cont.button("$settings.reset", () -> ui.showConfirm("$confirm", "$settings.clear.confirm", () -> {
+            dialog.cont.button("@settings.reset", () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
                 groups = JsonIO.copy(defaultWaves.get());
                 buildGroups();
                 dialog.hide();
@@ -130,12 +130,12 @@ public class WaveInfoDialog extends BaseDialog{
         cont.stack(new Table(Tex.clear, main -> {
             main.pane(t -> table = t).growX().growY().padRight(8f).get().setScrollingDisabled(true, false);
             main.row();
-            main.button("$add", () -> {
+            main.button("@add", () -> {
                 if(groups == null) groups = new Seq<>();
                 groups.add(new SpawnGroup(lastType));
                 buildGroups();
             }).growX().height(70f);
-        }), new Label("$waves.none"){{
+        }), new Label("@waves.none"){{
             visible(() -> groups.isEmpty());
             this.touchable = Touchable.disabled;
             setWrap(true);
@@ -180,7 +180,7 @@ public class WaveInfoDialog extends BaseDialog{
                                 updateWaves();
                             }
                         }).width(100f);
-                        spawns.add("$waves.to").padLeft(4).padRight(4);
+                        spawns.add("@waves.to").padLeft(4).padRight(4);
                         spawns.field(group.end == never ? "" : (group.end + 1) + "", TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePositiveInt(text)){
                                 group.end = Strings.parseInt(text) - 1;
@@ -193,14 +193,14 @@ public class WaveInfoDialog extends BaseDialog{
                     });
                     t.row();
                     t.table(p -> {
-                        p.add("$waves.every").padRight(4);
+                        p.add("@waves.every").padRight(4);
                         p.field(group.spacing + "", TextFieldFilter.digitsOnly, text -> {
                             if(Strings.canParsePositiveInt(text) && Strings.parseInt(text) > 0){
                                 group.spacing = Strings.parseInt(text);
                                 updateWaves();
                             }
                         }).width(100f);
-                        p.add("$waves.waves").padLeft(4);
+                        p.add("@waves.waves").padLeft(4);
                     });
 
                     t.row();
@@ -219,7 +219,7 @@ public class WaveInfoDialog extends BaseDialog{
                                 updateWaves();
                             }
                         }).width(80f);
-                        a.add("$waves.perspawn").padLeft(4);
+                        a.add("@waves.perspawn").padLeft(4);
                     });
                     t.row();
                     t.table(a -> {
@@ -237,17 +237,17 @@ public class WaveInfoDialog extends BaseDialog{
                                 updateWaves();
                             }
                         }).width(80f);
-                        a.add("$waves.shields").padLeft(4);
+                        a.add("@waves.shields").padLeft(4);
                     });
 
                     t.row();
-                    t.check("$waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
+                    t.check("@waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
                 }).width(340f).pad(8);
 
                 table.row();
             }
         }else{
-            table.add("$editor.default");
+            table.add("@editor.default");
         }
 
         updateWaves();

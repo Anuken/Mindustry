@@ -58,34 +58,34 @@ public class MapGenerateDialog extends BaseDialog{
 
     /** @param applied whether or not to use the applied in-game mode. */
     public MapGenerateDialog(MapEditor editor, boolean applied){
-        super("$editor.generate");
+        super("@editor.generate");
         this.editor = editor;
         this.applied = applied;
 
         shown(this::setup);
         addCloseButton();
         if(applied){
-            buttons.button("$editor.apply", () -> {
+            buttons.button("@editor.apply", () -> {
                 ui.loadAnd(() -> {
                     apply();
                     hide();
                 });
             }).size(160f, 64f);
         }else{
-            buttons.button("$settings.reset", () -> {
+            buttons.button("@settings.reset", () -> {
                 filters.set(maps.readFilters(""));
                 rebuildFilters();
                 update();
             }).size(160f, 64f);
         }
-        buttons.button("$editor.randomize", () -> {
+        buttons.button("@editor.randomize", () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
         }).size(160f, 64f);
 
-        buttons.button("$add", Icon.add, this::showAdd).height(64f).width(140f);
+        buttons.button("@add", Icon.add, this::showAdd).height(64f).width(140f);
 
         if(!applied){
             hidden(this::apply);
@@ -277,12 +277,12 @@ public class MapGenerateDialog extends BaseDialog{
         }
 
         if(filters.isEmpty()){
-            filterTable.add("$filters.empty").wrap().width(200f);
+            filterTable.add("@filters.empty").wrap().width(200f);
         }
     }
 
     void showAdd(){
-        BaseDialog selection = new BaseDialog("$add");
+        BaseDialog selection = new BaseDialog("@add");
         selection.setFillParent(false);
         selection.cont.defaults().size(210f, 60f);
         int i = 0;
@@ -300,7 +300,7 @@ public class MapGenerateDialog extends BaseDialog{
             if(++i % 2 == 0) selection.cont.row();
         }
 
-        selection.cont.button("$filter.defaultores", () -> {
+        selection.cont.button("@filter.defaultores", () -> {
             maps.addDefaultOres(filters);
             rebuildFilters();
             update();

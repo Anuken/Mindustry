@@ -266,11 +266,11 @@ public class Maps{
             Log.err(e);
 
             if("Outdated legacy map format".equals(e.getMessage())){
-                ui.showErrorMessage("$editor.errornot");
+                ui.showErrorMessage("@editor.errornot");
             }else if(e.getMessage() != null && e.getMessage().contains("Incorrect header!")){
-                ui.showErrorMessage("$editor.errorheader");
+                ui.showErrorMessage("@editor.errorheader");
             }else{
-                ui.showException("$editor.errorload", e);
+                ui.showException("@editor.errorload", e);
             }
         }
     }

@@ -58,7 +58,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         infoDialog = new MapInfoDialog(editor);
         generateDialog = new MapGenerateDialog(editor, true);
 
-        menu = new BaseDialog("$menu");
+        menu = new BaseDialog("@menu");
         menu.addCloseButton();
 
         float swidth = 180f;
@@ -66,41 +66,41 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.cont.table(t -> {
             t.defaults().size(swidth, 60f).padBottom(5).padRight(5).padLeft(5);
 
-            t.button("$editor.savemap", Icon.save, this::save);
+            t.button("@editor.savemap", Icon.save, this::save);
 
-            t.button("$editor.mapinfo", Icon.pencil, () -> {
+            t.button("@editor.mapinfo", Icon.pencil, () -> {
                 infoDialog.show();
                 menu.hide();
             });
 
             t.row();
 
-            t.button("$editor.generate", Icon.terrain, () -> {
+            t.button("@editor.generate", Icon.terrain, () -> {
                 generateDialog.show(generateDialog::applyToEditor);
                 menu.hide();
             });
 
-            t.button("$editor.resize", Icon.resize, () -> {
+            t.button("@editor.resize", Icon.resize, () -> {
                 resizeDialog.show();
                 menu.hide();
             });
 
             t.row();
 
-            t.button("$editor.import", Icon.download, () -> createDialog("$editor.import",
-                "$editor.importmap", "$editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
-                "$editor.importfile", "$editor.importfile.description", Icon.file, (Runnable)() ->
+            t.button("@editor.import", Icon.download, () -> createDialog("@editor.import",
+                "@editor.importmap", "@editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
+                "@editor.importfile", "@editor.importfile.description", Icon.file, (Runnable)() ->
                 platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
                     maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
-                            ui.showInfo("$editor.errorimage");
+                            ui.showInfo("@editor.errorimage");
                         }else{
                             editor.beginEdit(MapIO.createMap(file, true));
                         }
                     });
                 })),
 
-                "$editor.importimage", "$editor.importimage.description", Icon.fileImage, (Runnable)() ->
+                "@editor.importimage", "@editor.importimage.description", Icon.fileImage, (Runnable)() ->
                 platform.showFileChooser(true, "png", file ->
                 ui.loadAnd(() -> {
                     try{
@@ -108,16 +108,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         editor.beginEdit(pixmap);
                         pixmap.dispose();
                     }catch(Exception e){
-                        ui.showException("$editor.errorload", e);
+                        ui.showException("@editor.errorload", e);
                         Log.err(e);
                     }
                 })))
             );
 
-            t.button("$editor.export", Icon.upload, () -> createDialog("$editor.export",
-            "$editor.exportfile", "$editor.exportfile.description", Icon.file,
+            t.button("@editor.export", Icon.upload, () -> createDialog("@editor.export",
+            "@editor.exportfile", "@editor.exportfile.description", Icon.file,
                 (Runnable)() -> platform.export(editor.getTags().get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
-            "$editor.exportimage", "$editor.exportimage.description", Icon.fileImage,
+            "@editor.exportimage", "@editor.exportimage.description", Icon.fileImage,
                 (Runnable)() -> platform.export(editor.getTags().get("name", "unknown"), "png", file -> {
                     Pixmap out = MapIO.writeImage(editor.tiles());
                     file.writePNG(out);
@@ -128,7 +128,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.cont.row();
 
         if(steam){
-            menu.cont.button("$editor.publish.workshop", Icon.link, () -> {
+            menu.cont.button("@editor.publish.workshop", Icon.link, () -> {
                 Map builtin = maps.all().find(m -> m.name().equals(editor.getTags().get("name", "").trim()));
 
                 if(editor.getTags().containsKey("steamid") && builtin != null && !builtin.custom){
@@ -146,26 +146,26 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 if(map == null) return;
 
                 if(map.tags.get("description", "").length() < 4){
-                    ui.showErrorMessage("$editor.nodescription");
+                    ui.showErrorMessage("@editor.nodescription");
                     return;
                 }
 
                 if(!Structs.contains(Gamemode.all, g -> g.valid(map))){
-                    ui.showErrorMessage("$map.nospawn");
+                    ui.showErrorMessage("@map.nospawn");
                     return;
                 }
 
                 platform.publish(map);
-            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? editor.getTags().get("author").equals(player.name) ? "$workshop.listing" : "$view.workshop" : "$editor.publish.workshop"));
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? editor.getTags().get("author").equals(player.name) ? "@workshop.listing" : "@view.workshop" : "@editor.publish.workshop"));
 
             menu.cont.row();
         }
 
-        menu.cont.button("$editor.ingame", Icon.right, this::playtest).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
+        menu.cont.button("@editor.ingame", Icon.right, this::playtest).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
 
         menu.cont.row();
 
-        menu.cont.button("$quit", Icon.exit, () -> {
+        menu.cont.button("@quit", Icon.exit, () -> {
             tryExit();
             menu.hide();
         }).size(swidth * 2f + 10, 60f);
@@ -182,7 +182,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             try{
                 editor.beginEdit(map);
             }catch(Exception e){
-                ui.showException("$editor.errorload", e);
+                ui.showException("@editor.errorload", e);
                 Log.err(e);
             }
         }));
@@ -280,14 +280,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(name.isEmpty()){
             infoDialog.show();
-            Core.app.post(() -> ui.showErrorMessage("$editor.save.noname"));
+            Core.app.post(() -> ui.showErrorMessage("@editor.save.noname"));
         }else{
             Map map = maps.all().find(m -> m.name().equals(name));
             if(map != null && !map.custom){
                 handleSaveBuiltin(map);
             }else{
                 returned = maps.saveMap(editor.getTags());
-                ui.showInfoFade("$editor.saved");
+                ui.showInfoFade("@editor.saved");
             }
         }
 
@@ -299,7 +299,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     /** Called when a built-in map save is attempted.*/
     protected void handleSaveBuiltin(Map map){
-        ui.showErrorMessage("$editor.save.overwrite");
+        ui.showErrorMessage("@editor.save.overwrite");
     }
 
     /**
@@ -368,7 +368,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 show();
             }catch(Exception e){
                 Log.err(e);
-                ui.showException("$editor.errorload", e);
+                ui.showException("@editor.errorload", e);
             }
         });
     }
@@ -521,7 +521,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
-                tools.table(Tex.underline, t -> t.add("$editor.teams"))
+                tools.table(Tex.underline, t -> t.add("@editor.teams"))
                 .colspan(3).height(40).width(size * 3f + 3f).padBottom(3);
 
                 tools.row();
@@ -557,7 +557,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     }
 
                     t.top();
-                    t.add("$editor.brush");
+                    t.add("@editor.brush");
                     t.row();
                     t.add(slider).width(size * 3f - 20).padTop(4f);
                 }).padTop(5).growX().top();
@@ -650,7 +650,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     private void tryExit(){
         if(!saved){
-            ui.showConfirm("$confirm", "$editor.unsaved", this::hide);
+            ui.showConfirm("@confirm", "@editor.unsaved", this::hide);
         }else{
             hide();
         }

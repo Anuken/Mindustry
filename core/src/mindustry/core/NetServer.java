@@ -740,7 +740,7 @@ public class NetServer implements ApplicationListener{
 
         if(!headless && !closing && net.server() && state.isMenu()){
             closing = true;
-            ui.loadfrag.show("$server.closing");
+            ui.loadfrag.show("@server.closing");
             Time.runTask(5f, () -> {
                 net.closeServer();
                 ui.loadfrag.hide();
