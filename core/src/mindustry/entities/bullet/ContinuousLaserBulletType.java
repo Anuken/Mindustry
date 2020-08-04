@@ -53,7 +53,7 @@ public class ContinuousLaserBulletType extends BulletType{
         }
 
         if(shake > 0){
-            Effects.shake(shake, shake, b);
+            Effect.shake(shake, shake, b);
         }
     }
 

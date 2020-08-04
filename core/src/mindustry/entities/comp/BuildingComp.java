@@ -879,7 +879,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame);
         if(!floor().solid && !floor().isLiquid){
-            Effects.rubble(x, y, block.size);
+            Effect.rubble(x, y, block.size);
         }
     }
 

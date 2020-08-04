@@ -109,7 +109,7 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(GameOverEvent.class, event -> {
             state.stats.wavesLasted = state.wave;
-            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            Effect.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.gameOver(event.winner);
         });
@@ -188,7 +188,7 @@ public class Control implements ApplicationListener, Loadable{
             app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
-                Effects.shake(5f, 5f, core);
+                Effect.shake(5f, 5f, core);
             });
         });
 

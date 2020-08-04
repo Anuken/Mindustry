@@ -2,6 +2,7 @@ package mindustry.core;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -11,6 +12,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -314,7 +316,6 @@ public class NetClient implements ApplicationListener{
         ui.showLabel(message, duration, worldx, worldy);
     }
 
-    /*
     @Remote(variants = Variant.both, unreliable = true)
     public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
         if(effect == null) return;
@@ -325,7 +326,7 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
         onEffect(effect, x, y, rotation, color);
-    }*/
+    }
 
     @Remote(variants = Variant.both)
     public static void infoToast(String message, float duration){

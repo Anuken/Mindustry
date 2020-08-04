@@ -104,7 +104,7 @@ public class LaunchPad extends Block{
                 entity.add();
                 Fx.launchPod.at(this);
                 items.clear();
-                Effects.shake(3f, 3f, this);
+                Effect.shake(3f, 3f, this);
             }
         }
     }

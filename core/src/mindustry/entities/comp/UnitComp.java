@@ -181,7 +181,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void landed(){
         if(type.landShake > 0f){
-            Effects.shake(type.landShake, type.landShake, this);
+            Effect.shake(type.landShake, type.landShake, this);
         }
 
         type.landed(base());
@@ -283,9 +283,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         float shake = hitSize / 3f;
 
-        Effects.scorch(x, y, (int)(hitSize / 5));
+        Effect.scorch(x, y, (int)(hitSize / 5));
         Fx.explosion.at(this);
-        Effects.shake(shake, shake, this);
+        Effect.shake(shake, shake, this);
         type.deathSound.at(this);
 
         Events.fire(new UnitDestroyEvent(base()));
@@ -304,7 +304,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(type.wreckRegions[i].found()){
                     float range = type.hitsize/4f;
                     Tmp.v1.rnd(range);
-                    Effects.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
                 }
             }
         }

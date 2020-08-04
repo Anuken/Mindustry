@@ -369,7 +369,7 @@ public abstract class Turret extends Block{
             shootSound.at(tile, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){
-                Effects.shake(shootShake, shootShake, this);
+                Effect.shake(shootShake, shootShake, this);
             }
 
             recoil = recoilAmount;

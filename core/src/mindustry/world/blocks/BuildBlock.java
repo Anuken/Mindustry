@@ -163,7 +163,7 @@ public class BuildBlock extends Block{
             Fx.blockExplosionSmoke.at(tile);
 
             if(!tile.floor().solid && !tile.floor().isLiquid){
-                Effects.rubble(x, y, size);
+                Effect.rubble(x, y, size);
             }
         }
 

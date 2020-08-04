@@ -156,7 +156,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         }
         boolean parentize = ammo.keepVelocity;
 
-        Effects.shake(weapon.shake, weapon.shake, x, y);
+        Effect.shake(weapon.shake, weapon.shake, x, y);
         weapon.ejectEffect.at(x, y, rotation * side);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);
