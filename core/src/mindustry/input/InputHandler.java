@@ -262,7 +262,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(commander.isCommanding()){
             commander.clearCommand();
         }else{
-            FormationPattern pattern = new SquareFormation();
+            SquareFormation pattern = new SquareFormation();
             Formation formation = new Formation(new Vec3(player.x, player.y, player.unit().rotation), pattern);
             formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
 
@@ -277,6 +277,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             units.sort(u -> u.dst2(player.unit()));
             units.truncate(player.unit().type().commandLimit);
+
+            if(units.any()) pattern.spacing = units.max(u -> u.hitSize).hitSize * 2.4f;
 
             commander.command(formation, units);
         }

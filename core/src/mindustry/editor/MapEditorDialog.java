@@ -649,11 +649,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void tryExit(){
-        if(!saved){
-            ui.showConfirm("@confirm", "@editor.unsaved", this::hide);
-        }else{
-            hide();
-        }
+        ui.showConfirm("@confirm", "@editor.unsaved", this::hide);
     }
 
     private void addBlockSelection(Table table){

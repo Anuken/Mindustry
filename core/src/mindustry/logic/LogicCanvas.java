@@ -4,7 +4,9 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
+import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -18,13 +20,17 @@ public class LogicCanvas extends WidgetGroup{
     private static final Color backgroundCol = Color.black, gridCol = Pal.accent.cpy().mul(0.2f);
     private static final Color outCol = Pal.place, inCol = Pal.remove;
 
+    private Element selected;
+    private Element entered;
     private Seq<LogicNode> nodes = new Seq<>();
 
     {
-        LogicElement e = new LogicElement();
-        e.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f);
-        addChild(e);
-        e.pack();
+        for(int i = 0; i < 3; i++){
+            LogicElement e = new LogicElement();
+            e.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f);
+            addChild(e);
+            e.pack();
+        }
     }
 
     @Override
@@ -53,17 +59,45 @@ public class LogicCanvas extends WidgetGroup{
         Draw.reset();
 
         super.draw();
+
+        for(Element e : getChildren()){
+            if(e instanceof LogicElement){
+                LogicElement l = (LogicElement)e;
+
+                for(NodeField field : l.fields){
+                    field.drawConnection();
+                }
+            }
+        }
+
+        if(selected != null){
+            NodeField field = (NodeField)selected.userObject;
+            Vec2 dest = selected.localToStageCoordinates(Tmp.v1.set(selected.getWidth()/2f, selected.getHeight()/2f));
+            Vec2 mouse = Core.input.mouse();
+            drawCurve(dest.x, dest.y, mouse.x, mouse.y, field.color);
+        }
     }
 
-    static class LogicElement extends Table{
+    void drawCurve(float x, float y, float x2, float y2, Color color){
+        Lines.stroke(4f, color);
+        Lines.curve(
+        x, y,
+        x2, y,
+        x, y2,
+        x2, y2,
+        Math.max(3, (int)(Mathf.dst(x, y, x2, y2) / 5))
+        );
+
+        Draw.reset();
+    }
+
+    class LogicElement extends Table{
         LogicNode node;
         NodeField[] fields = {new NodeField(true, "input 1"), new NodeField(true, "input 2"), new NodeField(false, "output 1"), new NodeField(false, "output 2")};
 
         LogicElement(){
             background(Tex.whitePane);
             setColor(Pal.accent.cpy().mul(0.9f).shiftSaturation(-0.3f));
-            touchable = Touchable.enabled;
-
             margin(0f);
 
             table(Tex.whiteui, t -> {
@@ -72,12 +106,34 @@ public class LogicCanvas extends WidgetGroup{
                 });
 
                 t.margin(8f);
+                t.touchable = Touchable.enabled;
 
                 t.add("Node").style(Styles.outlineLabel).color(color);
                 t.add().growX();
                 t.button(Icon.cancel, Styles.onlyi, () -> {
                     //TODO disconnect things
                     remove();
+                });
+                t.addListener(new InputListener(){
+                    float lastx, lasty;
+
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        Vec2 v = localToStageCoordinates(Tmp.v1.set(x, y));
+                        lastx = v.x;
+                        lasty = v.y;
+                        toFront();
+                        return true;
+                    }
+
+                    @Override
+                    public void touchDragged(InputEvent event, float x, float y, int pointer){
+                        Vec2 v = localToStageCoordinates(Tmp.v1.set(x, y));
+
+                        moveBy(v.x - lastx, v.y - lasty);
+                        lastx = v.x;
+                        lasty = v.y;
+                    }
                 });
             }).growX().padBottom(6);
 
@@ -91,28 +147,6 @@ public class LogicCanvas extends WidgetGroup{
             }
 
             marginBottom(7);
-
-            addListener(new InputListener(){
-                float lastx, lasty;
-
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                    Vec2 v = localToStageCoordinates(Tmp.v1.set(x, y));
-                    lastx = v.x;
-                    lasty = v.y;
-                    toFront();
-                    return true;
-                }
-
-                @Override
-                public void touchDragged(InputEvent event, float x, float y, int pointer){
-                    Vec2 v = localToStageCoordinates(Tmp.v1.set(x, y));
-
-                    moveBy(v.x - lastx, v.y - lasty);
-                    lastx = v.x;
-                    lasty = v.y;
-                }
-            });
         }
 
         @Override
@@ -128,13 +162,15 @@ public class LogicCanvas extends WidgetGroup{
         }
     }
 
-    static class NodeField extends Table{
+    class NodeField extends Table{
         boolean input;
         ImageButton button;
+        Element connection;
 
         NodeField(boolean input, String name){
             this.input = input;
-            setColor(input ? inCol : outCol);
+            //TODO color should depend on data type
+            setColor(outCol);
 
             float marg = 24f;
 
@@ -151,6 +187,15 @@ public class LogicCanvas extends WidgetGroup{
 
             if(!input){
                 addIcon();
+            }
+        }
+
+        void drawConnection(){
+            if(connection != null){
+                Vec2 from = localToStageCoordinates(Tmp.v2.set(button.getX() + button.getWidth()/2f, button.getY() + button.getHeight()/2f));
+                Vec2 to = connection.localToStageCoordinates(Tmp.v1.set(connection.getWidth()/2f, connection.getHeight()/2f));
+
+                drawCurve(from.x, from.y, to.x, to.y, color);
             }
         }
 
@@ -171,6 +216,39 @@ public class LogicCanvas extends WidgetGroup{
             }else{
                 c.padRight(-pad);
             }
+
+            button.addListener(new InputListener(){
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode code){
+                    if(selected == null){
+                        selected = button;
+                    }
+                    return true;
+                }
+
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Element fromActor){
+                    entered = button;
+                }
+
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode code){
+                    localToStageCoordinates(Tmp.v1.set(x, y));
+                    Element element = entered;
+
+                    if(element != null && element.userObject instanceof NodeField){
+                        NodeField field = (NodeField)element.userObject;
+                        if(field != NodeField.this && field.input != input){
+                            connection = element;
+                            //field.connection = button;
+                        }
+                    }
+
+                    if(selected == button){
+                        selected = null;
+                    }
+                }
+            });
         }
     }
 }
