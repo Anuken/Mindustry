@@ -3,10 +3,14 @@ package mindustry.logic;
 import mindustry.ui.dialogs.*;
 
 public class LogicDialog extends BaseDialog{
+    LogicCanvas canvas;
 
     public LogicDialog(){
-        super("");
+        super("logic");
+
+        canvas = new LogicCanvas();
+
         clear();
-        addCloseButton();
+        add(canvas).grow();
     }
 }

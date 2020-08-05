@@ -92,6 +92,8 @@ public class Block extends UnlockableContent{
     public boolean squareSprite = true;
     /** whether this block absorbs laser attacks. */
     public boolean absorbLasers = false;
+    /** if false, the status is never drawn */
+    public boolean enableDrawStatus = true;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */

@@ -715,11 +715,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void drawStatus(){
-        if(block.consumes.any()){
+        if(block.enableDrawStatus && block.consumes.any()){
             float brcx = tile.drawx() + (block.size * tilesize / 2f) - (tilesize / 2f);
             float brcy = tile.drawy() - (block.size * tilesize / 2f) + (tilesize / 2f);
 
-            Draw.z(Layer.blockOver);
+            Draw.z(Layer.power + 1);
             Draw.color(Pal.gray);
             Fill.square(brcx, brcy, 2.5f, 45);
             Draw.color(cons.status().color);
