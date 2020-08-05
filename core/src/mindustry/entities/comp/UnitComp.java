@@ -252,6 +252,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             if(floor.damageTaken > 0f){
                 damageContinuous(floor.damageTaken);
             }
+
+            if(!net.client() && tile.solid()){
+                if(type.canBoost){
+                    elevation = 1f;
+                }else{
+                    kill();
+                }
+            }
         }
 
         //AI only updates on the server
