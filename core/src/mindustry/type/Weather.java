@@ -5,12 +5,13 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 
 public abstract class Weather extends MappableContent{
     /** Default duration of this weather event in ticks. */
@@ -20,6 +21,8 @@ public abstract class Weather extends MappableContent{
     //internals
     public Rand rand = new Rand();
     public Prov<WeatherState> type = WeatherState::create;
+    public StatusEffect status = StatusEffects.none;
+    public float statusDuration = 60f * 2;
 
     public Weather(String name, Prov<WeatherState> type){
         super(name);
@@ -58,6 +61,18 @@ public abstract class Weather extends MappableContent{
 
     public void update(WeatherState state){
 
+    }
+
+    public void updateEffect(WeatherState state){
+        if(status != StatusEffects.none){
+            if(state.effectTimer <= 0){
+                state.effectTimer = statusDuration - 5f;
+
+                Groups.unit.each(u -> u.apply(status, statusDuration));
+            }else{
+                state.effectTimer -= Time.delta;
+            }
+        }
     }
 
     public void drawOver(WeatherState state){
@@ -115,7 +130,7 @@ public abstract class Weather extends MappableContent{
         private static final float fadeTime = 60 * 4;
 
         Weather weather;
-        float intensity = 1f, opacity = 0f, life;
+        float intensity = 1f, opacity = 0f, life, effectTimer;
 
         void init(Weather weather){
             this.weather = weather;
@@ -132,6 +147,7 @@ public abstract class Weather extends MappableContent{
             life -= Time.delta;
 
             weather.update(base());
+            weather.updateEffect(base());
 
             if(life < 0){
                 remove();

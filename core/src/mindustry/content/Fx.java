@@ -654,13 +654,11 @@ public class Fx{
 
     }),
 
-    wet = new Effect(40f, e -> {
+    wet = new Effect(80f, e -> {
         color(Liquids.water.color);
+        alpha(Mathf.clamp(e.fin() * 2f));
 
-        randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
-        });
-
+        Fill.circle(e.x, e.y, e.fout() * 1f);
     }),
 
     sapped = new Effect(40f, e -> {

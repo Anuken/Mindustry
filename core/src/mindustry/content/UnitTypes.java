@@ -263,7 +263,7 @@ public class UnitTypes implements ContentList{
                     speed = 1f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
-                    splashDamage = 40f;
+                    splashDamage = 45f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -527,7 +527,7 @@ public class UnitTypes implements ContentList{
         }};
 
         antumbra = new UnitType("antumbra"){{
-            speed = 1.25f;
+            speed = 1.13f;
             accel = 0.035f;
             drag = 0.05f;
             rotateSpeed = 1.9f;
@@ -599,7 +599,7 @@ public class UnitTypes implements ContentList{
         }};
 
         eclipse = new UnitType("eclipse"){{
-            speed = 1.1f;
+            speed = 1.09f;
             accel = 0.02f;
             drag = 0.05f;
             rotateSpeed = 1f;

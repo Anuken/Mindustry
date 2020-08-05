@@ -1696,7 +1696,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.dagger, 60f * 20, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 10, Items.blastCompound, 10)),
+                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 10, Items.coal, 20)),
                 new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
             };
             size = 3;
@@ -1706,7 +1706,7 @@ public class Blocks implements ContentList{
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15)),
             };
             size = 3;
