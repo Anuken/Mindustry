@@ -40,6 +40,7 @@ public class PowerNode extends PowerBlock{
         configurable = true;
         consumesPower = false;
         outputsPower = false;
+
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
             Building other = world.build(value);
@@ -80,12 +81,20 @@ public class PowerNode extends PowerBlock{
 
         config(Point2[].class, (tile, value) -> {
             tile.power.links.clear();
-            for(Point2 p : value){
-                if(tile.power.links.size < maxNodes){
-                    tile.power.links.add(Point2.pack(p.x + tile.tileX(), p.y + tile.tileY()));
-                }
+
+            IntSeq old = new IntSeq(tile.power.links);
+
+            //clear old
+            for(int i = 0; i < old.size; i++){
+                int cur = old.get(i);
+                configurations.get(Integer.class).get(tile, cur);
             }
-            tile.updatePowerGraph();
+
+            //set new
+            for(Point2 p : value){
+                int newPos = Point2.pack(p.x + tile.tileX(), p.y + tile.tileY());
+                configurations.get(Integer.class).get(tile, newPos);
+            }
         });
     }
 

@@ -45,7 +45,7 @@ public class ContentParser{
                 return result;
             }else{
                 String str = data.asString();
-                if(str.startsWith(Schematics.base64Header)){
+                if(str.startsWith(Vars.schematicBaseStart)){
                     return Schematics.readBase64(str);
                 }else{
                     return Schematics.read(Vars.tree.get("schematics/" + str + "." + Vars.schematicExtension));

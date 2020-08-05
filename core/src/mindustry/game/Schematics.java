@@ -42,7 +42,6 @@ import static mindustry.Vars.*;
 public class Schematics implements Loadable{
     private static final Schematic tmpSchem = new Schematic(new Seq<>(), new StringMap(), 0, 0);
     private static final Schematic tmpSchem2 = new Schematic(new Seq<>(), new StringMap(), 0, 0);
-    public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 1;

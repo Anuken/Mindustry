@@ -16,6 +16,7 @@ import mindustry.ui.*;
 
 public class LogicCanvas extends WidgetGroup{
     private static final Color backgroundCol = Color.black, gridCol = Pal.accent.cpy().mul(0.2f);
+    private static final Color outCol = Pal.place, inCol = Pal.remove;
 
     private Seq<LogicNode> nodes = new Seq<>();
 
@@ -75,20 +76,21 @@ public class LogicCanvas extends WidgetGroup{
                 t.add("Node").style(Styles.outlineLabel).color(color);
                 t.add().growX();
                 t.button(Icon.cancel, Styles.onlyi, () -> {
-
+                    //TODO disconnect things
+                    remove();
                 });
-            }).growX().padBottom(5);
+            }).growX().padBottom(6);
 
             row();
 
-            defaults().size(190, 36);
+            defaults().height(30);
 
             for(NodeField field : fields){
-                add(field).color(color);
+                add(field).align(field.input ? Align.left : Align.right);
                 row();
             }
 
-            marginBottom(5);
+            marginBottom(7);
 
             addListener(new InputListener(){
                 float lastx, lasty;
@@ -132,14 +134,20 @@ public class LogicCanvas extends WidgetGroup{
 
         NodeField(boolean input, String name){
             this.input = input;
+            setColor(input ? inCol : outCol);
+
+            float marg = 24f;
+
             if(input){
                 addIcon();
                 left();
+                marginRight(marg);
             }else{
                 right();
+                marginLeft(marg);
             }
 
-            add(name).padLeft(5).padRight(5).style(Styles.outlineLabel);
+            add(name).padLeft(5).padRight(5).style(Styles.outlineLabel).color(color);
 
             if(!input){
                 addIcon();
@@ -153,7 +161,8 @@ public class LogicCanvas extends WidgetGroup{
             }).size(s);
 
             button = c.get();
-            c.update(i -> i.getStyle().imageUpColor = color);
+            button.userObject = this;
+            button.getStyle().imageUpColor = color;
 
             float pad = s/2f - 3f;
 
@@ -162,13 +171,6 @@ public class LogicCanvas extends WidgetGroup{
             }else{
                 c.padRight(-pad);
             }
-        }
-
-        @Override
-        public void setColor(Color color){
-            super.setColor(color);
-
-            button.getStyle().imageUpColor = color;
         }
     }
 }
