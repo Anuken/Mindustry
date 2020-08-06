@@ -70,9 +70,7 @@ public class NodeSlotProcessor extends BaseProcessor{
 
 
         CodeBlock.Builder code = CodeBlock.builder();
-        fields.each((type, inits) -> {
-            code.addStatement("map.put($L.class, new mindustry.logic.LogicNode.NodeSlot[]{$L})", type.toString(), inits.toString(","));
-        });
+        fields.each((type, inits) -> code.addStatement("map.put($L.class, new mindustry.logic.LogicNode.NodeSlot[]{$L})", type.toString(), inits.toString(",")));
 
         slotClass.addStaticBlock(code.build());
 

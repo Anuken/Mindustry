@@ -36,6 +36,7 @@ public abstract class LogicNode{
 
         @Override
         public void build(Table table){
+            //TODO replace with dropdown menu
             TextButton[] button = {null};
             button[0] = table.button(op.symbol, Styles.cleart, () -> {
                 op = BinaryOp.all[(op.ordinal() + 1) % BinaryOp.all.length];
