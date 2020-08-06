@@ -278,7 +278,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             units.sort(u -> u.dst2(player.unit()));
             units.truncate(player.unit().type().commandLimit);
 
-            if(units.any()) pattern.spacing = units.max(u -> u.hitSize).hitSize * 2.4f;
+            if(units.any()) pattern.spacing = units.max(u -> u.hitSize).hitSize * 2f;
 
             commander.command(formation, units);
         }

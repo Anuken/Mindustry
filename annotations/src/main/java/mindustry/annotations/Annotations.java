@@ -128,6 +128,13 @@ public class Annotations{
         String fallback() default "error";
     }
 
+    /** Registers a logic node's slot. */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface NodeSlotDef{
+        boolean input() default false;
+    }
+
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface StyleDefaults{

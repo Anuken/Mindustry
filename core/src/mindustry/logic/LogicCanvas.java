@@ -14,23 +14,33 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LogicNode.*;
 import mindustry.ui.*;
 
 public class LogicCanvas extends WidgetGroup{
-    private static final Color backgroundCol = Color.black, gridCol = Pal.accent.cpy().mul(0.2f);
-    private static final Color outCol = Pal.place, inCol = Pal.remove;
+    private static final Color backgroundCol = Pal.darkMetal.cpy().mul(0.1f), gridCol = Pal.darkMetal.cpy().mul(0.5f);
 
     private Element selected;
     private Element entered;
     private Seq<LogicNode> nodes = new Seq<>();
 
     {
-        for(int i = 0; i < 3; i++){
-            LogicElement e = new LogicElement();
-            e.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f);
-            addChild(e);
-            e.pack();
-        }
+        add(new BinaryOpNode());
+        add(new BinaryOpNode());
+        add(new BinaryOpNode());
+        add(new NumberNode());
+        add(new NumberNode());
+        add(new NumberNode());
+        add(new ConditionNode());
+        add(new ConditionNode());
+        add(new SignalNode());
+    }
+
+    private void add(LogicNode node){
+        LogicElement e = new LogicElement(node);
+        e.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f);
+        addChild(e);
+        e.pack();
     }
 
     @Override
@@ -64,14 +74,14 @@ public class LogicCanvas extends WidgetGroup{
             if(e instanceof LogicElement){
                 LogicElement l = (LogicElement)e;
 
-                for(NodeField field : l.fields){
+                for(SlotTable field : l.slots){
                     field.drawConnection();
                 }
             }
         }
 
         if(selected != null){
-            NodeField field = (NodeField)selected.userObject;
+            SlotTable field = (SlotTable)selected.userObject;
             Vec2 dest = selected.localToStageCoordinates(Tmp.v1.set(selected.getWidth()/2f, selected.getHeight()/2f));
             Vec2 mouse = Core.input.mouse();
             drawCurve(dest.x, dest.y, mouse.x, mouse.y, field.color);
@@ -80,10 +90,13 @@ public class LogicCanvas extends WidgetGroup{
 
     void drawCurve(float x, float y, float x2, float y2, Color color){
         Lines.stroke(4f, color);
+
+        float dist = Math.abs(x - x2)/2f;
+
         Lines.curve(
         x, y,
-        x2, y,
-        x, y2,
+        x + dist, y,
+        x2 - dist, y2,
         x2, y2,
         Math.max(3, (int)(Mathf.dst(x, y, x2, y2) / 5))
         );
@@ -92,12 +105,22 @@ public class LogicCanvas extends WidgetGroup{
     }
 
     class LogicElement extends Table{
-        LogicNode node;
-        NodeField[] fields = {new NodeField(true, "input 1"), new NodeField(true, "input 2"), new NodeField(false, "output 1"), new NodeField(false, "output 2")};
+        final LogicNode node;
+        final SlotTable[] slots;
 
-        LogicElement(){
+        LogicElement(LogicNode node){
+            this.node = node;
+            nodes.add(node);
+
+            NodeSlot[] nslots = node.slots();
+
+            this.slots = new SlotTable[nslots.length];
+            for(int i = 0; i < nslots.length; i++){
+                this.slots[i] = new SlotTable(nslots[i]);
+            }
+
             background(Tex.whitePane);
-            setColor(Pal.accent.cpy().mul(0.9f).shiftSaturation(-0.3f));
+            setColor(node.category().color);
             margin(0f);
 
             table(Tex.whiteui, t -> {
@@ -108,11 +131,12 @@ public class LogicCanvas extends WidgetGroup{
                 t.margin(8f);
                 t.touchable = Touchable.enabled;
 
-                t.add("Node").style(Styles.outlineLabel).color(color);
+                t.add(node.name()).style(Styles.outlineLabel).color(color).padRight(8);
                 t.add().growX();
                 t.button(Icon.cancel, Styles.onlyi, () -> {
                     //TODO disconnect things
                     remove();
+                    nodes.remove(node);
                 });
                 t.addListener(new InputListener(){
                     float lastx, lasty;
@@ -139,10 +163,14 @@ public class LogicCanvas extends WidgetGroup{
 
             row();
 
+            node.build(this);
+
+            row();
+
             defaults().height(30);
 
-            for(NodeField field : fields){
-                add(field).align(field.input ? Align.left : Align.right);
+            for(SlotTable field : slots){
+                add(field).align(field.slot.input ? Align.left : Align.right);
                 row();
             }
 
@@ -162,19 +190,20 @@ public class LogicCanvas extends WidgetGroup{
         }
     }
 
-    class NodeField extends Table{
-        boolean input;
+    class SlotTable extends Table{
+        final NodeSlot slot;
+
         ImageButton button;
         Element connection;
 
-        NodeField(boolean input, String name){
-            this.input = input;
-            //TODO color should depend on data type
-            setColor(outCol);
+        SlotTable(NodeSlot slot){
+            this.slot = slot;
+
+            setColor(slot.type.color);
 
             float marg = 24f;
 
-            if(input){
+            if(slot.input){
                 addIcon();
                 left();
                 marginRight(marg);
@@ -183,9 +212,9 @@ public class LogicCanvas extends WidgetGroup{
                 marginLeft(marg);
             }
 
-            add(name).padLeft(5).padRight(5).style(Styles.outlineLabel).color(color);
+            add(slot.name).padLeft(5).padRight(5).style(Styles.outlineLabel).color(color);
 
-            if(!input){
+            if(!slot.input){
                 addIcon();
             }
         }
@@ -211,7 +240,7 @@ public class LogicCanvas extends WidgetGroup{
 
             float pad = s/2f - 3f;
 
-            if(input){
+            if(slot.input){
                 c.padLeft(-pad);
             }else{
                 c.padRight(-pad);
@@ -236,9 +265,10 @@ public class LogicCanvas extends WidgetGroup{
                     localToStageCoordinates(Tmp.v1.set(x, y));
                     Element element = entered;
 
-                    if(element != null && element.userObject instanceof NodeField){
-                        NodeField field = (NodeField)element.userObject;
-                        if(field != NodeField.this && field.input != input){
+                    if(element != null && element.userObject instanceof SlotTable){
+                        SlotTable field = (SlotTable)element.userObject;
+                        //make sure inputs are matched to outputs, and that slot types match
+                        if(field != SlotTable.this && field.slot.input != slot.input && field.slot.type == slot.type){
                             connection = element;
                             //field.connection = button;
                         }

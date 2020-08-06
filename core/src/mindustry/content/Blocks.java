@@ -81,10 +81,10 @@ public class Blocks implements ContentList{
     repairPoint, resupplyPoint,
 
     //campaign
-    launchPad, launchPadLarge, dataProcessor,
+    launchPad, launchPadLarge,
 
     //misc experimental
-    blockForge, blockLoader, blockUnloader;
+    logicProcessor, blockForge, blockLoader, blockUnloader;
 
     @Override
     public void load(){
@@ -1883,15 +1883,15 @@ public class Blocks implements ContentList{
             consumes.power(6f);
         }};
 
-        dataProcessor = new ResearchBlock("data-processor"){{
-            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 200, Items.lead, 100));
+        //endregion campaign
+        //region experimental
+
+        logicProcessor = new ResearchBlock("logic-processor"){{
+            requirements(Category.effect, BuildVisibility.debugOnly, with(Items.copper, 200, Items.lead, 100));
 
             size = 3;
             alwaysUnlocked = true;
         }};
-
-        //endregion campaign
-        //region experimental
 
         blockForge = new BlockForge("block-forge"){{
             requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));
