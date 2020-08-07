@@ -35,11 +35,8 @@ public class LCanvas extends Table{
 
         pane(statements).grow().get().setClip(false);
 
+        add(new PrintStatement());
         add(new AssignStatement());
-        add(new FetchBuildStatement());
-        add(new JumpStatement());
-        add(new ToggleStatement());
-        add(new OpStatement());
     }
 
     private void drawGrid(){
@@ -73,7 +70,7 @@ public class LCanvas extends Table{
     }
 
     String save(){
-        return LAssembler.assemble(statements.getChildren().as()).toJson();
+        return LAssembler.toJson(statements.getChildren().as());
     }
 
     void load(String json){
@@ -83,11 +80,8 @@ public class LCanvas extends Table{
             add(st);
         }
 
-        LAssembler asm = new LAssembler();
-        asm.elements = this.statements.getChildren().as();
-
         for(LStatement st : statements){
-            st.afterLoad(asm);
+            st.setupUI();
         }
 
         this.statements.layout();
@@ -197,6 +191,7 @@ public class LCanvas extends Table{
 
         public StatementElem(LStatement st){
             this.st = st;
+            st.elem = this;
 
             background(Tex.whitePane);
             setColor(st.category().color);

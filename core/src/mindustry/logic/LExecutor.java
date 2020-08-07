@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 
@@ -11,6 +12,10 @@ public class LExecutor{
     //values of all the variables
     Var[] vars;
 
+    public boolean initialized(){
+        return instructions != null && vars != null && instructions.length > 0;
+    }
+
     /** Runs all the instructions at once. Debugging only. */
     public void runAll(){
         counter = 0;
@@ -20,7 +25,9 @@ public class LExecutor{
         }
     }
 
-    public void load(LAssembler builder){
+    public void load(Object context, LAssembler builder){
+        builder.putConst("this", context);
+
         vars = new Var[builder.vars.size];
         instructions = builder.instructions;
         counter = 0;
@@ -56,6 +63,11 @@ public class LExecutor{
     double num(int index){
         Var v = vars[index];
         return v.isobj ? 0 : v.numval;
+    }
+
+    String str(int index){
+        Var v = vars[index];
+        return v.isobj ? String.valueOf(v.objval) : String.valueOf(v.numval);
     }
 
     int numi(int index){
@@ -101,6 +113,8 @@ public class LExecutor{
             this.value = value;
         }
 
+        ToggleI(){}
+
         @Override
         public void run(LExecutor exec){
             Building b = exec.building(target);
@@ -125,6 +139,8 @@ public class LExecutor{
             this.to = to;
         }
 
+        AssignI(){}
+
         @Override
         public void run(LExecutor exec){
             Var v = exec.vars[to];
@@ -144,7 +160,7 @@ public class LExecutor{
     }
 
     public static class BinaryOpI implements LInstruction{
-        public mindustry.logic.BinaryOp op;
+        public BinaryOp op;
         public int a, b, dest;
 
         public BinaryOpI(BinaryOp op, int a, int b, int dest){
@@ -153,6 +169,8 @@ public class LExecutor{
             this.b = b;
             this.dest = dest;
         }
+
+        BinaryOpI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -168,6 +186,21 @@ public class LExecutor{
         }
     }
 
+    public static class PrintI implements LInstruction{
+        public int value;
+
+        public PrintI(int value){
+            this.value = value;
+        }
+
+        PrintI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            Log.info(exec.str(value));
+        }
+    }
+
     public static class JumpI implements LInstruction{
         public int cond, to;
 
@@ -175,6 +208,8 @@ public class LExecutor{
             this.cond = cond;
             this.to = to;
         }
+
+        JumpI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -193,6 +228,8 @@ public class LExecutor{
             this.x = x;
             this.y = y;
         }
+
+        FetchBuildI(){}
 
         @Override
         public void run(LExecutor exec){

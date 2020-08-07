@@ -115,8 +115,29 @@ public class LStatements{
         }
     }
 
+    public static class PrintStatement extends LStatement{
+        public String value = "\"frog\"";
+
+        @Override
+        public void build(Table table){
+            table.field(value, Styles.nodeField, str -> value = str)
+                .size(100f, 40f).pad(2f).color(table.color);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PrintI(builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.control;
+        }
+    }
+
     public static class JumpStatement extends LStatement{
         public transient StatementElem dest;
+
         public int destIndex;
         public String condition = "true";
 
@@ -131,20 +152,21 @@ public class LStatements{
 
         //elements need separate conversion logic
         @Override
-        public void afterLoad(LAssembler assembler){
-            if(assembler.elements != null){
-                dest = assembler.elements.get(destIndex);
+        public void setupUI(){
+            if(elem != null){
+                dest = (StatementElem)elem.parent.getChildren().get(destIndex);
             }
         }
 
         @Override
-        public void beforeSave(LAssembler assembler){
-            destIndex = dest == null ? -1 : dest.parent.getChildren().indexOf(dest);
+        public void saveUI(){
+            if(elem != null){
+                destIndex = dest == null ? -1 : dest.parent.getChildren().indexOf(dest);
+            }
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            beforeSave(builder);
             return new JumpI(builder.var(condition),destIndex);
         }
 
