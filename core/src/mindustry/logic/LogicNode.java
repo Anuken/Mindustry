@@ -1,13 +1,9 @@
 package mindustry.logic;
 
 import arc.graphics.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 
 /** Base class for a type of logic node. */
 public abstract class LogicNode{
@@ -25,96 +21,6 @@ public abstract class LogicNode{
 
     public String name(){
         return getClass().getSimpleName().replace("Node", "");
-    }
-
-    public static class BinaryOpNode extends LogicNode{
-        public BinaryOp op = BinaryOp.add;
-        @NodeSlotDef
-        public double a, b;
-        @NodeSlotDef
-        public SetNum result = val -> {};
-
-        @Override
-        public void build(Table table){
-            //TODO replace with dropdown menu
-            TextButton[] button = {null};
-            button[0] = table.button(op.symbol, Styles.cleart, () -> {
-                op = BinaryOp.all[(op.ordinal() + 1) % BinaryOp.all.length];
-                button[0].setText(op.symbol);
-            }).size(100f, 40f).pad(2f).get();
-        }
-
-        @Override
-        public void run(){
-            result.set(op.function.get(a, b));
-        }
-
-        @Override
-        public NodeCategory category(){
-            return NodeCategory.operations;
-        }
-    }
-
-    public static class ConditionNode extends LogicNode{
-        @NodeSlotDef(input = true)
-        public Runnable input = this::run;
-        @NodeSlotDef
-        public double condition;
-        @NodeSlotDef
-        public Runnable yes, no;
-
-        @Override
-        public void run(){
-            if(condition > 0){
-                yes.run();
-            }else{
-                no.run();
-            }
-        }
-
-        @Override
-        public NodeCategory category(){
-            return NodeCategory.controlFlow;
-        }
-    }
-
-    public static class NumberNode extends LogicNode{
-        @NodeSlotDef
-        public SetNum value;
-        public double var;
-
-        @Override
-        public void build(Table table){
-            table.field(var + "", Styles.nodeField, str -> var = Strings.parseDouble(str, var))
-                .valid(Strings::canParsePositiveFloat)
-                .size(100f, 40f).pad(2f).color(table.color)
-                .update(f -> f.setColor(f.isValid() ? table.color : Color.white));
-        }
-
-        @Override
-        public void run(){
-            value.set(var);
-        }
-
-        @Override
-        public NodeCategory category(){
-            return NodeCategory.controlFlow;
-        }
-    }
-
-    public static class SignalNode extends LogicNode{
-        @NodeSlotDef
-        public Runnable run;
-
-        @Override
-        public void run(){
-            run.run();
-        }
-
-        @Override
-        public NodeCategory category(){
-            return NodeCategory.controlFlow;
-        }
     }
 
     /** A field for a node, either an input or output. */
@@ -136,10 +42,6 @@ public abstract class LogicNode{
             this.numOutput = numOutput;
             this.objOutput = objOutput;
         }
-    }
-
-    static{
-        new NodeSlot("a", true, DataType.number, (BinaryOpNode node, double val) -> node.a = val, null);
     }
 
     public interface NumOutput<N>{

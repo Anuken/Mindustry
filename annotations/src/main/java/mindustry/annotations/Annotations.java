@@ -131,7 +131,7 @@ public class Annotations{
     /** Registers a logic node's slot. */
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface NodeSlotDef{
+    public @interface Slot{
         boolean input() default false;
     }
 

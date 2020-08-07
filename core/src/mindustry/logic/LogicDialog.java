@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.scene.ui.layout.*;
 import mindustry.ui.dialogs.*;
 
 public class LogicDialog extends BaseDialog{
@@ -9,8 +10,12 @@ public class LogicDialog extends BaseDialog{
         super("logic");
 
         canvas = new LogicCanvas();
+        addCloseButton();
 
         clear();
-        add(canvas).grow();
+        stack(canvas, new Table(t -> {
+            t.bottom();
+            t.add(buttons);
+        })).grow();
     }
 }

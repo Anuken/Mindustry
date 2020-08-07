@@ -501,8 +501,8 @@ public class Blocks implements ContentList{
         siliconCrucible = new AttributeSmelter("silicon-crucible"){{
             requirements(Category.crafting, with(Items.titanium, 120, Items.metaglass, 80, Items.plastanium, 35, Items.silicon, 60));
             craftEffect = Fx.smeltsmoke;
-            outputItem = new ItemStack(Items.silicon, 5);
-            craftTime = 140f;
+            outputItem = new ItemStack(Items.silicon, 6);
+            craftTime = 90f;
             size = 3;
             hasPower = true;
             hasLiquids = false;

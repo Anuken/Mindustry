@@ -11,7 +11,7 @@ import javax.annotation.processing.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 
-@SupportedAnnotationTypes("mindustry.annotations.Annotations.NodeSlotDef")
+@SupportedAnnotationTypes("mindustry.annotations.Annotations.Slot")
 public class NodeSlotProcessor extends BaseProcessor{
 
     @Override
@@ -20,10 +20,10 @@ public class NodeSlotProcessor extends BaseProcessor{
             .addModifiers(Modifier.PUBLIC);
 
         ObjectMap<Stype, Seq<String>> fields = new ObjectMap<>();
-        for(Svar var : fields(NodeSlotDef.class)){
+        for(Svar var : fields(Slot.class)){
             String type = var.mirror().toString();
 
-            boolean overrideInput = var.annotation(NodeSlotDef.class).input();
+            boolean overrideInput = var.annotation(Slot.class).input();
             boolean output = (type.contains("SetObj") || type.contains("SetNum") || type.contains("Runnable")) && !overrideInput;
 
             String objType = output ?

@@ -451,7 +451,7 @@ public class ResearchDialog extends BaseDialog{
                 }
             });
 
-            infoTable.update(() -> infoTable.setPosition(button.getX() + button.getWidth(), button.getY() + button.getHeight(), Align.topLeft));
+            infoTable.update(() -> infoTable.setPosition(button.x + button.getWidth(), button.y + button.getHeight(), Align.topLeft));
 
             infoTable.left();
             infoTable.background(Tex.button).margin(8f);
