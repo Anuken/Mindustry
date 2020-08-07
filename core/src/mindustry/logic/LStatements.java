@@ -30,7 +30,7 @@ public class LStatements{
         }
 
         @Override
-        public LExecutor.LInstruction build(LBuilder builder){
+        public LInstruction build(LAssembler builder){
             //TODO internal consts need to start with ___ and not be assignable to
             return new LExecutor.AssignI(builder.var(from), builder.var(to));
         }
@@ -57,13 +57,13 @@ public class LStatements{
         }
 
         @Override
-        public LExecutor.LInstruction build(LBuilder builder){
+        public LExecutor.LInstruction build(LAssembler builder){
             return new LExecutor.ToggleI(builder.var(target), builder.var(value));
         }
     }
 
     public static class OpStatement extends LStatement{
-        public mindustry.logic.BinaryOp op = mindustry.logic.BinaryOp.add;
+        public BinaryOp op = BinaryOp.add;
         public String a = "a", b = "b", dest = "result";
 
         @Override
@@ -79,7 +79,7 @@ public class LStatements{
 
             TextButton[] button = {null};
             button[0] = table.button(op.symbol, Styles.cleart, () -> {
-                op = mindustry.logic.BinaryOp.all[(op.ordinal() + 1) % BinaryOp.all.length];
+                op = BinaryOp.all[(op.ordinal() + 1) % BinaryOp.all.length];
                 button[0].setText(op.symbol);
             }).size(50f, 30f).pad(4f).get();
 
@@ -88,7 +88,7 @@ public class LStatements{
         }
 
         @Override
-        public LInstruction build(LBuilder builder){
+        public LInstruction build(LAssembler builder){
             return new BinaryOpI(op,builder.var(a), builder.var(b), builder.var(dest));
         }
 
@@ -105,7 +105,7 @@ public class LStatements{
         }
 
         @Override
-        public LInstruction build(LBuilder builder){
+        public LInstruction build(LAssembler builder){
             return new EndI();
         }
 
@@ -116,8 +116,9 @@ public class LStatements{
     }
 
     public static class JumpStatement extends LStatement{
-        public StatementElem dest;
-        public String condition = " true";
+        public transient StatementElem dest;
+        public int destIndex;
+        public String condition = "true";
 
         @Override
         public void build(Table table){
@@ -125,12 +126,26 @@ public class LStatements{
             table.field(condition, Styles.nodeField, str -> condition = str)
                 .size(100f, 40f).pad(2f).color(table.color);
             table.add().growX();
-            table.add(new JumpButton(Color.white, s -> dest = s)).size(30).right().padRight(-17);
+            table.add(new JumpButton(Color.white, () -> dest, s -> dest = s)).size(30).right().padRight(-17);
+        }
+
+        //elements need separate conversion logic
+        @Override
+        public void afterLoad(LAssembler assembler){
+            if(assembler.elements != null){
+                dest = assembler.elements.get(destIndex);
+            }
         }
 
         @Override
-        public LInstruction build(LBuilder builder){
-            return new JumpI(builder.var(condition), dest == null ? -1 : dest.parent.getChildren().indexOf(dest));
+        public void beforeSave(LAssembler assembler){
+            destIndex = dest == null ? -1 : dest.parent.getChildren().indexOf(dest);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            beforeSave(builder);
+            return new JumpI(builder.var(condition),destIndex);
         }
 
         @Override
@@ -159,7 +174,7 @@ public class LStatements{
         }
 
         @Override
-        public LExecutor.LInstruction build(LBuilder builder){
+        public LInstruction build(LAssembler builder){
             return new FetchBuildI(builder.var(dest), builder.var(x), builder.var(y));
         }
 

@@ -20,6 +20,29 @@ public class LExecutor{
         }
     }
 
+    public void load(LAssembler builder){
+        vars = new Var[builder.vars.size];
+        instructions = builder.instructions;
+        counter = 0;
+
+        builder.vars.each((name, var) -> {
+            Var v = new Var();
+            vars[var.id] = v;
+
+            if(var.constant){
+                v.constant = true;
+                if(var.value instanceof Number){
+                    v.numval = ((Number)var.value).doubleValue();
+                }else{
+                    v.isobj = true;
+                    v.objval = var.value;
+                }
+            }
+        });
+    }
+
+    //region utility
+
     @Nullable Building building(int index){
         Object o = vars[index].objval;
         return o == null && o instanceof Building ? (Building)o : null;
@@ -53,6 +76,8 @@ public class LExecutor{
         v.objval = value;
         v.isobj = true;
     }
+
+    //endregion
 
     static class Var{
         boolean isobj, constant;

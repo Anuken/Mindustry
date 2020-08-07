@@ -7,7 +7,15 @@ public abstract class LStatement{
 
     public abstract void build(Table table);
     public abstract LCategory category();
-    public abstract LExecutor.LInstruction build(LBuilder builder);
+    public abstract LExecutor.LInstruction build(LAssembler builder);
+
+    public void afterLoad(LAssembler assembler){
+
+    }
+
+    public void beforeSave(LAssembler assembler){
+
+    }
 
     public String name(){
         return getClass().getSimpleName().replace("Statement", "");
