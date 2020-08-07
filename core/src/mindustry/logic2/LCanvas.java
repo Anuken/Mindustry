@@ -60,7 +60,6 @@ public class LCanvas extends Table{
                     //TODO disconnect things
                     remove();
                     elems.remove(this);
-                    //TODO rebuild
                 });
 
                 t.addListener(new InputListener(){
