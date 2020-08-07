@@ -1502,7 +1502,7 @@ public class Blocks implements ContentList{
             health = 160 * size * size;
             rotateSpeed = 10;
 
-            consumes.power(3f);
+            consumes.powerCond(3f, (TractorBeamEntity e) -> e.target != null);
         }};
 
         swarmer = new ItemTurret("swarmer"){{

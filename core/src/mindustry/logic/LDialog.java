@@ -1,10 +1,10 @@
-package mindustry.logic2;
+package mindustry.logic;
 
 import arc.scene.ui.layout.*;
 import mindustry.ui.dialogs.*;
 
 public class LDialog extends BaseDialog{
-    LCanvas canvas;
+    mindustry.logic.LCanvas canvas;
 
     public LDialog(){
         super("logic");

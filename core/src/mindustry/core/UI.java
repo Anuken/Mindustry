@@ -24,7 +24,7 @@ import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic2.LDialog;
+import mindustry.logic.LDialog;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.fragments.*;

@@ -6,7 +6,7 @@ public enum BinaryOp{
     mul("*", (a, b) -> a * b),
     div("/", (a, b) -> a / b),
     mod("%", (a, b) -> a % b),
-    equal("=", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0),
+    equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0),
     lessThan("<", (a, b) -> a < b ? 1 : 0),
     lessThanEq("<=", (a, b) -> a <= b ? 1 : 0),
     greaterThan(">", (a, b) -> a > b ? 1 : 0),
@@ -16,7 +16,9 @@ public enum BinaryOp{
     shr("<<", (a, b) -> (int)a << (int)b),
     or("or", (a, b) -> (int)a | (int)b),
     and("and", (a, b) -> (int)a & (int)b),
-    xor("xor", (a, b) -> (int)a ^ (int)b);
+    xor("xor", (a, b) -> (int)a ^ (int)b),
+    max("max", Math::max),
+    min("min", Math::min);
 
     public static final BinaryOp[] all = values();
 
