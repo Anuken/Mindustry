@@ -1,15 +1,15 @@
-package mindustry.logic;
+package mindustry.logic2;
 
 import arc.scene.ui.layout.*;
 import mindustry.ui.dialogs.*;
 
-public class LogicDialog extends BaseDialog{
-    LogicCanvas canvas;
+public class LDialog extends BaseDialog{
+    LCanvas canvas;
 
-    public LogicDialog(){
+    public LDialog(){
         super("logic");
 
-        canvas = new LogicCanvas();
+        canvas = new LCanvas();
         addCloseButton();
 
         clear();
