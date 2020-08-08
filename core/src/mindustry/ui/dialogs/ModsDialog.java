@@ -245,9 +245,6 @@ public class ModsDialog extends BaseDialog{
                             });
                             dialog2.addCloseButton();
                             dialog2.show();
-                            //Keep this until mods work
-                            ui.showErrorMessage("This feature doesnt work completely due to mods not working in v6. Wait for this to be fixed. If you decide to use it anyways, mods will not let you enter the game.");
-                            //Until here
                         }catch (Exception e){
                             //ignore
                         }
