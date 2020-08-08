@@ -31,6 +31,6 @@ public class SaveMeta{
         this.mods = JsonIO.read(String[].class, tags.get("mods", "[]"));
         this.secinfo = secinfo;
 
-        secinfo.exportRates().each(e -> hasProduction |= e.value > 0.001f);
+        secinfo.production.each((e, amount) -> hasProduction |= amount.mean > 0.001f);
     }
 }

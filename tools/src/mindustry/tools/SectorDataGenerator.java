@@ -124,6 +124,7 @@ public class SectorDataGenerator{
                 boolean hasSnow = data.floors[0].name.contains("ice") || data.floors[0].name.contains("snow");
                 boolean hasRain = !hasSnow && data.floors[0].name.contains("water");
                 boolean hasDesert = !hasSnow && !hasRain && data.floors[0].name.contains("sand");
+                boolean hasSpores = data.floors[0].name.contains("spore") || data.floors[0].name.contains("moss") || data.floors[0].name.contains("tainted");
 
                 if(hasSnow){
                     data.attributes |= (1 << SectorAttribute.snowy.ordinal());
@@ -135,6 +136,10 @@ public class SectorDataGenerator{
 
                 if(hasDesert){
                     data.attributes |= (1 << SectorAttribute.desert.ordinal());
+                }
+
+                if(hasSpores){
+                    data.attributes |= (1 << SectorAttribute.spores.ordinal());
                 }
 
                 data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(UnlockableContent.class);

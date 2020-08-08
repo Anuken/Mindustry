@@ -1,9 +1,10 @@
 package mindustry.world.blocks.power;
 
+import arc.math.*;
 import arc.struct.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class SolarGenerator extends PowerGenerator{
 
@@ -23,7 +24,12 @@ public class SolarGenerator extends PowerGenerator{
     public class SolarGeneratorEntity extends GeneratorEntity{
         @Override
         public void updateTile(){
-            productionEfficiency = state.rules.solarPowerMultiplier < 0 ? (state.rules.lighting ? 1f - state.rules.ambientLight.a : 1f) : state.rules.solarPowerMultiplier;
+            productionEfficiency =
+                Mathf.maxZero(Attribute.light.env() +
+                (state.rules.solarPowerMultiplier < 0 ?
+                    (state.rules.lighting ? 1f - state.rules.ambientLight.a : 1f) :
+                    state.rules.solarPowerMultiplier
+                ));
         }
     }
 }

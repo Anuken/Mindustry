@@ -12,6 +12,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -80,7 +81,7 @@ public class PlacementFragment extends Fragment{
 
     void rebuild(){
         currentCategory = Category.turret;
-        Group group = toggler.getParent();
+        Group group = toggler.parent;
         int index = toggler.getZIndex();
         toggler.remove();
         build(group);
@@ -159,7 +160,7 @@ public class PlacementFragment extends Fragment{
                         blockSelectEnd = true;
                     }
                     Seq<Block> blocks = getByCategory(currentCategory);
-                    if(!unlocked(blocks.get(i))) return true;
+                    if(i >= blocks.size || !unlocked(blocks.get(i))) return true;
                     input.block = (i < blocks.size) ? blocks.get(i) : null;
                     selectedBlocks.put(currentCategory, input.block);
                     blockSelectSeqMillis = Time.millis();
@@ -215,7 +216,7 @@ public class PlacementFragment extends Fragment{
                             if(unlocked(block)){
                                 if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(block.name) != 0){
                                     Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
-                                    ui.showInfoFade("$copied");
+                                    ui.showInfoFade("@copied");
                                 }else{
                                     control.input.block = control.input.block == block ? null : block;
                                     selectedBlocks.put(currentCategory, control.input.block);
@@ -325,7 +326,7 @@ public class PlacementFragment extends Fragment{
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             String color = (amount < stackamount / 2f ? "[red]" : amount < stackamount ? "[accent]" : "[white]");
 
-                                            return color + ui.formatAmount(amount) + "[white]/" + stackamount;
+                                            return color + UI.formatAmount(amount) + "[white]/" + stackamount;
                                         }).padLeft(5);
                                     }).left();
                                     req.row();
@@ -336,7 +337,7 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "$unit.nobuild" : displayBlock.unplaceableMessage()).width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "@unit.nobuild" : displayBlock.unplaceableMessage()).width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }

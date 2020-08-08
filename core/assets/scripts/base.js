@@ -1,10 +1,12 @@
+"use strict";
+
 const log = function(context, obj){
     Vars.mods.getScripts().log(context, String(obj))
 }
 
-const onEvent = function(event, handler){
-    Vars.mods.getScripts().onEvent(event, handler)
-}
+const readString = path => Vars.mods.getScripts().readString(path)
+
+const readBytes = path => Vars.mods.getScripts().readBytes(path)
 
 var scriptName = "base.js"
 var modName = "none"

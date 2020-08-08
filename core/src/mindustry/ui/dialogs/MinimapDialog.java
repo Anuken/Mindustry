@@ -13,7 +13,7 @@ import static mindustry.Vars.renderer;
 public class MinimapDialog extends BaseDialog{
 
     public MinimapDialog(){
-        super("$minimap");
+        super("@minimap");
         setFillParent(true);
 
         shown(this::setup);

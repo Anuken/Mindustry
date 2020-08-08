@@ -103,11 +103,11 @@ public class LoadRegionProcessor extends BaseProcessor{
 
     private String parse(String value){
         value = '"' + value + '"';
+        value = value.replace("@size", "\" + ((mindustry.world.Block)content).size + \"");
         value = value.replace("@", "\" + content.name + \"");
         value = value.replace("#1", "\" + INDEX0 + \"");
         value = value.replace("#2", "\" + INDEX1 + \"");
         value = value.replace("#", "\" + INDEX0 + \"");
-        value = value.replace("$size", "\" + ((mindustry.world.Block)content).size + \"");
         return value;
     }
 

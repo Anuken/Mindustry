@@ -262,7 +262,7 @@ public class MassDriver extends Block{
             smokeEffect.at(x + Angles.trnsx(angle, translation),
             y + Angles.trnsy(angle, translation), angle);
 
-            Effects.shake(shake, shake, this);
+            Effect.shake(shake, shake, this);
         }
 
         public void handlePayload(Bullet bullet, DriverBulletData data){
@@ -280,7 +280,7 @@ public class MassDriver extends Block{
                 }
             }
 
-            Effects.shake(shake, shake, this);
+            Effect.shake(shake, shake, this);
             receiveEffect.at(bullet);
 
             reload = 1f;

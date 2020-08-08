@@ -12,15 +12,7 @@ import static mindustry.Vars.pathfinder;
 public class GroundAI extends AIController{
 
     @Override
-    public void updateUnit(){
-
-        if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
-            target = null;
-        }
-
-        if(retarget()){
-            targetClosest();
-        }
+    public void updateMovement(){
 
         Building core = unit.closestEnemyCore();
 

@@ -13,7 +13,7 @@ import arc.graphics.*;
 import arc.graphics.Pixmap.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.BitmapFont.*;
+import arc.graphics.g2d.Font.*;
 import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
@@ -27,14 +27,15 @@ import mindustry.core.*;
 import java.util.*;
 
 public class Fonts{
+    private static final String mainFont = "fonts/font.woff";
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
 
-    public static BitmapFont def;
-    public static BitmapFont outline;
-    public static BitmapFont chat;
-    public static BitmapFont icon;
-    public static BitmapFont tech;
+    public static Font def;
+    public static Font outline;
+    public static Font chat;
+    public static Font icon;
+    public static Font tech;
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -58,21 +59,19 @@ public class Fonts{
     }
 
     public static void loadFonts(){
-        String fontName = "fonts/font.ttf";
-
         FreeTypeFontParameter param = fontParameter();
 
-        Core.assets.load("default", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.def = (BitmapFont)f;
-        Core.assets.load("chat", BitmapFont.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.chat = (BitmapFont)f;
-        Core.assets.load("icon", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = (Font)f;
+        Core.assets.load("chat", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.chat = (Font)f;
+        Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
             characters = "\0";
-        }})).loaded = f -> Fonts.icon = (BitmapFont)f;
+        }})).loaded = f -> Fonts.icon = (Font)f;
     }
 
     public static void loadContentIcons(){
-        Seq<BitmapFont> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
+        Seq<Font> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
         Texture uitex = Core.atlas.find("logo").getTexture();
         int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
@@ -119,11 +118,11 @@ public class Fonts{
         UI.packer = new PixmapPacker(2048, 2048, Format.rgba8888, 2, true);
         FileHandleResolver resolver = new InternalFileHandleResolver();
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
-        Core.assets.setLoader(BitmapFont.class, null, new FreetypeFontLoader(resolver){
+        Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(resolver){
             ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
 
             @Override
-            public BitmapFont loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
+            public Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
                 if(fileName.equals("outline")){
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
@@ -146,11 +145,11 @@ public class Fonts{
             size = 18;
         }};
 
-        Core.assets.load("outline", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (BitmapFont)t;
+        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = t -> Fonts.outline = (Font)t;
 
-        Core.assets.load("tech", BitmapFont.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("tech", Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
             size = 18;
-        }})).loaded = f -> Fonts.tech = (BitmapFont)f;
+        }})).loaded = f -> Fonts.tech = (Font)f;
     }
 
     /** Merges the UI and font atlas together for better performance. */
@@ -184,7 +183,7 @@ public class Fonts{
         page.updateTexture(TextureFilter.linear, TextureFilter.linear, false);
     }
 
-    public static TextureRegionDrawable getGlyph(BitmapFont font, char glyph){
+    public static TextureRegionDrawable getGlyph(Font font, char glyph){
         Glyph g = font.getData().getGlyph(glyph);
         if(g == null) throw new IllegalArgumentException("No glyph: " + glyph + " (" + (int)glyph + ")");
 

@@ -52,15 +52,14 @@ public class MirrorFilter extends GenerateFilter{
         float imageHeight = Math.max(vsize.y, vsize.x);
 
         float size = Math.max(image.getWidth() *2, image.getHeight()*2);
-        Cons<Vec2> clamper = v ->
-            v.clamp(
-                image.getX() + image.getWidth()/2f - imageWidth/2f,
-                image.getX() + image.getWidth()/2f + imageWidth/2f,
-                image.getY() + image.getHeight()/2f - imageHeight/2f,
-                image.getY() + image.getHeight()/2f + imageHeight/2f);
+        Cons<Vec2> clamper = v -> v.clamp(
+            image.x + image.getWidth()/2f - imageWidth/2f,
+            image.x + image.getWidth()/2f + imageWidth/2f,
+            image.y + image.getHeight()/2f - imageHeight/2f,
+            image.y + image.getHeight()/2f + imageHeight/2f);
 
-        clamper.get(Tmp.v1.trns(angle - 90, size).add(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()));
-        clamper.get(Tmp.v2.set(Tmp.v1).sub(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()).rotate(180f).add(image.getWidth()/2f + image.getX(), image.getHeight()/2f + image.getY()));
+        clamper.get(Tmp.v1.trns(angle - 90, size).add(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y));
+        clamper.get(Tmp.v2.set(Tmp.v1).sub(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y).rotate(180f).add(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y));
 
         Lines.stroke(Scl.scl(3f), Pal.accent);
         Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);

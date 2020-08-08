@@ -86,7 +86,7 @@ public class PowerGraph{
         for(Building battery : batteries){
             Consumers consumes = battery.block().consumes;
             if(consumes.hasPower()){
-                totalAccumulator += battery.power().status * consumes.getPower().capacity;
+                totalAccumulator += battery.power.status * consumes.getPower().capacity;
             }
         }
         return totalAccumulator;
@@ -97,7 +97,7 @@ public class PowerGraph{
         for(Building battery : batteries){
             if(battery.block().consumes.hasPower()){
                 ConsumePower power = battery.block().consumes.getPower();
-                totalCapacity += (1f - battery.power().status) * power.capacity;
+                totalCapacity += (1f - battery.power.status) * power.capacity;
             }
         }
         return totalCapacity;
@@ -122,7 +122,7 @@ public class PowerGraph{
         for(Building battery : batteries){
             Consumers consumes = battery.block().consumes;
             if(consumes.hasPower()){
-                battery.power().status *= (1f-consumedPowerPercentage);
+                battery.power.status *= (1f-consumedPowerPercentage);
             }
         }
         return used;
@@ -139,7 +139,7 @@ public class PowerGraph{
             if(consumes.hasPower()){
                 ConsumePower consumePower = consumes.getPower();
                 if(consumePower.capacity > 0f){
-                    battery.power().status += (1f-battery.power().status) * chargedPercent;
+                    battery.power.status += (1f- battery.power.status) * chargedPercent;
                 }
             }
         }
@@ -157,17 +157,17 @@ public class PowerGraph{
                     if(!Mathf.zero(consumePower.capacity)){
                         // Add an equal percentage of power to all buffers, based on the global power coverage in this graph
                         float maximumRate = consumePower.requestedPower(consumer) * coverage * consumer.delta();
-                        consumer.power().status = Mathf.clamp(consumer.power().status + maximumRate / consumePower.capacity);
+                        consumer.power.status = Mathf.clamp(consumer.power.status + maximumRate / consumePower.capacity);
                     }
                 }else{
                     //valid consumers get power as usual
                     if(otherConsumersAreValid(consumer, consumePower)){
-                        consumer.power().status = coverage;
+                        consumer.power.status = coverage;
                     }else{ //invalid consumers get an estimate, if they were to activate
-                        consumer.power().status = Math.min(1, produced / (needed + consumePower.usage * consumer.delta()));
+                        consumer.power.status = Math.min(1, produced / (needed + consumePower.usage * consumer.delta()));
                         //just in case
-                        if(Float.isNaN(consumer.power().status)){
-                            consumer.power().status = 0f;
+                        if(Float.isNaN(consumer.power.status)){
+                            consumer.power.status = 0f;
                         }
                     }
                 }
@@ -275,7 +275,7 @@ public class PowerGraph{
         //go through all the connections of this tile
         for(Building other : tile.getPowerConnections(outArray1)){
             //a graph has already been assigned to this tile from a previous call, skip it
-            if(other.power().graph != this) continue;
+            if(other.power.graph != this) continue;
 
             //create graph for this branch
             PowerGraph graph = new PowerGraph();
@@ -294,7 +294,7 @@ public class PowerGraph{
                 for(Building next : child.getPowerConnections(outArray2)){
                     //make sure it hasn't looped back, and that the new graph being assigned hasn't already been assigned
                     //also skip closed tiles
-                    if(next != tile && next.power().graph != graph && !closedSet.contains(next.pos())){
+                    if(next != tile && next.power.graph != graph && !closedSet.contains(next.pos())){
                         queue.addLast(next);
                         closedSet.add(next.pos());
                     }

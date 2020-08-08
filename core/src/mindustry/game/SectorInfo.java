@@ -81,7 +81,7 @@ public class SectorInfo{
         state.rules.sector.setTimeSpent(internalTimeSpent);
     }
 
-    /** Update averages of various stats.
+    /** Update averages of various stats, updates some special sector logic.
      * Called every frame. */
     public void update(){
         internalTimeSpent += Time.delta;
@@ -140,17 +140,6 @@ public class SectorInfo{
         }
     }
 
-    /** @return the items in this sector now, taking into account production and items received. */
-    public ObjectIntMap<Item> getCurrentItems(Sector sector){
-        ObjectIntMap<Item> map = new ObjectIntMap<>();
-        map.putAll(coreItems);
-        long seconds = sector.getSecondsPassed();
-        production.each((item, stat) -> map.increment(item, (int)(stat.mean * seconds)));
-        //increment based on received items
-        sector.getReceivedItems().each(stack -> map.increment(stack.item, stack.amount));
-        return map;
-    }
-
     private void updateCoreDeltas(){
         CoreEntity ent = state.rules.defaultTeam.core();
         for(int i = 0; i < lastCoreItems.length; i++){
@@ -171,5 +160,9 @@ public class SectorInfo{
 
         /** mean in terms of items produced per refresh rate (currently, per second) */
         public float mean;
+
+        public String toString(){
+            return mean + "";
+        }
     }
 }

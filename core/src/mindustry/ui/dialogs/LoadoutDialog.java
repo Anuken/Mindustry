@@ -21,7 +21,7 @@ public class LoadoutDialog extends BaseDialog{
     private int capacity;
 
     public LoadoutDialog(){
-        super("$configure");
+        super("@configure");
         setFillParent(true);
 
         keyDown(key -> {
@@ -41,9 +41,9 @@ public class LoadoutDialog extends BaseDialog{
             }
         });
 
-        buttons.button("$back", Icon.left, this::hide).size(210f, 64f);
+        buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
 
-        buttons.button("$settings.reset", Icon.refresh, () -> {
+        buttons.button("@settings.reset", Icon.refresh, () -> {
             resetter.run();
             reseed();
             updater.run();
@@ -81,7 +81,7 @@ public class LoadoutDialog extends BaseDialog{
                     updater.run();
                 }).size(bsize);
 
-                t.button(Icon.pencil, Styles.cleari, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
+                t.button(Icon.pencil, Styles.cleari, () -> ui.showTextInput("@configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
                     if(Strings.canParsePositiveInt(str)){
                         int amount = Strings.parseInt(str);
                         if(amount >= 0 && amount <= capacity){

@@ -28,11 +28,6 @@ public class CrashSender{
             Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt").writeString(Strings.neatError(exception));
         }catch(Throwable ignored){
         }
-
-        if(exception instanceof RuntimeException){
-            throw (RuntimeException)exception;
-        }
-        throw new RuntimeException(exception);
     }
 
     public static void send(Throwable exception, Cons<File> writeListener){

@@ -127,9 +127,13 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public void buildConfiguration(Table table){
-            Seq<UnitType> units = Seq.with(plans).map(u -> u.unit);
+            Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow());
 
-            ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(units.indexOf(unit)));
+            if(units.any()){
+                ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(units.indexOf(unit)));
+            }else{
+                table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
+            }
         }
 
         @Override
@@ -151,7 +155,7 @@ public class UnitFactory extends UnitBlock{
                     i.setScaling(Scaling.fit);
                     i.setColor(currentPlan == -1 ? Color.lightGray : Color.white);
                 }).size(32).padBottom(-4).padRight(2);
-                t.label(() -> currentPlan == -1 ? "$none" : plans[currentPlan].unit.localizedName).color(Color.lightGray);
+                t.label(() -> currentPlan == -1 ? "@none" : plans[currentPlan].unit.localizedName).color(Color.lightGray);
             }).left();
         }
 

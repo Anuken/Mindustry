@@ -21,7 +21,7 @@ public class PointDefenseTurret extends Block{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
-    public @Load("block-$size") TextureRegion baseRegion;
+    public @Load("block-@size") TextureRegion baseRegion;
 
     public Color color = Color.white;
     public Effect beamEffect = Fx.pointBeam;

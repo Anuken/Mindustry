@@ -63,15 +63,15 @@ public class Fx{
     }),
 
     unitDespawn = new Effect(100f, e -> {
-        if(!(e.data instanceof Unitc)) return;
+        if(!(e.data instanceof Unit) || e.<Unit>data().type() == null) return;
 
-        Unitc select = (Unitc)e.data;
+        Unit select = e.data();
         float scl = e.fout(Interp.pow2Out);
         float p = Draw.scl;
         Draw.scl *= scl;
 
         mixcol(Pal.accent, 1f);
-        rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90f);
+        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
         reset();
 
         Draw.scl = p;
@@ -96,7 +96,7 @@ public class Fx{
         Fill.square(x, y, 1f * size, 45f);
     }),
 
-    itemTransfer = new Effect(30f, e -> {
+    itemTransfer = new Effect(12f, e -> {
         if(!(e.data instanceof Position)) return;
         Position to = e.data();
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)
@@ -654,13 +654,11 @@ public class Fx{
 
     }),
 
-    wet = new Effect(40f, e -> {
+    wet = new Effect(80f, e -> {
         color(Liquids.water.color);
+        alpha(Mathf.clamp(e.fin() * 2f));
 
-        randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
-        });
-
+        Fill.circle(e.x, e.y, e.fout() * 1f);
     }),
 
     sapped = new Effect(40f, e -> {

@@ -62,7 +62,7 @@ public class MessageBlock extends Block{
         public void drawSelect(){
             if(renderer.pixelator.enabled()) return;
 
-            BitmapFont font = Fonts.outline;
+            Font font = Fonts.outline;
             GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
             boolean ints = font.usesIntegerPositions();
             font.getData().setScale(1 / 4f / Scl.scl(1f));
@@ -96,7 +96,7 @@ public class MessageBlock extends Block{
                         accepted = str -> configure(str);
                     }});
                 }else{
-                    BaseDialog dialog = new BaseDialog("$editmessage");
+                    BaseDialog dialog = new BaseDialog("@editmessage");
                     dialog.setFillParent(false);
                     TextArea a = dialog.cont.add(new TextArea(message.replace("\n", "\r"))).size(380f, 160f).get();
                     a.setFilter((textField, c) -> {
@@ -112,7 +112,7 @@ public class MessageBlock extends Block{
                         return true;
                     });
                     a.setMaxLength(maxTextLength);
-                    dialog.buttons.button("$ok", () -> {
+                    dialog.buttons.button("@ok", () -> {
                         configure(a.getText());
                         dialog.hide();
                     }).size(130f, 60f);

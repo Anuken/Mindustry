@@ -11,17 +11,15 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.type.*;
-import mindustry.type.Sector.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -45,6 +43,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
+
+        shouldPause = true;
 
         getCell(buttons).padBottom(-4);
         buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
@@ -86,7 +86,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public Dialog show(){
         mode = look;
         selected = hovered = launchSector = null;
-        launching= false;
+        launching = false;
+        if(planets.planet.getLastSector() != null){
+            lookAt(planets.planet.getLastSector());
+        }
         return super.show();
     }
 
@@ -97,7 +100,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         launching = false;
 
         //update view to sector
-        planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
+        lookAt(sector);
         zoom = 1f;
         planets.zoom = 2f;
         selectAlpha = 0f;
@@ -109,11 +112,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         super.show();
     }
 
+    private void lookAt(Sector sector){
+        planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
+    }
+
     boolean canLaunch(Sector sector){
         return mode == launch &&
             (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
-            //TODO completely untested
-            || (sector.preset != null && sector.preset.unlocked() && sector.preset.requirements.contains(r -> r.zone() != null && r.zone() == sector.preset))); //is an unlocked preset
+            || (sector.preset != null && sector.preset.unlocked())); //is an unlocked preset
     }
 
     @Override
@@ -184,7 +190,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             planets.drawPlane(hovered, () -> {
                 Draw.color(Color.white, Pal.accent, Mathf.absin(5f, 1f));
 
-                TextureRegion icon = hovered.locked() && !canLaunch(hovered) ? Icon.lock.getRegion() : hovered.is(SectorAttribute.naval) ? Liquids.water.icon(Cicon.large) : null;
+                TextureRegion icon = hovered.locked() && !canLaunch(hovered) ? Icon.lock.getRegion() : null;
 
                 if(icon != null){
                     Draw.rect(icon, 0, 0);
@@ -329,7 +335,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     int total = (int)(stat.mean * 60);
                     if(total > 1){
                         t.image(item.icon(Cicon.small)).padRight(3);
-                        t.add(ui.formatAmount(total) + " /min").color(Color.lightGray);
+                        t.add(UI.formatAmount(total) + " /min").color(Color.lightGray);
                         t.row();
                     }
                 });
@@ -343,17 +349,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 t.left();
 
                 t.table(res -> {
-                    ObjectIntMap<Item> map = sector.save.meta.secinfo.getCurrentItems(sector);
+                    ItemSeq items = sector.calculateItems();
 
                     int i = 0;
-                    for(Item item : content.items()){
-                        int amount = Math.min(map.get(item), sector.save.meta.secinfo.storageCapacity);
-                        if(amount > 0){
-                            res.image(item.icon(Cicon.small)).padRight(3);
-                            res.add(ui.formatAmount(amount)).color(Color.lightGray);
-                            if(++i % 2 == 0){
-                                res.row();
-                            }
+                    for(ItemStack stack : items){
+                        res.image(stack.item.icon(Cicon.small)).padRight(3);
+                        res.add(UI.formatAmount(stack.amount)).color(Color.lightGray);
+                        if(++i % 2 == 0){
+                            res.row();
                         }
                     }
                 });
@@ -361,23 +364,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }).row();
         }
 
-        //display how many turns this sector has been attacked
-        //TODO implement properly
-        /*
-        if(sector.getTurnsPassed() > 0 && sector.hasBase()){
-            stable.row();
-
-            stable.add("[scarlet]" + Iconc.warning + " " + sector.getTurnsPassed() + "x attacks");
-        }*/
-
         stable.row();
 
-        if((sector.hasBase() && mode == look) || canLaunch(sector) || sector.preset.alwaysUnlocked){
+        if((sector.hasBase() && mode == look) || canLaunch(sector) || (sector.preset != null && sector.preset.alwaysUnlocked)){
             stable.button(sector.hasBase() ? "Resume" : "Launch", Styles.transt, () -> {
-                if(sector.is(SectorAttribute.naval)){
-                    ui.showInfo("You need a naval loadout to launch here.");
-                    return;
-                }
 
                 boolean shouldHide = true;
 
@@ -416,12 +406,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.update(() -> {
             if(selected != null){
                 if(launching){
-                    stable.getColor().sub(0, 0, 0, 0.05f * Time.delta);
+                    stable.color.sub(0, 0, 0, 0.05f * Time.delta);
                 }else{
                     //fade out UI when not facing selected sector
                     Tmp.v31.set(selected.tile.v).rotate(Vec3.Y, -planets.planet.getRotation()).scl(-1f).nor();
                     float dot = planets.cam.direction.dot(Tmp.v31);
-                    stable.getColor().a = Math.max(dot, 0f)*2f;
+                    stable.color.a = Math.max(dot, 0f)*2f;
                     if(dot*2f <= -0.1f){
                         stable.remove();
                         selected = null;

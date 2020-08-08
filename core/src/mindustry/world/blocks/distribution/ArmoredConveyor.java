@@ -18,7 +18,7 @@ public class ArmoredConveyor extends Conveyor{
     public class ArmoredConveyorEntity extends ConveyorEntity{
         @Override
         public boolean acceptItem(Building source, Item item){
-            return super.acceptItem(source, item) && (source.block() instanceof Conveyor || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == tile.rotation());
+            return super.acceptItem(source, item) && (source.block() instanceof Conveyor || Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation);
         }
     }
 }

@@ -164,6 +164,14 @@ public class Saves{
         return saves;
     }
 
+    public void deleteAll(){
+        for(SaveSlot slot : saves.copy()){
+            if(!slot.isSector()){
+                slot.delete();
+            }
+        }
+    }
+
     public class SaveSlot{
         public final Fi file;
         boolean requestedPreview;
@@ -180,7 +188,7 @@ public class Saves{
                 current = this;
                 totalPlaytime = meta.timePlayed;
                 savePreview();
-            }catch(Exception e){
+            }catch(Throwable e){
                 throw new SaveException(e);
             }
         }
@@ -263,7 +271,7 @@ public class Saves{
             mods.removeAll(Vars.mods.getModStrings());
 
             if(!mods.isEmpty()){
-                ui.showConfirm("$warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
+                ui.showConfirm("@warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
             }else{
                 run.run();
             }

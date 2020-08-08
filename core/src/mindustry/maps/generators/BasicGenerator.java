@@ -57,15 +57,15 @@ public abstract class BasicGenerator implements WorldGenerator{
                 }
             }
 
-            tile.rotation(rotation);
+            tile.data = (byte)rotation;
         }
 
         for(Tile tile : tiles){
-            if(tile.rotation() != 0){
-                int rotation = tile.rotation();
+            if(tile.data != 0){
+                int rotation = tile.data;
                 tile.setBlock(Blocks.cliff);
                 tile.setOverlay(Blocks.air);
-                tile.rotation(rotation);
+                tile.data = (byte)rotation;
             }
         }
     }
@@ -86,7 +86,7 @@ public abstract class BasicGenerator implements WorldGenerator{
                 tile.setBlock(Blocks.cliff);
             }
 
-            tile.rotation(rotation);
+            tile.data = (byte)rotation;
         }
 
         for(Tile tile : tiles){

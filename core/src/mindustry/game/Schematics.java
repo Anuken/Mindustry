@@ -42,7 +42,6 @@ import static mindustry.Vars.*;
 public class Schematics implements Loadable{
     private static final Schematic tmpSchem = new Schematic(new Seq<>(), new StringMap(), 0, 0);
     private static final Schematic tmpSchem2 = new Schematic(new Seq<>(), new StringMap(), 0, 0);
-    public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 1;
@@ -379,7 +378,7 @@ public class Schematics implements Loadable{
                     && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
                     Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
+                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }
@@ -418,8 +417,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, team, 0);
-            tile.rotation(st.rotation);
+            tile.setBlock(st.block, team, st.rotation);
 
             Object config = st.config;
             if(tile.build != null){
@@ -438,8 +436,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, team, 0);
-            tile.rotation(st.rotation);
+            tile.setBlock(st.block, team, st.rotation);
 
             Object config = st.config;
             if(tile.build != null){

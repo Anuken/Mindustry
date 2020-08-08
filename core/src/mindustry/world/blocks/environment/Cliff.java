@@ -18,7 +18,7 @@ public class Cliff extends Block{
 
     @Override
     public void drawBase(Tile tile){
-        int r = tile.rotation();
+        int r = tile.data;
         for(int i = 0; i < 8; i++){
             if((r & (1 << i)) != 0){
                 Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(1.3f + (i >= 4 ? -0.4f : 0.3f)));

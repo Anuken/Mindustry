@@ -46,7 +46,7 @@ public class MapView extends Element implements GestureListener{
         }
 
         Core.input.getInputProcessors().insert(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
-        touchable(Touchable.enabled);
+        this.touchable = Touchable.enabled;
 
         Point2 firstTouch = new Point2();
 
