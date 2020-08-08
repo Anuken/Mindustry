@@ -93,24 +93,24 @@ public class Conveyor extends Block implements Autotiler{
 
     public class ConveyorEntity extends Building{
         //parallel array data
-        Item[] ids = new Item[capacity];
-        float[] xs = new float[capacity];
-        float[] ys = new float[capacity];
+        public Item[] ids = new Item[capacity];
+        public float[] xs = new float[capacity];
+        public float[] ys = new float[capacity];
         //amount of items, always < capacity
-        int len = 0;
+        public int len = 0;
         //next entity
-        @Nullable Building next;
-        @Nullable ConveyorEntity nextc;
+        public @Nullable Building next;
+        public @Nullable ConveyorEntity nextc;
         //whether the next conveyor's rotation == tile rotation
-        boolean aligned;
+        public boolean aligned;
 
-        int lastInserted, mid;
-        float minitem = 1;
+        public int lastInserted, mid;
+        public float minitem = 1;
 
-        int blendbits, blending;
-        int blendsclx, blendscly;
+        public int blendbits, blending;
+        public int blendsclx, blendscly;
 
-        float clogHeat = 0f;
+        public float clogHeat = 0f;
 
         @Override
         public void draw(){
@@ -348,7 +348,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
 
-        final void add(int o){
+        public final void add(int o){
             for(int i = Math.max(o + 1, len); i > o; i--){
                 ids[i] = ids[i - 1];
                 xs[i] = xs[i - 1];
@@ -358,7 +358,7 @@ public class Conveyor extends Block implements Autotiler{
             len++;
         }
 
-        final void remove(int o){
+        public final void remove(int o){
             for(int i = o; i < len - 1; i++){
                 ids[i] = ids[i + 1];
                 xs[i] = xs[i + 1];

@@ -20,9 +20,9 @@ public class Router extends Block{
     }
 
     public class RouterEntity extends Building{
-        Item lastItem;
-        Tile lastInput;
-        float time;
+        public Item lastItem;
+        public Tile lastInput;
+        public float time;
 
         @Override
         public void updateTile(){
@@ -70,7 +70,7 @@ public class Router extends Block{
             return result;
         }
 
-        Building getTileTarget(Item item, Tile from, boolean set){
+        public Building getTileTarget(Item item, Tile from, boolean set){
             int counter = rotation;
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);

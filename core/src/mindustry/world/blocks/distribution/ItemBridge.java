@@ -357,7 +357,7 @@ public class ItemBridge extends Block{
             return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
         }
 
-        private boolean linked(Building source){
+        protected boolean linked(Building source){
             return source instanceof ItemBridgeEntity && linkValid(source.tile(), tile) && ((ItemBridgeEntity)source).link == pos();
         }
 

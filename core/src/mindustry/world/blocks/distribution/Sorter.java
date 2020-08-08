@@ -48,7 +48,7 @@ public class Sorter extends Block{
     }
 
     public class SorterEntity extends Building{
-        @Nullable Item sortItem;
+        public @Nullable Item sortItem;
 
         @Override
         public void configured(Player player, Object value){
@@ -86,12 +86,12 @@ public class Sorter extends Block{
             to.handleItem(this, item);
         }
 
-        boolean isSame(Building other){
-            //uncomment code below to prevent sorter/gate chaining
+        public boolean isSame(Building other){
+            // comment code below to allow sorter/gate chaining
             return other != null && (other.block() instanceof Sorter || other.block() instanceof OverflowGate);
         }
 
-        Building getTileTarget(Item item, Building source, boolean flip){
+        public Building getTileTarget(Item item, Building source, boolean flip){
             int dir = source.relativeTo(tile.x, tile.y);
             if(dir == -1) return null;
             Building to;
