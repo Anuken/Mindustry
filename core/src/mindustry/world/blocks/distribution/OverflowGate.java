@@ -31,9 +31,9 @@ public class OverflowGate extends Block{
     }
 
     public class OverflowGateEntity extends Building{
-        Item lastItem;
-        Tile lastInput;
-        float time;
+        public Item lastItem;
+        public Tile lastInput;
+        public float time;
 
         @Override
         public int acceptStack(Item item, int amount, Teamc source){

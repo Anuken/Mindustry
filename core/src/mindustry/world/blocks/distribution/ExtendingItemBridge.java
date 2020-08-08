@@ -15,7 +15,7 @@ public class ExtendingItemBridge extends ItemBridge{
         super(name);
         hasItems = true;
     }
-    
+
     public class ExtendingItemBridgeEntity extends ItemBridgeEntity{
         @Override
         public void draw(){
