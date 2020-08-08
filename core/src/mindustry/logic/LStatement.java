@@ -1,10 +1,12 @@
 package mindustry.logic;
 
+import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
+import mindustry.ui.*;
 
 /**
  * A statement is an intermediate representation of an instruction, to be used mostly in UI.
@@ -15,6 +17,11 @@ public abstract class LStatement{
     public abstract void build(Table table);
     public abstract LCategory category();
     public abstract LInstruction build(LAssembler builder);
+
+    protected void field(Table table, String value, Cons<String> setter){
+        table.field(value, Styles.nodeField, setter)
+            .size(130f, 40f).pad(2f).color(table.color);
+    }
 
     public void write(StringBuilder builder){
         LogicIO.write(this,builder);

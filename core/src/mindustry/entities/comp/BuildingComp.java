@@ -18,11 +18,13 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -37,7 +39,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable{
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -1163,6 +1165,26 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(health <= 0){
             Call.tileDestroyed(base());
         }
+    }
+
+    @Override
+    public double sense(LSensor sensor){
+        if(sensor == LSensor.health) return health;
+        if(sensor == LSensor.efficiency) return efficiency();
+        if(sensor == LSensor.totalItems && items != null) return items.total();
+        if(sensor == LSensor.totalLiquids && liquids != null) return liquids.total();
+        if(sensor == LSensor.totalPower && power != null) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+        if(sensor == LSensor.powerNetIn && power != null) return power.graph.getPowerProduced();
+        if(sensor == LSensor.powerNetOut && power != null) return power.graph.getPowerNeeded();
+        if(sensor == LSensor.powerNetStored && power != null) return power.graph.getLastPowerStored();
+        return 0;
+    }
+
+    @Override
+    public double sense(Content content){
+        if(content instanceof Item && items != null) return items.get((Item)content);
+        if(content instanceof Liquid && liquids != null) return liquids.get((Liquid)content);
+        return 0;
     }
 
     @Override

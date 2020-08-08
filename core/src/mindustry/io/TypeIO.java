@@ -16,6 +16,7 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
@@ -85,6 +86,9 @@ public class TypeIO{
         }else if(object instanceof Building){
             write.b((byte)12);
             write.i(((Building)object).pos());
+        }else if(object instanceof LSensor){
+            write.b((byte)13);
+            write.s(((LSensor)object).ordinal());
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -107,6 +111,7 @@ public class TypeIO{
             case 10: return read.bool();
             case 11: return read.d();
             case 12: return world.build(read.i());
+            case 13: return LSensor.all[read.s()];
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }

@@ -3,7 +3,6 @@ package mindustry.logic;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
@@ -18,15 +17,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            Log.info("mem:: ");
-
-            table.field(to, Styles.nodeField, str -> to = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            field(table, to, str -> to = str);
 
             table.add(" = ");
 
-            table.field(from, Styles.nodeField, str -> from = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            field(table, from, str -> from = str);
         }
 
         @Override
@@ -47,13 +42,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.field(to, Styles.nodeField, str -> to = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            field(table, to, str -> to = str);
 
             table.add(" = mem:: ");
 
-            table.field(from, Styles.nodeField, str -> from = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            field(table, from, str -> from = str);
         }
 
         @Override
@@ -74,18 +67,17 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.field(to, Styles.nodeField, str -> to = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            field(table, to, str -> to = str);
 
             table.add(" = ");
 
-            table.field(type, Styles.nodeField, str -> type = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            table.row();
+
+            field(table, type, str -> type = str);
 
             table.add(" in ");
 
-            table.field(from, Styles.nodeField, str -> from = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            field(table, from, str -> from = str);
         }
 
         @Override
@@ -106,13 +98,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.field(to, Styles.nodeField, str -> to = str)
-                .size(100f, 40f).pad(2f).color(table.color);
+            field(table, to, str -> to = str);
 
             table.add(" = ");
 
-            table.field(from, Styles.nodeField, str -> from = str)
-                .size(100f, 40f).pad(2f).color(table.color);
+            field(table, from, str -> from = str);
         }
 
         @Override
@@ -133,13 +123,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.field(target, Styles.nodeField, str -> target = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            field(table, target, str -> target = str);
 
             table.add(" -> ");
 
-            table.field(value, Styles.nodeField, str -> value = str)
-            .size(100f, 40f).pad(2f).color(table.color);
+            field(table, value, str -> value = str);
         }
 
         @Override
@@ -160,14 +148,13 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.field(dest, Styles.nodeField, str -> dest = str)
-                .size(100f, 40f).pad(2f).color(table.color);
+            field(table, dest, str -> dest = str);
 
             table.add(" = ");
 
-            table.field(a, Styles.nodeField, str -> a = str)
-                .size(90f, 40f).pad(2f).color(table.color);
+            table.row();
 
+            field(table, a, str -> a = str);
 
             TextButton[] button = {null};
             button[0] = table.button(op.symbol, Styles.cleart, () -> {
@@ -175,8 +162,7 @@ public class LStatements{
                 button[0].setText(op.symbol);
             }).size(50f, 30f).pad(4f).get();
 
-            table.field(b, Styles.nodeField, str -> b = str)
-                .size(90f, 40f).pad(2f).color(table.color);
+            field(table, b, str -> b = str);
         }
 
         @Override
@@ -215,13 +201,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.field(value, Styles.nodeField, str -> value = str)
-                .size(100f, 40f).pad(2f).color(table.color);
+            field(table, value, str -> value = str);
 
             table.add(" to ");
 
-            table.field(target, Styles.nodeField, str -> target = str)
-                .size(100f, 40f).pad(2f).color(table.color);
+            field(table, target, str -> target = str);
         }
 
         @Override
@@ -245,8 +229,8 @@ public class LStatements{
         @Override
         public void build(Table table){
             table.add("if ").padLeft(6);
-            table.field(condition, Styles.nodeField, str -> condition = str)
-                .size(100f, 40f).pad(2f).color(table.color);
+            field(table, condition, str -> condition = str);
+
             table.add().growX();
             table.add(new JumpButton(Color.white, () -> dest, s -> dest = s)).size(30).right().padRight(-17);
         }

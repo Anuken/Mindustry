@@ -64,9 +64,9 @@ public class LogicStatementProcessor extends BaseProcessor{
 
             reader.addStatement("$T result = new $T()", c.mirror(), c.mirror());
 
-            for(int i = 0; i < fields.size; i++){
-                Svar field = fields.get(i);
+            int index = 0;
 
+            for(Svar field : fields){
                 if(field.is(Modifier.TRANSIENT)) continue;
 
                 writer.addStatement("out.append(\" \")");
@@ -74,12 +74,14 @@ public class LogicStatementProcessor extends BaseProcessor{
 
                 //reading primitives, strings and enums is supported; nothing else is
                 reader.addStatement("result.$L = $L(tokens[$L])",
-                    field.name(),
-                    field.mirror().toString().equals("java.lang.String") ?
-                        "" : (field.tname().isPrimitive() ? field.tname().box().toString() :
-                        field.mirror().toString()) + ".valueOf", //if it's not a string, it must have a valueOf method
-                    i + 1
+                field.name(),
+                field.mirror().toString().equals("java.lang.String") ?
+                "" : (field.tname().isPrimitive() ? field.tname().box().toString() :
+                field.mirror().toString()) + ".valueOf", //if it's not a string, it must have a valueOf method
+                index + 1
                 );
+
+                index ++;
             }
 
             reader.addStatement("return result");

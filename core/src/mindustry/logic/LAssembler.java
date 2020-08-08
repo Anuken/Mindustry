@@ -12,14 +12,14 @@ import mindustry.type.*;
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
 
-    private transient int lastVar;
+    private int lastVar;
     /** Maps names to variable IDs. */
     ObjectMap<String, BVar> vars = new ObjectMap<>();
     /** All instructions to be executed. */
     LInstruction[] instructions;
 
     public LAssembler(){
-        putVar("@counter");
+        putVar("@counter").value = 0;
         putConst("@time", 0);
 
         //add default constants
@@ -35,6 +35,12 @@ public class LAssembler{
 
         for(Liquid liquid : Vars.content.liquids()){
             putConst("@" + liquid.name, liquid);
+        }
+
+        //store sensor constants
+
+        for(LSensor sensor : LSensor.all){
+            putConst("@" + sensor.name(), sensor);
         }
     }
 

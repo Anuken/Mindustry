@@ -9,12 +9,14 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -23,7 +25,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable{
 
     @Import boolean hovering;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
@@ -65,6 +67,19 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Replace
     public float clipSize(){
         return type.region.getWidth() * 2f;
+    }
+
+    @Override
+    public double sense(LSensor sensor){
+        if(sensor == LSensor.totalItems) return stack().amount;
+        if(sensor == LSensor.health) return health;
+        return 0;
+    }
+
+    @Override
+    public double sense(Content content){
+        if(content == stack().item) return stack().amount;
+        return 0;
     }
 
     @Override

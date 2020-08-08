@@ -13,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
@@ -105,6 +106,12 @@ public class NuclearReactor extends PowerGenerator{
                 Events.fire(Trigger.thoriumReactorOverheat);
                 kill();
             }
+        }
+
+        @Override
+        public double sense(LSensor sensor){
+            if(sensor == LSensor.heat) return heat;
+            return super.sense(sensor);
         }
 
         @Override

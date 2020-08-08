@@ -3,8 +3,8 @@ package mindustry.logic;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 
 public class LExecutor{
     //special variables
@@ -192,16 +192,16 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Building build = exec.building(from);
+            Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
             double output = 0;
 
-            if(build != null){
-                if(sense instanceof Item && build.items != null){
-                    output = build.items.get((Item)sense);
-                }else if(sense instanceof Liquid && build.liquids != null){
-                    output = build.liquids.get((Liquid)sense);
+            if(target instanceof Senseable){
+                if(sense instanceof Content){
+                    output = ((Senseable)target).sense(((Content)sense));
+                }else if(sense instanceof LSensor){
+                    output = ((Senseable)target).sense(((LSensor)sense));
                 }
             }
 
@@ -285,7 +285,7 @@ public class LExecutor{
 
             //this should avoid any garbage allocation
             Var v = exec.vars[value];
-            if(v.isobj){
+            if(v.isobj && value != 0){
                 if(v.objval instanceof String){
                     b.handleString(v.objval);
                 }else if(v.objval == null){

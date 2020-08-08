@@ -17,6 +17,7 @@ public class Router extends Block{
         itemCapacity = 1;
         group = BlockGroup.transportation;
         unloadable = false;
+        noUpdateDisabled = true;
     }
 
     public class RouterEntity extends Building{
