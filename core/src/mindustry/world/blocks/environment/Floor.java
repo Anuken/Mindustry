@@ -42,6 +42,8 @@ public class Floor extends Block{
     public float statusDuration = 60f;
     /** liquids that drop from this block, used for pumps */
     public @Nullable Liquid liquidDrop = null;
+    /** Multiplier for pumped liquids, used for deep water. */
+    public float liquidMultiplier = 1f;
     /** item that drops from this block, used for drills */
     public @Nullable Item itemDrop = null;
     /** whether this block can be drowned in */
