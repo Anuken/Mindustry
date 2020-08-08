@@ -27,6 +27,8 @@ public abstract class BulletType extends Content{
     public boolean pierce;
     public Effect hitEffect, despawnEffect;
 
+    /** Lifetime lost after collisions. */
+    public float lifelost = 0f;
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
     /** Extra smoke effect created when shooting. */

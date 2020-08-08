@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, railgun, spectre, meltdown, segment, parallax,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -1632,6 +1632,27 @@ public class Blocks implements ContentList{
             shootSound = Sounds.shootSnap;
 
             health = 145 * size * size;
+        }};
+
+        railgun = new PowerItemTurret("railgun"){{
+            requirements(Category.turret, with(Items.lead, 200, Items.silicon, 125, Items.titanium, 80));
+            ammo(
+            Items.graphite, Bullets.railgunDense, 
+            Items.titanium, Bullets.railgunTitanium, 
+            Items.thorium, Bullets.railgunThorium, 
+            Items.surgealloy, Bullets.railgunSurge
+            );
+            reloadTime = 600f;
+            range = 250f;
+            size = 3;
+            recoilAmount = 3f;
+            rotatespeed = 10f;
+            inaccuracy = 0f;
+            shootCone = 10f;
+            shootSound = Sounds.shootSnap;
+            health = 150 * size * size;
+            powerUse = 7.5f;
+            ammoPerShot = 2;
         }};
 
         spectre = new ItemTurret("spectre"){{

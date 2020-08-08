@@ -97,7 +97,9 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         }
 
         //must be last.
-        if(!type.pierce){
+        if(type.lifelost > 0f) {
+            lifetime(lifetime() - type.lifelost);
+        }else if(!type.pierce){
             remove();
         }else{
             collided.add(other.id());
@@ -123,7 +125,11 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
                     if(remove || type.collidesTeam){
                         type.hitTile(base(), tile);
-                        remove();
+                        if(type.lifelost > 0f) {
+                            lifetime(lifetime() - type.lifelost);
+                        }else{
+                            remove();
+                        }
                     }
                     return true;
                 }

@@ -327,8 +327,10 @@ public class TechTree implements ContentList{
                         });
 
                         node(lancer, () -> {
-                            node(meltdown, () -> {
+                            node(railgun, () -> {
+                                node(meltdown, () -> {
 
+                                });
                             });
 
                             node(shockMine, () -> {
