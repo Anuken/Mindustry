@@ -2,8 +2,11 @@ package mindustry.logic;
 
 import arc.func.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
+import mindustry.type.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
@@ -16,10 +19,23 @@ public class LAssembler{
     LInstruction[] instructions;
 
     public LAssembler(){
+        putVar("@counter");
+        putConst("@time", 0);
+
         //add default constants
         putConst("false", 0);
         putConst("true", 1);
         putConst("null", null);
+
+        //store base content (TODO hacky?)
+
+        for(Item item : Vars.content.items()){
+            putConst("@" + item.name, item);
+        }
+
+        for(Liquid liquid : Vars.content.liquids()){
+            putConst("@" + liquid.name, liquid);
+        }
     }
 
     public static LAssembler assemble(String data){
@@ -84,7 +100,7 @@ public class LAssembler{
     }
 
     /** Adds a constant value by name. */
-    BVar putConst(String name, Object value){
+    public BVar putConst(String name, Object value){
         BVar var = putVar(name);
         var.constant = true;
         var.value = value;
@@ -92,7 +108,7 @@ public class LAssembler{
     }
 
     /** Registers a variable name mapping. */
-    BVar putVar(String name){
+    public BVar putVar(String name){
         if(vars.containsKey(name)){
             return vars.get(name);
         }else{
@@ -102,7 +118,11 @@ public class LAssembler{
         }
     }
 
-    /** A saved variable. */
+    public @Nullable BVar getVar(String name){
+        return vars.get(name);
+    }
+
+    /** A variable "builder". */
     public static class BVar{
         public int id;
         public boolean constant;
@@ -113,5 +133,14 @@ public class LAssembler{
         }
 
         BVar(){}
+
+        @Override
+        public String toString(){
+            return "BVar{" +
+            "id=" + id +
+            ", constant=" + constant +
+            ", value=" + value +
+            '}';
+        }
     }
 }

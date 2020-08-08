@@ -81,11 +81,14 @@ public class Blocks implements ContentList{
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
     repairPoint, resupplyPoint,
 
+    //logic
+    microProcessor, logicProcessor,
+
     //campaign
     launchPad, launchPadLarge,
 
     //misc experimental
-    logicProcessor, blockForge, blockLoader, blockUnloader;
+    blockForge, blockLoader, blockUnloader;
 
     @Override
     public void load(){
@@ -1885,14 +1888,28 @@ public class Blocks implements ContentList{
         }};
 
         //endregion campaign
-        //region experimental
+        //region logic
 
-        logicProcessor = new LogicProcessor("logic-processor"){{
-            requirements(Category.effect, BuildVisibility.debugOnly, with(Items.copper, 200, Items.lead, 100));
+        microProcessor = new LogicBlock("micro-processor"){{
+            requirements(Category.effect, with(Items.copper, 30, Items.lead, 50, Items.silicon, 30));
+
+            instructionsPerTick = 2;
+            memory = 32;
+
+            size = 1;
+        }};
+
+        logicProcessor = new LogicBlock("logic-processor"){{
+            requirements(Category.effect, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
+
+            instructionsPerTick = 5;
+            memory = 128;
 
             size = 2;
-            alwaysUnlocked = true;
         }};
+
+        //endregion
+        //region experimental
 
         blockForge = new BlockForge("block-forge"){{
             requirements(Category.production, BuildVisibility.debugOnly, with(Items.thorium, 100));

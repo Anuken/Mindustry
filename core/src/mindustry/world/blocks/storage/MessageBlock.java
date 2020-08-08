@@ -34,7 +34,9 @@ public class MessageBlock extends Block{
                 throw new ValidateException(player, "Player has gone above text limit.");
             }
 
-            StringBuilder result = new StringBuilder(text.length());
+            tile.message.ensureCapacity(text.length());
+            tile.message.setLength(0);
+
             text = text.trim();
             int count = 0;
             for(int i = 0; i < text.length(); i++){
@@ -42,21 +44,17 @@ public class MessageBlock extends Block{
                 if(c == '\n' || c == '\r'){
                     count ++;
                     if(count <= maxNewlines){
-                        result.append('\n');
+                        tile.message.append('\n');
                     }
                 }else{
-                    result.append(c);
+                    tile.message.append(c);
                 }
             }
-
-            tile.message = result.toString();
-            tile.lines = tile.message.split("\n");
         });
     }
 
     public class MessageBlockEntity extends Building{
-        public String message = "";
-        public String[] lines = {""};
+        public StringBuilder message = new StringBuilder();
 
         @Override
         public void drawSelect(){
@@ -68,7 +66,7 @@ public class MessageBlock extends Block{
             font.getData().setScale(1 / 4f / Scl.scl(1f));
             font.setUseIntegerPositions(false);
 
-            String text = message == null || message.isEmpty() ? "[lightgray]" + Core.bundle.get("empty") : message;
+            CharSequence text = message == null || message.length() == 0 ? "[lightgray]" + Core.bundle.get("empty") : message;
 
             l.setText(font, text, Color.white, 90f, Align.left, true);
             float offset = 1f;
@@ -90,7 +88,7 @@ public class MessageBlock extends Block{
             table.button(Icon.pencil, () -> {
                 if(mobile){
                     Core.input.getTextInput(new TextInput(){{
-                        text = message;
+                        text = message.toString();
                         multiline = true;
                         maxLength = maxTextLength;
                         accepted = str -> configure(str);
@@ -98,7 +96,7 @@ public class MessageBlock extends Block{
                 }else{
                     BaseDialog dialog = new BaseDialog("@editmessage");
                     dialog.setFillParent(false);
-                    TextArea a = dialog.cont.add(new TextArea(message.replace("\n", "\r"))).size(380f, 160f).get();
+                    TextArea a = dialog.cont.add(new TextArea(message.toString().replace("\n", "\r"))).size(380f, 160f).get();
                     a.setFilter((textField, c) -> {
                         if(c == '\n' || c == '\r'){
                             int count = 0;
@@ -128,6 +126,12 @@ public class MessageBlock extends Block{
         }
 
         @Override
+        public void handleString(Object value){
+            message.setLength(0);
+            message.append(value);
+        }
+
+        @Override
         public void updateTableAlign(Table table){
             Vec2 pos = Core.input.mouseScreen(x, y + size * tilesize / 2f + 1);
             table.setPosition(pos.x, pos.y, Align.bottom);
@@ -135,19 +139,19 @@ public class MessageBlock extends Block{
 
         @Override
         public String config(){
-            return message;
+            return message.toString();
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
-            write.str(message);
+            write.str(message.toString());
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            message = read.str();
+            message = new StringBuilder(read.str());
         }
     }
 }

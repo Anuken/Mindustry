@@ -94,6 +94,8 @@ public class Block extends UnlockableContent{
     public boolean absorbLasers = false;
     /** if false, the status is never drawn */
     public boolean enableDrawStatus = true;
+    /** if true, the block stops updating when disabled */
+    public boolean noUpdateDisabled = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */

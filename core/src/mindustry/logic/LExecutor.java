@@ -4,59 +4,56 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
 public class LExecutor{
-    LInstruction[] instructions;
-    int counter;
+    //special variables
+    public static final int
+        varCounter = 0,
+        varTime = 1;
 
-    //values of all the variables
-    Var[] vars;
+    public double[] memory = {};
+    public LInstruction[] instructions = {};
+    public Var[] vars = {};
 
     public boolean initialized(){
         return instructions != null && vars != null && instructions.length > 0;
     }
 
-    /** Runs all the instructions at once. Debugging only! */
-    public void runAll(){
-        counter = 0;
-
-        while(counter < instructions.length){
-            instructions[counter++].run(this);
-        }
-    }
-
+    /** Runs a single instruction. */
     public void runOnce(){
-        //reset to start
-        if(counter >= instructions.length) counter = 0;
+        //set time
+        vars[varTime].numval = Time.millis();
 
-        if(counter < instructions.length){
-            instructions[counter++].run(this);
+        //reset to start
+        if(vars[varCounter].numval >= instructions.length) vars[varCounter].numval = 0;
+
+        if(vars[varCounter].numval < instructions.length){
+            instructions[(int)(vars[varCounter].numval++)].run(this);
         }
     }
 
-    public void load(Object context, String data){
-        load(context,LAssembler.assemble(data));
+    public void load(String data){
+        load(LAssembler.assemble(data));
     }
 
-    public void load(Object context, LAssembler builder){
-        builder.putConst("this", context);
-
+    /** Loads with a specified assembler. Resets all variables. */
+    public void load(LAssembler builder){
         vars = new Var[builder.vars.size];
         instructions = builder.instructions;
-        counter = 0;
 
         builder.vars.each((name, var) -> {
-            Var v = new Var();
-            vars[var.id] = v;
+            Var dest = new Var(name);
+            vars[var.id] = dest;
 
-            if(var.constant){
-                v.constant = true;
-                if(var.value instanceof Number){
-                    v.numval = ((Number)var.value).doubleValue();
-                }else{
-                    v.isobj = true;
-                    v.objval = var.value;
-                }
+            dest.constant = var.constant;
+
+            if(var.value instanceof Number){
+                dest.isobj = false;
+                dest.numval = ((Number)var.value).doubleValue();
+            }else{
+                dest.isobj = true;
+                dest.objval = var.value;
             }
         });
     }
@@ -65,22 +62,22 @@ public class LExecutor{
 
     @Nullable Building building(int index){
         Object o = vars[index].objval;
-        return o == null && o instanceof Building ? (Building)o : null;
+        return vars[index].isobj && o instanceof Building ? (Building)o : null;
+    }
+
+    @Nullable Object obj(int index){
+        Object o = vars[index].objval;
+        return vars[index].isobj ? o : null;
     }
 
     boolean bool(int index){
         Var v = vars[index];
-        return v.isobj ? v.objval != null : Math.abs(v.numval) < 0.0001;
+        return v.isobj ? v.objval != null : Math.abs(v.numval) >= 0.00001;
     }
 
     double num(int index){
         Var v = vars[index];
         return v.isobj ? 0 : v.numval;
-    }
-
-    String str(int index){
-        Var v = vars[index];
-        return v.isobj ? String.valueOf(v.objval) : String.valueOf(v.numval);
     }
 
     int numi(int index){
@@ -104,11 +101,17 @@ public class LExecutor{
 
     //endregion
 
-    static class Var{
-        boolean isobj, constant;
+    public static class Var{
+        public final String name;
 
-        Object objval;
-        double numval;
+        public boolean isobj, constant;
+
+        public Object objval;
+        public double numval;
+
+        public Var(String name){
+            this.name = name;
+        }
     }
 
     //region instruction types
@@ -135,11 +138,74 @@ public class LExecutor{
         }
     }
 
-    public static class SenseI implements LInstruction{
+    public static class ReadI implements LInstruction{
         public int from, to;
+
+        public ReadI(int from, int to){
+            this.from = from;
+            this.to = to;
+        }
+
+        public ReadI(){
+        }
 
         @Override
         public void run(LExecutor exec){
+            int address = exec.numi(from);
+
+            exec.setnum(to,address < 0 || address >= exec.memory.length ? 0 : exec.memory[address]);
+        }
+    }
+
+    public static class WriteI implements LInstruction{
+        public int from, to;
+
+        public WriteI(int from, int to){
+            this.from = from;
+            this.to = to;
+        }
+
+        public WriteI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            int address = exec.numi(to);
+
+            if(address >= 0 && address < exec.memory.length){
+                exec.memory[address] = exec.num(from);
+            }
+        }
+    }
+
+    public static class SenseI implements LInstruction{
+        public int from, to, type;
+
+        public SenseI(int from, int to, int type){
+            this.from = from;
+            this.to = to;
+            this.type = type;
+        }
+
+        public SenseI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Building build = exec.building(from);
+            Object sense = exec.obj(type);
+
+            double output = 0;
+
+            if(build != null){
+                if(sense instanceof Item && build.items != null){
+                    output = build.items.get((Item)sense);
+                }else if(sense instanceof Liquid && build.liquids != null){
+                    output = build.liquids.get((Liquid)sense);
+                }
+            }
+
+            exec.setnum(to, output);
 
         }
     }
@@ -195,22 +261,48 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            exec.counter = exec.instructions.length;
+            exec.vars[varCounter].numval = exec.instructions.length;
         }
     }
 
     public static class PrintI implements LInstruction{
-        public int value;
+        private static final StringBuilder out = new StringBuilder();
 
-        public PrintI(int value){
+        public int value, target;
+
+        public PrintI(int value, int target){
             this.value = value;
+            this.target = target;
         }
 
         PrintI(){}
 
         @Override
         public void run(LExecutor exec){
-            Log.info(exec.str(value));
+            Building b = exec.building(target);
+
+            if(b == null) return;
+
+            //this should avoid any garbage allocation
+            Var v = exec.vars[value];
+            if(v.isobj){
+                if(v.objval instanceof String){
+                    b.handleString(v.objval);
+                }else if(v.objval == null){
+                    b.handleString("null");
+                }else{
+                    b.handleString("[object]");
+                }
+            }else{
+                out.setLength(0);
+                //display integer version when possible
+                if(Math.abs(v.numval - (int)v.numval) < 0.000001){
+                    out.append((int)v.numval);
+                }else{
+                    out.append(v.numval);
+                }
+                b.handleString(out);
+            }
         }
     }
 
@@ -227,7 +319,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             if(to != -1 && exec.bool(cond)){
-                exec.counter = to;
+                exec.vars[varCounter].numval = to;
             }
         }
     }

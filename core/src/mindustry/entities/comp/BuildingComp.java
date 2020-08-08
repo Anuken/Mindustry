@@ -98,7 +98,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
         }
 
-        health(block.health);
+        health = block.health;
         maxHealth(block.health);
         timer(new Interval(block.timers));
 
@@ -142,7 +142,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public final void readBase(Reads read){
         health = read.f();
-        rotation(read.b());
+        rotation = read.b();
         team = Team.get(read.b());
         if(items != null) items.read(read);
         if(power != null) power.read(read);
@@ -295,6 +295,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
     public float efficiency(){
+        //disabled -> 0 efficiency
+        if(!enabled) return 0;
         return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
     }
 
@@ -325,6 +327,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //endregion
     //region handler methods
+
+    /** This is for logic blocks. */
+    public void handleString(Object value){
+
+    }
 
     public void created(){}
     
@@ -1190,7 +1197,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             loops.play(block.idleSound, base(), block.idleSoundVolume);
         }
 
-        updateTile();
+        if(enabled || !block.noUpdateDisabled){
+            updateTile();
+        }
 
         if(items != null){
             items.update(updateFlow);

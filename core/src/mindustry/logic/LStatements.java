@@ -3,12 +3,101 @@ package mindustry.logic;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.logic.LExecutor.*;
 import mindustry.logic.LCanvas.*;
+import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 
 public class LStatements{
+
+    @RegisterStatement("write")
+    public static class WriteStatement extends LStatement{
+        public String to = "0";
+        public String from = "result";
+
+        @Override
+        public void build(Table table){
+            Log.info("mem:: ");
+
+            table.field(to, Styles.nodeField, str -> to = str)
+            .size(100f, 40f).pad(2f).color(table.color);
+
+            table.add(" = ");
+
+            table.field(from, Styles.nodeField, str -> from = str)
+            .size(100f, 40f).pad(2f).color(table.color);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new WriteI(builder.var(from), builder.var(to));
+        }
+    }
+
+    @RegisterStatement("read")
+    public static class ReadStatement extends LStatement{
+        public String to = "result";
+        public String from = "0";
+
+        @Override
+        public void build(Table table){
+            table.field(to, Styles.nodeField, str -> to = str)
+            .size(100f, 40f).pad(2f).color(table.color);
+
+            table.add(" = mem:: ");
+
+            table.field(from, Styles.nodeField, str -> from = str)
+            .size(100f, 40f).pad(2f).color(table.color);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new ReadI(builder.var(from), builder.var(to));
+        }
+    }
+
+    @RegisterStatement("sensor")
+    public static class SensorStatement extends LStatement{
+        public String to = "result";
+        public String from = "@0", type = "@copper";
+
+        @Override
+        public void build(Table table){
+            table.field(to, Styles.nodeField, str -> to = str)
+            .size(100f, 40f).pad(2f).color(table.color);
+
+            table.add(" = ");
+
+            table.field(type, Styles.nodeField, str -> type = str)
+            .size(100f, 40f).pad(2f).color(table.color);
+
+            table.add(" in ");
+
+            table.field(from, Styles.nodeField, str -> from = str)
+            .size(100f, 40f).pad(2f).color(table.color);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new SenseI(builder.var(from), builder.var(to), builder.var(type));
+        }
+    }
 
     @RegisterStatement("set")
     public static class SetStatement extends LStatement{
@@ -122,16 +211,22 @@ public class LStatements{
     @RegisterStatement("print")
     public static class PrintStatement extends LStatement{
         public String value = "\"frog\"";
+        public String target = "result";
 
         @Override
         public void build(Table table){
             table.field(value, Styles.nodeField, str -> value = str)
                 .size(100f, 40f).pad(2f).color(table.color);
+
+            table.add(" to ");
+
+            table.field(target, Styles.nodeField, str -> target = str)
+                .size(100f, 40f).pad(2f).color(table.color);
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new PrintI(builder.var(value));
+            return new PrintI(builder.var(value), builder.var(target));
         }
 
         @Override
@@ -182,6 +277,8 @@ public class LStatements{
         }
     }
 
+    //disabled until further notice - bypasses the network
+    /*
     @RegisterStatement("getbuild")
     public static class getBuildStatement extends LStatement{
         public String x = "0", y = "0", dest = "result";
@@ -211,5 +308,5 @@ public class LStatements{
         public LCategory category(){
             return LCategory.blocks;
         }
-    }
+    }*/
 }

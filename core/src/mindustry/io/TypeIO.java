@@ -3,6 +3,7 @@ package mindustry.io;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
 import mindustry.ai.types.*;
@@ -78,11 +79,18 @@ public class TypeIO{
         }else if(object instanceof Boolean){
             write.b((byte)10);
             write.bool((Boolean)object);
+        }else if(object instanceof Double){
+            write.b((byte)11);
+            write.d((Double)object);
+        }else if(object instanceof Building){
+            write.b((byte)12);
+            write.i(((Building)object).pos());
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
     }
 
+    @Nullable
     public static Object readObject(Reads read){
         byte type = read.b();
         switch(type){
@@ -97,6 +105,8 @@ public class TypeIO{
             case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
             case 9: return TechTree.getNotNull(content.getByID(ContentType.all[read.b()], read.s()));
             case 10: return read.bool();
+            case 11: return read.d();
+            case 12: return world.build(read.i());
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
