@@ -137,7 +137,6 @@ public class LogicBlock extends Block{
                 if(executor.initialized()){
                     executor.runOnce();
                 }
-
                 accumulator --;
             }
         }
