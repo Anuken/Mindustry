@@ -135,6 +135,7 @@ public class Blocks implements ContentList{
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
+            liquidMultiplier = 2f;
             isLiquid = true;
             status = StatusEffects.wet;
             statusDuration = 120f;

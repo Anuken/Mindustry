@@ -33,18 +33,18 @@ public class Pump extends LiquidBlock{
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 
-        float tiles = 0f;
+        float amount = 0f;
         Liquid liquidDrop = null;
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canPump(other)){
                 liquidDrop = other.floor().liquidDrop;
-                tiles++;
+                amount += other.floor().liquidMultiplier;
             }
         }
 
         if(liquidDrop != null){
-            float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", tiles * pumpAmount * 60f, 0), x, y, valid);
+            float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", amount * pumpAmount * 60f, 0), x, y, valid);
             float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5;
             Draw.mixcol(Color.darkGray, 1f);
             Draw.rect(liquidDrop.icon(Cicon.small), dx, dy - 1);
@@ -80,8 +80,8 @@ public class Pump extends LiquidBlock{
     }
 
     public class PumpEntity extends LiquidBlockEntity{
-        float tiles = 0f;
-        Liquid liquidDrop = null;
+        public float amount = 0f;
+        public Liquid liquidDrop = null;
 
         @Override
         public void draw(){
@@ -97,18 +97,18 @@ public class Pump extends LiquidBlock{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            tiles = 0f;
+            amount = 0f;
             liquidDrop = null;
 
             if(isMultiblock()){
                 for(Tile other : tile.getLinkedTiles(tempTiles)){
                     if(canPump(other)){
                         liquidDrop = other.floor().liquidDrop;
-                        tiles++;
+                        amount += other.floor().liquidMultiplier;
                     }
                 }
             }else{
-                tiles = 1f;
+                amount = tile.floor().liquidMultiplier;
                 liquidDrop = tile.floor().liquidDrop;
             }
         }
@@ -121,7 +121,7 @@ public class Pump extends LiquidBlock{
         @Override
         public void updateTile(){
             if(consValid() && liquidDrop != null){
-                float maxPump = Math.min(liquidCapacity - liquids.total(), tiles * pumpAmount * edelta());
+                float maxPump = Math.min(liquidCapacity - liquids.total(), amount * pumpAmount * edelta());
                 liquids.add(liquidDrop, maxPump);
             }
 
