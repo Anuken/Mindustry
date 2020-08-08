@@ -1,12 +1,14 @@
 package mindustry.logic;
 
+import arc.func.*;
 import arc.struct.*;
-import mindustry.io.*;
-import mindustry.logic.LCanvas.*;
+import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
+    public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
+
     private transient int lastVar;
     /** Maps names to variable IDs. */
     ObjectMap<String, BVar> vars = new ObjectMap<>();
@@ -20,33 +22,45 @@ public class LAssembler{
         putConst("null", null);
     }
 
-    public static LAssembler assemble(Seq<StatementElem> seq){
-        LAssembler out = new LAssembler();
-
-        seq.each(s -> s.st.saveUI());
-        out.instructions = seq.map(s -> s.st.build(out)).toArray(LInstruction.class);
-
-        return out;
-    }
-
-    public static String toJson(Seq<StatementElem> seq){
-        seq.each(s -> s.st.saveUI());
-        LStatement[] statements = seq.map(s -> s.st).toArray(LStatement.class);
-
-        return JsonIO.write(statements);
-    }
-
-    //TODO this is awful and confusing
-    public static LAssembler fromJson(String json){
+    public static LAssembler assemble(String data){
         LAssembler asm = new LAssembler();
 
-        LStatement[] statements = JsonIO.read(LStatement[].class, json);
-        for(LStatement s : statements){
-            s.setupUI();
-        }
-        asm.instructions = Seq.with(statements).map(l -> l.build(asm)).toArray(LInstruction.class);
+        Seq<LStatement> st = read(data);
 
+        asm.instructions = st.map(l -> l.build(asm)).toArray(LInstruction.class);
         return asm;
+    }
+
+    public static String write(Seq<LStatement> statements){
+        StringBuilder out = new StringBuilder();
+        for(LStatement s : statements){
+            s.write(out);
+            out.append("\n");
+        }
+
+        return out.toString();
+    }
+
+    public static Seq<LStatement> read(String data){
+        Seq<LStatement> statements = new Seq<>();
+        String[] lines = data.split("[;\n]+");
+        for(String line : lines){
+            //comments
+            if(line.startsWith("#")) continue;
+
+            String[] tokens = line.split(" ");
+            LStatement st = LogicIO.read(tokens);
+            if(st != null){
+                statements.add(st);
+            }else{
+                //attempt parsing using custom parser if a match is found - this is for mods
+                String first = tokens[0];
+                if(customParsers.containsKey(first)){
+                    statements.add(customParsers.get(first).get(tokens));
+                }
+            }
+        }
+        return statements;
     }
 
     /** @return a variable ID by name.

@@ -16,13 +16,26 @@ public class LExecutor{
         return instructions != null && vars != null && instructions.length > 0;
     }
 
-    /** Runs all the instructions at once. Debugging only. */
+    /** Runs all the instructions at once. Debugging only! */
     public void runAll(){
         counter = 0;
 
         while(counter < instructions.length){
             instructions[counter++].run(this);
         }
+    }
+
+    public void runOnce(){
+        //reset to start
+        if(counter >= instructions.length) counter = 0;
+
+        if(counter < instructions.length){
+            instructions[counter++].run(this);
+        }
+    }
+
+    public void load(Object context, String data){
+        load(context,LAssembler.assemble(data));
     }
 
     public void load(Object context, LAssembler builder){
@@ -105,15 +118,15 @@ public class LExecutor{
     }
 
     /** Enables/disables a building. */
-    public static class ToggleI implements LInstruction{
+    public static class EnableI implements LInstruction{
         public int target, value;
 
-        public ToggleI(int target, int value){
+        public EnableI(int target, int value){
             this.target = target;
             this.value = value;
         }
 
-        ToggleI(){}
+        EnableI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -131,15 +144,15 @@ public class LExecutor{
         }
     }
 
-    public static class AssignI implements LInstruction{
+    public static class SetI implements LInstruction{
         public int from, to;
 
-        public AssignI(int from, int to){
+        public SetI(int from, int to){
             this.from = from;
             this.to = to;
         }
 
-        AssignI(){}
+        SetI(){}
 
         @Override
         public void run(LExecutor exec){
@@ -219,17 +232,17 @@ public class LExecutor{
         }
     }
 
-    public static class FetchBuildI implements LInstruction{
+    public static class GetBuildI implements LInstruction{
         public int dest;
         public int x, y;
 
-        public FetchBuildI(int dest, int x, int y){
+        public GetBuildI(int dest, int x, int y){
             this.dest = dest;
             this.x = x;
             this.y = y;
         }
 
-        FetchBuildI(){}
+        GetBuildI(){}
 
         @Override
         public void run(LExecutor exec){

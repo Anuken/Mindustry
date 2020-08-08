@@ -3,13 +3,15 @@ package mindustry.logic;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.ui.*;
 
 public class LStatements{
 
-    public static class AssignStatement extends LStatement{
+    @RegisterStatement("set")
+    public static class SetStatement extends LStatement{
         public String to = "result";
         public String from = "0";
 
@@ -31,12 +33,12 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            //TODO internal consts need to start with ___ and not be assignable to
-            return new LExecutor.AssignI(builder.var(from), builder.var(to));
+            return new SetI(builder.var(from), builder.var(to));
         }
     }
 
-    public static class ToggleStatement extends LStatement{
+    @RegisterStatement("enable")
+    public static class EnableStatement extends LStatement{
         public String target = "result";
         public String value = "0";
 
@@ -57,11 +59,12 @@ public class LStatements{
         }
 
         @Override
-        public LExecutor.LInstruction build(LAssembler builder){
-            return new LExecutor.ToggleI(builder.var(target), builder.var(value));
+        public LInstruction build(LAssembler builder){
+            return new EnableI(builder.var(target), builder.var(value));
         }
     }
 
+    @RegisterStatement("op")
     public static class OpStatement extends LStatement{
         public BinaryOp op = BinaryOp.add;
         public String a = "a", b = "b", dest = "result";
@@ -98,6 +101,7 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("end")
     public static class EndStatement extends LStatement{
         @Override
         public void build(Table table){
@@ -115,6 +119,7 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("print")
     public static class PrintStatement extends LStatement{
         public String value = "\"frog\"";
 
@@ -135,6 +140,7 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("jump")
     public static class JumpStatement extends LStatement{
         public transient StatementElem dest;
 
@@ -176,7 +182,8 @@ public class LStatements{
         }
     }
 
-    public static class FetchBuildStatement extends LStatement{
+    @RegisterStatement("getbuild")
+    public static class getBuildStatement extends LStatement{
         public String x = "0", y = "0", dest = "result";
 
         @Override
@@ -197,7 +204,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new FetchBuildI(builder.var(dest), builder.var(x), builder.var(y));
+            return new GetBuildI(builder.var(dest), builder.var(x), builder.var(y));
         }
 
         @Override

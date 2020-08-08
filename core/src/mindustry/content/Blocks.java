@@ -1890,7 +1890,7 @@ public class Blocks implements ContentList{
         logicProcessor = new LogicProcessor("logic-processor"){{
             requirements(Category.effect, BuildVisibility.debugOnly, with(Items.copper, 200, Items.lead, 100));
 
-            size = 3;
+            size = 2;
             alwaysUnlocked = true;
         }};
 

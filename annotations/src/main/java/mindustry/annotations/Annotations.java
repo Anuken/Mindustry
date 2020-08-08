@@ -128,11 +128,11 @@ public class Annotations{
         String fallback() default "error";
     }
 
-    /** Registers a logic node's slot. */
-    @Target(ElementType.FIELD)
+    /** Registers a statement for auto serialization. */
+    @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Slot{
-        boolean input() default false;
+    public @interface RegisterStatement{
+        String value();
     }
 
     @Target(ElementType.TYPE)

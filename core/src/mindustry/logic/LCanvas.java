@@ -16,9 +16,9 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.io.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
 
 public class LCanvas extends Table{
     private static final Color backgroundCol = Pal.darkMetal.cpy().mul(0.1f), gridCol = Pal.darkMetal.cpy().mul(0.5f);
@@ -35,8 +35,30 @@ public class LCanvas extends Table{
 
         pane(statements).grow().get().setClip(false);
 
+        row();
+
+        button("@add", Icon.add, Styles.cleart, () -> {
+            BaseDialog dialog = new BaseDialog("@add");
+            dialog.cont.pane(t -> {
+                t.background(Tex.button);
+                for(Prov<LStatement> prov : LogicIO.allStatements){
+                    LStatement example = prov.get();
+                    t.button(example.name(), Styles.cleart, () -> {
+                        add(prov.get());
+                        dialog.hide();
+                    }).size(200f, 50f);
+                    t.row();
+                }
+            });
+            dialog.addCloseButton();
+            dialog.show();
+        }).height(50f).left().width(400f).marginLeft(10f);
+
         add(new PrintStatement());
-        add(new AssignStatement());
+        add(new SetStatement());
+        add(new JumpStatement());
+        add(new EnableStatement());
+        add(new OpStatement());
     }
 
     private void drawGrid(){
@@ -70,18 +92,26 @@ public class LCanvas extends Table{
     }
 
     String save(){
-        return LAssembler.toJson(statements.getChildren().as());
+        Seq<LStatement> st = statements.getChildren().<StatementElem>as().map(s -> s.st);
+        st.each(LStatement::saveUI);
+
+        return LAssembler.write(st);
     }
 
-    void load(String json){
+    void load(String asm){
         statements.clearChildren();
-        LStatement[] statements = JsonIO.read(LStatement[].class, json);
-        for(LStatement st : statements){
-            add(st);
-        }
+        try{
+            Seq<LStatement> statements = LAssembler.read(asm);
+            for(LStatement st : statements){
+                add(st);
+            }
 
-        for(LStatement st : statements){
-            st.setupUI();
+            for(LStatement st : statements){
+                st.setupUI();
+            }
+        }catch(Exception e){
+            //ignore errors reading asm
+            e.printStackTrace();
         }
 
         this.statements.layout();
@@ -96,7 +126,7 @@ public class LCanvas extends Table{
 
     public class DragLayout extends WidgetGroup{
         float margin = 4f;
-        float space = 10f, width = 400f;
+        float space = 10f, width = 400f, prefWidth, prefHeight;
         Seq<Element> seq = new Seq<>();
         int insertPosition = 0;
 
@@ -104,6 +134,8 @@ public class LCanvas extends Table{
         public void layout(){
             float cy = 0;
             seq.clear();
+
+            prefWidth = width;
 
             //layout everything normally
             for(int i = 0; i < getChildren().size; i++){
@@ -143,10 +175,22 @@ public class LCanvas extends Table{
                 }
             }
 
+            prefHeight = cy;
+        }
+
+        @Override
+        public float getPrefWidth(){
+            return prefWidth;
+        }
+
+        @Override
+        public float getPrefHeight(){
+            return prefHeight;
         }
 
         @Override
         public void draw(){
+            Draw.alpha(parentAlpha);
 
             //draw selection box indicating placement position
             if(dragging != null && insertPosition <= seq.size){
@@ -260,9 +304,9 @@ public class LCanvas extends Table{
         @Override
         public void draw(){
             float pad = 5f;
-            Fill.dropShadow(x + width/2f, y + height/2f, width + pad, height + pad, 10f, 0.9f);
+            Fill.dropShadow(x + width/2f, y + height/2f, width + pad, height + pad, 10f, 0.9f * parentAlpha);
 
-            Draw.color(0, 0, 0, 0.3f);
+            Draw.color(0, 0, 0, 0.3f * parentAlpha);
             Fill.crect(x, y, width, height);
             Draw.reset();
 
@@ -323,24 +367,31 @@ public class LCanvas extends Table{
         public void draw(){
             super.draw();
 
-
-
             postDraw.add(() -> {
                 Element hover = to.get() == null && selecting ? hovered() : to.get();
                 float tx = 0, ty = 0;
                 boolean draw = false;
                 //capture coordinates for use in lambda
-                float rx = x, ry = y;
+                float rx = x + translation.x, ry = y + translation.y;
+
                 Element p = parent;
                 while(p != null){
-                    rx += p.x;
-                    ry += p.y;
+                    rx += p.x + p.translation.x;
+                    ry += p.y + p.translation.y;
                     p = p.parent;
                 }
 
                 if(hover != null){
                     tx = hover.getX(Align.right) + hover.translation.x;
                     ty = hover.getY(Align.right) + hover.translation.y;
+
+                    Element op = hover.parent;
+                    while(op != null){
+                        tx += op.x + op.translation.x;
+                        ty += op.y + op.translation.y;
+                        op = op.parent;
+                    }
+
                     draw = true;
                 }else if(selecting){
                     tx = rx + mx;

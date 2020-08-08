@@ -16,20 +16,28 @@ public class LogicProcessor extends Block{
         config(String.class, (LogicEntity entity, String code) -> {
             if(code != null){
                 entity.code = code;
-                entity.executor.load(entity, LAssembler.fromJson(code));
+
+                try{
+                    entity.executor.load(entity, code);
+                }catch(Exception e){
+                    e.printStackTrace();
+
+                    //handle malformed code and replace it with nothing
+                    entity.executor.load(entity, "");
+                }
             }
         });
     }
 
     public class LogicEntity extends Building{
         /** logic "source code" as list of json statements */
-        String code = "[]";
+        String code = "";
         LExecutor executor = new LExecutor();
 
         @Override
         public void updateTile(){
             if(executor.initialized()){
-                executor.runAll();
+                executor.runOnce();
             }
         }
 
@@ -51,7 +59,14 @@ public class LogicProcessor extends Block{
             super.read(read, revision);
 
             code = read.str();
-            executor.load(this, LAssembler.fromJson(code));
+            try{
+                executor.load(this, code);
+            }catch(Exception e){
+                e.printStackTrace();
+
+                //handle malformed code and ignore it
+                executor = new LExecutor();
+            }
         }
     }
 }
