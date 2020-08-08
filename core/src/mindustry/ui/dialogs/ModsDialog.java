@@ -188,6 +188,10 @@ public class ModsDialog extends BaseDialog{
                                                     modSelected.cont.add(modsbrolist.description).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
                                                     modSelected.buttons.defaults().size(200f, 54f).pad(2f);
                                                     modSelected.setFillParent(false);
+                                                    modSelected.buttons.button("$back", Icon.left, () -> {
+                                                        modSelected.clear();
+                                                        modSelected.hide();
+                                                    });
                                                     modSelected.buttons.button("$mods.browser.add", Icon.download, () -> {
                                                         modSelected.hide();
                                                         installMod[0] = () -> {
@@ -225,10 +229,6 @@ public class ModsDialog extends BaseDialog{
                                                             Core.app.openURI("https://github.com/" + modsbrolist.repo);
                                                         };
                                                         openGithubPage[0].run();
-                                                    });
-                                                    modSelected.buttons.button("$back", Icon.left, () -> {
-                                                        modSelected.clear();
-                                                        modSelected.hide();
                                                     });
                                                     modSelected.keyDown(KeyCode.escape, modSelected::hide);
                                                     modSelected.keyDown(KeyCode.back, modSelected::hide);
