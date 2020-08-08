@@ -147,7 +147,7 @@ public class StackConveyor extends Block implements Autotiler{
             int[] bits = buildBlending(tile, rotation, null, true);
             if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
             if(bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
-            
+
             blendprox = 0;
 
             for(int i = 0; i < 4; i++){
@@ -219,12 +219,12 @@ public class StackConveyor extends Block implements Autotiler{
             return false; // has no moving parts;
         }
 
-        private void poofIn(){
+        protected void poofIn(){
             link = tile.pos();
             Fx.plasticburn.at(this);
         }
 
-        private void poofOut(){
+        protected void poofOut(){
             Fx.plasticburn.at(this);
             link = -1;
         }

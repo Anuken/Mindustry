@@ -86,13 +86,13 @@ public class MassDriver extends Block{
     }
 
     public class MassDriverEntity extends Building{
-        int link = -1;
-        float rotation = 90;
-        float reload = 0f;
-        DriverState state = DriverState.idle;
-        OrderedSet<Tile> waitingShooters = new OrderedSet<>();
+        public int link = -1;
+        public float rotation = 90;
+        public float reload = 0f;
+        public DriverState state = DriverState.idle;
+        public OrderedSet<Tile> waitingShooters = new OrderedSet<>();
 
-        Tile currentShooter(){
+        public Tile currentShooter(){
             return waitingShooters.isEmpty() ? null : waitingShooters.first();
         }
 
@@ -322,7 +322,7 @@ public class MassDriver extends Block{
         }
     }
 
-    enum DriverState{
+    public enum DriverState{
         idle, //nothing is shooting at this mass driver and it does not have any target
         accepting, //currently getting shot at, unload items
         shooting,
