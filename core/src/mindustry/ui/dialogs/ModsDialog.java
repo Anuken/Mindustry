@@ -173,7 +173,7 @@ public class ModsDialog extends BaseDialog{
                                         }else{
                                             Json json = new Json();
                                             Seq<ModListing> listings = json.fromJson(Seq.class, ModListing.class, response.getResultAsString());
-                                            if(ModListing mod : listings){
+                                            for(ModListing mod : listings){
                                                 if((!searchtxt.isEmpty() && !mod.repo.contains(searchtxt))||searchtxt==null) continue;
                                                 tablebrow.button(btn -> {
                                                     btn.top().left();
