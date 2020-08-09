@@ -33,7 +33,9 @@ public class LCanvas extends Table{
 
         statements = new DragLayout();
 
-        pane(statements).grow().get().setClip(false);
+        ScrollPane pane = pane(statements).grow().get();
+        pane.setClip(false);
+        pane.setFlickScroll(false);
 
         row();
 
@@ -41,13 +43,14 @@ public class LCanvas extends Table{
             BaseDialog dialog = new BaseDialog("@add");
             dialog.cont.pane(t -> {
                 t.background(Tex.button);
+                int i = 0;
                 for(Prov<LStatement> prov : LogicIO.allStatements){
                     LStatement example = prov.get();
                     t.button(example.name(), Styles.cleart, () -> {
                         add(prov.get());
                         dialog.hide();
-                    }).size(200f, 50f);
-                    t.row();
+                    }).size(140f, 50f);
+                    if(++i % 2 == 0) t.row();
                 }
             });
             dialog.addCloseButton();
@@ -126,7 +129,7 @@ public class LCanvas extends Table{
 
     public class DragLayout extends WidgetGroup{
         float margin = 4f;
-        float space = 10f, width = 400f, prefWidth, prefHeight;
+        float space = 10f, prefWidth, prefHeight;
         Seq<Element> seq = new Seq<>();
         int insertPosition = 0;
 
@@ -135,7 +138,10 @@ public class LCanvas extends Table{
             float cy = 0;
             seq.clear();
 
-            prefWidth = width;
+            float totalHeight = getChildren().sumf(e -> e.getHeight() + space) + margin*2f;
+
+            height = prefHeight = totalHeight;
+            width = prefWidth = 400f;
 
             //layout everything normally
             for(int i = 0; i < getChildren().size; i++){
@@ -175,7 +181,7 @@ public class LCanvas extends Table{
                 }
             }
 
-            prefHeight = cy;
+            invalidateHierarchy();
         }
 
         @Override

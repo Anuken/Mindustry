@@ -31,8 +31,13 @@ public abstract class LStatement{
             .size(144f, 40f).pad(2f).color(table.color).addInputDialog();
     }
 
-    protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
-        return field(table, value, setter).width(70f);
+    protected void fields(Table table, String desc, String value, Cons<String> setter){
+        table.add(desc).padLeft(10).left();
+        field(table, value, setter).width(85f).padRight(10).left();
+    }
+
+    protected void fields(Table table, String value, Cons<String> setter){
+        field(table, value, setter).width(85f);
     }
 
     protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){

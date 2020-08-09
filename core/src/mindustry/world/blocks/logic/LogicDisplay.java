@@ -98,6 +98,7 @@ public class LogicDisplay extends Block{
         flush;
 
         public static final CommandType[] all = values();
+        public static final CommandType[] allNormal = Seq.select(all, t -> t != flush).toArray(CommandType.class);
     }
 
     @Struct

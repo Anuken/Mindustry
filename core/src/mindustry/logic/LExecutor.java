@@ -311,20 +311,21 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            Building build = exec.building(target);
-            if(build instanceof LogicDisplayEntity){
-                //flush is a special command
-                if(type == commandFlush){
+            if(type == commandFlush){
+                Building build = exec.building(target);
+                if(build instanceof LogicDisplayEntity){
+                    //flush is a special command
                     LogicDisplayEntity d = (LogicDisplayEntity)build;
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
                     }
                     exec.graphicsBuffer.clear();
-                }else{
-                    //cap graphics buffer size
-                    if(exec.graphicsBuffer.size < 1024){
-                        exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3)));
-                    }
+                }
+
+            }else{
+                //add graphics calls, cap graphics buffer size
+                if(exec.graphicsBuffer.size < 1024){
+                    exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3)));
                 }
             }
         }

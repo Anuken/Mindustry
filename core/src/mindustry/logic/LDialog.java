@@ -12,10 +12,11 @@ public class LDialog extends BaseDialog{
     public LDialog(){
         super("logic");
 
+        clearChildren();
+
         canvas = new LCanvas();
         addCloseButton();
 
-        clear();
         stack(canvas, new Table(t -> {
             t.bottom();
             t.add(buttons);

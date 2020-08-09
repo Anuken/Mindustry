@@ -88,10 +88,9 @@ public class LStatements{
     }
 
 
-    @RegisterStatement("display")
-    public static class DisplayStatement extends LStatement{
+    @RegisterStatement("draw")
+    public static class DrawStatement extends LStatement{
         public CommandType type = CommandType.line;
-        public String target = "monitor";
         public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0";
 
         @Override
@@ -102,65 +101,64 @@ public class LStatements{
         void rebuild(Table table){
             table.clearChildren();
 
-            table.add("draw").padLeft(4);
+            table.left();
 
             table.button(b -> {
                 b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, CommandType.all, type, t -> {
+                b.clicked(() -> showSelect(b, CommandType.allNormal, type, t -> {
                     type = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
-            }, Styles.cleari, () -> {}).size(90, 50);
+            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            table.add(" to ");
+            if(type != CommandType.stroke){
+                table.row();
+            }
 
-            field(table, target, str -> target = str);
+            table.table(s -> {
+                s.left();
+                s.setColor(table.color);
 
-            table.row();
-
-            table.table(c -> {
-                c.marginLeft(3);
-                c.left();
-                c.setColor(table.color);
                 switch(type){
                     case clear:
                     case color:
-                        c.add("rgb ");
-                        fields(c, x, v -> x = v);
-                        fields(c, y, v -> y = v);
-                        fields(c, p1, v -> p1 = v);
+                        fields(s, "r", x, v -> x = v);
+                        fields(s, "g", y, v -> y = v);
+                        fields(s, "b", p1, v -> p1 = v);
                         break;
                     case stroke:
-                        c.add("width ");
-                        fields(c, x, v -> x = v);
+                        s.add().width(4);
+                        fields(s, x, v -> x = v);
                         break;
                     case line:
-                        c.add("xyx2y2 ");
-                        fields(c, x, v -> x = v);
-                        fields(c, y, v -> y = v);
-                        fields(c, p1, v -> p1 = v);
-                        fields(c, p2, v -> p2 = v);
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                        s.row();
+                        fields(s, "x2", p1, v -> p1 = v);
+                        fields(s, "y2", p2, v -> p2 = v);
                         break;
                     case rect:
                     case lineRect:
-                        c.add("xywh ");
-                        fields(c, x, v -> x = v);
-                        fields(c, y, v -> y = v);
-                        fields(c, p1, v -> p1 = v);
-                        fields(c, p2, v -> p2 = v);
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                        s.row();
+                        fields(s, "width", p1, v -> p1 = v);
+                        fields(s, "height", p2, v -> p2 = v);
                         break;
                     case poly:
                     case linePoly:
-                        c.add("xysra ");
-                        fields(c, x, v -> x = v);
-                        fields(c, y, v -> y = v);
-                        c.row();
-                        fields(c, p1, v -> p1 = v);
-                        fields(c, p2, v -> p2 = v);
-                        fields(c, p3, v -> p3 = v);
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                        s.row();
+                        fields(s, "sides", p1, v -> p1 = v);
+                        fields(s, "radius", p2, v -> p2 = v);
+                        s.row();
+                        fields(s, "rotation", p3, v -> p3 = v);
                         break;
                 }
-            }).colspan(4).left();
+            }).expand().left();
+
+
         }
 
         @Override
@@ -170,7 +168,28 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DisplayI((byte)type.ordinal(), builder.var(target), builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3));
+            return new DisplayI((byte)type.ordinal(), 0, builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3));
+        }
+    }
+
+    @RegisterStatement("flush")
+    public static class FlushStatement extends LStatement{
+        public String target = "display";
+
+        @Override
+        public void build(Table table){
+            table.add(" to ");
+            field(table, target, str -> target = str);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.blocks;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new DisplayI(commandFlush, builder.var(target), 0, 0, 0, 0, 0);
         }
     }
 
@@ -254,7 +273,7 @@ public class LStatements{
                     t.row();
                     t.add(stack).colspan(3).expand().left();
                 }));
-            }, Styles.cleart, () -> {}).size(40f).padLeft(-1);
+            }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
             table.add(" in ");
 
@@ -345,7 +364,7 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> op.symbol);
                 b.clicked(() -> showSelect(b, BinaryOp.all, op, o -> op = o));
-            }, Styles.cleart, () -> {}).size(50f, 40f).pad(4f);
+            }, Styles.logict, () -> {}).size(50f, 40f).pad(4f).color(table.color);
 
             field(table, b, str -> b = str);
         }
@@ -375,7 +394,7 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> op.symbol);
                 b.clicked(() -> showSelect(b, UnaryOp.all, op, o -> op = o));
-            }, Styles.cleart, () -> {}).size(50f, 40f).pad(3f);
+            }, Styles.logict, () -> {}).size(50f, 40f).pad(3f).color(table.color);
 
             field(table, value, str -> value = str);
         }

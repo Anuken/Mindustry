@@ -25,7 +25,7 @@ import static mindustry.gen.Tex.*;
 public class Styles{
     public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver;
     public static ButtonStyle defaultb, waveb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet;
+    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
     public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, onlyi, colori, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
@@ -92,6 +92,14 @@ public class Styles{
             disabledFontColor = Color.gray;
             down = flatOver;
             up = black;
+        }};
+        logict = new TextButtonStyle(){{
+            over = flatOver;
+            font = Fonts.def;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            down = flatOver;
+            up = underlineWhite;
         }};
         discordt = new TextButtonStyle(){{
             font = Fonts.def;
