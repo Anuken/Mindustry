@@ -22,6 +22,8 @@ public class LogicDisplay extends Block{
         commandLinePoly = 7,
         commandFlush = 8;
 
+    public int maxSides = 25;
+
     public int displaySize = 64;
 
     public LogicDisplay(String name){
@@ -70,8 +72,8 @@ public class LogicDisplay extends Block{
                             case commandLine: Lines.line(x, y, p1, p2); break;
                             case commandRect: Fill.crect(x, y, p1, p2); break;
                             case commandLineRect: Lines.rect(x, y, p1, p2); break;
-                            case commandPoly: Fill.poly(x, y, p1, p2, p3); break;
-                            case commandLinePoly: Lines.poly(x, y, p1, p2, p3); break;
+                            case commandPoly: Fill.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
+                            case commandLinePoly: Lines.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
                             case commandColor: this.color = Color.toFloatBits(x, y, p1, 255); Draw.color(this.color); break;
                             case commandStroke: this.stroke = x; Lines.stroke(x); break;
                         }

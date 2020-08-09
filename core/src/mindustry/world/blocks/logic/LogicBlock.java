@@ -1,6 +1,7 @@
 package mindustry.world.blocks.logic;
 
 import arc.func.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -30,7 +31,24 @@ public class LogicBlock extends Block{
         update = true;
         configurable = true;
 
-        config(String.class, (LogicEntity entity, String code) -> entity.updateCode(code));
+        config(String.class, (LogicEntity entity, String value) -> {
+            if(value.startsWith("{")){ //it's json
+                try{
+                    LogicConfig conf = JsonIO.read(LogicConfig.class, value);
+                    for(int i = 0; i < conf.connections.size; i++){
+                        int pos = conf.connections.items[i];
+                        conf.connections.items[i] = Point2.pack(Point2.x(pos) + entity.tileX(), Point2.y(pos) + entity.tileY());
+                    }
+                    entity.connections = conf.connections;
+                    entity.updateCode(conf.code);
+                }catch(Exception e){
+                    //malformed json
+                    e.printStackTrace();
+                }
+            }else{ //it's (probably) asm or just garbage
+                entity.updateCode(value);
+            }
+        });
 
         config(Integer.class, (LogicEntity entity, Integer pos) -> {
             if(entity.connections.contains(pos)){
@@ -56,10 +74,10 @@ public class LogicBlock extends Block{
         }
 
         public void updateCode(String str){
-            updateCode(str, null);
+            updateCodeVars(str, null);
         }
 
-        public void updateCode(String str, Cons<LAssembler> assemble){
+        public void updateCodeVars(String str, Cons<LAssembler> assemble){
             if(str != null){
                 code = str;
 
@@ -113,7 +131,6 @@ public class LogicBlock extends Block{
         @Override
         public void updateTile(){
             //remove invalid links
-            //TODO remove variables
             removal.clear();
 
             for(int i = 0; i < connections.size; i++){
@@ -143,7 +160,13 @@ public class LogicBlock extends Block{
 
         @Override
         public String config(){
-            return code;
+            //set connections to use relative coordinates, not absolute (TODO maybe just store them like this?)
+            IntSeq copy = new IntSeq(connections);
+            for(int i = 0; i < copy.size; i++){
+                int pos = copy.items[i];
+                copy.items[i] = Point2.pack(Point2.x(pos) - tileX(), Point2.y(pos) - tileY());
+            }
+            return JsonIO.write(new LogicConfig(code, copy));
         }
 
         @Override
@@ -275,7 +298,7 @@ public class LogicBlock extends Block{
                 memorybank[i] = read.d();
             }
 
-            updateCode(code, asm -> {
+            updateCodeVars(code, asm -> {
 
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
@@ -287,6 +310,19 @@ public class LogicBlock extends Block{
             });
 
             executor.memory = memorybank;
+        }
+    }
+
+    public static class LogicConfig{
+        public String code;
+        public IntSeq connections;
+
+        public LogicConfig(String code, IntSeq connections){
+            this.code = code;
+            this.connections = connections;
+        }
+
+        public LogicConfig(){
         }
     }
 }

@@ -458,21 +458,31 @@ public class LStatements{
         public transient StatementElem dest;
 
         public int destIndex;
-        public String condition = "true";
+
+        public ConditionOp op = ConditionOp.notEqual;
+        public String value = "x", compare = "false";
 
         @Override
         public void build(Table table){
-            table.add("if ").padLeft(6);
-            field(table, condition, str -> condition = str);
+            table.add("if ").padLeft(4);
+
+            field(table, value, str -> value = str);
+
+            table.button(b -> {
+                b.label(() -> op.symbol);
+                b.clicked(() -> showSelect(b, ConditionOp.all, op, o -> op = o));
+            }, Styles.logict, () -> {}).size(48f, 40f).pad(4f).color(table.color);
+
+            field(table, compare, str -> compare = str);
 
             table.add().growX();
-            table.add(new JumpButton(Color.white, () -> dest, s -> dest = s)).size(30).right().padRight(-17);
+            table.add(new JumpButton(Color.white, () -> dest, s -> dest = s)).size(30).right().padLeft(-8);
         }
 
         //elements need separate conversion logic
         @Override
         public void setupUI(){
-            if(elem != null){
+            if(elem != null && destIndex > 0 && destIndex < elem.parent.getChildren().size){
                 dest = (StatementElem)elem.parent.getChildren().get(destIndex);
             }
         }
@@ -486,7 +496,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new JumpI(builder.var(condition),destIndex);
+            return new JumpI(op, builder.var(value), builder.var(compare), destIndex);
         }
 
         @Override

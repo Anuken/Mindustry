@@ -102,19 +102,14 @@ public class LCanvas extends Table{
     }
 
     void load(String asm){
-        statements.clearChildren();
-        try{
-            Seq<LStatement> statements = LAssembler.read(asm);
-            for(LStatement st : statements){
-                add(st);
-            }
+        Seq<LStatement> statements = LAssembler.read(asm);
+        this.statements.clearChildren();
+        for(LStatement st : statements){
+            add(st);
+        }
 
-            for(LStatement st : statements){
-                st.setupUI();
-            }
-        }catch(Exception e){
-            //ignore errors reading asm
-            e.printStackTrace();
+        for(LStatement st : statements){
+            st.setupUI();
         }
 
         this.statements.layout();
@@ -272,6 +267,20 @@ public class LCanvas extends Table{
 
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+
+                        if(button == KeyCode.mouseMiddle){
+                            LStatement copy = st.copy();
+                            if(copy != null){
+                                StatementElem s = new StatementElem(copy);
+
+                                statements.addChildAfter(StatementElem.this,s);
+                                statements.layout();
+                                copy.elem = s;
+                                copy.setupUI();
+                            }
+                            return false;
+                        }
+
                         Vec2 v = localToStageCoordinates(Tmp.v1.set(x, y));
                         lastx = v.x;
                         lasty = v.y;

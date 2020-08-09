@@ -24,6 +24,13 @@ public abstract class LStatement{
     public abstract LCategory category();
     public abstract LInstruction build(LAssembler builder);
 
+    //TODO doesn't work with modded stuff
+    public LStatement copy(){
+        StringBuilder build = new StringBuilder();
+        write(build);
+        return LogicIO.read(build.toString().split(" "));
+    }
+
     //protected methods are only for internal UI layout utilities
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){

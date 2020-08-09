@@ -373,19 +373,23 @@ public class LExecutor{
     }
 
     public static class JumpI implements LInstruction{
-        public int cond, to;
+        public ConditionOp op = ConditionOp.notEqual;
+        public int value, compare, address;
 
-        public JumpI(int cond, int to){
-            this.cond = cond;
-            this.to = to;
+        public JumpI(ConditionOp op, int value, int compare, int address){
+            this.op = op;
+            this.value = value;
+            this.compare = compare;
+            this.address = address;
         }
 
-        JumpI(){}
+        public JumpI(){
+        }
 
         @Override
         public void run(LExecutor exec){
-            if(to != -1 && exec.bool(cond)){
-                exec.vars[varCounter].numval = to;
+            if(address != -1 && op.function.get(exec.num(value), exec.num(compare))){
+                exec.vars[varCounter].numval = address;
             }
         }
     }

@@ -1912,7 +1912,7 @@ public class Blocks implements ContentList{
         logicDisplay = new LogicDisplay("logic-display"){{
             requirements(Category.effect, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
 
-            displaySize = 64;
+            displaySize = 80;
 
             size = 3;
         }};
