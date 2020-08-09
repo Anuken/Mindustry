@@ -56,9 +56,7 @@ public class LogicDialog extends BaseDialog{
             t.add(buttons);
         })).grow();
 
-        hidden(() -> {
-            consumer.get(canvas.save());
-        });
+        hidden(() -> consumer.get(canvas.save()));
     }
 
     public void show(String code, Cons<String> consumer){
