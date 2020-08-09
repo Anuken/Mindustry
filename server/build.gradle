@@ -1,9 +1,6 @@
-apply plugin: "java"
-
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
-project.ext.mainClassName = "io.anuke.mindustry.server.ServerLauncher"
+project.ext.mainClassName = "mindustry.server.ServerLauncher"
 project.ext.assetsDir = new File("../core/assets")
 
 ext.getServerFolder = {
@@ -19,6 +16,9 @@ task run(dependsOn: classes, type: JavaExec){
     if(project.hasProperty("appArgs")){
         args Eval.me(appArgs)
     }
+    if(project.hasProperty("jvmArgs")){
+        jvmArgs((List<String>)Eval.me(project.getProperties()["jvmArgs"]))
+    }
 }
 
 task debug(dependsOn: classes, type: JavaExec){
@@ -30,17 +30,16 @@ task debug(dependsOn: classes, type: JavaExec){
     debug = true
 }
 
-task dist(type: Jar){
+task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from{ configurations.compile.collect{ zipTree(it) } }
+    from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
     from files(project.assetsDir)
     exclude("sprites/**")
     exclude("music/**")
     exclude("sounds/**")
     exclude("fonts/**")
     exclude("zones/**")
-    exclude("com/badlogic/gdx/**")
     exclude("icons/**")
     exclude("bundles/**")
 
@@ -51,8 +50,8 @@ task dist(type: Jar){
 
 task dzip(type: Zip){
     from getServerFolder()
-    archiveName "${generateDeployName('server')}.zip"
-    destinationDir(file("../deploy/"))
+    archiveFileName = "${generateDeployName('server')}.zip"
+    destinationDirectory = file("../deploy/")
 
     finalizedBy 'cleanup'
 }

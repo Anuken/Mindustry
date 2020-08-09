@@ -1,0 +1,5 @@
+- Added fallback mod loading for poorly formatted old mods
+- Fixed infinite building range
+- Fixed impact reactors being able to blow up core on servers
+- Fixed liquid bridges passing backwards
+- Updated various translations

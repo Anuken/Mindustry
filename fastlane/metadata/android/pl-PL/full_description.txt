@@ -1,0 +1,15 @@
+Twórz skomplikowane linie transportowe przy użyciu przenośników by zaopatrzyć wieżyczki w amunicję, produkować materiały używane do budowy, oraz broń swoje struktury przed falami wrogów. Graj ze swoimi przyjaciółmi w międzyplatformowych rozgrywkach wieloosobwych typu co-op, lub rzuć im wyzwanie w drużynowych rozgrywkach PvP.
+
+W grze znajdziesz:
+- 24 podstawowe mapy
+- Kampanię z drzewkiem rozwoju technologii i terenami do odblokowania
+- 4 potężne fale bossów
+- System zarządzania elektrycznością, transportem cieczy i przedmiotów
+- 19 unikatowych typów dronów, mechów i statków
+- 120+ bloków do użycia podczas gry
+- 75+ różnorodnych bloków terenu
+- Graj ze znajomymi przez sieć lokalną lub na serwerze dedykowanym
+- Zmieniaj zasady gry: Modyfikuj koszt budowy bloków, statystyki przeciwników, przedmioty na start, czas trwania tury i wiele więcej
+- Stwórz własną mapę przy użyciu wbudowanego edytora i popisz się kreatywnością z innymi
+- Sam zdecyduj skąd nadejdzie następny atak
+

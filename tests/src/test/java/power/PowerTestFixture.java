@@ -1,20 +1,19 @@
 package power;
 
-import io.anuke.arc.*;
-import io.anuke.arc.util.*;
-import io.anuke.mindustry.*;
-import io.anuke.mindustry.content.*;
-import io.anuke.mindustry.core.*;
-import io.anuke.mindustry.ctype.*;
-import io.anuke.mindustry.world.*;
-import io.anuke.mindustry.world.blocks.*;
-import io.anuke.mindustry.world.blocks.power.*;
-import io.anuke.mindustry.world.modules.*;
+import arc.*;
+import arc.mock.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.core.*;
+import mindustry.ctype.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+import mindustry.world.blocks.power.*;
 import org.junit.jupiter.api.*;
 
-import java.lang.reflect.*;
-
-import static io.anuke.mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 /**
  * This class provides objects commonly used by power related unit tests.
@@ -26,32 +25,39 @@ public class PowerTestFixture{
 
     @BeforeAll
     static void initializeDependencies(){
+        headless = true;
         Core.graphics = new FakeGraphics();
+        Core.files = new MockFiles();
+        Vars.state = new GameState();
+        Vars.tree = new FileTree();
         Vars.content = new ContentLoader(){
             @Override
             public void handleMappableContent(MappableContent content){
 
             }
         };
-        content.createContent();
+        content.createBaseContent();
         Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
         return new PowerGenerator("fakegen"){{
+            entityType = () -> new GeneratorEntity();
             powerProduction = producedPower;
         }};
     }
 
     protected static Battery createFakeBattery(float capacity){
         return new Battery("fakebattery"){{
+            entityType = () -> new BatteryEntity();
             consumes.powerBuffered(capacity);
         }};
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
+            entityType = Building::create;
             consumes.power(powerPerTick);
         }};
     }
@@ -76,27 +82,25 @@ public class PowerTestFixture{
             // Since this part shall not be part of the test and would require more work anyway, we manually set the block and floor
             // through reflections and then simulate part of what the changed() method does.
 
-            Field field = Tile.class.getDeclaredField("block");
-            field.setAccessible(true);
-            field.set(tile, block);
-
-            field = Tile.class.getDeclaredField("floor");
-            field.setAccessible(true);
-            field.set(tile, Blocks.sand);
+            Reflect.set(Tile.class, tile, "block", block);
+            Reflect.set(Tile.class, tile, "floor", Blocks.sand);
 
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
-            tile.entity = block.newEntity().init(tile, false);
-            tile.entity.cons = new ConsumeModule(tile.entity);
-            if(block.hasItems) tile.entity.items = new ItemModule();
-            if(block.hasLiquids) tile.entity.liquids = new LiquidModule();
+            tile.build = block.newEntity().init(tile, Team.sharded, false, 0);
             if(block.hasPower){
-                tile.entity.power = new PowerModule();
-                tile.entity.power.graph.add(tile);
+                tile.build.power.graph = new PowerGraph(){
+                    //assume there's always something consuming power
+                    @Override
+                    public float getUsageFraction(){
+                        return 1f;
+                    }
+                };
+                tile.build.power.graph.add(tile.build);
             }
 
             // Assign incredibly high health so the block does not get destroyed on e.g. burning Blast Compound
             block.health = 100000;
-            tile.entity.health = 100000.0f;
+            tile.build.health(100000.0f);
 
             return tile;
         }catch(Exception ex){

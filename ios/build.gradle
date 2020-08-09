@@ -1,10 +1,7 @@
 sourceSets.main.java.srcDirs = ["src/"]
 
-sourceCompatibility = '1.8'
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
 ext{
-    mainClassName = "io.anuke.mindustry.IOSLauncher"
+    mainClassName = "mindustry.ios.IOSLauncher"
 }
 
 task copyAssets(){
@@ -37,12 +34,9 @@ task copyAssets(){
 }
 
 task deploy{
-    dependsOn copyAssets
+    if(System.getProperty("os.name").contains("Mac")) dependsOn copyAssets
     dependsOn createIPA
 }
-
-
-build.dependsOn copyAssets
 
 launchIPhoneSimulator.dependsOn build
 launchIPadSimulator.dependsOn build

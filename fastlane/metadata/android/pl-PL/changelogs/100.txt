@@ -1,0 +1,9 @@
+- Dodano eksperymentalny system oświetlenia - może być aktywowany w menu własnych zasad gry
+- Dodano blok diody (dodane dzięki @Quezler)
+- Dodano opancerzoną rurę (dodane dzięki @Quezler)
+- Dodano bloki światła tylko dla ciemnych map
+- Polepszono prędkość przepływu rury pulsacyjnej (dodane dzięki @Quezler)
+- Polepszono priorytet budowy
+- Nowy format parsowania modów (HJSON)
+- Naprawiono wyświetlanie niepoprawnych wartości zużycia bloku
+- Naprawiono 'underwater' w edytorze
