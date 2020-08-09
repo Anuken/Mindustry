@@ -148,7 +148,7 @@ public class ModsDialog extends BaseDialog{
                     t.row();
 
                     t.button("$mod.featured.title", Icon.star, bstyle, () -> {
-                        try {
+                        try{
                             dialog.hide();
                             BaseDialog dialog2 = new BaseDialog("$mod.featured.dialog.title");
                             dialog2.cont.table(table -> {
@@ -168,12 +168,12 @@ public class ModsDialog extends BaseDialog{
                                     tablebrow.clear();
                                     String searchString = searchtxt.toLowerCase();
                                     Core.net.httpGet("https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", response -> {
-                                        if (response.getStatus() != HttpStatus.OK) {
+                                        if(response.getStatus() != HttpStatus.OK){
                                             ui.showErrorMessage(Core.bundle.format("connectfail", response.getStatus()));
-                                        } else {
+                                        }else{
                                             Json json = new Json();
                                             Seq<ModListing> listings = json.fromJson(Seq.class, ModListing.class, response.getResultAsString());
-                                            for (ModListing mod : listings) {
+                                            if(ModListing mod : listings){
                                                 if((!searchtxt.isEmpty() && !mod.repo.contains(searchtxt))||searchtxt==null) continue;
                                                 tablebrow.button(btn -> {
                                                     btn.top().left();
@@ -198,24 +198,24 @@ public class ModsDialog extends BaseDialog{
                                                             ui.loadfrag.show();
                                                             Core.net.httpGet("http://api.github.com/repos/" + mod.repo + "/zipball/master", loc -> {
                                                                 Core.net.httpGet(loc.getHeader("Location"), result -> {
-                                                                    if (result.getStatus() != HttpStatus.OK) {
+                                                                    if(result.getStatus() != HttpStatus.OK){
                                                                         ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
                                                                         ui.loadfrag.hide();
-                                                                    } else {
-                                                                        try {
+                                                                    }else{
+                                                                        try{
                                                                             Fi file = tmpDirectory.child((mod.repo).replace("/", "") + ".zip");
                                                                             Streams.copy(result.getResultAsStream(), file.write(false));
                                                                             mods.importMod(file);
                                                                             file.delete();
                                                                             Core.app.post(() -> {
-                                                                                try {
+                                                                                try{
                                                                                     setup();
                                                                                     ui.loadfrag.hide();
-                                                                                } catch (Throwable e) {
+                                                                                }catch(Throwable e){
                                                                                     ui.showException(e);
                                                                                 }
                                                                             });
-                                                                        } catch (Throwable e) {
+                                                                        }catch(Throwable e){
                                                                             modError(e);
                                                                         }
                                                                     }
@@ -245,7 +245,7 @@ public class ModsDialog extends BaseDialog{
                             });
                             dialog2.addCloseButton();
                             dialog2.show();
-                        }catch (Exception e){
+                        }catch(Exception e){
                             //ignore
                         }
                     }).margin(12f);
