@@ -54,9 +54,8 @@ public class MirrorFilter extends GenerateFilter{
         float size = Math.max(image.getWidth() *2, image.getHeight()*2);
         Cons<Vec2> clamper = v -> v.clamp(
             image.x + image.getWidth()/2f - imageWidth/2f,
-            image.x + image.getWidth()/2f + imageWidth/2f,
-            image.y + image.getHeight()/2f - imageHeight/2f,
-            image.y + image.getHeight()/2f + imageHeight/2f);
+        image.y + image.getHeight()/2f - imageHeight/2f, image.y + image.getHeight()/2f + imageHeight/2f, image.x + image.getWidth()/2f + imageWidth/2f
+        );
 
         clamper.get(Tmp.v1.trns(angle - 90, size).add(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y));
         clamper.get(Tmp.v2.set(Tmp.v1).sub(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y).rotate(180f).add(image.getWidth()/2f + image.x, image.getHeight()/2f + image.y));

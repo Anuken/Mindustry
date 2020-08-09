@@ -1,7 +1,6 @@
 package mindustry.logic;
 
 import arc.graphics.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.logic.LCanvas.*;
@@ -141,8 +140,8 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("op")
-    public static class OpStatement extends LStatement{
+    @RegisterStatement("bop")
+    public static class BinaryOpStatement extends LStatement{
         public BinaryOp op = BinaryOp.add;
         public String a = "a", b = "b", dest = "result";
 
@@ -156,11 +155,10 @@ public class LStatements{
 
             field(table, a, str -> a = str);
 
-            TextButton[] button = {null};
-            button[0] = table.button(op.symbol, Styles.cleart, () -> {
-                op = BinaryOp.all[(op.ordinal() + 1) % BinaryOp.all.length];
-                button[0].setText(op.symbol);
-            }).size(50f, 30f).pad(4f).get();
+            table.button(b -> {
+                b.label(() -> op.symbol);
+                b.clicked(() -> showSelect(b, BinaryOp.all, op, o -> op = o));
+            }, Styles.cleart, () -> {}).size(50f, 40f).pad(4f);
 
             field(table, b, str -> b = str);
         }
@@ -168,6 +166,36 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new BinaryOpI(op,builder.var(a), builder.var(b), builder.var(dest));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operations;
+        }
+    }
+
+    @RegisterStatement("uop")
+    public static class UnaryOpStatement extends LStatement{
+        public UnaryOp op = UnaryOp.negate;
+        public String value = "b", dest = "result";
+
+        @Override
+        public void build(Table table){
+            field(table, dest, str -> dest = str);
+
+            table.add(" = ");
+
+            table.button(b -> {
+                b.label(() -> op.symbol);
+                b.clicked(() -> showSelect(b, UnaryOp.all, op, o -> op = o));
+            }, Styles.cleart, () -> {}).size(50f, 40f).pad(3f);
+
+            field(table, value, str -> value = str);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new UnaryOpI(op, builder.var(value), builder.var(dest));
         }
 
         @Override

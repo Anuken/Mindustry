@@ -257,6 +257,24 @@ public class LExecutor{
         }
     }
 
+    public static class UnaryOpI implements LInstruction{
+        public UnaryOp op;
+        public int value, dest;
+
+        public UnaryOpI(UnaryOp op, int value, int dest){
+            this.op = op;
+            this.value = value;
+            this.dest = dest;
+        }
+
+        UnaryOpI(){}
+
+        @Override
+        public void run(LExecutor exec){
+            exec.setnum(dest, op.function.get(exec.num(value)));
+        }
+    }
+
     public static class EndI implements LInstruction{
 
         @Override
@@ -296,8 +314,8 @@ public class LExecutor{
             }else{
                 out.setLength(0);
                 //display integer version when possible
-                if(Math.abs(v.numval - (int)v.numval) < 0.000001){
-                    out.append((int)v.numval);
+                if(Math.abs(v.numval - (long)v.numval) < 0.000001){
+                    out.append((long)v.numval);
                 }else{
                     out.append(v.numval);
                 }

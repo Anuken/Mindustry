@@ -58,7 +58,7 @@ public class LCanvas extends Table{
         add(new SetStatement());
         add(new JumpStatement());
         add(new EnableStatement());
-        add(new OpStatement());
+        add(new BinaryOpStatement());
     }
 
     private void drawGrid(){

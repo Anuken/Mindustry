@@ -18,7 +18,8 @@ public enum BinaryOp{
     and("and", (a, b) -> (int)a & (int)b),
     xor("xor", (a, b) -> (int)a ^ (int)b),
     max("max", Math::max),
-    min("min", Math::min);
+    min("min", Math::min),
+    atan2("atan2", Math::atan2);
 
     public static final BinaryOp[] all = values();
 
@@ -28,6 +29,11 @@ public enum BinaryOp{
     BinaryOp(String symbol, OpLambda function){
         this.symbol = symbol;
         this.function = function;
+    }
+
+    @Override
+    public String toString(){
+        return symbol;
     }
 
     interface OpLambda{
