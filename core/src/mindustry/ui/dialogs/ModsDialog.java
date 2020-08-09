@@ -173,19 +173,19 @@ public class ModsDialog extends BaseDialog{
                                         } else {
                                             Json json = new Json();
                                             Seq<ModListing> listings = json.fromJson(Seq.class, ModListing.class, response.getResultAsString());
-                                            for (ModListing modsbrolist : listings) {
-                                                if((!searchtxt.isEmpty() && !modsbrolist.repo.contains(searchtxt))||searchtxt==null) continue;
+                                            for (ModListing mod : listings) {
+                                                if((!searchtxt.isEmpty() && !mod.repo.contains(searchtxt))||searchtxt==null) continue;
                                                 tablebrow.button(btn -> {
                                                     btn.top().left();
                                                     btn.margin(12f);
                                                     btn.table(con -> {
                                                         con.left();
-                                                        con.add("[lightgray]Name:[] " + modsbrolist.name + "\n[lightgray]Author:[] " + modsbrolist.author + "\n[accent]\uE809: " + modsbrolist.stars).width(388f).wrap().growX().pad(0f,6f,0f,6f);
+                                                        con.add("[lightgray]Name:[] " + mod.name + "\n[lightgray]Author:[] " + mod.author + "\n[accent]\uE809 " + mod.stars).width(388f).wrap().growX().pad(0f,6f,0f,6f);
                                                         con.add().growX().pad(0f,6f,0f,6f);
                                                     }).fillY().growX().pad(0f,6f,0f,6f);
                                                 }, Styles.clearPartialt, () -> {
-                                                    BaseDialog modSelected = new BaseDialog((Core.bundle.get("mods.browser.selected"))+ ": "+ modsbrolist.name);
-                                                    modSelected.cont.add(modsbrolist.description).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
+                                                    BaseDialog modSelected = new BaseDialog((Core.bundle.get("mods.browser.selected"))+ ": "+ mod.name);
+                                                    modSelected.cont.add(mod.description).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
                                                     modSelected.buttons.defaults().size(200f, 54f).pad(2f);
                                                     modSelected.setFillParent(false);
                                                     modSelected.buttons.button("$back", Icon.left, () -> {
@@ -196,14 +196,14 @@ public class ModsDialog extends BaseDialog{
                                                         modSelected.hide();
                                                         installMod[0] = () -> {
                                                             ui.loadfrag.show();
-                                                            Core.net.httpGet("http://api.github.com/repos/" + modsbrolist.repo + "/zipball/master", loc -> {
+                                                            Core.net.httpGet("http://api.github.com/repos/" + mod.repo + "/zipball/master", loc -> {
                                                                 Core.net.httpGet(loc.getHeader("Location"), result -> {
                                                                     if (result.getStatus() != HttpStatus.OK) {
                                                                         ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
                                                                         ui.loadfrag.hide();
                                                                     } else {
                                                                         try {
-                                                                            Fi file = tmpDirectory.child((modsbrolist.repo).replace("/", "") + ".zip");
+                                                                            Fi file = tmpDirectory.child((mod.repo).replace("/", "") + ".zip");
                                                                             Streams.copy(result.getResultAsStream(), file.write(false));
                                                                             mods.importMod(file);
                                                                             file.delete();
@@ -226,7 +226,7 @@ public class ModsDialog extends BaseDialog{
                                                     });
                                                     modSelected.buttons.button("$mods.github.open", Icon.github, () -> {
                                                         openGithubPage[0] = () -> {
-                                                            Core.app.openURI("https://github.com/" + modsbrolist.repo);
+                                                            Core.app.openURI("https://github.com/" + mod.repo);
                                                         };
                                                         openGithubPage[0].run();
                                                     });
