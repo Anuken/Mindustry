@@ -24,12 +24,29 @@ public abstract class LStatement{
     public abstract LCategory category();
     public abstract LInstruction build(LAssembler builder);
 
-    protected void field(Table table, String value, Cons<String> setter){
-        table.field(value, Styles.nodeField, setter)
-            .size(130f, 40f).pad(2f).color(table.color);
+    protected Cell<TextField> field(Table table, String value, Cons<String> setter){
+        return table.field(value, Styles.nodeField, setter)
+            .size(144f, 40f).pad(2f).color(table.color).addInputDialog();
     }
 
     protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter){
+        showSelectTable(b, (t, hide) -> {
+            ButtonGroup<Button> group = new ButtonGroup<>();
+            int i = 0;
+            t.defaults().size(56f, 40f);
+
+            for(T p : values){
+                t.button(p.toString(), Styles.clearTogglet, () -> {
+                    getter.get(p);
+                    hide.run();
+                }).checked(current == p).group(group);
+
+                if(++i % 4 == 0) t.row();
+            }
+        });
+    }
+
+    protected void showSelectTable(Button b, Cons2<Table, Runnable> hideCons){
         Table t = new Table(Tex.button);
 
         //triggers events behind the element to simulate deselection
@@ -48,23 +65,12 @@ public abstract class LStatement{
 
         t.update(() -> {
             b.localToStageCoordinates(Tmp.v1.set(b.getWidth()/2f, b.getHeight()/2f));
-            Tmp.v1.clamp(0, 0, Core.graphics.getWidth() - b.getWidth(), Core.graphics.getHeight() - b.getHeight());
             t.setPosition(Tmp.v1.x, Tmp.v1.y, Align.center);
+            t.keepInStage();
         });
         t.actions(Actions.alpha(0), Actions.fadeIn(0.3f, Interp.fade));
 
-        ButtonGroup<Button> group = new ButtonGroup<>();
-        int i = 0;
-        t.defaults().size(56f, 40f);
-
-        for(T p : values){
-            t.button(p.toString(), Styles.clearTogglet, () -> {
-                getter.get(p);
-                hide.run();
-            }).checked(current == p).group(group);
-
-            if(++i % 4 == 0) t.row();
-        }
+        hideCons.get(t, hide);
 
         t.pack();
     }

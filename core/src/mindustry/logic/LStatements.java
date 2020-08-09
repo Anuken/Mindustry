@@ -1,10 +1,15 @@
 package mindustry.logic;
 
 import arc.graphics.*;
+import arc.scene.style.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.gen.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 public class LStatements{
@@ -64,6 +69,9 @@ public class LStatements{
         public String to = "result";
         public String from = "@0", type = "@copper";
 
+        private transient int selected = 0;
+        private transient TextField tfield;
+
         @Override
         public void build(Table table){
             field(table, to, str -> to = str);
@@ -72,11 +80,76 @@ public class LStatements{
 
             table.row();
 
-            field(table, type, str -> type = str);
+            tfield = field(table, type, str -> type = str).padRight(0f).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                //240
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    Table[] tables = {
+                        //items
+                        new Table(i -> {
+                            int c = 0;
+                            for(Item item : Vars.content.items()){
+                                i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                    stype("@" + item.name);
+                                    hide.run();
+                                }).size(40f);
+
+                                if(++c % 6 == 0) i.row();
+                            }
+                        }),
+                        //liquids
+                        new Table(i -> {
+                            int c = 0;
+                            for(Liquid item : Vars.content.liquids()){
+                                i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                    stype("@" + item.name);
+                                    hide.run();
+                                }).size(40f);
+
+                                if(++c % 6 == 0) i.row();
+                            }
+                        }),
+                        //sensors
+                        new Table(i -> {
+                            for(LSensor sensor : LSensor.all){
+                                i.button(sensor.name(), Styles.cleart, () -> {
+                                    stype("@" + sensor.name());
+                                    hide.run();
+                                }).size(240f, 40f).row();
+                            }
+                        })
+                    };
+
+                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.tree};
+                    Stack stack = new Stack(tables[selected]);
+                    ButtonGroup<Button> group = new ButtonGroup<>();
+
+                    for(int i = 0; i < tables.length; i++){
+                        int fi = i;
+
+                        t.button(icons[i], Styles.clearTogglei, () -> {
+                            selected = fi;
+
+                            stack.clearChildren();
+                            stack.addChild(tables[selected]);
+                            t.pack();
+                        }).size(80f, 50f).checked(selected == fi).group(group);
+                    }
+                    t.row();
+                    t.add(stack).colspan(3);
+                }));
+            }, Styles.cleart, () -> {}).size(40f).padLeft(-1);
 
             table.add(" in ");
 
             field(table, from, str -> from = str);
+        }
+
+        private void stype(String text){
+            tfield.setText(text);
+            this.type = text;
         }
 
         @Override
