@@ -77,7 +77,8 @@ public class LogicStatementProcessor extends BaseProcessor{
                         "");
 
                 //reading primitives, strings and enums is supported; nothing else is
-                reader.addStatement("result.$L = $L(tokens[$L])$L",
+                reader.addStatement("if(tokens.length > $L) result.$L = $L(tokens[$L])$L",
+                index + 1,
                 field.name(),
                 field.mirror().toString().equals("java.lang.String") ?
                 "" : (field.tname().isPrimitive() ? field.tname().box().toString() :

@@ -244,7 +244,7 @@ public class LExecutor{
     }
 
     public static class BinaryOpI implements LInstruction{
-        public BinaryOp op;
+        public BinaryOp op = BinaryOp.add;
         public int a, b, dest;
 
         public BinaryOpI(BinaryOp op, int a, int b, int dest){
@@ -263,7 +263,7 @@ public class LExecutor{
     }
 
     public static class UnaryOpI implements LInstruction{
-        public UnaryOp op;
+        public UnaryOp op = UnaryOp.negate;
         public int value, dest;
 
         public UnaryOpI(UnaryOp op, int value, int dest){
