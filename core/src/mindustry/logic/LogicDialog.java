@@ -5,11 +5,11 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.ui.dialogs.*;
 
-public class LDialog extends BaseDialog{
+public class LogicDialog extends BaseDialog{
     LCanvas canvas;
     Cons<String> consumer = s -> Log.info(s);
 
-    public LDialog(){
+    public LogicDialog(){
         super("logic");
 
         clearChildren();

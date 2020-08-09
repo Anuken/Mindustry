@@ -24,7 +24,7 @@ import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LDialog;
+import mindustry.logic.LogicDialog;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.fragments.*;
@@ -68,7 +68,7 @@ public class UI implements ApplicationListener, Loadable{
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
-    public LDialog logic;
+    public LogicDialog logic;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -181,7 +181,7 @@ public class UI implements ApplicationListener, Loadable{
         research = new ResearchDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
-        logic = new LDialog();
+        logic = new LogicDialog();
 
         Group group = Core.scene.root;
 

@@ -133,6 +133,10 @@ public class LCanvas extends Table{
         Seq<Element> seq = new Seq<>();
         int insertPosition = 0;
 
+        {
+            setTransform(true);
+        }
+
         @Override
         public void layout(){
             float cy = 0;
@@ -151,7 +155,7 @@ public class LCanvas extends Table{
                 if(dragging == e) continue;
 
                 e.setSize(width - margin * 2f, e.getPrefHeight());
-                e.setPosition(x + margin, height + y - margin - cy, Align.topLeft);
+                e.setPosition(x + margin, height- margin - cy, Align.topLeft);
 
                 cy += e.getPrefHeight() + space;
                 seq.add(e);
@@ -202,7 +206,7 @@ public class LCanvas extends Table{
             if(dragging != null && insertPosition <= seq.size){
                 float shiftAmount = dragging.getHeight();
                 float lastX = x + margin;
-                float lastY = insertPosition == 0 ? height + y - margin : seq.get(insertPosition - 1).y - space;
+                float lastY = insertPosition == 0 ? height + y - margin : seq.get(insertPosition - 1).y + y - space;
 
                 Tex.pane.draw(lastX, lastY - shiftAmount, width - margin*2f, dragging.getHeight());
             }

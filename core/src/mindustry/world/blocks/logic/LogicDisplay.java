@@ -45,6 +45,9 @@ public class LogicDisplay extends Block{
 
             if(buffer == null){
                 buffer = new FrameBuffer(displaySize, displaySize);
+                //clear the buffer - some OSs leave garbage in it
+                buffer.begin(Color.clear);
+                buffer.end();
             }
 
             if(!commands.isEmpty()){
