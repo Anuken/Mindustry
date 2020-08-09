@@ -49,7 +49,7 @@ public class LAssembler{
 
         Seq<LStatement> st = read(data);
 
-        asm.instructions = st.map(l -> l.build(asm)).toArray(LInstruction.class);
+        asm.instructions = st.map(l -> l.build(asm)).filter(l -> l != null).toArray(LInstruction.class);
         return asm;
     }
 
@@ -68,7 +68,7 @@ public class LAssembler{
         String[] lines = data.split("[;\n]+");
         for(String line : lines){
             //comments
-            if(line.startsWith("#")) continue;
+            //if(line.startsWith("#")) continue;
 
             String[] tokens = line.split(" ");
             LStatement st = LogicIO.read(tokens);

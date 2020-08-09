@@ -12,7 +12,30 @@ import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
+import static mindustry.world.blocks.logic.LogicDisplay.*;
+
 public class LStatements{
+
+    //TODO broken
+    //@RegisterStatement("#")
+    public static class CommentStatement extends LStatement{
+        public String comment = "";
+
+        @Override
+        public void build(Table table){
+            table.area(comment, Styles.nodeArea, v -> comment = v).growX().height(90f).padLeft(2).padRight(6).color(table.color);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.control;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return null;
+        }
+    }
 
     @RegisterStatement("write")
     public static class WriteStatement extends LStatement{
@@ -64,6 +87,93 @@ public class LStatements{
         }
     }
 
+
+    @RegisterStatement("display")
+    public static class DisplayStatement extends LStatement{
+        public CommandType type = CommandType.line;
+        public String target = "monitor";
+        public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.add("draw").padLeft(4);
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, CommandType.all, type, t -> {
+                    type = t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(100, 50)));
+            }, Styles.cleari, () -> {}).size(90, 50);
+
+            table.add(" to ");
+
+            field(table, target, str -> target = str);
+
+            table.row();
+
+            table.table(c -> {
+                c.marginLeft(3);
+                c.left();
+                c.setColor(table.color);
+                switch(type){
+                    case clear:
+                    case color:
+                        c.add("rgb ");
+                        fields(c, x, v -> x = v);
+                        fields(c, y, v -> y = v);
+                        fields(c, p1, v -> p1 = v);
+                        break;
+                    case stroke:
+                        c.add("width ");
+                        fields(c, x, v -> x = v);
+                        break;
+                    case line:
+                        c.add("xyx2y2 ");
+                        fields(c, x, v -> x = v);
+                        fields(c, y, v -> y = v);
+                        fields(c, p1, v -> p1 = v);
+                        fields(c, p2, v -> p2 = v);
+                        break;
+                    case rect:
+                    case lineRect:
+                        c.add("xywh ");
+                        fields(c, x, v -> x = v);
+                        fields(c, y, v -> y = v);
+                        fields(c, p1, v -> p1 = v);
+                        fields(c, p2, v -> p2 = v);
+                        break;
+                    case poly:
+                    case linePoly:
+                        c.add("xysra ");
+                        fields(c, x, v -> x = v);
+                        fields(c, y, v -> y = v);
+                        c.row();
+                        fields(c, p1, v -> p1 = v);
+                        fields(c, p2, v -> p2 = v);
+                        fields(c, p3, v -> p3 = v);
+                        break;
+                }
+            }).colspan(4).left();
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new DisplayI((byte)type.ordinal(), builder.var(target), builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3));
+        }
+    }
+
     @RegisterStatement("sensor")
     public static class SensorStatement extends LStatement{
         public String to = "result";
@@ -89,8 +199,10 @@ public class LStatements{
                     Table[] tables = {
                         //items
                         new Table(i -> {
+                            i.left();
                             int c = 0;
                             for(Item item : Vars.content.items()){
+                                if(!item.unlockedNow()) continue;
                                 i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
                                     stype("@" + item.name);
                                     hide.run();
@@ -101,8 +213,10 @@ public class LStatements{
                         }),
                         //liquids
                         new Table(i -> {
+                            i.left();
                             int c = 0;
                             for(Liquid item : Vars.content.liquids()){
+                                if(!item.unlockedNow()) continue;
                                 i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
                                     stype("@" + item.name);
                                     hide.run();
@@ -138,7 +252,7 @@ public class LStatements{
                         }).size(80f, 50f).checked(selected == fi).group(group);
                     }
                     t.row();
-                    t.add(stack).colspan(3);
+                    t.add(stack).colspan(3).expand().left();
                 }));
             }, Styles.cleart, () -> {}).size(40f).padLeft(-1);
 

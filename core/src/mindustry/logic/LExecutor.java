@@ -1,10 +1,14 @@
 package mindustry.logic;
 
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.logic.LogicDisplay.*;
+
+import static mindustry.world.blocks.logic.LogicDisplay.*;
 
 public class LExecutor{
     //special variables
@@ -15,6 +19,7 @@ public class LExecutor{
     public double[] memory = {};
     public LInstruction[] instructions = {};
     public Var[] vars = {};
+    public LongSeq graphicsBuffer = new LongSeq();
 
     public boolean initialized(){
         return instructions != null && vars != null && instructions.length > 0;
@@ -280,6 +285,48 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             exec.vars[varCounter].numval = exec.instructions.length;
+        }
+    }
+
+    public static class DisplayI implements LInstruction{
+        public byte type;
+        public int target;
+        public int x, y, p1, p2, p3;
+
+        public DisplayI(byte type, int target, int x, int y, int p1, int p2, int p3){
+            this.type = type;
+            this.target = target;
+            this.x = x;
+            this.y = y;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+        }
+
+        public DisplayI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            //graphics on headless servers are useless.
+            if(Vars.headless) return;
+
+            Building build = exec.building(target);
+            if(build instanceof LogicDisplayEntity){
+                //flush is a special command
+                if(type == commandFlush){
+                    LogicDisplayEntity d = (LogicDisplayEntity)build;
+                    for(int i = 0; i < exec.graphicsBuffer.size; i++){
+                        d.commands.addLast(exec.graphicsBuffer.items[i]);
+                    }
+                    exec.graphicsBuffer.clear();
+                }else{
+                    //cap graphics buffer size
+                    if(exec.graphicsBuffer.size < 1024){
+                        exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3)));
+                    }
+                }
+            }
         }
     }
 

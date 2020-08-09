@@ -82,7 +82,7 @@ public class Blocks implements ContentList{
     repairPoint, resupplyPoint,
 
     //logic
-    microProcessor, logicProcessor,
+    microProcessor, logicProcessor, logicDisplay,
 
     //campaign
     launchPad, launchPadLarge,
@@ -1907,6 +1907,14 @@ public class Blocks implements ContentList{
             memory = 128;
 
             size = 2;
+        }};
+
+        logicDisplay = new LogicDisplay("logic-display"){{
+            requirements(Category.effect, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
+
+            displaySize = 64;
+
+            size = 3;
         }};
 
         //endregion

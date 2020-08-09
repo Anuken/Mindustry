@@ -31,7 +31,7 @@ public class Styles{
     public static KeybindDialogStyle defaultKeybindDialog;
     public static SliderStyle defaultSlider, vSlider;
     public static LabelStyle defaultLabel, outlineLabel, techLabel;
-    public static TextFieldStyle defaultField, nodeField, areaField;
+    public static TextFieldStyle defaultField, nodeField, areaField, nodeArea;
     public static CheckBoxStyle defaultCheck;
     public static DialogStyle defaultDialog, fullDialog;
 
@@ -326,6 +326,17 @@ public class Styles{
             disabledFontColor = Color.gray;
             selection = Tex.selection;
             background = underline;
+            cursor = Tex.cursor;
+            messageFont = Fonts.def;
+            messageFontColor = Color.gray;
+        }};
+
+        nodeArea = new TextFieldStyle(){{
+            font = Fonts.chat;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            selection = Tex.selection;
+            background = underlineWhite;
             cursor = Tex.cursor;
             messageFont = Fonts.def;
             messageFontColor = Color.gray;

@@ -24,26 +24,36 @@ public abstract class LStatement{
     public abstract LCategory category();
     public abstract LInstruction build(LAssembler builder);
 
+    //protected methods are only for internal UI layout utilities
+
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, setter)
             .size(144f, 40f).pad(2f).color(table.color).addInputDialog();
     }
 
-    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter){
+    protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
+        return field(table, value, setter).width(70f);
+    }
+
+    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
         showSelectTable(b, (t, hide) -> {
             ButtonGroup<Button> group = new ButtonGroup<>();
             int i = 0;
             t.defaults().size(56f, 40f);
 
             for(T p : values){
-                t.button(p.toString(), Styles.clearTogglet, () -> {
+                sizer.get(t.button(p.toString(), Styles.clearTogglet, () -> {
                     getter.get(p);
                     hide.run();
-                }).checked(current == p).group(group);
+                }).checked(current == p).group(group));
 
-                if(++i % 4 == 0) t.row();
+                if(++i % cols == 0) t.row();
             }
         });
+    }
+
+    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter){
+        showSelect(b, values, current, getter, 4, c -> {});
     }
 
     protected void showSelectTable(Button b, Cons2<Table, Runnable> hideCons){
@@ -64,6 +74,8 @@ public abstract class LStatement{
         Core.scene.add(t);
 
         t.update(() -> {
+            if(b.parent == null) return;
+
             b.localToStageCoordinates(Tmp.v1.set(b.getWidth()/2f, b.getHeight()/2f));
             t.setPosition(Tmp.v1.x, Tmp.v1.y, Align.center);
             t.keepInStage();

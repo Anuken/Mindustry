@@ -421,6 +421,7 @@ public class LCanvas extends Table{
 
         void drawCurve(float x, float y, float x2, float y2, Color color){
             Lines.stroke(4f, color);
+            Draw.alpha(parentAlpha);
 
             float dist = 100f;
 
