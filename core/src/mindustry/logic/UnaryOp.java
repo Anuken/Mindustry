@@ -1,5 +1,7 @@
 package mindustry.logic;
 
+import arc.math.*;
+
 public enum UnaryOp{
     negate("-", a -> -a),
     not("not", a -> ~(int)(a)),
@@ -12,6 +14,7 @@ public enum UnaryOp{
     floor("floor", Math::floor),
     ceil("ceil", Math::ceil),
     sqrt("sqrt", Math::sqrt),
+    rand("rand", d -> Mathf.rand.nextDouble() * d),
     ;
 
     public static final UnaryOp[] all = values();

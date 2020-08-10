@@ -16,6 +16,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -45,6 +46,7 @@ public class LCanvas extends Table{
                 int i = 0;
                 for(Prov<LStatement> prov : LogicIO.allStatements){
                     LStatement example = prov.get();
+                    if(example instanceof InvalidStatement) continue;
                     t.button(example.name(), Styles.cleart, () -> {
                         add(prov.get());
                         dialog.hide();

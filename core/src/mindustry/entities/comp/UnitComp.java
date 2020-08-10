@@ -73,6 +73,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public double sense(LAccess sensor){
         if(sensor == LAccess.totalItems) return stack().amount;
         if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.x) return x;
+        if(sensor == LAccess.y) return y;
         return 0;
     }
 

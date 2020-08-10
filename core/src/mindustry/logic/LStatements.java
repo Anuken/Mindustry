@@ -266,7 +266,7 @@ public class LStatements{
 
             table.left();
 
-            table.add(" set ");
+            table.add("set ");
 
             table.button(b -> {
                 b.label(() -> type.name());
@@ -274,8 +274,7 @@ public class LStatements{
                     type = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
-            }, Styles.logict, () -> {
-            }).size(90, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
             table.add(" of ");
 
