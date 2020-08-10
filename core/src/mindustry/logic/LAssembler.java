@@ -68,7 +68,7 @@ public class LAssembler{
         String[] lines = data.split("[;\n]+");
         for(String line : lines){
             //comments
-            //if(line.startsWith("#")) continue;
+            if(line.startsWith("#")) continue;
 
             String[] tokens = line.split(" ");
             LStatement st = LogicIO.read(tokens);

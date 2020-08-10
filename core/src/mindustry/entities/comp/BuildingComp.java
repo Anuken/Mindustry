@@ -1177,6 +1177,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(sensor == LSensor.powerNetIn && power != null) return power.graph.getPowerProduced();
         if(sensor == LSensor.powerNetOut && power != null) return power.graph.getPowerNeeded();
         if(sensor == LSensor.powerNetStored && power != null) return power.graph.getLastPowerStored();
+        if(sensor == LSensor.powerNetCapacity && power != null) return power.graph.getBatteryCapacity();
         return 0;
     }
 

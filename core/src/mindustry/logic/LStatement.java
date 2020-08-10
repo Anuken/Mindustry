@@ -24,11 +24,12 @@ public abstract class LStatement{
     public abstract LCategory category();
     public abstract LInstruction build(LAssembler builder);
 
-    //TODO doesn't work with modded stuff
     public LStatement copy(){
         StringBuilder build = new StringBuilder();
         write(build);
-        return LogicIO.read(build.toString().split(" "));
+        String[] split = build.toString().split(" ");
+        LStatement result = LogicIO.read(split);
+        return result == null && LAssembler.customParsers.containsKey(split[0]) ? LAssembler.customParsers.get(split[0]).get(split) : result;
     }
 
     //protected methods are only for internal UI layout utilities

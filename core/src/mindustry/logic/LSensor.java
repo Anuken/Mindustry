@@ -5,6 +5,7 @@ public enum LSensor{
     totalLiquids,
     totalPower,
     powerNetStored,
+    powerNetCapacity,
     powerNetIn,
     powerNetOut,
     health,
