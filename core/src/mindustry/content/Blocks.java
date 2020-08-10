@@ -19,6 +19,7 @@ import mindustry.world.blocks.experimental.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
+import mindustry.world.blocks.logic.MessageBlock;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -49,7 +50,7 @@ public class Blocks implements ContentList{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, message, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, illuminator,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -82,7 +83,7 @@ public class Blocks implements ContentList{
     repairPoint, resupplyPoint,
 
     //logic
-    microProcessor, logicProcessor, logicDisplay,
+    message, switchBlock, microProcessor, logicProcessor, logicDisplay,
 
     //campaign
     launchPad, launchPadLarge,
@@ -1847,10 +1848,6 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
         }};
 
-        message = new MessageBlock("message"){{
-            requirements(Category.effect, with(Items.graphite, 5));
-        }};
-
         illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
             brightness = 0.67f;
@@ -1891,8 +1888,16 @@ public class Blocks implements ContentList{
         //endregion campaign
         //region logic
 
+        message = new MessageBlock("message"){{
+            requirements(Category.logic, with(Items.graphite, 5));
+        }};
+
+        switchBlock = new SwitchBlock("switch"){{
+            requirements(Category.logic, with(Items.graphite, 5));
+        }};
+
         microProcessor = new LogicBlock("micro-processor"){{
-            requirements(Category.effect, with(Items.copper, 30, Items.lead, 50, Items.silicon, 30));
+            requirements(Category.logic, with(Items.copper, 30, Items.lead, 50, Items.silicon, 30));
 
             instructionsPerTick = 2;
             memory = 32;
@@ -1901,7 +1906,7 @@ public class Blocks implements ContentList{
         }};
 
         logicProcessor = new LogicBlock("logic-processor"){{
-            requirements(Category.effect, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
+            requirements(Category.logic, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
 
             instructionsPerTick = 5;
             memory = 128;
@@ -1910,7 +1915,7 @@ public class Blocks implements ContentList{
         }};
 
         logicDisplay = new LogicDisplay("logic-display"){{
-            requirements(Category.effect, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
+            requirements(Category.logic, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
 
             displaySize = 80;
 

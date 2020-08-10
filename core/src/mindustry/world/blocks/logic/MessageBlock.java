@@ -1,4 +1,4 @@
-package mindustry.world.blocks.storage;
+package mindustry.world.blocks.logic;
 
 import arc.*;
 import arc.Input.*;

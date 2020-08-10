@@ -7,7 +7,7 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-import mindustry.world.blocks.storage.MessageBlock.*;
+import mindustry.world.blocks.logic.MessageBlock.*;
 
 public class LExecutor{
     //special variables

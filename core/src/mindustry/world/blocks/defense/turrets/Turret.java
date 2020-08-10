@@ -284,7 +284,7 @@ public abstract class Turret extends Block{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, team, x, y) || isControlled();
+            return !Units.invalidateTarget(target, team, x, y) || isControlled() || logicControlled();
         }
 
         protected void findTarget(){
