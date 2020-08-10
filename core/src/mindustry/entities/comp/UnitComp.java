@@ -282,6 +282,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             controller.updateUnit();
         }
 
+        //clear controller when it becomes invalid
+        if(!controller.isValidController()){
+            resetController();
+        }
+
         //do not control anything when deactivated
         if(deactivated){
             controlWeapons(false, false);
