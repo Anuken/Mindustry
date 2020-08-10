@@ -883,6 +883,7 @@ public class ServerControl implements ApplicationListener{
 
         Scanner scan = new Scanner(System.in);
         while(scan.hasNext()){
+            System.out.printf("> ");
             String line = scan.nextLine();
             Core.app.post(() -> handleCommandString(line));
         }
