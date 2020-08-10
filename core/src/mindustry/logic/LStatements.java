@@ -287,7 +287,7 @@ public class LStatements{
 
         @Override
         public LCategory category(){
-            return LCategory.operations;
+            return LCategory.blocks;
         }
 
         @Override
@@ -337,7 +337,7 @@ public class LStatements{
 
         @Override
         public LCategory category(){
-            return LCategory.operations;
+            return LCategory.blocks;
         }
 
         @Override

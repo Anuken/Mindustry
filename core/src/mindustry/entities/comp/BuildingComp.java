@@ -1174,6 +1174,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(sensor == LSensor.totalItems && items != null) return items.total();
         if(sensor == LSensor.totalLiquids && liquids != null) return liquids.total();
         if(sensor == LSensor.totalPower && power != null) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+        if(sensor == LSensor.itemCapacity) return block.itemCapacity;
+        if(sensor == LSensor.liquidCapacity) return block.liquidCapacity;
+        if(sensor == LSensor.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
         if(sensor == LSensor.powerNetIn && power != null) return power.graph.getPowerProduced();
         if(sensor == LSensor.powerNetOut && power != null) return power.graph.getPowerNeeded();
         if(sensor == LSensor.powerNetStored && power != null) return power.graph.getLastPowerStored();
