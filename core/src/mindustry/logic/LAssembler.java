@@ -6,6 +6,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
+import mindustry.logic.LStatements.*;
 import mindustry.type.*;
 
 /** "Compiles" a sequence of statements into instructions. */
@@ -39,7 +40,7 @@ public class LAssembler{
 
         //store sensor constants
 
-        for(LSensor sensor : LSensor.all){
+        for(LAccess sensor : LAccess.all){
             putConst("@" + sensor.name(), sensor);
         }
     }
@@ -64,22 +65,48 @@ public class LAssembler{
     }
 
     public static Seq<LStatement> read(String data){
+        //empty data check
+        if(data == null || data.isEmpty()) return new Seq<>();
+
         Seq<LStatement> statements = new Seq<>();
         String[] lines = data.split("[;\n]+");
         for(String line : lines){
             //comments
             if(line.startsWith("#")) continue;
 
-            String[] tokens = line.split(" ");
-            LStatement st = LogicIO.read(tokens);
-            if(st != null){
-                statements.add(st);
-            }else{
-                //attempt parsing using custom parser if a match is found - this is for mods
-                String first = tokens[0];
-                if(customParsers.containsKey(first)){
-                    statements.add(customParsers.get(first).get(tokens));
+            try{
+                //yes, I am aware that this can be split with regex, but that's slow and even more incomprehensible
+                Seq<String> tokens = new Seq<>();
+                boolean inString = false;
+                int lastIdx = 0;
+
+                for(int i = 0; i < line.length() + 1; i++){
+                    char c = i == line.length() ? ' ' : line.charAt(i);
+                    if(c == '"'){
+                        inString = !inString;
+                    }else if(c == ' ' && !inString){
+                        tokens.add(line.substring(lastIdx, i).replace("\\n", "\n"));
+                        lastIdx = i + 1;
+                    }
                 }
+
+                String[] arr = tokens.toArray(String.class);
+                LStatement st = LogicIO.read(arr);
+                if(st != null){
+                    statements.add(st);
+                }else{
+                    //attempt parsing using custom parser if a match is found - this is for mods
+                    String first = arr[0];
+                    if(customParsers.containsKey(first)){
+                        statements.add(customParsers.get(first).get(arr));
+                    }else{
+                        //unparseable statement
+                        statements.add(new InvalidStatement());
+                    }
+                }
+            }catch(Exception parseFailed){
+                //when parsing fails, add a dummy invalid statement
+                statements.add(new InvalidStatement());
             }
         }
         return statements;

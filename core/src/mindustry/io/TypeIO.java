@@ -86,9 +86,9 @@ public class TypeIO{
         }else if(object instanceof Building){
             write.b((byte)12);
             write.i(((Building)object).pos());
-        }else if(object instanceof LSensor){
+        }else if(object instanceof LAccess){
             write.b((byte)13);
-            write.s(((LSensor)object).ordinal());
+            write.s(((LAccess)object).ordinal());
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -111,7 +111,7 @@ public class TypeIO{
             case 10: return read.bool();
             case 11: return read.d();
             case 12: return world.build(read.i());
-            case 13: return LSensor.all[read.s()];
+            case 13: return LAccess.all[read.s()];
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
@@ -303,7 +303,7 @@ public class TypeIO{
             //make sure player exists
             if(player == null) return prev;
             return player;
-        }else if(type == 1){
+        }else if(type == 1){ //formation controller
             int id = read.i();
             return prev instanceof FormationAI ? prev : new FormationAI(Groups.unit.getByID(id), null);
         }else{

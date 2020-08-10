@@ -7,8 +7,7 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-
-import static mindustry.world.blocks.logic.LogicDisplay.*;
+import mindustry.world.blocks.storage.MessageBlock.*;
 
 public class LExecutor{
     //special variables
@@ -16,10 +15,16 @@ public class LExecutor{
         varCounter = 0,
         varTime = 1;
 
+    public static final int
+        maxGraphicsBuffer = 512,
+        maxTextBuffer = 256;
+
     public double[] memory = {};
     public LInstruction[] instructions = {};
     public Var[] vars = {};
+
     public LongSeq graphicsBuffer = new LongSeq();
+    public StringBuilder textBuffer = new StringBuilder();
 
     public boolean initialized(){
         return instructions != null && vars != null && instructions.length > 0;
@@ -125,21 +130,30 @@ public class LExecutor{
         void run(LExecutor exec);
     }
 
-    /** Enables/disables a building. */
-    public static class EnableI implements LInstruction{
-        public int target, value;
+    /** Controls a building's state. */
+    public static class ControlI implements LInstruction{
+        public int target;
+        public LAccess type = LAccess.enabled;
+        public int p1, p2, p3, p4;
 
-        public EnableI(int target, int value){
+        public ControlI(LAccess type, int target, int p1, int p2, int p3, int p4){
+            this.type = type;
             this.target = target;
-            this.value = value;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+            this.p4 = p4;
         }
 
-        EnableI(){}
+        ControlI(){}
 
         @Override
         public void run(LExecutor exec){
-            Building b = exec.building(target);
-            if(b != null) b.enabled = exec.bool(value);
+            Object obj = exec.obj(target);
+            if(obj instanceof Controllable){
+                Controllable cont = (Controllable)obj;
+                cont.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+            }
         }
     }
 
@@ -205,8 +219,8 @@ public class LExecutor{
             if(target instanceof Senseable){
                 if(sense instanceof Content){
                     output = ((Senseable)target).sense(((Content)sense));
-                }else if(sense instanceof LSensor){
-                    output = ((Senseable)target).sense(((LSensor)sense));
+                }else if(sense instanceof LAccess){
+                    output = ((Senseable)target).sense(((LAccess)sense));
                 }
             }
 
@@ -288,12 +302,17 @@ public class LExecutor{
         }
     }
 
-    public static class DisplayI implements LInstruction{
+    public static class NoopI implements LInstruction{
+        @Override
+        public void run(LExecutor exec){}
+    }
+
+    public static class DrawI implements LInstruction{
         public byte type;
         public int target;
         public int x, y, p1, p2, p3;
 
-        public DisplayI(byte type, int target, int x, int y, int p1, int p2, int p3){
+        public DrawI(byte type, int target, int x, int y, int p1, int p2, int p3){
             this.type = type;
             this.target = target;
             this.x = x;
@@ -303,7 +322,7 @@ public class LExecutor{
             this.p3 = p3;
         }
 
-        public DisplayI(){
+        public DrawI(){
         }
 
         @Override
@@ -311,63 +330,91 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
-            if(type == commandFlush){
-                Building build = exec.building(target);
-                if(build instanceof LogicDisplayEntity){
-                    //flush is a special command
-                    LogicDisplayEntity d = (LogicDisplayEntity)build;
-                    for(int i = 0; i < exec.graphicsBuffer.size; i++){
-                        d.commands.addLast(exec.graphicsBuffer.items[i]);
-                    }
-                    exec.graphicsBuffer.clear();
-                }
+            //add graphics calls, cap graphics buffer size
+            if(exec.graphicsBuffer.size < maxGraphicsBuffer){
+                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3)));
+            }
+        }
+    }
 
-            }else{
-                //add graphics calls, cap graphics buffer size
-                if(exec.graphicsBuffer.size < 1024){
-                    exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3)));
+    public static class DrawFlushI implements LInstruction{
+        public int target;
+
+        public DrawFlushI(int target){
+            this.target = target;
+        }
+
+        public DrawFlushI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            //graphics on headless servers are useless.
+            if(Vars.headless) return;
+
+            Building build = exec.building(target);
+            if(build instanceof LogicDisplayEntity){
+                LogicDisplayEntity d = (LogicDisplayEntity)build;
+                for(int i = 0; i < exec.graphicsBuffer.size; i++){
+                    d.commands.addLast(exec.graphicsBuffer.items[i]);
                 }
+                exec.graphicsBuffer.clear();
             }
         }
     }
 
     public static class PrintI implements LInstruction{
-        private static final StringBuilder out = new StringBuilder();
+        public int value;
 
-        public int value, target;
-
-        public PrintI(int value, int target){
+        public PrintI(int value){
             this.value = value;
-            this.target = target;
         }
 
         PrintI(){}
 
         @Override
         public void run(LExecutor exec){
-            Building b = exec.building(target);
 
-            if(b == null) return;
+            if(exec.textBuffer.length() >= maxTextBuffer) return;
 
             //this should avoid any garbage allocation
             Var v = exec.vars[value];
             if(v.isobj && value != 0){
-                if(v.objval instanceof String){
-                    b.handleString(v.objval);
-                }else if(v.objval == null){
-                    b.handleString("null");
-                }else{
-                    b.handleString("[object]");
-                }
+                String strValue = v.objval instanceof String ? (String)v.objval : v.objval == null ? "null" : "[object]";
+
+                exec.textBuffer.append(strValue);
             }else{
-                out.setLength(0);
                 //display integer version when possible
                 if(Math.abs(v.numval - (long)v.numval) < 0.000001){
-                    out.append((long)v.numval);
+                    exec.textBuffer.append((long)v.numval);
                 }else{
-                    out.append(v.numval);
+                    exec.textBuffer.append(v.numval);
                 }
-                b.handleString(out);
+            }
+        }
+    }
+
+    public static class PrintFlushI implements LInstruction{
+        public int target;
+
+        public PrintFlushI(int target){
+            this.target = target;
+        }
+
+        public PrintFlushI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+
+            Building build = exec.building(target);
+            if(build instanceof MessageBlockEntity){
+                MessageBlockEntity d = (MessageBlockEntity)build;
+
+                d.message.setLength(0);
+                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));
+
+                exec.textBuffer.setLength(0);
             }
         }
     }

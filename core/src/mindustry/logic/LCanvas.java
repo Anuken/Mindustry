@@ -16,7 +16,6 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -56,12 +55,6 @@ public class LCanvas extends Table{
             dialog.addCloseButton();
             dialog.show();
         }).height(50f).left().width(400f).marginLeft(10f);
-
-        add(new PrintStatement());
-        add(new SetStatement());
-        add(new JumpStatement());
-        add(new EnableStatement());
-        add(new BinaryOpStatement());
     }
 
     private void drawGrid(){

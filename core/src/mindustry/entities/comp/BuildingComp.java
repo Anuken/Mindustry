@@ -39,7 +39,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable{
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -1168,19 +1168,20 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
-    public double sense(LSensor sensor){
-        if(sensor == LSensor.health) return health;
-        if(sensor == LSensor.efficiency) return efficiency();
-        if(sensor == LSensor.totalItems && items != null) return items.total();
-        if(sensor == LSensor.totalLiquids && liquids != null) return liquids.total();
-        if(sensor == LSensor.totalPower && power != null) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-        if(sensor == LSensor.itemCapacity) return block.itemCapacity;
-        if(sensor == LSensor.liquidCapacity) return block.liquidCapacity;
-        if(sensor == LSensor.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
-        if(sensor == LSensor.powerNetIn && power != null) return power.graph.getPowerProduced();
-        if(sensor == LSensor.powerNetOut && power != null) return power.graph.getPowerNeeded();
-        if(sensor == LSensor.powerNetStored && power != null) return power.graph.getLastPowerStored();
-        if(sensor == LSensor.powerNetCapacity && power != null) return power.graph.getBatteryCapacity();
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.efficiency) return efficiency();
+        if(sensor == LAccess.rotation) return rotation;
+        if(sensor == LAccess.totalItems && items != null) return items.total();
+        if(sensor == LAccess.totalLiquids && liquids != null) return liquids.total();
+        if(sensor == LAccess.totalPower && power != null) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+        if(sensor == LAccess.itemCapacity) return block.itemCapacity;
+        if(sensor == LAccess.liquidCapacity) return block.liquidCapacity;
+        if(sensor == LAccess.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
+        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getPowerProduced();
+        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getPowerNeeded();
+        if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
+        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getBatteryCapacity();
         return 0;
     }
 
@@ -1189,6 +1190,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(content instanceof Item && items != null) return items.get((Item)content);
         if(content instanceof Liquid && liquids != null) return liquids.get((Liquid)content);
         return 0;
+    }
+
+    @Override
+    public void control(LAccess type, double p1, double p2, double p3, double p4){
+        if(type == LAccess.enabled){
+            enabled = !Mathf.zero((float)p1);
+        }
     }
 
     @Override

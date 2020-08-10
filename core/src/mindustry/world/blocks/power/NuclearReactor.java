@@ -109,8 +109,8 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         @Override
-        public double sense(LSensor sensor){
-            if(sensor == LSensor.heat) return heat;
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return heat;
             return super.sense(sensor);
         }
 

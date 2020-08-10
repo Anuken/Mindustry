@@ -18,6 +18,7 @@ import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -25,9 +26,12 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public abstract class Turret extends Block{
+    //after being logic-controlled and this amount of time passes, the turret will resume normal AI
+    public final static float logicControlCooldown = 60 * 2;
+
     public final int timerTarget = timers++;
     public int targetInterval = 20;
 
@@ -140,8 +144,9 @@ public abstract class Turret extends Block{
     public class TurretEntity extends Building implements ControlBlock{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
-        public float reload, rotation = 90, recoil, heat;
+        public float reload, rotation = 90, recoil, heat, logicControlTime = -1;
         public int shotCounter;
+        public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public @NonNull BlockUnitc unit = Nulls.blockUnit;
@@ -153,8 +158,23 @@ public abstract class Turret extends Block{
         }
 
         @Override
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if(type == LAccess.shoot && !unit.isPlayer()){
+                targetPos.set((float)p1, (float)p2);
+                logicControlTime = logicControlCooldown;
+                logicShooting = !Mathf.zero(p3);
+            }
+
+            super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
         public Unit unit(){
             return (Unit)unit;
+        }
+
+        public boolean logicControlled(){
+            return logicControlTime > 0;
         }
 
         @Override
@@ -184,6 +204,10 @@ public abstract class Turret extends Block{
             unit.rotation(rotation);
             unit.team(team);
 
+            if(logicControlTime > 0){
+                logicControlTime -= Time.delta;
+            }
+
             if(hasAmmo()){
 
                 if(timer(timerTarget, targetInterval)){
@@ -193,10 +217,11 @@ public abstract class Turret extends Block{
                 if(validateTarget()){
                     boolean canShoot = true;
 
-                    //player behavior
-                    if(isControlled()){
+                    if(isControlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());
                         canShoot = unit.isShooting();
+                    }else if(logicControlled()){ //logic behavior
+                        canShoot = logicShooting;
                     }else{ //default AI behavior
                         BulletType type = peekAmmo();
                         float speed = type.speed;

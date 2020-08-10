@@ -19,8 +19,7 @@ public class LogicDisplay extends Block{
         commandRect = 4,
         commandLineRect = 5,
         commandPoly = 6,
-        commandLinePoly = 7,
-        commandFlush = 8;
+        commandLinePoly = 7;
 
     public int maxSides = 25;
 
@@ -91,7 +90,7 @@ public class LogicDisplay extends Block{
         }
     }
 
-    public enum CommandType{
+    public enum GraphicsType{
         clear,
         color,
         stroke,
@@ -99,11 +98,9 @@ public class LogicDisplay extends Block{
         rect,
         lineRect,
         poly,
-        linePoly,
-        flush;
+        linePoly;
 
-        public static final CommandType[] all = values();
-        public static final CommandType[] allNormal = Seq.select(all, t -> t != flush).toArray(CommandType.class);
+        public static final GraphicsType[] all = values();
     }
 
     @Struct

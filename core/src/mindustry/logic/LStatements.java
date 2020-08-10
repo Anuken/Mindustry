@@ -37,6 +37,24 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("noop")
+    public static class InvalidStatement extends LStatement{
+
+        @Override
+        public void build(Table table){
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.operations;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new NoopI();
+        }
+    }
+
     @RegisterStatement("write")
     public static class WriteStatement extends LStatement{
         public String to = "0";
@@ -90,7 +108,7 @@ public class LStatements{
 
     @RegisterStatement("draw")
     public static class DrawStatement extends LStatement{
-        public CommandType type = CommandType.line;
+        public GraphicsType type = GraphicsType.line;
         public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0";
 
         @Override
@@ -105,13 +123,13 @@ public class LStatements{
 
             table.button(b -> {
                 b.label(() -> type.name());
-                b.clicked(() -> showSelect(b, CommandType.allNormal, type, t -> {
+                b.clicked(() -> showSelect(b, GraphicsType.all, type, t -> {
                     type = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
-            if(type != CommandType.stroke){
+            if(type != GraphicsType.stroke){
                 table.row();
             }
 
@@ -158,7 +176,6 @@ public class LStatements{
                 }
             }).expand().left();
 
-
         }
 
         @Override
@@ -168,13 +185,13 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DisplayI((byte)type.ordinal(), 0, builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3));
+            return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3));
         }
     }
 
-    @RegisterStatement("flush")
-    public static class FlushStatement extends LStatement{
-        public String target = "display";
+    @RegisterStatement("drawflush")
+    public static class DrawFlushStatement extends LStatement{
+        public String target = "@0";
 
         @Override
         public void build(Table table){
@@ -189,7 +206,102 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DisplayI(commandFlush, builder.var(target), 0, 0, 0, 0, 0);
+            return new DrawFlushI(builder.var(target));
+        }
+    }
+
+    @RegisterStatement("print")
+    public static class PrintStatement extends LStatement{
+        public String value = "\"frog\"";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str).width(0f).growX().padRight(3);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PrintI(builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.control;
+        }
+    }
+
+    @RegisterStatement("printflush")
+    public static class PrintFlushStatement extends LStatement{
+        public String target = "@0";
+
+        @Override
+        public void build(Table table){
+            table.add(" to ");
+            field(table, target, str -> target = str);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.blocks;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PrintFlushI(builder.var(target));
+        }
+    }
+
+    @RegisterStatement("control")
+    public static class ControlStatement extends LStatement{
+        public LAccess type = LAccess.enabled;
+        public String target = "@0", p1 = "0", p2 = "0", p3 = "0", p4 = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.left();
+
+            table.add(" set ");
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, LAccess.controls, type, t -> {
+                    type = t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(100, 50)));
+            }, Styles.logict, () -> {
+            }).size(90, 40).color(table.color).left().padLeft(2);
+
+            table.add(" of ");
+
+            field(table, target, v -> target = v);
+
+            table.row();
+
+            //Q: why don't you just use arrays for this?
+            //A: arrays aren't as easy to serialize so the code generator doesn't handle them
+            int c = 0;
+            for(int i = 0; i < type.parameters.length; i++){
+
+                fields(table, type.parameters[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
+
+                if(++c % 2 == 0) table.row();
+            }
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.blocks;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new ControlI(type, builder.var(target), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
     }
 
@@ -246,7 +358,7 @@ public class LStatements{
                         }),
                         //sensors
                         new Table(i -> {
-                            for(LSensor sensor : LSensor.all){
+                            for(LAccess sensor : LAccess.senseable){
                                 i.button(sensor.name(), Styles.cleart, () -> {
                                     stype("@" + sensor.name());
                                     hide.run();
@@ -318,31 +430,6 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SetI(builder.var(from), builder.var(to));
-        }
-    }
-
-    @RegisterStatement("enable")
-    public static class EnableStatement extends LStatement{
-        public String target = "result";
-        public String value = "0";
-
-        @Override
-        public void build(Table table){
-            field(table, target, str -> target = str);
-
-            table.add(" -> ");
-
-            field(table, value, str -> value = str);
-        }
-
-        @Override
-        public LCategory category(){
-            return LCategory.blocks;
-        }
-
-        @Override
-        public LInstruction build(LAssembler builder){
-            return new EnableI(builder.var(target), builder.var(value));
         }
     }
 
@@ -420,31 +507,6 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new EndI();
-        }
-
-        @Override
-        public LCategory category(){
-            return LCategory.control;
-        }
-    }
-
-    @RegisterStatement("print")
-    public static class PrintStatement extends LStatement{
-        public String value = "\"frog\"";
-        public String target = "result";
-
-        @Override
-        public void build(Table table){
-            field(table, value, str -> value = str);
-
-            table.add(" to ");
-
-            field(table, target, str -> target = str);
-        }
-
-        @Override
-        public LInstruction build(LAssembler builder){
-            return new PrintI(builder.var(value), builder.var(target));
         }
 
         @Override

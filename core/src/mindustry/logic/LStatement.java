@@ -7,6 +7,7 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
@@ -27,9 +28,8 @@ public abstract class LStatement{
     public LStatement copy(){
         StringBuilder build = new StringBuilder();
         write(build);
-        String[] split = build.toString().split(" ");
-        LStatement result = LogicIO.read(split);
-        return result == null && LAssembler.customParsers.containsKey(split[0]) ? LAssembler.customParsers.get(split[0]).get(split) : result;
+        Seq<LStatement> read = LAssembler.read(build.toString());
+        return read.size == 0 ? null : read.first();
     }
 
     //protected methods are only for internal UI layout utilities

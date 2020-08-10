@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -12,6 +13,8 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
+import mindustry.world.blocks.defense.Door.*;
 
 import static mindustry.Vars.*;
 
@@ -33,6 +36,11 @@ public class Door extends Wall{
             Sounds.door.at(base);
 
             for(DoorEntity entity : base.chained){
+                //skip doors with things in them
+                if((Units.anyEntities(entity.tile) && !open) || entity.open == open){
+                    continue;
+                }
+
                 entity.open = open;
                 pathfinder.updateTile(entity.tile());
                 entity.effect();
@@ -63,6 +71,19 @@ public class Door extends Wall{
                 if(b instanceof DoorEntity){
                     ((DoorEntity)b).updateChained();
                 }
+            }
+        }
+
+        @Override
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if(type == LAccess.enabled){
+                boolean shouldOpen = !Mathf.zero(p1);
+
+                if(open == shouldOpen || (Units.anyEntities(tile) && !shouldOpen) || !timer(timerToggle, 60f)){
+                    return;
+                }
+
+                configureAny(shouldOpen);
             }
         }
 
@@ -104,7 +125,7 @@ public class Door extends Wall{
 
         @Override
         public void tapped(Player player){
-            if((Units.anyEntities(tile) && open) || !timer(timerToggle, 30f)){
+            if((Units.anyEntities(tile) && open) || !timer(timerToggle, 40f)){
                 return;
             }
 
