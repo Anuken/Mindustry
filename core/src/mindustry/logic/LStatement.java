@@ -95,7 +95,10 @@ public abstract class LStatement{
         });
         t.actions(Actions.alpha(0), Actions.fadeIn(0.3f, Interp.fade));
 
-        hideCons.get(t, hide);
+        t.top().pane(inner -> {
+            inner.top();
+            hideCons.get(inner, hide);
+        }).top();
 
         t.pack();
     }

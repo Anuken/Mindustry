@@ -49,7 +49,6 @@ public class TypeIO{
         }else if(object instanceof String){
             write.b((byte)4);
             writeString(write, (String)object);
-            writeString(write, (String)object);
         }else if(object instanceof Content){
             Content map = (Content)object;
             write.b((byte)5);

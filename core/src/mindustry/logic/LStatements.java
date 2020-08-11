@@ -450,10 +450,10 @@ public class LStatements{
                             stack.clearChildren();
                             stack.addChild(tables[selected]);
                             t.pack();
-                        }).size(80f, 50f).checked(selected == fi).group(group);
+                        }).size(80f, 50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
-                    t.add(stack).colspan(3).expand().left();
+                    t.add(stack).colspan(3).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
@@ -614,7 +614,7 @@ public class LStatements{
         //elements need separate conversion logic
         @Override
         public void setupUI(){
-            if(elem != null && destIndex > 0 && destIndex < elem.parent.getChildren().size){
+            if(elem != null && destIndex >= 0 && destIndex < elem.parent.getChildren().size){
                 dest = (StatementElem)elem.parent.getChildren().get(destIndex);
             }
         }

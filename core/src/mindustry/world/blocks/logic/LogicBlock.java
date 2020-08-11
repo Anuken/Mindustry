@@ -20,8 +20,9 @@ import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final IntSeq removal = new IntSeq();
+    public static final int maxInstructions = 2000;
 
-    public int maxInstructionScale = 8;
+    public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
 
@@ -79,7 +80,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str);
+                    LAssembler asm = LAssembler.assemble(str, maxInstructions);
 
                     //store connections
                     for(int i = 0; i < connections.size; i++){
@@ -108,7 +109,7 @@ public class LogicBlock extends Block{
                     e.printStackTrace();
 
                     //handle malformed code and replace it with nothing
-                    executor.load("");
+                    executor.load("", maxInstructions);
                 }
             }
         }

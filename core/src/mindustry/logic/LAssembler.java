@@ -45,10 +45,10 @@ public class LAssembler{
         }
     }
 
-    public static LAssembler assemble(String data){
+    public static LAssembler assemble(String data, int maxInstructions){
         LAssembler asm = new LAssembler();
 
-        Seq<LStatement> st = read(data);
+        Seq<LStatement> st = read(data, maxInstructions);
 
         asm.instructions = st.map(l -> l.build(asm)).filter(l -> l != null).toArray(LInstruction.class);
         return asm;
@@ -65,14 +65,21 @@ public class LAssembler{
     }
 
     public static Seq<LStatement> read(String data){
+        return read(data, Integer.MAX_VALUE);
+    }
+
+    public static Seq<LStatement> read(String data, int max){
         //empty data check
         if(data == null || data.isEmpty()) return new Seq<>();
 
         Seq<LStatement> statements = new Seq<>();
         String[] lines = data.split("[;\n]+");
+        int index = 0;
         for(String line : lines){
             //comments
             if(line.startsWith("#")) continue;
+
+            if(index++ > max) continue;
 
             try{
                 //yes, I am aware that this can be split with regex, but that's slow and even more incomprehensible

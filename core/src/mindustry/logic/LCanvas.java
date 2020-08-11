@@ -19,6 +19,7 @@ import mindustry.graphics.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
+import mindustry.world.blocks.logic.*;
 
 public class LCanvas extends Table{
     private static final Color backgroundCol = Pal.darkMetal.cpy().mul(0.1f), gridCol = Pal.darkMetal.cpy().mul(0.5f);
@@ -56,7 +57,7 @@ public class LCanvas extends Table{
             });
             dialog.addCloseButton();
             dialog.show();
-        }).height(50f).left().width(400f).marginLeft(10f);
+        }).height(50f).left().width(400f).marginLeft(10f).disabled(t -> statements.getChildren().size >= LogicBlock.maxInstructions);
     }
 
     private void drawGrid(){
