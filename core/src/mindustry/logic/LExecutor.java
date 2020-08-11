@@ -74,31 +74,31 @@ public class LExecutor{
 
     //region utility
 
-    @Nullable Building building(int index){
+    public @Nullable Building building(int index){
         Object o = vars[index].objval;
         return vars[index].isobj && o instanceof Building ? (Building)o : null;
     }
 
-    @Nullable Object obj(int index){
+    public @Nullable Object obj(int index){
         Object o = vars[index].objval;
         return vars[index].isobj ? o : null;
     }
 
-    boolean bool(int index){
+    public boolean bool(int index){
         Var v = vars[index];
         return v.isobj ? v.objval != null : Math.abs(v.numval) >= 0.00001;
     }
 
-    double num(int index){
+    public double num(int index){
         Var v = vars[index];
         return v.isobj ? 1 : v.numval;
     }
 
-    int numi(int index){
+    public int numi(int index){
         return (int)num(index);
     }
 
-    void setnum(int index, double value){
+    public void setnum(int index, double value){
         Var v = vars[index];
         if(v.constant) return;
         v.numval = value;
@@ -106,7 +106,7 @@ public class LExecutor{
         v.isobj = false;
     }
 
-    void setobj(int index, Object value){
+    public void setobj(int index, Object value){
         Var v = vars[index];
         if(v.constant) return;
         v.objval = value;
