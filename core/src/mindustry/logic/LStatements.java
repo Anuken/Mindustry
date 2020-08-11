@@ -123,8 +123,8 @@ public class LStatements{
 
     @RegisterStatement("draw")
     public static class DrawStatement extends LStatement{
-        public GraphicsType type = GraphicsType.line;
-        public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0";
+        public GraphicsType type = GraphicsType.clear;
+        public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0", p4 = "0";
 
         @Override
         public void build(Table table){
@@ -188,6 +188,16 @@ public class LStatements{
                         s.row();
                         fields(s, "rotation", p3, v -> p3 = v);
                         break;
+                    case triangle:
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                        s.row();
+                        fields(s, "x2", p1, v -> p1 = v);
+                        fields(s, "y2", p2, v -> p2 = v);
+                        s.row();
+                        fields(s, "x3", p3, v -> p3 = v);
+                        fields(s, "y3", p4, v -> p4 = v);
+                        break;
                 }
             }).expand().left();
 
@@ -200,7 +210,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3));
+            return new DrawI((byte)type.ordinal(), 0, builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
         }
     }
 

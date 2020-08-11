@@ -19,7 +19,8 @@ public class LogicDisplay extends Block{
         commandRect = 4,
         commandLineRect = 5,
         commandPoly = 6,
-        commandLinePoly = 7;
+        commandLinePoly = 7,
+        commandTriangle = 8;
 
     public int maxSides = 25;
 
@@ -60,7 +61,7 @@ public class LogicDisplay extends Block{
                         long c = commands.removeFirst();
                         byte type = DisplayCmd.type(c);
                         int x = DisplayCmd.x(c), y = DisplayCmd.y(c),
-                        p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c);
+                        p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c), p4 = DisplayCmd.p4(c);
 
                         switch(type){
                             case commandClear: Core.graphics.clear(x/255f, y/255f, p1/255f, 1f); break;
@@ -69,6 +70,7 @@ public class LogicDisplay extends Block{
                             case commandLineRect: Lines.rect(x, y, p1, p2); break;
                             case commandPoly: Fill.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
                             case commandLinePoly: Lines.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
+                            case commandTriangle: Fill.tri(x, y, p1, p2, p3, p4); break;
                             case commandColor: this.color = Color.toFloatBits(x, y, p1, 255); Draw.color(this.color); break;
                             case commandStroke: this.stroke = x; Lines.stroke(x); break;
                         }
@@ -94,7 +96,8 @@ public class LogicDisplay extends Block{
         rect,
         lineRect,
         poly,
-        linePoly;
+        linePoly,
+        triangle;
 
         public static final GraphicsType[] all = values();
     }
@@ -105,7 +108,7 @@ public class LogicDisplay extends Block{
 
         //each coordinate is only 8 bits, limiting size to 256x256
         //anything larger than that would be excessive anyway
-        @StructField(9)
-        public int x, y, p1, p2, p3;
+        @StructField(8)
+        public int x, y, p1, p2, p3, p4;
     }
 }

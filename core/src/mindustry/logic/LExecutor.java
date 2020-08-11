@@ -406,9 +406,9 @@ public class LExecutor{
     public static class DrawI implements LInstruction{
         public byte type;
         public int target;
-        public int x, y, p1, p2, p3;
+        public int x, y, p1, p2, p3, p4;
 
-        public DrawI(byte type, int target, int x, int y, int p1, int p2, int p3){
+        public DrawI(byte type, int target, int x, int y, int p1, int p2, int p3, int p4){
             this.type = type;
             this.target = target;
             this.x = x;
@@ -416,6 +416,7 @@ public class LExecutor{
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
+            this.p4 = p4;
         }
 
         public DrawI(){
@@ -428,7 +429,7 @@ public class LExecutor{
 
             //add graphics calls, cap graphics buffer size
             if(exec.graphicsBuffer.size < maxGraphicsBuffer){
-                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3)));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3), exec.numi(p4)));
             }
         }
     }
