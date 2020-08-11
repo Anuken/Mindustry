@@ -54,11 +54,13 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit instanceof Minerc;
     }
 
-    public @Nullable CoreEntity closestCore(){
+    public @Nullable
+    CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable CoreEntity core(){
+    public @Nullable
+    CoreBuild core(){
         return team.core();
     }
 
@@ -104,7 +106,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             clearUnit();
         }
 
-        CoreEntity core = closestCore();
+        CoreBuild core = closestCore();
 
         if(!dead()){
             set(unit);

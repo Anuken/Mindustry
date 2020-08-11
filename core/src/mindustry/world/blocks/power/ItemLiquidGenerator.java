@@ -84,7 +84,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
         return 0.0f;
     }
 
-    public class ItemLiquidGeneratorEntity extends GeneratorEntity{
+    public class ItemLiquidGeneratorBuild extends GeneratorBuild{
         public float explosiveness, heat, totalTime;
 
         @Override

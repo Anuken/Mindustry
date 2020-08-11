@@ -48,7 +48,7 @@ public class PayloadConveyor extends Block{
         }
     }
 
-    public class PayloadConveyorEntity extends Building{
+    public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
         public @Nullable Building next;

@@ -803,11 +803,11 @@ public class NetServer implements ApplicationListener{
 
     public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
-        Seq<CoreEntity> cores = state.teams.cores(player.team());
+        Seq<CoreBuild> cores = state.teams.cores(player.team());
 
         dataStream.writeByte(cores.size);
 
-        for(CoreEntity entity : cores){
+        for(CoreBuild entity : cores){
             dataStream.writeInt(entity.tile().pos());
             entity.items.write(Writes.get(dataStream));
         }

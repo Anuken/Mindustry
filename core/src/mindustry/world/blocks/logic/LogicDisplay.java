@@ -30,15 +30,11 @@ public class LogicDisplay extends Block{
         update = true;
     }
 
-    public class LogicDisplayEntity extends Building{
+    public class LogicDisplayBuild extends Building{
         public FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
         public LongQueue commands = new LongQueue();
-
-        public LogicDisplayEntity(){
-
-        }
 
         @Override
         public void draw(){

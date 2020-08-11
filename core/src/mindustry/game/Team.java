@@ -91,7 +91,8 @@ public class Team implements Comparable<Team>{
         return state.teams.get(this);
     }
 
-    public @Nullable CoreEntity core(){
+    public @Nullable
+    CoreBuild core(){
         return data().core();
     }
 
@@ -103,7 +104,7 @@ public class Team implements Comparable<Team>{
         return state.teams.areEnemies(this, other);
     }
 
-    public Seq<CoreEntity> cores(){
+    public Seq<CoreBuild> cores(){
         return state.teams.cores(this);
     }
 

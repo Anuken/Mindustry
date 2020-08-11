@@ -43,14 +43,14 @@ public class PowerTestFixture{
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
         return new PowerGenerator("fakegen"){{
-            entityType = () -> new GeneratorEntity();
+            entityType = () -> new GeneratorBuild();
             powerProduction = producedPower;
         }};
     }
 
     protected static Battery createFakeBattery(float capacity){
         return new Battery("fakebattery"){{
-            entityType = () -> new BatteryEntity();
+            entityType = () -> new BatteryBuild();
             consumes.powerBuffered(capacity);
         }};
     }

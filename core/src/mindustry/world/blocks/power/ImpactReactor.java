@@ -43,7 +43,7 @@ public class ImpactReactor extends PowerGenerator{
     public void setBars(){
         super.setBars();
 
-        bars.add("poweroutput", (GeneratorEntity entity) -> new Bar(() ->
+        bars.add("poweroutput", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
         Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale(), 1)),
         () -> Pal.powerBar,
@@ -64,7 +64,7 @@ public class ImpactReactor extends PowerGenerator{
         return new TextureRegion[]{bottomRegion, region};
     }
 
-    public class FusionReactorEntity extends GeneratorEntity{
+    public class FusionReactorBuild extends GeneratorBuild{
         public float warmup;
 
 

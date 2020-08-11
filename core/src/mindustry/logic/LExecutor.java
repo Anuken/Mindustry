@@ -178,8 +178,8 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryEntity){
-                MemoryEntity mem = (MemoryEntity)from;
+            if(from instanceof MemoryBuild){
+                MemoryBuild mem = (MemoryBuild)from;
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -203,8 +203,8 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryEntity){
-                MemoryEntity mem = (MemoryEntity)from;
+            if(from instanceof MemoryBuild){
+                MemoryBuild mem = (MemoryBuild)from;
 
                 if(address >= 0 && address < mem.memory.length){
                     mem.memory[address] = exec.num(value);
@@ -449,8 +449,8 @@ public class LExecutor{
             if(Vars.headless) return;
 
             Building build = exec.building(target);
-            if(build instanceof LogicDisplayEntity){
-                LogicDisplayEntity d = (LogicDisplayEntity)build;
+            if(build instanceof LogicDisplayBuild){
+                LogicDisplayBuild d = (LogicDisplayBuild)build;
                 for(int i = 0; i < exec.graphicsBuffer.size; i++){
                     d.commands.addLast(exec.graphicsBuffer.items[i]);
                 }
@@ -504,8 +504,8 @@ public class LExecutor{
         public void run(LExecutor exec){
 
             Building build = exec.building(target);
-            if(build instanceof MessageBlockEntity){
-                MessageBlockEntity d = (MessageBlockEntity)build;
+            if(build instanceof MessageBuild){
+                MessageBuild d = (MessageBuild)build;
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));

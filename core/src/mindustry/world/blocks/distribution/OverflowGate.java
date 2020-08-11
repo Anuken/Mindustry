@@ -30,7 +30,7 @@ public class OverflowGate extends Block{
         return true;
     }
 
-    public class OverflowGateEntity extends Building{
+    public class OverflowGateBuild extends Building{
         public Item lastItem;
         public Tile lastInput;
         public float time;

@@ -20,7 +20,7 @@ public class Router extends Block{
         noUpdateDisabled = true;
     }
 
-    public class RouterEntity extends Building{
+    public class RouterBuild extends Building{
         public Item lastItem;
         public Tile lastInput;
         public float time;

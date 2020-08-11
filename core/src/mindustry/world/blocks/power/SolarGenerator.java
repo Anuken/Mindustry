@@ -21,7 +21,7 @@ public class SolarGenerator extends PowerGenerator{
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
-    public class SolarGeneratorEntity extends GeneratorEntity{
+    public class SolarGeneratorBuild extends GeneratorBuild{
         @Override
         public void updateTile(){
             productionEfficiency =

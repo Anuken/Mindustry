@@ -14,7 +14,6 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
-import mindustry.world.blocks.defense.Door.*;
 
 import static mindustry.Vars.*;
 
@@ -32,10 +31,10 @@ public class Door extends Wall{
         solidifes = true;
         consumesTap = true;
 
-        config(Boolean.class, (DoorEntity base, Boolean open) -> {
+        config(Boolean.class, (DoorBuild base, Boolean open) -> {
             Sounds.door.at(base);
 
-            for(DoorEntity entity : base.chained){
+            for(DoorBuild entity : base.chained){
                 //skip doors with things in them
                 if((Units.anyEntities(entity.tile) && !open) || entity.open == open){
                     continue;
@@ -53,9 +52,9 @@ public class Door extends Wall{
         return req.config == Boolean.TRUE ? openRegion : region;
     }
 
-    public class DoorEntity extends Building{
+    public class DoorBuild extends Building{
         public boolean open = false;
-        public ObjectSet<DoorEntity> chained = new ObjectSet<>();
+        public ObjectSet<DoorBuild> chained = new ObjectSet<>();
 
         @Override
         public void onProximityAdded(){
@@ -68,8 +67,8 @@ public class Door extends Wall{
             super.onProximityRemoved();
 
             for(Building b : proximity){
-                if(b instanceof DoorEntity){
-                    ((DoorEntity)b).updateChained();
+                if(b instanceof DoorBuild){
+                    ((DoorBuild)b).updateChained();
                 }
             }
         }
@@ -96,14 +95,14 @@ public class Door extends Wall{
             flow(chained);
         }
 
-        public void flow(ObjectSet<DoorEntity> set){
+        public void flow(ObjectSet<DoorBuild> set){
             if(!set.add(this)) return;
 
             this.chained = set;
 
             for(Building b : proximity){
-                if(b instanceof DoorEntity){
-                    ((DoorEntity)b).flow(set);
+                if(b instanceof DoorBuild){
+                    ((DoorBuild)b).flow(set);
                 }
             }
         }

@@ -77,7 +77,7 @@ public class Pump extends LiquidBlock{
         return tile != null && tile.floor().liquidDrop != null;
     }
 
-    public class PumpEntity extends LiquidBlockEntity{
+    public class PumpBuild extends LiquidBuild{
         public float amount = 0f;
         public Liquid liquidDrop = null;
 

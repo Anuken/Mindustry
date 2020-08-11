@@ -44,7 +44,7 @@ public class SolidPump extends Pump{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("efficiency", (SolidPumpEntity entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
+        bars.add("efficiency", (SolidPumpBuild entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
         entity.lastPump / Time.delta * 60, 1),
         () -> Pal.ammo,
         () -> entity.warmup));
@@ -77,7 +77,7 @@ public class SolidPump extends Pump{
         return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
-    public class SolidPumpEntity extends PumpEntity{
+    public class SolidPumpBuild extends PumpBuild{
         public float warmup;
         public float pumpTime;
         public float boost;

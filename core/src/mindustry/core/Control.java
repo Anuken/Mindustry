@@ -261,7 +261,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     //TODO move
-    public void handleLaunch(CoreEntity tile){
+    public void handleLaunch(CoreBuild tile){
         LaunchCorec ent = LaunchCore.create();
         ent.set(tile);
         ent.block(Blocks.coreShard);

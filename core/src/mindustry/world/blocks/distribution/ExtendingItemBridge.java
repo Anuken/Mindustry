@@ -16,7 +16,7 @@ public class ExtendingItemBridge extends ItemBridge{
         hasItems = true;
     }
 
-    public class ExtendingItemBridgeEntity extends ItemBridgeEntity{
+    public class ExtendingItemBridgeBuild extends ItemBridgeBuild{
         @Override
         public void draw(){
             Draw.rect(region, x, y);

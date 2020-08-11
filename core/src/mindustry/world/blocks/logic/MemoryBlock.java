@@ -12,7 +12,7 @@ public class MemoryBlock extends Block{
         destructible = true;
     }
 
-    public class MemoryEntity extends Building{
+    public class MemoryBuild extends Building{
         public double[] memory = new double[memoryCapacity];
 
         @Override

@@ -30,7 +30,7 @@ public class LogicBlock extends Block{
         update = true;
         configurable = true;
 
-        config(String.class, (LogicEntity entity, String value) -> {
+        config(String.class, (LogicBuild entity, String value) -> {
             if(value.startsWith("{")){ //it's json
                 try{
                     LogicConfig conf = JsonIO.read(LogicConfig.class, value);
@@ -49,7 +49,7 @@ public class LogicBlock extends Block{
             }
         });
 
-        config(Integer.class, (LogicEntity entity, Integer pos) -> {
+        config(Integer.class, (LogicBuild entity, Integer pos) -> {
             if(entity.connections.contains(pos)){
                 entity.connections.removeValue(pos);
             }else{
@@ -60,7 +60,7 @@ public class LogicBlock extends Block{
         });
     }
 
-    public class LogicEntity extends Building{
+    public class LogicBuild extends Building{
         /** logic "source code" as list of asm statements */
         public String code = "";
         public LExecutor executor = new LExecutor();

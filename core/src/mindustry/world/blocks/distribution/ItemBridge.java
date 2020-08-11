@@ -44,9 +44,9 @@ public class ItemBridge extends Block{
         canOverdrive = false;
 
         //point2 config is relative
-        config(Point2.class, (ItemBridgeEntity tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
+        config(Point2.class, (ItemBridgeBuild tile, Point2 i) -> tile.link = Point2.pack(i.x + tile.tileX(), i.y + tile.tileY()));
         //integer is not
-        config(Integer.class, (ItemBridgeEntity tile, Integer i) -> tile.link = i);
+        config(Integer.class, (ItemBridgeBuild tile, Integer i) -> tile.link = i);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ItemBridge extends Block{
 
         return ((other.block() == tile.block() && tile.block() == this) || (!(tile.block() instanceof ItemBridge) && other.block() == this))
             && (other.team() == tile.team() || tile.block() != this)
-            && (!checkDouble || other.<ItemBridgeEntity>bc().link != tile.pos());
+            && (!checkDouble || other.<ItemBridgeBuild>bc().link != tile.pos());
     }
 
     public Tile findLink(int x, int y){
@@ -124,7 +124,7 @@ public class ItemBridge extends Block{
         return null;
     }
 
-    public class ItemBridgeEntity extends Building{
+    public class ItemBridgeBuild extends Building{
         public int link = -1;
         public IntSet incoming = new IntSet();
         public float uptime;
@@ -208,7 +208,7 @@ public class ItemBridge extends Block{
         @Override
         public boolean onConfigureTileTapped(Building other){
             //reverse connection
-            if(other instanceof ItemBridgeEntity && ((ItemBridgeEntity)other).link == pos()){
+            if(other instanceof ItemBridgeBuild && ((ItemBridgeBuild)other).link == pos()){
                 configure(other.pos());
                 other.configure(-1);
                 return true;
@@ -230,7 +230,7 @@ public class ItemBridge extends Block{
             while(it.hasNext){
                 int i = it.next();
                 Tile other = world.tile(i);
-                if(!linkValid(tile, other, false) || other.<ItemBridgeEntity>bc().link != tile.pos()){
+                if(!linkValid(tile, other, false) || other.<ItemBridgeBuild>bc().link != tile.pos()){
                     it.remove();
                 }
             }
@@ -248,7 +248,7 @@ public class ItemBridge extends Block{
                 dump();
                 uptime = 0f;
             }else{
-                ((ItemBridgeEntity)other.build).incoming.add(tile.pos());
+                ((ItemBridgeBuild)other.build).incoming.add(tile.pos());
 
                 if(consValid() && Mathf.zero(1f - efficiency())){
                     uptime = Mathf.lerpDelta(uptime, 1f, 0.04f);
@@ -358,7 +358,7 @@ public class ItemBridge extends Block{
         }
 
         protected boolean linked(Building source){
-            return source instanceof ItemBridgeEntity && linkValid(source.tile(), tile) && ((ItemBridgeEntity)source).link == pos();
+            return source instanceof ItemBridgeBuild && linkValid(source.tile(), tile) && ((ItemBridgeBuild)source).link == pos();
         }
 
         @Override

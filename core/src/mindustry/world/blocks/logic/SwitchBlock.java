@@ -14,10 +14,10 @@ public class SwitchBlock extends Block{
         configurable = true;
         update = true;
 
-        config(Boolean.class, (ButtonEntity entity, Boolean b) -> entity.on = b);
+        config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.on = b);
     }
 
-    public class ButtonEntity extends Building{
+    public class SwitchBuild extends Building{
         public boolean on;
 
         @Override

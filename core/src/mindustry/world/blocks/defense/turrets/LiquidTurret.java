@@ -53,7 +53,7 @@ public class LiquidTurret extends Turret{
         });
     }
 
-    public class LiquidTurretEntity extends TurretEntity{
+    public class LiquidTurretBuild extends TurretBuild{
 
         @Override
         public void draw(){

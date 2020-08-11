@@ -19,7 +19,7 @@ public class BufferedItemBridge extends ExtendingItemBridge{
         canOverdrive = true;
     }
 
-    public class BufferedItemBridgeEntity extends ExtendingItemBridgeEntity{
+    public class BufferedItemBridgeBuild extends ExtendingItemBridgeBuild{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity);
 
         @Override

@@ -28,8 +28,8 @@ public class Sorter extends Block{
         unloadable = false;
         saveConfig = true;
 
-        config(Item.class, (SorterEntity tile, Item item) -> tile.sortItem = item);
-        configClear((SorterEntity tile) -> tile.sortItem = null);
+        config(Item.class, (SorterBuild tile, Item item) -> tile.sortItem = item);
+        configClear((SorterBuild tile) -> tile.sortItem = null);
     }
 
     @Override
@@ -44,10 +44,10 @@ public class Sorter extends Block{
 
     @Override
     public int minimapColor(Tile tile){
-        return tile.<SorterEntity>bc().sortItem == null ? 0 : tile.<SorterEntity>bc().sortItem.color.rgba();
+        return tile.<SorterBuild>bc().sortItem == null ? 0 : tile.<SorterBuild>bc().sortItem.color.rgba();
     }
 
-    public class SorterEntity extends Building{
+    public class SorterBuild extends Building{
         public @Nullable Item sortItem;
 
         @Override

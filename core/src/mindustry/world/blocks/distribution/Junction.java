@@ -26,7 +26,7 @@ public class Junction extends Block{
         return true;
     }
 
-    public class JunctionEntity extends Building{
+    public class JunctionBuild extends Building{
         public DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity);
 
         @Override

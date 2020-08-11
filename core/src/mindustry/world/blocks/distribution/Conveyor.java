@@ -92,7 +92,7 @@ public class Conveyor extends Block implements Autotiler{
             Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
-    public class ConveyorEntity extends Building{
+    public class ConveyorBuild extends Building{
         //parallel array data
         public Item[] ids = new Item[capacity];
         public float[] xs = new float[capacity];
@@ -101,7 +101,7 @@ public class Conveyor extends Block implements Autotiler{
         public int len = 0;
         //next entity
         public @Nullable Building next;
-        public @Nullable ConveyorEntity nextc;
+        public @Nullable ConveyorBuild nextc;
         //whether the next conveyor's rotation == tile rotation
         public boolean aligned;
 
@@ -163,7 +163,7 @@ public class Conveyor extends Block implements Autotiler{
 
             if(front() != null && front() != null){
                 next = front();
-                nextc = next instanceof ConveyorEntity && next.team() == team ? (ConveyorEntity)next : null;
+                nextc = next instanceof ConveyorBuild && next.team() == team ? (ConveyorBuild)next : null;
                 aligned = nextc != null && rotation == next.rotation;
             }
         }

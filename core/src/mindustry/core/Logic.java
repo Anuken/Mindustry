@@ -89,7 +89,7 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             if(state.isCampaign()){
                 long seconds = state.rules.sector.getSecondsPassed();
-                CoreEntity core = state.rules.defaultTeam.core();
+                CoreBuild core = state.rules.defaultTeam.core();
 
                 //apply fractional damage based on how many turns have passed for this sector
                 float turnsPassed = seconds / (turnDuration / 60f);

@@ -42,7 +42,7 @@ public class PowerDiode extends Block{
         return (tile != null && tile.block().hasPower) ? tile.power.graph.getLastPowerStored() / tile.power.graph.getTotalBatteryCapacity() : 0f;
     }
 
-    public class PowerDiodeEntity extends Building{
+    public class PowerDiodeBuild extends Building{
         @Override
         public void draw(){
             Draw.rect(region, x, y, 0);

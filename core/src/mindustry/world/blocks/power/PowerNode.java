@@ -272,7 +272,7 @@ public class PowerNode extends PowerBlock{
         });
     }
 
-    public class PowerNodeEntity extends Building{
+    public class PowerNodeBuild extends Building{
 
         @Override
         public void placed(){
