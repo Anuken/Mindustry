@@ -5,9 +5,13 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
+
+import static mindustry.Vars.*;
 
 public class LExecutor{
     //special variables
@@ -87,7 +91,7 @@ public class LExecutor{
 
     double num(int index){
         Var v = vars[index];
-        return v.isobj ? 0 : v.numval;
+        return v.isobj ? 1 : v.numval;
     }
 
     int numi(int index){
@@ -226,6 +230,85 @@ public class LExecutor{
 
             exec.setnum(to, output);
 
+        }
+    }
+
+    public static class RadarI implements LInstruction{
+        public RadarTarget target1 = RadarTarget.enemy, target2 = RadarTarget.any, target3 = RadarTarget.any;
+        public RadarSort sort = RadarSort.distance;
+        public int radar, sortOrder, output;
+
+        //radar instructions are special in that they cache their output and only change it at fixed intervals.
+        //this prevents lag from spam of radar instructions
+        public Healthc lastTarget;
+        public Interval timer = new Interval();
+
+        static float bestValue = 0f;
+        static Unit best = null;
+
+        public RadarI(RadarTarget target1, RadarTarget target2, RadarTarget target3, RadarSort sort, int radar, int sortOrder, int output){
+            this.target1 = target1;
+            this.target2 = target2;
+            this.target3 = target3;
+            this.sort = sort;
+            this.radar = radar;
+            this.sortOrder = sortOrder;
+            this.output = output;
+        }
+
+        public RadarI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Building target = exec.building(radar);
+
+            int sortDir = exec.bool(sortOrder) ? 1 : -1;
+
+            if(target instanceof Ranged){
+                float range = ((Ranged)target).range();
+
+                Healthc targeted;
+
+                if(timer.get(20f)){
+                    //if any of the targets involve enemies
+                    boolean enemies = target1 == RadarTarget.enemy || target2 == RadarTarget.enemy || target3 == RadarTarget.enemy;
+
+                    best = null;
+                    bestValue = 0;
+
+                    if(enemies){
+                        for(Team enemy : state.teams.enemiesOf(target.team)){
+                            find(target, range, sortDir, enemy);
+                        }
+                    }else{
+                        find(target, range, sortDir, target.team);
+                    }
+
+                    lastTarget = targeted = best;
+                }else{
+                    targeted = lastTarget;
+                }
+
+                exec.setobj(output, targeted);
+            }
+        }
+
+        void find(Building b, float range, int sortDir, Team team){
+            Units.nearby(team, b.x, b.y, range, u -> {
+                boolean valid =
+                    target1.func.get(b.team, u) &&
+                    target2.func.get(b.team, u) &&
+                    target3.func.get(b.team, u);
+
+                if(!valid) return;
+
+                float val = sort.func.get(b, u) * sortDir;
+                if(val > bestValue || best == null){
+                    bestValue = val;
+                    best = u;
+                }
+            });
         }
     }
 

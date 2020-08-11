@@ -67,6 +67,7 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public IntSeq connections = new IntSeq();
+        public IntSeq invalidConnections = new IntSeq();
         public boolean loaded = false;
 
         public LogicEntity(){
@@ -130,6 +131,22 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
+            //check for previously invalid links to add after configuration
+            removal.clear();
+
+            for(int i = 0; i < invalidConnections.size; i++){
+                int val = invalidConnections.get(i);
+                if(validLink(val) && !connections.contains(val)){
+                    removal.add(val);
+                }
+            }
+
+            if(!removal.isEmpty()){
+                connections.addAll(removal);
+                invalidConnections.removeAll(removal);
+                updateCode(code);
+            }
+
             //remove invalid links
             removal.clear();
 
@@ -141,10 +158,10 @@ public class LogicBlock extends Block{
             }
 
             if(!removal.isEmpty()){
+                invalidConnections.addAll(removal);
+                connections.removeAll(removal);
                 updateCode(code);
             }
-
-            connections.removeAll(removal);
 
             accumulator += edelta() * instructionsPerTick;
 
@@ -258,6 +275,7 @@ public class LogicBlock extends Block{
                 write.str(v.name);
 
                 Object value = v.isobj ? v.objval : v.numval;
+                if(value instanceof Unit) value = null; //do not save units.
                 TypeIO.writeObject(write, value);
             }
 

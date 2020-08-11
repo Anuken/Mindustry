@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
@@ -266,7 +267,7 @@ public class LStatements{
 
             table.left();
 
-            table.add("set ");
+            table.add(" set ");
 
             table.button(b -> {
                 b.label(() -> type.name());
@@ -301,6 +302,62 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new ControlI(type, builder.var(target), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+        }
+    }
+
+    @RegisterStatement("radar")
+    public static class RadarStatement extends LStatement{
+        public RadarTarget target1 = RadarTarget.enemy, target2 = RadarTarget.any, target3 = RadarTarget.any;
+        public RadarSort sort = RadarSort.distance;
+        public String radar = "@0", sortOrder = "0", output = "result";
+
+        @Override
+        public void build(Table table){
+            table.defaults().left();
+
+            table.add(" from ");
+
+            fields(table, radar, v -> radar = v);
+
+            table.row();
+
+            for(int i = 0; i < 3; i++){
+                int fi = i;
+                Prov<RadarTarget> get = () -> (fi == 0 ? target1 : fi == 1 ? target2 : target3);
+
+                table.add(i == 0 ? " target " : " and ");
+
+                table.button(b -> {
+                    b.label(() -> get.get().name());
+                    b.clicked(() -> showSelect(b, RadarTarget.all, get.get(), t -> {
+                        if(fi == 0) target1 = t; else if(fi == 1) target2 = t; else target3 = t;
+                    }, 2, cell -> cell.size(100, 50)));
+                }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+
+                if(i == 1){
+                    table.row();
+                }
+            }
+
+            table.add(" order ");
+
+            fields(table, sortOrder, v -> sortOrder = v);
+
+            table.row();
+
+            table.add(" output ");
+
+            fields(table, output, v -> output = v);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.blocks;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new RadarI(target1, target2, target3, sort, builder.var(radar), builder.var(sortOrder), builder.var(output));
         }
     }
 

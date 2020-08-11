@@ -141,7 +141,7 @@ public abstract class Turret extends Block{
         public abstract BulletType type();
     }
 
-    public class TurretEntity extends Building implements ControlBlock{
+    public class TurretEntity extends Building implements ControlBlock, Ranged{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float reload, rotation = 90, recoil, heat, logicControlTime = -1;
@@ -150,6 +150,11 @@ public abstract class Turret extends Block{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public @NonNull BlockUnitc unit = Nulls.blockUnit;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void created(){
@@ -166,6 +171,15 @@ public abstract class Turret extends Block{
             }
 
             super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.shootX) return targetPos.x;
+            if(sensor == LAccess.shootY) return targetPos.y;
+            if(sensor == LAccess.shooting) return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+
+            return super.sense(sensor);
         }
 
         @Override
@@ -407,7 +421,7 @@ public abstract class Turret extends Block{
         }
 
         protected float baseReloadSpeed(){
-            return 1f;
+            return efficiency();
         }
 
         @Override

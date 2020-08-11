@@ -75,6 +75,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(sensor == LAccess.health) return health;
         if(sensor == LAccess.x) return x;
         if(sensor == LAccess.y) return y;
+        if(sensor == LAccess.shooting) return isShooting() ? 1 : 0;
+        if(sensor == LAccess.shootX) return aimX();
+        if(sensor == LAccess.shootY) return aimY();
         return 0;
     }
 

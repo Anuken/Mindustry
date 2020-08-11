@@ -44,10 +44,5 @@ public class PowerTurret extends Turret{
         public BulletType peekAmmo(){
             return shootType;
         }
-
-        @Override
-        protected float baseReloadSpeed(){
-            return cheating() ? 1f : power.status;
-        }
     }
 }

@@ -1,5 +1,7 @@
 package mindustry.logic;
 
+import arc.math.*;
+
 public enum BinaryOp{
     add("+", (a, b) -> a + b),
     sub("-", (a, b) -> a - b),
@@ -20,7 +22,8 @@ public enum BinaryOp{
     xor("xor", (a, b) -> (int)a ^ (int)b),
     max("max", Math::max),
     min("min", Math::min),
-    atan2("atan2", Math::atan2);
+    atan2("atan2", (x, y) -> Mathf.atan2((float)x, (float)y) * Mathf.radDeg),
+    dst("dst", (x, y) -> Mathf.dst((float)x, (float)y));
 
     public static final BinaryOp[] all = values();
 
