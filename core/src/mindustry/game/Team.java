@@ -91,8 +91,7 @@ public class Team implements Comparable<Team>{
         return state.teams.get(this);
     }
 
-    public @Nullable
-    CoreBuild core(){
+    public @Nullable CoreBuild core(){
         return data().core();
     }
 
