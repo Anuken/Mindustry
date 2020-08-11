@@ -507,7 +507,7 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> op.symbol);
                 b.clicked(() -> showSelect(b, BinaryOp.all, op, o -> op = o));
-            }, Styles.logict, () -> {}).size(50f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {}).size(60f, 40f).pad(4f).color(table.color);
 
             field(table, b, str -> b = str);
         }

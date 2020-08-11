@@ -1911,6 +1911,8 @@ public class Blocks implements ContentList{
             instructionsPerTick = 5;
             memory = 128;
 
+            range = 16 * 10;
+
             size = 2;
         }};
 

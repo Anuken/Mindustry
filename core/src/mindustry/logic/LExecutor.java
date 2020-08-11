@@ -270,7 +270,7 @@ public class LExecutor{
 
                 Healthc targeted;
 
-                if(timer.get(20f)){
+                if(timer.get(30f)){
                     //if any of the targets involve enemies
                     boolean enemies = target1 == RadarTarget.enemy || target2 == RadarTarget.enemy || target3 == RadarTarget.enemy;
 
