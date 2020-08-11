@@ -67,7 +67,7 @@ public class ContinuousLaserBulletType extends BulletType{
             for(int i = 0; i < tscales.length; i++){
                 Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * 35f);
                 Lines.stroke((9f + Mathf.absin(Time.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
-                Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], CapStyle.none);
+                Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
             }
         }
 

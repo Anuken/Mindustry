@@ -24,7 +24,6 @@ public class LogicBlock extends Block{
     public int maxInstructionScale = 8;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
-    public int memory = 16;
 
     public LogicBlock(String name){
         super(name);
@@ -69,10 +68,6 @@ public class LogicBlock extends Block{
         public IntSeq connections = new IntSeq();
         public IntSeq invalidConnections = new IntSeq();
         public boolean loaded = false;
-
-        public LogicEntity(){
-            executor.memory = new double[memory];
-        }
 
         public void updateCode(String str){
             updateCodeVars(str, null);
@@ -279,10 +274,8 @@ public class LogicBlock extends Block{
                 TypeIO.writeObject(write, value);
             }
 
-            write.i(executor.memory.length);
-            for(int i = 0; i < executor.memory.length; i++){
-                write.d(executor.memory[i]);
-            }
+            //no memory
+            write.i(0);
         }
 
         @Override
@@ -311,10 +304,8 @@ public class LogicBlock extends Block{
             }
 
             int memory = read.i();
-            double[] memorybank = executor.memory.length != memory ? new double[memory] : executor.memory;
-            for(int i = 0; i < memory; i++){
-                memorybank[i] = read.d();
-            }
+            //skip memory, it isn't used anymore
+            read.skip(memory * 8);
 
             updateCodeVars(code, asm -> {
 
@@ -326,8 +317,6 @@ public class LogicBlock extends Block{
                     }
                 }
             });
-
-            executor.memory = memorybank;
         }
     }
 

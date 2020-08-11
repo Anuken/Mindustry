@@ -9,6 +9,7 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
+import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
 
 import static mindustry.Vars.*;
@@ -23,7 +24,6 @@ public class LExecutor{
         maxGraphicsBuffer = 512,
         maxTextBuffer = 256;
 
-    public double[] memory = {};
     public LInstruction[] instructions = {};
     public Var[] vars = {};
 
@@ -162,11 +162,12 @@ public class LExecutor{
     }
 
     public static class ReadI implements LInstruction{
-        public int from, to;
+        public int target, position, output;
 
-        public ReadI(int from, int to){
-            this.from = from;
-            this.to = to;
+        public ReadI(int target, int position, int output){
+            this.target = target;
+            this.position = position;
+            this.output = output;
         }
 
         public ReadI(){
@@ -174,18 +175,24 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = exec.numi(from);
+            int address = exec.numi(position);
+            Building from = exec.building(target);
 
-            exec.setnum(to,address < 0 || address >= exec.memory.length ? 0 : exec.memory[address]);
+            if(from instanceof MemoryEntity){
+                MemoryEntity mem = (MemoryEntity)from;
+
+                exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
+            }
         }
     }
 
     public static class WriteI implements LInstruction{
-        public int from, to;
+        public int target, position, value;
 
-        public WriteI(int from, int to){
-            this.from = from;
-            this.to = to;
+        public WriteI(int target, int position, int value){
+            this.target = target;
+            this.position = position;
+            this.value = value;
         }
 
         public WriteI(){
@@ -193,10 +200,16 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            int address = exec.numi(to);
+            int address = exec.numi(position);
+            Building from = exec.building(target);
 
-            if(address >= 0 && address < exec.memory.length){
-                exec.memory[address] = exec.num(from);
+            if(from instanceof MemoryEntity){
+                MemoryEntity mem = (MemoryEntity)from;
+
+                if(address >= 0 && address < mem.memory.length){
+                    mem.memory[address] = exec.num(value);
+                }
+
             }
         }
     }

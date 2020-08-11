@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     repairPoint, resupplyPoint,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, logicDisplay,
+    message, switchBlock, microProcessor, logicProcessor, logicDisplay, memoryCell,
 
     //campaign
     launchPad, launchPadLarge,
@@ -1897,19 +1897,17 @@ public class Blocks implements ContentList{
         }};
 
         microProcessor = new LogicBlock("micro-processor"){{
-            requirements(Category.logic, with(Items.copper, 30, Items.lead, 50, Items.silicon, 30));
+            requirements(Category.logic, with(Items.copper, 80, Items.lead, 50, Items.silicon, 60));
 
             instructionsPerTick = 2;
-            memory = 32;
 
             size = 1;
         }};
 
         logicProcessor = new LogicBlock("logic-processor"){{
-            requirements(Category.logic, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
+            requirements(Category.logic, with(Items.copper, 200, Items.lead, 120, Items.silicon, 110, Items.metaglass, 60));
 
             instructionsPerTick = 5;
-            memory = 128;
 
             range = 16 * 10;
 
@@ -1922,6 +1920,12 @@ public class Blocks implements ContentList{
             displaySize = 80;
 
             size = 3;
+        }};
+
+        memoryCell = new MemoryBlock("memory-cell"){{
+            requirements(Category.logic, with(Items.graphite, 40, Items.silicon, 40));
+
+            memoryCapacity = 64;
         }};
 
         //endregion

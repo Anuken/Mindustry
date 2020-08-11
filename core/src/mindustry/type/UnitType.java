@@ -514,10 +514,10 @@ public class UnitType extends UnlockableContent{
             Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 
             Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
+            Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, false, 0);
 
             Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, CapStyle.none, 0);
+            Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, false, 0);
 
             if(jointRegion.found()){
                 Draw.rect(jointRegion, leg.joint.x, leg.joint.y);

@@ -58,16 +58,23 @@ public class LStatements{
 
     @RegisterStatement("write")
     public static class WriteStatement extends LStatement{
-        public String to = "0";
-        public String from = "result";
+        public String input = "result", target = "@0", address = "0";
 
         @Override
         public void build(Table table){
-            field(table, to, str -> to = str);
+            table.add(" write ");
 
-            table.add(" = ");
+            field(table, input, str -> input = str);
 
-            field(table, from, str -> from = str);
+            table.add(" to ");
+
+            fields(table, target, str -> target = str);
+
+            table.row();
+
+            table.add(" at ");
+
+            field(table, address, str -> address = str);
         }
 
         @Override
@@ -77,22 +84,29 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new WriteI(builder.var(from), builder.var(to));
+            return new WriteI(builder.var(target), builder.var(address), builder.var(input));
         }
     }
 
     @RegisterStatement("read")
     public static class ReadStatement extends LStatement{
-        public String to = "result";
-        public String from = "0";
+        public String output = "result", target = "@0", address = "0";
 
         @Override
         public void build(Table table){
-            field(table, to, str -> to = str);
+            table.add(" read ");
 
-            table.add(" = mem:: ");
+            field(table, output, str -> output = str);
 
-            field(table, from, str -> from = str);
+            table.add(" = ");
+
+            fields(table, target, str -> target = str);
+
+            table.row();
+
+            table.add(" at ");
+
+            field(table, address, str -> address = str);
         }
 
         @Override
@@ -102,7 +116,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new ReadI(builder.var(from), builder.var(to));
+            return new ReadI(builder.var(target), builder.var(address), builder.var(output));
         }
     }
 

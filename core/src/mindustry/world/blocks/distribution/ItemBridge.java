@@ -65,7 +65,7 @@ public class ItemBridge extends Block{
         req.drawx(),
         req.drawy(),
         otherReq.drawx(),
-        otherReq.drawy(), CapStyle.none, -tilesize / 2f);
+        otherReq.drawy(), false, -tilesize / 2f);
         Draw.rect(arrowRegion, (req.drawx() + otherReq.drawx()) / 2f, (req.drawy() + otherReq.drawy()) / 2f,
             Angles.angle(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy()));
     }
@@ -298,7 +298,7 @@ public class ItemBridge extends Block{
             x,
             y,
             other.worldx(),
-            other.worldy(), CapStyle.none, -tilesize / 2f);
+            other.worldy(), false, -tilesize / 2f);
 
             int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
 
