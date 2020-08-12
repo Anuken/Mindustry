@@ -16,10 +16,14 @@ import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import java.io.*;
+import java.util.zip.*;
+
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final IntSeq removal = new IntSeq();
+
     public static final int maxInstructions = 2000;
 
     public int maxInstructionScale = 5;
@@ -31,24 +35,7 @@ public class LogicBlock extends Block{
         update = true;
         configurable = true;
 
-        config(String.class, (LogicBuild entity, String value) -> {
-            if(value.startsWith("{")){ //it's json
-                try{
-                    LogicConfig conf = JsonIO.read(LogicConfig.class, value);
-                    for(int i = 0; i < conf.connections.size; i++){
-                        int pos = conf.connections.items[i];
-                        conf.connections.items[i] = Point2.pack(Point2.x(pos) + entity.tileX(), Point2.y(pos) + entity.tileY());
-                    }
-                    entity.connections = conf.connections;
-                    entity.updateCode(conf.code);
-                }catch(Exception e){
-                    //malformed json
-                    e.printStackTrace();
-                }
-            }else{ //it's (probably) asm or just garbage
-                entity.updateCode(value);
-            }
-        });
+        config(byte[].class, LogicBuild::readCompressed);
 
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
             if(entity.connections.contains(pos)){
@@ -61,6 +48,33 @@ public class LogicBlock extends Block{
         });
     }
 
+    static byte[] compress(String code, IntSeq connections){
+        try{
+            byte[] bytes = code.getBytes(charset);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(baos));
+
+            //current version of config format
+            stream.write(0);
+
+            //write string data
+            stream.writeInt(bytes.length);
+            stream.write(bytes);
+
+            stream.writeInt(connections.size);
+            for(int i = 0; i < connections.size; i++){
+                stream.writeInt(connections.get(i));
+            }
+
+            stream.close();
+
+            return baos.toByteArray();
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
     public class LogicBuild extends Building{
         /** logic "source code" as list of asm statements */
         public String code = "";
@@ -69,6 +83,30 @@ public class LogicBlock extends Block{
         public IntSeq connections = new IntSeq();
         public IntSeq invalidConnections = new IntSeq();
         public boolean loaded = false;
+
+        public void readCompressed(byte[] data){
+            DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
+
+            try{
+                //discard version, there's only one
+                stream.read();
+
+                int bytelen = stream.readInt();
+                byte[] bytes = new byte[bytelen];
+                stream.read(bytes);
+
+                connections.clear();
+
+                int cons = stream.readInt();
+                for(int i = 0; i < cons; i++){
+                    connections.add(stream.readInt());
+                }
+
+                updateCode(new String(bytes, charset));
+            }catch(IOException e){
+                Log.err(e);
+            }
+        }
 
         public void updateCode(String str){
             updateCodeVars(str, null);
@@ -225,7 +263,9 @@ public class LogicBlock extends Block{
             cont.defaults().size(40);
 
             cont.button(Icon.pencil, Styles.clearTransi, () -> {
-                Vars.ui.logic.show(code, this::configure);
+                Vars.ui.logic.show(code, code -> {
+                    configure(compress(code, connections));
+                });
             });
 
             //cont.button(Icon.refreshSmall, Styles.clearTransi, () -> {
@@ -250,14 +290,17 @@ public class LogicBlock extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
 
-            write.str(code);
-            write.s(connections.size);
-            for(int i = 0; i < connections.size; i++){
-                write.i(connections.get(i));
-            }
+            byte[] compressed = compress(code, connections);
+            write.i(compressed.length);
+            write.b(compressed);
 
             //write only the non-constant variables
             int count = Structs.count(executor.vars, v -> !v.constant);
@@ -284,11 +327,18 @@ public class LogicBlock extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            code = read.str();
-            connections.clear();
-            short total = read.s();
-            for(int i = 0; i < total; i++){
-                connections.add(read.i());
+            if(revision == 1){
+                int compl = read.i();
+                byte[] bytes = new byte[compl];
+                read.b(bytes);
+                readCompressed(bytes);
+            }else{
+                code = read.str();
+                connections.clear();
+                short total = read.s();
+                for(int i = 0; i < total; i++){
+                    connections.add(read.i());
+                }
             }
 
             int varcount = read.i();
