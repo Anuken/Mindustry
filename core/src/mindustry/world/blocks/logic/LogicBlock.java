@@ -140,7 +140,6 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
 
-        //TODO refactor this system, it's broken.
         public Seq<LogicLink> links = new Seq<>();
 
         public void readCompressed(byte[] data, boolean relative){
@@ -194,7 +193,6 @@ public class LogicBlock extends Block{
 
         public void updateCodeVars(String str, Cons<LAssembler> assemble){
             if(str != null){
-                if(str.length() >= Short.MAX_VALUE) str = str.substring(0, Short.MAX_VALUE - 1);
                 code = str;
 
                 try{
