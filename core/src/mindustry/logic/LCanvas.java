@@ -99,6 +99,7 @@ public class LCanvas extends Table{
 
     void load(String asm){
         Seq<LStatement> statements = LAssembler.read(asm);
+        statements.truncate(LogicBlock.maxInstructions);
         this.statements.clearChildren();
         for(LStatement st : statements){
             add(st);
@@ -119,8 +120,8 @@ public class LCanvas extends Table{
     }
 
     public class DragLayout extends WidgetGroup{
-        float margin = 4f;
-        float space = 10f, prefWidth, prefHeight;
+        float margin = Scl.scl(4f);
+        float space = Scl.scl(10f), prefWidth, prefHeight;
         Seq<Element> seq = new Seq<>();
         int insertPosition = 0;
 
@@ -136,7 +137,7 @@ public class LCanvas extends Table{
             float totalHeight = getChildren().sumf(e -> e.getHeight() + space) + margin*2f;
 
             height = prefHeight = totalHeight;
-            width = prefWidth = 400f;
+            width = prefWidth = Scl.scl(400f);
 
             //layout everything normally
             for(int i = 0; i < getChildren().size; i++){

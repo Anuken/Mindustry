@@ -175,6 +175,7 @@ public abstract class Turret extends Block{
 
         @Override
         public double sense(LAccess sensor){
+            if(sensor == LAccess.rotation) return rotation;
             if(sensor == LAccess.shootX) return targetPos.x;
             if(sensor == LAccess.shootY) return targetPos.y;
             if(sensor == LAccess.shooting) return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;

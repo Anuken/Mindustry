@@ -687,13 +687,17 @@ public class UnitTypes implements ContentList{
         //region air support
 
         mono = new UnitType("mono"){{
+            defaultController = MinerAI::new;
+
             flying = true;
-            drag = 0.05f;
-            accel = 0.15f;
-            speed = 2f;
+            drag = 0.06f;
+            accel = 0.12f;
+            speed = 1.1f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
+            itemCapacity = 30;
+            range = 50f;
 
             mineTier = 1;
             mineSpeed = 2.5f;
@@ -704,7 +708,7 @@ public class UnitTypes implements ContentList{
 
             flying = true;
             drag = 0.05f;
-            speed = 2f;
+            speed = 1.9f;
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 70f;

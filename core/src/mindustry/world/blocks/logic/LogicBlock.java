@@ -76,6 +76,7 @@ public class LogicBlock extends Block{
 
         public void updateCodeVars(String str, Cons<LAssembler> assemble){
             if(str != null){
+                if(str.length() >= Short.MAX_VALUE) str = str.substring(0, Short.MAX_VALUE - 1);
                 code = str;
 
                 try{
