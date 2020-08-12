@@ -35,7 +35,7 @@ public class LogicBlock extends Block{
         update = true;
         configurable = true;
 
-        config(byte[].class, LogicBuild::readCompressed);
+        config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
             if(entity.connections.contains(pos)){
@@ -80,11 +80,13 @@ public class LogicBlock extends Block{
         public String code = "";
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
+
+        //TODO refactor this system, it's broken.
         public IntSeq connections = new IntSeq();
         public IntSeq invalidConnections = new IntSeq();
         public boolean loaded = false;
 
-        public void readCompressed(byte[] data){
+        public void readCompressed(byte[] data, boolean relative){
             DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
 
             try{
@@ -99,7 +101,8 @@ public class LogicBlock extends Block{
 
                 int cons = stream.readInt();
                 for(int i = 0; i < cons; i++){
-                    connections.add(stream.readInt());
+                    int pos = stream.readInt();
+                    connections.add(relative ? Point2.pack(Point2.x(pos) + tileX(), Point2.y(pos) + tileY()) : pos);
                 }
 
                 updateCode(new String(bytes, charset));
@@ -211,14 +214,17 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public String config(){
-            //set connections to use relative coordinates, not absolute (TODO maybe just store them like this?)
+        public byte[] config(){
+            return compress(code, relativeConnections());
+        }
+
+        public IntSeq relativeConnections(){
             IntSeq copy = new IntSeq(connections);
             for(int i = 0; i < copy.size; i++){
                 int pos = copy.items[i];
                 copy.items[i] = Point2.pack(Point2.x(pos) - tileX(), Point2.y(pos) - tileY());
             }
-            return JsonIO.write(new LogicConfig(code, copy));
+            return copy;
         }
 
         @Override
@@ -264,7 +270,7 @@ public class LogicBlock extends Block{
 
             cont.button(Icon.pencil, Styles.clearTransi, () -> {
                 Vars.ui.logic.show(code, code -> {
-                    configure(compress(code, connections));
+                    configure(compress(code, relativeConnections()));
                 });
             });
 
@@ -331,7 +337,7 @@ public class LogicBlock extends Block{
                 int compl = read.i();
                 byte[] bytes = new byte[compl];
                 read.b(bytes);
-                readCompressed(bytes);
+                readCompressed(bytes, false);
             }else{
                 code = read.str();
                 connections.clear();

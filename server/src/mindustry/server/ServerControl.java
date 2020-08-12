@@ -924,7 +924,7 @@ public class ServerControl implements ApplicationListener{
                 players.add(p);
                 p.clearUnit();
             }
-            
+
             logic.reset();
 
             Call.worldDataBegin();

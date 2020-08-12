@@ -706,10 +706,12 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
+        player.add();
+
         if(player.con == null || player.con.hasConnected) return;
 
-        player.add();
         player.con.hasConnected = true;
+
         if(Config.showConnectMessages.bool()){
             Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
             Log.info("&lm[@] &y@ has connected. ", player.uuid(), player.name);

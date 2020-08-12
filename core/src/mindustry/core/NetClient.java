@@ -345,6 +345,7 @@ public class NetClient implements ApplicationListener{
         Groups.clear();
         netClient.removed.clear();
         logic.reset();
+        netClient.connecting = true;
 
         net.setClientLoaded(false);
 
