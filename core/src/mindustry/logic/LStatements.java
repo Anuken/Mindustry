@@ -58,7 +58,7 @@ public class LStatements{
 
     @RegisterStatement("write")
     public static class WriteStatement extends LStatement{
-        public String input = "result", target = "@0", address = "0";
+        public String input = "result", target = "cell1", address = "0";
 
         @Override
         public void build(Table table){
@@ -90,7 +90,7 @@ public class LStatements{
 
     @RegisterStatement("read")
     public static class ReadStatement extends LStatement{
-        public String output = "result", target = "@0", address = "0";
+        public String output = "result", target = "cell1", address = "0";
 
         @Override
         public void build(Table table){
@@ -216,7 +216,7 @@ public class LStatements{
 
     @RegisterStatement("drawflush")
     public static class DrawFlushStatement extends LStatement{
-        public String target = "@0";
+        public String target = "display1";
 
         @Override
         public void build(Table table){
@@ -257,7 +257,7 @@ public class LStatements{
 
     @RegisterStatement("printflush")
     public static class PrintFlushStatement extends LStatement{
-        public String target = "@0";
+        public String target = "message1";
 
         @Override
         public void build(Table table){
@@ -279,7 +279,7 @@ public class LStatements{
     @RegisterStatement("control")
     public static class ControlStatement extends LStatement{
         public LAccess type = LAccess.enabled;
-        public String target = "@0", p1 = "0", p2 = "0", p3 = "0", p4 = "0";
+        public String target = "block1", p1 = "0", p2 = "0", p3 = "0", p4 = "0";
 
         @Override
         public void build(Table table){
@@ -333,7 +333,7 @@ public class LStatements{
     public static class RadarStatement extends LStatement{
         public RadarTarget target1 = RadarTarget.enemy, target2 = RadarTarget.any, target3 = RadarTarget.any;
         public RadarSort sort = RadarSort.distance;
-        public String radar = "@0", sortOrder = "0", output = "result";
+        public String radar = "turret1", sortOrder = "0", output = "result";
 
         @Override
         public void build(Table table){
@@ -388,7 +388,7 @@ public class LStatements{
     @RegisterStatement("sensor")
     public static class SensorStatement extends LStatement{
         public String to = "result";
-        public String from = "@0", type = "@copper";
+        public String from = "block1", type = "@copper";
 
         private transient int selected = 0;
         private transient TextField tfield;

@@ -91,7 +91,7 @@ public class LExecutor{
 
     public double num(int index){
         Var v = vars[index];
-        return v.isobj ? 1 : v.numval;
+        return v.isobj ? v.objval != null ? 1 : 0 : v.numval;
     }
 
     public int numi(int index){
@@ -309,6 +309,8 @@ public class LExecutor{
 
         void find(Building b, float range, int sortDir, Team team){
             Units.nearby(team, b.x, b.y, range, u -> {
+                if(!u.within(b, range)) return;
+
                 boolean valid =
                     target1.func.get(b.team, u) &&
                     target2.func.get(b.team, u) &&

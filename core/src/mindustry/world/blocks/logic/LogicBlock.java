@@ -74,7 +74,12 @@ public class LogicBlock extends Block{
         String name = block.name;
         if(name.contains("-")){
             String[] split = name.split("-");
-            name = split[split.length - 1];
+            //filter out 'large' at the end of block names
+            if(split.length >= 2 && split[split.length - 1].equals("large")){
+                name = split[split.length - 2];
+            }else{
+                name = split[split.length - 1];
+            }
         }
         if(block.minfo.mod != null){
             name = name.substring(block.minfo.mod.name.length() + 1);
@@ -139,7 +144,6 @@ public class LogicBlock extends Block{
         public String code = "";
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
-
         public Seq<LogicLink> links = new Seq<>();
 
         public void readCompressed(byte[] data, boolean relative){
