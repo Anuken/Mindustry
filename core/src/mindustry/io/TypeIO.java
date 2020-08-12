@@ -88,6 +88,10 @@ public class TypeIO{
         }else if(object instanceof LAccess){
             write.b((byte)13);
             write.s(((LAccess)object).ordinal());
+        }else if(object instanceof byte[]){
+            write.b((byte)14);
+            write.i(((byte[])object).length);
+            write.b((byte[])object);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -111,6 +115,7 @@ public class TypeIO{
             case 11: return read.d();
             case 12: return world.build(read.i());
             case 13: return LAccess.all[read.s()];
+            case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
