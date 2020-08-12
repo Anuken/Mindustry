@@ -122,6 +122,7 @@ public class LogicBlock extends Block{
                     LAssembler asm = LAssembler.assemble(str, maxInstructions);
 
                     //store connections
+                    asm.putConst("@#", connections.size);
                     for(int i = 0; i < connections.size; i++){
                         asm.putConst("@" + i, world.build(connections.get(i)));
                     }
