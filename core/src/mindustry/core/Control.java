@@ -94,7 +94,6 @@ public class Control implements ApplicationListener, Loadable{
             tutorial.reset();
 
             hiscore = false;
-
             saves.resetSave();
         });
 
