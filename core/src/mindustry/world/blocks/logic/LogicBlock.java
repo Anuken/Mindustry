@@ -1,7 +1,6 @@
 package mindustry.world.blocks.logic;
 
 import arc.func.*;
-import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -38,31 +37,21 @@ public class LogicBlock extends Block{
         config(Integer.class, (LogicBuild entity, Integer pos) -> {
             //if there is no valid link in the first place, nobody cares
             if(!entity.validLink(world.build(pos))) return;
-            int x = Point2.x(pos), y = Point2.y(pos);
             Building lbuild = world.build(pos);
+            int x = lbuild.tileX(), y = lbuild.tileY();
 
             LogicLink link = entity.links.find(l -> l.x == x && l.y == y);
+            String bname = getLinkName(lbuild.block);
 
             if(link != null){
                 link.active = !link.active;
-            }else{
-                String bname = getLinkName(lbuild.block);
-                int maxnum = 0;
-
-                for(LogicLink others : entity.links){
-                    if(others.name.startsWith(bname)){
-
-                        String num = others.name.substring(bname.length());
-                        try{
-                            int parsed = Integer.parseInt(num);
-                            maxnum = Math.max(parsed, maxnum);
-                        }catch(NumberFormatException ignored){
-                            //ignore failed parsing, it isn't relevant
-                        }
-                    }
+                //find a name when the base name differs (new block type)
+                if(!link.name.startsWith(bname)){
+                    link.name = "";
+                    link.name = entity.findLinkName(lbuild.block);
                 }
-
-                LogicLink out = new LogicLink(x, y, bname + (maxnum + 1), true);
+            }else{
+                LogicLink out = new LogicLink(x, y, entity.findLinkName(lbuild.block), true);
                 entity.links.add(out);
             }
 
@@ -121,7 +110,7 @@ public class LogicBlock extends Block{
     }
 
     public static class LogicLink{
-        public boolean active = true, valid = true;
+        public boolean active = true, valid;
         public int x, y;
         public String name;
 
@@ -187,6 +176,37 @@ public class LogicBlock extends Block{
             }
         }
 
+        public String findLinkName(Block block){
+            String bname = getLinkName(block);
+            Bits taken = new Bits(links.size);
+            int max = 1;
+
+            for(LogicLink others : links){
+                if(others.name.startsWith(bname)){
+
+                    String num = others.name.substring(bname.length());
+                    try{
+                        int val = Integer.parseInt(num);
+                        taken.set(val);
+                        max = Math.max(val, max);
+                    }catch(NumberFormatException ignored){
+                        //ignore failed parsing, it isn't relevant
+                    }
+                }
+            }
+
+            int outnum = 0;
+
+            for(int i = 1; i < max + 2; i++){
+                if(!taken.get(i)){
+                    outnum = i;
+                    break;
+                }
+            }
+
+            return bname + outnum;
+        }
+
         public void updateCode(){
             updateCode(code);
         }
@@ -250,6 +270,12 @@ public class LogicBlock extends Block{
                 if(valid != l.valid ){
                     changed = true;
                     l.valid = valid;
+                    if(valid){
+                        //this prevents conflicts
+                        l.name = "";
+                        //finds a new matching name after toggling
+                        l.name = findLinkName(world.build(l.x, l.y).block);
+                    }
                 }
             }
 
@@ -337,7 +363,8 @@ public class LogicBlock extends Block{
         @Override
         public boolean onConfigureTileTapped(Building other){
             if(this == other){
-                return true;
+                deselect();
+                return false;
             }
 
             if(validLink(other)){

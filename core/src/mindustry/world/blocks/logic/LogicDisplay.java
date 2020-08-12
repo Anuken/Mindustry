@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 
 public class LogicDisplay extends Block{
@@ -44,7 +45,7 @@ public class LogicDisplay extends Block{
             if(buffer == null){
                 buffer = new FrameBuffer(displaySize, displaySize);
                 //clear the buffer - some OSs leave garbage in it
-                buffer.begin(Color.clear);
+                buffer.begin(Pal.darkerMetal);
                 buffer.end();
             }
 
