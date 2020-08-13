@@ -583,7 +583,7 @@ public class Schematics implements Loadable{
         int ox = schem.width/2, oy = schem.height/2;
 
         schem.tiles.each(req -> {
-            req.config = BuildPlan.pointConfig(req.config, p -> {
+            req.config = BuildPlan.pointConfig(req.block, req.config, p -> {
                 int cx = p.x, cy = p.y;
                 int lx = cx;
 

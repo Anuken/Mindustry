@@ -53,7 +53,7 @@ public class BuildPlan{
 
     }
 
-    public static Object pointConfig(Object config, Cons<Point2> cons){
+    public static Object pointConfig(Block block, Object config, Cons<Point2> cons){
         if(config instanceof Point2){
             config = ((Point2)config).cpy();
             cons.get((Point2)config);
@@ -65,6 +65,8 @@ public class BuildPlan{
                 cons.get(result[i++]);
             }
             config = result;
+        }else if(block != null){
+            config = block.pointConfig(config, cons);
         }
         return config;
     }
@@ -72,7 +74,7 @@ public class BuildPlan{
     /** If this requests's config is a Point2 or an array of Point2s, this returns a copy of them for transformation.
      * Otherwise does nothing. */
     public void pointConfig(Cons<Point2> cons){
-        this.config = pointConfig(this.config, cons);
+        this.config = pointConfig(block, this.config, cons);
     }
 
     public BuildPlan copy(){

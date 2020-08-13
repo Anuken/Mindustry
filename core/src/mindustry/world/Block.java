@@ -405,6 +405,10 @@ public class Block extends UnlockableContent{
 
     }
 
+    public Object pointConfig(Object config, Cons<Point2> transformer){
+        return config;
+    }
+
     /** Configure when a null value is passed.*/
     public <E extends Building> void configClear(Cons<E> cons){
         configurations.put(void.class, (tile, value) -> cons.get((E)tile));

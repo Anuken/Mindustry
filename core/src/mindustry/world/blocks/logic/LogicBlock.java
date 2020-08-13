@@ -1,7 +1,9 @@
 package mindustry.world.blocks.logic;
 
 import arc.func.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.Bits;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -77,9 +79,11 @@ public class LogicBlock extends Block{
     }
 
     static byte[] compress(String code, Seq<LogicLink> links){
-        try{
-            byte[] bytes = code.getBytes(charset);
+        return compress(code.getBytes(charset), links);
+    }
 
+    static byte[] compress(byte[] bytes, Seq<LogicLink> links){
+        try{
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(baos));
 
@@ -107,6 +111,39 @@ public class LogicBlock extends Block{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Object pointConfig(Object config, Cons<Point2> transformer){
+        if(config instanceof byte[]){
+            byte[] data = (byte[])config;
+
+            try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
+                //discard version for now
+                stream.read();
+
+                int bytelen = stream.readInt();
+                byte[] bytes = new byte[bytelen];
+                stream.read(bytes);
+
+                int total = stream.readInt();
+
+                Seq<LogicLink> links = new Seq<>();
+
+                for(int i = 0; i < total; i++){
+                    String name = stream.readUTF();
+                    short x = stream.readShort(), y = stream.readShort();
+
+                    transformer.get(Tmp.p1.set(x, y));
+                    links.add(new LogicLink(Tmp.p1.x, Tmp.p1.y, name, true));
+                }
+
+                return compress(bytes, links);
+            }catch(IOException e){
+                Log.err(e);
+            }
+        }
+        return config;
     }
 
     public static class LogicLink{
@@ -139,7 +176,6 @@ public class LogicBlock extends Block{
             DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
 
             try{
-                //discard version, there's only one
                 int version = stream.read();
 
                 int bytelen = stream.readInt();
@@ -301,7 +337,7 @@ public class LogicBlock extends Block{
         }
 
         public Seq<LogicLink> relativeConnections(){
-            Seq<LogicLink> copy = new Seq<>(links);
+            Seq<LogicLink> copy = new Seq<>(links.size);
             for(LogicLink l : links){
                 LogicLink c = l.copy();
                 c.x -= tileX();
