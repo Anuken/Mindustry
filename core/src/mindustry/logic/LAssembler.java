@@ -8,6 +8,7 @@ import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.type.*;
+import mindustry.world.blocks.logic.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
@@ -65,7 +66,7 @@ public class LAssembler{
     }
 
     public static Seq<LStatement> read(String data){
-        return read(data, Integer.MAX_VALUE);
+        return read(data, LogicBlock.maxInstructions);
     }
 
     public static Seq<LStatement> read(String data, int max){
@@ -79,7 +80,7 @@ public class LAssembler{
             //comments
             if(line.startsWith("#")) continue;
 
-            if(index++ > max) continue;
+            if(index++ > max) break;
 
             try{
                 //yes, I am aware that this can be split with regex, but that's slow and even more incomprehensible
