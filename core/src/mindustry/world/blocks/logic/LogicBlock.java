@@ -53,6 +53,7 @@ public class LogicBlock extends Block{
                     link.name = entity.findLinkName(lbuild.block);
                 }
             }else{
+                entity.links.remove(l -> world.build(l.x, l.y) == lbuild);
                 LogicLink out = new LogicLink(x, y, entity.findLinkName(lbuild.block), true);
                 entity.links.add(out);
             }
