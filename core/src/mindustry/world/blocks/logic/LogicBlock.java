@@ -262,10 +262,21 @@ public class LogicBlock extends Block{
 
                     //store connections
                     for(LogicLink link : links){
-                        if(link.active && validLink(world.build(link.x, link.y))){
+                        if(link.active && (link.valid = validLink(world.build(link.x, link.y)))){
                             asm.putConst(link.name, world.build(link.x, link.y));
                         }
                     }
+
+                    //store link objects
+                    executor.links = new Building[links.count(l -> l.valid && l.active)];
+                    int index = 0;
+                    for(LogicLink link : links){
+                        if(link.active && link.valid){
+                            executor.links[index ++] = world.build(link.x, link.y);
+                        }
+                    }
+
+                    asm.putConst("@links", executor.links.length);
 
                     //store any older variables
                     for(Var var : executor.vars){

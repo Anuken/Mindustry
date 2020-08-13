@@ -29,6 +29,7 @@ public class LExecutor{
 
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
+    public Building[] links = {};
 
     public boolean initialized(){
         return instructions != null && vars != null && instructions.length > 0;
@@ -157,6 +158,27 @@ public class LExecutor{
             if(obj instanceof Controllable){
                 Controllable cont = (Controllable)obj;
                 cont.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+            }
+        }
+    }
+
+    public static class GetLinkI implements LInstruction{
+        public int output, index;
+
+        public GetLinkI(int output, int index){
+            this.index = index;
+            this.output = output;
+        }
+
+        public GetLinkI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            int address = exec.numi(index);
+
+            if(address >= 0 && address < exec.links.length){
+                exec.setobj(output, exec.links[address]);
             }
         }
     }

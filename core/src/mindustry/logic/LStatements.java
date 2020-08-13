@@ -56,6 +56,30 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("read")
+    public static class GetLinkStatement extends LStatement{
+        public String output = "result", address = "0";
+
+        @Override
+        public void build(Table table){
+            field(table, output, str -> output = str);
+
+            table.add(" = link# ");
+
+            field(table, address, str -> address = str);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new GetLinkI(builder.var(output), builder.var(address));
+        }
+    }
+
     @RegisterStatement("write")
     public static class WriteStatement extends LStatement{
         public String input = "result", target = "cell1", address = "0";
@@ -119,7 +143,6 @@ public class LStatements{
             return new ReadI(builder.var(target), builder.var(address), builder.var(output));
         }
     }
-
 
     @RegisterStatement("draw")
     public static class DrawStatement extends LStatement{
