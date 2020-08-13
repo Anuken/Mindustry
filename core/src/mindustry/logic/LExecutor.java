@@ -562,23 +562,5 @@ public class LExecutor{
         }
     }
 
-    public static class GetBuildI implements LInstruction{
-        public int dest;
-        public int x, y;
-
-        public GetBuildI(int dest, int x, int y){
-            this.dest = dest;
-            this.x = x;
-            this.y = y;
-        }
-
-        GetBuildI(){}
-
-        @Override
-        public void run(LExecutor exec){
-            exec.setobj(dest, Vars.world.build(exec.numi(x), exec.numi(y)));
-        }
-    }
-
     //endregion
 }

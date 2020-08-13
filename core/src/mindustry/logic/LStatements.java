@@ -56,7 +56,7 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("read")
+    @RegisterStatement("getlink")
     public static class GetLinkStatement extends LStatement{
         public String output = "result", address = "0";
 
