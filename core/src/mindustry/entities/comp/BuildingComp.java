@@ -1171,6 +1171,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public double sense(LAccess sensor){
         if(sensor == LAccess.x) return x;
         if(sensor == LAccess.y) return y;
+        if(sensor == LAccess.team) return team.id;
         if(sensor == LAccess.health) return health;
         if(sensor == LAccess.efficiency) return efficiency();
         if(sensor == LAccess.rotation) return rotation;

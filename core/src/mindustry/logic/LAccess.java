@@ -23,10 +23,11 @@ public enum LAccess{
     shootX,
     shootY,
     shooting,
+    team,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
-    shoot("x", "y", "shoot");
+    shoot("x", "y", "shoot"),;
 
     public final String[] parameters;
 

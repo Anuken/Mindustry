@@ -125,7 +125,7 @@ public class LogicBlock extends Block{
 
                 int bytelen = stream.readInt();
                 byte[] bytes = new byte[bytelen];
-                stream.read(bytes);
+                stream.readFully(bytes);
 
                 int total = stream.readInt();
 
@@ -181,7 +181,7 @@ public class LogicBlock extends Block{
 
                 int bytelen = stream.readInt();
                 byte[] bytes = new byte[bytelen];
-                stream.read(bytes);
+                stream.readFully(bytes);
 
                 links.clear();
 
