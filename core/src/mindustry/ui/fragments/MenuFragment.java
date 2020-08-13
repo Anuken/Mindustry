@@ -77,6 +77,7 @@ public class MenuFragment extends Fragment{
 
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
+            TextureRegion errorlogo = Core.atlas.find("error");
             float logoscl = Scl.scl(1);
             float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - Scl.scl(20));
             float logoh = logow * (float)logo.getHeight() / logo.getWidth();
@@ -85,8 +86,11 @@ public class MenuFragment extends Fragment{
             float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
 
             Draw.color();
-            Draw.rect(logo, fx, fy, logow, logoh);
-
+            if(Calendar.get(Calendar.MONTH)==4&&Calendar.get(Calendar.DAY_OF_MONTH)==1){
+                Draw.rect(errorlogo, fx, fy, logow, logoh);
+            } else {
+                Draw.rect(logo, fx, fy, logow, logoh);
+            };
             Fonts.def.setColor(Color.white);
             Fonts.def.draw(versionText, fx, fy - logoh/2f, Align.center);
         }).touchable = Touchable.disabled;
