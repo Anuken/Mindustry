@@ -405,6 +405,7 @@ public class Block extends UnlockableContent{
 
     }
 
+    /** Transforms the internal position of this config using the specified function, and return the result. */
     public Object pointConfig(Object config, Cons<Point2> transformer){
         return config;
     }

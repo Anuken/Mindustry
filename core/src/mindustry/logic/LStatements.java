@@ -646,37 +646,4 @@ public class LStatements{
             return LCategory.control;
         }
     }
-
-    //disabled until further notice - bypasses the network
-    /*
-    @RegisterStatement("getbuild")
-    public static class getBuildStatement extends LStatement{
-        public String x = "0", y = "0", dest = "result";
-
-        @Override
-        public void build(Table table){
-            table.field(dest, Styles.nodeField, str -> dest = str)
-            .size(100f, 40f).pad(2f).color(table.color);
-
-            table.add(" = ");
-
-            table.field(x, Styles.nodeField, str -> x = str)
-            .size(90f, 40f).pad(2f).color(table.color);
-
-            table.add(", ");
-
-            table.field(y, Styles.nodeField, str -> y = str)
-            .size(90f, 40f).pad(2f).color(table.color);
-        }
-
-        @Override
-        public LInstruction build(LAssembler builder){
-            return new GetBuildI(builder.var(dest), builder.var(x), builder.var(y));
-        }
-
-        @Override
-        public LCategory category(){
-            return LCategory.blocks;
-        }
-    }*/
 }

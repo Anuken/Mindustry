@@ -53,6 +53,7 @@ public class BuildPlan{
 
     }
 
+    /** Transforms the internal position of this config using the specified function, and return the result. */
     public static Object pointConfig(Block block, Object config, Cons<Point2> cons){
         if(config instanceof Point2){
             config = ((Point2)config).cpy();
@@ -71,8 +72,7 @@ public class BuildPlan{
         return config;
     }
 
-    /** If this requests's config is a Point2 or an array of Point2s, this returns a copy of them for transformation.
-     * Otherwise does nothing. */
+    /** Transforms the internal position of this config using the specified function. */
     public void pointConfig(Cons<Point2> cons){
         this.config = pointConfig(block, this.config, cons);
     }

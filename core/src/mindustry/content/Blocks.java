@@ -894,10 +894,10 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
             hasShadow = false;
             health = 40;
-            damage = 11;
+            damage = 23;
             tileDamage = 7f;
             length = 10;
-            tendrils = 5;
+            tendrils = 4;
         }};
 
         //endregion
