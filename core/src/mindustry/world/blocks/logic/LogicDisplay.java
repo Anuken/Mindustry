@@ -107,9 +107,8 @@ public class LogicDisplay extends Block{
     static class DisplayCmdStruct{
         public byte type;
 
-        //each coordinate is only 8 bits, limiting size to 256x256
-        //anything larger than that would be excessive anyway
-        @StructField(8)
+        //9 bits are required for full 360 degrees
+        @StructField(9)
         public int x, y, p1, p2, p3, p4;
     }
 }
