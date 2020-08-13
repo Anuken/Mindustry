@@ -714,7 +714,7 @@ public class NetServer implements ApplicationListener{
 
         if(Config.showConnectMessages.bool()){
             Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-            Log.info("&lm[@] &y@ has connected. ", player.uuid(), player.name);
+            Log.info("&lm[@] &y@ has connected.", player.uuid(), player.name);
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
