@@ -3,7 +3,6 @@ package mindustry.logic;
 import arc.*;
 import arc.func.*;
 import arc.scene.ui.TextButton.*;
-import arc.util.*;
 import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
@@ -14,7 +13,7 @@ import static mindustry.Vars.*;
 
 public class LogicDialog extends BaseDialog{
     LCanvas canvas;
-    Cons<String> consumer = s -> Log.info(s);
+    Cons<String> consumer = s -> {};
 
     public LogicDialog(){
         super("logic");
