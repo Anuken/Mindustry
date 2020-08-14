@@ -58,7 +58,6 @@ public class ServerControl implements ApplicationListener{
 
     public ServerControl(String[] args){
         Core.settings.defaults(
-            "shufflemode", "normal",
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
