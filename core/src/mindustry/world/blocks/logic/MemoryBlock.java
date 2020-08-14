@@ -10,6 +10,7 @@ public class MemoryBlock extends Block{
     public MemoryBlock(String name){
         super(name);
         destructible = true;
+        solid = true;
     }
 
     public class MemoryBuild extends Building{
