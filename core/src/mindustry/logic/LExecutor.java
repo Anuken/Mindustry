@@ -501,7 +501,11 @@ public class LExecutor{
             //this should avoid any garbage allocation
             Var v = exec.vars[value];
             if(v.isobj && value != 0){
-                String strValue = v.objval instanceof String ? (String)v.objval : v.objval == null ? "null" : "[object]";
+                String strValue = v.objval instanceof String ? (String)v.objval : v.objval == null ? "null" :
+                    v.objval instanceof Content ? "[content]" :
+                    v.objval instanceof Building ? "[building]" :
+                    v.objval instanceof Unit ? "[unit]" :
+                    "[object]";
 
                 exec.textBuffer.append(strValue);
             }else{

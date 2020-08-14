@@ -33,6 +33,8 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
+
+    if(localArc()) compileOnly fileTree(dir: '../../Arc/backends/backend-android/libs', include: ['*.jar'])
 }
 
 task deploy(type: Copy){

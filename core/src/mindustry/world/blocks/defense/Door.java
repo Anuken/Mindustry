@@ -74,6 +74,12 @@ public class Door extends Wall{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.enabled) return open ? 1 : 0;
+            return super.sense(sensor);
+        }
+
+        @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.enabled){
                 boolean shouldOpen = !Mathf.zero(p1);
