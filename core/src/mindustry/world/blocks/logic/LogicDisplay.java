@@ -30,6 +30,7 @@ public class LogicDisplay extends Block{
     public LogicDisplay(String name){
         super(name);
         update = true;
+        solid = true;
     }
 
     public class LogicDisplayBuild extends Building{

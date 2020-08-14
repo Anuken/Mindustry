@@ -32,6 +32,7 @@ public class LogicBlock extends Block{
     public LogicBlock(String name){
         super(name);
         update = true;
+        solid = true;
         configurable = true;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
