@@ -74,7 +74,7 @@ public class DesktopInput extends InputHandler{
                 Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.table(a -> {
-                    a.button("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                    a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
             }).margin(6f);
         });

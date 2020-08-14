@@ -13,7 +13,7 @@ jobs:
       with:
         java-version: 8
     - name: Run unit tests with gradle and Java 8
-      run: ./gradlew test
+      run: ./gradlew compileJava
       
   buildJava14:
     runs-on: ubuntu-latest
@@ -25,4 +25,4 @@ jobs:
       with:
         java-version: 14
     - name: Run unit tests with gradle and Java 14
-      run: ./gradlew test
+      run: ./gradlew compileJava

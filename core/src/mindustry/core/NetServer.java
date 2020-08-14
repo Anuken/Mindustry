@@ -706,13 +706,15 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
+        player.add();
+
         if(player.con == null || player.con.hasConnected) return;
 
-        player.add();
         player.con.hasConnected = true;
+
         if(Config.showConnectMessages.bool()){
             Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-            Log.info("&lm[@] &y@ has connected. ", player.uuid(), player.name);
+            Log.info("&lm[@] &y@ has connected.", player.uuid(), player.name);
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
@@ -740,7 +742,7 @@ public class NetServer implements ApplicationListener{
 
         if(!headless && !closing && net.server() && state.isMenu()){
             closing = true;
-            ui.loadfrag.show("$server.closing");
+            ui.loadfrag.show("@server.closing");
             Time.runTask(5f, () -> {
                 net.closeServer();
                 ui.loadfrag.hide();
@@ -803,11 +805,11 @@ public class NetServer implements ApplicationListener{
 
     public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
-        Seq<CoreEntity> cores = state.teams.cores(player.team());
+        Seq<CoreBuild> cores = state.teams.cores(player.team());
 
         dataStream.writeByte(cores.size);
 
-        for(CoreEntity entity : cores){
+        for(CoreBuild entity : cores){
             dataStream.writeInt(entity.tile().pos());
             entity.items.write(Writes.get(dataStream));
         }

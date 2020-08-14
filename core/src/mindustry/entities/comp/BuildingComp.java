@@ -18,11 +18,13 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -37,7 +39,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable{
     //region vars and initialization
     static final float timeToSleep = 60f * 1;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -54,6 +56,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient boolean updateFlow;
     transient byte dump;
     transient int rotation;
+    transient boolean enabled = true;
 
     PowerModule power;
     ItemModule items;
@@ -97,7 +100,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
         }
 
-        health(block.health);
+        health = block.health;
         maxHealth(block.health);
         timer(new Interval(block.timers));
 
@@ -141,7 +144,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public final void readBase(Reads read){
         health = read.f();
-        rotation(read.b());
+        rotation = read.b();
         team = Team.get(read.b());
         if(items != null) items.read(read);
         if(power != null) power.read(read);
@@ -294,6 +297,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Base efficiency. If this entity has non-buffered power, returns the power %, otherwise returns 1. */
     public float efficiency(){
+        //disabled -> 0 efficiency
+        if(!enabled) return 0;
         return power != null && (block.consumes.has(ConsumeType.power) && !block.consumes.getPower().buffered) ? power.status : 1f;
     }
 
@@ -324,6 +329,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //endregion
     //region handler methods
+
+    /** This is for logic blocks. */
+    public void handleString(Object value){
+
+    }
 
     public void created(){}
     
@@ -715,11 +725,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void drawStatus(){
-        if(block.consumes.any()){
+        if(block.enableDrawStatus && block.consumes.any()){
             float brcx = tile.drawx() + (block.size * tilesize / 2f) - (tilesize / 2f);
             float brcy = tile.drawy() - (block.size * tilesize / 2f) + (tilesize / 2f);
 
-            Draw.z(Layer.blockOver);
+            Draw.z(Layer.power + 1);
             Draw.color(Pal.gray);
             Fill.square(brcx, brcy, 2.5f, 45);
             Draw.color(cons.status().color);
@@ -879,7 +889,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame);
         if(!floor().solid && !floor().isLiquid){
-            Effects.rubble(x, y, block.size);
+            Effect.rubble(x, y, block.size);
         }
     }
 
@@ -1158,6 +1168,41 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.x) return x;
+        if(sensor == LAccess.y) return y;
+        if(sensor == LAccess.team) return team.id;
+        if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.efficiency) return efficiency();
+        if(sensor == LAccess.rotation) return rotation;
+        if(sensor == LAccess.totalItems && items != null) return items.total();
+        if(sensor == LAccess.totalLiquids && liquids != null) return liquids.total();
+        if(sensor == LAccess.totalPower && power != null && block.consumes.hasPower()) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+        if(sensor == LAccess.itemCapacity) return block.itemCapacity;
+        if(sensor == LAccess.liquidCapacity) return block.liquidCapacity;
+        if(sensor == LAccess.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
+        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getPowerProduced();
+        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getPowerNeeded();
+        if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
+        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getBatteryCapacity();
+        return 0;
+    }
+
+    @Override
+    public double sense(Content content){
+        if(content instanceof Item && items != null) return items.get((Item)content);
+        if(content instanceof Liquid && liquids != null) return liquids.get((Liquid)content);
+        return 0;
+    }
+
+    @Override
+    public void control(LAccess type, double p1, double p2, double p3, double p4){
+        if(type == LAccess.enabled){
+            enabled = !Mathf.zero((float)p1);
+        }
+    }
+
+    @Override
     public void remove(){
         if(sound != null){
             sound.stop();
@@ -1189,7 +1234,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             loops.play(block.idleSound, base(), block.idleSoundVolume);
         }
 
-        updateTile();
+        if(enabled || !block.noUpdateDisabled){
+            updateTile();
+        }
 
         if(items != null){
             items.update(updateFlow);

@@ -10,7 +10,7 @@ public class LegacyCommandCenter extends LegacyBlock{
         update = true;
     }
 
-    public class LegacyCommandCenterEntity extends Building{
+    public class LegacyCommandCenterBuild extends Building{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);

@@ -70,7 +70,6 @@ public class Weathers implements ContentList{
             }
         };
 
-        //TODO should apply wet effect
         rain = new Weather("rain"){
             float yspeed = 5f, xspeed = 1.5f, padding = 16f, size = 40f, density = 1200f;
             TextureRegion[] splashes = new TextureRegion[12];
@@ -78,6 +77,7 @@ public class Weathers implements ContentList{
             {
                 attrs.set(Attribute.light, -0.2f);
                 attrs.set(Attribute.water, 0.2f);
+                status = StatusEffects.wet;
             }
 
             @Override

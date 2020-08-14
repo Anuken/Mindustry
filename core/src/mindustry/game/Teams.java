@@ -21,15 +21,15 @@ public class Teams{
         active.add(get(Team.crux));
     }
 
-    public @Nullable CoreEntity closestEnemyCore(float x, float y, Team team){
+    public @Nullable CoreBuild closestEnemyCore(float x, float y, Team team){
         for(Team enemy : team.enemies()){
-            CoreEntity tile = Geometry.findClosest(x, y, enemy.cores());
+            CoreBuild tile = Geometry.findClosest(x, y, enemy.cores());
             if(tile != null) return tile;
         }
         return null;
     }
 
-    public @Nullable CoreEntity closestCore(float x, float y, Team team){
+    public @Nullable CoreBuild closestCore(float x, float y, Team team){
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
@@ -37,10 +37,10 @@ public class Teams{
         return get(team).enemies;
     }
 
-    public boolean eachEnemyCore(Team team, Boolf<CoreEntity> ret){
+    public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
         for(TeamData data : active){
             if(areEnemies(team, data.team)){
-                for(CoreEntity tile : data.cores){
+                for(CoreBuild tile : data.cores){
                     if(ret.get(tile)){
                         return true;
                     }
@@ -68,12 +68,12 @@ public class Teams{
         return map[team.id];
     }
 
-    public Seq<CoreEntity> playerCores(){
+    public Seq<CoreBuild> playerCores(){
         return get(state.rules.defaultTeam).cores;
     }
 
     /** Do not modify! */
-    public Seq<CoreEntity> cores(Team team){
+    public Seq<CoreBuild> cores(Team team){
         return get(team).cores;
     }
 
@@ -98,7 +98,7 @@ public class Teams{
         return active;
     }
 
-    public void registerCore(CoreEntity core){
+    public void registerCore(CoreBuild core){
         TeamData data = get(core.team());
         //add core if not present
         if(!data.cores.contains(core)){
@@ -113,7 +113,7 @@ public class Teams{
         }
     }
 
-    public void unregisterCore(CoreEntity entity){
+    public void unregisterCore(CoreBuild entity){
         TeamData data = get(entity.team());
         //remove core
         data.cores.remove(entity);
@@ -143,7 +143,7 @@ public class Teams{
     }
 
     public class TeamData{
-        public final Seq<CoreEntity> cores = new Seq<>();
+        public final Seq<CoreBuild> cores = new Seq<>();
         public final Team team;
         public final BaseAI ai;
         public Team[] enemies = {};
@@ -166,7 +166,7 @@ public class Teams{
             return cores.isEmpty();
         }
 
-        public @Nullable CoreEntity core(){
+        public @Nullable CoreBuild core(){
             return cores.isEmpty() ? null : cores.first();
         }
 

@@ -100,7 +100,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
                     //shake when legs contact ground
                     if(type.landShake > 0){
-                        Effects.shake(type.landShake, type.landShake, l.base);
+                        Effect.shake(type.landShake, type.landShake, l.base);
                     }
 
                     if(type.legSplashDamage > 0){

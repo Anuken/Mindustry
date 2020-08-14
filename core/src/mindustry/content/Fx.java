@@ -102,7 +102,7 @@ public class Fx{
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)
         .add(Tmp.v2.sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * e.fslope() * 10f));
         float x = Tmp.v1.x, y = Tmp.v1.y;
-        float size = Math.min(0.8f + e.rotation / 5f, 2);
+        float size = 1f;
 
         stroke(e.fslope() * 2f * size, Pal.accent);
         Lines.circle(x, y, e.fslope() * 2f * size);
@@ -654,13 +654,11 @@ public class Fx{
 
     }),
 
-    wet = new Effect(40f, e -> {
+    wet = new Effect(80f, e -> {
         color(Liquids.water.color);
+        alpha(Mathf.clamp(e.fin() * 2f));
 
-        randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
-        });
-
+        Fill.circle(e.x, e.y, e.fout() * 1f);
     }),
 
     sapped = new Effect(40f, e -> {

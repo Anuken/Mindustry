@@ -45,7 +45,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             if(accepted > 0){
                 Call.transferItemTo(item(), accepted,
                 mineTile.worldx() + Mathf.range(tilesize / 2f),
-                mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile());
+                mineTile.worldy() + Mathf.range(tilesize / 2f), core);
                 clearItem();
             }
         }
@@ -66,7 +66,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
                 if(within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
                     Call.transferItemTo(item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
-                    mineTile.worldy() + Mathf.range(tilesize / 2f), core.tile());
+                    mineTile.worldy() + Mathf.range(tilesize / 2f), core);
                 }else if(acceptsItem(item)){
                     //this is clientside, since items are synced anyway
                     InputHandler.transferItemToUnit(item,

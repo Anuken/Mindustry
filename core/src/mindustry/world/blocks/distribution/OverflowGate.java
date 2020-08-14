@@ -30,10 +30,10 @@ public class OverflowGate extends Block{
         return true;
     }
 
-    public class OverflowGateEntity extends Building{
-        Item lastItem;
-        Tile lastInput;
-        float time;
+    public class OverflowGateBuild extends Building{
+        public Item lastItem;
+        public Tile lastInput;
+        public float time;
 
         @Override
         public int acceptStack(Item item, int amount, Teamc source){

@@ -3,6 +3,7 @@ package mindustry.io;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import arc.util.pooling.*;
 import mindustry.ai.types.*;
@@ -10,10 +11,12 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
@@ -46,7 +49,6 @@ public class TypeIO{
         }else if(object instanceof String){
             write.b((byte)4);
             writeString(write, (String)object);
-            writeString(write, (String)object);
         }else if(object instanceof Content){
             Content map = (Content)object;
             write.b((byte)5);
@@ -77,11 +79,25 @@ public class TypeIO{
         }else if(object instanceof Boolean){
             write.b((byte)10);
             write.bool((Boolean)object);
+        }else if(object instanceof Double){
+            write.b((byte)11);
+            write.d((Double)object);
+        }else if(object instanceof Building){
+            write.b((byte)12);
+            write.i(((Building)object).pos());
+        }else if(object instanceof LAccess){
+            write.b((byte)13);
+            write.s(((LAccess)object).ordinal());
+        }else if(object instanceof byte[]){
+            write.b((byte)14);
+            write.i(((byte[])object).length);
+            write.b((byte[])object);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
     }
 
+    @Nullable
     public static Object readObject(Reads read){
         byte type = read.b();
         switch(type){
@@ -96,6 +112,10 @@ public class TypeIO{
             case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
             case 9: return TechTree.getNotNull(content.getByID(ContentType.all[read.b()], read.s()));
             case 10: return read.bool();
+            case 11: return read.d();
+            case 12: return world.build(read.i());
+            case 13: return LAccess.all[read.s()];
+            case 14: int blen = read.i(); byte[] bytes = new byte[blen]; read.b(bytes); return bytes;
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
@@ -287,7 +307,7 @@ public class TypeIO{
             //make sure player exists
             if(player == null) return prev;
             return player;
-        }else if(type == 1){
+        }else if(type == 1){ //formation controller
             int id = read.i();
             return prev instanceof FormationAI ? prev : new FormationAI(Groups.unit.getByID(id), null);
         }else{
@@ -384,12 +404,20 @@ public class TypeIO{
         return AdminAction.values()[read.b()];
     }
 
-    public static void writeUnitDef(Writes write, UnitType effect){
+    public static void writeUnitType(Writes write, UnitType effect){
         write.s(effect.id);
     }
 
-    public static UnitType readUnitDef(Reads read){
+    public static UnitType readUnitType(Reads read){
         return content.getByID(ContentType.unit, read.s());
+    }
+
+    public static void writeEffect(Writes write, Effect effect){
+        write.s(effect.id);
+    }
+
+    public static Effect readEffect(Reads read){
+        return Effect.get(read.us());
     }
 
     public static void writeColor(Writes write, Color color){

@@ -70,7 +70,7 @@ public class Net{
             }
 
             if(isError){
-                ui.showException("$error.any", e);
+                ui.showException("@error.any", e);
             }else{
                 ui.showText("", Core.bundle.format("connectfail", error));
             }
@@ -152,6 +152,7 @@ public class Net{
     }
 
     public void disconnect(){
+        Log.info("Disconnecting.");
         provider.disconnectClient();
         server = false;
         active = false;

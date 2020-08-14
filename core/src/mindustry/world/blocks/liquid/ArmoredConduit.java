@@ -19,7 +19,7 @@ public class ArmoredConduit extends Conduit{
         return otherblock.outputsLiquid && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
-    public class ArmoredConduitEntity extends ConduitEntity{
+    public class ArmoredConduitBuild extends ConduitBuild{
         @Override
         public void draw(){
             super.draw();

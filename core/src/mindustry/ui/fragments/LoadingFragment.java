@@ -24,16 +24,16 @@ public class LoadingFragment extends Fragment{
             t.add().height(133f).row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
-            nameLabel = t.add("$loading").pad(10f).style(Styles.techLabel).get();
+            nameLabel = t.add("@loading").pad(10f).style(Styles.techLabel).get();
             t.row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
 
-            text("$loading");
+            text("@loading");
 
             bar = t.add(new Bar()).pad(3).size(500f, 40f).visible(false).get();
             t.row();
-            button = t.button("$cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            button = t.button("@cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
             table = t;
         });
     }
@@ -56,7 +56,7 @@ public class LoadingFragment extends Fragment{
     }
 
     public void show(){
-        show("$loading");
+        show("@loading");
     }
 
     public void show(String text){

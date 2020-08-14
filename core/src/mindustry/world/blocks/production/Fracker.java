@@ -33,7 +33,7 @@ public class Fracker extends SolidPump{
         return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
-    public class FrackerEntity extends SolidPumpEntity{
+    public class FrackerBuild extends SolidPumpBuild{
         public float accumulator;
 
         @Override

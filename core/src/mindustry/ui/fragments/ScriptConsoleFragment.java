@@ -115,7 +115,7 @@ public class ScriptConsoleFragment extends Table{
         Draw.color(shadowColor);
 
         if(open){
-            Fill.crect(offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            Fill.crect(offsetx, chatfield.y, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();

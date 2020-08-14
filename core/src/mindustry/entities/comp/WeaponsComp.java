@@ -24,7 +24,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
 
     /** weapon mount array, never null */
     @SyncLocal WeaponMount[] mounts = {};
-    @ReadOnly transient float range, aimX, aimY;
+    @ReadOnly transient float aimX, aimY;
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
     float ammo;
@@ -35,16 +35,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         }
     }
 
-    boolean inRange(Position other){
-        return within(other, range);
-    }
-
     void setupWeapons(UnitType def){
         mounts = new WeaponMount[def.weapons.size];
-        range = def.range;
         for(int i = 0; i < mounts.length; i++){
             mounts[i] = new WeaponMount(def.weapons.get(i));
-            range = Math.max(range, def.weapons.get(i).bullet.range());
         }
     }
 
@@ -103,7 +97,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
 
                 mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation;
                 mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
-            }else{
+            }else if(!weapon.rotate){
                 mount.rotation = 0;
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
@@ -162,7 +156,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         }
         boolean parentize = ammo.keepVelocity;
 
-        Effects.shake(weapon.shake, weapon.shake, x, y);
+        Effect.shake(weapon.shake, weapon.shake, x, y);
         weapon.ejectEffect.at(x, y, rotation * side);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);

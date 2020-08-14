@@ -43,8 +43,8 @@ public class Reconstructor extends UnitBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (ReconstructorEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
-        bars.add("units", (ReconstructorEntity e) ->
+        bars.add("progress", (ReconstructorBuild entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        bars.add("units", (ReconstructorBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",
@@ -77,7 +77,7 @@ public class Reconstructor extends UnitBlock{
         super.init();
     }
 
-    public class ReconstructorEntity extends UnitBlockEntity{
+    public class ReconstructorBuild extends UnitBuild{
 
         public float fraction(){
             return progress / constructTime;
@@ -146,7 +146,7 @@ public class Reconstructor extends UnitBlock{
                         if(progress >= constructTime){
                             payload.unit = upgrade(payload.unit.type()).create(payload.unit.team());
                             progress = 0;
-                            Effects.shake(2f, 3f, this);
+                            Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
                             consume();
                         }

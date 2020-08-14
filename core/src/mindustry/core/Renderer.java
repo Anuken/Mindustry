@@ -138,7 +138,7 @@ public class Renderer implements ApplicationListener{
         }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
-            ui.showErrorMessage("$error.bloom");
+            ui.showErrorMessage("@error.bloom");
         }
     }
 
@@ -318,7 +318,7 @@ public class Renderer implements ApplicationListener{
         int memory = w * h * 4 / 1024 / 1024;
 
         if(memory >= 65){
-            ui.showInfo("$screenshot.invalid");
+            ui.showInfo("@screenshot.invalid");
             return;
         }
 

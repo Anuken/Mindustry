@@ -37,7 +37,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private int launchRange;
     private float zoom = 1f, selectAlpha = 1f;
     private @Nullable Sector selected, hovered, launchSector;
-    private CoreEntity launcher;
+    private CoreBuild launcher;
     private Mode mode = look;
     private boolean launching;
 
@@ -93,7 +93,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         return super.show();
     }
 
-    public void show(Sector sector, CoreEntity launcher){
+    public void show(Sector sector, CoreBuild launcher){
         this.launcher = launcher;
         selected = null;
         hovered = null;

@@ -112,7 +112,7 @@ public class ResearchDialog extends BaseDialog{
 
         addCloseButton();
 
-        buttons.button("$database", Icon.book, () -> {
+        buttons.button("@database", Icon.book, () -> {
             hide();
             ui.database.show();
         }).size(210f, 64f);
@@ -451,7 +451,7 @@ public class ResearchDialog extends BaseDialog{
                 }
             });
 
-            infoTable.update(() -> infoTable.setPosition(button.getX() + button.getWidth(), button.getY() + button.getHeight(), Align.topLeft));
+            infoTable.update(() -> infoTable.setPosition(button.x + button.getWidth(), button.y + button.getHeight(), Align.topLeft));
 
             infoTable.left();
             infoTable.background(Tex.button).margin(8f);
@@ -531,7 +531,7 @@ public class ResearchDialog extends BaseDialog{
                                 }
                             }else if(node.objectives.size > 0){
                                 t.table(r -> {
-                                    r.add("$complete").colspan(2).left();
+                                    r.add("@complete").colspan(2).left();
                                     r.row();
                                     for(Objective o : node.objectives){
                                         if(o.complete()) continue;
@@ -545,13 +545,13 @@ public class ResearchDialog extends BaseDialog{
                             }
                         });
                     }else{
-                        desc.add("$completed");
+                        desc.add("@completed");
                     }
                 }).pad(9);
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.button("$research", Icon.ok, Styles.nodet, () -> spend(node))
+                    b.button("@research", Icon.ok, Styles.nodet, () -> spend(node))
                     .disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
             });

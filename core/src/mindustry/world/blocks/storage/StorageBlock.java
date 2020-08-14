@@ -41,7 +41,7 @@ public abstract class StorageBlock extends Block{
         ));
     }
 
-    public class StorageBlockEntity extends Building{
+    public class StorageBuild extends Building{
         protected @Nullable Building linkedCore;
 
         @Override

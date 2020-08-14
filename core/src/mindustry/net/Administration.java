@@ -85,9 +85,9 @@ public class Administration{
                     return true;
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
-                        player.kick("You are interacting with too many blocks.", 1000 * 30);
+                        action.player.kick("You are interacting with too many blocks.", 1000 * 30);
                     }else{
-                        player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
+                        action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
                     }
 
                     return false;

@@ -24,8 +24,8 @@ public class ItemSource extends Block{
         configurable = true;
         saveConfig = true;
 
-        config(Item.class, (ItemSourceEntity tile, Item item) -> tile.outputItem = item);
-        configClear((ItemSourceEntity tile) -> tile.outputItem = null);
+        config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
+        configClear((ItemSourceBuild tile) -> tile.outputItem = null);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ItemSource extends Block{
         return true;
     }
 
-    public class ItemSourceEntity extends Building{
+    public class ItemSourceBuild extends Building{
         Item outputItem;
 
         @Override

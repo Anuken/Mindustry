@@ -47,8 +47,9 @@ public class StatusEffects implements ContentList{
 
         wet = new StatusEffect("wet"){{
             color = Color.royal;
-            speedMultiplier = 0.9f;
+            speedMultiplier = 0.94f;
             effect = Fx.wet;
+            effectChance = 0.09f;
 
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {

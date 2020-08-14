@@ -40,7 +40,7 @@ public class AttributeSmelter extends GenericSmelter{
         stats.add(BlockStat.affinities, attribute, boostScale);
     }
 
-    public class AttributeSmelterEntity extends SmelterEntity{
+    public class AttributeSmelterBuild extends SmelterBuild{
         public float attrsum;
 
         @Override

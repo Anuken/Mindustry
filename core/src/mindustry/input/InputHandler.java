@@ -86,12 +86,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
-        if(tile == null || tile.build == null || tile.build.items == null) return;
+    public static void transferItemTo(Item item, int amount, float x, float y, Building build){
+        if(build == null || build.items == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, tile, () -> {}));
+            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
-        tile.build.items.add(item, amount);
+        build.items.add(item, amount);
     }
 
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
@@ -227,7 +227,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitControl(Player player, @Nullable Unit unit){
         //clear player unit when they possess a core
-        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreEntity)){
+        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreBuild)){
             Fx.spawn.at(player);
             player.clearUnit();
             player.deathTimer(60f); //for instant respawn
@@ -262,7 +262,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(commander.isCommanding()){
             commander.clearCommand();
         }else{
-            FormationPattern pattern = new SquareFormation();
+            SquareFormation pattern = new SquareFormation();
             Formation formation = new Formation(new Vec3(player.x, player.y, player.unit().rotation), pattern);
             formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
 
@@ -277,6 +277,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             units.sort(u -> u.dst2(player.unit()));
             units.truncate(player.unit().type().commandLimit);
+
+            if(units.any()) pattern.spacing = units.max(u -> u.hitSize).hitSize * 2f;
 
             commander.command(formation, units);
         }
@@ -396,18 +398,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
 
-        ui.showTextInput("$schematic.add", "$name", "", text -> {
+        ui.showTextInput("@schematic.add", "@name", "", text -> {
             Schematic replacement = schematics.all().find(s -> s.name().equals(text));
             if(replacement != null){
-                ui.showConfirm("$confirm", "$schematic.replace", () -> {
+                ui.showConfirm("@confirm", "@schematic.replace", () -> {
                     schematics.overwrite(replacement, lastSchematic);
-                    ui.showInfoFade("$schematic.saved");
+                    ui.showInfoFade("@schematic.saved");
                     ui.schematics.showInfo(replacement);
                 });
             }else{
                 lastSchematic.tags.put("name", text);
                 schematics.add(lastSchematic);
-                ui.showInfoFade("$schematic.saved");
+                ui.showInfoFade("@schematic.saved");
                 ui.schematics.showInfo(lastSchematic);
             }
         });

@@ -92,6 +92,10 @@ public class Block extends UnlockableContent{
     public boolean squareSprite = true;
     /** whether this block absorbs laser attacks. */
     public boolean absorbLasers = false;
+    /** if false, the status is never drawn */
+    public boolean enableDrawStatus = true;
+    /** if true, the block stops updating when disabled */
+    public boolean noUpdateDisabled = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -265,7 +269,8 @@ public class Block extends UnlockableContent{
         return width;
     }
 
-    public float sumAttribute(Attribute attr, int x, int y){
+    public float sumAttribute(@Nullable Attribute attr, int x, int y){
+        if(attr == null) return 0;
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
@@ -398,6 +403,11 @@ public class Block extends UnlockableContent{
 
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
 
+    }
+
+    /** Transforms the internal position of this config using the specified function, and return the result. */
+    public Object pointConfig(Object config, Cons<Point2> transformer){
+        return config;
     }
 
     /** Configure when a null value is passed.*/

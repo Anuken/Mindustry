@@ -18,7 +18,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
         group = BlockGroup.liquids;
     }
 
-    public class LiquidExtendingBridgeEntity extends ExtendingItemBridgeEntity{
+    public class LiquidExtendingBridgeBuild extends ExtendingItemBridgeBuild{
         @Override
         public void updateTile(){
             time += cycleSpeed * delta();
@@ -30,7 +30,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
             if(other == null || !linkValid(tile, other.tile())){
                 dumpLiquid(liquids.current());
             }else{
-                ((ItemBridgeEntity)other).incoming.add(tile.pos());
+                ((ItemBridgeBuild)other).incoming.add(tile.pos());
 
                 if(consValid()){
                     uptime = Mathf.lerpDelta(uptime, 1f, 0.04f);

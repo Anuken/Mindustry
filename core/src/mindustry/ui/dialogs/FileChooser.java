@@ -57,7 +57,7 @@ public class FileChooser extends BaseDialog{
         if(!open) filefield.addInputDialog();
         filefield.setDisabled(open);
 
-        ok = new TextButton(open ? "$load" : "$save");
+        ok = new TextButton(open ? "@load" : "@save");
 
         ok.clicked(() -> {
             if(ok.isDisabled()) return;
@@ -72,7 +72,7 @@ public class FileChooser extends BaseDialog{
 
         filefield.change();
 
-        TextButton cancel = new TextButton("$cancel");
+        TextButton cancel = new TextButton("@cancel");
         cancel.clicked(this::hide);
 
         navigation = new TextField("");
@@ -119,7 +119,7 @@ public class FileChooser extends BaseDialog{
         icontable.add(up);
 
         Table fieldcontent = new Table();
-        fieldcontent.bottom().left().add(new Label("$filename"));
+        fieldcontent.bottom().left().add(new Label("@filename"));
         fieldcontent.add(filefield).height(40f).fillX().expandX().padLeft(10f);
 
         Table buttons = new Table();

@@ -142,7 +142,7 @@ public abstract class BulletType extends Content{
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
-        Effects.shake(hitShake, hitShake, b);
+        Effect.shake(hitShake, hitShake, b);
 
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){

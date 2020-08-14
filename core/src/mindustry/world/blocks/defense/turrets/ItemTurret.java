@@ -43,7 +43,7 @@ public class ItemTurret extends Turret{
             public void build(Building tile, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
-                    () -> tile != null && !((ItemTurretEntity)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretEntity)tile).ammo.peek()).item == item)));
+                    () -> tile != null && !((ItemTurretBuild)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretBuild)tile).ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
@@ -51,7 +51,7 @@ public class ItemTurret extends Turret{
             @Override
             public boolean valid(Building entity){
                 //valid when there's any ammo in the turret
-                return !((ItemTurretEntity)entity).ammo.isEmpty();
+                return !((ItemTurretBuild)entity).ammo.isEmpty();
             }
 
             @Override
@@ -61,7 +61,7 @@ public class ItemTurret extends Turret{
         });
     }
 
-    public class ItemTurretEntity extends TurretEntity{
+    public class ItemTurretBuild extends TurretBuild{
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();

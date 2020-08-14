@@ -17,12 +17,13 @@ public class Router extends Block{
         itemCapacity = 1;
         group = BlockGroup.transportation;
         unloadable = false;
+        noUpdateDisabled = true;
     }
 
-    public class RouterEntity extends Building{
-        Item lastItem;
-        Tile lastInput;
-        float time;
+    public class RouterBuild extends Building{
+        public Item lastItem;
+        public Tile lastInput;
+        public float time;
 
         @Override
         public void updateTile(){
@@ -70,7 +71,7 @@ public class Router extends Block{
             return result;
         }
 
-        Building getTileTarget(Item item, Tile from, boolean set){
+        public Building getTileTarget(Item item, Tile from, boolean set){
             int counter = rotation;
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
