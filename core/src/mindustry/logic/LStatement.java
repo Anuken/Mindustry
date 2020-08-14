@@ -48,6 +48,12 @@ public abstract class LStatement{
         field(table, value, setter).width(85f);
     }
 
+    protected void row(Table table){
+        if(LCanvas.useRows()){
+            table.row();
+        }
+    }
+
     protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
         showSelectTable(b, (t, hide) -> {
             ButtonGroup<Button> group = new ButtonGroup<>();

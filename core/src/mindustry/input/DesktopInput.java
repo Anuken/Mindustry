@@ -197,7 +197,7 @@ public class DesktopInput extends InputHandler{
             Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
         }
 
-        shouldShoot = true;
+        shouldShoot = !scene.hasMouse();
 
         if(!scene.hasMouse()){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){

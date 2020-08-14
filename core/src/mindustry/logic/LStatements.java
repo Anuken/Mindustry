@@ -94,7 +94,7 @@ public class LStatements{
 
             fields(table, target, str -> target = str);
 
-            table.row();
+            row(table);
 
             table.add(" at ");
 
@@ -126,7 +126,7 @@ public class LStatements{
 
             fields(table, target, str -> target = str);
 
-            table.row();
+            row(table);
 
             table.add(" at ");
 
@@ -168,7 +168,7 @@ public class LStatements{
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
             if(type != GraphicsType.stroke){
-                table.row();
+                row(table);
             }
 
             table.table(s -> {
@@ -189,7 +189,7 @@ public class LStatements{
                     case line:
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
-                        s.row();
+                        row(s);
                         fields(s, "x2", p1, v -> p1 = v);
                         fields(s, "y2", p2, v -> p2 = v);
                         break;
@@ -197,7 +197,7 @@ public class LStatements{
                     case lineRect:
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
-                        s.row();
+                        row(s);
                         fields(s, "width", p1, v -> p1 = v);
                         fields(s, "height", p2, v -> p2 = v);
                         break;
@@ -205,19 +205,19 @@ public class LStatements{
                     case linePoly:
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
-                        s.row();
+                        row(s);
                         fields(s, "sides", p1, v -> p1 = v);
                         fields(s, "radius", p2, v -> p2 = v);
-                        s.row();
+                        row(s);
                         fields(s, "rotation", p3, v -> p3 = v);
                         break;
                     case triangle:
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
-                        s.row();
+                        row(s);
                         fields(s, "x2", p1, v -> p1 = v);
                         fields(s, "y2", p2, v -> p2 = v);
-                        s.row();
+                        row(s);
                         fields(s, "x3", p3, v -> p3 = v);
                         fields(s, "y3", p4, v -> p4 = v);
                         break;
@@ -328,7 +328,7 @@ public class LStatements{
 
             field(table, target, v -> target = v);
 
-            table.row();
+            row(table);
 
             //Q: why don't you just use arrays for this?
             //A: arrays aren't as easy to serialize so the code generator doesn't handle them
@@ -337,7 +337,7 @@ public class LStatements{
 
                 fields(table, type.parameters[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
 
-                if(++c % 2 == 0) table.row();
+                if(++c % 2 == 0) row(table);
             }
         }
 
@@ -366,7 +366,7 @@ public class LStatements{
 
             fields(table, radar, v -> radar = v);
 
-            table.row();
+            row(table);
 
             for(int i = 0; i < 3; i++){
                 int fi = i;
@@ -382,7 +382,7 @@ public class LStatements{
                 }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
                 if(i == 1){
-                    table.row();
+                    row(table);
                 }
             }
 
@@ -390,7 +390,7 @@ public class LStatements{
 
             fields(table, sortOrder, v -> sortOrder = v);
 
-            table.row();
+            row(table);
 
             table.add(" output ");
 
@@ -422,7 +422,7 @@ public class LStatements{
 
             table.add(" = ");
 
-            table.row();
+            row(table);
 
             tfield = field(table, type, str -> type = str).padRight(0f).get();
 
@@ -547,7 +547,7 @@ public class LStatements{
 
             table.add(" = ");
 
-            table.row();
+            row(table);
 
             field(table, a, str -> a = str);
 

@@ -16,9 +16,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
-import mindustry.ui.dialogs.*;
 import mindustry.world.blocks.logic.*;
 
 public class LCanvas extends Table{
@@ -26,38 +24,46 @@ public class LCanvas extends Table{
     private static Seq<Runnable> postDraw = new Seq<>();
     private Vec2 offset = new Vec2();
 
-    private DragLayout statements;
-    private StatementElem dragging;
+    DragLayout statements;
+    StatementElem dragging;
+    ScrollPane pane;
+    float targetWidth;
 
     public LCanvas(){
-        //left();
+        rebuild();
+    }
+
+    /** @return if statement elements should have rows. */
+    public static boolean useRows(){
+        return Core.graphics.getWidth() < Scl.scl(900f) * 1.2f;
+    }
+
+    public void rebuild(){
+        targetWidth = useRows() ? 400f : 900f;
+        float s = pane != null ? pane.getScrollPercentY() : 0f;
+        String toLoad = statements != null ? save() : null;
+
+        clear();
 
         statements = new DragLayout();
 
-        ScrollPane pane = pane(statements).grow().get();
+        pane = pane(t -> {
+            t.center();
+            t.add(statements).pad(2f).center().width(targetWidth);
+        }).grow().get();
         pane.setClip(false);
         pane.setFlickScroll(false);
 
-        row();
+        //load old scroll percent
+        Core.app.post(() -> {
+            pane.setScrollPercentY(s);
+            pane.updateVisualScroll();
+            pane.requestScroll();
+        });
 
-        button("@add", Icon.add, Styles.cleart, () -> {
-            BaseDialog dialog = new BaseDialog("@add");
-            dialog.cont.pane(t -> {
-                t.background(Tex.button);
-                int i = 0;
-                for(Prov<LStatement> prov : LogicIO.allStatements){
-                    LStatement example = prov.get();
-                    if(example instanceof InvalidStatement) continue;
-                    t.button(example.name(), Styles.cleart, () -> {
-                        add(prov.get());
-                        dialog.hide();
-                    }).size(140f, 50f);
-                    if(++i % 2 == 0) t.row();
-                }
-            });
-            dialog.addCloseButton();
-            dialog.show();
-        }).height(50f).left().width(400f).marginLeft(10f).disabled(t -> statements.getChildren().size >= LogicBlock.maxInstructions);
+        if(toLoad != null){
+            load(toLoad);
+        }
     }
 
     private void drawGrid(){
@@ -120,7 +126,6 @@ public class LCanvas extends Table{
     }
 
     public class DragLayout extends WidgetGroup{
-        float margin = Scl.scl(4f);
         float space = Scl.scl(10f), prefWidth, prefHeight;
         Seq<Element> seq = new Seq<>();
         int insertPosition = 0;
@@ -134,10 +139,10 @@ public class LCanvas extends Table{
             float cy = 0;
             seq.clear();
 
-            float totalHeight = getChildren().sumf(e -> e.getHeight() + space) + margin*2f;
+            float totalHeight = getChildren().sumf(e -> e.getHeight() + space);
 
             height = prefHeight = totalHeight;
-            width = prefWidth = Scl.scl(400f);
+            width = prefWidth = Scl.scl(targetWidth);
 
             //layout everything normally
             for(int i = 0; i < getChildren().size; i++){
@@ -146,8 +151,8 @@ public class LCanvas extends Table{
                 //ignore the dragged element
                 if(dragging == e) continue;
 
-                e.setSize(width - margin * 2f, e.getPrefHeight());
-                e.setPosition(x + margin, height- margin - cy, Align.topLeft);
+                e.setSize(width, e.getPrefHeight());
+                e.setPosition(0, height - cy, Align.topLeft);
 
                 cy += e.getPrefHeight() + space;
                 seq.add(e);
@@ -197,10 +202,10 @@ public class LCanvas extends Table{
             //draw selection box indicating placement position
             if(dragging != null && insertPosition <= seq.size){
                 float shiftAmount = dragging.getHeight();
-                float lastX = x + margin;
-                float lastY = insertPosition == 0 ? height + y - margin : seq.get(insertPosition - 1).y + y - space;
+                float lastX = x;
+                float lastY = insertPosition == 0 ? height + y : seq.get(insertPosition - 1).y + y - space;
 
-                Tex.pane.draw(lastX, lastY - shiftAmount, width - margin*2f, dragging.getHeight());
+                Tex.pane.draw(lastX, lastY - shiftAmount, width, dragging.getHeight());
             }
 
             super.draw();
@@ -253,6 +258,10 @@ public class LCanvas extends Table{
 
                 t.add(st.name()).style(Styles.outlineLabel).color(color).padRight(8);
                 t.add().growX();
+
+                t.button(Icon.copy, Styles.logici, () -> {
+                }).padRight(6).get().tapped(() -> copy());
+
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
                     dragging = null;
@@ -266,15 +275,7 @@ public class LCanvas extends Table{
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
 
                         if(button == KeyCode.mouseMiddle){
-                            LStatement copy = st.copy();
-                            if(copy != null){
-                                StatementElem s = new StatementElem(copy);
-
-                                statements.addChildAfter(StatementElem.this,s);
-                                statements.layout();
-                                copy.elem = s;
-                                copy.setupUI();
-                            }
+                            copy();
                             return false;
                         }
 
@@ -315,6 +316,18 @@ public class LCanvas extends Table{
             }).pad(4).padTop(2).left().grow();
 
             marginBottom(7);
+        }
+
+        void copy(){
+            LStatement copy = st.copy();
+            if(copy != null){
+                StatementElem s = new StatementElem(copy);
+
+                statements.addChildAfter(StatementElem.this,s);
+                statements.layout();
+                copy.elem = s;
+                copy.setupUI();
+            }
         }
 
         @Override

@@ -40,7 +40,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     public void update(){
         Building core = closestCore();
 
-        if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && within(core, mineTransferRange)){
+        if(core != null && mineTile != null && mineTile.drop() != null && !acceptsItem(mineTile.drop()) && within(core, mineTransferRange) && !offloadImmediately()){
             int accepted = core.acceptStack(item(), stack().amount, this);
             if(accepted > 0){
                 Call.transferItemTo(item(), accepted,
@@ -52,13 +52,17 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
 
         if(mineTile == null || core == null || mineTile.block() != Blocks.air || dst(mineTile.worldx(), mineTile.worldy()) > miningRange
         || (((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding())
-        || mineTile.drop() == null || !acceptsItem(mineTile.drop()) || !canMine(mineTile.drop())){
+        || mineTile.drop() == null || !canMine(mineTile.drop())){
             mineTile = null;
             mineTimer = 0f;
         }else{
             Item item = mineTile.drop();
             rotation(Mathf.slerpDelta(rotation(), angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f));
             mineTimer += Time.delta *type.mineSpeed;
+
+            if(Mathf.chance(0.06 * Time.delta)){
+                Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
+            }
 
             if(mineTimer >= 50f + item.hardness*10f){
                 mineTimer = 0;
@@ -73,12 +77,13 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f),
                     this);
+                }else{
+                    mineTile = null;
+                    mineTimer = 0f;
                 }
             }
 
-            if(Mathf.chance(0.06 * Time.delta)){
-                Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
-            }
+
         }
     }
 

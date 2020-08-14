@@ -203,7 +203,7 @@ public class Styles{
         }};
         geni = new ImageButtonStyle(){{
             imageDownColor = Pal.accent;
-            imageUpColor = Color.white;
+            imageUpColor = Color.black;
         }};
         colori = new ImageButtonStyle(){{
             //imageDownColor = Pal.accent;
