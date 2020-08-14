@@ -221,41 +221,45 @@ public class MapGenerateDialog extends BaseDialog{
         for(GenerateFilter filter : filters){
 
             //main container
-            filterTable.table(Tex.button, c -> {
+            filterTable.table(Tex.pane, c -> {
+                c.margin(0);
+
                 //icons to perform actions
-                c.table(t -> {
-                    t.top();
-                    t.add(filter.name()).padTop(5).color(Pal.accent).growX().left();
+                c.table(Tex.whiteui, t -> {
+                    t.setColor(Pal.gray);
 
-                    t.row();
+                    t.top().left();
+                    t.add(filter.name()).left().padLeft(6);
 
-                    t.table(b -> {
-                        ImageButtonStyle style = Styles.cleari;
-                        b.defaults().size(50f);
-                        b.button(Icon.refresh, style, () -> {
-                            filter.randomize();
-                            update();
-                        });
+                    t.add().growX();
 
-                        b.button(Icon.upOpen, style, () -> {
-                            int idx = filters.indexOf(filter);
-                            filters.swap(idx, Math.max(0, idx - 1));
-                            rebuildFilters();
-                            update();
-                        });
-                        b.button(Icon.downOpen, style, () -> {
-                            int idx = filters.indexOf(filter);
-                            filters.swap(idx, Math.min(filters.size - 1, idx + 1));
-                            rebuildFilters();
-                            update();
-                        });
-                        b.button(Icon.trash, style, () -> {
-                            filters.remove(filter);
-                            rebuildFilters();
-                            update();
-                        });
+                    ImageButtonStyle style = Styles.geni;
+                    t.defaults().size(42f);
+
+                    t.button(Icon.refresh, style, () -> {
+                        filter.randomize();
+                        update();
                     });
-                }).fillX();
+
+                    t.button(Icon.upOpen, style, () -> {
+                        int idx = filters.indexOf(filter);
+                        filters.swap(idx, Math.max(0, idx - 1));
+                        rebuildFilters();
+                        update();
+                    });
+                    t.button(Icon.downOpen, style, () -> {
+                        int idx = filters.indexOf(filter);
+                        filters.swap(idx, Math.min(filters.size - 1, idx + 1));
+                        rebuildFilters();
+                        update();
+                    });
+                    t.button(Icon.cancel, style, () -> {
+                        filters.remove(filter);
+                        rebuildFilters();
+                        update();
+                    });
+                }).growX();
+
                 c.row();
                 //all the options
                 c.table(f -> {
@@ -269,7 +273,7 @@ public class MapGenerateDialog extends BaseDialog{
                         }).growX().left();
                         f.row();
                     }
-                }).grow().left().pad(2).top();
+                }).grow().left().pad(6).top();
             }).width(280f).pad(3).top().left().fillY();
             if(++i % cols == 0){
                 filterTable.row();

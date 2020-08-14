@@ -310,6 +310,7 @@ project(":tests"){
         workingDir = new File("../core/assets")
         testLogging {
             exceptionFormat = 'full'
+            showStandardStreams = true
         }
     }
 }

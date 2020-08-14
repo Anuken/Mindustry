@@ -253,7 +253,7 @@ public class LCanvas extends Table{
 
                 t.add(st.name()).style(Styles.outlineLabel).color(color).padRight(8);
                 t.add().growX();
-                t.button(Icon.cancel, Styles.onlyi, () -> {
+                t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
                     dragging = null;
                     statements.layout();
