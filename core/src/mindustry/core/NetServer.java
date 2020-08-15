@@ -780,7 +780,7 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
 
         short sent = 0;
-        for(Building entity : Groups.tile){
+        for(Building entity : Groups.build){
             if(!entity.block().sync) continue;
             sent ++;
 
