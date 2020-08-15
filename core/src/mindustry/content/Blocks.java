@@ -1905,7 +1905,7 @@ public class Blocks implements ContentList{
         }};
 
         logicProcessor = new LogicBlock("logic-processor"){{
-            requirements(Category.logic, with(Items.copper, 200, Items.lead, 120, Items.silicon, 110, Items.metaglass, 60));
+            requirements(Category.logic, with(Items.lead, 320, Items.silicon, 140, Items.graphite, 80, Items.thorium, 70));
 
             instructionsPerTick = 5;
 

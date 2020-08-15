@@ -66,32 +66,6 @@ public class LCanvas extends Table{
         }
     }
 
-    private void drawGrid(){
-        Draw.color(backgroundCol);
-
-        Fill.crect(x, y, width, height);
-
-        Draw.color(gridCol);
-
-        float spacing = Scl.scl(50f);
-        int xbars = (int)(width / spacing) + 2, ybars = (int)(width / spacing) + 2;
-        float ox = offset.x % spacing, oy = offset.y % spacing;
-
-        Lines.stroke(Scl.scl(3f));
-
-        for(int i = 0; i < xbars; i++){
-            float cx = x + width/2f + (i - xbars/2) * spacing + ox;
-            Lines.line(cx, y, cx, y + height);
-        }
-
-        for(int i = 0; i < ybars; i++){
-            float cy = y + height/2f + (i - ybars/2) * spacing + oy;
-            Lines.line(0, cy, x + width, cy);
-        }
-
-        Draw.reset();
-    }
-
     void add(LStatement statement){
         statements.addChild(new StatementElem(statement));
     }

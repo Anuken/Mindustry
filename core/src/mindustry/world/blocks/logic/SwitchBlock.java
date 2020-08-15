@@ -1,6 +1,7 @@
 package mindustry.world.blocks.logic;
 
 import arc.graphics.g2d.*;
+import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -14,21 +15,20 @@ public class SwitchBlock extends Block{
         configurable = true;
         update = true;
 
-        config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.on = b);
+        config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.enabled = b);
     }
 
     public class SwitchBuild extends Building{
-        public boolean on;
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.enabled) return on ? 1 : 0;
+            if(sensor == LAccess.enabled) return enabled ? 1 : 0;
             return super.sense(sensor);
         }
 
         @Override
         public boolean configTapped(){
-            configure(!on);
+            configure(!enabled);
             Sounds.click.at(this);
             return false;
         }
@@ -37,9 +37,30 @@ public class SwitchBlock extends Block{
         public void draw(){
             super.draw();
 
-            if(on){
+            if(enabled){
                 Draw.rect(onRegion, x, y);
             }
+        }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void readAll(Reads read, byte revision){
+            super.readAll(read, revision);
+
+            if(revision == 1){
+                enabled = read.bool();
+            }
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.bool(enabled);
         }
     }
 }
