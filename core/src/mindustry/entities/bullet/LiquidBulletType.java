@@ -25,7 +25,7 @@ public class LiquidBulletType extends BulletType{
         }
 
         lifetime = 74f;
-        statusDuration = 90f;
+        statusDuration = 60f * 2f;
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLiquid;
         smokeEffect = Fx.none;

@@ -895,7 +895,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;
-                player.shooting = true;
+                player.shooting = !boosted;
 
                 unit.aim(player.mouseX, player.mouseY);
             }

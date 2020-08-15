@@ -526,7 +526,7 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client, unreliable = true)
-    public static void clientShapshot(
+    public static void clientSnapshot(
         Player player,
         int snapshotID,
         boolean dead,
@@ -554,6 +554,10 @@ public class NetServer implements ApplicationListener{
         //disable shooting when a mech flies
         if(!player.dead() && player.unit().isFlying() && player.unit() instanceof Mechc){
             shooting = false;
+        }
+
+        if(!player.dead() && (player.unit().type().flying || !player.unit().type().canBoost)){
+            boosting = false;
         }
 
         //TODO these need to be assigned elsewhere
@@ -607,7 +611,7 @@ public class NetServer implements ApplicationListener{
 
             unit.vel.set(xVelocity, yVelocity).limit(unit.type().speed);
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
-            float maxSpeed = player.unit().type().speed;
+            float maxSpeed = (boosting ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
             if(con.lastUnit != unit){

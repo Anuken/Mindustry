@@ -566,7 +566,7 @@ public class NetClient implements ApplicationListener{
 
             Unit unit = player.dead() ? Nulls.unit : player.unit();
 
-            Call.clientShapshot(lastSent++,
+            Call.clientSnapshot(lastSent++,
             player.dead(),
             unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
