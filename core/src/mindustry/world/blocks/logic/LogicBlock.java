@@ -65,9 +65,6 @@ public class LogicBlock extends Block{
 
     static String getLinkName(Block block){
         String name = block.name;
-        if(block.minfo.mod != null){
-            name = name.substring(block.minfo.mod.name.length() + 1);
-        }
         if(name.contains("-")){
             String[] split = name.split("-");
             //filter out 'large' at the end of block names
