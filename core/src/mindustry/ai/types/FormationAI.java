@@ -66,7 +66,7 @@ public class FormationAI extends AIController implements FormationMember{
             //TODO return formation size
             //eturn ((Commanderc)unit).formation().
         }
-        return unit.hitSize * 2f;
+        return unit.hitSize * 1.7f;
     }
 
     @Override

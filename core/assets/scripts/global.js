@@ -23,6 +23,16 @@ const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
 
+//these are not sctrictly necessary, but are kept for edge cases
+const run = method => new java.lang.Runnable(){run: method}
+const boolf = method => new Boolf(){get: method}
+const boolp = method => new Boolp(){get: method}
+const floatf = method => new Floatf(){get: method}
+const floatp = method => new Floatp(){get: method}
+const cons = method => new Cons(){get: method}
+const prov = method => new Prov(){get: method}
+const func = method => new Func(){get: method}
+
 const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
 Call = Packages.mindustry.gen.Call
 
@@ -82,6 +92,7 @@ importPackage(Packages.mindustry.world.blocks.environment)
 importPackage(Packages.mindustry.world.blocks.experimental)
 importPackage(Packages.mindustry.world.blocks.legacy)
 importPackage(Packages.mindustry.world.blocks.liquid)
+importPackage(Packages.mindustry.world.blocks.logic)
 importPackage(Packages.mindustry.world.blocks.payloads)
 importPackage(Packages.mindustry.world.blocks.power)
 importPackage(Packages.mindustry.world.blocks.production)
