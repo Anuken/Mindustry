@@ -727,7 +727,7 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon("heal-weapon-mount"){{
                 y = -2.5f;
                 x = 3.5f;
-                reload = 34f;
+                reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 shootSound = Sounds.pew;
@@ -736,11 +736,11 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 15f;
                 alternate = true;
 
-                bullet = new MissileBulletType(4f, 10){{
+                bullet = new MissileBulletType(4f, 12){{
                     homingPower = 0.08f;
                     weaveMag = 4;
                     weaveScale = 4;
-                    lifetime = 50f;
+                    lifetime = 56f;
                     keepVelocity = false;
                     shootEffect = Fx.shootHeal;
                     smokeEffect = Fx.hitLaser;
