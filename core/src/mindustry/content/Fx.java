@@ -670,6 +670,12 @@ public class Fx{
 
     }),
 
+    sporeSlowed = new Effect(40f, e -> {
+        color(Pal.spore);
+
+        Fill.circle(e.x, e.y, e.fslope() * 1.1f);
+    }),
+
     oily = new Effect(42f, e -> {
         color(Liquids.oil.color);
 

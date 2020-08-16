@@ -45,17 +45,23 @@ abstract class CommanderComp implements Unitc{
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
+        float spacing = 8f;
+
         controlling.addAll(units);
         for(Unit unit : units){
-            unit.controller(new FormationAI(base(), formation));
+            FormationAI ai;
+            unit.controller(ai = new FormationAI(base(), formation));
+            spacing = Math.max(spacing, ai.formationSize());
         }
         this.formation = formation;
+
+        //update formation spacing based on max size
+        formation.pattern.spacing = spacing;
 
         members.clear();
         for(Unitc u : units){
             members.add((FormationAI)u.controller());
         }
-
 
         //TODO doesn't handle units that don't fit a formation
         formation.addMembers(members);

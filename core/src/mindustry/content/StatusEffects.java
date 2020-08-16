@@ -9,7 +9,7 @@ import mindustry.type.StatusEffect;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss;
+    public static StatusEffect none, burning, freezing, wet, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed;
 
     @Override
     public void load(){
@@ -80,6 +80,12 @@ public class StatusEffects implements ContentList{
             armorMultiplier = 0.8f;
             effect = Fx.sapped;
             effectChance = 0.1f;
+        }};
+
+        sporeSlowed = new StatusEffect("sapped"){{
+            speedMultiplier = 0.8f;
+            effect = Fx.sapped;
+            effectChance = 0.04f;
         }};
 
         tarred = new StatusEffect("tarred"){{

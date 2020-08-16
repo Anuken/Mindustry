@@ -5,7 +5,6 @@ import arc.math.geom.*;
 import mindustry.ai.formations.*;
 
 public class SquareFormation extends FormationPattern{
-    public float spacing = 20;
 
     @Override
     public Vec3 calculateSlotLocation(Vec3 out, int slot){

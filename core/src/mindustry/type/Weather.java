@@ -23,6 +23,7 @@ public abstract class Weather extends MappableContent{
     public Prov<WeatherState> type = WeatherState::create;
     public StatusEffect status = StatusEffects.none;
     public float statusDuration = 60f * 2;
+    public boolean statusAir = true, statusGround = true;
 
     public Weather(String name, Prov<WeatherState> type){
         super(name);
@@ -68,7 +69,11 @@ public abstract class Weather extends MappableContent{
             if(state.effectTimer <= 0){
                 state.effectTimer = statusDuration - 5f;
 
-                Groups.unit.each(u -> u.apply(status, statusDuration));
+                Groups.unit.each(u -> {
+                    if(u.checkTarget(statusAir, statusGround)){
+                        u.apply(status, statusDuration);
+                    }
+                });
             }else{
                 state.effectTimer -= Time.delta;
             }
