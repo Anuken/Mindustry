@@ -82,7 +82,7 @@ public class StatusEffects implements ContentList{
             effectChance = 0.1f;
         }};
 
-        sporeSlowed = new StatusEffect("sapped"){{
+        sporeSlowed = new StatusEffect("spore-slowed"){{
             speedMultiplier = 0.8f;
             effect = Fx.sapped;
             effectChance = 0.04f;

@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.ai.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -146,8 +147,12 @@ public class Teams{
         public final Seq<CoreBuild> cores = new Seq<>();
         public final Team team;
         public final BaseAI ai;
+
         public Team[] enemies = {};
+        /** Planned blocks for drones. This is usually only blocks that have been broken. */
         public Queue<BlockPlan> blocks = new Queue<>();
+        /** The current command for units to follow. */
+        public UnitCommand command = UnitCommand.attack;
 
         public TeamData(Team team){
             this.team = team;
