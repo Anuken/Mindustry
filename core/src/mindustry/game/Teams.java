@@ -5,8 +5,10 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.ai.*;
+import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -153,6 +155,8 @@ public class Teams{
         public Queue<BlockPlan> blocks = new Queue<>();
         /** The current command for units to follow. */
         public UnitCommand command = UnitCommand.attack;
+        /** Target items to mine. */
+        public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
 
         public TeamData(Team team){
             this.team = team;

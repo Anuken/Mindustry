@@ -310,9 +310,11 @@ public class UnitType extends UnlockableContent{
 
         if(abilities.size > 0){
             for(Ability a : abilities){
-                a.draw(unit);
                 Draw.reset();
+                a.draw(unit);
             }
+
+            Draw.reset();
         }
     }
 

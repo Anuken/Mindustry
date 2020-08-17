@@ -626,7 +626,7 @@ public class DesktopInput extends InputHandler{
                 }else if(!pay.hasPayload()){
                     Building tile = world.buildWorld(pay.x(), pay.y());
 
-                    if(tile != null && tile.team() == unit.team){
+                    if(tile != null && tile.team == unit.team){
                         Call.pickupBlockPayload(player, tile);
                     }
                 }

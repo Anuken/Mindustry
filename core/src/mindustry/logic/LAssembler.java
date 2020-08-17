@@ -83,22 +83,29 @@ public class LAssembler{
             if(index++ > max) break;
 
             try{
-                //yes, I am aware that this can be split with regex, but that's slow and even more incomprehensible
-                Seq<String> tokens = new Seq<>();
-                boolean inString = false;
-                int lastIdx = 0;
+                String[] arr;
 
-                for(int i = 0; i < line.length() + 1; i++){
-                    char c = i == line.length() ? ' ' : line.charAt(i);
-                    if(c == '"'){
-                        inString = !inString;
-                    }else if(c == ' ' && !inString){
-                        tokens.add(line.substring(lastIdx, i).replace("\\n", "\n"));
-                        lastIdx = i + 1;
+                //yes, I am aware that this can be split with regex, but that's slow and even more incomprehensible
+                if(line.contains(" ")){
+                    Seq<String> tokens = new Seq<>();
+                    boolean inString = false;
+                    int lastIdx = 0;
+
+                    for(int i = 0; i < line.length() + 1; i++){
+                        char c = i == line.length() ? ' ' : line.charAt(i);
+                        if(c == '"'){
+                            inString = !inString;
+                        }else if(c == ' ' && !inString){
+                            tokens.add(line.substring(lastIdx, i).replace("\\n", "\n"));
+                            lastIdx = i + 1;
+                        }
                     }
+
+                    arr = tokens.toArray(String.class);
+                }else{
+                    arr = new String[]{line};
                 }
 
-                String[] arr = tokens.toArray(String.class);
                 LStatement st = LogicIO.read(arr);
                 if(st != null){
                     statements.add(st);

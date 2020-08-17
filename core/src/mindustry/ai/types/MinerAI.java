@@ -1,7 +1,5 @@
 package mindustry.ai.types;
 
-import arc.struct.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -11,9 +9,6 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class MinerAI extends AIController{
-    //miners are limited to copper and lead until further notice
-    Seq<Item> targets = Seq.with(Items.copper, Items.lead);
-
     boolean mining = true;
     Item targetItem;
     Tile ore;
@@ -39,7 +34,7 @@ public class MinerAI extends AIController{
         }
 
         if(mining){
-            targetItem = Structs.findMin(targets, indexer::hasOre, Structs.comparingInt(i -> -core.items.get(i)));
+            targetItem = unit.team.data().mineItems.min(i -> indexer.hasOre(i) && miner.canMine(i), i -> core.items.get(i));
 
             //core full of the target item, do nothing
             if(targetItem != null && core.acceptStack(targetItem, 1, unit) == 0){
