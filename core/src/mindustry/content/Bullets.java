@@ -350,18 +350,21 @@ public class Bullets implements ContentList{
         standardDenseBig = new BasicBulletType(7f, 55, "bullet"){{
             width = 15f;
             height = 21f;
+            pierce = true;
             shootEffect = Fx.shootBig;
         }};
 
         standardThoriumBig = new BasicBulletType(8f, 80, "bullet"){{
             width = 16f;
             height = 23f;
+            pierce = true;
             shootEffect = Fx.shootBig;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
             width = 16f;
             height = 21f;
+            pierce = true;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
