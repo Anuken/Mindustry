@@ -572,9 +572,18 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             //apply command on double tap
-            if(count == 2 && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 2f) &&
-                player.unit() instanceof Commanderc){
-                Call.unitCommand(player);
+            if(count == 2 && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 2f)){
+                if(player.unit() instanceof Commanderc){
+                    Call.unitCommand(player);
+                }
+
+                if(player.unit() instanceof Payloadc){
+                    if(((Payloadc)player.unit()).hasPayload()){
+                        tryDropPayload();
+                    }else{
+                        tryPickupPayload();
+                    }
+                }
             }
         }
 

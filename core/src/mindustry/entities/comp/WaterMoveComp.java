@@ -36,6 +36,20 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     }
 
     @Override
+    @Replace
+    public void lookAt(float angle){
+        if(onLiquid()){
+            rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta);
+        }
+    }
+
+    @Override
+    @Replace
+    public boolean canShoot(){
+        return onLiquid();
+    }
+
+    @Override
     public void add(){
         tleft.clear();
         tright.clear();
@@ -78,6 +92,10 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
         return on.isDeep() ? 1.3f : 1f;
+    }
+
+    public boolean onLiquid(){
+        return floorOn().isLiquid;
     }
 }
 

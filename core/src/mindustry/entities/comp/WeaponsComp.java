@@ -76,9 +76,15 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         aimY = y;
     }
 
+    boolean canShoot(){
+        return true;
+    }
+
     /** Update shooting and rotation for this unit. */
     @Override
     public void update(){
+        boolean can = canShoot();
+
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
@@ -91,7 +97,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
             }
 
             //rotate if applicable
-            if(weapon.rotate && (mount.rotate || mount.shoot)){
+            if(weapon.rotate && (mount.rotate || mount.shoot) && can){
                 float axisX = this.x + Angles.trnsx(rotation - 90,  weapon.x, weapon.y),
                     axisY = this.y + Angles.trnsy(rotation - 90,  weapon.x, weapon.y);
 
@@ -104,6 +110,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
 
             //shoot if applicable
             if(mount.shoot && //must be shooting
+                can && //must be able to shoot
                 (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && //check ammo
                 (!weapon.alternate || mount.side == weapon.flipSprite) &&
                 vel.len() >= mount.weapon.minShootVelocity && //check velocity requirements

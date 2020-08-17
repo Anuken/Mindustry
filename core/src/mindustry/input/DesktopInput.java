@@ -13,7 +13,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -619,22 +618,12 @@ public class DesktopInput extends InputHandler{
         if(unit instanceof Payloadc){
             Payloadc pay = (Payloadc)unit;
 
-            if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
-                Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && u.mass() < unit.mass() && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
-                if(target != null){
-                    Call.pickupUnitPayload(player, target);
-                }else if(!pay.hasPayload()){
-                    Building tile = world.buildWorld(pay.x(), pay.y());
-
-                    if(tile != null && tile.team == unit.team){
-                        Call.pickupBlockPayload(player, tile);
-                    }
-                }
+            if(Core.input.keyTap(Binding.pickupCargo)){
+                tryPickupPayload();
             }
 
             if(Core.input.keyTap(Binding.dropCargo)){
-                Call.dropPayload(player, player.x, player.y);
-                pay.dropLastPayload();
+                tryDropPayload();
             }
         }
 

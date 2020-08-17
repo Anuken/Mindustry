@@ -238,7 +238,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated){
+        }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated()){
             player.unit(unit);
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
@@ -315,7 +315,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead()){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated());
 
             if(unit != null){
                 Call.unitControl(player, unit);
@@ -325,7 +325,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void checkUnit(){
         if(controlledType != null){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated());
             if(unit == null && controlledType == UnitTypes.block){
                 unit = world.buildWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.buildWorld(player.x, player.y)).unit() : null;
             }
@@ -338,6 +338,34 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
         }
+    }
+
+    public void tryPickupPayload(){
+        Unit unit = player.unit();
+        if(!(unit instanceof Payloadc)) return;
+        Payloadc pay = (Payloadc)unit;
+
+        if(pay.payloads().size >= unit.type().payloadCapacity) return;
+
+        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && u.mass() < unit.mass() && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+        if(target != null){
+            Call.pickupUnitPayload(player, target);
+        }else if(!pay.hasPayload()){
+            Building tile = world.buildWorld(pay.x(), pay.y());
+
+            if(tile != null && tile.team == unit.team){
+                Call.pickupBlockPayload(player, tile);
+            }
+        }
+    }
+
+    public void tryDropPayload(){
+        Unit unit = player.unit();
+        if(!(unit instanceof Payloadc)) return;
+        Payloadc pay = (Payloadc)unit;
+
+        Call.dropPayload(player, player.x, player.y);
+        pay.dropLastPayload();
     }
 
     public float getMouseX(){
@@ -848,7 +876,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && !u.deactivated);
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && !u.deactivated());
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
