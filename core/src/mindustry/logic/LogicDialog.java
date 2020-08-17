@@ -84,6 +84,8 @@ public class LogicDialog extends BaseDialog{
     }
 
     public void show(String code, Cons<String> consumer){
+        canvas.statements.clearChildren();
+        canvas.rebuild();
         try{
             canvas.load(code);
         }catch(Throwable t){
