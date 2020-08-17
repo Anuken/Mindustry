@@ -107,6 +107,7 @@ public class LAssembler{
                 }
 
                 LStatement st = LogicIO.read(arr);
+
                 if(st != null){
                     statements.add(st);
                 }else{
