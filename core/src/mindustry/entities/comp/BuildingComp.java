@@ -843,8 +843,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
-    /** Called when the block is tapped.*/
-    public void tapped(Player player){
+    /** Called when the block is tapped by the local player. */
+    public void tapped(){
 
     }
 

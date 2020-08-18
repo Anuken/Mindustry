@@ -166,17 +166,6 @@ public class EventType{
         }
     }
 
-    /** Called when the player taps a block. */
-    public static class TapEvent{
-        public final Building tile;
-        public final Player player;
-
-        public TapEvent(Building tile, Player player){
-            this.tile = tile;
-            this.player = player;
-        }
-    }
-
     /** Called when the player sets a specific block. */
     public static class TapConfigEvent{
         public final Building tile;

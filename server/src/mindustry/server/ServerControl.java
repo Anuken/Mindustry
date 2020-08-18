@@ -86,6 +86,21 @@ public class ServerControl implements ApplicationListener{
         registerCommands();
 
         Core.app.post(() -> {
+            //try to load auto-update save if possible
+            if(Config.autoUpdate.bool()){
+                Fi fi = saveDirectory.child("autosavebe." + saveExtension);
+                if(fi.exists()){
+                    try{
+                        SaveIO.load(fi);
+                        info("Auto-save loaded.");
+                        state.set(State.playing);
+                        netServer.openServer();
+                    }catch(Throwable e){
+                        Log.err(e);
+                    }
+                }
+            }
+
             Seq<String> commands = new Seq<>();
 
             if(args.length > 0){

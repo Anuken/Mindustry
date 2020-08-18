@@ -10,6 +10,7 @@ import arc.util.serialization.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
@@ -129,6 +130,9 @@ public class BeControl{
                     progress -> {},
                     () -> false,
                     () -> Core.app.post(() -> {
+                        Log.info("&lcSaving...");
+                        SaveIO.save(saveDirectory.child("autosavebe." + saveExtension));
+
                         netServer.kickAll(KickReason.serverRestarting);
                         Threads.sleep(32);
 

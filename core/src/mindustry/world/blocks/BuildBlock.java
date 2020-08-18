@@ -148,9 +148,9 @@ public class BuildBlock extends Block{
         }
 
         @Override
-        public void tapped(Player player){
+        public void tapped(){
             //if the target is constructible, begin constructing
-            if(!headless && cblock != null){
+            if(cblock != null){
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
