@@ -566,9 +566,9 @@ public class DesktopInput extends InputHandler{
 
     protected void updateMovement(Unit unit){
         boolean omni = !(unit instanceof WaterMovec);
-        boolean legs = unit.isGrounded();
+        boolean ground = unit.isGrounded();
 
-        float strafePenalty = legs ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
+        float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
         float baseSpeed = unit.type().speed;
 
         //limit speed to minimum formation speed to preserve formation
@@ -602,8 +602,8 @@ public class DesktopInput extends InputHandler{
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero() && legs){
-                unit.vel.rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta);
+            if(!movement.isZero() && ground){
+                unit.vel.rotateTo(movement.angle(), unit.type().rotateSpeed);
             }
         }
 
