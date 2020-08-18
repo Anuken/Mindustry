@@ -84,7 +84,7 @@ public class Door extends Wall{
             if(type == LAccess.enabled){
                 boolean shouldOpen = !Mathf.zero(p1);
 
-                if(net.client() || open == shouldOpen || (Units.anyEntities(tile) && !shouldOpen) || !origin().timer(timerToggle, 60f)){
+                if(net.client() || open == shouldOpen || (Units.anyEntities(tile) && !shouldOpen) || !origin().timer(timerToggle, 80f)){
                     return;
                 }
 
@@ -134,7 +134,7 @@ public class Door extends Wall{
 
         @Override
         public void tapped(){
-            if((Units.anyEntities(tile) && open) || !origin().timer(timerToggle, 50f)){
+            if((Units.anyEntities(tile) && open) || !origin().timer(timerToggle, 60f)){
                 return;
             }
 

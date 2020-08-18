@@ -1310,7 +1310,7 @@ public class Blocks implements ContentList{
             itemCapacity = 9000;
             size = 4;
 
-            unitCapModifier = 16;
+            unitCapModifier = 14;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -1321,7 +1321,7 @@ public class Blocks implements ContentList{
             itemCapacity = 13000;
             size = 5;
 
-            unitCapModifier = 24;
+            unitCapModifier = 20;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1452,7 +1452,7 @@ public class Blocks implements ContentList{
             recoilAmount = 2f;
             reloadTime = 90f;
             cooldown = 0.03f;
-            powerUse = 2.5f;
+            powerUse = 6f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
             smokeEffect = Fx.none;

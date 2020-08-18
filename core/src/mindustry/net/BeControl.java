@@ -42,7 +42,7 @@ public class BeControl{
                 if(checkUpdates && !mobile){
                     checkUpdate(t -> {});
                 }
-            }, 1, updateInterval);
+            }, updateInterval, updateInterval);
         }
     }
 

@@ -165,7 +165,7 @@ public class LogicBlock extends Block{
         }
     }
 
-    public class LogicBuild extends Building{
+    public class LogicBuild extends Building implements Ranged{
         /** logic "source code" as list of asm statements */
         public String code = "";
         public LExecutor executor = new LExecutor();
@@ -302,6 +302,11 @@ public class LogicBlock extends Block{
                     executor.load("", maxInstructions);
                 }
             }
+        }
+
+        @Override
+        public float range(){
+            return range;
         }
 
         @Override

@@ -154,7 +154,7 @@ public class ServerControl implements ApplicationListener{
             nextMapOverride = null;
             if(map != null){
                 Call.infoMessage((state.rules.pvp
-                ? "[yellow]The " + event.winner.name + " team is victorious![]" : "[scarlet]Game over![]")
+                ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
