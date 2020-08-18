@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 /** Handles control of bleeding edge builds. */
 public class BeControl{
-    private static final int updateInterval = 60 * 2;
+    private static final int updateInterval = 60 * 1;
 
     private AsyncExecutor executor = new AsyncExecutor(1);
     private boolean checkUpdates = true;
@@ -47,7 +47,7 @@ public class BeControl{
 
     /** asynchronously checks for updates. */
     public void checkUpdate(Boolc done){
-        Core.net.httpGet("https://api.github.com/repos/Anuken/MindustryBuilds/releases/latest", res -> Core.app.post(() -> {
+        Core.net.httpGet("https://api.github.com/repos/Anuken/MindustryBuilds/releases/latest", res -> {
             if(res.getStatus() == HttpStatus.OK){
                 Jval val = Jval.read(res.getResultAsString());
                 int newBuild = Strings.parseInt(val.getString("tag_name", "0"));
@@ -57,15 +57,17 @@ public class BeControl{
                     updateAvailable = true;
                     updateBuild = newBuild;
                     updateUrl = url;
-                    showUpdateDialog();
-                    Core.app.post(() -> done.get(true));
+                    Core.app.post(() -> {
+                        showUpdateDialog();
+                        done.get(true);
+                    });
                 }else{
                     Core.app.post(() -> done.get(false));
                 }
             }else{
                 Core.app.post(() -> done.get(false));
             }
-        }), error -> Core.app.post(() -> {
+        }, error -> Core.app.post(() -> {
             if(!headless){
                 ui.showException(error);
             }else{
