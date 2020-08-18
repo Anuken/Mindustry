@@ -47,7 +47,7 @@ public class BeControl{
 
     /** asynchronously checks for updates. */
     public void checkUpdate(Boolc done){
-        Core.net.httpGet("https://api.github.com/repos/Anuken/MindustryBuilds/releases/latest", res -> {
+        Core.net.httpGet("https://api.github.com/repos/Anuken/MindustryBuilds/releases/latest", res -> Core.app.post(() -> {
             if(res.getStatus() == HttpStatus.OK){
                 Jval val = Jval.read(res.getResultAsString());
                 int newBuild = Strings.parseInt(val.getString("tag_name", "0"));
@@ -65,13 +65,13 @@ public class BeControl{
             }else{
                 Core.app.post(() -> done.get(false));
             }
-        }, error -> {
+        }), error -> Core.app.post(() -> {
             if(!headless){
                 ui.showException(error);
             }else{
                 error.printStackTrace();
             }
-        });
+        }));
     }
 
     /** @return whether a new update is available */
