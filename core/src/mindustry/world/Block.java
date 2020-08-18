@@ -319,6 +319,10 @@ public class Block extends UnlockableContent{
             stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
 
+        if(instantTransfer){
+            stats.add(BlockStat.maxConsecutive, 2, StatUnit.none);
+        }
+
         consumes.display(stats);
 
         // Note: Power stats are added by the consumers.
