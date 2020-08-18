@@ -212,7 +212,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
         tile.configured(player, value);
-        Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
+        Core.app.post(() -> Events.fire(new ConfigEvent(tile, player, value)));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

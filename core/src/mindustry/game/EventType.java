@@ -166,13 +166,13 @@ public class EventType{
         }
     }
 
-    /** Called when the player sets a specific block. */
-    public static class TapConfigEvent{
+    /** Called when the configures sets a specific block. */
+    public static class ConfigEvent{
         public final Building tile;
         public final Player player;
         public final Object value;
 
-        public TapConfigEvent(Building tile, Player player, Object value){
+        public ConfigEvent(Building tile, Player player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;
