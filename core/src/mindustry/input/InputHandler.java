@@ -250,7 +250,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void unitClear(Player player){
         //no free core teleports?
-        if(!player.dead() && player.unit().spawnedByCore) return;
+        if(player == null || !player.dead() && player.unit().spawnedByCore) return;
 
         Fx.spawn.at(player);
         player.clearUnit();
@@ -259,7 +259,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitCommand(Player player){
-        if(player.dead() || !(player.unit() instanceof Commanderc)) return;
+        if(player == null || player.dead() || !(player.unit() instanceof Commanderc)) return;
 
         Commanderc commander = (Commanderc)player.unit();
 
