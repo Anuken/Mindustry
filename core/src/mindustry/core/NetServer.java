@@ -332,6 +332,8 @@ public class NetServer implements ApplicationListener{
 
                 Call.sendMessage(Strings.format("[lightgray]A player has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                             target.name, votes, votesRequired()));
+
+                checkPass();
             }
 
             boolean checkPass(){

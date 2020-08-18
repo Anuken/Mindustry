@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
@@ -95,7 +96,8 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     }
 
     public boolean onLiquid(){
-        return floorOn().isLiquid;
+        Tile tile = tileOn();
+        return tile != null && tile.floor().isLiquid;
     }
 }
 
