@@ -285,8 +285,6 @@ public class EntityProcess extends BaseProcessor{
 
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-                if(isFinal && !typeIsBase) builder.addModifiers(Modifier.FINAL);
-
                 //add serialize() boolean
                 builder.addMethod(MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC).returns(boolean.class).addStatement("return " + ann.serialize()).build());
 
