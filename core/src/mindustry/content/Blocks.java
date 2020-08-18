@@ -1485,7 +1485,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 1.5f;
+            powerUse = 4.5f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
