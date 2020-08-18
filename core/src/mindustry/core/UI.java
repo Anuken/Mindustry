@@ -286,6 +286,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public void showInfoFade(String info){
         Table table = new Table();
+        table.touchable = Touchable.disabled;
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
@@ -481,10 +482,11 @@ public class UI implements ApplicationListener, Loadable{
 
     public void announce(String text){
         Table t = new Table();
+        t.touchable = Touchable.disabled;
         t.background(Styles.black3).margin(8f)
         .add(text).style(Styles.outlineLabel);
         t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
-        t.actions(Actions.fadeOut(3, Interp.pow4In));
+        t.actions(Actions.fadeOut(3, Interp.pow4In), Actions.remove());
         Core.scene.add(t);
     }
 

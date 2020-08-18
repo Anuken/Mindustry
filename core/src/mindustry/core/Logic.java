@@ -331,7 +331,9 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
-                state.secinfo.update();
+                if(state.isCampaign()){
+                    state.secinfo.update();
+                }
 
                 if(state.isCampaign()){
                     universe.update();

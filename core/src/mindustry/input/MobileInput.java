@@ -794,6 +794,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         Rect rect = Tmp.r3;
 
         UnitType type = unit.type();
+        if(type == null) return;
+
         boolean flying = type.flying;
         boolean omni = !(unit instanceof WaterMovec);
         boolean legs = unit.isGrounded();
