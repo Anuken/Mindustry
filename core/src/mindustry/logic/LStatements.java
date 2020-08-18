@@ -406,7 +406,16 @@ public class LStatements{
 
             fields(table, sortOrder, v -> sortOrder = v);
 
-            row(table);
+            table.row();
+
+            table.add(" sort ");
+
+            table.button(b -> {
+                b.label(() -> sort.name());
+                b.clicked(() -> showSelect(b, RadarSort.all, sort, t -> {
+                    sort = t;
+                }, 2, cell -> cell.size(100, 50)));
+            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
             table.add(" output ");
 

@@ -10,6 +10,8 @@ public enum RadarSort{
 
     public final RadarSortFunc func;
 
+    public static final RadarSort[] all = values();
+
     RadarSort(RadarSortFunc func){
         this.func = func;
     }
