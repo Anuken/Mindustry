@@ -59,6 +59,7 @@ public class LCanvas extends Table{
             pane.setScrollPercentY(s);
             pane.updateVisualScroll();
             pane.requestScroll();
+            Core.app.post(() -> pane.requestScroll());
         });
 
         if(toLoad != null){

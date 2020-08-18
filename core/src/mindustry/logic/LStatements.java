@@ -163,6 +163,9 @@ public class LStatements{
                 b.label(() -> type.name());
                 b.clicked(() -> showSelect(b, GraphicsType.all, type, t -> {
                     type = t;
+                    if(type == GraphicsType.color){
+                        p2 = "255";
+                    }
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
@@ -177,10 +180,16 @@ public class LStatements{
 
                 switch(type){
                     case clear:
+                        fields(s, "r", x, v -> x = v);
+                        fields(s, "g", y, v -> y = v);
+                        fields(s, "b", p1, v -> p1 = v);
+                        break;
                     case color:
                         fields(s, "r", x, v -> x = v);
                         fields(s, "g", y, v -> y = v);
                         fields(s, "b", p1, v -> p1 = v);
+                        row(s);
+                        fields(s, "a", p2, v -> p2 = v);
                         break;
                     case stroke:
                         s.add().width(4);
@@ -223,7 +232,14 @@ public class LStatements{
                         break;
                 }
             }).expand().left();
+        }
 
+        @Override
+        public void afterRead(){
+            //0 constant alpha for colors is not allowed
+            if(type == GraphicsType.color && p2.equals("0")){
+                p2 = "255";
+            }
         }
 
         @Override

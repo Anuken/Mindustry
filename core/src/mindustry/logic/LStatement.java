@@ -109,6 +109,8 @@ public abstract class LStatement{
         t.pack();
     }
 
+    public void afterRead(){}
+
     public void write(StringBuilder builder){
         LogicIO.write(this,builder);
     }

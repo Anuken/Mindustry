@@ -92,6 +92,7 @@ public class LogicStatementProcessor extends BaseProcessor{
                 index ++;
             }
 
+            reader.addStatement("result.afterRead()");
             reader.addStatement("return result");
         }
 

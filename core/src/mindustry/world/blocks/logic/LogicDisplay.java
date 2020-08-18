@@ -73,7 +73,7 @@ public class LogicDisplay extends Block{
                             case commandPoly: Fill.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
                             case commandLinePoly: Lines.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
                             case commandTriangle: Fill.tri(x, y, p1, p2, p3, p4); break;
-                            case commandColor: this.color = Color.toFloatBits(x, y, p1, 255); Draw.color(this.color); break;
+                            case commandColor: this.color = Color.toFloatBits(x, y, p1, p2); Draw.color(this.color); break;
                             case commandStroke: this.stroke = x; Lines.stroke(x); break;
                         }
                     }
