@@ -19,6 +19,8 @@ public class BuilderAI extends AIController{
             builder.lookAt(builder.vel().angle());
         }
 
+        builder.updateBuilding(true);
+
         //approach request if building
         if(builder.buildPlan() != null){
             BuildPlan req = builder.buildPlan();

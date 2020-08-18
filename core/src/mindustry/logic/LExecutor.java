@@ -326,6 +326,8 @@ public class LExecutor{
                 }
 
                 exec.setobj(output, targeted);
+            }else{
+                exec.setobj(output, null);
             }
         }
 

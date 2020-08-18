@@ -554,7 +554,7 @@ public class NetClient implements ApplicationListener{
     void sync(){
         if(timer.get(0, playerSyncTime)){
             BuildPlan[] requests = null;
-            if(player.isBuilder() && control.input.isBuilding){
+            if(player.isBuilder()){
                 //limit to 10 to prevent buffer overflows
                 int usedRequests = Math.min(player.builder().plans().size, 10);
 
@@ -574,7 +574,7 @@ public class NetClient implements ApplicationListener{
             unit instanceof Mechc ? ((Mechc)unit).baseRotation() : 0,
             unit.vel.x, unit.vel.y,
             player.miner().mineTile(),
-            player.boosting, player.shooting, ui.chatfrag.shown(),
+            player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
             Core.camera.width * viewScale, Core.camera.height * viewScale);

@@ -6,8 +6,8 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
@@ -535,7 +535,7 @@ public class NetServer implements ApplicationListener{
         float rotation, float baseRotation,
         float xVelocity, float yVelocity,
         Tile mining,
-        boolean boosting, boolean shooting, boolean chatting,
+        boolean boosting, boolean shooting, boolean chatting, boolean building,
         @Nullable BuildPlan[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
@@ -572,6 +572,7 @@ public class NetServer implements ApplicationListener{
 
         if(player.isBuilder()){
             player.builder().clearBuilding();
+            player.builder().updateBuilding(building);
         }
 
         if(player.isMiner()){
