@@ -5,6 +5,7 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -84,6 +85,14 @@ public class EventType{
         public CommandIssueEvent(Building tile, UnitCommand command){
             this.tile = tile;
             this.command = command;
+        }
+    }
+
+    public static class ClientPreConnectEvent{
+        public final Host host;
+
+        public ClientPreConnectEvent(Host host){
+            this.host = host;
         }
     }
 

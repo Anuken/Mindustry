@@ -10,6 +10,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.legacy.*;
@@ -108,6 +109,7 @@ public class JoinDialog extends BaseDialog{
             TextButton button = buttons[0] = remote.button("[accent]" + server.displayIP(), Styles.cleart, () -> {
                 if(!buttons[0].childrenPressed()){
                     if(server.lastHost != null){
+                        Events.fire(new ClientPreConnectEvent(server.lastHost));
                         safeConnect(server.ip, server.port, server.lastHost.version);
                     }else{
                         connect(server.ip, server.port);
