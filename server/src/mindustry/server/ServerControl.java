@@ -208,6 +208,10 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
+        //autosave settings once a minute
+        float saveInterval = 60;
+        Timer.schedule(() -> Core.settings.forceSave(), saveInterval, saveInterval);
+
         if(!mods.list().isEmpty()){
             info("&lc@ mods loaded.", mods.list().size);
         }
@@ -516,6 +520,7 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     Log.info("&lc@&lg set to &lc@.", c.name(), c.get());
+                    Core.settings.forceSave();
                 }
             }catch(IllegalArgumentException e){
                 err("Unknown config: '@'. Run the command with no arguments to get a list of valid configs.", arg[0]);

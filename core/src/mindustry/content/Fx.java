@@ -26,15 +26,15 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
 
     unitSpawn = new Effect(30f, e -> {
-        if(!(e.data instanceof Unit)) return;
+        if(!(e.data instanceof UnitType)) return;
 
         alpha(e.fin());
 
         float scl = 1f + e.fout() * 2f;
 
-        Unit unit = e.data();
-        rect(unit.type().region, e.x, e.y,
-        unit.type().region.getWidth() * Draw.scl * scl, unit.type().region.getHeight() * Draw.scl * scl, 180f);
+        UnitType unit = e.data();
+        rect(unit.region, e.x, e.y,
+        unit.region.getWidth() * Draw.scl * scl, unit.region.getHeight() * Draw.scl * scl, 180f);
 
     }),
 
@@ -369,7 +369,7 @@ public class Fx{
     hitLiquid = new Effect(16, e -> {
         color(e.color);
 
-        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation + 180f, 60f, (x, y) -> {
+        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 60f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
 

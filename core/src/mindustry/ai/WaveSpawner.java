@@ -5,11 +5,13 @@ import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -127,14 +129,18 @@ public class WaveSpawner{
     }
 
     private void spawnEffect(Unit unit){
-        Fx.unitSpawn.at(unit.x(), unit.y(), 0f, unit);
-        Time.run(30f, () -> {
-            unit.add();
-            Fx.spawn.at(unit);
-        });
+        Call.spawnEffect(unit.x, unit.y, unit.type());
+        Time.run(30f, unit::add);
     }
 
     private interface SpawnConsumer{
         void accept(float x, float y, boolean shockwave);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void spawnEffect(float x, float y, UnitType type){
+        Fx.unitSpawn.at(x, y, 0f, type);
+
+        Time.run(30f, () -> Fx.spawn.at(x, y));
     }
 }
