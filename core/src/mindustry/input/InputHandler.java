@@ -126,7 +126,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile != null && tile.team() == unit.team && pay.payloads().size < unit.type().payloadCapacity
             && unit.within(tile, tilesize * tile.block.size * 1.2f)){
             //pick up block directly
-            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
+            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2 && tile.canPickup()){
                 pay.pickup(tile);
             }else{ //pick up block payload
                 Payload current = tile.getPayload();

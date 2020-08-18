@@ -39,5 +39,10 @@ public abstract class StorageBlock extends Block{
                 linkedCore.drawSelect();
             }
         }
+
+        @Override
+        public boolean canPickup(){
+            return linkedCore != null;
+        }
     }
 }

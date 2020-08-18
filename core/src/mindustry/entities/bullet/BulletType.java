@@ -270,7 +270,7 @@ public abstract class BulletType extends Content{
     }
 
     public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
-        Call.createBullet(this, team, x, y, damage, angle, velocityScl, lifetimeScl);
+        Call.createBullet(this, team, x, y, angle, damage, velocityScl, lifetimeScl);
     }
 
     @Remote(called = Loc.server, unreliable = true)

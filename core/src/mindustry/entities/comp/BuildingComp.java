@@ -1070,6 +1070,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return true;
     }
 
+    public boolean canPickup(){
+        return true;
+    }
+
     public void removeFromProximity(){
         onProximityRemoved();
         tmpTiles.clear();

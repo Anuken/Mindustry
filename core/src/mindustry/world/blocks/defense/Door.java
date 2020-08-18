@@ -84,12 +84,16 @@ public class Door extends Wall{
             if(type == LAccess.enabled){
                 boolean shouldOpen = !Mathf.zero(p1);
 
-                if(open == shouldOpen || (Units.anyEntities(tile) && !shouldOpen) || !timer(timerToggle, 60f)){
+                if(open == shouldOpen || (Units.anyEntities(tile) && !shouldOpen) || !origin().timer(timerToggle, 60f)){
                     return;
                 }
 
                 configureAny(shouldOpen);
             }
+        }
+
+        public DoorBuild origin(){
+            return chained.isEmpty() ? this : chained.first();
         }
 
         public void effect(){
@@ -130,7 +134,7 @@ public class Door extends Wall{
 
         @Override
         public void tapped(Player player){
-            if((Units.anyEntities(tile) && open) || !timer(timerToggle, 40f)){
+            if((Units.anyEntities(tile) && open) || !origin().timer(timerToggle, 50f)){
                 return;
             }
 

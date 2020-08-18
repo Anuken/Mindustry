@@ -43,12 +43,14 @@ public class LogicDisplay extends Block{
         public void draw(){
             super.draw();
 
-            if(buffer == null){
-                buffer = new FrameBuffer(displaySize, displaySize);
-                //clear the buffer - some OSs leave garbage in it
-                buffer.begin(Pal.darkerMetal);
-                buffer.end();
-            }
+            Draw.draw(Draw.z(), () -> {
+                if(buffer == null){
+                    buffer = new FrameBuffer(displaySize, displaySize);
+                    //clear the buffer - some OSs leave garbage in it
+                    buffer.begin(Pal.darkerMetal);
+                    buffer.end();
+                }
+            });
 
             if(!commands.isEmpty()){
                 Draw.draw(Draw.z(), () -> {
@@ -86,7 +88,11 @@ public class LogicDisplay extends Block{
                 });
             }
 
-            Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * Draw.scl, -buffer.getHeight() * Draw.scl);
+            Draw.draw(Draw.z(), () -> {
+                if(buffer != null){
+                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * Draw.scl, -buffer.getHeight() * Draw.scl);
+                }
+            });
         }
     }
 
