@@ -88,7 +88,7 @@ public class Sorter extends Block{
 
         public boolean isSame(Building other){
             // comment code below to allow sorter/gate chaining
-            return other != null && (other.block() instanceof Sorter || other.block() instanceof OverflowGate);
+            return other != null && other.block().instantTransfer;
         }
 
         public Building getTileTarget(Item item, Building source, boolean flip){
