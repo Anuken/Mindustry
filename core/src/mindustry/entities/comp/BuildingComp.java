@@ -45,6 +45,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
     static final Seq<Building> tempTileEnts = new Seq<>();
     static final Seq<Tile> tempTiles = new Seq<>();
+    static final float timeToUncontrol = 60f * 4;
     static int sleepingEntities = 0;
     
     @Import float x, y, health;
@@ -57,6 +58,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient byte dump;
     transient int rotation;
     transient boolean enabled = true;
+    transient float enabledControlTime;
 
     PowerModule power;
     ItemModule items;
@@ -336,9 +338,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void created(){}
-    
+
     public boolean shouldConsume(){
-        return true;
+        return enabled;
     }
 
     public boolean productionValid(){
@@ -749,6 +751,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Draw the block overlay that is shown when a cursor is over the block. */
     public void drawSelect(){
+    }
+
+    public void drawDisabled(){
+        Draw.color(Color.scarlet);
+        Draw.alpha(0.8f);
+
+        float size = 6f;
+        Draw.rect(Icon.cancel.getRegion(), x, y, size, size);
+
+        Draw.reset();
     }
 
     public void draw(){
@@ -1203,6 +1215,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void control(LAccess type, double p1, double p2, double p3, double p4){
         if(type == LAccess.enabled){
             enabled = !Mathf.zero((float)p1);
+            enabledControlTime = timeToUncontrol;
         }
     }
 
@@ -1228,6 +1241,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;
+        }
+
+        enabledControlTime -= Time.delta;
+
+        if(enabledControlTime <= 0){
+            enabled = true;
         }
 
         if(sound != null){

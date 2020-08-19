@@ -136,6 +136,9 @@ public class OverlayRenderer{
 
             if(tile != null && tile.team() == player.team()){
                 tile.drawSelect();
+                if(!tile.enabled){
+                   tile.drawDisabled();
+                }
 
                 if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.team())){
                     control.input.drawArrow(tile.block(), tile.tileX(), tile.tileY(), tile.rotation, true);

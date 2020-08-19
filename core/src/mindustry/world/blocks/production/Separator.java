@@ -71,7 +71,7 @@ public class Separator extends Block{
                     total -= items.get(stack.item);
                 }
             }
-            return total < itemCapacity;
+            return total < itemCapacity && super.shouldConsume();
         }
 
         @Override

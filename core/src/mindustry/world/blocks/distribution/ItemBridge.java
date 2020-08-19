@@ -391,7 +391,7 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return linkValid(tile, world.tile(link));
+            return linkValid(tile, world.tile(link)) && super.shouldConsume();
         }
 
         @Override
