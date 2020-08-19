@@ -88,7 +88,7 @@ public class NetworkIO{
         return buffer;
     }
 
-    public static Host readServerData(String hostAddress, ByteBuffer buffer){
+    public static Host readServerData(int ping, String hostAddress, ByteBuffer buffer){
         String host = readString(buffer);
         String map = readString(buffer);
         int players = buffer.getInt();
@@ -100,7 +100,7 @@ public class NetworkIO{
         String description = readString(buffer);
         String modeName = readString(buffer);
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
+        return new Host(ping, host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){

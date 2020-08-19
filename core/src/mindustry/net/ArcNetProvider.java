@@ -180,6 +180,7 @@ public class ArcNetProvider implements NetProvider{
         Threads.daemon(() -> {
             try{
                 DatagramSocket socket = new DatagramSocket();
+                long time = Time.millis();
                 socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
                 socket.setSoTimeout(2000);
 
@@ -187,7 +188,7 @@ public class ArcNetProvider implements NetProvider{
                 socket.receive(packet);
 
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
+                Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
 
                 Core.app.post(() -> valid.get(host));
             }catch(Exception e){
@@ -199,6 +200,7 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void discoverServers(Cons<Host> callback, Runnable done){
         Seq<InetAddress> foundAddresses = new Seq<>();
+        long time = Time.millis();
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
             Core.app.post(() -> {
                 try{
@@ -206,7 +208,7 @@ public class ArcNetProvider implements NetProvider{
                         return;
                     }
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                    Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
+                    Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
                     callback.get(host);
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
