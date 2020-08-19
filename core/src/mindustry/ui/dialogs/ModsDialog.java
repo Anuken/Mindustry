@@ -3,6 +3,7 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.Net.*;
 import arc.files.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.TextButton.*;
@@ -106,31 +107,13 @@ public class ModsDialog extends BaseDialog{
                             Core.settings.put("lastmod", text);
 
                             ui.loadfrag.show();
-                            Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/6.0", loc -> {
-                                Core.net.httpGet(loc.getHeader("Location"), result -> {
-                                    if(result.getStatus() != HttpStatus.OK){
-                                        ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
-                                        ui.loadfrag.hide();
-                                    }else{
-                                        try{
-                                            Fi file = tmpDirectory.child(text.replace("/", "") + ".zip");
-                                            Streams.copy(result.getResultAsStream(), file.write(false));
-                                            mods.importMod(file);
-                                            file.delete();
-                                            Core.app.post(() -> {
-                                                try{
-                                                    setup();
-                                                    ui.loadfrag.hide();
-                                                }catch(Throwable e){
-                                                    ui.showException(e);
-                                                }
-                                            });
-                                        }catch(Throwable e){
-                                            modError(e);
-                                        }
-                                    }
-                                }, t2 -> Core.app.post(() -> modError(t2)));
-                            }, t2 -> Core.app.post(() -> modError(t2)));
+                            // Try to download the 6.0 branch first, but if it doesnt exist try master.
+                            githubImport("6.0", text, e1 -> {
+                                githubImport("master", text, e2 -> {
+                                    ui.showErrorMessage(Core.bundle.format("connectfail", e2));
+                                    ui.loadfrag.hide();
+                                });
+                            });
                         });
                     }).margin(12f);
                 });
@@ -288,8 +271,33 @@ public class ModsDialog extends BaseDialog{
             }*/
         }).width(400f);
 
-
-
         dialog.show();
+    }
+
+    private void githubImport(String branch, String repo, Cons<HttpStatus> err){
+        Core.net.httpGet("http://api.github.com/repos/" + repo + "/zipball/" + branch, loc -> {
+            Core.net.httpGet(loc.getHeader("Location"), result -> {
+                if(result.getStatus() != HttpStatus.OK){
+                    err.get(result.getStatus());
+                }else{
+                    try{
+                        Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
+                        Streams.copy(result.getResultAsStream(), file.write(false));
+                        mods.importMod(file);
+                        file.delete();
+                        Core.app.post(() -> {
+                            try{
+                                setup();
+                                ui.loadfrag.hide();
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
+                        });
+                    }catch(Throwable e){
+                        modError(e);
+                    }
+                }
+             }, t2 -> Core.app.post(() -> modError(t2)));
+         }, t2 -> Core.app.post(() -> modError(t2)));
     }
 }
