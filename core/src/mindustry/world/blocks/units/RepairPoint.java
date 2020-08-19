@@ -115,7 +115,7 @@ public class RepairPoint extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return target != null && super.shouldConsume();
+            return target != null && enabled;
         }
     }
 }

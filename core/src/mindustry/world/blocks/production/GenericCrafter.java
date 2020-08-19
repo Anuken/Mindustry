@@ -93,7 +93,7 @@ public class GenericCrafter extends Block{
             if(outputItem != null && items.get(outputItem.item) >= itemCapacity){
                 return false;
             }
-            return (outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f)) && super.shouldConsume();
+            return (outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f)) && enabled;
         }
 
         @Override

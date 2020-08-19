@@ -45,7 +45,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
     static final Seq<Building> tempTileEnts = new Seq<>();
     static final Seq<Tile> tempTiles = new Seq<>();
-    static final float timeToUncontrol = 60f * 4;
+    static final float timeToUncontrol = 60f * 6;
     static int sleepingEntities = 0;
     
     @Import float x, y, health;
