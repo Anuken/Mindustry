@@ -210,7 +210,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void tileConfig(Player player, Building tile, @Nullable Object value){
-        if(tile == null || player == null) return;
+        if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
         tile.configured(player, value);
