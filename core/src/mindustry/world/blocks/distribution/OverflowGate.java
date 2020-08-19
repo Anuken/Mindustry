@@ -21,6 +21,7 @@ public class OverflowGate extends Block{
         solid = true;
         update = true;
         group = BlockGroup.transportation;
+        instantTransfer = true;
         unloadable = false;
         canOverdrive = false;
     }
@@ -30,10 +31,10 @@ public class OverflowGate extends Block{
         return true;
     }
 
-    public class OverflowGateEntity extends Building{
-        Item lastItem;
-        Tile lastInput;
-        float time;
+    public class OverflowGateBuild extends Building{
+        public Item lastItem;
+        public Tile lastInput;
+        public float time;
 
         @Override
         public int acceptStack(Item item, int amount, Teamc source){
@@ -92,12 +93,11 @@ public class OverflowGate extends Block{
             Building to = nearby((from + 2) % 4);
             boolean canForward = to != null && to.acceptItem(this, item) && to.team() == team && !(to.block() instanceof OverflowGate);
 
-
             if(!canForward || invert){
                 Building a = nearby(Mathf.mod(from - 1, 4));
                 Building b = nearby(Mathf.mod(from + 1, 4));
-                boolean ac = a != null && a.acceptItem(this, item) && !(a.block() instanceof OverflowGate) && a.team() == team;
-                boolean bc = b != null && b.acceptItem(this, item) && !(b.block() instanceof OverflowGate) && b.team() == team;
+                boolean ac = a != null && a.acceptItem(this, item) && !(a.block() instanceof OverflowGate) && a.team == team;
+                boolean bc = b != null && b.acceptItem(this, item) && !(b.block() instanceof OverflowGate) && b.team == team;
 
                 if(!ac && !bc){
                     return invert && canForward ? to : null;
@@ -128,12 +128,15 @@ public class OverflowGate extends Block{
 
         @Override
         public void write(Writes write){
+            super.write(write);
+
             write.i(lastInput == null ? -1 : lastInput.pos());
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+
             if(revision == 1){
                 new DirectionalItemBuffer(25).read(read);
             }else if(revision == 3){

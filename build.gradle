@@ -180,6 +180,15 @@ allprojects{
     }
 }
 
+//compile with java 8 compatibility for everything except the annotati project
+configure(subprojects - project(":annotations")){
+    tasks.withType(JavaCompile){
+        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+            options.compilerArgs.addAll(['--release', '8'])
+        }
+    }
+}
+
 project(":desktop"){
     apply plugin: "java"
 
@@ -310,6 +319,7 @@ project(":tests"){
         workingDir = new File("../core/assets")
         testLogging {
             exceptionFormat = 'full'
+            showStandardStreams = true
         }
     }
 }
@@ -324,8 +334,6 @@ project(":tools"){
         implementation arcModule("natives:natives-freetype-desktop")
         implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
-
-        implementation "org.reflections:reflections:0.9.11"
     }
 }
 

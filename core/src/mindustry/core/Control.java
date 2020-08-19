@@ -94,7 +94,6 @@ public class Control implements ApplicationListener, Loadable{
             tutorial.reset();
 
             hiscore = false;
-
             saves.resetSave();
         });
 
@@ -109,20 +108,24 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(GameOverEvent.class, event -> {
             state.stats.wavesLasted = state.wave;
-            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            Effect.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.gameOver(event.winner);
         });
 
+        //add player when world loads regardless
+        Events.on(WorldLoadEvent.class, e -> {
+            player.add();
+        });
+
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
-            player.add();
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
                     player.admin(true);
                 }catch(IOException e){
-                    ui.showException("$server.error", e);
+                    ui.showException("@server.error", e);
                     state.set(State.menu);
                 }
             }
@@ -171,7 +174,7 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(Trigger.newGame, () -> {
+        Events.run(Trigger.newGame, () -> {
             Building core = player.closestCore();
 
             if(core == null) return;
@@ -188,7 +191,7 @@ public class Control implements ApplicationListener, Loadable{
             app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
-                Effects.shake(5f, 5f, core);
+                Effect.shake(5f, 5f, core);
             });
         });
 
@@ -257,7 +260,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     //TODO move
-    public void handleLaunch(CoreEntity tile){
+    public void handleLaunch(CoreBuild tile){
         LaunchCorec ent = LaunchCore.create();
         ent.set(tile);
         ent.block(Blocks.coreShard);
@@ -312,7 +315,7 @@ public class Control implements ApplicationListener, Loadable{
                 }catch(SaveException e){
                     Log.err(e);
                     sector.save = null;
-                    Time.runTask(10f, () -> ui.showErrorMessage("$save.corrupted"));
+                    Time.runTask(10f, () -> ui.showErrorMessage("@save.corrupted"));
                     slot.delete();
                     playSector(origin, sector);
                 }
@@ -434,6 +437,7 @@ public class Control implements ApplicationListener, Loadable{
                 ui.showStartupInfo("[accent]v6[] is currently in [accent]pre-alpha[].\n" +
                 "[lightgray]This means:[]\n" +
                 "- Content is missing\n" +
+                "- [scarlet]Mobile[] is not supported.\n" +
                 "- Most [scarlet]Unit AI[] does not work\n" +
                 "- Many units are [scarlet]missing[] or unfinished\n" +
                 "- The campaign is completely unfinished\n" +
@@ -450,7 +454,7 @@ public class Control implements ApplicationListener, Loadable{
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             Core.app.post(() -> Core.app.post(() -> {
-                BaseDialog dialog = new BaseDialog("$confirm");
+                BaseDialog dialog = new BaseDialog("@confirm");
                 dialog.setFillParent(true);
 
                 float[] countdown = {60 * 11};
@@ -469,9 +473,9 @@ public class Control implements ApplicationListener, Loadable{
                 }).pad(10f).expand().center();
 
                 dialog.buttons.defaults().size(200f, 60f);
-                dialog.buttons.button("$uiscale.cancel", exit);
+                dialog.buttons.button("@uiscale.cancel", exit);
 
-                dialog.buttons.button("$ok", () -> {
+                dialog.buttons.button("@ok", () -> {
                     Core.settings.put("uiscalechanged", false);
                     dialog.hide();
                 });

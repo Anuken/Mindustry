@@ -12,15 +12,7 @@ import static mindustry.Vars.pathfinder;
 public class GroundAI extends AIController{
 
     @Override
-    public void updateUnit(){
-
-        if(Units.invalidateTarget(target, unit.team(), unit.x(), unit.y(), Float.MAX_VALUE)){
-            target = null;
-        }
-
-        if(retarget()){
-            targetClosest();
-        }
+    public void updateMovement(){
 
         Building core = unit.closestEnemyCore();
 
@@ -34,20 +26,13 @@ public class GroundAI extends AIController{
             }
         }
 
-        boolean rotate = false, shoot = false;
-
         if(!Units.invalidateTarget(target, unit, unit.range())){
-            rotate = true;
-            shoot = unit.within(target, unit.range());
-
             if(unit.type().hasWeapons()){
                 unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
             unit.lookAt(unit.vel().angle());
         }
-
-        unit.controlWeapons(rotate, shoot);
     }
 
     protected void moveToCore(FlagTarget path){

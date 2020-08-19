@@ -20,7 +20,7 @@ public abstract class StorageBlock extends Block{
         return false;
     }
 
-    public class StorageBlockEntity extends Building{
+    public class StorageBuild extends Building{
         protected @Nullable Building linkedCore;
 
         @Override
@@ -38,6 +38,11 @@ public abstract class StorageBlock extends Block{
             if(linkedCore != null){
                 linkedCore.drawSelect();
             }
+        }
+
+        @Override
+        public boolean canPickup(){
+            return linkedCore != null;
         }
     }
 }

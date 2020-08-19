@@ -11,6 +11,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
+import static mindustry.content.SectorPresets.*;
+import static mindustry.content.SectorPresets.craters;
 import static mindustry.content.UnitTypes.*;
 import static mindustry.type.ItemStack.*;
 
@@ -110,7 +112,7 @@ public class TechTree implements ContentList{
                 });
 
                 node(Items.coal, with(Items.lead, 3000), () -> {
-                    node(Items.graphite, with(Items.coal, 3000), () -> {
+                    node(Items.graphite, with(Items.coal, 1000), () -> {
                         node(graphitePress, () -> {
                             node(Items.titanium, with(Items.graphite, 6000, Items.copper, 10000, Items.lead, 10000), () -> {
                                 node(pneumaticDrill, () -> {
@@ -405,17 +407,87 @@ public class TechTree implements ContentList{
             });
 
             //TODO research sectors
-            /*
-            node(SectorPresets.groundZero, () -> {
-                node(SectorPresets.nuclearComplex, () -> {
-                    node(SectorPresets.craters, () -> {
-                        node(SectorPresets.saltFlats, () -> {
 
+            node(groundZero, () -> {
+                node(frozenForest, Seq.with(
+                    new SectorComplete(groundZero),
+                    new Research(junction),
+                    new Research(router)
+                ), () -> {
+                    node(craters, Seq.with(
+                        new SectorComplete(frozenForest),
+                        new Research(mender),
+                        new Research(combustionGenerator)
+                    ), () -> {
+                        node(ruinousShores, Seq.with(
+                            new SectorComplete(craters),
+                            new Research(graphitePress),
+                            new Research(combustionGenerator),
+                            new Research(kiln),
+                            new Research(mechanicalPump)
+                        ), () -> {
+
+                            node(tarFields, Seq.with(
+                                new SectorComplete(ruinousShores),
+                                new Research(coalCentrifuge),
+                                new Research(conduit),
+                                new Research(wave)
+                            ), () -> {
+                                node(desolateRift, Seq.with(
+                                    new SectorComplete(tarFields),
+                                    new Research(thermalGenerator),
+                                    new Research(thoriumReactor)
+                                ), () -> {
+
+                                });
+                            });
+
+                            node(saltFlats, Seq.with(
+                                new SectorComplete(ruinousShores),
+                                new Research(groundFactory),
+                                new Research(airFactory),
+                                new Research(door),
+                                new Research(waterExtractor)
+                            ), () -> {
+
+                            });
+                        });
+
+                        node(overgrowth, Seq.with(
+                            new SectorComplete(craters),
+                            new SectorComplete(fungalPass),
+                            new Research(cultivator),
+                            new Research(sporePress),
+                            new Research(UnitTypes.mace),
+                            new Research(UnitTypes.flare)
+                        ), () -> {
+
+                        });
+                    });
+
+                    node(stainedMountains, Seq.with(
+                        new SectorComplete(frozenForest),
+                        new Research(pneumaticDrill),
+                        new Research(powerNode),
+                        new Research(turbineGenerator)
+                    ), () -> {
+                        node(fungalPass, Seq.with(
+                            new SectorComplete(stainedMountains),
+                            new Research(groundFactory),
+                            new Research(door),
+                            new Research(siliconSmelter)
+                        ), () -> {
+                            node(nuclearComplex, Seq.with(
+                                new SectorComplete(fungalPass),
+                                new Research(thermalGenerator),
+                                new Research(laserDrill)
+                            ), () -> {
+
+                            });
                         });
                     });
                 });
             });
-             */
         });
     }
 
@@ -446,6 +518,12 @@ public class TechTree implements ContentList{
 
     private static TechNode node(UnlockableContent content, ItemStack[] requirements, Runnable children){
         return new TechNode(content, requirements, children);
+    }
+
+    private static TechNode node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
+        TechNode node = new TechNode(content, empty, children);
+        node.objectives = objectives;
+        return node;
     }
 
     private static TechNode node(UnlockableContent block){

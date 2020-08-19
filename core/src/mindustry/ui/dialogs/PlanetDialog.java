@@ -37,12 +37,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private int launchRange;
     private float zoom = 1f, selectAlpha = 1f;
     private @Nullable Sector selected, hovered, launchSector;
-    private CoreEntity launcher;
+    private CoreBuild launcher;
     private Mode mode = look;
     private boolean launching;
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
+
+        shouldPause = true;
 
         getCell(buttons).padBottom(-4);
         buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
@@ -91,7 +93,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         return super.show();
     }
 
-    public void show(Sector sector, CoreEntity launcher){
+    public void show(Sector sector, CoreBuild launcher){
         this.launcher = launcher;
         selected = null;
         hovered = null;
@@ -117,8 +119,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean canLaunch(Sector sector){
         return mode == launch &&
             (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
-            //TODO completely untested
-            || (sector.preset != null && sector.preset.unlocked() && sector.preset.requirements.contains(r -> r.zone() != null && r.zone() == sector.preset))); //is an unlocked preset
+            || (sector.preset != null && sector.preset.unlocked())); //is an unlocked preset
     }
 
     @Override
@@ -362,15 +363,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             }).row();
         }
-
-        //display how many turns this sector has been attacked
-        //TODO implement properly
-        /*
-        if(sector.getTurnsPassed() > 0 && sector.hasBase()){
-            stable.row();
-
-            stable.add("[scarlet]" + Iconc.warning + " " + sector.getTurnsPassed() + "x attacks");
-        }*/
 
         stable.row();
 

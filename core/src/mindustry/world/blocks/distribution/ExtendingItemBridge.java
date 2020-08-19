@@ -15,8 +15,8 @@ public class ExtendingItemBridge extends ItemBridge{
         super(name);
         hasItems = true;
     }
-    
-    public class ExtendingItemBridgeEntity extends ItemBridgeEntity{
+
+    public class ExtendingItemBridgeBuild extends ItemBridgeBuild{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
@@ -45,7 +45,7 @@ public class ExtendingItemBridge extends ItemBridge{
             x + Geometry.d4[i].x * tilesize / 2f,
             y + Geometry.d4[i].y * tilesize / 2f,
             x + ex,
-            y + ey, CapStyle.none, 0f);
+            y + ey, false, 0f);
 
             Draw.rect(endRegion, x, y, i * 90 + 90);
             Draw.rect(endRegion,

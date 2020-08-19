@@ -89,7 +89,7 @@ public class Sector{
      * Only sectors adjacent to non-wave sectors can be landed on.
      * TODO also preset sectors*/
     public boolean unlocked(){
-        return hasBase() || Structs.contains(tile.tiles, p -> planet.getSector(p).isCaptured()) || (preset != null && preset.unlocked());
+        return hasBase() || (preset != null && preset.alwaysUnlocked);
     }
 
     /** @return whether the player has a base here. */
@@ -149,12 +149,16 @@ public class Sector{
     }
 
     //TODO this should be stored in a more efficient structure, and be updated each turn
-    public Seq<ItemStack> getReceivedItems(){
-        return Core.settings.getJson(key("received-items"), Seq.class, ItemStack.class, Seq::new);
+    public ItemSeq getExtraItems(){
+        return Core.settings.getJson(key("extra-items"), ItemSeq.class, ItemSeq::new);
     }
 
-    public void setReceivedItems(Seq<ItemStack> stacks){
-        Core.settings.putJson(key("received-items"), ItemStack.class, stacks);
+    public void setExtraItems(ItemSeq stacks){
+        Core.settings.putJson(key("extra-items"),  stacks);
+    }
+
+    public void addItem(Item item, int amount){
+        removeItem(item, -amount);
     }
 
     public void removeItem(Item item, int amount){
@@ -163,16 +167,11 @@ public class Sector{
                 state.rules.defaultTeam.items().remove(item, amount);
             }
         }else{
-            Seq<ItemStack> recv = getReceivedItems();
+            ItemSeq recv = getExtraItems();
 
-            ItemStack fit = recv.find(i -> i.item == item);
-            if(fit != null){
-                fit.amount -= amount;
-            }else{
-                recv.add(new ItemStack(item, amount));
-            }
+            recv.remove(item, amount);
 
-            setReceivedItems(recv);
+            setExtraItems(recv);
         }
     }
 
@@ -188,26 +187,9 @@ public class Sector{
                 count.add(ent.key, ent.value);
             }
 
-            count.add(calculateRecievedItems());
-        }
+            count.add(calculateReceivedItems());
 
-        return count;
-    }
-
-    public ItemSeq calculateRecievedItems(){
-        ItemSeq count = new ItemSeq();
-
-        if(save != null){
             int capacity = save.meta.secinfo.storageCapacity;
-            long seconds = getSecondsPassed();
-
-            //add produced items
-            save.meta.secinfo.production.each((item, stat) -> {
-                count.add(item, (int)(stat.mean * seconds));
-            });
-
-            //add received items
-            getReceivedItems().each(stack -> count.add(stack.item, stack.amount));
 
             //validation
             for(Item item : content.items()){
@@ -216,6 +198,22 @@ public class Sector{
                 //cap the items
                 if(count.get(item) > capacity) count.set(item, capacity);
             }
+        }
+
+        return count;
+    }
+
+    public ItemSeq calculateReceivedItems(){
+        ItemSeq count = new ItemSeq();
+
+        if(save != null){
+            long seconds = getSecondsPassed();
+
+            //add produced items
+            save.meta.secinfo.production.each((item, stat) -> count.add(item, (int)(stat.mean * seconds)));
+
+            //add received items
+            getExtraItems().each(count::add);
         }
 
         return count;

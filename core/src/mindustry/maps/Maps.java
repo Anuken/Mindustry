@@ -3,11 +3,11 @@ package mindustry.maps;
 import arc.*;
 import arc.assets.*;
 import arc.assets.loaders.*;
-import arc.struct.*;
-import arc.struct.IntSet.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.struct.IntSet.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.async.*;
@@ -15,7 +15,7 @@ import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.io.*;
@@ -87,7 +87,7 @@ public class Maps{
         });
 
         if(Core.assets != null){
-            ((CustomLoader) Core.assets.getLoader(Content.class)).loaded = this::createAllPreviews;
+            ((CustomLoader)Core.assets.getLoader(ContentLoader.class)).loaded = this::createAllPreviews;
         }
     }
 
@@ -266,11 +266,11 @@ public class Maps{
             Log.err(e);
 
             if("Outdated legacy map format".equals(e.getMessage())){
-                ui.showErrorMessage("$editor.errornot");
+                ui.showErrorMessage("@editor.errornot");
             }else if(e.getMessage() != null && e.getMessage().contains("Incorrect header!")){
-                ui.showErrorMessage("$editor.errorheader");
+                ui.showErrorMessage("@editor.errorheader");
             }else{
-                ui.showException("$editor.errorload", e);
+                ui.showException("@editor.errorload", e);
             }
         }
     }

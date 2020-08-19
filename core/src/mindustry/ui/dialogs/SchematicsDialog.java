@@ -28,14 +28,14 @@ public class SchematicsDialog extends BaseDialog{
     private TextField searchField;
 
     public SchematicsDialog(){
-        super("$schematics");
+        super("@schematics");
         Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> {
             ((Texture)t).setWrap(TextureWrap.repeat);
         };
 
         shouldPause = true;
         addCloseButton();
-        buttons.button("$schematic.import", Icon.download, this::showImport);
+        buttons.button("@schematic.import", Icon.download, this::showImport);
         shown(this::setup);
         onResize(this::setup);
     }
@@ -102,11 +102,11 @@ public class SchematicsDialog extends BaseDialog{
                             });
 
                             buttons.button(Icon.pencil, style, () -> {
-                                ui.showTextInput("$schematic.rename", "$name", s.name(), res -> {
+                                ui.showTextInput("@schematic.rename", "@name", s.name(), res -> {
                                     Schematic replacement = schematics.all().find(other -> other.name().equals(res) && other != s);
                                     if(replacement != null){
                                         //renaming to an existing schematic is not allowed, as it is not clear how the tags would be merged, and which one should be removed
-                                        ui.showErrorMessage("$schematic.exists");
+                                        ui.showErrorMessage("@schematic.exists");
                                         return;
                                     }
 
@@ -123,7 +123,7 @@ public class SchematicsDialog extends BaseDialog{
                                     if(s.mod != null){
                                         ui.showInfo(Core.bundle.format("mod.item.remove", s.mod.meta.displayName()));
                                     }else{
-                                        ui.showConfirm("$confirm", "$schematic.delete.confirm", () -> {
+                                        ui.showConfirm("@confirm", "@schematic.delete.confirm", () -> {
                                             schematics.remove(s);
                                             rebuildPane[0].run();
                                         });
@@ -159,7 +159,7 @@ public class SchematicsDialog extends BaseDialog{
                 }
 
                 if(firstSchematic == null){
-                    t.add("$none");
+                    t.add("@none");
                 }
             };
 
@@ -172,28 +172,28 @@ public class SchematicsDialog extends BaseDialog{
     }
 
     public void showImport(){
-        BaseDialog dialog = new BaseDialog("$editor.export");
+        BaseDialog dialog = new BaseDialog("@editor.export");
         dialog.cont.pane(p -> {
             p.margin(10f);
             p.table(Tex.button, t -> {
                 TextButtonStyle style = Styles.cleart;
                 t.defaults().size(280f, 60f).left();
                 t.row();
-                t.button("$schematic.copy.import", Icon.copy, style, () -> {
+                t.button("@schematic.copy.import", Icon.copy, style, () -> {
                     dialog.hide();
                     try{
                         Schematic s = Schematics.readBase64(Core.app.getClipboardText());
                         s.removeSteamID();
                         schematics.add(s);
                         setup();
-                        ui.showInfoFade("$schematic.saved");
+                        ui.showInfoFade("@schematic.saved");
                         showInfo(s);
                     }catch(Throwable e){
                         ui.showException(e);
                     }
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith(schematicBaseStart));
                 t.row();
-                t.button("$schematic.importfile", Icon.download, style, () -> platform.showFileChooser(true, schematicExtension, file -> {
+                t.button("@schematic.importfile", Icon.download, style, () -> platform.showFileChooser(true, schematicExtension, file -> {
                     dialog.hide();
 
                     try{
@@ -208,7 +208,7 @@ public class SchematicsDialog extends BaseDialog{
                 })).marginLeft(12f);
                 t.row();
                 if(steam){
-                    t.button("$schematic.browseworkshop", Icon.book, style, () -> {
+                    t.button("@schematic.browseworkshop", Icon.book, style, () -> {
                         dialog.hide();
                         platform.openWorkshop();
                     }).marginLeft(12f);
@@ -221,25 +221,25 @@ public class SchematicsDialog extends BaseDialog{
     }
 
     public void showExport(Schematic s){
-        BaseDialog dialog = new BaseDialog("$editor.export");
+        BaseDialog dialog = new BaseDialog("@editor.export");
         dialog.cont.pane(p -> {
            p.margin(10f);
            p.table(Tex.button, t -> {
                TextButtonStyle style = Styles.cleart;
                 t.defaults().size(280f, 60f).left();
                 if(steam && !s.hasSteamID()){
-                    t.button("$schematic.shareworkshop", Icon.book, style,
+                    t.button("@schematic.shareworkshop", Icon.book, style,
                         () -> platform.publish(s)).marginLeft(12f);
                     t.row();
                     dialog.hide();
                 }
-                t.button("$schematic.copy", Icon.copy, style, () -> {
+                t.button("@schematic.copy", Icon.copy, style, () -> {
                     dialog.hide();
-                    ui.showInfoFade("$copied");
+                    ui.showInfoFade("@copied");
                     Core.app.setClipboardText(schematics.writeBase64(s));
                 }).marginLeft(12f);
                 t.row();
-                t.button("$schematic.exportfile", Icon.export, style, () -> {
+                t.button("@schematic.exportfile", Icon.export, style, () -> {
                     dialog.hide();
                     platform.export(s.name(), schematicExtension, file -> Schematics.write(s, file));
                 }).marginLeft(12f);

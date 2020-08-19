@@ -45,6 +45,7 @@ public class Conveyor extends Block implements Autotiler{
         idleSound = Sounds.conveyor;
         idleSoundVolume = 0.004f;
         unloadable = false;
+        noUpdateDisabled = false;
     }
 
     @Override
@@ -91,30 +92,30 @@ public class Conveyor extends Block implements Autotiler{
             Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
     }
 
-    public class ConveyorEntity extends Building{
+    public class ConveyorBuild extends Building{
         //parallel array data
-        Item[] ids = new Item[capacity];
-        float[] xs = new float[capacity];
-        float[] ys = new float[capacity];
+        public Item[] ids = new Item[capacity];
+        public float[] xs = new float[capacity];
+        public float[] ys = new float[capacity];
         //amount of items, always < capacity
-        int len = 0;
+        public int len = 0;
         //next entity
-        @Nullable Building next;
-        @Nullable ConveyorEntity nextc;
+        public @Nullable Building next;
+        public @Nullable ConveyorBuild nextc;
         //whether the next conveyor's rotation == tile rotation
-        boolean aligned;
+        public boolean aligned;
 
-        int lastInserted, mid;
-        float minitem = 1;
+        public int lastInserted, mid;
+        public float minitem = 1;
 
-        int blendbits, blending;
-        int blendsclx, blendscly;
+        public int blendbits, blending;
+        public int blendsclx, blendscly;
 
-        float clogHeat = 0f;
+        public float clogHeat = 0f;
 
         @Override
         public void draw(){
-            int frame = clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time() * speed * 8f * timeScale())) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -162,7 +163,7 @@ public class Conveyor extends Block implements Autotiler{
 
             if(front() != null && front() != null){
                 next = front();
-                nextc = next instanceof ConveyorEntity && next.team() == team ? (ConveyorEntity)next : null;
+                nextc = next instanceof ConveyorBuild && next.team() == team ? (ConveyorBuild)next : null;
                 aligned = nextc != null && rotation == next.rotation;
             }
         }
@@ -208,10 +209,11 @@ public class Conveyor extends Block implements Autotiler{
             }
 
             float nextMax = aligned ? 1f - Math.max(itemSpace - nextc.minitem, 0) : 1f;
+            float moved = speed * edelta();
 
             for(int i = len - 1; i >= 0; i--){
                 float nextpos = (i == len - 1 ? 100f : ys[i + 1]) - itemSpace;
-                float maxmove = Mathf.clamp(nextpos - ys[i], 0, speed * delta());
+                float maxmove = Mathf.clamp(nextpos - ys[i], 0, moved);
 
                 ys[i] += maxmove;
 
@@ -348,7 +350,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
 
-        final void add(int o){
+        public final void add(int o){
             for(int i = Math.max(o + 1, len); i > o; i--){
                 ids[i] = ids[i - 1];
                 xs[i] = xs[i - 1];
@@ -358,7 +360,7 @@ public class Conveyor extends Block implements Autotiler{
             len++;
         }
 
-        final void remove(int o){
+        public final void remove(int o){
             for(int i = o; i < len - 1; i++){
                 ids[i] = ids[i + 1];
                 xs[i] = xs[i + 1];

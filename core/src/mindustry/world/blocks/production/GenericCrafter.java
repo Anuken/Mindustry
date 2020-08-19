@@ -31,7 +31,6 @@ public class GenericCrafter extends Block{
         update = true;
         solid = true;
         hasItems = true;
-        health = 60;
         idleSound = Sounds.machine;
         sync = true;
         idleSoundVolume = 0.03f;
@@ -79,7 +78,7 @@ public class GenericCrafter extends Block{
         return outputItem != null;
     }
 
-    public class GenericCrafterEntity extends Building{
+    public class GenericCrafterBuild extends Building{
         public float progress;
         public float totalProgress;
         public float warmup;

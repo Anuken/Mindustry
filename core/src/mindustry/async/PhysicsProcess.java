@@ -68,6 +68,8 @@ public class PhysicsProcess implements AsyncProcess{
             PhysicRef ref = entity.physref();
 
             if(ref.wasGround != grounded){
+                if(ref.body.getFixtureList().isEmpty()) continue;
+
                 //set correct filter
                 ref.body.getFixtureList().first().setFilterData(grounded ? ground : flying);
                 ref.wasGround = grounded;

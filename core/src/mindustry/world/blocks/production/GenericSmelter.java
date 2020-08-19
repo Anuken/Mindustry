@@ -16,7 +16,7 @@ public class GenericSmelter extends GenericCrafter{
         super(name);
     }
 
-    public class SmelterEntity extends GenericCrafterEntity{
+    public class SmelterBuild extends GenericCrafterBuild{
         @Override
         public void draw(){
             super.draw();

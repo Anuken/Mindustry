@@ -17,6 +17,8 @@ abstract class CommanderComp implements Unitc{
 
     transient @Nullable Formation formation;
     transient Seq<Unit> controlling = new Seq<>();
+    /** minimum speed of any unit in the formation. */
+    transient float minFormationSpeed;
 
     @Override
     public void update(){
@@ -45,17 +47,25 @@ abstract class CommanderComp implements Unitc{
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
+        float spacing = hitSize() * 1.7f;
+        minFormationSpeed = type().speed;
+
         controlling.addAll(units);
         for(Unit unit : units){
-            unit.controller(new FormationAI(base(), formation));
+            FormationAI ai;
+            unit.controller(ai = new FormationAI(base(), formation));
+            spacing = Math.max(spacing, ai.formationSize());
+            minFormationSpeed = Math.min(minFormationSpeed, unit.type().speed);
         }
         this.formation = formation;
+
+        //update formation spacing based on max size
+        formation.pattern.spacing = spacing;
 
         members.clear();
         for(Unitc u : units){
             members.add((FormationAI)u.controller());
         }
-
 
         //TODO doesn't handle units that don't fit a formation
         formation.addMembers(members);

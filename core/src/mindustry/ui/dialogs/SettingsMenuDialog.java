@@ -82,14 +82,14 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.clearChildren();
         prefs.add(menu);
 
-        dataDialog = new BaseDialog("$settings.data");
+        dataDialog = new BaseDialog("@settings.data");
         dataDialog.addCloseButton();
 
         dataDialog.cont.table(Tex.button, t -> {
             t.defaults().size(270f, 60f).left();
             TextButtonStyle style = Styles.cleart;
 
-            t.button("$settings.cleardata", Icon.trash, style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
+            t.button("@settings.cleardata", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
                 for(String value : Core.settings.keys()){
                     if(value.contains("usid") || value.contains("uuid")){
@@ -104,19 +104,19 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
 
                 Core.app.exit();
-            }));
+            })).marginLeft(4);
 
             t.row();
 
-            t.button("$settings.clearsaves", Icon.trash, style, () -> {
-                ui.showConfirm("$confirm", "$settings.clearsaves.confirm", () -> {
+            t.button("@settings.clearsaves", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> {
                     control.saves.deleteAll();
                 });
-            });
+            }).marginLeft(4);
 
             t.row();
 
-            t.button("$data.export", Icon.upload, style, () -> {
+            t.button("@data.export", Icon.upload, style, () -> {
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
                     try{
@@ -129,36 +129,36 @@ public class SettingsMenuDialog extends SettingsDialog{
                     platform.showFileChooser(false, "zip", file -> {
                         try{
                             exportData(file);
-                            ui.showInfo("$data.exported");
+                            ui.showInfo("@data.exported");
                         }catch(Exception e){
                             e.printStackTrace();
                             ui.showException(e);
                         }
                     });
                 }
-            });
+            }).marginLeft(4);
 
             t.row();
 
-            t.button("$data.import", Icon.download, style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+            t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                 try{
                     importData(file);
                     Core.app.exit();
                 }catch(IllegalArgumentException e){
-                    ui.showErrorMessage("$data.invalid");
+                    ui.showErrorMessage("@data.invalid");
                 }catch(Exception e){
                     e.printStackTrace();
                     if(e.getMessage() == null || !e.getMessage().contains("too short")){
                         ui.showException(e);
                     }else{
-                        ui.showErrorMessage("$data.invalid");
+                        ui.showErrorMessage("@data.invalid");
                     }
                 }
-            })));
+            }))).marginLeft(4);
 
             if(!mobile){
                 t.row();
-                t.button("$data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath()));
+                t.button("@data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath())).marginLeft(4);
             }
         });
 
@@ -197,20 +197,20 @@ public class SettingsMenuDialog extends SettingsDialog{
         TextButtonStyle style = Styles.cleart;
 
         menu.defaults().size(300f, 60f);
-        menu.button("$settings.game", style, () -> visible(0));
+        menu.button("@settings.game", style, () -> visible(0));
         menu.row();
-        menu.button("$settings.graphics", style, () -> visible(1));
+        menu.button("@settings.graphics", style, () -> visible(1));
         menu.row();
-        menu.button("$settings.sound", style, () -> visible(2));
+        menu.button("@settings.sound", style, () -> visible(2));
         menu.row();
-        menu.button("$settings.language", style, ui.language::show);
+        menu.button("@settings.language", style, ui.language::show);
         if(!mobile || Core.settings.getBool("keyboard")){
             menu.row();
-            menu.button("$settings.controls", style, ui.controls::show);
+            menu.button("@settings.controls", style, ui.controls::show);
         }
 
         menu.row();
-        menu.button("$settings.data", style, () -> dataDialog.show());
+        menu.button("@settings.data", style, () -> dataDialog.show());
     }
 
     void addSettings(){
@@ -268,7 +268,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){
-                table.button("$tutorial.retake", () -> {
+                table.button("@tutorial.retake", () -> {
                     hide();
                     control.playTutorial();
                 }).size(220f, 60f).pad(6).left();
@@ -363,7 +363,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         });
 
-        graphics.checkPref("linear", true, b -> {
+        graphics.checkPref("linear", !mobile, b -> {
             for(Texture tex : Core.atlas.getTextures()){
                 TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
                 tex.setFilter(filter, filter);
@@ -434,7 +434,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.button("$back", Icon.leftOpen, () -> {
+        buttons.button("@back", Icon.leftOpen, () -> {
             if(prefs.getChildren().first() != menu){
                 back();
             }else{

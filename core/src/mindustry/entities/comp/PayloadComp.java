@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
@@ -69,17 +70,22 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc{
 
     boolean dropUnit(UnitPayload payload){
         Unit u = payload.unit;
+        Fx.unitDrop.at(this);
 
         //can't drop ground units
-        if((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f){
+        if(((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f) || (!floorOn().isLiquid && u instanceof WaterMovec)){
             return false;
         }
+
+        //clients do not drop payloads
+        if(Vars.net.client()) return true;
 
         u.set(this);
         u.trns(Tmp.v1.rnd(Mathf.random(2f)));
         u.rotation(rotation);
+        //reset the ID to a new value to make sure it's synced
+        u.id = EntityGroup.nextId();
         u.add();
-        Fx.unitDrop.at(u);
 
         return true;
     }

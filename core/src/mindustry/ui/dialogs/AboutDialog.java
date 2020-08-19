@@ -19,7 +19,7 @@ public class AboutDialog extends BaseDialog{
     private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
 
     public AboutDialog(){
-        super("$about.button");
+        super("@about.button");
 
         shown(() -> {
             contributors = Seq.with(Core.files.internal("contributors").readString("UTF-8").split("\n"));
@@ -68,7 +68,7 @@ public class AboutDialog extends BaseDialog{
                 if(link.name.equals("wiki")) Events.fire(Trigger.openWiki);
 
                 if(!Core.app.openURI(link.link)){
-                    ui.showErrorMessage("$linkfail");
+                    ui.showErrorMessage("@linkfail");
                     Core.app.setClipboardText(link.link);
                 }
             }).size(h - 5, h);
@@ -82,7 +82,7 @@ public class AboutDialog extends BaseDialog{
 
         addCloseButton();
 
-        buttons.button("$credits", this::showCredits).size(200f, 64f);
+        buttons.button("@credits", this::showCredits).size(200f, 64f);
 
         if(Core.graphics.isPortrait()){
             for(Cell<?> cell : buttons.getCells()){
@@ -93,14 +93,14 @@ public class AboutDialog extends BaseDialog{
     }
 
     public void showCredits(){
-        BaseDialog dialog = new BaseDialog("$credits");
+        BaseDialog dialog = new BaseDialog("@credits");
         dialog.addCloseButton();
-        dialog.cont.add("$credits.text").fillX().wrap().get().setAlignment(Align.center);
+        dialog.cont.add("@credits.text").fillX().wrap().get().setAlignment(Align.center);
         dialog.cont.row();
         if(!contributors.isEmpty()){
             dialog.cont.image().color(Pal.accent).fillX().height(3f).pad(3f);
             dialog.cont.row();
-            dialog.cont.add("$contributors");
+            dialog.cont.add("@contributors");
             dialog.cont.row();
             dialog.cont.pane(new Table(){{
                 int i = 0;

@@ -7,6 +7,7 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.environment.*;
 
 public class UnitPayload implements Payload{
     public Unit unit;
@@ -40,6 +41,8 @@ public class UnitPayload implements Payload{
 
     @Override
     public boolean dump(){
+        Floor floor = unit.floorOn();
+
         //no client dumping
         if(Vars.net.client()) return true;
 

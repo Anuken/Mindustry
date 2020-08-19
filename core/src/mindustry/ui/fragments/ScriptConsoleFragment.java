@@ -24,7 +24,7 @@ public class ScriptConsoleFragment extends Table{
     private boolean open = false, shown;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
-    private BitmapFont font;
+    private Font font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
@@ -53,7 +53,7 @@ public class ScriptConsoleFragment extends Table{
                 clearChatInput();
             }
 
-            return shown && !Vars.net.active();
+            return shown;
         });
 
         update(() -> {
@@ -115,7 +115,7 @@ public class ScriptConsoleFragment extends Table{
         Draw.color(shadowColor);
 
         if(open){
-            Fill.crect(offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            Fill.crect(offsetx, chatfield.y, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -159,7 +159,7 @@ public class ScriptConsoleFragment extends Table{
         String message = chatfield.getText();
         clearChatInput();
 
-        if(message.replaceAll(" ", "").isEmpty()) return;
+        if(message.replace(" ", "").isEmpty()) return;
 
         //special case for 'clear' command
         if(message.equals("clear")){

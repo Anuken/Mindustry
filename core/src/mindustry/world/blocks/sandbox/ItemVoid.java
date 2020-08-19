@@ -11,7 +11,7 @@ public class ItemVoid extends Block{
         update = solid = acceptsItems = true;
     }
 
-    public class ItemVoidEntity extends Building{
+    public class ItemVoidBuild extends Building{
         @Override
         public void handleItem(Building source, Item item){}
 

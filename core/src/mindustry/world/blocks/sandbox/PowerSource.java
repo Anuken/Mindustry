@@ -11,7 +11,7 @@ public class PowerSource extends PowerNode{
         consumesPower = false;
     }
 
-    public class PowerSourceEntity extends PowerNodeEntity{
+    public class PowerSourceBuild extends PowerNodeBuild{
         @Override
         public float getPowerProduction(){
             return 10000f;

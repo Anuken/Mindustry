@@ -75,7 +75,6 @@ public class Administration{
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
-                action.type != ActionType.tapTile &&
                 Config.antiSpam.bool() &&
                 //make sure players can configure their own stuff, e.g. in schematics
                 lastPlaced.get(action.tile.pos(), -1) != action.player.id()){
@@ -85,9 +84,9 @@ public class Administration{
                     return true;
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
-                        player.kick("You are interacting with too many blocks.", 1000 * 30);
+                        action.player.kick("You are interacting with too many blocks.", 1000 * 30);
                     }else{
-                        player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
+                        action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
                     }
 
                     return false;
@@ -720,7 +719,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
     }
 
 }

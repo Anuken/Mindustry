@@ -121,7 +121,7 @@ public class AndroidRhinoContext{
                 }
                 return loadClass(dex, name);
             }catch(IOException | ClassNotFoundException e){
-                throw new FatalLoadingException(e);
+                throw new RuntimeException("Failed to define class", e);
             }
         }
 
@@ -148,14 +148,6 @@ public class AndroidRhinoContext{
                 }
             }
             return loadedClass;
-        }
-    }
-
-
-    /** Might be thrown in any Rhino method that loads bytecode if the loading failed. */
-    public static class FatalLoadingException extends RuntimeException{
-        FatalLoadingException(Throwable t){
-            super("Failed to define class", t);
         }
     }
 

@@ -36,7 +36,7 @@ public class ThermalGenerator extends PowerGenerator{
         return tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute)) > 0.01f;
     }
 
-    public class ThermalGeneratorEntity extends GeneratorEntity{
+    public class ThermalGeneratorBuild extends GeneratorBuild{
         public float sum;
 
         @Override

@@ -28,8 +28,8 @@ public class Sorter extends Block{
         unloadable = false;
         saveConfig = true;
 
-        config(Item.class, (SorterEntity tile, Item item) -> tile.sortItem = item);
-        configClear((SorterEntity tile) -> tile.sortItem = null);
+        config(Item.class, (SorterBuild tile, Item item) -> tile.sortItem = item);
+        configClear((SorterBuild tile) -> tile.sortItem = null);
     }
 
     @Override
@@ -44,11 +44,11 @@ public class Sorter extends Block{
 
     @Override
     public int minimapColor(Tile tile){
-        return tile.<SorterEntity>bc().sortItem == null ? 0 : tile.<SorterEntity>bc().sortItem.color.rgba();
+        return tile.<SorterBuild>bc().sortItem == null ? 0 : tile.<SorterBuild>bc().sortItem.color.rgba();
     }
 
-    public class SorterEntity extends Building{
-        @Nullable Item sortItem;
+    public class SorterBuild extends Building{
+        public @Nullable Item sortItem;
 
         @Override
         public void configured(Player player, Object value){
@@ -86,17 +86,17 @@ public class Sorter extends Block{
             to.handleItem(this, item);
         }
 
-        boolean isSame(Building other){
-            //uncomment code below to prevent sorter/gate chaining
-            return other != null && (other.block() instanceof Sorter || other.block() instanceof OverflowGate);
+        public boolean isSame(Building other){
+            // comment code below to allow sorter/gate chaining
+            return other != null && other.block().instantTransfer;
         }
 
-        Building getTileTarget(Item item, Building source, boolean flip){
+        public Building getTileTarget(Item item, Building source, boolean flip){
             int dir = source.relativeTo(tile.x, tile.y);
             if(dir == -1) return null;
             Building to;
 
-            if((item == sortItem) != invert){
+            if(((item == sortItem) != invert) == enabled){
                 //prevent 3-chains
                 if(isSame(source) && isSame(nearby(dir))){
                     return null;

@@ -16,9 +16,9 @@ import static mindustry.Vars.tilesize;
 public class PayloadAcceptor extends Block{
     public float payloadSpeed = 0.5f;
 
-    public @Load(value = "@-top", fallback = "factory-top-$size") TextureRegion topRegion;
-    public @Load(value = "@-out", fallback = "factory-out-$size") TextureRegion outRegion;
-    public @Load(value = "@-in", fallback = "factory-in-$size") TextureRegion inRegion;
+    public @Load(value = "@-top", fallback = "factory-top-@size") TextureRegion topRegion;
+    public @Load(value = "@-out", fallback = "factory-out-@size") TextureRegion outRegion;
+    public @Load(value = "@-in", fallback = "factory-in-@size") TextureRegion inRegion;
 
     public PayloadAcceptor(String name){
         super(name);
@@ -46,7 +46,7 @@ public class PayloadAcceptor extends Block{
             );
     }
 
-    public class PayloadAcceptorEntity<T extends Payload> extends Building{
+    public class PayloadAcceptorBuild<T extends Payload> extends Building{
         public @Nullable T payload;
         public Vec2 payVector = new Vec2();
         public float payRotation;
@@ -59,7 +59,7 @@ public class PayloadAcceptor extends Block{
         @Override
         public void handlePayload(Building source, Payload payload){
             this.payload = (T)payload;
-            this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f);
+            this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = source.angleTo(this);
 
             updatePayload();
@@ -108,7 +108,7 @@ public class PayloadAcceptor extends Block{
             payRotation = rotdeg();
 
             if(payVector.len() >= size * tilesize/2f){
-                payVector.clamp(-size * tilesize / 2f, size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f);
+                payVector.clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
 
                 Building front = front();
                 if(front != null && front.block().outputsPayload){

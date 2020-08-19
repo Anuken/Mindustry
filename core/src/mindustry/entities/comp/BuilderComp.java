@@ -29,13 +29,7 @@ abstract class BuilderComp implements Unitc{
     @Import float x, y, rotation;
 
     @SyncLocal Queue<BuildPlan> plans = new Queue<>();
-    transient boolean updateBuilding = true;
-
-    @Override
-    public void controller(UnitController next){
-        //reset building state so AI controlled units will always start off building
-        updateBuilding = true;
-    }
+    @SyncLocal transient boolean updateBuilding = true;
 
     @Override
     public void update(){
@@ -76,7 +70,7 @@ abstract class BuilderComp implements Unitc{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(!within(tile, finalPlaceDst)){
+        if(within(tile, finalPlaceDst)){
             rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
         }
 
@@ -85,12 +79,12 @@ abstract class BuilderComp implements Unitc{
                 boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
                 if(hasAll){
-                    Build.beginPlace(current.block, team(), current.x, current.y, current.rotation);
+                    Call.beginPlace(current.block, team(), current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
                 }
             }else if(!current.initialized && current.breaking && Build.validBreak(team(), current.x, current.y)){
-                Build.beginBreak(team(), current.x, current.y);
+                Call.beginBreak(team(), current.x, current.y);
             }else{
                 plans.removeFirst();
                 return;
@@ -198,6 +192,10 @@ abstract class BuilderComp implements Unitc{
         }else{
             plans.addFirst(place);
         }
+    }
+
+    boolean activelyBuilding(){
+        return isBuilding() && updateBuilding;
     }
 
     /** Return the build request currently active, or the one at the top of the queue.*/
