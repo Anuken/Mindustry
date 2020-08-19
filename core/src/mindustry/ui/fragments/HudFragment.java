@@ -89,7 +89,7 @@ public class HudFragment extends Fragment{
                     select.button(Icon.menu, style, ui.paused::show);
                     flip = select.button(Icon.upOpen, style, this::toggleMenus).get();
 
-                    select.button(Icon.paste, style, ui.schematics::show);
+                    select.button(Icon.paste, style, ui.schematics::show).disabled(!state.rules.schematicAllowed);
 
                     select.button(Icon.pause, style, () -> {
                         if(net.active()){
