@@ -106,7 +106,7 @@ public class ModsDialog extends BaseDialog{
                             Core.settings.put("lastmod", text);
 
                             ui.loadfrag.show();
-                            Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
+                            Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/6.0", loc -> {
                                 Core.net.httpGet(loc.getHeader("Location"), result -> {
                                     if(result.getStatus() != HttpStatus.OK){
                                         ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
