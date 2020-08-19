@@ -329,7 +329,7 @@ public class DesktopInput extends InputHandler{
 
         table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
-        }).tooltip("Schematics");
+        }).tooltip("Schematics").disabled(d -> !state.rules.schematicAllowed);
 
         table.button(Icon.tree, Styles.clearPartiali, () -> {
             ui.research.show();
@@ -387,6 +387,8 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyTap(Binding.schematic_menu) && !Core.scene.hasKeyboard()){
             if(ui.schematics.isShown()){
                 ui.schematics.hide();
+            }else if(!state.rules.schematicAllowed) {
+                ui.showInfoToast("@schematic.disabled", 3f);
             }else{
                 ui.schematics.show();
                 ui.schematics.focusSearchField();
@@ -399,10 +401,14 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard()){
-            lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
-            useSchematic(lastSchematic);
-            if(selectRequests.isEmpty()){
-                lastSchematic = null;
+            if(!state.rules.schematicAllowed){
+                ui.showInfoToast("@schematic.disabled", 3f);
+            }else {
+                lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
+                useSchematic(lastSchematic);
+                if (selectRequests.isEmpty()) {
+                    lastSchematic = null;
+                }
             }
         }
 

@@ -61,7 +61,7 @@ public class ServerControl implements ApplicationListener{
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false}"
+            "globalrules", "{reactorExplosions: false, schematicAllowed: true}"
         );
 
         Log.setLogger((level, text) -> {
