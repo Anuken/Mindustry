@@ -14,6 +14,7 @@ public enum BlockStat{
     itemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),
     launchTime(StatCategory.items),
+    maxConsecutive(StatCategory.items),
 
     liquidCapacity(StatCategory.liquids),
 

@@ -75,16 +75,16 @@ public class TractorBeamTurret extends Block{
             }
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().flying){
+            if(target != null && target.within(this, range) && target.team() != team && target.type().flying && efficiency() > 0.01f){
                 any = true;
                 float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation,dest, rotateSpeed * edelta());
+                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 lastX = target.x;
                 lastY = target.y;
                 strength = Mathf.lerpDelta(strength, 1f, 0.1f);
 
                 if(damage > 0){
-                    target.damageContinuous(damage);
+                    target.damageContinuous(damage * efficiency());
                 }
 
                 //shoot when possible

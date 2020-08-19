@@ -27,6 +27,7 @@ import mindustry.core.*;
 import java.util.*;
 
 public class Fonts{
+    private static final String mainFont = "fonts/font.woff";
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
 
@@ -58,12 +59,10 @@ public class Fonts{
     }
 
     public static void loadFonts(){
-        String fontName = "fonts/font.ttf";
-
         FreeTypeFontParameter param = fontParameter();
 
-        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.def = (Font)f;
-        Core.assets.load("chat", Font.class, new FreeTypeFontLoaderParameter(fontName, param)).loaded = f -> Fonts.chat = (Font)f;
+        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = (Font)f;
+        Core.assets.load("chat", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.chat = (Font)f;
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
@@ -146,11 +145,14 @@ public class Fonts{
             size = 18;
         }};
 
-        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter("fonts/font.ttf", param)).loaded = t -> Fonts.outline = (Font)t;
+        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = t -> Fonts.outline = (Font)t;
 
         Core.assets.load("tech", Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
             size = 18;
-        }})).loaded = f -> Fonts.tech = (Font)f;
+        }})).loaded = f -> {
+            Fonts.tech = (Font)f;
+            ((Font)f).getData().down *= 1.5f;
+        };
     }
 
     /** Merges the UI and font atlas together for better performance. */

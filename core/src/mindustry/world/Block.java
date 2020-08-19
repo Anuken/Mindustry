@@ -92,6 +92,10 @@ public class Block extends UnlockableContent{
     public boolean squareSprite = true;
     /** whether this block absorbs laser attacks. */
     public boolean absorbLasers = false;
+    /** if false, the status is never drawn */
+    public boolean enableDrawStatus = true;
+    /** if true, the block stops updating when disabled */
+    public boolean noUpdateDisabled = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -315,6 +319,10 @@ public class Block extends UnlockableContent{
             stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
 
+        if(instantTransfer){
+            stats.add(BlockStat.maxConsecutive, 2, StatUnit.none);
+        }
+
         consumes.display(stats);
 
         // Note: Power stats are added by the consumers.
@@ -399,6 +407,11 @@ public class Block extends UnlockableContent{
 
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
 
+    }
+
+    /** Transforms the internal position of this config using the specified function, and return the result. */
+    public Object pointConfig(Object config, Cons<Point2> transformer){
+        return config;
     }
 
     /** Configure when a null value is passed.*/

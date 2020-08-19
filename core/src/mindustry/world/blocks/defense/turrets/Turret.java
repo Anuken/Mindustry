@@ -18,6 +18,7 @@ import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -25,9 +26,12 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public abstract class Turret extends Block{
+    //after being logic-controlled and this amount of time passes, the turret will resume normal AI
+    public final static float logicControlCooldown = 60 * 2;
+
     public final int timerTarget = timers++;
     public int targetInterval = 20;
 
@@ -70,8 +74,8 @@ public abstract class Turret extends Block{
     public @Load("block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
 
-    public Cons<TurretEntity> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
-    public Cons<TurretEntity> heatDrawer = tile -> {
+    public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
+    public Cons<TurretBuild> heatDrawer = tile -> {
         if(tile.heat <= 0.00001f) return;
         Draw.color(heatColor, tile.heat);
         Draw.blend(Blending.additive);
@@ -137,14 +141,20 @@ public abstract class Turret extends Block{
         public abstract BulletType type();
     }
 
-    public class TurretEntity extends Building implements ControlBlock{
+    public class TurretBuild extends Building implements ControlBlock, Ranged{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
-        public float reload, rotation = 90, recoil, heat;
+        public float reload, rotation = 90, recoil, heat, logicControlTime = -1;
         public int shotCounter;
+        public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public @NonNull BlockUnitc unit = Nulls.blockUnit;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void created(){
@@ -153,8 +163,33 @@ public abstract class Turret extends Block{
         }
 
         @Override
+        public void control(LAccess type, double p1, double p2, double p3, double p4){
+            if(type == LAccess.shoot && !unit.isPlayer()){
+                targetPos.set((float)p1, (float)p2);
+                logicControlTime = logicControlCooldown;
+                logicShooting = !Mathf.zero(p3);
+            }
+
+            super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.rotation) return rotation;
+            if(sensor == LAccess.shootX) return targetPos.x;
+            if(sensor == LAccess.shootY) return targetPos.y;
+            if(sensor == LAccess.shooting) return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+
+            return super.sense(sensor);
+        }
+
+        @Override
         public Unit unit(){
             return (Unit)unit;
+        }
+
+        public boolean logicControlled(){
+            return logicControlTime > 0;
         }
 
         @Override
@@ -184,6 +219,10 @@ public abstract class Turret extends Block{
             unit.rotation(rotation);
             unit.team(team);
 
+            if(logicControlTime > 0){
+                logicControlTime -= Time.delta;
+            }
+
             if(hasAmmo()){
 
                 if(timer(timerTarget, targetInterval)){
@@ -193,10 +232,11 @@ public abstract class Turret extends Block{
                 if(validateTarget()){
                     boolean canShoot = true;
 
-                    //player behavior
-                    if(isControlled()){
+                    if(isControlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());
                         canShoot = unit.isShooting();
+                    }else if(logicControlled()){ //logic behavior
+                        canShoot = logicShooting;
                     }else{ //default AI behavior
                         BulletType type = peekAmmo();
                         float speed = type.speed;
@@ -259,7 +299,7 @@ public abstract class Turret extends Block{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, team, x, y) || isControlled();
+            return !Units.invalidateTarget(target, team, x, y) || isControlled() || logicControlled();
         }
 
         protected void findTarget(){
@@ -369,7 +409,7 @@ public abstract class Turret extends Block{
             shootSound.at(tile, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){
-                Effects.shake(shootShake, shootShake, this);
+                Effect.shake(shootShake, shootShake, this);
             }
 
             recoil = recoilAmount;
@@ -382,7 +422,7 @@ public abstract class Turret extends Block{
         }
 
         protected float baseReloadSpeed(){
-            return 1f;
+            return efficiency();
         }
 
         @Override

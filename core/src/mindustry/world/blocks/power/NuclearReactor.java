@@ -13,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.consumers.*;
@@ -60,10 +61,10 @@ public class NuclearReactor extends PowerGenerator{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("heat", (NuclearReactorEntity entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
+        bars.add("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
     }
 
-    public class NuclearReactorEntity extends GeneratorEntity{
+    public class NuclearReactorBuild extends GeneratorBuild{
         public float heat;
 
         @Override
@@ -108,6 +109,12 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return heat;
+            return super.sense(sensor);
+        }
+
+        @Override
         public void onDestroyed(){
             super.onDestroyed();
 
@@ -117,7 +124,7 @@ public class NuclearReactor extends PowerGenerator{
 
             if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
 
-            Effects.shake(6f, 16f, x, y);
+            Effect.shake(6f, 16f, x, y);
             Fx.nuclearShockwave.at(x, y);
             for(int i = 0; i < 6; i++){
                 Time.run(Mathf.random(40), () -> Fx.nuclearcloud.at(x, y));

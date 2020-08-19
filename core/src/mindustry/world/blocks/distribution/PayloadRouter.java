@@ -24,7 +24,7 @@ public class PayloadRouter extends PayloadConveyor{
         Draw.rect(overRegion, req.drawx(), req.drawy());
     }
 
-    public class PayloadRouterEntity extends PayloadConveyorEntity{
+    public class PayloadRouterBuild extends PayloadConveyorBuild{
         public float smoothRot;
 
         @Override

@@ -59,7 +59,7 @@ public class Damage{
         }
 
         float shake = Math.min(explosiveness / 4f + 3f, 9f);
-        Effects.shake(shake, shake, x, y);
+        Effect.shake(shake, shake, x, y);
         Fx.dynamicExplosion.at(x, y, radius / 8f);
     }
 

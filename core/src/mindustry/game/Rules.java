@@ -92,6 +92,8 @@ public class Rules{
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors */
     public Team waveTeam = Team.crux;
+    /** name of the custom mode that this ruleset describes, or null. */
+    public @Nullable String modeName;
     /** special tags for additional info */
     public StringMap tags = new StringMap();
 

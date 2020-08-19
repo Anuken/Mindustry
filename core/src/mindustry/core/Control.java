@@ -94,7 +94,6 @@ public class Control implements ApplicationListener, Loadable{
             tutorial.reset();
 
             hiscore = false;
-
             saves.resetSave();
         });
 
@@ -109,14 +108,18 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(GameOverEvent.class, event -> {
             state.stats.wavesLasted = state.wave;
-            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            Effect.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.gameOver(event.winner);
         });
 
+        //add player when world loads regardless
+        Events.on(WorldLoadEvent.class, e -> {
+            player.add();
+        });
+
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
-            player.add();
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
@@ -171,7 +174,7 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(Trigger.newGame, () -> {
+        Events.run(Trigger.newGame, () -> {
             Building core = player.closestCore();
 
             if(core == null) return;
@@ -188,7 +191,7 @@ public class Control implements ApplicationListener, Loadable{
             app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
-                Effects.shake(5f, 5f, core);
+                Effect.shake(5f, 5f, core);
             });
         });
 
@@ -257,7 +260,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     //TODO move
-    public void handleLaunch(CoreEntity tile){
+    public void handleLaunch(CoreBuild tile){
         LaunchCorec ent = LaunchCore.create();
         ent.set(tile);
         ent.block(Blocks.coreShard);

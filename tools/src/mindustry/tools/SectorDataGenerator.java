@@ -81,7 +81,7 @@ public class SectorDataGenerator{
                     }
                 }
 
-                CoreEntity entity = Team.sharded.core();
+                CoreBuild entity = Team.sharded.core();
                 int cx = entity.tileX(), cy = entity.tileY();
 
                 int nearTiles = 0;

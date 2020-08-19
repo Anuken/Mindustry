@@ -64,7 +64,7 @@ public class SectorInfo{
         //update core items
         coreItems.clear();
 
-        CoreEntity entity = state.rules.defaultTeam.core();
+        CoreBuild entity = state.rules.defaultTeam.core();
 
         if(entity != null){
             ItemModule items = entity.items;
@@ -97,7 +97,7 @@ public class SectorInfo{
             updateCoreDeltas();
         }
 
-        CoreEntity ent = state.rules.defaultTeam.core();
+        CoreBuild ent = state.rules.defaultTeam.core();
 
         //refresh throughput
         if(time.get(refreshPeriod)){
@@ -141,7 +141,7 @@ public class SectorInfo{
     }
 
     private void updateCoreDeltas(){
-        CoreEntity ent = state.rules.defaultTeam.core();
+        CoreBuild ent = state.rules.defaultTeam.core();
         for(int i = 0; i < lastCoreItems.length; i++){
             lastCoreItems[i] = ent == null ? 0 : ent.items.get(i);
         }

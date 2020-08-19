@@ -532,10 +532,10 @@ public class MobileInput extends InputHandler implements GestureListener{
             lineMode = true;
 
             if(mode == breaking){
-                Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
+                if(!state.isPaused()) Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
             }else if(block != null){
                 updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
-                Fx.tapBlock.at(cursor.worldx() + block.offset, cursor.worldy() + block.offset, block.size);
+                if(!state.isPaused()) Fx.tapBlock.at(cursor.worldx() + block.offset, cursor.worldy() + block.offset, block.size);
             }
         }
 
@@ -572,9 +572,18 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             //apply command on double tap
-            if(count == 2 && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 2f) &&
-                player.unit() instanceof Commanderc){
-                Call.unitCommand(player);
+            if(count == 2 && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 2f)){
+                if(player.unit() instanceof Commanderc){
+                    Call.unitCommand(player);
+                }
+
+                if(player.unit() instanceof Payloadc){
+                    if(((Payloadc)player.unit()).hasPayload()){
+                        tryDropPayload();
+                    }else{
+                        tryPickupPayload();
+                    }
+                }
             }
         }
 
@@ -785,6 +794,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         Rect rect = Tmp.r3;
 
         UnitType type = unit.type();
+        if(type == null) return;
+
         boolean flying = type.flying;
         boolean omni = !(unit instanceof WaterMovec);
         boolean legs = unit.isGrounded();
@@ -803,7 +814,16 @@ public class MobileInput extends InputHandler implements GestureListener{
         targetPos.set(Core.camera.position);
         float attractDst = 15f;
         float strafePenalty = legs ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(unit.vel.angle(), unit.rotation) / 180f);
-        float speed = type.speed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+
+        float baseSpeed = unit.type().speed;
+
+        //limit speed to minimum formation speed to preserve formation
+        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+            //add a tiny multiplier to let units catch up just in case
+            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.98f;
+        }
+
+        float speed = baseSpeed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
@@ -895,7 +915,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;
-                player.shooting = true;
+                player.shooting = !boosted;
 
                 unit.aim(player.mouseX, player.mouseY);
             }

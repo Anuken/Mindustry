@@ -78,7 +78,7 @@ public class LaserBulletType extends BulletType{
         for(Color color : colors){
             Draw.color(color);
             Lines.stroke((cwidth *= lengthFalloff) * b.fout());
-            Lines.lineAngle(b.x, b.y, b.rotation(), baseLen, CapStyle.none);
+            Lines.lineAngle(b.x, b.y, b.rotation(), baseLen, false);
             Tmp.v1.trns(b.rotation(), baseLen);
             Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke() * 1.22f, cwidth * 2f + width / 2f, b.rotation());
 

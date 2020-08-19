@@ -18,6 +18,8 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.experimental.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
+import mindustry.world.blocks.logic.*;
+import mindustry.world.blocks.logic.MessageBlock;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -48,7 +50,7 @@ public class Blocks implements ContentList{
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
-    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, message, illuminator,
+    powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, illuminator,
 
     //defense
     copperWall, copperWallLarge, titaniumWall, titaniumWallLarge, plastaniumWall, plastaniumWallLarge, thoriumWall, thoriumWallLarge, door, doorLarge,
@@ -80,8 +82,11 @@ public class Blocks implements ContentList{
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
     repairPoint, resupplyPoint,
 
+    //logic
+    message, switchBlock, microProcessor, logicProcessor, logicDisplay, memoryCell,
+
     //campaign
-    launchPad, launchPadLarge, dataProcessor,
+    launchPad, launchPadLarge,
 
     //misc experimental
     blockForge, blockLoader, blockUnloader;
@@ -134,6 +139,7 @@ public class Blocks implements ContentList{
             speedMultiplier = 0.2f;
             variants = 0;
             liquidDrop = Liquids.water;
+            liquidMultiplier = 1.5f;
             isLiquid = true;
             status = StatusEffects.wet;
             statusDuration = 120f;
@@ -501,8 +507,8 @@ public class Blocks implements ContentList{
         siliconCrucible = new AttributeSmelter("silicon-crucible"){{
             requirements(Category.crafting, with(Items.titanium, 120, Items.metaglass, 80, Items.plastanium, 35, Items.silicon, 60));
             craftEffect = Fx.smeltsmoke;
-            outputItem = new ItemStack(Items.silicon, 5);
-            craftTime = 140f;
+            outputItem = new ItemStack(Items.silicon, 6);
+            craftTime = 90f;
             size = 3;
             hasPower = true;
             hasLiquids = false;
@@ -888,10 +894,10 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
             hasShadow = false;
             health = 40;
-            damage = 11;
+            damage = 23;
             tileDamage = 7f;
             length = 10;
-            tendrils = 5;
+            tendrils = 4;
         }};
 
         //endregion
@@ -1304,18 +1310,18 @@ public class Blocks implements ContentList{
             itemCapacity = 9000;
             size = 4;
 
-            unitCapModifier = 16;
+            unitCapModifier = 14;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
-            requirements(Category.effect, with(Items.copper, 1000, Items.lead, 1000));
+            requirements(Category.effect, with(Items.copper, 8000, Items.lead, 8000, Items.silicon, 5000, Items.thorium, 4000));
 
             unitType = UnitTypes.gamma;
             health = 4000;
             itemCapacity = 13000;
             size = 5;
 
-            unitCapModifier = 24;
+            unitCapModifier = 20;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1446,7 +1452,7 @@ public class Blocks implements ContentList{
             recoilAmount = 2f;
             reloadTime = 90f;
             cooldown = 0.03f;
-            powerUse = 2.5f;
+            powerUse = 6f;
             shootShake = 2f;
             shootEffect = Fx.lancerLaserShoot;
             smokeEffect = Fx.none;
@@ -1479,7 +1485,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 1.5f;
+            powerUse = 5f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1502,7 +1508,7 @@ public class Blocks implements ContentList{
             health = 160 * size * size;
             rotateSpeed = 10;
 
-            consumes.power(3f);
+            consumes.powerCond(3f, (TractorBeamEntity e) -> e.target != null);
         }};
 
         swarmer = new ItemTurret("swarmer"){{
@@ -1696,7 +1702,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.dagger, 60f * 20, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 10, Items.blastCompound, 10)),
+                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 10, Items.coal, 20)),
                 new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
             };
             size = 3;
@@ -1706,7 +1712,7 @@ public class Blocks implements ContentList{
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 10)),
+                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15)),
             };
             size = 3;
@@ -1842,10 +1848,6 @@ public class Blocks implements ContentList{
             alwaysUnlocked = true;
         }};
 
-        message = new MessageBlock("message"){{
-            requirements(Category.effect, with(Items.graphite, 5));
-        }};
-
         illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
             brightness = 0.67f;
@@ -1883,14 +1885,50 @@ public class Blocks implements ContentList{
             consumes.power(6f);
         }};
 
-        dataProcessor = new ResearchBlock("data-processor"){{
-            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 200, Items.lead, 100));
+        //endregion campaign
+        //region logic
 
-            size = 3;
-            alwaysUnlocked = true;
+        message = new MessageBlock("message"){{
+            requirements(Category.logic, with(Items.graphite, 5));
         }};
 
-        //endregion campaign
+        switchBlock = new SwitchBlock("switch"){{
+            requirements(Category.logic, with(Items.graphite, 5));
+        }};
+
+        microProcessor = new LogicBlock("micro-processor"){{
+            requirements(Category.logic, with(Items.copper, 80, Items.lead, 50, Items.silicon, 60));
+
+            instructionsPerTick = 2;
+
+            size = 1;
+        }};
+
+        logicProcessor = new LogicBlock("logic-processor"){{
+            requirements(Category.logic, with(Items.lead, 320, Items.silicon, 140, Items.graphite, 80, Items.thorium, 70));
+
+            instructionsPerTick = 5;
+
+            range = 16 * 10;
+
+            size = 2;
+        }};
+
+        logicDisplay = new LogicDisplay("logic-display"){{
+            requirements(Category.logic, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
+
+            displaySize = 80;
+
+            size = 3;
+        }};
+
+        memoryCell = new MemoryBlock("memory-cell"){{
+            requirements(Category.logic, with(Items.graphite, 40, Items.silicon, 40));
+
+            memoryCapacity = 64;
+        }};
+
+        //endregion
         //region experimental
 
         blockForge = new BlockForge("block-forge"){{

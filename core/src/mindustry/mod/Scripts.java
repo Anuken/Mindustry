@@ -2,7 +2,6 @@ package mindustry.mod;
 
 import arc.*;
 import arc.files.*;
-import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -19,8 +18,8 @@ import java.util.regex.*;
 public class Scripts implements Disposable{
     private final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream");
-    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
+        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.");
+    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.", "mindustry.logic.");
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
@@ -75,10 +74,6 @@ public class Scripts implements Disposable{
     }
 
     //utility mod functions
-
-    public <T> void onEvent(Class<T> type, Cons<T> listener){
-        Events.on(type, listener);
-    }
 
     public String readString(String path){
         return Vars.tree.get(path, true).readString();

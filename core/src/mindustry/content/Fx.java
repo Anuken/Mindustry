@@ -26,15 +26,15 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
 
     unitSpawn = new Effect(30f, e -> {
-        if(!(e.data instanceof Unit)) return;
+        if(!(e.data instanceof UnitType)) return;
 
         alpha(e.fin());
 
         float scl = 1f + e.fout() * 2f;
 
-        Unit unit = e.data();
-        rect(unit.type().region, e.x, e.y,
-        unit.type().region.getWidth() * Draw.scl * scl, unit.type().region.getHeight() * Draw.scl * scl, 180f);
+        UnitType unit = e.data();
+        rect(unit.region, e.x, e.y,
+        unit.region.getWidth() * Draw.scl * scl, unit.region.getHeight() * Draw.scl * scl, 180f);
 
     }),
 
@@ -102,7 +102,7 @@ public class Fx{
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)
         .add(Tmp.v2.sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * e.fslope() * 10f));
         float x = Tmp.v1.x, y = Tmp.v1.y;
-        float size = Math.min(0.8f + e.rotation / 5f, 2);
+        float size = 1f;
 
         stroke(e.fslope() * 2f * size, Pal.accent);
         Lines.circle(x, y, e.fslope() * 2f * size);
@@ -369,7 +369,7 @@ public class Fx{
     hitLiquid = new Effect(16, e -> {
         color(e.color);
 
-        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation + 180f, 60f, (x, y) -> {
+        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 60f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
 
@@ -654,13 +654,11 @@ public class Fx{
 
     }),
 
-    wet = new Effect(40f, e -> {
+    wet = new Effect(80f, e -> {
         color(Liquids.water.color);
+        alpha(Mathf.clamp(e.fin() * 2f));
 
-        randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
-        });
-
+        Fill.circle(e.x, e.y, e.fout() * 1f);
     }),
 
     sapped = new Effect(40f, e -> {
@@ -670,6 +668,12 @@ public class Fx{
             Fill.square(e.x + x, e.y + y, e.fslope() * 1.1f, 45f);
         });
 
+    }),
+
+    sporeSlowed = new Effect(40f, e -> {
+        color(Pal.spore);
+
+        Fill.circle(e.x, e.y, e.fslope() * 1.1f);
     }),
 
     oily = new Effect(42f, e -> {

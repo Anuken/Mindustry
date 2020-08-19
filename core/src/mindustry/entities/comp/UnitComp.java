@@ -9,12 +9,14 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -23,7 +25,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable{
 
     @Import boolean hovering;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
@@ -65,6 +67,26 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Replace
     public float clipSize(){
         return type.region.getWidth() * 2f;
+    }
+
+    @Override
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.totalItems) return stack().amount;
+        if(sensor == LAccess.rotation) return rotation;
+        if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.x) return x;
+        if(sensor == LAccess.y) return y;
+        if(sensor == LAccess.team) return team.id;
+        if(sensor == LAccess.shooting) return isShooting() ? 1 : 0;
+        if(sensor == LAccess.shootX) return aimX();
+        if(sensor == LAccess.shootY) return aimY();
+        return 0;
+    }
+
+    @Override
+    public double sense(Content content){
+        if(content == stack().item) return stack().amount;
+        return 0;
     }
 
     @Override
@@ -181,7 +203,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void landed(){
         if(type.landShake > 0f){
-            Effects.shake(type.landShake, type.landShake, this);
+            Effect.shake(type.landShake, type.landShake, this);
         }
 
         type.landed(base());
@@ -252,11 +274,24 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             if(floor.damageTaken > 0f){
                 damageContinuous(floor.damageTaken);
             }
+
+            if(!net.client() && tile.solid()){
+                if(type.canBoost){
+                    elevation = 1f;
+                }else{
+                    kill();
+                }
+            }
         }
 
         //AI only updates on the server
         if(!net.client() && !dead && !deactivated){
             controller.updateUnit();
+        }
+
+        //clear controller when it becomes invalid
+        if(!controller.isValidController()){
+            resetController();
         }
 
         //do not control anything when deactivated
@@ -283,9 +318,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         float shake = hitSize / 3f;
 
-        Effects.scorch(x, y, (int)(hitSize / 5));
+        Effect.scorch(x, y, (int)(hitSize / 5));
         Fx.explosion.at(this);
-        Effects.shake(shake, shake, this);
+        Effect.shake(shake, shake, this);
         type.deathSound.at(this);
 
         Events.fire(new UnitDestroyEvent(base()));
@@ -304,7 +339,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(type.wreckRegions[i].found()){
                     float range = type.hitsize/4f;
                     Tmp.v1.rnd(range);
-                    Effects.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
                 }
             }
         }

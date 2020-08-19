@@ -28,7 +28,7 @@ public class BurnerGenerator extends ItemLiquidGenerator{
         return turbineRegions[0].found() ? new TextureRegion[]{region, turbineRegions[0], turbineRegions[1], capRegion} : super.icons();
     }
 
-    public class BurnerGeneratorEntity extends ItemLiquidGeneratorEntity{
+    public class BurnerGeneratorBuild extends ItemLiquidGeneratorBuild{
 
         @Override
         public void draw(){

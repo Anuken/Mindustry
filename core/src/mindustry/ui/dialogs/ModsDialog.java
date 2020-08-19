@@ -52,7 +52,7 @@ public class ModsDialog extends BaseDialog{
 
     void setup(){
         float h = 110f;
-        float w = mobile ? 430f : 524f;
+        float w = mobile ? 440f : 524f;
 
         cont.clear();
         cont.defaults().width(mobile ? 500 : 560f).pad(4);
@@ -153,7 +153,6 @@ public class ModsDialog extends BaseDialog{
 
                 boolean anyDisabled = false;
                 for(LoadedMod mod : mods.list()){
-                    String letter = (Strings.stripColors(mod.name).charAt(0) + "").toUpperCase();
 
                     if(!mod.enabled() && !anyDisabled && mods.list().size > 0){
                         anyDisabled = true;
@@ -170,36 +169,27 @@ public class ModsDialog extends BaseDialog{
                         t.table(title -> {
                             title.left();
 
-                            title.add(new BorderImage(){
-                                {
-                                    if(mod.iconTexture != null){
-                                        setDrawable(new TextureRegion(mod.iconTexture));
-                                    }else{
-                                        setDrawable(Tex.clear);
-                                    }
-                                    border(Pal.accent);
+                            title.add(new BorderImage(){{
+                                if(mod.iconTexture != null){
+                                    setDrawable(new TextureRegion(mod.iconTexture));
+                                }else{
+                                    setDrawable(Tex.nomap);
                                 }
+                                border(Pal.accent);
+                            }}).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
 
-                                @Override
-                                public void draw(){
-                                    super.draw();
+                            title.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+                                .wrap().top().width(170f).growX().left();
 
-                                    if(mod.iconTexture == null){
-                                        Fonts.def.draw(letter, x + width/2f, y + height/2f, Align.center);
-                                    }
-                                }
-                            }).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
-
-                            title.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).wrap().width(170f).growX();
                             title.add().growX();
-                        }).growX().left();
+                        }).growX().growY().left();
 
                         t.table(right -> {
                             right.right();
-                            right.button(mod.enabled() ? "@mod.disable" : "@mod.enable", mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.transt, () -> {
+                            right.button(mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.clearPartiali, () -> {
                                 mods.setEnabled(mod, !mod.enabled());
                                 setup();
-                            }).height(50f).margin(8f).width(130f).disabled(!mod.isSupported());
+                            }).size(50f).disabled(!mod.isSupported());
 
                             right.button(mod.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
                                 if(!mod.hasSteamID()){
@@ -218,7 +208,7 @@ public class ModsDialog extends BaseDialog{
                                     platform.publish(mod);
                                 }).size(50f);
                             }
-                        }).growX().right();
+                        }).growX().right().padRight(-8f).padTop(-8f);
 
                         t.row();
                         if(!mod.isSupported()){

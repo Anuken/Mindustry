@@ -213,9 +213,9 @@ public class MapView extends Element implements GestureListener{
         y = (y - getHeight() / 2 + sclheight / 2 - offsety * zoom) / sclheight * editor.height();
 
         if(editor.drawBlock.size % 2 == 0 && tool != EditorTool.eraser){
-            return Tmp.g1.set((int)(x - 0.5f), (int)(y - 0.5f));
+            return Tmp.p1.set((int)(x - 0.5f), (int)(y - 0.5f));
         }else{
-            return Tmp.g1.set((int)x, (int)y);
+            return Tmp.p1.set((int)x, (int)y);
         }
     }
 

@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
@@ -35,6 +36,27 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
         }
     }
 
+    @Override
+    @Replace
+    public void lookAt(float angle){
+        if(onLiquid()){
+            rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta);
+        }
+    }
+
+    @Override
+    @Replace
+    public boolean canShoot(){
+        return onLiquid();
+    }
+
+    @Override
+    public void add(){
+        tleft.clear();
+        tright.clear();
+    }
+
+    @Override
     public void draw(){
         float z = Draw.z();
 
@@ -71,6 +93,11 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
         return on.isDeep() ? 1.3f : 1f;
+    }
+
+    public boolean onLiquid(){
+        Tile tile = tileOn();
+        return tile != null && tile.floor().isLiquid;
     }
 }
 

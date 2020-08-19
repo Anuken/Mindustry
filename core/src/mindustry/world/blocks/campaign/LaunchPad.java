@@ -50,7 +50,7 @@ public class LaunchPad extends Block{
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
-    public class LaunchPadEntity extends Building{
+    public class LaunchPadBuild extends Building{
         @Override
         public void draw(){
             super.draw();
@@ -104,7 +104,7 @@ public class LaunchPad extends Block{
                 entity.add();
                 Fx.launchPod.at(this);
                 items.clear();
-                Effects.shake(3f, 3f, this);
+                Effect.shake(3f, 3f, this);
             }
         }
     }

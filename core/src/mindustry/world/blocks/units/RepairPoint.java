@@ -47,7 +47,7 @@ public class RepairPoint extends Block{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, entity -> ((RepairPointEntity)entity).target != null);
+        consumes.powerCond(powerUse, entity -> ((RepairPointBuild)entity).target != null);
         super.init();
     }
 
@@ -61,7 +61,7 @@ public class RepairPoint extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class RepairPointEntity extends Building{
+    public class RepairPointBuild extends Building{
         public Unit target;
         public float strength, rotation = 90;
 

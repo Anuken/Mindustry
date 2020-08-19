@@ -165,9 +165,10 @@ public class Saves{
     }
 
     public void deleteAll(){
-        saves.clear();
-        for(Fi file : saveDirectory.list()){
-            file.delete();
+        for(SaveSlot slot : saves.copy()){
+            if(!slot.isSector()){
+                slot.delete();
+            }
         }
     }
 
@@ -187,7 +188,7 @@ public class Saves{
                 current = this;
                 totalPlaytime = meta.timePlayed;
                 savePreview();
-            }catch(Exception e){
+            }catch(Throwable e){
                 throw new SaveException(e);
             }
         }

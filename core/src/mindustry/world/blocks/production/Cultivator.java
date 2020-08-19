@@ -31,7 +31,7 @@ public class Cultivator extends GenericCrafter{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("multiplier", (CultivatorEntity entity) -> new Bar(() ->
+        bars.add("multiplier", (CultivatorBuild entity) -> new Bar(() ->
         Core.bundle.formatFloat("bar.efficiency",
         ((entity.boost + 1f + attribute.env()) * entity.warmup) * 100f, 1),
         () -> Pal.ammo,
@@ -55,7 +55,7 @@ public class Cultivator extends GenericCrafter{
         return new TextureRegion[]{region, topRegion};
     }
 
-    public class CultivatorEntity extends GenericCrafterEntity{
+    public class CultivatorBuild extends GenericCrafterBuild{
         public float warmup;
         public float boost;
 

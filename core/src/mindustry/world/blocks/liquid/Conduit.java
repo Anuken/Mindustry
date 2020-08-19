@@ -72,7 +72,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         return new TextureRegion[]{Core.atlas.find("conduit-bottom"), topRegions[0]};
     }
 
-    public class ConduitEntity extends LiquidBlockEntity{
+    public class ConduitBuild extends LiquidBuild{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
 

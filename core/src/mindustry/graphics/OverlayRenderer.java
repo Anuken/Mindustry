@@ -42,10 +42,10 @@ public class OverlayRenderer{
                         if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                         .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
 
-                            Tmp.v1.set(player.x, player.y).sub(player).setLength(indicatorLength);
+                            Tmp.v1.set(player).sub(Vars.player).setLength(indicatorLength);
 
-                            Lines.stroke(2f, player.team().color);
-                            Lines.lineAngle(player.x + Tmp.v1.x, player.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
+                            Lines.stroke(2f, Vars.player.team().color);
+                            Lines.lineAngle(Vars.player.x + Tmp.v1.x, Vars.player.y + Tmp.v1.y, Tmp.v1.angle(), 4f);
                             Draw.reset();
                         }
                     }

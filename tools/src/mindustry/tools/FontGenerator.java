@@ -40,7 +40,7 @@ public class FontGenerator{
         Log.info("Icon font...");
 
         ZipFi zip = new ZipFi(folder.child("font.zip"));
-        Fi dest = folder.child("font.ttf");
+        Fi dest = folder.child("font.woff");
         zip.list()[0].child("font").child("fontello.ttf").copyTo(dest);
         dest.copyTo(Fi.get("core/assets/fonts/icon.ttf"));
 

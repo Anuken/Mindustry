@@ -5,6 +5,7 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -87,6 +88,14 @@ public class EventType{
         }
     }
 
+    public static class ClientPreConnectEvent{
+        public final Host host;
+
+        public ClientPreConnectEvent(Host host){
+            this.host = host;
+        }
+    }
+
     public static class PlayerChatEvent{
         public final Player player;
         public final String message;
@@ -157,24 +166,13 @@ public class EventType{
         }
     }
 
-    /** Called when the player taps a block. */
-    public static class TapEvent{
-        public final Building tile;
-        public final Player player;
-
-        public TapEvent(Building tile, Player player){
-            this.tile = tile;
-            this.player = player;
-        }
-    }
-
-    /** Called when the player sets a specific block. */
-    public static class TapConfigEvent{
+    /** Called when the configures sets a specific block. */
+    public static class ConfigEvent{
         public final Building tile;
         public final Player player;
         public final Object value;
 
-        public TapConfigEvent(Building tile, Player player, Object value){
+        public ConfigEvent(Building tile, Player player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;

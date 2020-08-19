@@ -54,7 +54,7 @@ public abstract class BulletType extends Content{
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
-    public float statusDuration = 60 * 10f;
+    public float statusDuration = 60 * 8f;
     /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
@@ -142,7 +142,7 @@ public abstract class BulletType extends Content{
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
-        Effects.shake(hitShake, hitShake, b);
+        Effect.shake(hitShake, hitShake, b);
 
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
@@ -270,7 +270,7 @@ public abstract class BulletType extends Content{
     }
 
     public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
-        Call.createBullet(this, team, x, y, damage, angle, velocityScl, lifetimeScl);
+        Call.createBullet(this, team, x, y, angle, damage, velocityScl, lifetimeScl);
     }
 
     @Remote(called = Loc.server, unreliable = true)

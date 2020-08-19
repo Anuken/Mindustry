@@ -26,8 +26,8 @@ public class Junction extends Block{
         return true;
     }
 
-    public class JunctionEntity extends Building{
-        DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity);
+    public class JunctionBuild extends Building{
+        public DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity);
 
         @Override
         public int acceptStack(Item item, int amount, Teamc source){

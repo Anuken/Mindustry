@@ -68,10 +68,10 @@ public class NetworkIO{
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
         String map = state.map.name();
 
-        ByteBuffer buffer = ByteBuffer.allocate(512);
+        ByteBuffer buffer = ByteBuffer.allocate(500);
 
         writeString(buffer, name, 100);
-        writeString(buffer, map);
+        writeString(buffer, map, 64);
 
         buffer.putInt(Core.settings.getInt("totalPlayers", Groups.player.size()));
         buffer.putInt(state.wave);
@@ -82,6 +82,9 @@ public class NetworkIO{
         buffer.putInt(netServer.admins.getPlayerLimit());
 
         writeString(buffer, description, 100);
+        if(state.rules.modeName != null){
+            writeString(buffer, state.rules.modeName, 50);
+        }
         return buffer;
     }
 
@@ -95,8 +98,9 @@ public class NetworkIO{
         Gamemode gamemode = Gamemode.all[buffer.get()];
         int limit = buffer.getInt();
         String description = readString(buffer);
+        String modeName = readString(buffer);
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description);
+        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){

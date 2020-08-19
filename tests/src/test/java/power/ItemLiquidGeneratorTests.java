@@ -8,6 +8,7 @@ import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.power.ItemLiquidGenerator.*;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
@@ -26,7 +27,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
     private ItemLiquidGenerator generator;
     private Tile tile;
-    private ItemLiquidGenerator.ItemLiquidGeneratorEntity entity;
+    private ItemLiquidGeneratorBuild entity;
     private final float fakeItemDuration = 60f; //ticks
     private final float maximumLiquidUsage = 0.5f;
 
@@ -38,7 +39,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
                 powerProduction = 0.1f;
                 itemDuration = fakeItemDuration;
                 maxLiquidGenerate = maximumLiquidUsage;
-                entityType = ItemLiquidGeneratorEntity::new;
+                entityType = ItemLiquidGeneratorBuild::new;
             }
 
             @Override

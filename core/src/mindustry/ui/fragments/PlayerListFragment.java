@@ -16,8 +16,8 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class PlayerListFragment extends Fragment{
+    public Table content = new Table().marginRight(13f).marginLeft(13f);
     private boolean visible = false;
-    private Table content = new Table().marginRight(13f).marginLeft(13f);
     private Interval timer = new Interval();
     private TextField sField;
     private boolean found = false;

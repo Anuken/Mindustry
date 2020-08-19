@@ -56,7 +56,7 @@ public class Wall extends Block{
         return super.canReplace(other) && health > other.health && size == other.size;
     }
 
-    public class WallEntity extends Building{
+    public class WallBuild extends Building{
         public float hit;
 
         @Override

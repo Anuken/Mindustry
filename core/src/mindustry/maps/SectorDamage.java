@@ -44,7 +44,7 @@ public class SectorDamage{
                         //just remove all the buildings in the way - as long as they're not cores!
                         if(other.build != null && other.team() == state.rules.defaultTeam && !(other.block() instanceof CoreBlock)){
                             if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                Effects.rubble(other.build.x, other.build.y, other.block().size);
+                                Effect.rubble(other.build.x, other.build.y, other.block().size);
                             }
 
                             other.remove();
@@ -86,7 +86,7 @@ public class SectorDamage{
                             if(other.build.health < 0){
                                 //rubble
                                 if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                    Effects.rubble(other.build.x, other.build.y, other.block().size);
+                                    Effect.rubble(other.build.x, other.build.y, other.block().size);
                                 }
 
                                 other.remove();

@@ -53,7 +53,7 @@ public class LiquidTurret extends Turret{
         });
     }
 
-    public class LiquidTurretEntity extends TurretEntity{
+    public class LiquidTurretBuild extends TurretBuild{
 
         @Override
         public void draw(){
@@ -98,7 +98,7 @@ public class LiquidTurret extends Turret{
             shootSound.at(tile);
 
             if(shootShake > 0){
-                Effects.shake(shootShake, shootShake, tile.build);
+                Effect.shake(shootShake, shootShake, tile.build);
             }
 
             recoil = recoilAmount;

@@ -128,6 +128,13 @@ public class Annotations{
         String fallback() default "error";
     }
 
+    /** Registers a statement for auto serialization. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface RegisterStatement{
+        String value();
+    }
+
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface StyleDefaults{

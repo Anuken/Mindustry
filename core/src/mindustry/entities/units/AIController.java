@@ -115,6 +115,41 @@ public class AIController implements UnitController{
 
     }
 
+    protected void circle(Position target, float circleLength){
+        circle(target, circleLength, unit.type().speed);
+    }
+
+    protected void circle(Position target, float circleLength, float speed){
+        if(target == null) return;
+
+        vec.set(target).sub(unit);
+
+        if(vec.len() < circleLength){
+            vec.rotate((circleLength - vec.len()) / circleLength * 180f);
+        }
+
+        vec.setLength(speed * Time.delta);
+
+        unit.moveAt(vec);
+    }
+
+    protected void moveTo(Position target, float circleLength){
+        if(target == null) return;
+
+        vec.set(target).sub(unit);
+
+        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
+
+        vec.setLength(unit.type().speed * Time.delta * length);
+        if(length < -0.5f){
+            vec.rotate(180f);
+        }else if(length < 0){
+            vec.setZero();
+        }
+
+        unit.moveAt(vec);
+    }
+
     @Override
     public void unit(Unit unit){
         if(this.unit == unit) return;

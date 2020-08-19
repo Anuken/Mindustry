@@ -42,7 +42,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
 
     //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Trailc.class}) UnitType alpha, beta, gamma;
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risso, minke, bryde;
@@ -193,7 +193,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
-                    damage = 11f;
+                    damage = 12f;
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
@@ -263,7 +263,7 @@ public class UnitTypes implements ContentList{
                     speed = 1f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
-                    splashDamage = 40f;
+                    splashDamage = 45f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -527,7 +527,7 @@ public class UnitTypes implements ContentList{
         }};
 
         antumbra = new UnitType("antumbra"){{
-            speed = 1.25f;
+            speed = 1.13f;
             accel = 0.035f;
             drag = 0.05f;
             rotateSpeed = 1.9f;
@@ -599,7 +599,7 @@ public class UnitTypes implements ContentList{
         }};
 
         eclipse = new UnitType("eclipse"){{
-            speed = 1.1f;
+            speed = 1.09f;
             accel = 0.02f;
             drag = 0.05f;
             rotateSpeed = 1f;
@@ -687,13 +687,17 @@ public class UnitTypes implements ContentList{
         //region air support
 
         mono = new UnitType("mono"){{
+            defaultController = MinerAI::new;
+
             flying = true;
-            drag = 0.05f;
-            accel = 0.15f;
-            speed = 2f;
+            drag = 0.06f;
+            accel = 0.12f;
+            speed = 1.1f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
+            itemCapacity = 30;
+            range = 50f;
 
             mineTier = 1;
             mineSpeed = 2.5f;
@@ -704,7 +708,7 @@ public class UnitTypes implements ContentList{
 
             flying = true;
             drag = 0.05f;
-            speed = 2f;
+            speed = 1.9f;
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 70f;
@@ -723,7 +727,7 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon("heal-weapon-mount"){{
                 y = -2.5f;
                 x = 3.5f;
-                reload = 34f;
+                reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 shootSound = Sounds.pew;
@@ -732,11 +736,11 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 15f;
                 alternate = true;
 
-                bullet = new MissileBulletType(4f, 10){{
+                bullet = new MissileBulletType(4f, 12){{
                     homingPower = 0.08f;
                     weaveMag = 4;
                     weaveScale = 4;
-                    lifetime = 50f;
+                    lifetime = 56f;
                     keepVelocity = false;
                     shootEffect = Fx.shootHeal;
                     smokeEffect = Fx.hitLaser;
