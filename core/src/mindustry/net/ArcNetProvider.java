@@ -265,7 +265,7 @@ public class ArcNetProvider implements NetProvider{
         return null;
     }
 
-    private void handleException(Throwable e){
+    void handleException(Throwable e){
         if(e instanceof ArcNetException){
             Core.app.post(() -> net.showError(new IOException("mismatch")));
         }else if(e instanceof ClosedChannelException){

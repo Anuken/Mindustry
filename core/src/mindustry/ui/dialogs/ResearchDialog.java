@@ -32,14 +32,14 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class ResearchDialog extends BaseDialog{
-    private final float nodeSize = Scl.scl(60f);
-    private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
-    private TechTreeNode root = new TechTreeNode(TechTree.root, null);
-    private Rect bounds = new Rect();
-    private ItemsDisplay itemDisplay;
-    private View view;
+    final float nodeSize = Scl.scl(60f);
+    ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
+    TechTreeNode root = new TechTreeNode(TechTree.root, null);
+    Rect bounds = new Rect();
+    ItemsDisplay itemDisplay;
+    View view;
 
-    private ItemSeq items;
+    ItemSeq items;
 
     public ResearchDialog(){
         super("");

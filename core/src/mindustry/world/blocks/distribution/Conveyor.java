@@ -25,8 +25,8 @@ public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final int capacity = 4;
 
-    private final Vec2 tr1 = new Vec2();
-    private final Vec2 tr2 = new Vec2();
+    final Vec2 tr1 = new Vec2();
+    final Vec2 tr2 = new Vec2();
 
     public @Load(value = "@-#1-#2", lengths = {7, 4}) TextureRegion[][] regions;
 

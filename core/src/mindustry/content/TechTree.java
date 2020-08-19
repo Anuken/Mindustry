@@ -17,7 +17,7 @@ import static mindustry.content.UnitTypes.*;
 import static mindustry.type.ItemStack.*;
 
 public class TechTree implements ContentList{
-    private static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
+    static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
 
     public static Seq<TechNode> all;
     public static TechNode root;
@@ -544,7 +544,7 @@ public class TechTree implements ContentList{
     }
 
     public static class TechNode{
-        private static TechNode context;
+        static TechNode context;
 
         /** Depth in tech tree. */
         public int depth;

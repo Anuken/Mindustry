@@ -30,15 +30,15 @@ import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private final FrameBuffer buffer = new FrameBuffer(2, 2, true);
-    private final PlanetRenderer planets = renderer.planets;
+    final PlanetRenderer planets = renderer.planets;
     private final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
     private final Table stable  = new Table().background(Styles.black3);
 
     private int launchRange;
     private float zoom = 1f, selectAlpha = 1f;
-    private @Nullable Sector selected, hovered, launchSector;
+    @Nullable Sector selected, hovered, launchSector;
     private CoreBuild launcher;
-    private Mode mode = look;
+    Mode mode = look;
     private boolean launching;
 
     public PlanetDialog(){
@@ -291,7 +291,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     //TODO localize
-    private void updateSelected(){
+    void updateSelected(){
         Sector sector = selected;
 
         if(sector == null){

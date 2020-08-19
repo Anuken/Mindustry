@@ -22,7 +22,7 @@ import static mindustry.Vars.ui;
 
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;
-    private EditorTool tool = EditorTool.pencil;
+    EditorTool tool = EditorTool.pencil;
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
@@ -31,11 +31,11 @@ public class MapView extends Element implements GestureListener{
     private Rect rect = new Rect();
     private Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
 
-    private boolean drawing;
-    private int lastx, lasty;
-    private int startx, starty;
-    private float mousex, mousey;
-    private EditorTool lastTool;
+    boolean drawing;
+    int lastx, lasty;
+    int startx, starty;
+    float mousex, mousey;
+    EditorTool lastTool;
 
     public MapView(MapEditor editor){
         this.editor = editor;
@@ -204,7 +204,7 @@ public class MapView extends Element implements GestureListener{
         zoom = Mathf.clamp(zoom, 0.2f, 20f);
     }
 
-    private Point2 project(float x, float y){
+    Point2 project(float x, float y){
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;

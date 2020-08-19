@@ -37,18 +37,18 @@ public class MapGenerateDialog extends BaseDialog{
     private Pixmap pixmap;
     private Texture texture;
     private GenerateInput input = new GenerateInput();
-    private Seq<GenerateFilter> filters = new Seq<>();
+    Seq<GenerateFilter> filters = new Seq<>();
     private int scaling = mobile ? 3 : 1;
     private Table filterTable;
 
     private AsyncExecutor executor = new AsyncExecutor(1);
     private AsyncResult<Void> result;
-    private boolean generating;
+    boolean generating;
     private GenTile returnTile = new GenTile();
 
     private GenTile[][] buffer1, buffer2;
     private Cons<Seq<GenerateFilter>> applier;
-    private CachedTile ctile = new CachedTile(){
+    CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
         protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
@@ -407,6 +407,9 @@ public class MapGenerateDialog extends BaseDialog{
     private class GenTile{
         public byte team;
         public short block, floor, ore;
+
+        GenTile(){
+        }
 
         public void set(Block floor, Block wall, Block ore, Team team){
             this.floor = floor.id;

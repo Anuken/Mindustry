@@ -23,7 +23,7 @@ public class Scripts implements Disposable{
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
-    private LoadedMod currentMod = null;
+    LoadedMod currentMod = null;
 
     public Scripts(){
         Time.mark();

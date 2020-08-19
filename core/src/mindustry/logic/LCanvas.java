@@ -21,7 +21,7 @@ import mindustry.world.blocks.logic.*;
 
 public class LCanvas extends Table{
     private static final Color backgroundCol = Pal.darkMetal.cpy().mul(0.1f), gridCol = Pal.darkMetal.cpy().mul(0.5f);
-    private static Seq<Runnable> postDraw = new Seq<>();
+    static Seq<Runnable> postDraw = new Seq<>();
     private Vec2 offset = new Vec2();
 
     DragLayout statements;

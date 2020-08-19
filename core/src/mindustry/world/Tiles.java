@@ -11,7 +11,7 @@ import java.util.*;
 public class Tiles implements Iterable<Tile>{
     public final int width, height;
 
-    private final Tile[] array;
+    final Tile[] array;
 
     public Tiles(int width, int height){
         this.array = new Tile[width * height];
@@ -86,6 +86,9 @@ public class Tiles implements Iterable<Tile>{
 
     private class TileIterator implements Iterator<Tile>{
         int index = 0;
+
+        TileIterator(){
+        }
 
         @Override
         public boolean hasNext(){

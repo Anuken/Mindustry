@@ -270,7 +270,7 @@ public class Blocks implements ContentList{
         }};
 
         grass = new Floor("grass"){{
-
+            attributes.set(Attribute.water, 0.1f);
         }};
 
         salt = new Floor("salt"){{

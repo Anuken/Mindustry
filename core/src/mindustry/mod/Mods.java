@@ -39,7 +39,7 @@ public class Mods implements Loadable{
     private int totalSprites;
     private MultiPacker packer;
 
-    private Seq<LoadedMod> mods = new Seq<>();
+    Seq<LoadedMod> mods = new Seq<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
     private boolean requiresReload, createdAtlas;
 

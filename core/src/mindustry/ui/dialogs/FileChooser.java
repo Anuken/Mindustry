@@ -17,10 +17,10 @@ import java.util.*;
 
 public class FileChooser extends BaseDialog{
     private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
-    private static Fi lastDirectory = homeDirectory;
+    static Fi lastDirectory = homeDirectory;
 
     private Table files;
-    private Fi directory = lastDirectory;
+    Fi directory = lastDirectory;
     private ScrollPane pane;
     private TextField navigation, filefield;
     private TextButton ok;
@@ -163,7 +163,7 @@ public class FileChooser extends BaseDialog{
         return handles;
     }
 
-    private void updateFiles(boolean push){
+    void updateFiles(boolean push){
         if(push) stack.push(directory);
         navigation.setText(directory.toString());
 

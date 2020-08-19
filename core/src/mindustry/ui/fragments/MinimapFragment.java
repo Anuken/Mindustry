@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 
 public class MinimapFragment extends Fragment{
     private boolean shown;
-    private float panx, pany, zoom = 1f, lastZoom = -1;
+    float panx, pany, zoom = 1f, lastZoom = -1;
     private float baseSize = Scl.scl(5f);
     private Element elem;
 
