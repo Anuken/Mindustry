@@ -454,7 +454,7 @@ public class Mods implements Loadable{
             content.setCurrentMod(null);
         }
 
-        Log.debug("Time to initialize modded scripts: @", Time.elapsed());
+        Log.info("Time to initialize modded scripts: @", Time.elapsed());
     }
 
     /** Creates all the content found in mod files. */
@@ -586,6 +586,8 @@ public class Mods implements Loadable{
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods.*/
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
+        Time.mark();
+
         Fi zip = sourceFile.isDirectory() ? sourceFile : new ZipFi(sourceFile);
         if(zip.list().length == 1 && zip.list()[0].isDirectory()){
             zip = zip.list()[0];
@@ -637,6 +639,7 @@ public class Mods implements Loadable{
             meta.hidden = true;
         }
 
+        Log.info("Loaded mod '@' in @", meta.name, Time.elapsed());
         return new LoadedMod(sourceFile, zip, mainMod, meta);
     }
 
