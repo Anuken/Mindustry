@@ -485,11 +485,15 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             lineMode = false;
         }else if(mode == schematicSelect){
-            selectRequests.clear();
-            lastSchematic = schematics.create(lineStartX, lineStartY, lastLineX, lastLineY);
-            useSchematic(lastSchematic);
-            if(selectRequests.isEmpty()){
-                lastSchematic = null;
+            if(!state.rules.copyAllowed){
+                ui.showInfoToast("@schematic.copydisabled", 3f);
+            }else {
+                selectRequests.clear();
+                lastSchematic = schematics.create(lineStartX, lineStartY, lastLineX, lastLineY);
+                useSchematic(lastSchematic);
+                if (selectRequests.isEmpty()) {
+                    lastSchematic = null;
+                }
             }
             schematicMode = false;
             mode = none;
