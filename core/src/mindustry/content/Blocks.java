@@ -1476,7 +1476,7 @@ public class Blocks implements ContentList{
         }};
 
         arc = new PowerTurret("arc"){{
-            requirements(Category.turret, with(Items.copper, 35, Items.lead, 50));
+            requirements(Category.turret, with(Items.copper, 35, Items.lead, 50, Items.silicon, 20));
             shootType = new LightningBulletType(){{
                 damage = 21;
                 lightningLength = 25;
