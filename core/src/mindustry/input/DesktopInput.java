@@ -401,8 +401,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard()){
-            if(!state.rules.schematicAllowed){
-                ui.showInfoToast("@schematic.disabled", 3f);
+            if(!state.rules.copyAllowed){
+                ui.showInfoToast("@schematic.copydisabled", 3f);
             }else {
                 lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
                 useSchematic(lastSchematic);
