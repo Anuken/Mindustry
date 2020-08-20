@@ -114,6 +114,11 @@ public class LogicBlock extends Block{
     }
 
     @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        Drawf.circles(x*tilesize + offset, y*tilesize + offset, range);
+    }
+
+    @Override
     public Object pointConfig(Object config, Cons<Point2> transformer){
         if(config instanceof byte[]){
             byte[] data = (byte[])config;
@@ -389,10 +394,7 @@ public class LogicBlock extends Block{
             return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof BuildEntity);
         }
 
-        @Override
-        public void drawSelect(){
 
-        }
 
         @Override
         public void buildConfiguration(Table table){

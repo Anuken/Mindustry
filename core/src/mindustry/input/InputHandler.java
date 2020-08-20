@@ -14,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.ai.formations.*;
 import mindustry.ai.formations.patterns.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -261,23 +260,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(commander.isCommanding()){
             commander.clearCommand();
         }else{
-            FormationPattern pattern = new SquareFormation();
-            Formation formation = new Formation(new Vec3(player.x, player.y, player.unit().rotation), pattern);
-            formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
 
-            units.clear();
-
+            commander.commandNearby(new SquareFormation());
             Fx.commandSend.at(player);
-            Units.nearby(player.team(), player.x, player.y, 200f, u -> {
-                if(u.isAI()){
-                    units.add(u);
-                }
-            });
-
-            units.sort(u -> u.dst2(player.unit()));
-            units.truncate(player.unit().type().commandLimit);
-
-            commander.command(formation, units);
         }
 
     }

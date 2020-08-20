@@ -31,6 +31,7 @@ public class BlockPayload implements Payload{
 
     public void place(Tile tile, int rotation){
         tile.setBlock(entity.block(), entity.team(), rotation, () -> entity);
+        entity.dropped();
     }
 
     @Override

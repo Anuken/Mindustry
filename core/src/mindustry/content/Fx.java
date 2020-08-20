@@ -33,8 +33,10 @@ public class Fx{
         float scl = 1f + e.fout() * 2f;
 
         UnitType unit = e.data();
-        rect(unit.region, e.x, e.y,
-        unit.region.getWidth() * Draw.scl * scl, unit.region.getHeight() * Draw.scl * scl, 180f);
+        TextureRegion region = unit.icon(Cicon.full);
+
+        rect(region, e.x, e.y,
+            region.getWidth() * Draw.scl * scl, region.getHeight() * Draw.scl * scl, 180f);
 
     }),
 

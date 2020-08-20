@@ -7,9 +7,11 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.pathfinder;
+import static mindustry.Vars.*;
 
 public class GroundAI extends AIController{
+    //static final float commandCooldown = 60f * 10;
+    //float commandTimer = 60*3;
 
     @Override
     public void updateMovement(){
@@ -33,6 +35,21 @@ public class GroundAI extends AIController{
         }else if(unit.moving()){
             unit.lookAt(unit.vel().angle());
         }
+
+        //auto-command works but it's very buggy
+        /*
+        if(unit instanceof Commanderc){
+            Commanderc c = (Commanderc)unit;
+            //try to command when missing members
+            if(c.controlling().size <= unit.type().commandLimit/2){
+                commandTimer -= Time.delta;
+
+                if(commandTimer <= 0){
+                    c.commandNearby(new SquareFormation(), u -> !(u.controller() instanceof FormationAI) && !(u instanceof Commanderc));
+                    commandTimer = commandCooldown;
+                }
+            }
+        }*/
     }
 
     protected void moveToCore(FlagTarget path){
