@@ -995,12 +995,12 @@ public class Blocks implements ContentList{
             consumes.power(1.75f);
         }};
 
-        payloadConveyor = new PayloadConveyor("mass-conveyor"){{
-            requirements(Category.distribution, with(Items.copper, 1));
+        payloadConveyor = new PayloadConveyor("payload-conveyor"){{
+            requirements(Category.distribution, with(Items.graphite, 10, Items.copper, 20));
         }};
 
         payloadRouter = new PayloadRouter("payload-router"){{
-            requirements(Category.distribution, with(Items.copper, 1));
+            requirements(Category.distribution, with(Items.graphite, 15, Items.copper, 20));
         }};
 
         //endregion

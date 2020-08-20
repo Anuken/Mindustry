@@ -863,6 +863,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(player.within(targetPos, attractDst)){
             movement.setZero();
+            unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
         }
 
         float expansion = 3f;

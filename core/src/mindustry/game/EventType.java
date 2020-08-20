@@ -106,27 +106,6 @@ public class EventType{
         }
     }
 
-    /** Called when a zone's requirements are met. */
-    public static class ZoneRequireCompleteEvent{
-        public final SectorPreset zoneMet, zoneForMet;
-        public final Objectives.Objective objective;
-
-        public ZoneRequireCompleteEvent(SectorPreset zoneMet, SectorPreset zoneForMet, Objectives.Objective objective){
-            this.zoneMet = zoneMet;
-            this.zoneForMet = zoneForMet;
-            this.objective = objective;
-        }
-    }
-
-    /** Called when a zone's requirements are met. */
-    public static class ZoneConfigureCompleteEvent{
-        public final SectorPreset zone;
-
-        public ZoneConfigureCompleteEvent(SectorPreset zone){
-            this.zone = zone;
-        }
-    }
-
     /** Called when a sector is conquered, e.g. a boss or base is defeated. */
     public static class SectorCaptureEvent{
         public final Sector sector;

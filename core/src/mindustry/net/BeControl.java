@@ -132,6 +132,7 @@ public class BeControl{
                     () -> Core.app.post(() -> {
                         Log.info("&lcSaving...");
                         SaveIO.save(saveDirectory.child("autosavebe." + saveExtension));
+                        Log.info("&lcAutosaved.");
 
                         netServer.kickAll(KickReason.serverRestarting);
                         Threads.sleep(32);
