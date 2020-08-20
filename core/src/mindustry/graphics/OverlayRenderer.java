@@ -136,7 +136,7 @@ public class OverlayRenderer{
 
             if(tile != null && tile.team() == player.team()){
                 tile.drawSelect();
-                if(!tile.enabled){
+                if(!tile.enabled && tile.block.drawDisabled){
                    tile.drawDisabled();
                 }
 

@@ -94,6 +94,10 @@ public class Block extends UnlockableContent{
     public boolean absorbLasers = false;
     /** if false, the status is never drawn */
     public boolean enableDrawStatus = true;
+    /** whether to draw disabled status */
+    public boolean drawDisabled = true;
+    /** whether to automatically reset enabled status after a logic block has not interacted for a while. */
+    public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
     /** tile entity health */

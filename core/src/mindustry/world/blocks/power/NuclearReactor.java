@@ -76,12 +76,14 @@ public class NuclearReactor extends PowerGenerator{
             float fullness = (float)fuel / itemCapacity;
             productionEfficiency = fullness;
 
-            if(fuel > 0){
+            if(fuel > 0 && enabled){
                 heat += fullness * heating * Math.min(delta(), 4f);
 
                 if(timer(timerFuel, itemDuration / timeScale())){
                     consume();
                 }
+            }else{
+                productionEfficiency = 0f;
             }
 
             Liquid liquid = cliquid.liquid;

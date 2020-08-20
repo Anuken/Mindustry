@@ -14,6 +14,8 @@ public class SwitchBlock extends Block{
         super(name);
         configurable = true;
         update = true;
+        drawDisabled = false;
+        autoResetEnabled = false;
 
         config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.enabled = b);
     }

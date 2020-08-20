@@ -26,6 +26,7 @@ public class Unloader extends Block{
         configurable = true;
         saveConfig = true;
         itemCapacity = 0;
+        noUpdateDisabled = true;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);

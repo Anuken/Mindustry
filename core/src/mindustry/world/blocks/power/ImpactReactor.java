@@ -64,9 +64,8 @@ public class ImpactReactor extends PowerGenerator{
         return new TextureRegion[]{bottomRegion, region};
     }
 
-    public class FusionReactorBuild extends GeneratorBuild{
+    public class ImpactReactorBuild extends GeneratorBuild{
         public float warmup;
-
 
         @Override
         public void updateTile(){

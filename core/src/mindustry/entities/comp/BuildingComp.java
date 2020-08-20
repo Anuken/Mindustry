@@ -1247,10 +1247,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScale = 1f;
         }
 
-        enabledControlTime -= Time.delta;
+        if(block.autoResetEnabled){
+            enabledControlTime -= Time.delta;
 
-        if(enabledControlTime <= 0){
-            enabled = true;
+            if(enabledControlTime <= 0){
+                enabled = true;
+            }
         }
 
         if(sound != null){
