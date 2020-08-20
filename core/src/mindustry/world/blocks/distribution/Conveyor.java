@@ -171,16 +171,14 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f){
-                return;
-            }
+            if(clogHeat > 0.5f) return;
 
             noSleep();
 
             float mspeed = speed * tilesize * 55f;
             float centerSpeed = 0.1f;
             float centerDstScl = 3f;
-            float tx = Geometry.d4[rotation].x, ty = Geometry.d4[rotation].y;
+            float tx = Geometry.d4x[rotation], ty = Geometry.d4y[rotation];
 
             float centerx = 0f, centery = 0f;
 

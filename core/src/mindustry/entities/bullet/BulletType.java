@@ -264,7 +264,7 @@ public abstract class BulletType extends Content{
         bullet.damage = damage < 0 ? this.damage : damage;
         bullet.add();
 
-        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
+        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX() / Time.delta, ((Hitboxc)owner).deltaY() / Time.delta);
         return bullet;
 
     }

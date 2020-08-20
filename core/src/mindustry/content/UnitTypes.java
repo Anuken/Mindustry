@@ -592,6 +592,7 @@ public class UnitTypes implements ContentList{
                 bullet = new BasicBulletType(7f, 60){{
                     width = 12f;
                     height = 18f;
+                    lifetime = 30f;
                     shootEffect = Fx.shootBig;
                 }};
             }}

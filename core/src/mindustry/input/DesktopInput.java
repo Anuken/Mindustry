@@ -593,8 +593,8 @@ public class DesktopInput extends InputHandler{
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(unit.moving()){
-                unit.lookAt(unit.vel().angle());
+            if(!movement.isZero()){
+                unit.lookAt(unit.vel.isZero() ? movement.angle() : unit.vel.angle());
             }
         }
 
@@ -616,7 +616,6 @@ public class DesktopInput extends InputHandler{
 
         //update payload input
         if(unit instanceof Payloadc){
-            Payloadc pay = (Payloadc)unit;
 
             if(Core.input.keyTap(Binding.pickupCargo)){
                 tryPickupPayload();
