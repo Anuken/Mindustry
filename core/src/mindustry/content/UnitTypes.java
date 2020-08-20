@@ -1001,7 +1001,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.95f;
+                    tileDamageMultiplier = 0.01f;
                 }};
             }});
         }};
