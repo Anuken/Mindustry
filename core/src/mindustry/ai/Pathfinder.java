@@ -464,13 +464,15 @@ public class Pathfinder implements Runnable{
     /** Holds a copy of tile data for a specific tile position. */
     @Struct
     class PathTileStruct{
-        //traversal cost
+        //base traversal cost
         short cost;
         //team of block, if applicable (0 by default)
         byte team;
-        //whether it's viable to pass this block
-        boolean passable;
-        //whether it's viable to pass this block through water
-        boolean passableWater;
+        //general solid state
+        boolean solid;
+        //whether this block is a liquid that boats can move on
+        boolean water;
+        //whether this block is solid for leg units that can move over some solid blocks
+        boolean legSolid;
     }
 }
