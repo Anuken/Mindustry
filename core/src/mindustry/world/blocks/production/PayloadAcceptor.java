@@ -24,6 +24,7 @@ public class PayloadAcceptor extends Block{
         super(name);
 
         update = true;
+        sync = true;
     }
 
     public static boolean blends(Building tile, int direction){

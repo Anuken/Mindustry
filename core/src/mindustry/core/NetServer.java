@@ -735,7 +735,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public boolean isWaitingForPlayers(){
-        if(state.rules.pvp){
+        if(state.rules.pvp && !state.gameOver){
             int used = 0;
             for(TeamData t : state.teams.getActive()){
                 if(Groups.player.count(p -> p.team() == t.team) > 0){
@@ -794,7 +794,7 @@ public class NetServer implements ApplicationListener{
             if(!entity.block().sync) continue;
             sent ++;
 
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.pos());
             entity.writeAll(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
@@ -828,7 +828,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 

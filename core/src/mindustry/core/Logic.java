@@ -303,6 +303,11 @@ public class Logic implements ApplicationListener{
     }
 
     @Remote(called = Loc.both)
+    public static void updateGameOver(Team winner){
+        state.gameOver = true;
+    }
+
+    @Remote(called = Loc.both)
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);

@@ -41,6 +41,8 @@ public class MassDriver extends Block{
         hasItems = true;
         hasPower = true;
         outlineIcon = true;
+        sync = true;
+
         //point2 is relative
         config(Point2.class, (MassDriverBuild tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
         config(Integer.class, (MassDriverBuild tile, Integer point) -> tile.link = point);
@@ -318,7 +320,7 @@ public class MassDriver extends Block{
             super.read(read, revision);
             link = read.i();
             rotation = read.f();
-            state = DriverState.values()[read.b()];
+            state = DriverState.all[read.b()];
         }
     }
 
@@ -326,6 +328,8 @@ public class MassDriver extends Block{
         idle, //nothing is shooting at this mass driver and it does not have any target
         accepting, //currently getting shot at, unload items
         shooting,
-        unloading
+        unloading;
+
+        public static final DriverState[] all = values();
     }
 }

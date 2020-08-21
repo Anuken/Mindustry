@@ -159,6 +159,9 @@ public class ServerControl implements ApplicationListener{
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
 
+                state.gameOver = true;
+                Call.updateGameOver(event.winner);
+
                 info("Selected next map to be @.", map.name());
 
                 play(true, () -> world.loadMap(map, map.applyRules(lastMode)));
