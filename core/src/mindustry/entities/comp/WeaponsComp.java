@@ -113,7 +113,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
                 can && //must be able to shoot
                 (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && //check ammo
                 (!weapon.alternate || mount.side == weapon.flipSprite) &&
-                vel.len() >= mount.weapon.minShootVelocity && //check velocity requirements
+                //TODO checking for velocity this way isn't entirely correct
+                (vel.len() >= mount.weapon.minShootVelocity || (net.active() && !isLocal())) && //check velocity requirements
                 mount.reload <= 0.0001f && //reload has to be 0
                 Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
             ){

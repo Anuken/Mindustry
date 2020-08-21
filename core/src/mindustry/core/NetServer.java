@@ -35,7 +35,7 @@ import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
     private static final int maxSnapshotSize = 430, timerBlockSync = 0;
-    private static final float serverSyncTime = 12, blockSyncTime = 60 * 8;
+    private static final float serverSyncTime = 12, blockSyncTime = 60 * 6;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Vec2 vector = new Vec2();
     private static final Rect viewport = new Rect();
@@ -612,12 +612,12 @@ public class NetServer implements ApplicationListener{
         if(!player.dead()){
             Unit unit = player.unit();
 
-            unit.vel.set(xVelocity, yVelocity).limit(unit.type().speed);
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
             float maxSpeed = (boosting ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
             if(unit.isGrounded()){
                 maxSpeed *= unit.floorSpeedMultiplier();
             }
+            unit.vel.set(xVelocity, yVelocity).limit(maxSpeed);
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
             if(con.lastUnit != unit){

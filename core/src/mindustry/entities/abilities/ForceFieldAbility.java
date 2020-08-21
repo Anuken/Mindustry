@@ -23,6 +23,7 @@ public class ForceFieldAbility implements Ability{
 
     private float realRad;
     private Unit paramUnit;
+    private boolean hadShield;
     private final Cons<Shielderc> shieldConsumer = trait -> {
         if(trait.team() != paramUnit.team && Intersector.isInsideHexagon(paramUnit.x, paramUnit.y, realRad * 2f, trait.x(), trait.y()) && paramUnit.shield > 0){
             trait.absorb();
@@ -31,7 +32,6 @@ public class ForceFieldAbility implements Ability{
             //break shield
             if(paramUnit.shield <= trait.damage()){
                 paramUnit.shield -= cooldown * regen;
-                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, radius, paramUnit.team.color);
             }
 
             paramUnit.shield -= trait.damage();
@@ -53,6 +53,13 @@ public class ForceFieldAbility implements Ability{
         if(unit.shield < max){
             unit.shield += Time.delta * regen;
         }
+
+        //break effect
+        if(hadShield && unit.shield <= 0){
+            Fx.shieldBreak.at(paramUnit.x, paramUnit.y, radius, paramUnit.team.color);
+        }
+
+        hadShield = unit.shield > 0;
 
         if(unit.shield > 0){
             unit.timer2 = Mathf.lerpDelta(unit.timer2, 1f, 0.06f);
