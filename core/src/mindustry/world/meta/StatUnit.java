@@ -19,6 +19,7 @@ public enum StatUnit{
     perSecond,
     timesSpeed(false),
     percent(false),
+    shieldHealth,
     none,
     items;
 

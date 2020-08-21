@@ -879,7 +879,7 @@ public class Blocks implements ContentList{
         forceProjector = new ForceProjector("force-projector"){{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 125));
             size = 3;
-            phaseRadiusBoost = 80f;
+            phaseBoost = 80f;
             radius = 101.7f;
             breakage = 750f;
             cooldownNormal = 1.5f;
