@@ -107,6 +107,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void pickupUnitPayload(Player player, Unit target){
+        if(player == null) return;
+
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
@@ -119,6 +121,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void pickupBlockPayload(Player player, Building tile){
+        if(player == null) return;
+
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
@@ -142,6 +146,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void dropPayload(Player player, float x, float y){
+        if(player == null) return;
+
         Payloadc pay = (Payloadc)player.unit();
 
         //allow a slight margin of error
@@ -180,6 +186,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building tile){
         if(player == null || tile == null) return;
+
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile(), action -> {
                 action.itemAmount = player.unit().stack.amount;
