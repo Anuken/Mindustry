@@ -908,6 +908,7 @@ public class Blocks implements ContentList{
             health = 45;
             speed = 0.03f;
             displayedSpeed = 4.2f;
+            buildCostMultiplier = 2f;
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
