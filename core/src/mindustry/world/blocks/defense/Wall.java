@@ -20,7 +20,7 @@ public class Wall extends Block{
     public float lightningDamage = 20f;
     public int lightningLength = 17;
 
-    public float maxDamageDeflect = 10f;
+    public float chanceDeflect = 10f;
     public boolean flashWhite;
     public boolean deflect;
 
@@ -97,8 +97,8 @@ public class Wall extends Block{
 
             //deflect bullets if necessary
             if(deflect){
-                //doesn't reflect powerful bullets
-                if(bullet.damage() > maxDamageDeflect) return true;
+                //bullet reflection chance depends on bullet damage
+                if(!Mathf.chance(chanceDeflect/bullet.damage())) return true;
 
                 //translate bullet back to where it was upon collision
                 bullet.trns(-bullet.vel.x, -bullet.vel.y);
