@@ -425,46 +425,48 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    public interface PathTarget{
-        /** Gets targets to pathfind towards. This must run on the main thread. */
-        IntSeq getPositions(Team team, IntSeq out);
+    /**
+     * Data for a flow field to some set of destinations.
+     * Concrete subclasses must specify a way to fetch costs and destinations.
+     * */
+    static abstract class Flowfield{
         /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
-        int refreshRate();
-    }
-
-    /** Data for a specific flow field to some set of destinations. */
-    static class Flowfield{
+        protected int refreshRate;
         /** Team this path is for. */
-        final Team team;
-        /** Flag that is being targeted. */
-        final PathTarget target;
+        protected Team team;
+
         /** costs of getting to a specific tile */
-        final int[][] weights;
+        int[][] weights;
         /** search IDs of each position - the highest, most recent search is prioritized and overwritten */
-        final int[][] searches;
+        int[][] searches;
         /** search frontier, these are Pos objects */
-        final IntQueue frontier = new IntQueue();
+        IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */
-        final IntSeq targets = new IntSeq();
+        IntSeq targets = new IntSeq();
         /** current search ID */
         int search = 1;
         /** last updated time */
         long lastUpdateTime;
 
-        Flowfield(Team team, PathTarget target, int width, int height){
+        void setup(Team team, int width, int height){
             this.team = team;
-            this.target = target;
 
             this.weights = new int[width][height];
             this.searches = new int[width][height];
             this.frontier.ensureCapacity((width + height) * 3);
         }
+
+        /** Gets targets to pathfind towards. This must run on the main thread. */
+        protected abstract IntSeq getPositions(IntSeq out);
+
+        /** Gets the cost of a tile at a position. */
+        protected abstract int getCost(int pathTile);
     }
 
     /** Holds a copy of tile data for a specific tile position. */
     @Struct
     class PathTileStruct{
-        //base traversal cost
+        //base traversal cost (could be a byte..)
         short cost;
         //team of block, if applicable (0 by default)
         byte team;
