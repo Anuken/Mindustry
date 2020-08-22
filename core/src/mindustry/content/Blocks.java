@@ -1704,7 +1704,7 @@ public class Blocks implements ContentList{
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.dagger, with(Items.silicon, 10, Items.lead, 10)),
                 new UnitPlan(UnitTypes.crawler, with(Items.silicon, 5, Items.coal, 10)),
-                new UnitPlan(UnitTypes.nova, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
+                new UnitPlan(UnitTypes.nova, with(Items.silicon, 15, Items.lead, 10, Items.titanium, 10)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1714,7 +1714,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.flare, with(Items.silicon, 15)),
-                new UnitPlan(UnitTypes.mono, with(Items.silicon, 30, Items.lead, 15)),
+                new UnitPlan(UnitTypes.mono, with(Items.silicon, 20, Items.lead, 15)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1723,7 +1723,7 @@ public class Blocks implements ContentList{
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.risso, with(Items.silicon, 20, Items.metaglass, 25)),
+                new UnitPlan(UnitTypes.risso, with(Items.silicon, 20, Items.metaglass, 15)),
             };
             size = 3;
             requiresWater = true;
@@ -1735,19 +1735,15 @@ public class Blocks implements ContentList{
 
             size = 3;
             consumes.power(3f);
-            //consumes.items(with(Items.silicon, 40, Items.graphite, 40));
 
             upgrades = new UpgradePlan[]{
-                new UpgradePlan(UnitTypes.dagger, UnitTypes.mace, with(Items.silicon, 40, Items.graphite, 40))
+                new UpgradePlan(UnitTypes.nova, UnitTypes.pulsar, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
+                new UpgradePlan(UnitTypes.dagger, UnitTypes.mace, with(Items.silicon, 20, Items.graphite, 20)),
+                new UpgradePlan(UnitTypes.crawler, UnitTypes.atrax, with(Items.silicon, 20, Items.metaglass, 20)),
+                new UpgradePlan(UnitTypes.flare, UnitTypes.horizon, with(Items.silicon, 20, Items.titanium, 20)), 
+                new UpgradePlan(UnitTypes.mono, UnitTypes.poly, with(Items.silicon, 30, Items.lead, 30, Items.titanium, 20)), 
+                new UpgradePlan(UnitTypes.risso, UnitTypes.minke, with(Items.silicon, 30, Items.graphite, 20, Items.metaglass, 30)), 
             };
-            /*upgrades = new UnitType[][]{
-                {UnitTypes.nova, UnitTypes.pulsar},
-                {UnitTypes.dagger, UnitTypes.mace},
-                {UnitTypes.crawler, UnitTypes.atrax},
-                {UnitTypes.flare, UnitTypes.horizon},
-                {UnitTypes.mono, UnitTypes.poly},
-                {UnitTypes.risso, UnitTypes.minke},
-            };*/
         }};
 
         multiplicativeReconstructor = new Reconstructor("multiplicative-reconstructor"){{
@@ -1755,18 +1751,15 @@ public class Blocks implements ContentList{
 
             size = 5;
             consumes.power(6f);
-            consumes.items(with(Items.silicon, 130, Items.titanium, 80, Items.metaglass, 30));
 
-            //constructTime = 60f * 30f;
-
-            /*upgrades = new UnitType[][]{
-                {UnitTypes.horizon, UnitTypes.zenith},
-                {UnitTypes.mace, UnitTypes.fortress},
-                {UnitTypes.poly, UnitTypes.mega},
-                {UnitTypes.minke, UnitTypes.bryde},
-                {UnitTypes.pulsar, UnitTypes.quasar},
-                {UnitTypes.atrax, UnitTypes.spiroct},
-            };*/
+            upgrades = new UpgradePlan[]{
+                new UpgradePlan(UnitTypes.pulsar, UnitTypes.quasar, with(Items.silicon, 50, Items.lead, 30, Items.plastanium, 20)),
+                new UpgradePlan(UnitTypes.mace, UnitTypes.fortress, with(Items.silicon, 50, Items.graphite, 40, Items.titanium, 20)),
+                new UpgradePlan(UnitTypes.atrax, UnitTypes.spiroct, with(Items.silicon, 60, Items.lead, 20, Items.phasefabric, 10)),
+                new UpgradePlan(UnitTypes.horizon, UnitTypes.zenith, with(Items.silicon, 50, Items.titanium, 30, Items.plastanium, 20)),
+                new UpgradePlan(UnitTypes.poly, UnitTypes.mega, with(Items.silicon, 50, Items.lead, 30, Items.plastanium, 40)),
+                new UpgradePlan(UnitTypes.minke, UnitTypes.bryde, with(Items.silicon, 60, Items.metaglass, 40, Items.plastanium, 20)),
+            };
         }};
 
         exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
@@ -1774,15 +1767,11 @@ public class Blocks implements ContentList{
 
             size = 7;
             consumes.power(12f);
-            consumes.items(with(Items.silicon, 250, Items.titanium, 500, Items.plastanium, 400));
             consumes.liquid(Liquids.cryofluid, 1f);
-
-            //constructTime = 60f * 60f * 1.5f;
             liquidCapacity = 60f;
-
-            /*upgrades = new UnitType[][]{
-                {UnitTypes.zenith, UnitTypes.antumbra},
-            };*/
+            upgrades = new UpgradePlan[]{
+                new UpgradePlan(UnitTypes.zenith, UnitTypes.antumbra, with(Items.silicon, 400, Items.titanium, 300, Items.plastanium, 200, Items.surgealloy, 100)),
+            };
         }};
 
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
@@ -1790,15 +1779,12 @@ public class Blocks implements ContentList{
 
             size = 9;
             consumes.power(25f);
-            consumes.items(with(Items.silicon, 350, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150));
             consumes.liquid(Liquids.cryofluid, 3f);
-
-            //constructTime = 60f * 60f * 4;
             liquidCapacity = 180f;
 
-            /*upgrades = new UnitType[][]{
-                {UnitTypes.antumbra, UnitTypes.eclipse},
-            };*/
+            upgrades = new UpgradePlan[]{
+                new UpgradePlan(UnitTypes.antumbra, UnitTypes.eclipse, with(Items.silicon, 500, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150)),
+            };
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

@@ -107,6 +107,12 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
+        public boolean acceptItem(Building source, Item item){
+            return currentPlan != UpgradePlan.empty && items.get(item) < getMaximumAccepted(item) &&
+                Structs.contains(currentPlan.requirements, stack -> stack.item == item);
+        }
+
+        @Override
         public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null
                 && relativeTo(source) != rotation
