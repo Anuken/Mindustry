@@ -22,7 +22,8 @@ public class ForceProjector extends Block{
     public final int timerUse = timers++;
     public float phaseUseTime = 350f;
 
-    public float phaseBoost = 80f;
+    public float phaseRadiusBoost = 80f;
+    public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
     public float breakage = 550f;
     public float cooldownNormal = 1.75f;
@@ -63,8 +64,8 @@ public class ForceProjector extends Block{
         stats.add(BlockStat.shieldHealth, breakage, StatUnit.none);
         stats.add(BlockStat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.boostEffect, phaseBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, phaseBoost * 5f, StatUnit.shieldHealth);
+        stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+        stats.add(BlockStat.boostEffect, phaseShieldBoost * 5f, StatUnit.shieldHealth);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class ForceProjector extends Block{
         Lines.poly(x * tilesize, y * tilesize, 6, radius);
         Draw.color();
 
-        float phaseBoostedRadius = radius + phaseBoost;
+        float phaseBoostedRadius = radius + phaseRadiusBoost;
         Draw.color(Pal.gray);
         Lines.stroke(3f);
         Lines.poly(x * tilesize, y * tilesize, 6, phaseBoostedRadius);
@@ -130,7 +131,7 @@ public class ForceProjector extends Block{
                 broken = false;
             }
 
-            if(buildup >= breakage + (phaseBoost * 5f) && !broken){
+            if(buildup >= breakage + phaseShieldBoost && !broken){
                 broken = true;
                 buildup = breakage;
                 Fx.shieldBreak.at(x, y, radius, team.color);
@@ -149,7 +150,7 @@ public class ForceProjector extends Block{
         }
 
         float realRadius(){
-            return (radius + phaseHeat * phaseBoost) * radscl;
+            return (radius + phaseHeat * phaseRadiusBoost) * radscl;
         }
 
         @Override
