@@ -23,8 +23,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /** Extra data for very specific blocks. */
     public byte data;
-    /** Tile traversal cost. */
-    public short cost = 1;
     /** Tile entity, usually null. */
     public @Nullable Building build;
     public short x, y;
@@ -442,42 +440,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
+    //TODO remove this method?
     public void updateOcclusion(){
-        cost = 1;
-        boolean occluded = false;
-
-        //check for occlusion
-        for(int i = 0; i < 8; i++){
-            Point2 point = Geometry.d8[i];
-            Tile tile = world.tile(x + point.x, y + point.y);
-            if(tile != null && tile.floor.isLiquid){
-                cost += 4;
-            }
-            if(tile != null && tile.solid()){
-                occluded = true;
-                break;
-            }
-        }
-
-        if(occluded){
-            cost += 2;
-        }
-
-        if(block.synthetic() && solid()){
-            cost += Mathf.clamp(block.health / 6f, 0, 1000);
-        }
-
-        if(floor.isLiquid){
-            cost += 10;
-        }
-
-        if(floor.drownTime > 0){
-            cost += 70;
-        }
-
-        if(cost < 0){
-            cost = Byte.MAX_VALUE;
-        }
     }
 
     protected void preChanged(){

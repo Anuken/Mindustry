@@ -27,14 +27,8 @@ public class Pathfinder implements Runnable{
     private int[][] tiles;
     /** unordered array of path data for iteration only. DO NOT iterate or access this in the main thread. */
     private Seq<Flowfield> threadList = new Seq<>(), mainList = new Seq<>();
-    /** Maps team ID and target to to a flowfield.*/
-    private ObjectMap<PathTarget, Flowfield>[] fieldMap = new ObjectMap[Team.all.length];
-    /** Used field maps. */
-    private ObjectSet<PathTarget>[] fieldMapUsed = new ObjectSet[Team.all.length];
     /** handles task scheduling on the update thread. */
     private TaskQueue queue = new TaskQueue();
-    /** Stores path target for a position. Main thread only.*/
-    private ObjectMap<Position, PathTarget> targetCache = new ObjectMap<>();
     /** Current pathfinding thread */
     private @Nullable Thread thread;
     private IntSeq tmpArray = new IntSeq();
@@ -45,9 +39,6 @@ public class Pathfinder implements Runnable{
 
             //reset and update internal tile array
             tiles = new int[world.width()][world.height()];
-            fieldMap = new ObjectMap[Team.all.length];
-            fieldMapUsed = new ObjectSet[Team.all.length];
-            targetCache = new ObjectMap<>();
             threadList = new Seq<>();
             mainList = new Seq<>();
 
@@ -56,7 +47,7 @@ public class Pathfinder implements Runnable{
             }
 
             //special preset which may help speed things up; this is optional
-            preloadPath(state.rules.waveTeam, FlagTarget.enemyCores);
+            //preloadPath(state.rules.waveTeam, FlagTarget.enemyCores);
 
             start();
         });
@@ -68,7 +59,29 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        return PathTile.get(tile.cost, (byte)tile.getTeamID(), !tile.solid() && tile.floor().drownTime <= 0f, !tile.solid() && tile.floor().isLiquid);
+        //TODO nearGround is just the inverse of nearLiquid?
+        boolean nearLiquid = false, nearSolid = false, nearGround = false;
+
+        for(int i = 0; i < 4; i++){
+            Tile other = tile.getNearby(i);
+            if(other != null){
+                if(other.floor().isLiquid) nearLiquid = true;
+                if(other.solid()) nearSolid = true;
+                if(!other.floor().isLiquid) nearGround = true;
+            }
+        }
+
+        return PathTile.get(
+            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 127),
+            tile.getTeamID(),
+            tile.solid(),
+            tile.floor().isLiquid,
+            tile.staticDarkness() < 2,
+            nearLiquid,
+            nearGround,
+            nearSolid,
+            tile.floor().isDeep()
+        );
     }
 
     /** Starts or restarts the pathfinding thread. */
@@ -104,7 +117,7 @@ public class Pathfinder implements Runnable{
             if(path != null){
                 synchronized(path.targets){
                     path.targets.clear();
-                    path.target.getPositions(path.team, path.targets);
+                    path.getPositions(path.targets);
                 }
             }
         }
@@ -131,18 +144,19 @@ public class Pathfinder implements Runnable{
                         updateFrontier(data, maxUpdate / threadList.size);
 
                         //remove flowfields that have 'timed out' so they can be garbage collected and no longer waste space
-                        if(data.target.refreshRate() > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
+                        if(data.refreshRate > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
                             //make sure it doesn't get removed twice
                             data.lastUpdateTime = Time.millis();
 
                             Team team = data.team;
 
                             Core.app.post(() -> {
+                                //TODO ?????
                                 //remove its used state
-                                if(fieldMap[team.id] != null){
-                                    fieldMap[team.id].remove(data.target);
-                                    fieldMapUsed[team.id].remove(data.target);
-                                }
+                                //if(fieldMap[team.id] != null){
+                                //    fieldMap[team.id].remove(data.target);
+                                //    fieldMapUsed[team.id].remove(data.target);
+                                //}
                                 //remove from main thread list
                                 mainList.remove(data);
                             });
@@ -167,51 +181,62 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    public @Nullable Tile getTargetTile(Tile tile, Team team, Position target){
-        return getTargetTile(tile, team, getTarget(target));
+    //public @Nullable Tile getTargetTile(Tile tile, Team team, Position target){
+   //     return getTargetTile(tile, team, getTarget(target));
+   // }
+
+    public @Nullable Tile getTargetTile(Tile tile, Prov<Flowfield> fieldtype, Team team, PathCost cost){
+        if(true){ //TODO cache this
+            Flowfield field = fieldtype.get();
+            IntSeq out = new IntSeq();
+            field.team = team;
+            field.getPositions(out);
+            createPath(field, cost, team, out);
+        }
+
+        if(false){ //TODO if field exists
+            //TODO fetch it from the cache
+            //return getTargetTile(tile, path);
+        }
+
+        return tile;
     }
 
     /** Gets next tile to travel to. Main thread only. */
-    public @Nullable Tile getTargetTile(Tile tile, Team team, PathTarget target){
+    public @Nullable Tile getTargetTile(Tile tile, Flowfield path){
         if(tile == null) return null;
 
-        if(fieldMap[team.id] == null){
-            fieldMap[team.id] = new ObjectMap<>();
-            fieldMapUsed[team.id] = new ObjectSet<>();
-        }
-
-        Flowfield data = fieldMap[team.id].get(target);
-
-        if(data == null){
+        if(path == null){
             //if this combination is not found, create it on request
-            if(fieldMapUsed[team.id].add(target)){
+            //TODO do above task
+            //if(fieldMapUsed[team.id].add(target)){
                 //grab targets since this is run on main thread
-                IntSeq targets = target.getPositions(team, new IntSeq());
-                queue.post(() -> createPath(team, target, targets));
-            }
+            //    IntSeq targets = target.getPositions(team, new IntSeq());
+            //    queue.post(() -> createPath(team, target, targets));
+            //}
             return tile;
         }
 
         //if refresh rate is positive, queue a refresh
-        if(target.refreshRate() > 0 && Time.timeSinceMillis(data.lastUpdateTime) > target.refreshRate()){
-            data.lastUpdateTime = Time.millis();
+        if(path.refreshRate > 0 && Time.timeSinceMillis(path.lastUpdateTime) > path.refreshRate){
+            path.lastUpdateTime = Time.millis();
 
             tmpArray.clear();
-            data.target.getPositions(data.team, tmpArray);
+            path.getPositions(tmpArray);
 
-            synchronized(data.targets){
+            synchronized(path.targets){
                 //make sure the position actually changed
-                if(!(data.targets.size == 1 && tmpArray.size == 1 && data.targets.first() == tmpArray.first())){
-                    data.targets.clear();
-                    data.target.getPositions(data.team, data.targets);
+                if(!(path.targets.size == 1 && tmpArray.size == 1 && path.targets.first() == tmpArray.first())){
+                    path.targets.clear();
+                    path.getPositions(path.targets);
 
                     //queue an update
-                    queue.post(() -> updateTargets(data));
+                    queue.post(() -> updateTargets(path));
                 }
             }
         }
 
-        int[][] values = data.weights;
+        int[][] values = path.weights;
         int value = values[tile.x][tile.y];
 
         Tile current = null;
@@ -234,16 +259,6 @@ public class Pathfinder implements Runnable{
         return current;
     }
 
-    private PathTarget getTarget(Position position){
-        return targetCache.get(position, () -> new PositionTarget(position));
-    }
-
-    /** @return whether a tile can be passed through by this team. Pathfinding thread only. */
-    private boolean passable(int x, int y, Team team){
-        int tile = tiles[x][y];
-        return PathTile.passable(tile) || (PathTile.team(tile) != team.id && PathTile.team(tile) != (int)Team.derelict.id);
-    }
-
     /**
      * Clears the frontier, increments the search and sets up all flow sources.
      * This only occurs for active teams.
@@ -259,10 +274,8 @@ public class Pathfinder implements Runnable{
             return;
         }
 
-        //assign impassability to the tile
-        if(!passable(x, y, path.team)){
-            path.weights[x][y] = impassable;
-        }
+        //update cost of the tile TODO maybe only update the cost when it's not passable
+        path.weights[x][y] = path.cost.getCost(path.team, tiles[x][y]);
 
         //clear frontier to prevent contamination
         path.frontier.clear();
@@ -289,26 +302,30 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    private void preloadPath(Team team, PathTarget target){
-        updateFrontier(createPath(team, target, target.getPositions(team, new IntSeq())), -1);
+    private void preloadPath(Flowfield path, PathCost cost, Team team){
+        IntSeq out = new IntSeq();
+        path.team = team;
+        path.getPositions(out);
+        updateFrontier(createPath(path, cost, team, out), -1);
     }
 
     /**
      * Created a new flowfield that aims to get to a certain target for a certain team.
      * Pathfinding thread only.
      */
-    private Flowfield createPath(Team team, PathTarget target, IntSeq targets){
-        Flowfield path = new Flowfield(team, target, world.width(), world.height());
+    private Flowfield createPath(Flowfield path, PathCost cost, Team team, IntSeq targets){
         path.lastUpdateTime = Time.millis();
+        path.setup(team, cost, tiles.length, tiles[0].length);
 
         threadList.add(path);
 
         //add to main thread's list of paths
         Core.app.post(() -> {
             mainList.add(path);
-            if(fieldMap[team.id] != null){
-                fieldMap[team.id].put(target, path);
-            }
+            //TODO
+            //if(fieldMap[team.id] != null){
+            //    fieldMap[team.id].put(target, path);
+            //}
         });
 
         //grab targets from passed array
@@ -350,15 +367,15 @@ public class Pathfinder implements Runnable{
             }
 
             if(cost != impassable){
+                //TODO this is probably slow.
                 for(Point2 point : Geometry.d4){
 
                     int dx = tile.x + point.x, dy = tile.y + point.y;
-                    Tile other = world.tile(dx, dy);
+                    int otherCost = path.cost.getCost(path.team, tiles[dx][dy]);
 
-                    if(other != null && (path.weights[dx][dy] > cost + other.cost || path.searches[dx][dy] < path.search) && passable(dx, dy, path.team)){
-                        if(other.cost < 0) throw new IllegalArgumentException("Tile cost cannot be negative! " + other);
+                    if((path.weights[dx][dy] > cost + otherCost || path.searches[dx][dy] < path.search) && otherCost != impassable){
                         path.frontier.addFirst(Point2.pack(dx, dy));
-                        path.weights[dx][dy] = cost + other.cost;
+                        path.weights[dx][dy] = cost + otherCost;
                         path.searches[dx][dy] = (short)path.search;
                     }
                 }
@@ -366,9 +383,24 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    /** A path target defines a set of targets for a path. */
-    public enum FlagTarget implements PathTarget{
-        enemyCores((team, out) -> {
+    public static final PathCost
+
+    groundCost = (team, tile) -> (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.solid(tile) ? impassable : 1 +
+        PathTile.health(tile) * 5 +
+        (PathTile.nearSolid(tile) ? 2 : 0) +
+        (PathTile.nearLiquid(tile) ? 6 : 0) +
+        (PathTile.deep(tile) ? 70 : 0),
+
+    legsCost = (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
+        (PathTile.solid(tile) ? 5 : 0),
+
+    waterCost = (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 2 + //TODO cannot go through blocks
+        (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
+        (PathTile.deep(tile) ? -1 : 0);
+
+    public static class EnemyCoreField extends Flowfield{
+        @Override
+        protected void getPositions(IntSeq out){
             for(Tile other : indexer.getEnemy(team, BlockFlag.core)){
                 out.add(other.pos());
             }
@@ -379,50 +411,31 @@ public class Pathfinder implements Runnable{
                     out.add(other.pos());
                 }
             }
-        }),
-        rallyPoints((team, out) -> {
-            for(Tile other : indexer.getAllied(team, BlockFlag.rally)){
-                out.add(other.pos());
-            }
-        });
-
-        public static final FlagTarget[] all = values();
-
-        private final Cons2<Team, IntSeq> targeter;
-
-        FlagTarget(Cons2<Team, IntSeq> targeter){
-            this.targeter = targeter;
-        }
-
-        @Override
-        public IntSeq getPositions(Team team, IntSeq out){
-            targeter.get(team, out);
-            return out;
-        }
-
-        @Override
-        public int refreshRate(){
-            return 0;
         }
     }
 
-    public static class PositionTarget implements PathTarget{
+    public static class RallyField extends Flowfield{
+        @Override
+        protected void getPositions(IntSeq out){
+            for(Tile other : indexer.getAllied(team, BlockFlag.rally)){
+                out.add(other.pos());
+            }
+        }
+    }
+
+    public static class PositionTarget extends Flowfield{
         public final Position position;
 
         public PositionTarget(Position position){
             this.position = position;
+            this.refreshRate = 900;
         }
 
         @Override
-        public IntSeq getPositions(Team team, IntSeq out){
+        public void getPositions(IntSeq out){
             out.add(Point2.pack(world.toTile(position.getX()), world.toTile(position.getY())));
-            return out;
         }
 
-        @Override
-        public int refreshRate(){
-            return 900;
-        }
     }
 
     /**
@@ -434,6 +447,8 @@ public class Pathfinder implements Runnable{
         protected int refreshRate;
         /** Team this path is for. */
         protected Team team;
+        /** Function for calculating path cost. */
+        protected PathCost cost;
 
         /** costs of getting to a specific tile */
         int[][] weights;
@@ -447,34 +462,47 @@ public class Pathfinder implements Runnable{
         int search = 1;
         /** last updated time */
         long lastUpdateTime;
+        /** whether this flow field is ready to be used */
+        boolean initialized;
 
-        void setup(Team team, int width, int height){
+        void setup(Team team, PathCost cost, int width, int height){
             this.team = team;
+            this.cost = cost;
 
             this.weights = new int[width][height];
             this.searches = new int[width][height];
             this.frontier.ensureCapacity((width + height) * 3);
+            this.initialized = true;
         }
 
         /** Gets targets to pathfind towards. This must run on the main thread. */
-        protected abstract IntSeq getPositions(IntSeq out);
+        protected abstract void getPositions(IntSeq out);
+    }
 
-        /** Gets the cost of a tile at a position. */
-        protected abstract int getCost(int pathTile);
+    interface PathCost{
+        int getCost(Team traversing, int tile);
     }
 
     /** Holds a copy of tile data for a specific tile position. */
     @Struct
     class PathTileStruct{
-        //base traversal cost (could be a byte..)
-        short cost;
+        //scaled block health
+        @StructField(8) int health;
         //team of block, if applicable (0 by default)
-        byte team;
+        @StructField(8) int team;
         //general solid state
         boolean solid;
         //whether this block is a liquid that boats can move on
-        boolean water;
+        boolean liquid;
         //whether this block is solid for leg units that can move over some solid blocks
         boolean legSolid;
+        //whether this block is near liquids
+        boolean nearLiquid;
+        //whether this block is near a solid floor tile
+        boolean nearGround;
+        //whether this block is near a solid object
+        boolean nearSolid;
+        //whether this block is deep / drownable
+        boolean deep;
     }
 }
