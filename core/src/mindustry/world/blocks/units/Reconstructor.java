@@ -122,6 +122,10 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
+            for(ItemStack stack : currentPlan.requirements){
+                capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
+                itemCapacity = Math.max(itemCapacity, stack.amount * 2);
+            }
             return capacities[item.id];
         }
 
