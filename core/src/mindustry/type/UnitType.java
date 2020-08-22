@@ -160,9 +160,9 @@ public class UnitType extends UnlockableContent{
         for(Block block : content.blocks()){
             if(block instanceof Reconstructor){
                 Reconstructor r = (Reconstructor)block;
-                for(UnitType[] recipe : r.upgrades){
+                for(Reconstructor.UpgradePlan recipe : r.upgrades){
                     //result of reconstruction is this, so it must be a dependency
-                    if(recipe[1] == this){
+                    if(recipe.unit == this){
                         cons.get(block);
                     }
                 }

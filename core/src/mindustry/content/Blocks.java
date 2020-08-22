@@ -1702,9 +1702,9 @@ public class Blocks implements ContentList{
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 60f * 12, with(Items.silicon, 10, Items.coal, 20)),
-                new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
+                new UnitPlan(UnitTypes.dagger, with(Items.silicon, 10, Items.lead, 10)),
+                new UnitPlan(UnitTypes.crawler, with(Items.silicon, 5, Items.coal, 10)),
+                new UnitPlan(UnitTypes.nova, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1713,8 +1713,8 @@ public class Blocks implements ContentList{
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
-                new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15)),
+                new UnitPlan(UnitTypes.flare, with(Items.silicon, 15)),
+                new UnitPlan(UnitTypes.mono, with(Items.silicon, 30, Items.lead, 15)),
             };
             size = 3;
             consumes.power(1.2f);
@@ -1723,7 +1723,7 @@ public class Blocks implements ContentList{
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.risso, 60f * 30f, with(Items.silicon, 20, Items.metaglass, 25)),
+                new UnitPlan(UnitTypes.risso, with(Items.silicon, 20, Items.metaglass, 25)),
             };
             size = 3;
             requiresWater = true;
@@ -1735,18 +1735,19 @@ public class Blocks implements ContentList{
 
             size = 3;
             consumes.power(3f);
-            consumes.items(with(Items.silicon, 40, Items.graphite, 40));
+            //consumes.items(with(Items.silicon, 40, Items.graphite, 40));
 
-            constructTime = 60f * 10f;
-
-            upgrades = new UnitType[][]{
+            upgrades = new UpgradePlan[]{
+                new UpgradePlan(UnitTypes.dagger, UnitTypes.mace, with(Items.silicon, 40, Items.graphite, 40))
+            };
+            /*upgrades = new UnitType[][]{
                 {UnitTypes.nova, UnitTypes.pulsar},
                 {UnitTypes.dagger, UnitTypes.mace},
                 {UnitTypes.crawler, UnitTypes.atrax},
                 {UnitTypes.flare, UnitTypes.horizon},
                 {UnitTypes.mono, UnitTypes.poly},
                 {UnitTypes.risso, UnitTypes.minke},
-            };
+            };*/
         }};
 
         multiplicativeReconstructor = new Reconstructor("multiplicative-reconstructor"){{
@@ -1756,16 +1757,16 @@ public class Blocks implements ContentList{
             consumes.power(6f);
             consumes.items(with(Items.silicon, 130, Items.titanium, 80, Items.metaglass, 30));
 
-            constructTime = 60f * 30f;
+            //constructTime = 60f * 30f;
 
-            upgrades = new UnitType[][]{
+            /*upgrades = new UnitType[][]{
                 {UnitTypes.horizon, UnitTypes.zenith},
                 {UnitTypes.mace, UnitTypes.fortress},
                 {UnitTypes.poly, UnitTypes.mega},
                 {UnitTypes.minke, UnitTypes.bryde},
                 {UnitTypes.pulsar, UnitTypes.quasar},
                 {UnitTypes.atrax, UnitTypes.spiroct},
-            };
+            };*/
         }};
 
         exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
@@ -1776,12 +1777,12 @@ public class Blocks implements ContentList{
             consumes.items(with(Items.silicon, 250, Items.titanium, 500, Items.plastanium, 400));
             consumes.liquid(Liquids.cryofluid, 1f);
 
-            constructTime = 60f * 60f * 1.5f;
+            //constructTime = 60f * 60f * 1.5f;
             liquidCapacity = 60f;
 
-            upgrades = new UnitType[][]{
+            /*upgrades = new UnitType[][]{
                 {UnitTypes.zenith, UnitTypes.antumbra},
-            };
+            };*/
         }};
 
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
@@ -1792,12 +1793,12 @@ public class Blocks implements ContentList{
             consumes.items(with(Items.silicon, 350, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150));
             consumes.liquid(Liquids.cryofluid, 3f);
 
-            constructTime = 60f * 60f * 4;
+            //constructTime = 60f * 60f * 4;
             liquidCapacity = 180f;
 
-            upgrades = new UnitType[][]{
+            /*upgrades = new UnitType[][]{
                 {UnitTypes.antumbra, UnitTypes.eclipse},
-            };
+            };*/
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

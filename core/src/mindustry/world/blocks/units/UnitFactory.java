@@ -109,9 +109,12 @@ public class UnitFactory extends UnitBlock{
         public ItemStack[] requirements;
         public float time;
 
-        public UnitPlan(UnitType unit, float time, ItemStack[] requirements){
+        public UnitPlan(UnitType unit, ItemStack[] requirements){
             this.unit = unit;
-            this.time = time;
+            this.time = 0f;
+            for(ItemStack stack : requirements){
+                this.time += stack.amount * stack.item.cost * 60f;
+            }
             this.requirements = requirements;
         }
 

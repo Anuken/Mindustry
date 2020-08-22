@@ -38,6 +38,7 @@ public class Items implements ContentList{
             explosiveness = 0.2f;
             flammability = 1f;
             hardness = 2;
+            cost = 0.5f;
         }};
 
         titanium = new Item("titanium", Color.valueOf("8da1e3")){{

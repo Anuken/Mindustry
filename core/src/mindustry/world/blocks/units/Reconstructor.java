@@ -20,12 +20,12 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Reconstructor extends UnitBlock{
-    public float constructTime = 60 * 2;
-    public UnitType[][] upgrades = {};
+    public UpgradePlan[] upgrades = {};
     public int[] capacities;
 
     public Reconstructor(String name){
         super(name);
+        consumes.add(new ConsumeItemDynamic((ReconstructorBuild e) -> e.currentPlan != UpgradePlan.empty ? e.currentPlan.requirements : ItemStack.empty));
     }
 
     @Override
@@ -61,8 +61,6 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void setStats(){
         super.setStats();
-
-        stats.add(BlockStat.productionTime, constructTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -78,8 +76,32 @@ public class Reconstructor extends UnitBlock{
         super.init();
     }
 
-    public class ReconstructorBuild extends UnitBuild{
+    public static class UpgradePlan{
+        public static final UpgradePlan empty = new UpgradePlan();
 
+        /** the "base" unit or the one that is being upgraded */
+        public UnitType base;
+        public UnitType unit;
+        public ItemStack[] requirements = ItemStack.empty;
+        public float time;
+
+        public UpgradePlan(UnitType base, UnitType unit, ItemStack[] requirements){
+
+            this.base = base;
+            this.unit = unit;
+            this.time = 0f;
+            for(ItemStack stack : requirements){
+                this.time += stack.amount * stack.item.cost * 60f;
+            }
+            this.requirements = requirements;
+        }
+
+        UpgradePlan(){}
+    }
+
+    public class ReconstructorBuild extends UnitBuild{
+        public UpgradePlan currentPlan = UpgradePlan.empty;
+        public float constructTime = 1f;
         public float fraction(){
             return progress / constructTime;
         }
@@ -115,7 +137,7 @@ public class Reconstructor extends UnitBlock{
                     Draw.alpha(1f - progress/ constructTime);
                     Draw.rect(payload.unit.type().icon(Cicon.full), x, y, rotdeg() - 90);
                     Draw.reset();
-                    Drawf.construct(this, upgrade(payload.unit.type()), rotdeg() - 90f, progress / constructTime, speedScl, time);
+                    Drawf.construct(this, currentPlan.unit, rotdeg() - 90f, progress / constructTime, speedScl, time);
                 });
             }else{
                 Draw.z(Layer.blockOver);
@@ -131,12 +153,19 @@ public class Reconstructor extends UnitBlock{
         @Override
         public void updateTile(){
             boolean valid = false;
+            //update plan (this was the only way I could get it to work help help help help)
+            try {
+                currentPlan = upgrade(payload.unit.type());
+            } catch(NullPointerException npe) {
+                currentPlan = UpgradePlan.empty;
+            }
 
             if(payload != null){
                 //check if offloading
                 if(!hasUpgrade(payload.unit.type())){
                     moveOutPayload();
                 }else{ //update progress
+                    constructTime = currentPlan.time;
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
@@ -145,7 +174,7 @@ public class Reconstructor extends UnitBlock{
 
                         //upgrade the unit
                         if(progress >= constructTime){
-                            payload.unit = upgrade(payload.unit.type()).create(payload.unit.team());
+                            payload.unit = currentPlan.unit.create(payload.unit.team());
                             progress = 0;
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
@@ -163,7 +192,7 @@ public class Reconstructor extends UnitBlock{
         public boolean shouldConsume(){
             //do not consume when cap reached
             if(constructing()){
-                return Units.canCreate(team, upgrade(payload.unit.type()));
+                return Units.canCreate(team, currentPlan.unit);
             }
             return false;
         }
@@ -171,7 +200,7 @@ public class Reconstructor extends UnitBlock{
         public UnitType unit(){
             if(payload == null) return null;
 
-            UnitType t = upgrade(payload.unit.type());
+            UnitType t = currentPlan.unit;
             return t != null && t.unlockedNow() ? t : null;
         }
 
@@ -180,13 +209,16 @@ public class Reconstructor extends UnitBlock{
         }
 
         public boolean hasUpgrade(UnitType type){
-            UnitType t = upgrade(type);
+            UnitType t = upgrade(type).unit;
             return t != null && t.unlockedNow();
         }
 
-        public UnitType upgrade(UnitType type){
-            UnitType[] r =  Structs.find(upgrades, arr -> arr[0] == type);
-            return r == null ? null : r[1];
+        public UpgradePlan upgrade(UnitType type){
+            if(type == null) return UpgradePlan.empty;
+            for(UpgradePlan plan : upgrades) {
+                if(plan.base == type) return plan;
+            }
+            return UpgradePlan.empty;
         }
 
         @Override
