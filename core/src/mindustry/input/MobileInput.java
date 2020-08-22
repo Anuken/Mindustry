@@ -850,17 +850,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         movement.set(targetPos).sub(player).limit(speed);
         movement.setAngle(Mathf.slerp(movement.angle(), unit.vel.angle(), 0.05f));
 
-        //pathfind for ground units
-        if(!flying && !type.canBoost && !(unit instanceof WaterMovec)){
-            Tile on = unit.tileOn();
-            if(on != null && !on.solid()){
-                Tile to = pathfinder.getTargetTile(unit.tileOn(), unit.team, targetPos);
-                if(to != null){
-                    movement.set(to).sub(unit).setLength(speed);
-                }
-            }
-        }
-
         if(player.within(targetPos, attractDst)){
             movement.setZero();
             unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);

@@ -185,6 +185,8 @@ public class Renderer implements ApplicationListener{
     }
 
     public void draw(){
+        Events.fire(Trigger.preDraw);
+
         camera.update();
 
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
@@ -204,6 +206,8 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         Draw.sort(true);
+
+        Events.fire(Trigger.draw);
 
         if(pixelator.enabled()){
             pixelator.register();
@@ -254,6 +258,8 @@ public class Renderer implements ApplicationListener{
         Draw.reset();
         Draw.flush();
         Draw.sort(false);
+
+        Events.fire(Trigger.postDraw);
     }
 
     private void drawBackground(){

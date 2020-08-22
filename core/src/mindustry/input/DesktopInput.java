@@ -132,14 +132,12 @@ public class DesktopInput extends InputHandler{
         }
 
         //draw schematic requests
-        for(BuildPlan request : selectRequests){
-            request.animScale = 1f;
-            drawRequest(request);
-        }
+        selectRequests.each(req -> {
+            req.animScale = 1f;
+            drawRequest(req);
+        });
 
-        for(BuildPlan request : selectRequests){
-            drawOverRequest(request);
-        }
+        selectRequests.each(this::drawOverRequest);
 
         if(player.isBuilder()){
             //draw things that may be placed soon

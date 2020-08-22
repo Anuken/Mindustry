@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     repairPoint, resupplyPoint,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, logicDisplay, memoryCell,
+    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, logicDisplay, memoryCell,
 
     //campaign
     launchPad, launchPadLarge,
@@ -998,10 +998,12 @@ public class Blocks implements ContentList{
 
         payloadConveyor = new PayloadConveyor("payload-conveyor"){{
             requirements(Category.distribution, with(Items.graphite, 10, Items.copper, 20));
+            canOverdrive = false;
         }};
 
         payloadRouter = new PayloadRouter("payload-router"){{
             requirements(Category.distribution, with(Items.graphite, 15, Items.copper, 20));
+            canOverdrive = false;
         }};
 
         //endregion
@@ -1486,7 +1488,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 5f;
+            powerUse = 4f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1556,14 +1558,14 @@ public class Blocks implements ContentList{
         }};
 
         segment = new PointDefenseTurret("segment"){{
-            requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 50));
+            requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 25));
 
             hasPower = true;
             consumes.power(3f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 12f;
-            reloadTime = 25f;
+            reloadTime = 20f;
             health = 190 * size * size;
         }};
 
@@ -1885,7 +1887,7 @@ public class Blocks implements ContentList{
         }};
 
         microProcessor = new LogicBlock("micro-processor"){{
-            requirements(Category.logic, with(Items.copper, 80, Items.lead, 50, Items.silicon, 60));
+            requirements(Category.logic, with(Items.copper, 80, Items.lead, 50, Items.silicon, 50));
 
             instructionsPerTick = 2;
 
@@ -1893,13 +1895,26 @@ public class Blocks implements ContentList{
         }};
 
         logicProcessor = new LogicBlock("logic-processor"){{
-            requirements(Category.logic, with(Items.lead, 320, Items.silicon, 140, Items.graphite, 80, Items.thorium, 70));
+            requirements(Category.logic, with(Items.lead, 320, Items.silicon, 100, Items.graphite, 60, Items.thorium, 50));
 
             instructionsPerTick = 5;
 
-            range = 16 * 10;
+            range = 8 * 20;
 
             size = 2;
+        }};
+
+        hyperProcessor = new LogicBlock("hyper-processor"){{
+            requirements(Category.logic, with(Items.lead, 450, Items.silicon, 150, Items.thorium, 75, Items.surgealloy, 50));
+
+            consumes.liquid(Liquids.cryofluid, 0.08f);
+            hasLiquids = true;
+
+            instructionsPerTick = 15;
+
+            range = 8 * 40;
+
+            size = 3;
         }};
 
         logicDisplay = new LogicDisplay("logic-display"){{
