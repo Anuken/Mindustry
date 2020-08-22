@@ -41,12 +41,6 @@ public class ForceProjector extends Block{
         }
     };
 
-    static final Cons<Unitc> unitPusher = unit -> {
-        if(unit.team() != paramEntity.team && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, unit.x(), unit.y())){
-            unit.impulse(Tmp.v3.set(unit).sub(paramEntity.x, paramEntity.y).nor().scl(100f));
-        }
-    };
-
     public ForceProjector(String name){
         super(name);
         update = true;
@@ -151,7 +145,6 @@ public class ForceProjector extends Block{
             if(realRadius > 0 && !broken){
                 paramEntity = this;
                 Groups.bullet.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, shieldConsumer);
-                Groups.unit.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, unitPusher);
             }
         }
 
