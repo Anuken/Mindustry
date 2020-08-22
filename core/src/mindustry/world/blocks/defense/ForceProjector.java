@@ -65,7 +65,7 @@ public class ForceProjector extends Block{
         stats.add(BlockStat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, phaseShieldBoost * 5f, StatUnit.shieldHealth);
+        stats.add(BlockStat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
     }
 
     @Override
