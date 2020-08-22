@@ -57,6 +57,10 @@ public class Pathfinder implements Runnable{
         Events.on(BuildinghangeEvent.class, event -> updateTile(event.tile));
     }
 
+    public Flowfield getField(Team team, PathCost cost){
+
+    }
+
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
         //TODO nearGround is just the inverse of nearLiquid?
@@ -185,13 +189,12 @@ public class Pathfinder implements Runnable{
    //     return getTargetTile(tile, team, getTarget(target));
    // }
 
-    public @Nullable Tile getTargetTile(Tile tile, Prov<Flowfield> fieldtype, Team team, PathCost cost){
+    public @Nullable Tile getTargetTile(Tile tile, Prov<Flowfield> fieldtype){
         if(true){ //TODO cache this
             Flowfield field = fieldtype.get();
             IntSeq out = new IntSeq();
-            field.team = team;
             field.getPositions(out);
-            createPath(field, cost, team, out);
+            createPath(field, out);
         }
 
         if(false){ //TODO if field exists
@@ -302,20 +305,20 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    private void preloadPath(Flowfield path, PathCost cost, Team team){
+    private void preloadPath(Flowfield path){
         IntSeq out = new IntSeq();
-        path.team = team;
         path.getPositions(out);
-        updateFrontier(createPath(path, cost, team, out), -1);
+        updateFrontier(createPath(path, out), -1);
     }
 
     /**
+     * TODO wrong docs
      * Created a new flowfield that aims to get to a certain target for a certain team.
      * Pathfinding thread only.
      */
-    private Flowfield createPath(Flowfield path, PathCost cost, Team team, IntSeq targets){
+    private Flowfield createPath(Flowfield path, IntSeq targets){
         path.lastUpdateTime = Time.millis();
-        path.setup(team, cost, tiles.length, tiles[0].length);
+        path.setup(tiles.length, tiles[0].length);
 
         threadList.add(path);
 
@@ -445,10 +448,10 @@ public class Pathfinder implements Runnable{
     static abstract class Flowfield{
         /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
         protected int refreshRate;
-        /** Team this path is for. */
-        protected Team team;
-        /** Function for calculating path cost. */
-        protected PathCost cost;
+        /** Team this path is for. Set before using. */
+        protected Team team = Team.derelict;
+        /** Function for calculating path cost. Set before using. */
+        protected PathCost cost = groundCost;
 
         /** costs of getting to a specific tile */
         int[][] weights;
@@ -465,10 +468,7 @@ public class Pathfinder implements Runnable{
         /** whether this flow field is ready to be used */
         boolean initialized;
 
-        void setup(Team team, PathCost cost, int width, int height){
-            this.team = team;
-            this.cost = cost;
-
+        void setup(int width, int height){
             this.weights = new int[width][height];
             this.searches = new int[width][height];
             this.frontier.ensureCapacity((width + height) * 3);
