@@ -1005,6 +1005,8 @@ public class Blocks implements ContentList{
 
         payloadIncinerator = new PayloadVoid("payload-incinerator"){{
             requirements(Category.units, with(Items.graphite, 120, Items.copper, 40, Items.titanium, 25));
+            consumes.power(1.5f);
+            hasPower = true;
         }};
 
         //endregion
