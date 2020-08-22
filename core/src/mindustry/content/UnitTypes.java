@@ -449,7 +449,7 @@ public class UnitTypes implements ContentList{
         }};
 
         horizon = new UnitType("horizon"){{
-            health = 300;
+            health = 350;
             speed = 2f;
             accel = 0.08f;
             drag = 0.016f;
@@ -458,19 +458,19 @@ public class UnitTypes implements ContentList{
             engineOffset = 7.8f;
             range = 140f;
             faceTarget = false;
-            armor = 2f;
+            armor = 4f;
 
             weapons.add(new Weapon(){{
                 minShootVelocity = 0.75f;
                 x = 3f;
                 shootY = 0f;
-                reload = 12f;
+                reload = 11f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 inaccuracy = 15f;
                 ignoreRotation = true;
                 shootSound = Sounds.none;
-                bullet = new BombBulletType(23f, 25f){{
+                bullet = new BombBulletType(28f, 25f){{
                     width = 10f;
                     height = 14f;
                     hitEffect = Fx.flakExplosion;
@@ -534,7 +534,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 1.9f;
             flying = true;
             lowAltitude = true;
-            health = 9000;
+            health = 8000;
             armor = 9f;
             engineOffset = 21;
             engineSize = 5.3f;

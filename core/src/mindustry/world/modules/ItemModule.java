@@ -295,11 +295,11 @@ public class ItemModule extends BlockModule{
     public void read(Reads read){
         //just in case, reset items
         Arrays.fill(items, 0);
-        byte count = read.b();
+        int count = read.ub();
         total = 0;
 
         for(int j = 0; j < count; j++){
-            int itemid = read.b();
+            int itemid = read.ub();
             int itemamount = read.i();
             items[content.item(itemid).id] = itemamount;
             total += itemamount;

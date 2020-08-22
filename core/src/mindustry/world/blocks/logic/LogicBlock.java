@@ -17,6 +17,7 @@ import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -111,6 +112,14 @@ public class LogicBlock extends Block{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.linkRange, range / 8, StatUnit.blocks);
+        stats.add(BlockStat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
     }
 
     @Override
@@ -340,7 +349,7 @@ public class LogicBlock extends Block{
                 updateCode();
             }
 
-            accumulator += edelta() * instructionsPerTick;
+            accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
 
             if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
 
