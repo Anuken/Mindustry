@@ -177,9 +177,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             int address = exec.numi(index);
 
-            if(address >= 0 && address < exec.links.length){
-                exec.setobj(output, exec.links[address]);
-            }
+            exec.setobj(output, address >= 0 && address < exec.links.length ? exec.links[address] : null);
         }
     }
 

@@ -30,7 +30,12 @@ public class EventType{
         openWiki,
         teamCoreDamage,
         socketConfigChanged,
-        update
+        update,
+        draw,
+        preDraw,
+        postDraw,
+        uiDrawBegin,
+        uiDrawEnd
     }
 
     public static class WinEvent{}

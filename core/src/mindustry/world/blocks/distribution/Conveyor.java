@@ -178,7 +178,7 @@ public class Conveyor extends Block implements Autotiler{
             float mspeed = speed * tilesize * 55f;
             float centerSpeed = 0.1f;
             float centerDstScl = 3f;
-            float tx = Geometry.d4x[rotation], ty = Geometry.d4y[rotation];
+            float tx = Geometry.d4x(rotation), ty = Geometry.d4y(rotation);
 
             float centerx = 0f, centery = 0f;
 

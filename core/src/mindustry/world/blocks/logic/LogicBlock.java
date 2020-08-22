@@ -207,7 +207,6 @@ public class LogicBlock extends Block{
                         stream.readInt();
                     }
                 }else{
-
                     for(int i = 0; i < total; i++){
                         String name = stream.readUTF();
                         short x = stream.readShort(), y = stream.readShort();
@@ -290,6 +289,7 @@ public class LogicBlock extends Block{
                     }
 
                     asm.putConst("@links", executor.links.length);
+                    asm.putConst("@ipt", instructionsPerTick);
 
                     //store any older variables
                     for(Var var : executor.vars){

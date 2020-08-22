@@ -484,7 +484,7 @@ public class UnitTypes implements ContentList{
         }};
 
         zenith = new UnitType("zenith"){{
-            health = 1000;
+            health = 700;
             speed = 1.9f;
             accel = 0.04f;
             drag = 0.016f;
@@ -492,13 +492,13 @@ public class UnitTypes implements ContentList{
             range = 140f;
             hitsize = 18f;
             lowAltitude = true;
-            armor = 6f;
+            armor = 5f;
 
             engineOffset = 12f;
             engineSize = 3f;
 
             weapons.add(new Weapon("zenith-missiles"){{
-                reload = 32f;
+                reload = 40f;
                 x = 7f;
                 rotate = true;
                 shake = 1f;
