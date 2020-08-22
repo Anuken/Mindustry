@@ -19,7 +19,6 @@ import mindustry.world.blocks.experimental.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.logic.MessageBlock;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -59,7 +58,7 @@ public class Blocks implements ContentList{
 
     //transport
     conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
-    overflowGate, underflowGate, massDriver, payloadConveyor, payloadRouter,
+    overflowGate, underflowGate, massDriver, payloadConveyor, payloadRouter, payloadIncinerator,
 
     //liquid
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -1002,6 +1001,10 @@ public class Blocks implements ContentList{
 
         payloadRouter = new PayloadRouter("payload-router"){{
             requirements(Category.distribution, with(Items.graphite, 15, Items.copper, 20));
+        }};
+
+        payloadIncinerator = new PayloadVoid("payload-incinerator"){{
+            requirements(Category.units, with(Items.graphite, 120, Items.copper, 40, Items.titanium, 25));
         }};
 
         //endregion

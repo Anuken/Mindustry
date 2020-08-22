@@ -187,7 +187,7 @@ public class PayloadConveyor extends Block{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             //accepting payloads from units isn't supported
-            return this.item == null && progress <= 5f && source != this && payload.fits();
+            return item == null && progress <= 5f && source != this && payload.fits();
         }
 
         @Override
