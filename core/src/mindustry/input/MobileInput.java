@@ -852,13 +852,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //pathfind for ground units
         if(!flying && !type.canBoost && !(unit instanceof WaterMovec)){
-            Tile on = unit.tileOn();
-            if(on != null && !on.solid()){
-                Tile to = pathfinder.getTargetTile(unit.tileOn(), unit.team, targetPos);
-                if(to != null){
-                    movement.set(to).sub(unit).setLength(speed);
-                }
-            }
+            movement.set(targetPos).sub(unit).limit(speed);
         }
 
         if(player.within(targetPos, attractDst)){

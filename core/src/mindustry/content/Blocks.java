@@ -998,10 +998,12 @@ public class Blocks implements ContentList{
 
         payloadConveyor = new PayloadConveyor("payload-conveyor"){{
             requirements(Category.distribution, with(Items.graphite, 10, Items.copper, 20));
+            canOverdrive = false;
         }};
 
         payloadRouter = new PayloadRouter("payload-router"){{
             requirements(Category.distribution, with(Items.graphite, 15, Items.copper, 20));
+            canOverdrive = false;
         }};
 
         //endregion
