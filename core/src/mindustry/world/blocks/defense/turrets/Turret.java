@@ -237,7 +237,7 @@ public abstract class Turret extends Block{
                         canShoot = unit.isShooting();
                     }else if(logicControlled()){ //logic behavior
                         canShoot = logicShooting;
-                    }else{ //default AI behavior
+                    }else if(peekAmmo() != null){ //default AI behavior
                         BulletType type = peekAmmo();
                         float speed = type.speed;
                         //slow bullets never intersect

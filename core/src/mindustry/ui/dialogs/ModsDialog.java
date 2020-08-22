@@ -161,8 +161,22 @@ public class ModsDialog extends BaseDialog{
                                 border(Pal.accent);
                             }}).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
 
-                            title.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
-                                .wrap().top().width(170f).growX().left();
+                            title.table(text -> {
+                                text.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+                                    .wrap().top().width(300f).growX().left();
+
+                                text.row();
+                                if(!mod.isSupported()){
+                                    text.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
+                                    text.row();
+                                }else if(mod.hasUnmetDependencies()){
+                                    text.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
+                                    t.row();
+                                }else if(mod.hasContentErrors()){
+                                    text.labelWrap("@mod.erroredcontent").growX();
+                                    text.row();
+                                }
+                            }).top().growX();
 
                             title.add().growX();
                         }).growX().growY().left();
@@ -193,17 +207,7 @@ public class ModsDialog extends BaseDialog{
                             }
                         }).growX().right().padRight(-8f).padTop(-8f);
 
-                        t.row();
-                        if(!mod.isSupported()){
-                            t.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
-                            t.row();
-                        }else if(mod.hasUnmetDependencies()){
-                            t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
-                            t.row();
-                        }else if(mod.hasContentErrors()){
-                            t.labelWrap("@mod.erroredcontent").growX();
-                            t.row();
-                        }
+
                     }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
                     table.row();
                 }

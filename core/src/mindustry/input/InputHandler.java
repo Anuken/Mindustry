@@ -538,11 +538,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(test.get(req)) return req;
         }
 
-        for(BuildPlan req : selectRequests){
-            if(test.get(req)) return req;
-        }
-
-        return null;
+        return selectRequests.find(test);
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){

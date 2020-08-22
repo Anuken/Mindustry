@@ -17,6 +17,7 @@ import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -114,6 +115,14 @@ public class LogicBlock extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.linkRange, range / 8, StatUnit.blocks);
+        stats.add(BlockStat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+    }
+
+    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Drawf.circles(x*tilesize + offset, y*tilesize + offset, range);
     }
@@ -198,7 +207,6 @@ public class LogicBlock extends Block{
                         stream.readInt();
                     }
                 }else{
-
                     for(int i = 0; i < total; i++){
                         String name = stream.readUTF();
                         short x = stream.readShort(), y = stream.readShort();
@@ -281,6 +289,7 @@ public class LogicBlock extends Block{
                     }
 
                     asm.putConst("@links", executor.links.length);
+                    asm.putConst("@ipt", instructionsPerTick);
 
                     //store any older variables
                     for(Var var : executor.vars){
@@ -340,7 +349,7 @@ public class LogicBlock extends Block{
                 updateCode();
             }
 
-            accumulator += edelta() * instructionsPerTick;
+            accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
 
             if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
 

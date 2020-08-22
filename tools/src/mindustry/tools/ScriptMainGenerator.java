@@ -5,6 +5,7 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -16,14 +17,14 @@ import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 
-public class ScriptStubGenerator{
+public class ScriptMainGenerator{
 
     public static void main(String[] args) throws Exception{
         String base = "mindustry";
         Seq<String> blacklist = Seq.with("plugin", "mod", "net", "io", "tools");
         Seq<String> nameBlacklist = Seq.with("ClassAccess");
         Seq<Class<?>> whitelist = Seq.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
-        AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class,
+        AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Shader.class,
         Sounds.class, Musics.class, Call.class, Texture.class, TextureData.class, Pixmap.class, I18NBundle.class, Interval.class, DataInput.class, DataOutput.class,
         DataInputStream.class, DataOutputStream.class, Integer.class, Float.class, Double.class, Long.class, Boolean.class, Short.class, Byte.class, Character.class);
         Seq<String> nopackage = Seq.with("java.lang", "java");
