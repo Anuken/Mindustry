@@ -124,10 +124,6 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public int getMaximumAccepted(Item item){
-            for(ItemStack stack : currentPlan.requirements){
-                capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
-                itemCapacity = Math.max(itemCapacity, stack.amount * 2);
-            }
             return capacities[item.id];
         }
 
@@ -164,7 +160,6 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public void updateTile(){
-            boolean valid = false;
             //update plan (this was the only way I could get it to work help help help help)
             try {
                 currentPlan = upgrade(payload.unit.type());
@@ -172,6 +167,13 @@ public class Reconstructor extends UnitBlock{
                 currentPlan = UpgradePlan.empty;
             }
 
+            //update capacities
+            for(ItemStack stack : currentPlan.requirements){
+                capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
+                itemCapacity = Math.max(itemCapacity, stack.amount * 2);
+            }
+
+            boolean valid = false;
             if(payload != null){
                 //check if offloading
                 if(!hasUpgrade(payload.unit.type())){
