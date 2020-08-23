@@ -1,7 +1,6 @@
 package mindustry.logic;
 
 import arc.func.*;
-import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -655,7 +654,7 @@ public class LStatements{
             field(table, compare, str -> compare = str);
 
             table.add().growX();
-            table.add(new JumpButton(Color.white, () -> dest, s -> dest = s)).size(30).right().padLeft(-8);
+            table.add(new JumpButton(() -> dest, s -> dest = s)).size(30).right().padLeft(-8);
         }
 
         //elements need separate conversion logic

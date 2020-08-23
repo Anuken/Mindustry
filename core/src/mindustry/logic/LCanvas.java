@@ -20,9 +20,8 @@ import mindustry.ui.*;
 import mindustry.world.blocks.logic.*;
 
 public class LCanvas extends Table{
-    private static final Color backgroundCol = Pal.darkMetal.cpy().mul(0.1f), gridCol = Pal.darkMetal.cpy().mul(0.5f);
     static Seq<Runnable> postDraw = new Seq<>();
-    private Vec2 offset = new Vec2();
+    static Seq<Runnable> postDrawPriority = new Seq<>();
 
     DragLayout statements;
     StatementElem dragging;
@@ -92,10 +91,26 @@ public class LCanvas extends Table{
     }
 
     @Override
+    public void act(float delta){
+        super.act(delta);
+
+        if(Core.input.isTouched()){
+            float y = Core.input.mouseY();
+            float dst = Math.min(y - this.y, Core.graphics.getHeight() - y);
+            if(dst < Scl.scl(100f)){ //scroll margin
+                int sign = Mathf.sign(Core.graphics.getHeight()/2f - y);
+                pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f));
+            }
+        }
+    }
+
+    @Override
     public void draw(){
         postDraw.clear();
+        postDrawPriority.clear();
         super.draw();
         postDraw.each(Runnable::run);
+        postDrawPriority.each(Runnable::run);
     }
 
     public class DragLayout extends WidgetGroup{
@@ -252,7 +267,7 @@ public class LCanvas extends Table{
                             return false;
                         }
 
-                        Vec2 v = localToStageCoordinates(Tmp.v1.set(x, y));
+                        Vec2 v = localToParentCoordinates(Tmp.v1.set(x, y));
                         lastx = v.x;
                         lasty = v.y;
                         dragging = StatementElem.this;
@@ -263,7 +278,7 @@ public class LCanvas extends Table{
 
                     @Override
                     public void touchDragged(InputEvent event, float x, float y, int pointer){
-                        Vec2 v = localToStageCoordinates(Tmp.v1.set(x, y));
+                        Vec2 v = localToParentCoordinates(Tmp.v1.set(x, y));
 
                         translation.add(v.x - lastx, v.y - lasty);
                         lastx = v.x;
@@ -317,16 +332,18 @@ public class LCanvas extends Table{
     }
 
     public static class JumpButton extends ImageButton{
+        Color hoverColor = Pal.place;
+        Color defaultColor = Color.white;
         @NonNull Prov<StatementElem> to;
         boolean selecting;
         float mx, my;
+        ClickListener listener;
 
-        public JumpButton(Color color, @NonNull Prov<StatementElem> getter, Cons<StatementElem> setter){
+        public JumpButton(@NonNull Prov<StatementElem> getter, Cons<StatementElem> setter){
             super(Tex.logicNode, Styles.colori);
 
             to = getter;
-
-            getStyle().imageUpColor = color;
+            addListener(listener = new ClickListener());
 
             addListener(new InputListener(){
                 @Override
@@ -362,6 +379,9 @@ public class LCanvas extends Table{
                 if(to.get() != null && to.get().parent == null){
                     setter.get(null);
                 }
+
+                setColor(listener.isOver() ? hoverColor : defaultColor);
+                getStyle().imageUpColor = this.color;
             });
         }
 
@@ -369,7 +389,7 @@ public class LCanvas extends Table{
         public void draw(){
             super.draw();
 
-            postDraw.add(() -> {
+            (listener.isOver() ? postDrawPriority : postDraw).add(() -> {
                 Element hover = to.get() == null && selecting ? hovered() : to.get();
                 float tx = 0, ty = 0;
                 boolean draw = false;
@@ -402,10 +422,12 @@ public class LCanvas extends Table{
                 }
 
                 if(draw){
-                    drawCurve(rx + width/2f, ry + height/2f, tx, ty, color);
+                    drawCurve(rx + width/2f, ry + height/2f, tx, ty);
 
                     float s = width;
+                    Draw.color(color);
                     Tex.logicNode.draw(tx + s*0.75f, ty - s/2f, -s, s);
+                    Draw.reset();
                 }
             });
         }
@@ -421,7 +443,7 @@ public class LCanvas extends Table{
             return (StatementElem)e;
         }
 
-        void drawCurve(float x, float y, float x2, float y2, Color color){
+        void drawCurve(float x, float y, float x2, float y2){
             Lines.stroke(4f, color);
             Draw.alpha(parentAlpha);
 
@@ -434,8 +456,6 @@ public class LCanvas extends Table{
             x2, y2,
             Math.max(20, (int)(Mathf.dst(x, y, x2, y2) / 5))
             );
-
-            Draw.reset();
         }
     }
 }
