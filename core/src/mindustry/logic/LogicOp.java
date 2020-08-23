@@ -26,7 +26,7 @@ public enum LogicOp{
     dst("dst", (x, y) -> Mathf.dst((float)x, (float)y)),
 
     not("not", a -> ~(int)(a)),
-    abs("abs", Math::abs),
+    abs("abs", a -> Math.abs(a)),
     log("log", Math::log),
     log10("log10", Math::log10),
     sin("sin", d -> Math.sin(d * 0.017453292519943295D)),
