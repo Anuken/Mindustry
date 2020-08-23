@@ -61,7 +61,12 @@ public class LogicDialog extends BaseDialog{
                 for(Prov<LStatement> prov : LogicIO.allStatements){
                     LStatement example = prov.get();
                     if(example instanceof InvalidStatement) continue;
-                    t.button(example.name(), Styles.cleart, () -> {
+
+                    TextButtonStyle style = new TextButtonStyle(Styles.cleart);
+                    style.fontColor = example.category().color;
+                    style.font = Fonts.outline;
+
+                    t.button(example.name(), style, () -> {
                         canvas.add(prov.get());
                         dialog.hide();
                     }).size(140f, 50f);

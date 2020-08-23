@@ -106,6 +106,26 @@ public class LAssembler{
                     arr = new String[]{line};
                 }
 
+                String type = arr[0];
+
+                //legacy stuff
+                if(type.equals("bop")){
+                    arr[0] = "op";
+
+                    //field order for bop used to be op a, b, result, but now it's op result a b
+                    String res = arr[4];
+                    arr[4] = arr[3];
+                    arr[3] = arr[2];
+                    arr[2] = res;
+                }else if(type.equals("uop")){
+                    arr[0] = "op";
+
+                    //field order for uop used to be op a, result, but now it's op result a
+                    String res = arr[3];
+                    arr[3] = arr[2];
+                    arr[2] = res;
+                }
+
                 LStatement st = LogicIO.read(arr);
 
                 if(st != null){
@@ -121,6 +141,7 @@ public class LAssembler{
                     }
                 }
             }catch(Exception parseFailed){
+                parseFailed.printStackTrace();
                 //when parsing fails, add a dummy invalid statement
                 statements.add(new InvalidStatement());
             }
