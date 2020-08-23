@@ -183,9 +183,7 @@ allprojects{
 //compile with java 8 compatibility for everything except the annotati project
 configure(subprojects - project(":annotations")){
     tasks.withType(JavaCompile){
-        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-            options.compilerArgs.addAll(['--release', '8'])
-        }
+        options.release = 8
     }
 
     tasks.withType(Javadoc){
