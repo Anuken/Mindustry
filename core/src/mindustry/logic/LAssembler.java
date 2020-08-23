@@ -96,7 +96,7 @@ public class LAssembler{
                         if(c == '"'){
                             inString = !inString;
                         }else if(c == ' ' && !inString){
-                            tokens.add(line.substring(lastIdx, i).replace("\\n", "\n"));
+                            tokens.add(line.substring(lastIdx, i));
                             lastIdx = i + 1;
                         }
                     }
@@ -162,7 +162,7 @@ public class LAssembler{
 
         //string case
         if(symbol.startsWith("\"") && symbol.endsWith("\"")){
-            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1)).id;
+            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n")).id;
         }
 
         try{
