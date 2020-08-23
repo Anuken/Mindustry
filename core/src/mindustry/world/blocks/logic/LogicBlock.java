@@ -329,7 +329,9 @@ public class LogicBlock extends Block{
             //check for previously invalid links to add after configuration
             boolean changed = false;
 
-            for(LogicLink l : links){
+            for(int i = 0; i < links.size; i++){
+                LogicLink l = links.get(i);
+
                 if(!l.active) continue;
 
                 boolean valid = validLink(world.build(l.x, l.y));
@@ -337,10 +339,18 @@ public class LogicBlock extends Block{
                     changed = true;
                     l.valid = valid;
                     if(valid){
+                        Building lbuild = world.build(l.x, l.y);
+
                         //this prevents conflicts
                         l.name = "";
                         //finds a new matching name after toggling
-                        l.name = findLinkName(world.build(l.x, l.y).block);
+                        l.name = findLinkName(lbuild.block);
+
+                        //remove redundant links
+                        links.removeAll(o -> world.build(o.x, o.y) == lbuild && o != l);
+
+                        //break to prevent concurrent modification
+                        break;
                     }
                 }
             }

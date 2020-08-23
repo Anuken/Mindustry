@@ -36,7 +36,7 @@ public class LogicDialog extends BaseDialog{
                     t.button("@schematic.copy.import", Icon.download, style, () -> {
                         dialog.hide();
                         try{
-                            canvas.load(Core.app.getClipboardText());
+                            canvas.load(Core.app.getClipboardText().replace("\r\n", "\n"));
                         }catch(Throwable e){
                             ui.showException(e);
                         }

@@ -1923,7 +1923,7 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 0.08f);
             hasLiquids = true;
 
-            instructionsPerTick = 15;
+            instructionsPerTick = 25;
 
             range = 8 * 40;
 
