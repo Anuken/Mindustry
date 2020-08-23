@@ -1703,6 +1703,7 @@ public class Blocks implements ContentList{
 
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
+            blockUnitBuildSpeed = 1.2f;
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.dagger, with(Items.silicon, 10, Items.lead, 10)),
                 new UnitPlan(UnitTypes.crawler, with(Items.silicon, 5, Items.coal, 5)),
@@ -1714,6 +1715,7 @@ public class Blocks implements ContentList{
 
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
+            blockUnitBuildSpeed = 1.2f;
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.flare, with(Items.silicon, 15)),
                 new UnitPlan(UnitTypes.mono, with(Items.silicon, 20, Items.lead, 15)),
@@ -1724,6 +1726,7 @@ public class Blocks implements ContentList{
 
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
+            blockUnitBuildSpeed = 1.5f;
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.risso, with(Items.silicon, 20, Items.metaglass, 15)),
             };
@@ -1743,7 +1746,7 @@ public class Blocks implements ContentList{
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.nova, UnitTypes.pulsar, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
                 new UpgradePlan(UnitTypes.dagger, UnitTypes.mace, with(Items.silicon, 20, Items.graphite, 20)),
-                new UpgradePlan(UnitTypes.crawler, UnitTypes.atrax, with(Items.silicon, 20, Items.metaglass, 20)),
+                new UpgradePlan(UnitTypes.crawler, UnitTypes.atrax, with(Items.silicon, 20, Items.metaglass, 15)),
                 new UpgradePlan(UnitTypes.flare, UnitTypes.horizon, with(Items.silicon, 20, Items.titanium, 20)), 
                 new UpgradePlan(UnitTypes.mono, UnitTypes.poly, with(Items.silicon, 30, Items.lead, 30, Items.titanium, 20)), 
                 new UpgradePlan(UnitTypes.risso, UnitTypes.minke, with(Items.silicon, 30, Items.graphite, 20, Items.metaglass, 30)), 
