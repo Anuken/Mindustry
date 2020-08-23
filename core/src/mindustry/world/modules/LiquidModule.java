@@ -133,10 +133,10 @@ public class LiquidModule extends BlockModule{
     public void read(Reads read){
         Arrays.fill(liquids, 0);
         total = 0f;
-        byte count = read.b();
+        int count = read.ub();
 
         for(int j = 0; j < count; j++){
-            int liquidid = read.b();
+            int liquidid = read.ub();
             float amount = read.f();
             liquids[liquidid] = amount;
             if(amount > 0){

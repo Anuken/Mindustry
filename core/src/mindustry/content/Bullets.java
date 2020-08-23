@@ -163,7 +163,7 @@ public class Bullets implements ContentList{
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 20f;
+            splashDamage = 22f;
             splashDamageRadius = 20f;
             fragBullet = flakGlassFrag;
             fragBullets = 5;
