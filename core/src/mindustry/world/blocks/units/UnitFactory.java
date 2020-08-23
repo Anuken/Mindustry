@@ -26,6 +26,8 @@ import static mindustry.Vars.*;
 
 public class UnitFactory extends UnitBlock{
     public int[] capacities;
+    /** A variable unique to each type of block that controls how fast a unit is built */
+    public float  blockUnitBuildSpeed = 1f;
 
     public UnitPlan[] plans = new UnitPlan[0];
 
@@ -195,7 +197,7 @@ public class UnitFactory extends UnitBlock{
 
             if(consValid() && currentPlan != -1){
                 time += edelta() * speedScl * Vars.state.rules.unitBuildSpeedMultiplier;
-                progress += edelta() * Vars.state.rules.unitBuildSpeedMultiplier;
+                progress += edelta() * Vars.state.rules.unitBuildSpeedMultiplier * blockUnitBuildSpeed;
                 speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
             }else{
                 speedScl = Mathf.lerpDelta(speedScl, 0f, 0.05f);

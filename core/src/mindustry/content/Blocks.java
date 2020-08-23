@@ -1705,7 +1705,7 @@ public class Blocks implements ContentList{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.dagger, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, with(Items.silicon, 5, Items.coal, 10)),
+                new UnitPlan(UnitTypes.crawler, with(Items.silicon, 5, Items.coal, 5)),
                 new UnitPlan(UnitTypes.nova, with(Items.silicon, 15, Items.lead, 10, Items.titanium, 10)),
             };
             size = 3;
@@ -1738,6 +1738,8 @@ public class Blocks implements ContentList{
             size = 3;
             consumes.power(3f);
 
+            blockUnitBuildSpeed = 1.5f;
+
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.nova, UnitTypes.pulsar, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
                 new UpgradePlan(UnitTypes.dagger, UnitTypes.mace, with(Items.silicon, 20, Items.graphite, 20)),
@@ -1754,10 +1756,12 @@ public class Blocks implements ContentList{
             size = 5;
             consumes.power(6f);
 
+            blockUnitBuildSpeed = 2f;
+
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.pulsar, UnitTypes.quasar, with(Items.silicon, 50, Items.lead, 30, Items.plastanium, 20)),
                 new UpgradePlan(UnitTypes.mace, UnitTypes.fortress, with(Items.silicon, 50, Items.graphite, 40, Items.titanium, 20)),
-                new UpgradePlan(UnitTypes.atrax, UnitTypes.spiroct, with(Items.silicon, 60, Items.lead, 20, Items.phasefabric, 10)),
+                new UpgradePlan(UnitTypes.atrax, UnitTypes.spiroct, with(Items.silicon, 60, Items.lead, 20, Items.phasefabric, 5)),
                 new UpgradePlan(UnitTypes.horizon, UnitTypes.zenith, with(Items.silicon, 50, Items.titanium, 30, Items.plastanium, 20)),
                 new UpgradePlan(UnitTypes.poly, UnitTypes.mega, with(Items.silicon, 50, Items.lead, 30, Items.plastanium, 40)),
                 new UpgradePlan(UnitTypes.minke, UnitTypes.bryde, with(Items.silicon, 60, Items.metaglass, 40, Items.plastanium, 20)),
@@ -1771,6 +1775,9 @@ public class Blocks implements ContentList{
             consumes.power(12f);
             consumes.liquid(Liquids.cryofluid, 1f);
             liquidCapacity = 60f;
+
+            blockUnitBuildSpeed = 3f;
+
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.zenith, UnitTypes.antumbra, with(Items.silicon, 400, Items.titanium, 300, Items.plastanium, 200, Items.surgealloy, 100)),
             };
@@ -1783,6 +1790,8 @@ public class Blocks implements ContentList{
             consumes.power(25f);
             consumes.liquid(Liquids.cryofluid, 3f);
             liquidCapacity = 180f;
+
+            blockUnitBuildSpeed = 3f;
 
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.antumbra, UnitTypes.eclipse, with(Items.silicon, 500, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150)),

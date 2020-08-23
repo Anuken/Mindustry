@@ -22,6 +22,8 @@ import static mindustry.Vars.*;
 public class Reconstructor extends UnitBlock{
     public UpgradePlan[] upgrades = {};
     public int[] capacities;
+    /** A variable unique to each type of block that controls how fast a unit is built */
+    public float  blockUnitBuildSpeed = 1f;
 
     public Reconstructor(String name){
         super(name);
@@ -179,7 +181,7 @@ public class Reconstructor extends UnitBlock{
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
-                            progress += edelta();
+                            progress += edelta() * Vars.state.rules.unitBuildSpeedMultiplier * blockUnitBuildSpeed;
                         }
 
                         //upgrade the unit
