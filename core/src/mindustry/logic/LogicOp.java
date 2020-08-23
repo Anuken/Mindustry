@@ -25,7 +25,6 @@ public enum LogicOp{
     atan2("atan2", (x, y) -> Mathf.atan2((float)x, (float)y) * Mathf.radDeg),
     dst("dst", (x, y) -> Mathf.dst((float)x, (float)y)),
 
-    negate("-", a -> -a),
     not("not", a -> ~(int)(a)),
     abs("abs", Math::abs),
     log("log", Math::log),

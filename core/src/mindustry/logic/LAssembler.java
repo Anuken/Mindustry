@@ -120,10 +120,16 @@ public class LAssembler{
                 }else if(type.equals("uop")){
                     arr[0] = "op";
 
-                    //field order for uop used to be op a, result, but now it's op result a
-                    String res = arr[3];
-                    arr[3] = arr[2];
-                    arr[2] = res;
+                    if(arr[1].equals("negate")){
+                        arr = new String[]{
+                            "op", "mul", arr[3], arr[2], "-1"
+                        };
+                    }else{
+                        //field order for uop used to be op a, result, but now it's op result a
+                        String res = arr[3];
+                        arr[3] = arr[2];
+                        arr[2] = res;
+                    }
                 }
 
                 LStatement st = LogicIO.read(arr);
