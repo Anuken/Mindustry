@@ -91,7 +91,7 @@ public class Wall extends Block{
             //create lightning if necessary
             if(lightningChance > 0){
                 if(Mathf.chance(lightningChance)){
-                    Lightning.create(team(), Pal.surge, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
+                    Lightning.create(team, Pal.surge, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
                 }
             }
 

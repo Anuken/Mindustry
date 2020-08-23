@@ -53,7 +53,7 @@ public class PowerDiode extends Block{
         public void updateTile(){
             super.updateTile();
 
-            if(front() == null || back() == null || !back().block().hasPower || !front().block().hasPower || back().team() != front().team()) return;
+            if(front() == null || back() == null || !back().block().hasPower || !front().block().hasPower || back().team != front().team) return;
 
             PowerGraph backGraph = back().power.graph;
             PowerGraph frontGraph = front().power.graph;

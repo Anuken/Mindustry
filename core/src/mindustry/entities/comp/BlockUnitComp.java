@@ -27,7 +27,7 @@ abstract class BlockUnitComp implements Unitc{
     @Override
     public void update(){
         if(tile != null){
-            team = tile.team();
+            team = tile.team;
         }
     }
 
@@ -61,7 +61,7 @@ abstract class BlockUnitComp implements Unitc{
     public void team(Team team){
         if(tile != null && this.team != team){
             this.team = team;
-            if(tile.team() != team){
+            if(tile.team != team){
                 tile.team(team);
             }
         }

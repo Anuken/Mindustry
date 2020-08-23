@@ -76,7 +76,7 @@ public class OverflowGate extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return team == source.team() && lastItem == null && items.total() == 0;
+            return team == source.team && lastItem == null && items.total() == 0;
         }
 
         @Override
@@ -91,7 +91,7 @@ public class OverflowGate extends Block{
             int from = relativeToEdge(src);
             if(from == -1) return null;
             Building to = nearby((from + 2) % 4);
-            boolean canForward = to != null && to.acceptItem(this, item) && to.team() == team && !(to.block() instanceof OverflowGate);
+            boolean canForward = to != null && to.acceptItem(this, item) && to.team == team && !(to.block() instanceof OverflowGate);
 
             if(!canForward || invert){
                 Building a = nearby(Mathf.mod(from - 1, 4));

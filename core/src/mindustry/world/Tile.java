@@ -150,7 +150,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Team team(){
-        return build == null ? Team.derelict : build.team();
+        return build == null ? Team.derelict : build.team;
     }
 
     public void setTeam(Team team){

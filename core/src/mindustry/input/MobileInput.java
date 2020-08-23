@@ -77,7 +77,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if(tile != null && player.team().isEnemy(tile.team())){
+            if(tile != null && player.team().isEnemy(tile.team)){
                 player.miner().mineTile(null);
                 target = tile;
             }else if(tile != null && player.unit().type().canHeal && tile.team == player.team() && tile.damaged()){
