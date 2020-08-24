@@ -34,8 +34,8 @@ public class MobileInput extends InputHandler implements GestureListener{
     private final float edgePan = Scl.scl(60f);
 
     //gesture data
-    private Vec2 vector = new Vec2(), movement = new Vec2(), targetPos = new Vec2();
-    private float lastZoom = -1;
+    public Vec2 vector = new Vec2(), movement = new Vec2(), targetPos = new Vec2();
+    public float lastZoom = -1;
 
     /** Position where the player started dragging a line. */
     private int lineStartX, lineStartY, lastLineX, lastLineY;
@@ -44,7 +44,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     private float lineScale;
     /** Animation data for crosshair. */
     private float crosshairScale;
-    private Teamc lastTarget;
+    public Teamc lastTarget;
     /** Used for shifting build requests. */
     private float shiftDeltaX, shiftDeltaY;
 
@@ -55,15 +55,15 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Whether the player is currently in line-place mode. */
     private boolean lineMode, schematicMode;
     /** Current place mode. */
-    private PlaceMode mode = none;
+    public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
-    private Block lastBlock;
+    public Block lastBlock;
     /** Last placed request. Used for drawing block overlay. */
-    private BuildPlan lastPlaced;
+    public BuildPlan lastPlaced;
     /** Down tracking for panning.*/
     private boolean down = false;
 
-    private Teamc target, moveTarget;
+    public Teamc target, moveTarget;
 
     //region utility methods
 

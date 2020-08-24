@@ -27,19 +27,19 @@ import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
-    private Vec2 movement = new Vec2();
+    public Vec2 movement = new Vec2();
     /** Current cursor type. */
-    private Cursor cursorType = SystemCursor.arrow;
+    public Cursor cursorType = SystemCursor.arrow;
     /** Position where the player started dragging a line. */
     private int selectX, selectY, schemX, schemY;
     /** Last known line positions.*/
     private int lastLineX, lastLineY, schematicX, schematicY;
     /** Whether selecting mode is active. */
-    private PlaceMode mode;
+    public PlaceMode mode;
     /** Animation scale for line. */
     private float selectScale;
     /** Selected build request for movement. */
-    private @Nullable BuildPlan sreq;
+    public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
     private boolean deleting = false, shouldShoot = false;
 
