@@ -31,29 +31,29 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Maximum speed the player can pan. */
     private static final float maxPanSpeed = 1.3f;
     /** Distance to edge of screen to start panning. */
-    private final float edgePan = Scl.scl(60f);
+    public final float edgePan = Scl.scl(60f);
 
     //gesture data
     public Vec2 vector = new Vec2(), movement = new Vec2(), targetPos = new Vec2();
     public float lastZoom = -1;
 
     /** Position where the player started dragging a line. */
-    private int lineStartX, lineStartY, lastLineX, lastLineY;
+    public int lineStartX, lineStartY, lastLineX, lastLineY;
 
     /** Animation scale for line. */
-    private float lineScale;
+    public float lineScale;
     /** Animation data for crosshair. */
-    private float crosshairScale;
+    public float crosshairScale;
     public Teamc lastTarget;
     /** Used for shifting build requests. */
-    private float shiftDeltaX, shiftDeltaY;
+    public float shiftDeltaX, shiftDeltaY;
 
     /** Place requests to be removed. */
-    private Seq<BuildPlan> removals = new Seq<>();
+    public Seq<BuildPlan> removals = new Seq<>();
     /** Whether or not the player is currently shifting all placed tiles. */
-    private boolean selecting;
+    public boolean selecting;
     /** Whether the player is currently in line-place mode. */
-    private boolean lineMode, schematicMode;
+    public boolean lineMode, schematicMode;
     /** Current place mode. */
     public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
@@ -61,7 +61,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Last placed request. Used for drawing block overlay. */
     public BuildPlan lastPlaced;
     /** Down tracking for panning.*/
-    private boolean down = false;
+    public boolean down = false;
 
     public Teamc target, moveTarget;
 

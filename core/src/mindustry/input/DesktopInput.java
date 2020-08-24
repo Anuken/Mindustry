@@ -31,17 +31,17 @@ public class DesktopInput extends InputHandler{
     /** Current cursor type. */
     public Cursor cursorType = SystemCursor.arrow;
     /** Position where the player started dragging a line. */
-    private int selectX, selectY, schemX, schemY;
+    public int selectX, selectY, schemX, schemY;
     /** Last known line positions.*/
-    private int lastLineX, lastLineY, schematicX, schematicY;
+    public int lastLineX, lastLineY, schematicX, schematicY;
     /** Whether selecting mode is active. */
     public PlaceMode mode;
     /** Animation scale for line. */
-    private float selectScale;
+    public float selectScale;
     /** Selected build request for movement. */
     public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
-    private boolean deleting = false, shouldShoot = false;
+    public boolean deleting = false, shouldShoot = false;
 
     @Override
     public void buildUI(Group group){

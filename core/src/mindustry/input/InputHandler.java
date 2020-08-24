@@ -62,13 +62,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean isBuilding = true, buildWasAutoPaused = false;
     public @Nullable UnitType controlledType;
 
-    protected @Nullable Schematic lastSchematic;
-    protected GestureDetector detector;
-    protected PlaceLine line = new PlaceLine();
-    protected BuildPlan resultreq;
-    protected BuildPlan brequest = new BuildPlan();
-    protected Seq<BuildPlan> lineRequests = new Seq<>();
-    protected Seq<BuildPlan> selectRequests = new Seq<>();
+    public @Nullable Schematic lastSchematic;
+    public GestureDetector detector;
+    public PlaceLine line = new PlaceLine();
+    public BuildPlan resultreq;
+    public BuildPlan brequest = new BuildPlan();
+    public Seq<BuildPlan> lineRequests = new Seq<>();
+    public Seq<BuildPlan> selectRequests = new Seq<>();
 
     //methods to override
 
