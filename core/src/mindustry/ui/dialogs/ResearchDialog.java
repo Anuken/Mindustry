@@ -134,7 +134,7 @@ public class ResearchDialog extends BaseDialog{
             }
         });
 
-        addListener(new ElementGestureListener(){
+        view.addListener(new ElementGestureListener(){
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
                 if(view.lastZoom < 0){
