@@ -233,7 +233,7 @@ public class ResearchDialog extends BaseDialog{
     }
 
     boolean selectable(TechNode node){
-        return !node.objectives.contains(i -> !i.complete());
+        return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());
     }
 
     void showToast(String info){

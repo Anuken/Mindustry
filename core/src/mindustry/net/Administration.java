@@ -75,9 +75,13 @@ public class Administration{
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
-                Config.antiSpam.bool() &&
-                //make sure players can configure their own stuff, e.g. in schematics
-                lastPlaced.get(action.tile.pos(), -1) != action.player.id()){
+                Config.antiSpam.bool()){
+
+                //make sure players can configure their own stuff, e.g. in schematics - but only once.
+                if(lastPlaced.get(action.tile.pos(), -1) == action.player.id()){
+                    lastPlaced.remove(action.tile.pos());
+                    return true;
+                }
 
                 Ratekeeper rate = action.player.getInfo().rate;
                 if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){

@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import mindustry.ai.Pathfinder.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -26,6 +27,10 @@ public class GroundAI extends AIController{
             if(!unit.within(core, unit.range() * 0.5f)){
                 moveToCore(FlagTarget.enemyCores);
             }
+        }
+
+        if(unit.type().canBoost){
+            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
         if(!Units.invalidateTarget(target, unit, unit.range())){

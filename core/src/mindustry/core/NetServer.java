@@ -614,7 +614,7 @@ public class NetServer implements ApplicationListener{
             Unit unit = player.unit();
 
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
-            float maxSpeed = (boosting ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
+            float maxSpeed = ((player.unit().type().canBoost && player.unit().isFlying()) ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
             if(unit.isGrounded()){
                 maxSpeed *= unit.floorSpeedMultiplier();
             }
