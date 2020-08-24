@@ -19,7 +19,6 @@ import mindustry.world.blocks.experimental.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.logic.MessageBlock;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -78,6 +77,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
 
     //units
+    commandCenter,
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
     repairPoint, resupplyPoint,
@@ -1701,6 +1701,12 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
+        commandCenter = new CommandCenter("command-center"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
+            size = 2;
+            health = size * size * 55;
+        }};
+
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = new UnitPlan[]{
@@ -1864,7 +1870,6 @@ public class Blocks implements ContentList{
         //looked up by name, no ref needed
         new LegacyMechPad("legacy-mech-pad");
         new LegacyUnitFactory("legacy-unit-factory");
-        new LegacyCommandCenter("legacy-command-center");
 
         //endregion
         //region campaign

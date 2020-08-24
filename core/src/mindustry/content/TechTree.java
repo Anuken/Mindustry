@@ -358,6 +358,10 @@ public class TechTree implements ContentList{
             });
 
             node(groundFactory, () -> {
+                node(commandCenter, () -> {
+
+                });
+
                 node(dagger, () -> {
                     node(mace, () -> {
                         node(fortress, () -> {

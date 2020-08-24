@@ -6,6 +6,8 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class FlyingAI extends AIController{
 
     @Override
@@ -18,13 +20,22 @@ public class FlyingAI extends AIController{
             unit.wobble();
         }
 
-        if(target != null && unit.hasWeapons()){
+        if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
             if(unit.type().weapons.first().rotate){
                 moveTo(target, unit.range() * 0.8f);
                 unit.lookAt(target);
             }else{
                 attack(80f);
             }
+        }
+
+        if(target == null && command() == UnitCommand.attack && state.rules.waves && unit.team == state.rules.defaultTeam){
+            moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 120f);
+        }
+
+        if(command() == UnitCommand.rally){
+            target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
+            moveTo(target, 60f);
         }
     }
 
