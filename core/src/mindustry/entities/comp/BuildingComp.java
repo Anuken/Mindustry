@@ -884,7 +884,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             power += this.power.status * block.consumes.getPower().capacity;
         }
 
-        if(block.hasLiquids){
+        if(block.hasLiquids && state.rules.damageExplosions){
 
             liquids.each((liquid, amount) -> {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
