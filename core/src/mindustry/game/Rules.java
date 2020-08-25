@@ -38,6 +38,8 @@ public class Rules{
     public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
+    /** Whether friendly explosions can occur and set fire/damage other blocks. */
+    public boolean damageExplosions = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
     /** How fast unit pads build units. */
