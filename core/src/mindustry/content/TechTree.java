@@ -38,7 +38,6 @@ public class TechTree implements ContentList{
                         node(distributor);
                         node(sorter, () -> {
                             node(invertedSorter);
-                            node(message);
                             node(overflowGate, () -> {
                                 node(underflowGate);
                             });
@@ -206,19 +205,21 @@ public class TechTree implements ContentList{
                                     });
 
                                     node(microProcessor, () -> {
-                                        node(logicProcessor, () -> {
-                                            node(hyperProcessor, () -> {
-
-                                            });
-                                        });
-
                                         node(switchBlock, () -> {
-                                            node(logicDisplay, () -> {
+                                            node(message, () -> {
+                                                node(logicDisplay, () -> {
 
+                                                });
+
+                                                node(memoryCell, () -> {
+
+                                                });
                                             });
 
-                                            node(memoryCell, () -> {
+                                            node(logicProcessor, () -> {
+                                                node(hyperProcessor, () -> {
 
+                                                });
                                             });
                                         });
                                     });
