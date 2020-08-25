@@ -41,9 +41,7 @@ public class DesktopInput extends InputHandler{
     /** Selected build request for movement. */
     public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
-    public boolean deleting = false, shouldShoot = false;
-
-    private boolean panning = false;
+    public boolean deleting = false, shouldShoot = false, panning = false;
 
     @Override
     public void buildUI(Group group){

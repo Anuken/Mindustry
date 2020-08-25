@@ -2,7 +2,6 @@ package mindustry.ui.fragments;
 
 import arc.*;
 import arc.Input.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -10,8 +9,8 @@ import arc.scene.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Label.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 
@@ -96,7 +95,6 @@ public class ScriptConsoleFragment extends Table{
         fieldlabel.setStyle(fieldlabel.getStyle());
 
         chatfield = new TextField("", new TextField.TextFieldStyle(scene.getStyle(TextField.TextFieldStyle.class)));
-        chatfield.setMaxLength(Vars.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().font = Fonts.chat;
         chatfield.getStyle().fontColor = Color.white;
@@ -180,7 +178,6 @@ public class ScriptConsoleFragment extends Table{
             open = !open;
             if(mobile){
                 TextInput input = new TextInput();
-                input.maxLength = maxTextLength;
                 input.accepted = text -> {
                     chatfield.setText(text);
                     sendMessage();
