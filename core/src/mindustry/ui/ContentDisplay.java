@@ -42,7 +42,7 @@ public class ContentDisplay{
 
             if(map.size == 0) continue;
 
-            table.add("$category." + cat.name()).color(Pal.accent).fillX();
+            table.add("@category." + cat.name()).color(Pal.accent).fillX();
             table.row();
 
             for(BlockStat stat : map.keys()){

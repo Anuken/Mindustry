@@ -47,6 +47,11 @@ public class JsonIO{
         return json.toJson(object, object.getClass());
     }
 
+    public static <T> T copy(T object, T dest){
+        json.copyFields(object, dest);
+        return dest;
+    }
+
     public static <T> T copy(T object){
         return read((Class<T>)object.getClass(), write(object));
     }
@@ -63,7 +68,7 @@ public class JsonIO{
         return json.prettyPrint(in);
     }
 
-    private static void apply(Json json){
+    static void apply(Json json){
         json.setIgnoreUnknownFields(true);
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);

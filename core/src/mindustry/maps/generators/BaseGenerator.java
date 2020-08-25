@@ -21,7 +21,7 @@ import static mindustry.Vars.*;
 public class BaseGenerator{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
-    private final static int range = 180;
+    private static final int range = 180;
 
     private Tiles tiles;
     private Team team;
@@ -36,7 +36,7 @@ public class BaseGenerator{
         //don't generate bases when there are no loaded schematics
         if(bases.cores.isEmpty()) return;
 
-        Mathf.random.setSeed(sector.id);
+        Mathf.rand.setSeed(sector.id);
 
         for(Block block : content.blocks()){
             if(block instanceof OreBlock && block.asFloor().itemDrop != null){

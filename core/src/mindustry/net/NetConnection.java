@@ -22,10 +22,10 @@ public abstract class NetConnection{
     public @Nullable Unitc lastUnit;
     public Vec2 lastPosition = new Vec2();
 
-    /** ID of last recieved client snapshot. */
-    public int lastRecievedClientSnapshot = -1;
-    /** Timestamp of last recieved snapshot. */
-    public long lastRecievedClientTime;
+    /** ID of last received client snapshot. */
+    public int lastReceivedClientSnapshot = -1;
+    /** Timestamp of last received snapshot. */
+    public long lastReceivedClientTime;
     /** Build requests that have been recently rejected. This is cleared every snapshot. */
     public Seq<BuildPlan> rejectedRequests = new Seq<>();
 

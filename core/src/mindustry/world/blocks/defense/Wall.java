@@ -20,7 +20,7 @@ public class Wall extends Block{
     public float lightningDamage = 20f;
     public int lightningLength = 17;
 
-    public float maxDamageDeflect = 10f;
+    public float chanceDeflect = 10f;
     public boolean flashWhite;
     public boolean deflect;
 
@@ -56,7 +56,7 @@ public class Wall extends Block{
         return super.canReplace(other) && health > other.health && size == other.size;
     }
 
-    public class WallEntity extends Building{
+    public class WallBuild extends Building{
         public float hit;
 
         @Override
@@ -78,7 +78,7 @@ public class Wall extends Block{
                 Draw.blend();
                 Draw.reset();
 
-                hit = Mathf.clamp(hit - Time.delta() / 10f);
+                hit = Mathf.clamp(hit - Time.delta / 10f);
             }
         }
 
@@ -91,24 +91,24 @@ public class Wall extends Block{
             //create lightning if necessary
             if(lightningChance > 0){
                 if(Mathf.chance(lightningChance)){
-                    Lightning.create(team(), Pal.surge, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
+                    Lightning.create(team, Pal.surge, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
                 }
             }
 
             //deflect bullets if necessary
             if(deflect){
-                //doesn't reflect powerful bullets
-                if(bullet.damage() > maxDamageDeflect) return true;
+                //bullet reflection chance depends on bullet damage
+                if(!Mathf.chance(chanceDeflect/bullet.damage())) return true;
 
                 //translate bullet back to where it was upon collision
-                bullet.trns(-bullet.vel().x, -bullet.vel().y);
+                bullet.trns(-bullet.vel.x, -bullet.vel.y);
 
-                float penX = Math.abs(x - bullet.x()), penY = Math.abs(y - bullet.y());
+                float penX = Math.abs(x - bullet.x), penY = Math.abs(y - bullet.y);
 
                 if(penX > penY){
-                    bullet.vel().x *= -1;
+                    bullet.vel.x *= -1;
                 }else{
-                    bullet.vel().y *= -1;
+                    bullet.vel.y *= -1;
                 }
 
                 bullet.owner(this);

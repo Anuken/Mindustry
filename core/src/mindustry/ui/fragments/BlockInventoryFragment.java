@@ -28,15 +28,15 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
-    private final static float holdWithdraw = 20f;
-    private final static float holdShrink = 120f;
+    private static final float holdWithdraw = 20f;
+    private static final float holdShrink = 120f;
 
-    private Table table = new Table();
-    private Building tile;
-    private float holdTime = 0f, emptyTime;
-    private boolean holding;
-    private float[] shrinkHoldTimes = new float[content.items().size];
-    private Item lastItem;
+    Table table = new Table();
+    Building tile;
+    float holdTime = 0f, emptyTime;
+    boolean holding;
+    float[] shrinkHoldTimes = new float[content.items().size];
+    Item lastItem;
 
     {
         Events.on(WorldLoadEvent.class, e -> hide());
@@ -65,7 +65,7 @@ public class BlockInventoryFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        table.setName("inventory");
+        table.name = "inventory";
         table.setTransform(true);
         parent.setTransform(true);
         parent.addChild(table);
@@ -90,7 +90,7 @@ public class BlockInventoryFragment extends Fragment{
             table.clearListeners();
             table.update(null);
         }), Actions.visible(false));
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         tile = null;
     }
 
@@ -103,20 +103,20 @@ public class BlockInventoryFragment extends Fragment{
         table.clearChildren();
         table.clearActions();
         table.background(Tex.inventory);
-        table.touchable(Touchable.enabled);
+        table.touchable = Touchable.enabled;
         table.update(() -> {
 
             if(state.isMenu() || tile == null || !tile.isValid() || !tile.block().isAccessible() || emptyTime >= holdShrink){
                 hide();
             }else{
                 if(tile.items.total() == 0){
-                    emptyTime += Time.delta();
+                    emptyTime += Time.delta;
                 }else{
                     emptyTime = 0f;
                 }
 
                 if(holding && lastItem != null){
-                    holdTime += Time.delta();
+                    holdTime += Time.delta;
 
                     if(holdTime >= holdWithdraw){
                         int amount = Math.min(tile.items.get(lastItem), player.unit().maxAccepted(lastItem));
@@ -140,7 +140,7 @@ public class BlockInventoryFragment extends Fragment{
                             shrinkHoldTimes[i] = 0f;
                             dirty |= !had;
                         }else if(had){
-                            shrinkHoldTimes[i] += Time.delta();
+                            shrinkHoldTimes[i] += Time.delta;
                             dirty |= shrinkHoldTimes[i] >= holdShrink;
                         }
                     }
@@ -209,7 +209,7 @@ public class BlockInventoryFragment extends Fragment{
 
         updateTablePosition();
 
-        table.visible(true);
+        table.visible = true;
 
         if(actions){
             table.setScale(0f, 1f);

@@ -21,13 +21,13 @@ import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class ChatFragment extends Table{
-    private final static int messagesShown = 10;
+    private static final int messagesShown = 10;
     private Seq<ChatMessage> messages = new Seq<>();
     private float fadetime;
     private boolean shown = false;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
-    private BitmapFont font;
+    private Font font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
@@ -124,15 +124,15 @@ public class ChatFragment extends Table{
         Draw.color(shadowColor);
 
         if(shown){
-            Fill.crect(offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            Fill.crect(offsetx, chatfield.y, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
 
         float spacing = chatspace;
 
-        chatfield.visible(shown);
-        fieldlabel.visible(shown);
+        chatfield.visible = shown;
+        fieldlabel.visible = shown;
 
         Draw.color(shadowColor);
         Draw.alpha(shadowColor.a * opacity);
@@ -164,14 +164,14 @@ public class ChatFragment extends Table{
         Draw.color();
 
         if(fadetime > 0 && !shown)
-            fadetime -= Time.delta() / 180f;
+            fadetime -= Time.delta / 180f;
     }
 
     private void sendMessage(){
         String message = chatfield.getText();
         clearChatInput();
 
-        if(message.replaceAll(" ", "").isEmpty()) return;
+        if(message.replace(" ", "").isEmpty()) return;
 
         history.insert(1, message);
 

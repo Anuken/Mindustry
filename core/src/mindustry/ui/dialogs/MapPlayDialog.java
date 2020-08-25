@@ -47,7 +47,7 @@ public class MapPlayDialog extends BaseDialog{
         rules = map.applyRules(selectedGamemode);
 
         Table selmode = new Table();
-        selmode.add("$level.mode").colspan(4);
+        selmode.add("@level.mode").colspan(4);
         selmode.row();
         int i = 0;
 
@@ -67,7 +67,7 @@ public class MapPlayDialog extends BaseDialog{
 
         cont.add(selmode);
         cont.row();
-        cont.button("$customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
+        cont.button("@customize", Icon.settings, () -> dialog.show(rules, () -> rules = map.applyRules(selectedGamemode))).width(230);
         cont.row();
         cont.add(new BorderImage(map.safeTexture(), 3f)).size(mobile && !Core.graphics.isPortrait() ? 150f : 250f).get().setScaling(Scaling.fit);
         //only maps with survival are valid for high scores
@@ -79,7 +79,7 @@ public class MapPlayDialog extends BaseDialog{
         buttons.clearChildren();
         addCloseButton();
 
-        buttons.button("$play", Icon.play, () -> {
+        buttons.button("@play", Icon.play, () -> {
             control.playMap(map, rules);
             hide();
             ui.custom.hide();
@@ -103,7 +103,7 @@ public class MapPlayDialog extends BaseDialog{
         }
 
         d.cont.add(pane);
-        d.buttons.button("$ok", d::hide).size(110, 50).pad(10f);
+        d.buttons.button("@ok", d::hide).size(110, 50).pad(10f);
         d.show();
     }
 }

@@ -1,5 +1,5 @@
 jdk:
-- openjdk8
+- openjdk14
 dist: xenial
 android:
   components:

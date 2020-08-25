@@ -52,7 +52,7 @@ public class MendProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
     public class MendEntity extends Building{
@@ -65,9 +65,9 @@ public class MendProjector extends Block{
             heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
 
-            if(cons().optionalValid() && timer(timerUse, useTime) && efficiency() > 0){
+            if(cons.optionalValid() && timer(timerUse, useTime) && efficiency() > 0){
                 consume();
             }
 

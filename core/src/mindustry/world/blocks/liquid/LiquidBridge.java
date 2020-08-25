@@ -18,7 +18,7 @@ public class LiquidBridge extends ItemBridge{
         group = BlockGroup.liquids;
     }
 
-    public class LiquidBridgeEntity extends ItemBridgeEntity{
+    public class LiquidBridgeBuild extends ItemBridgeBuild{
         @Override
         public void updateTile(){
             time += cycleSpeed * delta();
@@ -26,11 +26,11 @@ public class LiquidBridge extends ItemBridge{
 
             checkIncoming();
 
-            Building other = world.ent(link);
+            Building other = world.build(link);
             if(other == null || !linkValid(tile, other.tile())){
                 dumpLiquid(liquids.current());
             }else{
-                ((ItemBridgeEntity)other).incoming.add(tile.pos());
+                ((ItemBridgeBuild)other).incoming.add(tile.pos());
 
                 if(consValid()){
                     float alpha = 0.04f;

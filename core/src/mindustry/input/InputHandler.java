@@ -14,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.ai.formations.*;
 import mindustry.ai.formations.patterns.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -86,12 +85,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
-    public static void transferItemTo(Item item, int amount, float x, float y, Tile tile){
-        if(tile == null || tile.build == null || tile.build.items == null) return;
+    public static void transferItemTo(Item item, int amount, float x, float y, Building build){
+        if(build == null || build.items == null) return;
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, tile, () -> {}));
+            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
-        tile.build.items.add(item, amount);
+        build.items.add(item, amount);
     }
 
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
@@ -108,30 +107,38 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void pickupUnitPayload(Player player, Unit target){
+        if(player == null) return;
+
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
         if(target.isAI() && target.isGrounded() && pay.payloads().size < unit.type().payloadCapacity
-            && target.within(unit, unit.type().hitsize * 1.5f)){
+            && target.mass() < unit.mass()
+            && target.within(unit, unit.type().hitsize * 1.5f + target.type().hitsize)){
             pay.pickup(target);
         }
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void pickupBlockPayload(Player player, Building tile){
+        if(player == null) return;
+
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
-        if(tile != null && tile.team() == unit.team && pay.payloads().size < unit.type().payloadCapacity
+        if(tile != null && tile.team == unit.team && pay.payloads().size < unit.type().payloadCapacity
             && unit.within(tile, tilesize * tile.block.size * 1.2f)){
             //pick up block directly
-            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2){
+            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2 && tile.canPickup()){
                 pay.pickup(tile);
             }else{ //pick up block payload
-                Payload taken = tile.takePayload();
-                if(taken != null){
-                    pay.addPayload(taken);
-                    Fx.unitPickup.at(tile);
+                Payload current = tile.getPayload();
+                if(current != null && current.canBeTaken(pay)){
+                    Payload taken = tile.takePayload();
+                    if(taken != null){
+                        pay.addPayload(taken);
+                        Fx.unitPickup.at(tile);
+                    }
                 }
             }
         }
@@ -139,6 +146,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void dropPayload(Player player, float x, float y){
+        if(player == null) return;
+
         Payloadc pay = (Payloadc)player.unit();
 
         //allow a slight margin of error
@@ -152,6 +161,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
+        if(player == null) return;
+
         if(net.server() && player.unit().stack.amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
@@ -163,11 +174,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
     public static void rotateBlock(Player player, Building tile, boolean direction){
         if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.rotate, tile.tile(), action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
+            !netServer.admins.allowAction(player, ActionType.rotate, tile.tile(), action -> action.rotation = Mathf.mod(tile.rotation + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
-        tile.rotation(Mathf.mod(tile.rotation() + Mathf.sign(direction), 4));
+        tile.rotation = Mathf.mod(tile.rotation + Mathf.sign(direction), 4);
         tile.updateProximity();
         tile.noSleep();
     }
@@ -175,6 +186,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building tile){
         if(player == null || tile == null) return;
+
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile(), action -> {
                 action.itemAmount = player.unit().stack.amount;
@@ -191,23 +203,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         tile.getStackOffset(item, stackTrns);
+        tile.handleStack(item, accepted, player.unit());
 
         createItemTransfer(
             item,
             amount,
             player.x + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y + Angles.trnsy(player.unit().rotation + 180f, backTrns),
             new Vec2(tile.x + stackTrns.x, tile.y + stackTrns.y),
-            () -> tile.handleStack(item, accepted, player.unit())
+            () -> {}
         );
-    }
-
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void tileTapped(Player player, Building tile){
-        if(tile == null || player == null) return;
-        if(net.server() && (!Units.canInteract(player, tile) ||
-        !netServer.admins.allowAction(player, ActionType.tapTile, tile.tile(), action -> {}))) throw new ValidateException(player, "Player cannot tap a tile.");
-        tile.tapped(player);
-        Core.app.post(() -> Events.fire(new TapEvent(tile, player)));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -216,20 +220,26 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
         tile.configured(player, value);
-        Core.app.post(() -> Events.fire(new TapConfigEvent(tile, player, value)));
+        Core.app.post(() -> Events.fire(new ConfigEvent(tile, player, value)));
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void unitControl(Player player, @Nullable Unit unit){
+        if(player == null) return;
+
         //clear player unit when they possess a core
-        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreEntity)){
+        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreBuild)){
             Fx.spawn.at(player);
+            if(net.client()){
+                control.input.controlledType = null;
+            }
+
             player.clearUnit();
-            player.deathTimer(60f); //for instant respawn
+            player.deathTimer = 61f;
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team == player.team()){
+        }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated() && !unit.dead){
             player.unit(unit);
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
@@ -238,42 +248,28 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void unitClear(Player player){
         //no free core teleports?
-        if(!player.dead() && player.unit().spawnedByCore) return;
+        if(player == null || !player.dead() && player.unit().spawnedByCore) return;
 
         Fx.spawn.at(player);
         player.clearUnit();
-        player.deathTimer(60f); //for instant respawn
+        player.deathTimer = 61f; //for instant respawn
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitCommand(Player player){
-        if(player.dead() || !(player.unit() instanceof Commanderc)) return;
+        if(player == null || player.dead() || !(player.unit() instanceof Commanderc)) return;
 
         Commanderc commander = (Commanderc)player.unit();
 
         if(commander.isCommanding()){
             commander.clearCommand();
         }else{
-            FormationPattern pattern = new SquareFormation();
-            Formation formation = new Formation(new Vec3(player.x, player.y, player.unit().rotation), pattern);
-            formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
 
-            units.clear();
-
+            commander.commandNearby(new SquareFormation());
             Fx.commandSend.at(player);
-            Units.nearby(player.team(), player.x, player.y, 200f, u -> {
-                if(u.isAI()){
-                    units.add(u);
-                }
-            });
-
-            units.sort(u -> u.dst2(player.unit()));
-            units.truncate(player.unit().type().commandLimit);
-
-            commander.command(formation, units);
         }
 
     }
@@ -298,7 +294,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.typing = ui.chatfrag.shown();
 
         if(player.isBuilder()){
-            player.builder().building(isBuilding);
+            player.builder().updateBuilding(isBuilding);
         }
 
         if(!player.dead()){
@@ -306,7 +302,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead()){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated() && !u.dead);
 
             if(unit != null){
                 Call.unitControl(player, unit);
@@ -316,9 +312,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void checkUnit(){
         if(controlledType != null){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated() && !u.dead);
             if(unit == null && controlledType == UnitTypes.block){
-                unit = world.entWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.entWorld(player.x, player.y)).unit() : null;
+                unit = world.buildWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.buildWorld(player.x, player.y)).unit() : null;
             }
 
             if(unit != null){
@@ -329,6 +325,34 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
         }
+    }
+
+    public void tryPickupPayload(){
+        Unit unit = player.unit();
+        if(!(unit instanceof Payloadc)) return;
+        Payloadc pay = (Payloadc)unit;
+
+        if(pay.payloads().size >= unit.type().payloadCapacity) return;
+
+        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && u.mass() < unit.mass() && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+        if(target != null){
+            Call.pickupUnitPayload(player, target);
+        }else if(!pay.hasPayload()){
+            Building tile = world.buildWorld(pay.x(), pay.y());
+
+            if(tile != null && tile.team == unit.team){
+                Call.pickupBlockPayload(player, tile);
+            }
+        }
+    }
+
+    public void tryDropPayload(){
+        Unit unit = player.unit();
+        if(!(unit instanceof Payloadc)) return;
+        Payloadc pay = (Payloadc)unit;
+
+        Call.dropPayload(player, player.x, player.y);
+        pay.dropLastPayload();
     }
 
     public float getMouseX(){
@@ -391,18 +415,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
 
-        ui.showTextInput("$schematic.add", "$name", "", text -> {
+        ui.showTextInput("@schematic.add", "@name", "", text -> {
             Schematic replacement = schematics.all().find(s -> s.name().equals(text));
             if(replacement != null){
-                ui.showConfirm("$confirm", "$schematic.replace", () -> {
+                ui.showConfirm("@confirm", "@schematic.replace", () -> {
                     schematics.overwrite(replacement, lastSchematic);
-                    ui.showInfoFade("$schematic.saved");
+                    ui.showInfoFade("@schematic.saved");
                     ui.schematics.showInfo(replacement);
                 });
             }else{
                 lastSchematic.tags.put("name", text);
                 schematics.add(lastSchematic);
-                ui.showInfoFade("$schematic.saved");
+                ui.showInfoFade("@schematic.saved");
                 ui.schematics.showInfo(lastSchematic);
             }
         });
@@ -427,7 +451,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             });
 
             //rotate actual request, centered on its multiblock position
-            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float wx = (req.x - ox) * tilesize + req.block.offset, wy = (req.y - oy) * tilesize + req.block.offset;
             float x = wx;
             if(direction >= 0){
                 wx = -wy;
@@ -436,8 +460,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 wx = wy;
                 wy = -x;
             }
-            req.x = world.toTile(wx - req.block.offset()) + ox;
-            req.y = world.toTile(wy - req.block.offset()) + oy;
+            req.x = world.toTile(wx - req.block.offset) + ox;
+            req.y = world.toTile(wy - req.block.offset) + oy;
             req.rotation = Mathf.mod(req.rotation + direction, 4);
         });
     }
@@ -446,12 +470,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         int origin = (x ? schemOriginX() : schemOriginY()) * tilesize;
 
         requests.each(req -> {
-            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset()) + origin;
+            float value = -((x ? req.x : req.y) * tilesize - origin + req.block.offset) + origin;
 
             if(x){
-                req.x = (int)((value - req.block.offset()) / tilesize);
+                req.x = (int)((value - req.block.offset) / tilesize);
             }else{
-                req.y = (int)((value - req.block.offset()) / tilesize);
+                req.y = (int)((value - req.block.offset) / tilesize);
             }
 
             req.pointConfig(p -> {
@@ -501,10 +525,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             if(!req.breaking){
                 r1.setSize(req.block.size * tilesize);
-                r1.setCenter(other.worldx() + req.block.offset(), other.worldy() + req.block.offset());
+                r1.setCenter(other.worldx() + req.block.offset, other.worldy() + req.block.offset);
             }else{
                 r1.setSize(other.block().size * tilesize);
-                r1.setCenter(other.worldx() + other.block().offset(), other.worldy() + other.block().offset());
+                r1.setCenter(other.worldx() + other.block().offset, other.worldy() + other.block().offset);
             }
 
             return r2.overlaps(r1);
@@ -514,11 +538,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(test.get(req)) return req;
         }
 
-        for(BuildPlan req : selectRequests){
-            if(test.get(req)) return req;
-        }
-
-        return null;
+        return selectRequests.find(test);
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
@@ -527,7 +547,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
-                Tile tile = world.Building(x, y);
+                Tile tile = world.tileBuilding(x, y);
                 if(tile == null || !validBreak(tile.x, tile.y)) continue;
 
                 drawBreaking(tile.x, tile.y);
@@ -643,7 +663,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int wx = x1 + x * Mathf.sign(x2 - x1);
                 int wy = y1 + y * Mathf.sign(y2 - y1);
 
-                Tile tile = world.Building(wx, wy);
+                Tile tile = world.tileBuilding(wx, wy);
 
                 if(tile == null) continue;
 
@@ -741,7 +761,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         //call tapped event
         if(!consumed && tile.interactable(player.team())){
-            Call.tileTapped(player, tile);
+            tile.tapped();
         }
 
         //consume tap event if necessary
@@ -793,10 +813,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
     }
 
-    Building entAt(float x, float y){
-        return world.ent(tileX(x), tileY(y));
-    }
-
     /** Returns the tile at the specified MOUSE coordinates. */
     Tile tileAt(float x, float y){
         return world.tile(tileX(x), tileY(y));
@@ -813,7 +829,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     int tileX(float cursorX){
         Vec2 vec = Core.input.mouseWorld(cursorX, 0);
         if(selectedBlock()){
-            vec.sub(block.offset(), block.offset());
+            vec.sub(block.offset, block.offset);
         }
         return world.toTile(vec.x);
     }
@@ -821,7 +837,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     int tileY(float cursorY){
         Vec2 vec = Core.input.mouseWorld(0, cursorY);
         if(selectedBlock()){
-            vec.sub(block.offset(), block.offset());
+            vec.sub(block.offset, block.offset);
         }
         return world.toTile(vec.y);
     }
@@ -843,7 +859,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unit::isAI);
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && !u.deactivated());
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
@@ -852,8 +868,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        Building tile = world.entWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(tile instanceof ControlBlock && tile.team() == player.team()){
+        Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        if(tile instanceof ControlBlock && tile.team == player.team()){
             return ((ControlBlock)tile).unit();
         }
 
@@ -890,7 +906,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
             uiGroup = new WidgetGroup();
-            uiGroup.touchable(Touchable.childrenOnly);
+            uiGroup.touchable = Touchable.childrenOnly;
             uiGroup.setFillParent(true);
             ui.hudGroup.addChild(uiGroup);
             buildUI(uiGroup);
@@ -900,7 +916,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean canShoot(){
-        return block == null && !Core.scene.hasMouse() && !onConfigurable() && !isDroppingItem();
+        return block == null && !onConfigurable() && !isDroppingItem() && !(player.builder().updateBuilding() && player.builder().isBuilding()) &&
+            !(player.unit() instanceof Mechc && player.unit().isFlying());
     }
 
     public boolean onConfigurable(){
@@ -985,15 +1002,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Draw.color(!valid ? Pal.removeBack : Pal.accentBack);
         Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset() + dx*trns,
-        y * tilesize + block.offset() - 1 + dy*trns,
+        x * tilesize + block.offset + dx*trns,
+        y * tilesize + block.offset - 1 + dy*trns,
         Core.atlas.find("place-arrow").getWidth() * Draw.scl,
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(Core.atlas.find("place-arrow"),
-        x * tilesize + block.offset() + dx*trns,
-        y * tilesize + block.offset() + dy*trns,
+        x * tilesize + block.offset + dx*trns,
+        y * tilesize + block.offset + dy*trns,
         Core.atlas.find("place-arrow").getWidth() * Draw.scl,
         Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
     }
@@ -1050,7 +1067,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int i = 0; i < points.size; i++){
             Point2 point = points.get(i);
 
-            if(block != null && Tmp.r2.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset()).overlaps(Tmp.r3)){
+            if(block != null && Tmp.r2.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset, point.y * tilesize + block.offset).overlaps(Tmp.r3)){
                 continue;
             }
 
@@ -1065,7 +1082,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             line.last = next == null;
             cons.get(line);
 
-            Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset(), point.y * tilesize + block.offset());
+            Tmp.r3.setSize(block.size * tilesize).setCenter(point.x * tilesize + block.offset, point.y * tilesize + block.offset);
         }
     }
 
@@ -1073,192 +1090,4 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         public int x, y, rotation;
         public boolean last;
     }
-
-    //TODO implement all of this!
-    /*
-        protected void updateKeyboard(){
-        Tile tile = world.tileWorld(x, y);
-        boolean canMove = !Core.scene.hasKeyboard() || ui.minimapfrag.shown();
-
-        isBoosting = Core.input.keyDown(Binding.dash) && !mech.flying;
-
-        //if player is in solid block
-        if(tile != null && tile.solid()){
-            isBoosting = true;
-        }
-
-        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
-
-        if(mech.flying){
-            //prevent strafing backwards, have a penalty for doing so
-            float penalty = 0.2f; //when going 180 degrees backwards, reduce speed to 0.2x
-            speed *= Mathf.lerp(1f, penalty, Angles.angleDist(rotation, velocity.angle()) / 180f);
-        }
-
-        movement.setZero();
-
-        float xa = Core.input.axis(Binding.move_x);
-        float ya = Core.input.axis(Binding.move_y);
-        if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
-            movement.y += ya * speed;
-            movement.x += xa * speed;
-        }
-
-        if(Core.input.keyDown(Binding.mouse_move)){
-            movement.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * speed;
-            movement.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * speed;
-        }
-
-        Vec2 vec = Core.input.mouseWorld(control.input.getMouseX(), control.input.getMouseY());
-        pointerX = vec.x;
-        pointerY = vec.y;
-        updateShooting();
-
-        movement.limit(speed).scl(Time.delta());
-
-        if(canMove){
-            velocity.add(movement.x, movement.y);
-        }else{
-            isShooting = false;
-        }
-        float prex = x, prey = y;
-        updateVelocityStatus();
-        moved = dst(prex, prey) > 0.001f;
-
-        if(canMove){
-            float baseLerp = mech.getRotationAlpha(this);
-            if(!isShooting() || !mech.faceTarget){
-                if(!movement.isZero()){
-                    rotation = Mathf.slerpDelta(rotation, mech.flying ? velocity.angle() : movement.angle(), 0.13f * baseLerp);
-                }
-            }else{
-                float angle = control.input.mouseAngle(x, y);
-                this.rotation = Mathf.slerpDelta(this.rotation, angle, 0.1f * baseLerp);
-            }
-        }
-    }
-
-    protected void updateShooting(){
-        if(!state.isEditor() && isShooting() && mech.canShoot(this)){
-            weapons.update(this);
-            //if(!mech.turnCursor){
-                //shoot forward ignoring cursor
-                //mech.weapon.update(this, x + Angles.trnsx(rotation, mech.weapon.targetDistance), y + Angles.trnsy(rotation, mech.weapon.targetDistance));
-            //}else{
-                //mech.weapon.update(this, pointerX, pointerY);
-            //}
-        }
-    }
-
-    protected void updateTouch(){
-        if(Units.invalidateTarget(target, this) &&
-            !(target instanceof Building && ((Building)target).damaged() && target.isValid() && target.team() == team && mech.canHeal && dst(target) < mech.range && !(((Building)target).block instanceof BuildBlock))){
-            target = null;
-        }
-
-        if(state.isEditor()){
-            target = null;
-        }
-
-        float targetX = Core.camera.position.x, targetY = Core.camera.position.y;
-        float attractDst = 15f;
-        float speed = isBoosting && !mech.flying ? mech.boostSpeed : mech.speed;
-
-        if(moveTarget != null && !moveTarget.dead()){
-            targetX = moveTarget.getX();
-            targetY = moveTarget.getY();
-            boolean tapping = moveTarget instanceof Building && moveTarget.team() == team;
-            attractDst = 0f;
-
-            if(tapping){
-                velocity.setAngle(angleTo(moveTarget));
-            }
-
-            if(dst(moveTarget) <= 2f * Time.delta()){
-                if(tapping && !dead()){
-                    Tile tile = ((Building)moveTarget).tile;
-                    tile.tapped(this);
-                }
-
-                moveTarget = null;
-            }
-        }else{
-            moveTarget = null;
-        }
-
-        movement.set((targetX - x) / Time.delta(), (targetY - y) / Time.delta()).limit(speed);
-        movement.setAngle(Mathf.slerp(movement.angle(), velocity.angle(), 0.05f));
-
-        if(dst(targetX, targetY) < attractDst){
-            movement.setZero();
-        }
-
-        float expansion = 3f;
-
-        hitbox(rect);
-        rect.x -= expansion;
-        rect.y -= expansion;
-        rect.width += expansion * 2f;
-        rect.height += expansion * 2f;
-
-        isBoosting = collisions.overlapsTile(rect) || dst(targetX, targetY) > 85f;
-
-        velocity.add(movement.scl(Time.delta()));
-
-        if(velocity.len() <= 0.2f && mech.flying){
-            rotation += Mathf.sin(Time.time() + id * 99, 10f, 1f);
-        }else if(target == null){
-            rotation = Mathf.slerpDelta(rotation, velocity.angle(), velocity.len() / 10f);
-        }
-
-        float lx = x, ly = y;
-        updateVelocityStatus();
-        moved = dst(lx, ly) > 0.001f;
-
-        if(mech.flying){
-            //hovering effect
-            x += Mathf.sin(Time.time() + id * 999, 25f, 0.08f);
-            y += Mathf.cos(Time.time() + id * 999, 25f, 0.08f);
-        }
-
-        //update shooting if not building, not mining and there's ammo left
-        if(!isBuilding() && mineTile() == null){
-
-            //autofire
-            if(target == null){
-                isShooting = false;
-                if(Core.settings.getBool("autotarget")){
-                    target = Units.closestTarget(team, x, y, mech.range, u -> u.team() != Team.derelict, u -> u.team() != Team.derelict);
-
-                    if(mech.canHeal && target == null){
-                        target = Geometry.findClosest(x, y, indexer.getDamaged(Team.sharded));
-                        if(target != null && dst(target) > mech.range){
-                            target = null;
-                        }else if(target != null){
-                            target = ((Tile)target).entity;
-                        }
-                    }
-
-                    if(target != null){
-                        mineTile(null);
-                    }
-                }
-            }else if(target.isValid() || (target instanceof Building && ((Building)target).damaged() && target.team() == team && mech.canHeal && dst(target) < mech.range)){
-                //rotate toward and shoot the target
-                if(mech.faceTarget){
-                    rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.2f);
-                }
-
-                Vec2 intercept = Predict.intercept(this, target, getWeapon().bullet.speed);
-
-                pointerX = intercept.x;
-                pointerY = intercept.y;
-
-                updateShooting();
-                isShooting = true;
-            }
-
-        }
-    }
-     */
 }

@@ -13,9 +13,12 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
+
+import static mindustry.Vars.*;
 
 public abstract class BulletType extends Content{
-    public float lifetime;
+    public float lifetime = 40f;
     public float speed;
     public float damage;
     public float hitSize = 4;
@@ -51,7 +54,7 @@ public abstract class BulletType extends Content{
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
-    public float statusDuration = 60 * 10f;
+    public float statusDuration = 60 * 8f;
     /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
@@ -75,6 +78,11 @@ public abstract class BulletType extends Content{
     public BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
+    public Color trailColor = Pal.missileYellowBack;
+    public float trailChance = -0.0001f;
+    public Effect trailEffect = Fx.missileTrail;
+    public float trailParam =  2f;
+
     /** Use a negative value to disable splash damage. */
     public float splashDamageRadius = -1f;
 
@@ -93,6 +101,11 @@ public abstract class BulletType extends Content{
     public float weaveMag = -1f;
     public float hitShake = 0f;
 
+    public int puddles;
+    public float puddleRange;
+    public float puddleAmount = 5f;
+    public Liquid puddleLiquid = Liquids.water;
+
     public float lightRadius = 16f;
     public float lightOpacity = 0.3f;
     public Color lightColor = Pal.powerLight;
@@ -100,9 +113,12 @@ public abstract class BulletType extends Content{
     public BulletType(float speed, float damage){
         this.speed = speed;
         this.damage = damage;
-        lifetime = 40f;
         hitEffect = Fx.hitBulletSmall;
         despawnEffect = Fx.hitBulletSmall;
+    }
+
+    public BulletType(){
+        this(1f, 1f);
     }
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
@@ -119,14 +135,14 @@ public abstract class BulletType extends Content{
     }
 
     public void hit(Bullet b){
-        hit(b, b.getX(), b.getY());
+        hit(b, b.x, b.y);
     }
 
     public void hit(Bullet b, float x, float y){
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
-        Effects.shake(hitShake, hitShake, b);
+        Effect.shake(hitShake, hitShake, b);
 
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
@@ -136,25 +152,32 @@ public abstract class BulletType extends Content{
             }
         }
 
+        if(puddleLiquid != null && puddles > 0){
+            for(int i = 0; i < puddles; i++){
+                Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
+                Puddles.deposit(tile, puddleLiquid, puddleAmount);
+            }
+        }
+
         if(Mathf.chance(incendChance)){
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
 
         if(splashDamageRadius > 0){
-            Damage.damage(b.team(), x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
             if(status != StatusEffects.none){
-                Damage.status(b.team(), x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b.team(), Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.getX(), b.getY(), Mathf.random(360f), lightningLength);
+            Lightning.create(b, Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 
     public void despawned(Bullet b){
-        despawnEffect.at(b.getX(), b.getY(), b.rotation());
+        despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         hitSound.at(b);
 
         if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
@@ -166,7 +189,7 @@ public abstract class BulletType extends Content{
     }
 
     public void drawLight(Bullet b){
-        Drawf.light(b.team(), b, lightRadius, lightColor, lightOpacity);
+        Drawf.light(b.team, b, lightRadius, lightColor, lightOpacity);
     }
 
     public void init(Bullet b){
@@ -181,14 +204,20 @@ public abstract class BulletType extends Content{
 
     public void update(Bullet b){
         if(homingPower > 0.0001f){
-            Teamc target = Units.closestTarget(b.team(), b.getX(), b.getY(), homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
+            Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
-                b.vel().setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
+                b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
             }
         }
 
         if(weaveMag > 0){
-            b.vel().rotate(Mathf.sin(Time.time() + b.id() * 3, weaveScale, weaveMag) * Time.delta());
+            b.vel.rotate(Mathf.sin(Mathf.randomSeed(b.id, 10f) + b.time, weaveScale, weaveMag) * Time.delta);
+        }
+
+        if(trailChance > 0){
+            if(Mathf.chanceDelta(trailChance)){
+                trailEffect.at(b.x, b.y, trailParam, trailColor);
+            }
         }
     }
 
@@ -214,34 +243,34 @@ public abstract class BulletType extends Content{
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle){
-        return create(parent.owner(), parent.team(), x, y, angle);
+        return create(parent.owner(), parent.team, x, y, angle);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
-        return create(parent.owner(), parent.team(), x, y, angle, velocityScl);
+        return create(parent.owner(), parent.team, x, y, angle, velocityScl);
     }
 
     public Bullet create(@Nullable Entityc owner, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data){
         Bullet bullet = Bullet.create();
-        bullet.type(this);
-        bullet.owner(owner);
-        bullet.team(team);
-        bullet.vel().trns(angle, speed * velocityScl);
-        bullet.set(x - bullet.vel().x * Time.delta(), y - bullet.vel().y * Time.delta());
-        bullet.lifetime(lifetime * lifetimeScl);
-        bullet.data(data);
-        bullet.drag(drag);
-        bullet.hitSize(hitSize);
-        bullet.damage(damage < 0 ? this.damage : damage);
+        bullet.type = this;
+        bullet.owner = owner;
+        bullet.team = team;
+        bullet.vel.trns(angle, speed * velocityScl);
+        bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        bullet.lifetime = lifetime * lifetimeScl;
+        bullet.data = data;
+        bullet.drag = drag;
+        bullet.hitSize = hitSize;
+        bullet.damage = damage < 0 ? this.damage : damage;
         bullet.add();
 
-        if(keepVelocity && owner instanceof Hitboxc) bullet.vel().add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
+        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX() / Time.delta, ((Hitboxc)owner).deltaY() / Time.delta);
         return bullet;
 
     }
 
     public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
-        Call.createBullet(this, team, x, y, damage, angle, velocityScl, lifetimeScl);
+        Call.createBullet(this, team, x, y, angle, damage, velocityScl, lifetimeScl);
     }
 
     @Remote(called = Loc.server, unreliable = true)

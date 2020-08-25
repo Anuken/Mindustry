@@ -26,16 +26,26 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
 
     unitSpawn = new Effect(30f, e -> {
-        if(!(e.data instanceof Unit)) return;
+        if(!(e.data instanceof UnitType)) return;
 
         alpha(e.fin());
 
         float scl = 1f + e.fout() * 2f;
 
-        Unit unit = e.data();
-        rect(unit.type().region, e.x, e.y,
-        unit.type().region.getWidth() * Draw.scl * scl, unit.type().region.getHeight() * Draw.scl * scl, 180f);
+        UnitType unit = e.data();
+        TextureRegion region = unit.icon(Cicon.full);
 
+        rect(region, e.x, e.y,
+            region.getWidth() * Draw.scl * scl, region.getHeight() * Draw.scl * scl, 180f);
+
+    }),
+
+    unitCapKill = new Effect(80f, e -> {
+        color(Color.scarlet);
+        alpha(e.fout(Interp.pow4Out));
+
+        float size = 10f + e.fout(Interp.pow10In) * 25f;
+        Draw.rect(Icon.warning.getRegion(), e.x, e.y, size, size);
     }),
 
     unitControl = new Effect(30f, e -> {
@@ -55,15 +65,15 @@ public class Fx{
     }),
 
     unitDespawn = new Effect(100f, e -> {
-        if(!(e.data instanceof Unitc)) return;
+        if(!(e.data instanceof Unit) || e.<Unit>data().type() == null) return;
 
-        Unitc select = (Unitc)e.data;
+        Unit select = e.data();
         float scl = e.fout(Interp.pow2Out);
         float p = Draw.scl;
         Draw.scl *= scl;
 
         mixcol(Pal.accent, 1f);
-        rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90f);
+        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
         reset();
 
         Draw.scl = p;
@@ -88,13 +98,13 @@ public class Fx{
         Fill.square(x, y, 1f * size, 45f);
     }),
 
-    itemTransfer = new Effect(30f, e -> {
+    itemTransfer = new Effect(12f, e -> {
         if(!(e.data instanceof Position)) return;
         Position to = e.data();
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)
         .add(Tmp.v2.sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * e.fslope() * 10f));
         float x = Tmp.v1.x, y = Tmp.v1.y;
-        float size = Math.min(0.8f + e.rotation / 5f, 2);
+        float size = 1f;
 
         stroke(e.fslope() * 2f * size, Pal.accent);
         Lines.circle(x, y, e.fslope() * 2f * size);
@@ -291,6 +301,18 @@ public class Fx{
         Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
     }),
 
+    shieldWave = new Effect(22, e -> {
+        color(Pal.shield);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * 60f);
+    }),
+
+    shieldApply = new Effect(11, e -> {
+        color(Pal.shield);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
+    }),
+
     hitBulletSmall = new Effect(14, e -> {
         color(Color.white, Pal.lightOrange, e.fin());
 
@@ -349,7 +371,7 @@ public class Fx{
     hitLiquid = new Effect(16, e -> {
         color(e.color);
 
-        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation + 180f, 60f, (x, y) -> {
+        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 60f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
 
@@ -492,6 +514,29 @@ public class Fx{
 
     }),
 
+    massiveExplosion = new Effect(30, e -> {
+
+        color(Pal.missileYellow);
+        e.scaled(7, i -> {
+            stroke(3f * i.fout());
+            Lines.circle(e.x, e.y, 4f + i.fin() * 30f);
+        });
+
+        color(Color.gray);
+
+        randLenVectors(e.id, 8, 2f + 30f * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+        });
+
+        color(Pal.missileYellowBack);
+        stroke(1f * e.fout());
+
+        randLenVectors(e.id + 1, 6, 1f + 29f * e.finpow(), (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 4f);
+        });
+
+    }),
+
     artilleryTrail = new Effect(50, e -> {
         color(e.color);
         Fill.circle(e.x, e.y, e.rotation * e.fout());
@@ -611,13 +656,26 @@ public class Fx{
 
     }),
 
-    wet = new Effect(40f, e -> {
+    wet = new Effect(80f, e -> {
         color(Liquids.water.color);
+        alpha(Mathf.clamp(e.fin() * 2f));
+
+        Fill.circle(e.x, e.y, e.fout() * 1f);
+    }),
+
+    sapped = new Effect(40f, e -> {
+        color(Pal.sap);
 
         randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
+            Fill.square(e.x + x, e.y + y, e.fslope() * 1.1f, 45f);
         });
 
+    }),
+
+    sporeSlowed = new Effect(40f, e -> {
+        color(Pal.spore);
+
+        Fill.circle(e.x, e.y, e.fslope() * 1.1f);
     }),
 
     oily = new Effect(42f, e -> {
@@ -636,6 +694,12 @@ public class Fx{
             Fill.square(e.x + x, e.y + y, e.fout() * 2.3f + 0.5f);
         });
 
+    }),
+
+    overclocked = new Effect(50f, e -> {
+        color(Pal.accent);
+
+        Fill.square(e.x, e.y, e.fslope() * 2f, 45f);
     }),
 
     dropItem = new Effect(20f, e -> {
@@ -1275,9 +1339,9 @@ public class Fx{
     }),
 
     shieldBreak = new Effect(40, e -> {
-        color(Pal.accent);
+        color(e.color);
         stroke(3f * e.fout());
-        Lines.poly(e.x, e.y, 6, e.rotation + e.fin(), 90);
+        Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
     }),
 
     unitShieldBreak = new Effect(35, e -> {

@@ -66,18 +66,18 @@ public abstract class LegacySaveVersion extends SaveVersion{
                         readChunk(stream, true, in -> {
                             byte version = in.readByte();
                             //legacy impl of Building#read()
-                            tile.build.health(stream.readUnsignedShort());
+                            tile.build.health = stream.readUnsignedShort();
                             byte packedrot = stream.readByte();
                             byte team = Pack.leftByte(packedrot) == 8 ? stream.readByte() : Pack.leftByte(packedrot);
                             byte rotation = Pack.rightByte(packedrot);
 
                             tile.setTeam(Team.get(team));
-                            tile.rotation(rotation);
+                            tile.build.rotation = rotation;
 
                             if(tile.build.items != null) tile.build.items.read(Reads.get(stream));
                             if(tile.build.power != null) tile.build.power.read(Reads.get(stream));
                             if(tile.build.liquids != null) tile.build.liquids.read(Reads.get(stream));
-                            if(tile.build.cons() != null) tile.build.cons().read(Reads.get(stream));
+                            if(tile.build.cons != null) tile.build.cons.read(Reads.get(stream));
 
                             //read only from subclasses!
                             tile.build.read(Reads.get(in), version);

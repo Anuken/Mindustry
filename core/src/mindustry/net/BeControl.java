@@ -10,6 +10,7 @@ import arc.util.serialization.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
@@ -22,7 +23,7 @@ import static mindustry.Vars.*;
 
 /** Handles control of bleeding edge builds. */
 public class BeControl{
-    private static final int updateInterval = 60 * 2;
+    private static final int updateInterval = 60 * 1;
 
     private AsyncExecutor executor = new AsyncExecutor(1);
     private boolean checkUpdates = true;
@@ -41,7 +42,7 @@ public class BeControl{
                 if(checkUpdates && !mobile){
                     checkUpdate(t -> {});
                 }
-            }, 1, updateInterval);
+            }, updateInterval, updateInterval);
         }
     }
 
@@ -57,21 +58,23 @@ public class BeControl{
                     updateAvailable = true;
                     updateBuild = newBuild;
                     updateUrl = url;
-                    showUpdateDialog();
-                    Core.app.post(() -> done.get(true));
+                    Core.app.post(() -> {
+                        showUpdateDialog();
+                        done.get(true);
+                    });
                 }else{
                     Core.app.post(() -> done.get(false));
                 }
             }else{
                 Core.app.post(() -> done.get(false));
             }
-        }, error -> {
+        }, error -> Core.app.post(() -> {
             if(!headless){
                 ui.showException(error);
             }else{
                 error.printStackTrace();
             }
-        });
+        }));
     }
 
     /** @return whether a new update is available */
@@ -85,13 +88,13 @@ public class BeControl{
 
         if(!headless){
             checkUpdates = false;
-            ui.showCustomConfirm(Core.bundle.format("be.update", "") + " " + updateBuild, "$be.update.confirm", "$ok", "$be.ignore", () -> {
+            ui.showCustomConfirm(Core.bundle.format("be.update", "") + " " + updateBuild, "@be.update.confirm", "@ok", "@be.ignore", () -> {
                 boolean[] cancel = {false};
                 float[] progress = {0};
                 int[] length = {0};
                 Fi file = bebuildDirectory.child("client-be-" + updateBuild + ".jar");
 
-                BaseDialog dialog = new BaseDialog("$be.updating");
+                BaseDialog dialog = new BaseDialog("@be.updating");
                 download(updateUrl, file, i -> length[0] = i, v -> progress[0] = v, () -> cancel[0], () -> {
                     try{
                         Runtime.getRuntime().exec(new String[]{"java", "-DlastBuild=" + Version.build, "-Dberestart", "-jar", file.absolutePath()});
@@ -105,7 +108,7 @@ public class BeControl{
                 });
 
                 dialog.cont.add(new Bar(() -> length[0] == 0 ? Core.bundle.get("be.updating") : (int)(progress[0] * length[0]) / 1024/ 1024 + "/" + length[0]/1024/1024 + " MB", () -> Pal.accent, () -> progress[0])).width(400f).height(70f);
-                dialog.buttons.button("$cancel", Icon.cancel, () -> {
+                dialog.buttons.button("@cancel", Icon.cancel, () -> {
                     cancel[0] = true;
                     dialog.hide();
                 }).size(210f, 64f);
@@ -127,6 +130,10 @@ public class BeControl{
                     progress -> {},
                     () -> false,
                     () -> Core.app.post(() -> {
+                        Log.info("&lcSaving...");
+                        SaveIO.save(saveDirectory.child("autosavebe." + saveExtension));
+                        Log.info("&lcAutosaved.");
+
                         netServer.kickAll(KickReason.serverRestarting);
                         Threads.sleep(32);
 

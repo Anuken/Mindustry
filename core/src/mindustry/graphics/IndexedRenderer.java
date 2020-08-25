@@ -9,7 +9,7 @@ import arc.util.*;
 
 //TODO this class is a trainwreck, remove it
 public class IndexedRenderer implements Disposable{
-    private final static int vsize = 5;
+    private static final int vsize = 5;
 
     private Shader program = new Shader(
     "attribute vec4 a_position;\n" +

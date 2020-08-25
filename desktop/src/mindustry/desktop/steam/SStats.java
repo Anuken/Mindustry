@@ -51,7 +51,7 @@ public class SStats implements SteamUserStatsCallback{
         this.updated = true;
     }
 
-    private void checkUpdate(){
+    void checkUpdate(){
         if(campaign()){
             SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
 
@@ -86,13 +86,14 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            if(!content.sectors().contains(z -> !z.canConfigure())){
-                configAllZones.complete();
-            }
-        });
+        //TODO achievement invalid
+        //Events.on(ZoneConfigureCompleteEvent.class, e -> {
+            //if(!content.sectors().contains(z -> !z.canConfigure())){
+            //    configAllZones.complete();
+            //}
+        //});
 
-        Events.on(Trigger.newGame, () -> Core.app.post(() -> {
+        Events.run(Trigger.newGame, () -> Core.app.post(() -> {
             if(campaign() && player.core() != null && player.core().items.total() >= 10 * 1000){
                 drop10kitems.complete();
             }
@@ -152,11 +153,11 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        Events.on(Trigger.openWiki, openWiki::complete);
+        Events.run(Trigger.openWiki, openWiki::complete);
 
-        Events.on(Trigger.exclusionDeath, dieExclusion::complete);
+        Events.run(Trigger.exclusionDeath, dieExclusion::complete);
 
-        Events.on(Trigger.drown, drown::complete);
+        Events.run(Trigger.drown, drown::complete);
 
         trigger(Trigger.impactPower, powerupImpactReactor);
 
@@ -166,9 +167,9 @@ public class SStats implements SteamUserStatsCallback{
 
         trigger(Trigger.suicideBomb, suicideBomb);
 
-        Events.on(Trigger.enablePixelation, enablePixelation::complete);
+        Events.run(Trigger.enablePixelation, enablePixelation::complete);
 
-        Events.on(Trigger.thoriumReactorOverheat, () -> {
+        Events.run(Trigger.thoriumReactorOverheat, () -> {
             if(campaign()){
                 SStat.reactorsOverheated.add();
             }
@@ -263,7 +264,7 @@ public class SStats implements SteamUserStatsCallback{
     }
 
     private void trigger(Trigger trigger, SAchievement ach){
-        Events.on(trigger, () -> {
+        Events.run(trigger, () -> {
             if(campaign()){
                 ach.complete();
             }
@@ -283,9 +284,9 @@ public class SStats implements SteamUserStatsCallback{
         registerEvents();
 
         if(result != SteamResult.OK){
-            Log.err("Failed to recieve steam stats: @", result);
+            Log.err("Failed to receive steam stats: @", result);
         }else{
-            Log.info("Recieved steam stats.");
+            Log.info("Received steam stats.");
         }
     }
 

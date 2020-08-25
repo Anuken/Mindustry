@@ -12,8 +12,10 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
 
+import static mindustry.Vars.*;
+
 @Component
-abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, ElevationMovec{
+abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Import float x, y;
     @Import UnitType type;
 
@@ -21,6 +23,12 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
     transient float totalLength;
     transient float moveSpace;
     transient float baseRotation;
+
+    @Replace
+    @Override
+    public void move(float cx, float cy){
+        collisions.moveCheck(this, cx, cy, !type.allowLegStep ? EntityCollisions::solid : EntityCollisions::legsSolid);
+    }
 
     @Override
     public void update(){
@@ -92,7 +100,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc, Elevatio
 
                     //shake when legs contact ground
                     if(type.landShake > 0){
-                        Effects.shake(type.landShake, type.landShake, l.base);
+                        Effect.shake(type.landShake, type.landShake, l.base);
                     }
 
                     if(type.legSplashDamage > 0){

@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -56,7 +57,7 @@ public class CoreBlock extends StorageBlock{
     public static void playerSpawn(Tile tile, Player player){
         if(player == null || tile == null) return;
 
-        CoreEntity entity = tile.bc();
+        CoreBuild entity = tile.bc();
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
 
@@ -75,19 +76,12 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
-        bars.add("capacity", (CoreEntity e) ->
+        bars.add("capacity", (CoreBuild e) ->
             new Bar(
-                () -> Core.bundle.format("bar.capacity", ui.formatAmount(e.storageCapacity)),
+                () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
                 () -> Pal.items,
             () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
-            ));
-
-        bars.add("units", e ->
-            new Bar(
-                () -> Core.bundle.format("bar.units", teamIndex.count(e.team()), Units.getCap(e.team())),
-                () -> Pal.power,
-                () -> (float)teamIndex.count(e.team()) / Units.getCap(e.team())
-            ));
+        ));
     }
 
     @Override
@@ -103,7 +97,8 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team){
-        CoreEntity core = team.core();
+        if(tile == null) return false;
+        CoreBuild core = team.core();
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements))) return false;
         return canReplace(tile.block());
@@ -131,7 +126,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void beforePlaceBegan(Tile tile, Block previous){
-        if(tile.build instanceof CoreEntity){
+        if(tile.build instanceof CoreBuild){
             //right before placing, create a "destination" item array which is all the previous items minus core requirements
             ItemModule items = tile.build.items.copy();
             if(!state.rules.infiniteResources){
@@ -144,7 +139,9 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        if(!canPlaceOn(world.tile(x, y),player.team())){
+        if(world.tile(x, y) == null) return;
+
+        if(!canPlaceOn(world.tile(x, y), player.team())){
 
             drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements) && !state.rules.infiniteResources) ?
                 "bar.corereq" :
@@ -154,7 +151,7 @@ public class CoreBlock extends StorageBlock{
         }
     }
 
-    public class CoreEntity extends Building implements ControlBlock{
+    public class CoreBuild extends Building implements ControlBlock{
         public int storageCapacity;
         //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
         public @NonNull BlockUnitc unit = Nulls.blockUnit;
@@ -210,7 +207,7 @@ public class CoreBlock extends StorageBlock{
             storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) && owns(e) ? e.block().itemCapacity : 0);
             proximity.each(e -> isContainer(e) && owns(e), t -> {
                 t.items = items;
-                ((StorageBlockEntity)t).linkedCore = this;
+                ((StorageBuild)t).linkedCore = this;
             });
 
             for(Building other : state.teams.cores(team)){
@@ -224,7 +221,7 @@ public class CoreBlock extends StorageBlock{
                 }
             }
 
-            for(CoreEntity other : state.teams.cores(team)){
+            for(CoreBuild other : state.teams.cores(team)){
                 other.storageCapacity = storageCapacity;
             }
         }
@@ -248,15 +245,15 @@ public class CoreBlock extends StorageBlock{
 
 
         public boolean isContainer(Building tile){
-            return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == this || ((StorageBlockEntity)tile).linkedCore == null);
+            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == this || ((StorageBuild)tile).linkedCore == null);
         }
 
         public boolean owns(Building tile){
-            return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == this || ((StorageBlockEntity)tile).linkedCore == null);
+            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == this || ((StorageBuild)tile).linkedCore == null);
         }
 
         public boolean owns(Building core, Building tile){
-            return tile instanceof StorageBlockEntity && (((StorageBlockEntity)tile).linkedCore == core || ((StorageBlockEntity)tile).linkedCore == null);
+            return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == core || ((StorageBuild)tile).linkedCore == null);
         }
 
         @Override
@@ -273,7 +270,7 @@ public class CoreBlock extends StorageBlock{
             float fract = 1f / total / state.teams.cores(team).size;
 
             proximity.each(e -> isContainer(e) && e.items == items && owns(e), t -> {
-                StorageBlockEntity ent = (StorageBlockEntity)t;
+                StorageBuild ent = (StorageBuild)t;
                 ent.linkedCore = null;
                 ent.items = new ItemModule();
                 for(Item item : content.items()){
@@ -288,7 +285,7 @@ public class CoreBlock extends StorageBlock{
                 items.set(item, Math.min(items.get(item), max));
             }
 
-            for(CoreEntity other : state.teams.cores(team)){
+            for(CoreBuild other : state.teams.cores(team)){
                 other.onProximityUpdate();
             }
         }

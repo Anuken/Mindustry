@@ -13,7 +13,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -44,16 +43,27 @@ public class DesktopInput extends InputHandler{
     /** Whether player is currently deleting removal requests. */
     private boolean deleting = false, shouldShoot = false;
 
+    private boolean panning = false;
+
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
+            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
+            t.bottom();
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
+            }).margin(6f);
+        });
+
+        group.fill(t -> {
             t.bottom();
             t.visible(() -> {
-                t.getColor().a = Mathf.lerpDelta(t.getColor().a, player.builder().isBuilding() ? 1f : 0f, 0.15f);
+                t.color.a = Mathf.lerpDelta(t.color.a, player.builder().isBuilding() ? 1f : 0f, 0.15f);
 
-                return Core.settings.getBool("hints") && selectRequests.isEmpty() && t.getColor().a > 0.01f;
+                return Core.settings.getBool("hints") && selectRequests.isEmpty() && t.color.a > 0.01f;
             });
-            t.touchable(() -> t.getColor().a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
+            t.touchable(() -> t.color.a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
@@ -74,17 +84,8 @@ public class DesktopInput extends InputHandler{
                 Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
                 b.row();
                 b.table(a -> {
-                    a.button("$schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                    a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
-            }).margin(6f);
-        });
-
-        group.fill(t -> {
-            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore());
-            t.bottom();
-            t.table(Styles.black6, b -> {
-                b.defaults().left();
-                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
             }).margin(6f);
         });
     }
@@ -133,14 +134,12 @@ public class DesktopInput extends InputHandler{
         }
 
         //draw schematic requests
-        for(BuildPlan request : selectRequests){
-            request.animScale = 1f;
-            drawRequest(request);
-        }
+        selectRequests.each(req -> {
+            req.animScale = 1f;
+            drawRequest(req);
+        });
 
-        for(BuildPlan request : selectRequests){
-            drawOverRequest(request);
-        }
+        selectRequests.each(this::drawOverRequest);
 
         if(player.isBuilder()){
             //draw things that may be placed soon
@@ -177,27 +176,40 @@ public class DesktopInput extends InputHandler{
     public void update(){
         super.update();
 
-        if(net.active() && Core.input.keyTap(Binding.player_list)){
+        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content))){
             ui.listfrag.toggle();
         }
 
-        //TODO awful UI state checking code
-        if((player.dead() || state.isPaused()) && !ui.chatfrag.shown()){
-            if(!(scene.getKeyboardFocus() instanceof TextField) && !scene.hasDialog()){
-                //move camera around
-                float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
-                Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta() * camSpeed));
+        boolean panCam = false;
+        float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
 
-                if(Core.input.keyDown(Binding.mouse_move)){
-                    Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
-                    Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
-                }
+        if(input.keyDown(Binding.pan)){
+            panCam = true;
+            panning = true;
+        }
+
+        if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0 || input.keyDown(Binding.mouse_move)) && (!scene.hasField())){
+            panning = false;
+        }
+
+        //TODO awful UI state checking code
+        if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && (!scene.hasField() && !scene.hasDialog())){
+            if(input.keyDown(Binding.mouse_move)){
+                panCam = true;
             }
-        }else if(!player.dead()){
+            panning = false;
+
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+        }else if(!player.dead() && !panning){
             Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
         }
 
-        shouldShoot = true;
+        if(panCam){
+            Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
+            Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
+        }
+
+        shouldShoot = !scene.hasMouse();
 
         if(!scene.hasMouse()){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
@@ -330,20 +342,20 @@ public class DesktopInput extends InputHandler{
 
         table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
-        });
+        }).tooltip("Schematics");
 
         table.button(Icon.tree, Styles.clearPartiali, () -> {
             ui.research.show();
-        }).visible(() -> state.isCampaign());
+        }).visible(() -> state.isCampaign()).tooltip("Research");
 
         table.button(Icon.map, Styles.clearPartiali, () -> {
             ui.planet.show();
-        }).visible(() -> state.isCampaign());
+        }).visible(() -> state.isCampaign()).tooltip("Planet Map");
 
         table.button(Icon.up, Styles.clearPartiali, () -> {
             ui.planet.show(state.getSector(), player.team().core());
         }).visible(() -> state.isCampaign())
-        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements));
+        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)).tooltip("Launch Core");
     }
 
     void pollInput(){
@@ -432,6 +444,10 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyTap(Binding.pause_building)){
             isBuilding = !isBuilding;
             buildWasAutoPaused = false;
+
+            if(isBuilding){
+                player.shooting = false;
+            }
         }
 
         if((cursorX != lastLineX || cursorY != lastLineY) && isPlacing() && mode == placing){
@@ -460,7 +476,7 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().isBuilding()) && !droppingItem &&
+                if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().updateBuilding()) && !droppingItem &&
                 !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
                     player.shooting = shouldShoot;
                 }
@@ -563,66 +579,68 @@ public class DesktopInput extends InputHandler{
 
     protected void updateMovement(Unit unit){
         boolean omni = !(unit instanceof WaterMovec);
-        boolean legs = unit.isGrounded();
+        boolean ground = unit.isGrounded();
 
-        float strafePenalty = legs ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
-        float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation()) * strafePenalty;
+        float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
+        float baseSpeed = unit.type().speed;
+
+        //limit speed to minimum formation speed to preserve formation
+        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+            //add a tiny multiplier to let units catch up just in case
+            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.98f;
+        }
+
+        float speed = baseSpeed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         movement.set(xa, ya).nor().scl(speed);
-        float mouseAngle = Angles.mouseAngle(unit.x(), unit.y());
+        if(Core.input.keyDown(Binding.mouse_move)){
+            movement.add(input.mouseWorld().sub(player).scl(1f / 25f * speed)).limit(speed);
+        }
+
+        float mouseAngle = Angles.mouseAngle(unit.x, unit.y);
         boolean aimCursor = omni && player.shooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(unit.moving()){
-                unit.lookAt(unit.vel().angle());
+            if(!movement.isZero()){
+                unit.lookAt(unit.vel.isZero() ? movement.angle() : unit.vel.angle());
             }
         }
 
         if(omni){
             unit.moveAt(movement);
         }else{
-            unit.moveAt(Tmp.v2.trns(unit.rotation(), movement.len()));
-            if(!movement.isZero() && legs){
-                unit.vel().rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta());
+            unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
+            if(!movement.isZero() && ground){
+                unit.vel.rotateTo(movement.angle(), unit.type().rotateSpeed);
             }
         }
 
-        unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation(), Core.input.mouseWorld().dst(unit)).add(unit.x(), unit.y()));
+        unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);
 
         player.boosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
         player.mouseX = unit.aimX();
         player.mouseY = unit.aimY();
 
+        //update payload input
         if(unit instanceof Payloadc){
-            Payloadc pay = (Payloadc)unit;
 
-            if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
-                Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 1.1f, u -> u.isAI() && u.isGrounded());
-                if(target != null){
-                    Call.pickupUnitPayload(player, target);
-                }else if(!pay.hasPayload()){
-                    Building tile = world.entWorld(pay.x(), pay.y());
-
-                    if(tile != null && tile.team() == unit.team){
-                        Call.pickupBlockPayload(player, tile);
-                    }
-                }
+            if(Core.input.keyTap(Binding.pickupCargo)){
+                tryPickupPayload();
             }
 
             if(Core.input.keyTap(Binding.dropCargo)){
-                Call.dropPayload(player, player.x, player.y);
-                pay.dropLastPayload();
+                tryDropPayload();
             }
         }
 
+        //update commander inut
         if(unit instanceof Commanderc){
-
             if(Core.input.keyTap(Binding.command)){
                 Call.unitCommand(player);
             }

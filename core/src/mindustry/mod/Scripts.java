@@ -1,8 +1,10 @@
 package mindustry.mod;
 
 import arc.*;
+import arc.assets.*;
+import arc.audio.*;
 import arc.files.*;
-import arc.func.*;
+import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -17,15 +19,14 @@ import java.net.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private final Seq<String> blacklist = Seq.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
+    private final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");
-    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
+        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.");
+    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.", "mindustry.logic.");
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
-    private LoadedMod currentMod = null;
-    private Seq<EventHandle> events = new Seq<>();
+    LoadedMod currentMod = null;
 
     public Scripts(){
         Time.mark();
@@ -41,7 +42,7 @@ public class Scripts implements Disposable{
             .setModuleScriptProvider(new SoftCachingModuleScriptProvider(new ScriptModuleProvider()))
             .setSandboxed(true).createRequire(context, scope).install(scope);
 
-        if(!run(Core.files.internal("scripts/global.js").readString(), "global.js")){
+        if(!run(Core.files.internal("scripts/global.js").readString(), "global.js", false)){
             errored = true;
         }
         Log.debug("Time to load script engine: @", Time.elapsed());
@@ -75,25 +76,62 @@ public class Scripts implements Disposable{
         Log.log(level, "[@]: @", source, message);
     }
 
-    public <T> void onEvent(Class<T> type, Cons<T> listener){
-        Events.on(type, listener);
-        events.add(new EventHandle(type, listener));
+    //region utility mod functions
+
+    public String readString(String path){
+        return Vars.tree.get(path, true).readString();
     }
+
+    public byte[] readBytes(String path){
+        return Vars.tree.get(path, true).readBytes();
+    }
+
+    public Sound loadSound(String soundName){
+        if(Vars.headless) return new MockSound();
+
+        String name = "sounds/" + soundName;
+        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+
+        if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
+        ModLoadingSound sound = new ModLoadingSound();
+        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
+        desc.loaded = result -> sound.sound = (Sound)result;
+        desc.errored = Throwable::printStackTrace;
+
+        return sound;
+    }
+
+    public Music loadMusic(String soundName){
+        if(Vars.headless) return new MockMusic();
+
+        String name = "music/" + soundName;
+        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+
+        if(Core.assets.contains(path, Music.class)) return Core.assets.get(path, Music.class);
+        ModLoadingMusic sound = new ModLoadingMusic();
+        AssetDescriptor<?> desc = Core.assets.load(path, Music.class);
+        desc.loaded = result -> sound.music = (Music)result;
+        desc.errored = Throwable::printStackTrace;
+
+        return sound;
+    }
+
+    //endregion
 
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;
-        run(file.readString(), file.name());
+        run(file.readString(), file.name(), true);
         currentMod = null;
     }
 
-    private boolean run(String script, String file){
+    private boolean run(String script, String file, boolean wrap){
         try{
             if(currentMod != null){
-                //inject script info into file (TODO maybe rhino handles this?)
+                //inject script info into file
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
             }
             context.evaluateString(scope,
-            "(function(){\n" + script + "\n})();",
+            wrap ? "(function(){'use strict';\n" + script + "\n})();" : script,
             file, 0, null);
             return true;
         }catch(Throwable t){
@@ -107,21 +145,7 @@ public class Scripts implements Disposable{
 
     @Override
     public void dispose(){
-        for(EventHandle e : events){
-            Events.remove(e.type, e.listener);
-        }
-        events.clear();
         Context.exit();
-    }
-
-    private static class EventHandle{
-        Class type;
-        Cons listener;
-
-        public EventHandle(Class type, Cons listener){
-            this.type = type;
-            this.listener = listener;
-        }
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{
@@ -132,7 +156,7 @@ public class Scripts implements Disposable{
         }
 
         @Override
-        public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws IOException, URISyntaxException{
+        public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws URISyntaxException{
             if(currentMod == null) return null;
             return loadSource(moduleId, currentMod.root.child("scripts"), validator);
         }

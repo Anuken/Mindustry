@@ -68,8 +68,8 @@ public class Drawf{
             Point2 p = Geometry.d8edge[i];
             float offset = -Math.max(block.size - 1, 0) / 2f * tilesize;
             Draw.rect("block-select",
-            x*tilesize + block.offset() + offset * p.x,
-            y*tilesize + block.offset() + offset * p.y, i * 90);
+            x*tilesize + block.offset + offset * p.x,
+            y*tilesize + block.offset + offset * p.y, i * 90);
         }
         Draw.reset();
     }
@@ -157,7 +157,7 @@ public class Drawf{
 
         Lines.stroke(12f * scale);
         Lines.precise(true);
-        Lines.line(line, x + Tmp.v1.x, y + Tmp.v1.y, x2 - Tmp.v1.x, y2 - Tmp.v1.y, CapStyle.none, 0f);
+        Lines.line(line, x + Tmp.v1.x, y + Tmp.v1.y, x2 - Tmp.v1.x, y2 - Tmp.v1.y, false, 0f);
         Lines.precise(false);
         Lines.stroke(1f);
 

@@ -21,7 +21,7 @@ public class PointDefenseTurret extends Block{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
-    public @Load("block-$size") TextureRegion baseRegion;
+    public @Load("block-@size") TextureRegion baseRegion;
 
     public Color color = Color.white;
     public Effect beamEffect = Fx.pointBeam;
@@ -44,7 +44,7 @@ public class PointDefenseTurret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
     @Override
@@ -69,11 +69,11 @@ public class PointDefenseTurret extends Block{
 
             //retarget
             if(timer(timerTarget, retargetTime)){
-                target = Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team() == team || !b.type().hittable ? Float.MAX_VALUE : b.dst2(this));
+                target = Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team == team || !b.type().hittable ? Float.MAX_VALUE : b.dst2(this));
             }
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().hittable){
+            if(target != null && target.within(this, range) && target.team != team && target.type().hittable){
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 reload -= edelta();
@@ -90,7 +90,7 @@ public class PointDefenseTurret extends Block{
 
                     beamEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color, new Vec2().set(target));
                     shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
-                    hitEffect.at(target.x(), target.y(), color);
+                    hitEffect.at(target.x, target.y, color);
                     reload = reloadTime;
                 }
             }else{

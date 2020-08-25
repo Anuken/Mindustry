@@ -21,6 +21,8 @@ import static mindustry.Vars.*;
 public class Tile implements Position, QuadTreeObject, Displayable{
     static final ObjectSet<Building> tileSet = new ObjectSet<>();
 
+    /** Extra data for very specific blocks. */
+    public byte data;
     /** Tile traversal cost. */
     public short cost = 1;
     /** Tile entity, usually null. */
@@ -29,8 +31,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;
-    /** Rotation, 0-3. Not guaranteed to be in any specific range. */
-    protected byte rotation;
     protected boolean changing = false;
 
     public Tile(int x, int y){
@@ -47,7 +47,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.block = wall;
 
         //update entity and create it if needed
-        changeEntity(Team.derelict, wall::newEntity);
+        changeEntity(Team.derelict, wall::newEntity, 0);
         changed();
     }
 
@@ -121,11 +121,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public float drawx(){
-        return block().offset() + worldx();
+        return block().offset + worldx();
     }
 
     public float drawy(){
-        return block().offset() + worldy();
+        return block().offset + worldy();
     }
 
     public boolean isDarkened(){
@@ -150,7 +150,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Team team(){
-        return build == null ? Team.derelict : build.team();
+        return build == null ? Team.derelict : build.team;
     }
 
     public void setTeam(Team team){
@@ -183,9 +183,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         changing = true;
 
         this.block = type;
-        this.rotation = rotation == 0 ? 0 : (byte)Mathf.mod(rotation, 4);
         preChanged();
-        changeEntity(team, entityprov);
+        changeEntity(team, entityprov, (byte)Mathf.mod(rotation, 4));
 
         if(build != null){
             build.team(team);
@@ -302,18 +301,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     /** set()-s this tile, except it's synced across the network */
     public void setFloorNet(Block floor){
         setFloorNet(floor, Blocks.air);
-    }
-
-    public byte rotation(){
-        return rotation;
-    }
-
-    public int rotdeg(){
-        return rotation * 90;
-    }
-
-    public void rotation(int rotation){
-        this.rotation = (byte)rotation;
     }
 
     public short overlayID(){
@@ -436,28 +423,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Building getNearbyEntity(int rotation){
-        if(rotation == 0) return world.ent(x + 1, y);
-        if(rotation == 1) return world.ent(x, y + 1);
-        if(rotation == 2) return world.ent(x - 1, y);
-        if(rotation == 3) return world.ent(x, y - 1);
+        if(rotation == 0) return world.build(x + 1, y);
+        if(rotation == 1) return world.build(x, y + 1);
+        if(rotation == 2) return world.build(x - 1, y);
+        if(rotation == 3) return world.build(x, y - 1);
         return null;
-    }
-
-    // ▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A
-    public @Nullable Building front(){
-        return getNearbyEntity((rotation + 4) % 4);
-    }
-
-    public @Nullable Building right(){
-        return getNearbyEntity((rotation + 3) % 4);
-    }
-
-    public @Nullable Building back(){
-        return getNearbyEntity((rotation + 2) % 4);
-    }
-
-    public @Nullable Building left(){
-        return getNearbyEntity((rotation + 1) % 4);
     }
 
     public boolean interactable(Team team){
@@ -466,6 +436,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public @Nullable Item drop(){
         return overlay == Blocks.air || overlay.itemDrop == null ? floor.itemDrop : overlay.itemDrop;
+    }
+
+    public int staticDarkness(){
+        return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
     public void updateOcclusion(){
@@ -544,7 +518,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
-    protected void changeEntity(Team team, Prov<Building> entityprov){
+    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
         if(build != null){
             int size = build.block.size;
             build.remove();
@@ -554,7 +528,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             tileSet.clear();
 
             for(Point2 edge : Edges.getEdges(size)){
-                Building other = world.ent(x + edge.x, y + edge.y);
+                Building other = world.build(x + edge.x, y + edge.y);
                 if(other != null){
                     tileSet.add(other);
                 }
@@ -567,7 +541,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
 
         if(block.hasEntity()){
-            build = entityprov.get().init(this, team, block.update);
+            build = entityprov.get().init(this, team, block.update, rotation);
         }
     }
 
@@ -578,7 +552,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             }else{
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(Point2 p : Geometry.d4){
-                    Building tile = world.ent(x + p.x, y + p.y);
+                    Building tile = world.build(x + p.x, y + p.y);
                     if(tile != null && !tile.tile().changing){
                         tile.onProximityUpdate();
                     }

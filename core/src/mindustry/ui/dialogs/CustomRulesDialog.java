@@ -1,14 +1,13 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -21,25 +20,25 @@ import static mindustry.Vars.*;
 
 public class CustomRulesDialog extends BaseDialog{
     private Table main;
-    private Rules rules;
+    Rules rules;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
     private BaseDialog banDialog;
 
     public CustomRulesDialog(){
-        super("$mode.custom");
+        super("@mode.custom");
 
         loadoutDialog = new LoadoutDialog();
-        banDialog = new BaseDialog("$bannedblocks");
+        banDialog = new BaseDialog("@bannedblocks");
         banDialog.addCloseButton();
 
         banDialog.shown(this::rebuildBanned);
-        banDialog.buttons.button("$addall", Icon.add, () -> {
+        banDialog.buttons.button("@addall", Icon.add, () -> {
             rules.bannedBlocks.addAll(content.blocks().select(Block::canBeBuilt));
             rebuildBanned();
         }).size(180, 64f);
 
-        banDialog.buttons.button("$clear", Icon.trash, () -> {
+        banDialog.buttons.button("@clear", Icon.trash, () -> {
             rules.bannedBlocks.clear();
             rebuildBanned();
         }).size(180, 64f);
@@ -56,7 +55,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.margin(10f);
 
             if(rules.bannedBlocks.isEmpty()){
-                t.add("$empty");
+                t.add("@empty");
             }
 
             Seq<Block> array = Seq.with(rules.bannedBlocks);
@@ -83,8 +82,8 @@ public class CustomRulesDialog extends BaseDialog{
             }
         }).get().setScrollYForce(previousScroll);
         banDialog.cont.row();
-        banDialog.cont.button("$add", Icon.add, () -> {
-            BaseDialog dialog = new BaseDialog("$add");
+        banDialog.cont.button("@add", Icon.add, () -> {
+            BaseDialog dialog = new BaseDialog("@add");
             dialog.cont.pane(t -> {
                 t.left().margin(14f);
                 int[] i = {0};
@@ -117,7 +116,7 @@ public class CustomRulesDialog extends BaseDialog{
         cont.clear();
         cont.pane(m -> main = m).get().setScrollingDisabled(true, false);
         main.margin(10f);
-        main.button("$settings.reset", () -> {
+        main.button("@settings.reset", () -> {
             rules = resetter.get();
             setup();
             requestKeyboard();
@@ -126,45 +125,45 @@ public class CustomRulesDialog extends BaseDialog{
         main.left().defaults().fillX().left().pad(5);
         main.row();
 
-        title("$rules.title.waves");
-        check("$rules.waves", b -> rules.waves = b, () -> rules.waves);
-        check("$rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
-        check("$rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
-        number("$rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
-        number("$rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
+        title("@rules.title.waves");
+        check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
+        check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
+        check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
+        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
+        number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
-        title("$rules.title.resourcesbuilding");
-        check("$rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
-        check("$rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
-        number("$rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
-        number("$rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
-        number("$rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
-        number("$rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
-        number("$rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
+        title("@rules.title.resourcesbuilding");
+        check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
+        check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
+        number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
+        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
+        number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
+        number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
+        number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
-        main.button("$configure",
+        main.button("@configure",
             () -> loadoutDialog.show(Blocks.coreShard.itemCapacity, rules.loadout,
                 () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
                 () -> {}, () -> {}
         )).left().width(300f);
         main.row();
 
-        main.button("$bannedblocks", banDialog::show).left().width(300f);
+        main.button("@bannedblocks", banDialog::show).left().width(300f);
         main.row();
 
-        title("$rules.title.unit");
-        check("$rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
-        number("$rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
-        number("$rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
-        number("$rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
+        title("@rules.title.unit");
+        check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
+        number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
+        number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
+        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
 
-        title("$rules.title.enemy");
-        check("$rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
-        number("$rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
+        title("@rules.title.enemy");
+        check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
+        number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
-        title("$rules.title.environment");
-        number("$rules.solarpowermultiplier", f -> rules.solarPowerMultiplier = f, () -> rules.solarPowerMultiplier);
-        check("$rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
+        title("@rules.title.environment");
+        number("@rules.solarpowermultiplier", f -> rules.solarPowerMultiplier = f, () -> rules.solarPowerMultiplier);
+        check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
         main.button(b -> {
             b.left();
@@ -173,7 +172,7 @@ public class CustomRulesDialog extends BaseDialog{
                     update(() -> setColor(rules.ambientLight));
                 }}).grow();
             }).margin(4).size(50f).padRight(10);
-            b.add("$rules.ambientlight");
+            b.add("@rules.ambientlight");
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
         main.row();
 
@@ -189,10 +188,10 @@ public class CustomRulesDialog extends BaseDialog{
             t.left();
             t.add(text).left().padRight(5)
             .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
-            Vars.platform.addDialog(t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
+            t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
-            .valid(Strings::canParsePositiveFloat).width(120f).left().get());
+            .valid(Strings::canParsePositiveFloat).width(120f).left().addInputDialog();
         }).padTop(0);
         main.row();
     }

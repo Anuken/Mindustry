@@ -6,13 +6,14 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
 /** An entity that holds a payload. */
 @Component
-abstract class PayloadComp implements Posc, Rotc{
+abstract class PayloadComp implements Posc, Rotc, Hitboxc{
     @Import float x, y, rotation;
 
     Seq<Payload> payloads = new Seq<>();
@@ -68,19 +69,23 @@ abstract class PayloadComp implements Posc, Rotc{
     }
 
     boolean dropUnit(UnitPayload payload){
-        //TODO create an effect here and/or make them be at a lower elevation
         Unit u = payload.unit;
+        Fx.unitDrop.at(this);
 
         //can't drop ground units
-        if((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f){
+        if(((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f) || (!floorOn().isLiquid && u instanceof WaterMovec)){
             return false;
         }
+
+        //clients do not drop payloads
+        if(Vars.net.client()) return true;
 
         u.set(this);
         u.trns(Tmp.v1.rnd(Mathf.random(2f)));
         u.rotation(rotation);
+        //reset the ID to a new value to make sure it's synced
+        u.id = EntityGroup.nextId();
         u.add();
-        Fx.unitDrop.at(u);
 
         return true;
     }
@@ -88,9 +93,9 @@ abstract class PayloadComp implements Posc, Rotc{
     /** @return whether the tile has been successfully placed. */
     boolean dropBlock(BlockPayload payload){
         Building tile = payload.entity;
-        int tx = Vars.world.toTile(x - tile.block().offset()), ty = Vars.world.toTile(y - tile.block().offset());
+        int tx = Vars.world.toTile(x - tile.block().offset), ty = Vars.world.toTile(y - tile.block().offset);
         Tile on = Vars.world.tile(tx, ty);
-        if(on != null && Build.validPlace(tile.block(), tile.team(), tx, ty, tile.rotation())){
+        if(on != null && Build.validPlace(tile.block(), tile.team, tx, ty, tile.rotation)){
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
 

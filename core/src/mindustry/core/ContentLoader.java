@@ -36,10 +36,10 @@ public class ContentLoader{
         new UnitTypes(),
         new Blocks(),
         new Loadouts(),
-        new TechTree(),
         new Weathers(),
         new Planets(),
-        new SectorPresets()
+        new SectorPresets(),
+        new TechTree(),
     };
 
     public ContentLoader(){
@@ -167,6 +167,10 @@ public class ContentLoader{
     }
 
     public void handleContent(Content content){
+        if(content instanceof Item && content.id > 255){
+            throw new IllegalArgumentException("You may not have more than 255 different items total. Remove some mods.");
+        }
+
         this.lastAdded = content;
         contentMap[content.getContentType().ordinal()].add(content);
     }
@@ -243,11 +247,11 @@ public class ContentLoader{
     }
 
     public Block block(int id){
-        return (Block)getByID(ContentType.block, id);
+        return getByID(ContentType.block, id);
     }
 
     public Block block(String name){
-        return (Block)getByName(ContentType.block, name);
+        return getByName(ContentType.block, name);
     }
 
     public Seq<Item> items(){
@@ -255,7 +259,7 @@ public class ContentLoader{
     }
 
     public Item item(int id){
-        return (Item)getByID(ContentType.item, id);
+        return getByID(ContentType.item, id);
     }
 
     public Seq<Liquid> liquids(){
@@ -263,7 +267,7 @@ public class ContentLoader{
     }
 
     public Liquid liquid(int id){
-        return (Liquid)getByID(ContentType.liquid, id);
+        return getByID(ContentType.liquid, id);
     }
 
     public Seq<BulletType> bullets(){
@@ -271,7 +275,7 @@ public class ContentLoader{
     }
 
     public BulletType bullet(int id){
-        return (BulletType)getByID(ContentType.bullet, id);
+        return getByID(ContentType.bullet, id);
     }
 
     public Seq<SectorPreset> sectors(){

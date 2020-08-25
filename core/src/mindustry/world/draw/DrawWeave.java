@@ -12,7 +12,7 @@ public class DrawWeave extends DrawBlock{
     public TextureRegion weave, bottom;
 
     @Override
-    public void draw(GenericCrafterEntity entity){
+    public void draw(GenericCrafterBuild entity){
         Draw.rect(bottom, entity.x, entity.y);
         Draw.rect(weave, entity.x, entity.y, entity.totalProgress);
 

@@ -25,8 +25,8 @@ public class LiquidSource extends Block{
         outputsLiquid = true;
         saveConfig = true;
 
-        config(Liquid.class, (LiquidSourceEntity tile, Liquid l) -> tile.source = l);
-        configClear((LiquidSourceEntity tile) -> tile.source = null);
+        config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
+        configClear((LiquidSourceBuild tile) -> tile.source = null);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class LiquidSource extends Block{
         drawRequestConfigCenter(req, req.config, "center");
     }
 
-    public class LiquidSourceEntity extends Building{
+    public class LiquidSourceBuild extends Building{
         public @Nullable Liquid source = null;
 
         @Override
@@ -67,7 +67,7 @@ public class LiquidSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> configure(liquid));
+            ItemSelection.buildTable(table, content.liquids(), () -> source, this::configure);
         }
 
         @Override

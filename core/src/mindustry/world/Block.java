@@ -74,12 +74,16 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
+    /** for static blocks only: if true, tile data() is saved in world data. */
+    public boolean saveData;
     /** whether you can break this with rightclick */
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
     /** whether this water can only be placed on water */
     public boolean requiresWater = false;
+    /** whether this water can be placed on any liquids, anywhere */
+    public boolean placeableLiquid = false;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
@@ -88,6 +92,14 @@ public class Block extends UnlockableContent{
     public boolean squareSprite = true;
     /** whether this block absorbs laser attacks. */
     public boolean absorbLasers = false;
+    /** if false, the status is never drawn */
+    public boolean enableDrawStatus = true;
+    /** whether to draw disabled status */
+    public boolean drawDisabled = true;
+    /** whether to automatically reset enabled status after a logic block has not interacted for a while. */
+    public boolean autoResetEnabled = true;
+    /** if true, the block stops updating when disabled */
+    public boolean noUpdateDisabled = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -96,6 +108,8 @@ public class Block extends UnlockableContent{
     public boolean floating = false;
     /** multiblock size */
     public int size = 1;
+    /** multiblock offset */
+    public float offset = 0f;
     /** Whether to draw this block in the expanded draw range. */
     public boolean expanded = false;
     /** Max of timers used. */
@@ -209,7 +223,7 @@ public class Block extends UnlockableContent{
         if(tile.build != null){
             tile.build.draw();
         }else{
-            Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy());
         }
     }
 
@@ -232,7 +246,7 @@ public class Block extends UnlockableContent{
         if(renderer.pixelator.enabled()) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
-        BitmapFont font = Fonts.outline;
+        Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
@@ -242,7 +256,7 @@ public class Block extends UnlockableContent{
         float width = layout.width;
 
         font.setColor(color);
-        float dx = x * tilesize + offset(), dy = y * tilesize + offset() + size * tilesize / 2f + 3;
+        float dx = x * tilesize + offset, dy = y * tilesize + offset + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
         Lines.stroke(2f, Color.darkGray);
@@ -259,7 +273,8 @@ public class Block extends UnlockableContent{
         return width;
     }
 
-    public float sumAttribute(Attribute attr, int x, int y){
+    public float sumAttribute(@Nullable Attribute attr, int x, int y){
+        if(attr == null) return 0;
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
@@ -306,6 +321,10 @@ public class Block extends UnlockableContent{
         if(canBeBuilt()){
             stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
             stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
+        }
+
+        if(instantTransfer){
+            stats.add(BlockStat.maxConsecutive, 2, StatUnit.none);
         }
 
         consumes.display(stats);
@@ -394,6 +413,11 @@ public class Block extends UnlockableContent{
 
     }
 
+    /** Transforms the internal position of this config using the specified function, and return the result. */
+    public Object pointConfig(Object config, Cons<Point2> transformer){
+        return config;
+    }
+
     /** Configure when a null value is passed.*/
     public <E extends Building> void configClear(Cons<E> cons){
         configurations.put(void.class, (tile, value) -> cons.get((E)tile));
@@ -470,13 +494,8 @@ public class Block extends UnlockableContent{
         return entityType.get();
     }
 
-    /** Offset for placing and drawing multiblocks. */
-    public float offset(){
-        return ((size + 1) % 2) * tilesize / 2f;
-    }
-
     public Rect bounds(int x, int y, Rect rect){
-        return rect.setSize(size * tilesize).setCenter(x * tilesize + offset(), y * tilesize + offset());
+        return rect.setSize(size * tilesize).setCenter(x * tilesize + offset, y * tilesize + offset);
     }
 
     public boolean isMultiblock(){
@@ -586,6 +605,14 @@ public class Block extends UnlockableContent{
     }
 
     @Override
+    public void getDependencies(Cons<UnlockableContent> cons){
+        //just requires items
+        for(ItemStack stack : requirements){
+            cons.get(stack.item);
+        }
+    }
+
+    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
     }
@@ -603,6 +630,12 @@ public class Block extends UnlockableContent{
         if(health == -1){
             health = size * size * 40;
         }
+
+        if(group == BlockGroup.transportation || consumes.has(ConsumeType.item) || category == Category.distribution){
+            acceptsItems = true;
+        }
+
+        offset = ((size + 1) % 2) * tilesize / 2f;
 
         buildCost = 0f;
         for(ItemStack stack : requirements){

@@ -26,8 +26,8 @@ public class Junction extends Block{
         return true;
     }
 
-    public class JunctionEntity extends Building{
-        DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity);
+    public class JunctionBuild extends Building{
+        public DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity);
 
         @Override
         public int acceptStack(Item item, int amount, Teamc source){
@@ -49,7 +49,7 @@ public class Junction extends Block{
                         Building dest = nearby(i);
 
                         //skip blocks that don't want the item, keep waiting until they do
-                        if(dest == null || !dest.acceptItem(this, item) || dest.team() != team){
+                        if(dest == null || !dest.acceptItem(this, item) || dest.team != team){
                             continue;
                         }
 
@@ -73,7 +73,7 @@ public class Junction extends Block{
 
             if(relative == -1 || !buffer.accepts(relative)) return false;
             Building to = nearby(relative);
-            return to != null && to.team() == team;
+            return to != null && to.team == team;
         }
 
         @Override

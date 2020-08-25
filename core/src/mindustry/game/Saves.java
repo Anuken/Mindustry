@@ -23,14 +23,14 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Saves{
-    private Seq<SaveSlot> saves = new Seq<>();
-    private @Nullable SaveSlot current;
+    Seq<SaveSlot> saves = new Seq<>();
+    @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
-    private AsyncExecutor previewExecutor = new AsyncExecutor(1);
+    AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
 
-    private long totalPlaytime;
+    long totalPlaytime;
     private long lastTimestamp;
 
     public Saves(){
@@ -86,7 +86,7 @@ public class Saves{
         }
 
         if(state.isGame() && !state.gameOver && current != null && current.isAutosave() && !state.rules.tutorial){
-            time += Time.delta();
+            time += Time.delta;
             if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
 
@@ -164,6 +164,14 @@ public class Saves{
         return saves;
     }
 
+    public void deleteAll(){
+        for(SaveSlot slot : saves.copy()){
+            if(!slot.isSector()){
+                slot.delete();
+            }
+        }
+    }
+
     public class SaveSlot{
         public final Fi file;
         boolean requestedPreview;
@@ -180,7 +188,7 @@ public class Saves{
                 current = this;
                 totalPlaytime = meta.timePlayed;
                 savePreview();
-            }catch(Exception e){
+            }catch(Throwable e){
                 throw new SaveException(e);
             }
         }
@@ -263,7 +271,7 @@ public class Saves{
             mods.removeAll(Vars.mods.getModStrings());
 
             if(!mods.isEmpty()){
-                ui.showConfirm("$warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
+                ui.showConfirm("@warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
             }else{
                 run.run();
             }

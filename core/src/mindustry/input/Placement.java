@@ -154,7 +154,7 @@ public class Placement{
     public static NormalizeDrawResult normalizeDrawArea(Block block, int startx, int starty, int endx, int endy, boolean snap, int maxLength, float scaling){
         normalizeArea(startx, starty, endx, endy, 0, snap, maxLength);
 
-        float offset = block.offset();
+        float offset = block.offset;
 
         drawResult.x = result.x * tilesize;
         drawResult.y = result.y * tilesize;

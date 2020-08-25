@@ -19,7 +19,7 @@ public class TractorBeamTurret extends Block{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
-    public @Load("block-$size") TextureRegion baseRegion;
+    public @Load("block-@size") TextureRegion baseRegion;
     public @Load("@-laser") TextureRegion laser;
     public @Load("@-laser-end") TextureRegion laserEnd;
 
@@ -42,7 +42,7 @@ public class TractorBeamTurret extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
     @Override
@@ -75,16 +75,16 @@ public class TractorBeamTurret extends Block{
             }
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().flying){
+            if(target != null && target.within(this, range) && target.team() != team && target.type().flying && efficiency() > 0.01f){
                 any = true;
                 float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation,dest, rotateSpeed * edelta());
+                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 lastX = target.x;
                 lastY = target.y;
                 strength = Mathf.lerpDelta(strength, 1f, 0.1f);
 
                 if(damage > 0){
-                    target.damageContinuous(damage);
+                    target.damageContinuous(damage * efficiency());
                 }
 
                 //shoot when possible

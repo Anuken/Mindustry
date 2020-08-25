@@ -28,6 +28,7 @@ public class ContinuousLaserBulletType extends BulletType{
         pierce = true;
         hittable = false;
         hitColor = colors[2];
+        collidesTiles = false;
         incendAmount = 1;
         incendSpread = 5;
         incendChance = 0.4f;
@@ -48,11 +49,11 @@ public class ContinuousLaserBulletType extends BulletType{
 
         //damage every 5 ticks
         if(b.timer(1, 5f)){
-            Damage.collideLine(b, b.team(), hitEffect, b.x(), b.y(), b.rotation(), length, true);
+            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), length, true);
         }
 
         if(shake > 0){
-            Effects.shake(shake, shake, b);
+            Effect.shake(shake, shake, b);
         }
     }
 
@@ -60,19 +61,19 @@ public class ContinuousLaserBulletType extends BulletType{
     public void draw(Bullet b){
         float baseLen = length * b.fout();
 
-        Lines.lineAngle(b.x(), b.y(), b.rotation(), baseLen);
+        Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
         for(int s = 0; s < colors.length; s++){
             Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
             for(int i = 0; i < tscales.length; i++){
                 Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * 35f);
                 Lines.stroke((9f + Mathf.absin(Time.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
-                Lines.lineAngle(b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], CapStyle.none);
+                Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
             }
         }
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
 
-        Drawf.light(b.team(), b.x(), b.y(), b.x() + Tmp.v1.x, b.y() + Tmp.v1.y, 40, Color.orange, 0.7f);
+        Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 40, Color.orange, 0.7f);
         Draw.reset();
     }
 

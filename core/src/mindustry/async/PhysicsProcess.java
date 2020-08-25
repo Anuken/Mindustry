@@ -1,6 +1,5 @@
 package mindustry.async;
 
-import arc.*;
 import arc.box2d.*;
 import arc.box2d.BodyDef.*;
 import arc.math.geom.*;
@@ -68,6 +67,8 @@ public class PhysicsProcess implements AsyncProcess{
             PhysicRef ref = entity.physref();
 
             if(ref.wasGround != grounded){
+                if(ref.body.getFixtureList().isEmpty()) continue;
+
                 //set correct filter
                 ref.body.getFixtureList().first().setFilterData(grounded ? ground : flying);
                 ref.wasGround = grounded;
@@ -96,7 +97,7 @@ public class PhysicsProcess implements AsyncProcess{
             ref.lastVelocity.set(ref.velocity);
         }
 
-        physics.step(Core.graphics.getDeltaTime(), 5, 8);
+        physics.step(1f/45f, 5, 8);
 
         //get delta vectors
         for(PhysicRef ref : refs){

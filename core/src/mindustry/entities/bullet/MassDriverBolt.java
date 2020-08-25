@@ -26,10 +26,10 @@ public class MassDriverBolt extends BulletType{
         float w = 11f, h = 13f;
 
         Draw.color(Pal.bulletYellowBack);
-        Draw.rect("shell-back", b.x(), b.y(), w, h, b.rotation() + 90);
+        Draw.rect("shell-back", b.x, b.y, w, h, b.rotation() + 90);
 
         Draw.color(Pal.bulletYellow);
-        Draw.rect("shell", b.x(), b.y(), w, h, b.rotation() + 90);
+        Draw.rect("shell", b.x, b.y, w, h, b.rotation() + 90);
 
         Draw.reset();
     }
@@ -73,7 +73,7 @@ public class MassDriverBolt extends BulletType{
         //if on course and it's in range of the target
         if(Math.abs(dst1 + dst2 - baseDst) < 4f && dst2 <= hitDst){
             intersect = true;
-        } //else, bullet has gone off course, does not get recieved.
+        } //else, bullet has gone off course, does not get received.
 
         if(intersect){
             data.to.handlePayload(b, data);
@@ -92,7 +92,7 @@ public class MassDriverBolt extends BulletType{
             int amountDropped = Mathf.random(0, data.items[i]);
             if(amountDropped > 0){
                 float angle = b.rotation() + Mathf.range(100f);
-                Fx.dropItem.at(b.x(), b.y(), angle, Color.white, content.item(i));
+                Fx.dropItem.at(b.x, b.y, angle, Color.white, content.item(i));
             }
         }
     }

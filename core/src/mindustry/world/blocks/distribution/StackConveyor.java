@@ -25,8 +25,8 @@ public class StackConveyor extends Block implements Autotiler{
     public @Load("@-stack") TextureRegion stackRegion;
 
     public float speed = 0f;
-    public float recharge = 4f;
     public boolean splitOut = true;
+    public float recharge = 2f;
 
     public StackConveyor(String name){
         super(name);
@@ -52,15 +52,17 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(tile.build instanceof StackConveyorEntity){
-            int state = ((StackConveyorEntity)tile.build).state;
+        if(tile.build instanceof StackConveyorBuild){
+            int state = ((StackConveyorBuild)tile.build).state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
-                return (otherblock.hasItems || otherblock.outputsItems() || otherblock.acceptsItems) &&
+                return otherblock.acceptsItems &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
-                    !(world.ent(otherx, othery) instanceof StackConveyorEntity && ((StackConveyorEntity)world.ent(otherx, othery)).state == stateUnload);
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild && ((StackConveyorBuild)world.build(otherx, othery)).state == stateUnload) &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild && ((StackConveyorBuild)world.build(otherx, othery)).state == stateMove &&
+                        !facing(otherx, othery, otherrot, tile.x, tile.y));
             }
         }
         return otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock) && otherblock instanceof StackConveyor;
@@ -84,14 +86,14 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean rotatedOutput(int x, int y){
-        Building tile = world.ent(x, y);
-        if(tile instanceof StackConveyorEntity){
-            return ((StackConveyorEntity)tile).state != stateUnload;
+        Building tile = world.build(x, y);
+        if(tile instanceof StackConveyorBuild){
+            return ((StackConveyorBuild)tile).state != stateUnload;
         }
         return super.rotatedOutput(x, y);
     }
 
-    public class StackConveyorEntity extends Building{
+    public class StackConveyorBuild extends Building{
         public int state, blendprox;
 
         public int link = -1;
@@ -104,25 +106,26 @@ public class StackConveyor extends Block implements Autotiler{
 
             for(int i = 0; i < 4; i++){
                 if((blendprox & (1 << i)) == 0){
-                    Draw.rect(edgeRegion, x, y, (rotation() - i) * 90);
+                    Draw.rect(edgeRegion, x, y, (rotation - i) * 90);
                 }
             }
 
             Draw.z(Layer.blockOver);
 
-            if(link == -1) return;
+            Building from = world.build(link);
+
+            if(link == -1 || from == null) return;
 
             //offset
-            Tile from = world.tile(link);
             Tmp.v1.set(from);
             Tmp.v2.set(tile);
             Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interp.linear);
 
             //rotation
-            float a = (from.rotation()%4) * 90;
-            float b = (tile.rotation()%4) * 90;
-            if((from.rotation()%4) == 3 && (tile.rotation()%4) == 0) a = -1 * 90;
-            if((from.rotation()%4) == 0 && (tile.rotation()%4) == 3) a =  4 * 90;
+            float a = (from.rotation%4) * 90;
+            float b = (rotation%4) * 90;
+            if((from.rotation%4) == 3 && (rotation%4) == 0) a = -1 * 90;
+            if((from.rotation%4) == 0 && (rotation%4) == 3) a =  4 * 90;
 
             //stack
             Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
@@ -141,14 +144,14 @@ public class StackConveyor extends Block implements Autotiler{
 
             state = stateMove;
 
-            int[] bits = buildBlending(tile, tile.rotation(), null, true);
-            if(bits[0] == 0 &&  blends(tile, tile.rotation(), 0) && !blends(tile, tile.rotation(), 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
-            if(bits[0] == 0 && !blends(tile, tile.rotation(), 0) && blends(tile, tile.rotation(), 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
-            
+            int[] bits = buildBlending(tile, rotation, null, true);
+            if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
+            if(bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
+
             blendprox = 0;
 
             for(int i = 0; i < 4; i++){
-                if(blends(tile, rotation(), i)){
+                if(blends(tile, rotation, i)){
                     blendprox |= (1 << i);
                 }
             }
@@ -156,8 +159,11 @@ public class StackConveyor extends Block implements Autotiler{
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
                 for(Building near : proximity){
-                    if(near instanceof StackConveyorEntity){
+                    if(near instanceof StackConveyorBuild){
                         near.onProximityUpdate();
+                        for(Building other : near.proximity){
+                            if(!(other instanceof StackConveyorBuild)) other.onProximityUpdate();
+                        }
                     }
                 }
             }
@@ -187,9 +193,9 @@ public class StackConveyor extends Block implements Autotiler{
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
                     if(front() != null
-                    && front().team() == team()
-                    && front().block() instanceof StackConveyor){
-                        StackConveyorEntity e = (StackConveyorEntity)front();
+                    && front().team == team
+                    && front().block instanceof StackConveyor){
+                        StackConveyorBuild e = (StackConveyorBuild)front();
 
                         // sleep if its occupied
                         if(e.link == -1){
@@ -213,12 +219,12 @@ public class StackConveyor extends Block implements Autotiler{
             return false; // has no moving parts;
         }
 
-        private void poofIn(){
+        protected void poofIn(){
             link = tile.pos();
             Fx.plasticburn.at(this);
         }
 
-        private void poofOut(){
+        protected void poofOut(){
             Fx.plasticburn.at(this);
             link = -1;
         }
@@ -253,7 +259,7 @@ public class StackConveyor extends Block implements Autotiler{
             return !((state != stateLoad)                   // not a loading dock
             ||  (items.total() > 0 && !items.has(item))     // incompatible items
             ||  (items.total() >= getMaximumAccepted(item)) // filled to capacity
-            ||  (tile.front()  == source));
+            ||  (front()  == source));
         }
 
         @Override

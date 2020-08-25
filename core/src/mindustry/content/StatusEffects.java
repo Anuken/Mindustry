@@ -9,7 +9,7 @@ import mindustry.type.StatusEffect;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, tarred, overdrive, shielded, shocked, blasted, corroded, boss;
+    public static StatusEffect none, burning, freezing, wet, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed;
 
     @Override
     public void load(){
@@ -17,7 +17,7 @@ public class StatusEffects implements ContentList{
         none = new StatusEffect("none");
 
         burning = new StatusEffect("burning"){{
-            damage = 0.075f;
+            damage = 0.12f; //over 8 seconds, this would be 60 damage
             effect = Fx.burning;
 
             init(() -> {
@@ -47,8 +47,9 @@ public class StatusEffects implements ContentList{
 
         wet = new StatusEffect("wet"){{
             color = Color.royal;
-            speedMultiplier = 0.9f;
+            speedMultiplier = 0.94f;
             effect = Fx.wet;
+            effectChance = 0.09f;
 
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
@@ -74,6 +75,19 @@ public class StatusEffects implements ContentList{
             });
         }};
 
+        sapped = new StatusEffect("sapped"){{
+            speedMultiplier = 0.7f;
+            armorMultiplier = 0.8f;
+            effect = Fx.sapped;
+            effectChance = 0.1f;
+        }};
+
+        sporeSlowed = new StatusEffect("spore-slowed"){{
+            speedMultiplier = 0.8f;
+            effect = Fx.sapped;
+            effectChance = 0.04f;
+        }};
+
         tarred = new StatusEffect("tarred"){{
             speedMultiplier = 0.6f;
             effect = Fx.oily;
@@ -91,6 +105,14 @@ public class StatusEffects implements ContentList{
             damage = -0.01f;
             effect = Fx.overdriven;
             permanent = true;
+        }};
+
+        overclock = new StatusEffect("overclock"){{
+            speedMultiplier = 1.15f;
+            damageMultiplier = 1.15f;
+            reloadMultiplier = 1.25f;
+            effectChance = 0.07f;
+            effect = Fx.overclocked;
         }};
 
         shielded = new StatusEffect("shielded"){{

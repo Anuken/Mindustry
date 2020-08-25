@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
 @Component
-abstract class HealthComp implements Entityc{
+abstract class HealthComp implements Entityc, Posc{
     static final float hitDuration = 9f;
 
     float health;
@@ -24,7 +24,7 @@ abstract class HealthComp implements Entityc{
 
     @Override
     public void update(){
-        hitTime -= Time.delta() / hitDuration;
+        hitTime -= Time.delta / hitDuration;
     }
 
     void killed(){
@@ -82,19 +82,25 @@ abstract class HealthComp implements Entityc{
     }
 
     void damageContinuous(float amount){
-        damage(amount * Time.delta(), hitTime <= -10 + hitDuration);
+        damage(amount * Time.delta, hitTime <= -10 + hitDuration);
     }
 
     void damageContinuousPierce(float amount){
-        damagePierce(amount * Time.delta(), hitTime <= -20 + hitDuration);
+        damagePierce(amount * Time.delta, hitTime <= -20 + hitDuration);
     }
 
     void clampHealth(){
         health = Mathf.clamp(health, 0, maxHealth);
     }
 
+    /** Heals by a flat amount. */
     void heal(float amount){
         health += amount;
         clampHealth();
+    }
+
+    /** Heals by a 0-1 fraction of max health. */
+    void healFract(float amount){
+        heal(amount * maxHealth);
     }
 }

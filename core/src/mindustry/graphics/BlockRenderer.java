@@ -20,9 +20,9 @@ import static arc.Core.camera;
 import static mindustry.Vars.*;
 
 public class BlockRenderer implements Disposable{
-    private final static int initialRequests = 32 * 32;
-    private final static int expandr = 9;
-    private final static Color shadowColor = new Color(0, 0, 0, 0.71f);
+    private static final int initialRequests = 32 * 32;
+    private static final int expandr = 9;
+    private static final Color shadowColor = new Color(0, 0, 0, 0.71f);
 
     public final FloorRenderer floor = new FloorRenderer();
 
@@ -114,11 +114,11 @@ public class BlockRenderer implements Disposable{
         if(brokenFade > 0.001f){
             for(BlockPlan block : state.teams.get(player.team()).blocks){
                 Block b = content.block(block.block);
-                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset(), block.y * tilesize + b.offset()))) continue;
+                if(!camera.bounds(Tmp.r1).grow(tilesize * 2f).overlaps(Tmp.r2.setSize(b.size * tilesize).setCenter(block.x * tilesize + b.offset, block.y * tilesize + b.offset))) continue;
 
                 Draw.alpha(0.33f * brokenFade);
                 Draw.mixcol(Color.white, 0.2f + Mathf.absin(Time.globalTime(), 6f, 0.2f));
-                Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset(), block.y * tilesize + b.offset(), b.rotate ? block.rotation * 90 : 0f);
+                Draw.rect(b.icon(Cicon.full), block.x * tilesize + b.offset, block.y * tilesize + b.offset, b.rotate ? block.rotation * 90 : 0f);
             }
             Draw.reset();
         }
@@ -249,7 +249,7 @@ public class BlockRenderer implements Disposable{
                         Draw.z(Layer.block);
                     }
 
-                    if(entity.team() != player.team()){
+                    if(entity.team != player.team()){
                         entity.drawTeam();
                         Draw.z(Layer.block);
                     }

@@ -29,7 +29,7 @@ public class MassDriver extends Block{
     public float bulletLifetime = 200f;
     public Effect shootEffect = Fx.shootBig2;
     public Effect smokeEffect = Fx.shootBigSmoke2;
-    public Effect recieveEffect = Fx.mineBig;
+    public Effect receiveEffect = Fx.mineBig;
     public float shake = 3f;
     public @Load("@-base") TextureRegion baseRegion;
 
@@ -41,9 +41,11 @@ public class MassDriver extends Block{
         hasItems = true;
         hasPower = true;
         outlineIcon = true;
+        sync = true;
+
         //point2 is relative
-        config(Point2.class, (MassDriverEntity tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
-        config(Integer.class, (MassDriverEntity tile, Integer point) -> tile.link = point);
+        config(Point2.class, (MassDriverBuild tile, Point2 point) -> tile.link = Point2.pack(point.x + tile.tileX(), point.y + tile.tileY()));
+        config(Integer.class, (MassDriverBuild tile, Integer point) -> tile.link = point);
     }
 
     @Override
@@ -62,7 +64,7 @@ public class MassDriver extends Block{
 
         //if so, draw a dotted line towards it while it is in range
         float sin = Mathf.absin(Time.time(), 6f, 1f);
-        Tmp.v1.set(x * tilesize + offset(), y * tilesize + offset()).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
+        Tmp.v1.set(x * tilesize + offset, y * tilesize + offset).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
             x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
         int segs = (int)(selected.dst(x * tilesize, y * tilesize) / tilesize);
@@ -75,7 +77,7 @@ public class MassDriver extends Block{
     }
 
     public class DriverBulletData implements Poolable{
-        public MassDriverEntity from, to;
+        public MassDriverBuild from, to;
         public int[] items = new int[content.items().size];
 
         @Override
@@ -85,20 +87,20 @@ public class MassDriver extends Block{
         }
     }
 
-    public class MassDriverEntity extends Building{
-        int link = -1;
-        float rotation = 90;
-        float reload = 0f;
-        DriverState state = DriverState.idle;
-        OrderedSet<Tile> waitingShooters = new OrderedSet<>();
+    public class MassDriverBuild extends Building{
+        public int link = -1;
+        public float rotation = 90;
+        public float reload = 0f;
+        public DriverState state = DriverState.idle;
+        public OrderedSet<Tile> waitingShooters = new OrderedSet<>();
 
-        Tile currentShooter(){
+        public Tile currentShooter(){
             return waitingShooters.isEmpty() ? null : waitingShooters.first();
         }
 
         @Override
         public void updateTile(){
-            Building link = world.ent(this.link);
+            Building link = world.build(this.link);
             boolean hasLink = linkValid();
 
             //reload regardless of state
@@ -153,7 +155,7 @@ public class MassDriver extends Block{
                 items.total() >= minDistribute && //must shoot minimum amount of items
                 link.block().itemCapacity - link.items.total() >= minDistribute //must have minimum amount of space
                 ){
-                    MassDriverEntity other = (MassDriverEntity)link;
+                    MassDriverBuild other = (MassDriverBuild)link;
                     other.waitingShooters.add(tile);
 
                     if(reload <= 0.0001f){
@@ -221,7 +223,7 @@ public class MassDriver extends Block{
             if(link == other.pos()){
                 configure(-1);
                 return false;
-            }else if(other.block() instanceof MassDriver && other.dst(tile) <= range && other.team() == team){
+            }else if(other.block() instanceof MassDriver && other.dst(tile) <= range && other.team == team){
                 configure(other.pos());
                 return false;
             }
@@ -235,7 +237,7 @@ public class MassDriver extends Block{
             return items.total() < itemCapacity && linkValid();
         }
 
-        protected void fire(MassDriverEntity target){
+        protected void fire(MassDriverBuild target){
             //reset reload, use power.
             reload = 1f;
 
@@ -252,7 +254,7 @@ public class MassDriver extends Block{
 
             float angle = tile.angleTo(target);
 
-            Bullets.driverBolt.create(this, team(),
+            Bullets.driverBolt.create(this, team,
                 x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation),
                 angle, -1f, bulletSpeed, bulletLifetime, data);
 
@@ -262,7 +264,7 @@ public class MassDriver extends Block{
             smokeEffect.at(x + Angles.trnsx(angle, translation),
             y + Angles.trnsy(angle, translation), angle);
 
-            Effects.shake(shake, shake, this);
+            Effect.shake(shake, shake, this);
         }
 
         public void handlePayload(Bullet bullet, DriverBulletData data){
@@ -280,8 +282,8 @@ public class MassDriver extends Block{
                 }
             }
 
-            Effects.shake(shake, shake, this);
-            recieveEffect.at(bullet);
+            Effect.shake(shake, shake, this);
+            receiveEffect.at(bullet);
 
             reload = 1f;
             bullet.remove();
@@ -290,7 +292,7 @@ public class MassDriver extends Block{
         protected boolean shooterValid(Tile other){
             if(other == null) return true;
             if(!(other.block() instanceof MassDriver)) return false;
-            MassDriverEntity entity = other.bc();
+            MassDriverBuild entity = other.bc();
             return entity.link == tile.pos() && tile.dst(other) <= range;
         }
 
@@ -318,14 +320,16 @@ public class MassDriver extends Block{
             super.read(read, revision);
             link = read.i();
             rotation = read.f();
-            state = DriverState.values()[read.b()];
+            state = DriverState.all[read.b()];
         }
     }
 
-    enum DriverState{
+    public enum DriverState{
         idle, //nothing is shooting at this mass driver and it does not have any target
         accepting, //currently getting shot at, unload items
         shooting,
-        unloading
+        unloading;
+
+        public static final DriverState[] all = values();
     }
 }

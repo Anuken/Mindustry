@@ -3,6 +3,7 @@ package mindustry.entities.units;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -52,7 +53,8 @@ public class BuildPlan{
 
     }
 
-    public static Object pointConfig(Object config, Cons<Point2> cons){
+    /** Transforms the internal position of this config using the specified function, and return the result. */
+    public static Object pointConfig(Block block, Object config, Cons<Point2> cons){
         if(config instanceof Point2){
             config = ((Point2)config).cpy();
             cons.get((Point2)config);
@@ -64,14 +66,15 @@ public class BuildPlan{
                 cons.get(result[i++]);
             }
             config = result;
+        }else if(block != null){
+            config = block.pointConfig(config, cons);
         }
         return config;
     }
 
-    /** If this requests's config is a Point2 or an array of Point2s, this returns a copy of them for transformation.
-     * Otherwise does nothing. */
+    /** Transforms the internal position of this config using the specified function. */
     public void pointConfig(Cons<Point2> cons){
-        this.config = pointConfig(this.config, cons);
+        this.config = pointConfig(block, this.config, cons);
     }
 
     public BuildPlan copy(){
@@ -117,11 +120,11 @@ public class BuildPlan{
     }
 
     public float drawx(){
-        return x*tilesize + block.offset();
+        return x*tilesize + block.offset;
     }
 
     public float drawy(){
-        return y*tilesize + block.offset();
+        return y*tilesize + block.offset;
     }
 
     public BuildPlan configure(Object config){
@@ -132,6 +135,10 @@ public class BuildPlan{
 
     public @Nullable Tile tile(){
         return world.tile(x, y);
+    }
+
+    public @Nullable Building build(){
+        return world.build(x, y);
     }
 
     @Override

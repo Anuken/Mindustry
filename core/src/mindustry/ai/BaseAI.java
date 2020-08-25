@@ -25,7 +25,7 @@ public class BaseAI{
     private static final float step = 5;
     private static final int attempts = 5;
     private static final float emptyChance = 0.01f;
-    private final static int timerStep = 0, timerSpawn = 1;
+    private static final int timerStep = 0, timerSpawn = 1;
 
     private static int correct = 0, incorrect = 0;
 

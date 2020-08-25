@@ -50,7 +50,7 @@ public class LaunchPad extends Block{
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
-    public class LaunchPadEntity extends Building{
+    public class LaunchPadBuild extends Building{
         @Override
         public void draw(){
             super.draw();
@@ -104,7 +104,7 @@ public class LaunchPad extends Block{
                 entity.add();
                 Fx.launchPod.at(this);
                 items.clear();
-                Effects.shake(3f, 3f, this);
+                Effect.shake(3f, 3f, this);
             }
         }
     }
@@ -174,25 +174,19 @@ public class LaunchPad extends Block{
 
         @Override
         public void remove(){
-
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam && state.secinfo.origin != null){
-                Seq<ItemStack> dest = state.secinfo.origin.getRecievedItems();
+                ItemSeq dest = state.secinfo.origin.getExtraItems();
 
                 for(ItemStack stack : stacks){
-                    ItemStack sto = dest.find(i -> i.item == stack.item);
-                    if(sto != null){
-                        sto.amount += stack.amount;
-                    }else{
-                        dest.add(stack);
-                    }
+                    dest.add(stack);
 
                     //update export
                     state.secinfo.handleItemExport(stack);
                     Events.fire(new LaunchItemEvent(stack));
                 }
 
-                state.secinfo.origin.setRecievedItems(dest);
+                state.secinfo.origin.setExtraItems(dest);
             }
         }
     }

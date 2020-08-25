@@ -16,7 +16,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class RepairPoint extends Block{
-    private static final Rect rect = new Rect();
+    static final Rect rect = new Rect();
 
     public int timerTarget = timers++;
 
@@ -47,13 +47,13 @@ public class RepairPoint extends Block{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, entity -> ((RepairPointEntity)entity).target != null);
+        consumes.powerCond(powerUse, entity -> ((RepairPointBuild)entity).target != null);
         super.init();
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), repairRadius, Pal.accent);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, repairRadius, Pal.accent);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class RepairPoint extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class RepairPointEntity extends Building{
+    public class RepairPointBuild extends Building{
         public Unit target;
         public float strength, rotation = 90;
 
@@ -96,15 +96,15 @@ public class RepairPoint extends Block{
             if(target != null && (target.dead() || target.dst(tile) > repairRadius || target.health() >= target.maxHealth())){
                 target = null;
             }else if(target != null && consValid()){
-                target.heal(repairSpeed * Time.delta() * strength * efficiency());
+                target.heal(repairSpeed * Time.delta * strength * efficiency());
                 rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.5f);
                 targetIsBeingRepaired = true;
             }
 
             if(target != null && targetIsBeingRepaired){
-                strength = Mathf.lerpDelta(strength, 1f, 0.08f * Time.delta());
+                strength = Mathf.lerpDelta(strength, 1f, 0.08f * Time.delta);
             }else{
-                strength = Mathf.lerpDelta(strength, 0f, 0.07f * Time.delta());
+                strength = Mathf.lerpDelta(strength, 0f, 0.07f * Time.delta);
             }
 
             if(timer(timerTarget, 20)){
@@ -115,7 +115,7 @@ public class RepairPoint extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return target != null;
+            return target != null && enabled;
         }
     }
 }

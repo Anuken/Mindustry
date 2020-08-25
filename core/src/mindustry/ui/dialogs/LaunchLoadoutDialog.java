@@ -27,7 +27,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
     boolean valid;
 
     public LaunchLoadoutDialog(){
-        super("$configure");
+        super("@configure");
     }
 
     public void show(CoreBlock core, Building build, Runnable confirm){
@@ -70,7 +70,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         Runnable rebuildItems = () -> rebuild.get(items);
 
-        buttons.button("$resources", Icon.terrain, () -> {
+        buttons.button("@resources", Icon.terrain, () -> {
             loadout.show(core.itemCapacity, stacks, stacks::clear, () -> {}, () -> {
                 universe.updateLaunchResources(stacks);
                 update.run();
@@ -78,7 +78,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             });
         });
 
-        buttons.button("$launch.text", Icon.ok, () -> {
+        buttons.button("@launch.text", Icon.ok, () -> {
             universe.updateLoadout(core, selected);
             confirm.run();
             hide();

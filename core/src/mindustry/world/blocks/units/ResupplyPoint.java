@@ -30,10 +30,10 @@ public class ResupplyPoint extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.placing);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.placing);
     }
 
-    public class ResupplyPointEntity extends Building{
+    public class ResupplyPointBuild extends Building{
 
         @Override
         public void drawSelect(){

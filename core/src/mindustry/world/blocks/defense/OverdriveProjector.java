@@ -43,7 +43,7 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset(), y * tilesize + offset(), range, Pal.accent);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
     @Override
@@ -73,13 +73,13 @@ public class OverdriveProjector extends Block{
         @Override
         public void updateTile(){
             heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.08f);
-            charge += heat * Time.delta();
+            charge += heat * Time.delta;
 
             if(hasBoost){
-                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
             }
 
-            if(timer(timerUse, useTime) && efficiency() > 0){
+            if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
                 consume();
             }
 

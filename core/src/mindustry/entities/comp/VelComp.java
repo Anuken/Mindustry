@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -17,8 +18,8 @@ abstract class VelComp implements Posc{
     @MethodPriority(-1)
     @Override
     public void update(){
-        move(vel.x * Time.delta(), vel.y * Time.delta());
-        vel.scl(1f - drag * Time.delta());
+        move(vel.x * Time.delta, vel.y * Time.delta);
+        vel.scl(Mathf.clamp(1f - drag * Time.delta));
     }
 
     boolean moving(){

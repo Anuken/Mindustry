@@ -28,7 +28,7 @@ public class LiquidJunction extends LiquidBlock{
         return new TextureRegion[]{region};
     }
 
-    public class LiquidJunctionEntity extends Building{
+    public class LiquidJunctionBuild extends Building{
         @Override
         public void draw(){
             Draw.rect(region, x, y);

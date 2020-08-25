@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.*;
@@ -75,19 +76,22 @@ public class Administration{
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
-                action.type != ActionType.tapTile &&
-                Config.antiSpam.bool() &&
-                //make sure players can configure their own stuff, e.g. in schematics
-                lastPlaced.get(action.tile.pos(), -1) != action.player.id()){
+                Config.antiSpam.bool()){
+
+                //make sure players can configure their own stuff, e.g. in schematics - but only once.
+                if(lastPlaced.get(action.tile.pos(), -1) == action.player.id()){
+                    lastPlaced.remove(action.tile.pos());
+                    return true;
+                }
 
                 Ratekeeper rate = action.player.getInfo().rate;
                 if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
                     return true;
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
-                        player.kick("You are interacting with too many blocks.", 1000 * 30);
+                        action.player.kick("You are interacting with too many blocks.", 1000 * 30);
                     }else{
-                        player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
+                        action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
                     }
 
                     return false;
@@ -139,6 +143,9 @@ public class Administration{
 
     /** @return whether this action is allowed by the action filters. */
     public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
+        //some actions are done by the server (null player) and thus are always allowed
+        if(player == null) return true;
+
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
         setter.get(act.set(player, type, tile));
         for(ActionFilter filter : actionFilters){
@@ -567,7 +574,11 @@ public class Administration{
         socketInputAddress("The bind address for socket input.", "localhost", () -> Events.fire(Trigger.socketConfigChanged)),
         allowCustomClients("Whether custom clients are allowed to connect.", !headless, "allow-custom"),
         whitelist("Whether the whitelist is used.", false),
-        motd("The message displayed to people on connection.", "off");
+        motd("The message displayed to people on connection.", "off"),
+        autosave("Whether the periodically save the map when playing.", false),
+        autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
+        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
+        debug("Enable debug logging", false, () -> Log.setLogLevel(debug() ? LogLevel.debug : LogLevel.info));
 
         public static final Config[] all = values();
 
@@ -625,6 +636,10 @@ public class Administration{
         public void set(Object value){
             Core.settings.put(key, value);
             changed.run();
+        }
+
+        private static boolean debug(){
+            return Config.debug.bool();
         }
     }
 
@@ -714,7 +729,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
     }
 
 }

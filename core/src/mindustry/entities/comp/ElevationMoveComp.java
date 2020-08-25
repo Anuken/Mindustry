@@ -3,7 +3,7 @@ package mindustry.entities.comp;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.collisions;
+import static mindustry.Vars.*;
 
 @Component
 abstract class ElevationMoveComp implements Velc, Posc, Flyingc, Hitboxc{
@@ -19,4 +19,5 @@ abstract class ElevationMoveComp implements Velc, Posc, Flyingc, Hitboxc{
             collisions.move(this, cx, cy);
         }
     }
+
 }

@@ -5,6 +5,9 @@ public class Layer{
 
     public static final float
 
+    //min layer
+    min = -11,
+
     //background, which may be planets or an image or nothing at all
     background = -10,
 
@@ -37,6 +40,9 @@ public class Layer{
 
     //power lines
     power = 70,
+
+    //certain multi-legged units
+    legUnit = 75f,
 
     //darkness over block clusters
     darkness = 80,
@@ -78,7 +84,10 @@ public class Layer{
     end = 200,
 
     //things after pixelation - used for text
-    endPixeled = 210
+    endPixeled = 210,
+
+    //max layer
+    max = 220
 
     ;
 }

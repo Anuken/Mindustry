@@ -24,6 +24,12 @@ public class EntityCollisions{
     //entity collisions
     private Seq<Hitboxc> arrOut = new Seq<>();
 
+    public void moveCheck(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
+        if(!solidCheck.solid(entity.tileX(), entity.tileY())){
+            move(entity, deltax, deltay, solidCheck);
+        }
+    }
+
     public void move(Hitboxc entity, float deltax, float deltay){
         move(entity, deltax, deltay, EntityCollisions::solid);
     }
@@ -119,14 +125,19 @@ public class EntityCollisions{
         });
     }
 
+    public static boolean legsSolid(int x, int y){
+        Tile tile = world.tile(x, y);
+        return tile == null || tile.staticDarkness() >= 2;
+    }
+
     public static boolean waterSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile != null && (tile.solid() || !tile.floor().isLiquid);
+        return tile == null || (tile.solid() || !tile.floor().isLiquid);
     }
 
     public static boolean solid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile != null && tile.solid();
+        return tile == null || tile.solid();
     }
 
     private void checkCollide(Hitboxc a, Hitboxc b){

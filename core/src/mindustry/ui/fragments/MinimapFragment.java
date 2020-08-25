@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 
 public class MinimapFragment extends Fragment{
     private boolean shown;
-    private float panx, pany, zoom = 1f, lastZoom = -1;
+    float panx, pany, zoom = 1f, lastZoom = -1;
     private float baseSize = Scl.scl(5f);
     private Element elem;
 
@@ -54,7 +54,7 @@ public class MinimapFragment extends Fragment{
                 shown = false;
             }
         });
-        elem.touchable(Touchable.enabled);
+        elem.touchable = Touchable.enabled;
 
         elem.addListener(new ElementGestureListener(){
 
@@ -98,11 +98,11 @@ public class MinimapFragment extends Fragment{
             t.visible(() -> shown);
             t.update(() -> t.setBounds(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight()));
 
-            t.add("$minimap").style(Styles.outlineLabel).pad(10f);
+            t.add("@minimap").style(Styles.outlineLabel).pad(10f);
             t.row();
             t.add().growY();
             t.row();
-            t.button("$back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
+            t.button("@back", Icon.leftOpen, () -> shown = false).size(220f, 60f).pad(10f);
         });
     }
 
@@ -111,6 +111,12 @@ public class MinimapFragment extends Fragment{
     }
 
     public void toggle(){
+        if(Core.settings.getBool("mapcenter")){
+            float size = baseSize * zoom * world.width();
+            float ratio = (float)renderer.minimap.getTexture().getHeight() / renderer.minimap.getTexture().getWidth();
+            panx = (size/2f - player.x() / (world.width() * tilesize) * size) / zoom;
+            pany = (size*ratio/2f - player.y() / (world.height() * tilesize) * size*ratio) / zoom;
+        }
         shown = !shown;
     }
 }

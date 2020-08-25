@@ -51,7 +51,7 @@ public class Separator extends Block{
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
     }
 
-    public class SeparatorEntity extends Building{
+    public class SeparatorBuild extends Building{
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -71,7 +71,7 @@ public class Separator extends Block{
                     total -= items.get(stack.item);
                 }
             }
-            return total < itemCapacity;
+            return total < itemCapacity && enabled;
         }
 
         @Override

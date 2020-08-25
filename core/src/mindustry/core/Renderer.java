@@ -63,7 +63,7 @@ public class Renderer implements ApplicationListener{
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
 
         if(landTime > 0){
-            landTime -= Time.delta();
+            landTime -= Time.delta;
             landscale = Interp.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
             camerascale = landscale;
             weatherAlpha = 0f;
@@ -85,6 +85,10 @@ public class Renderer implements ApplicationListener{
                 draw();
             }
         }
+    }
+
+    public boolean isLanding(){
+        return landTime > 0;
     }
 
     public float weatherAlpha(){
@@ -134,7 +138,7 @@ public class Renderer implements ApplicationListener{
         }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
-            ui.showErrorMessage("$error.bloom");
+            ui.showErrorMessage("@error.bloom");
         }
     }
 
@@ -172,8 +176,8 @@ public class Renderer implements ApplicationListener{
         if(shaketime > 0){
             float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
             camera.position.add(Mathf.range(intensity), Mathf.range(intensity));
-            shakeIntensity -= 0.25f * Time.delta();
-            shaketime -= Time.delta();
+            shakeIntensity -= 0.25f * Time.delta;
+            shaketime -= Time.delta;
             shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
         }else{
             shakeIntensity = 0f;
@@ -181,6 +185,8 @@ public class Renderer implements ApplicationListener{
     }
 
     public void draw(){
+        Events.fire(Trigger.preDraw);
+
         camera.update();
 
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
@@ -200,6 +206,8 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         Draw.sort(true);
+
+        Events.fire(Trigger.draw);
 
         if(pixelator.enabled()){
             pixelator.register();
@@ -250,6 +258,8 @@ public class Renderer implements ApplicationListener{
         Draw.reset();
         Draw.flush();
         Draw.sort(false);
+
+        Events.fire(Trigger.postDraw);
     }
 
     private void drawBackground(){
@@ -314,7 +324,7 @@ public class Renderer implements ApplicationListener{
         int memory = w * h * 4 / 1024 / 1024;
 
         if(memory >= 65){
-            ui.showInfo("$screenshot.invalid");
+            ui.showInfo("@screenshot.invalid");
             return;
         }
 

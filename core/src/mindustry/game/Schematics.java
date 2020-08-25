@@ -42,7 +42,6 @@ import static mindustry.Vars.*;
 public class Schematics implements Loadable{
     private static final Schematic tmpSchem = new Schematic(new Seq<>(), new StringMap(), 0, 0);
     private static final Schematic tmpSchem2 = new Schematic(new Seq<>(), new StringMap(), 0, 0);
-    public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 1;
@@ -345,7 +344,7 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Building linked = world.ent(cx, cy);
+                Building linked = world.build(cx, cy);
 
                 if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof BuildBlock)){
                     int top = linked.block().size/2;
@@ -373,13 +372,13 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Building tile = world.ent(cx, cy);
+                Building tile = world.build(cx, cy);
 
                 if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
                     && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
                     Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
+                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }
@@ -418,8 +417,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, team, 0);
-            tile.rotation(st.rotation);
+            tile.setBlock(st.block, team, st.rotation);
 
             Object config = st.config;
             if(tile.build != null){
@@ -438,8 +436,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, team, 0);
-            tile.rotation(st.rotation);
+            tile.setBlock(st.block, team, st.rotation);
 
             Object config = st.config;
             if(tile.build != null){
@@ -586,7 +583,7 @@ public class Schematics implements Loadable{
         int ox = schem.width/2, oy = schem.height/2;
 
         schem.tiles.each(req -> {
-            req.config = BuildPlan.pointConfig(req.config, p -> {
+            req.config = BuildPlan.pointConfig(req.block, req.config, p -> {
                 int cx = p.x, cy = p.y;
                 int lx = cx;
 
@@ -601,7 +598,7 @@ public class Schematics implements Loadable{
             });
 
             //rotate actual request, centered on its multiblock position
-            float wx = (req.x - ox) * tilesize + req.block.offset(), wy = (req.y - oy) * tilesize + req.block.offset();
+            float wx = (req.x - ox) * tilesize + req.block.offset, wy = (req.y - oy) * tilesize + req.block.offset;
             float x = wx;
             if(direction >= 0){
                 wx = -wy;
@@ -610,8 +607,8 @@ public class Schematics implements Loadable{
                 wx = wy;
                 wy = -x;
             }
-            req.x = (short)(world.toTile(wx - req.block.offset()) + ox);
-            req.y = (short)(world.toTile(wy - req.block.offset()) + oy);
+            req.x = (short)(world.toTile(wx - req.block.offset) + ox);
+            req.y = (short)(world.toTile(wy - req.block.offset) + oy);
             req.rotation = (byte)Mathf.mod(req.rotation + direction, 4);
         });
 

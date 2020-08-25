@@ -59,7 +59,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conduit &&
-            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
+            Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
     }
 
     @Override
@@ -72,14 +72,14 @@ public class Conduit extends LiquidBlock implements Autotiler{
         return new TextureRegion[]{Core.atlas.find("conduit-bottom"), topRegions[0]};
     }
 
-    public class ConduitEntity extends LiquidBlockEntity{
+    public class ConduitBuild extends LiquidBuild{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
 
         @Override
         public void draw(){
             float rotation = rotdeg();
-            int r = rotation();
+            int r = this.rotation;
 
             //draw extra conduits facing this one for tiling purposes
             Draw.z(Layer.blockUnder);
@@ -114,7 +114,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            int[] bits = buildBlending(tile, rotation(), null, true);
+            int[] bits = buildBlending(tile, rotation, null, true);
             blendbits = bits[0];
             xscl = bits[1];
             yscl = bits[2];
@@ -125,7 +125,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public boolean acceptLiquid(Building source, Liquid liquid, float amount){
             noSleep();
             return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
-                && ((source.relativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
+                && ((source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
         }
 
         @Override

@@ -90,7 +90,7 @@ public class Drill extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("drillspeed", (DrillEntity e) ->
+        bars.add("drillspeed", (DrillBuild e) ->
              new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60 * e.timeScale(), 2)), () -> Pal.ammo, () -> e.warmup));
     }
 
@@ -121,7 +121,7 @@ public class Drill extends Block{
 
         if(returnItem != null){
             float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / (drillTime + hardnessDrillMultiplier * returnItem.hardness) * returnCount, 2), x, y, valid);
-            float dx = x * tilesize + offset() - width/2f - 4f, dy = y * tilesize + offset() + size * tilesize / 2f + 5;
+            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5;
             Draw.mixcol(Color.darkGray, 1f);
             Draw.rect(returnItem.icon(Cicon.small), dx, dy - 1);
             Draw.reset();
@@ -208,7 +208,7 @@ public class Drill extends Block{
         return drops != null && drops.hardness <= tier;
     }
 
-    public class DrillEntity extends Building{
+    public class DrillBuild extends Building{
         public float progress;
         public int index;
         public float warmup;
@@ -222,7 +222,7 @@ public class Drill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity;
+            return items.total() < itemCapacity && enabled;
         }
 
         @Override
@@ -264,7 +264,7 @@ public class Drill extends Block{
             if(items.total() < itemCapacity && dominantItems > 0 && consValid()){
 
                 float speed = 1f;
-
+                
                 if(cons().optionalValid()){
                     updateCooling();
                     speed = (float) Math.sqrt(liquidBoostIntensity);

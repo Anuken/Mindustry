@@ -35,8 +35,10 @@ public class FormationAI extends AIController implements FormationMember{
         if(leader.isShooting){
             unit.aimLook(leader.aimX(), leader.aimY());
         }else{
-            if(!unit.moving()){
-                unit.lookAt(unit.vel.angle());
+            if(!leader.moving() || !unit.type().rotateShooting){
+                if(unit.moving()){
+                    unit.lookAt(unit.vel.angle());
+                }
             }else{
                 unit.lookAt(leader.rotation);
             }
@@ -56,6 +58,15 @@ public class FormationAI extends AIController implements FormationMember{
         if(formation != null){
             formation.removeMember(this);
         }
+    }
+
+    @Override
+    public float formationSize(){
+        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+            //TODO return formation size
+            //eturn ((Commanderc)unit).formation().
+        }
+        return unit.hitSize * 1.7f;
     }
 
     @Override

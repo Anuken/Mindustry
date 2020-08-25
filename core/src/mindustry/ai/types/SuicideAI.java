@@ -17,7 +17,7 @@ public class SuicideAI extends GroundAI{
         }
 
         if(retarget()){
-            targetClosest();
+            target = target(unit.x, unit.y, unit.range(), unit.type().targetAir, unit.type().targetGround);
         }
 
         Building core = unit.closestEnemyCore();
@@ -39,7 +39,7 @@ public class SuicideAI extends GroundAI{
             boolean blocked = Vars.world.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
                 Tile tile = Vars.world.tile(x, y);
                 if(tile != null && tile.build == target) return false;
-                if(tile != null && tile.build != null && tile.build.team() != unit.team()){
+                if(tile != null && tile.build != null && tile.build.team != unit.team()){
                     blockedByBlock = true;
                     return true;
                 }else{

@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
@@ -21,7 +22,7 @@ import java.io.*;
 
 public class ImagePacker{
     static ObjectMap<String, TextureRegion> regionCache = new ObjectMap<>();
-    static ObjectMap<TextureRegion, BufferedImage> imageCache = new ObjectMap<>();
+    static ObjectMap<String, BufferedImage> imageCache = new ObjectMap<>();
 
     public static void main(String[] args) throws Exception{
         Vars.headless = true;
@@ -33,10 +34,14 @@ public class ImagePacker{
         Log.setLogger(new DefaultLogHandler());
 
         Fi.get("../../../assets-raw/sprites_out").walk(path -> {
+            if(!path.extEquals("png")) return;
+
             String fname = path.nameWithoutExtension();
 
             try{
                 BufferedImage image = ImageIO.read(path.file());
+
+                if(image == null) throw new IOException("image " + path.absolutePath() + " is null for terrible reasons");
                 GenRegion region = new GenRegion(fname, path){
 
                     @Override
@@ -61,7 +66,7 @@ public class ImagePacker{
                 };
 
                 regionCache.put(fname, region);
-                imageCache.put(region, image);
+                imageCache.put(fname, image);
             }catch(IOException e){
                 throw new RuntimeException(e);
             }
@@ -117,7 +122,7 @@ public class ImagePacker{
         ObjectMap<String, String> content2id = new ObjectMap<>();
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
-        Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids());
+        Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids(), Vars.content.units());
         cont.removeAll(u -> u instanceof BuildBlock || u == Blocks.air);
 
         int minid = 0xF8FF;
@@ -142,6 +147,7 @@ public class ImagePacker{
 
     static String texname(UnlockableContent c){
         if(c instanceof Block) return "block-" + c.name + "-medium";
+        if(c instanceof UnitType) return "unit-" + c.name + "-medium";
         return c.getContentType() + "-" + c.name + "-icon";
     }
 
@@ -152,7 +158,7 @@ public class ImagePacker{
     }
 
     static BufferedImage buf(TextureRegion region){
-        return imageCache.get(region);
+        return imageCache.get(((AtlasRegion)region).name);
     }
 
     static Image create(int width, int height){
@@ -170,7 +176,7 @@ public class ImagePacker{
     static Image get(TextureRegion region){
         GenRegion.validate(region);
 
-        return new Image(imageCache.get(region));
+        return new Image(imageCache.get(((AtlasRegion)region).name));
     }
 
     static void err(String message, Object... args){
@@ -178,11 +184,11 @@ public class ImagePacker{
     }
 
     static class GenRegion extends AtlasRegion{
-        String name;
         boolean invalid;
         Fi path;
 
         GenRegion(String name, Fi path){
+            if(name == null) throw new IllegalArgumentException("name is null");
             this.name = name;
             this.path = path;
         }

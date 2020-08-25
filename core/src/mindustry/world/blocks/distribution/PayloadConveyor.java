@@ -41,14 +41,14 @@ public class PayloadConveyor extends Block{
         super.drawPlace(x, y, rotation, valid);
 
         for(int i = 0; i < 4; i++){
-            Building other = world.ent(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
+            Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
             if(other != null && other.block().outputsPayload && other.block().size == size){
                 Drawf.selected(other.tileX(), other.tileY(), other.block(), Pal.accent);
             }
         }
     }
 
-    public class PayloadConveyorEntity extends Building{
+    public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
         public @Nullable Building next;
@@ -66,15 +66,15 @@ public class PayloadConveyor extends Block{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            Building accept = nearby(Geometry.d4(rotation()).x * size, Geometry.d4(rotation()).y * size);
+            Building accept = nearby(Geometry.d4(rotation).x * size, Geometry.d4(rotation).y * size);
             //next block must be aligned and of the same size
             if(accept != null && (
                 //same size
-                (accept.block().size == size && tileX() + Geometry.d4(rotation()).x * size == accept.tileX() && tileY() + Geometry.d4(rotation()).y * size == accept.tileY()) ||
+                (accept.block().size == size && tileX() + Geometry.d4(rotation).x * size == accept.tileX() && tileY() + Geometry.d4(rotation).y * size == accept.tileY()) ||
 
                 //differing sizes
                 (accept.block().size > size &&
-                    (rotation() % 2 == 0 ? //check orientation
+                    (rotation % 2 == 0 ? //check orientation
                     Math.abs(accept.y - y) <= (accept.block().size * tilesize - size * tilesize)/2f : //check Y alignment
                     Math.abs(accept.x - x) <= (accept.block().size * tilesize - size * tilesize)/2f   //check X alignment
                 )))){
@@ -84,8 +84,13 @@ public class PayloadConveyor extends Block{
             }
 
             int ntrns = 1 + size/2;
-            Tile next = tile.getNearby(Geometry.d4(rotation()).x * ntrns, Geometry.d4(rotation()).y * ntrns);
-            blocked = (next != null && next.solid()) || (this.next != null && (this.next.rotation() + 2)%4 == rotation());
+            Tile next = tile.getNearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
+            blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
+        }
+
+        @Override
+        public Payload getPayload(){
+            return item;
         }
 
         @Override
@@ -131,7 +136,7 @@ public class PayloadConveyor extends Block{
             super.draw();
         }
 
-        @Override 
+        @Override
         public void draw(){
             super.draw();
 
@@ -156,7 +161,7 @@ public class PayloadConveyor extends Block{
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
             for(int i = 0; i < 4; i++){
-                if(blends(i) && i != rotation()){
+                if(blends(i) && i != rotation){
                     Draw.alpha(1f - Interp.pow5In.apply(fract()));
                     //prev from back
                     Tmp.v1.set(- s/2f + clipped.getWidth()/2f*Draw.scl,  - s/2f + clipped.getHeight()/2f*Draw.scl).rotate(i * 90 + 180);
@@ -236,15 +241,14 @@ public class PayloadConveyor extends Block{
             }
         }
 
-        boolean blends(int direction){
-            if(direction == rotation()){
+        protected boolean blends(int direction){
+            if(direction == rotation){
                 return !blocked || next != null;
-            }else{
-                return PayloadAcceptor.blends(this, direction);
             }
+            return PayloadAcceptor.blends(this, direction);
         }
 
-        TextureRegion clipRegion(Rect bounds, Rect sprite, TextureRegion region){
+        protected TextureRegion clipRegion(Rect bounds, Rect sprite, TextureRegion region){
             Rect over = Tmp.r3;
 
             boolean overlaps = Intersector.intersectRectangles(bounds, sprite, over);
@@ -268,11 +272,11 @@ public class PayloadConveyor extends Block{
             return out;
         }
 
-        int curStep(){
+        public int curStep(){
             return (int)((Time.time()) / moveTime);
         }
 
-        float fract(){
+        public float fract(){
             return interp.apply(progress / moveTime);
         }
     }

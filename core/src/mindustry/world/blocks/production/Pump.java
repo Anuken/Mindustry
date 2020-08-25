@@ -13,8 +13,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Pump extends LiquidBlock{
-    /** Pump amount, total. */
-    protected float pumpAmount = 1f;
+    /** Pump amount per tile. */
+    protected float pumpAmount = 0.2f;
 
     public Pump(String name){
         super(name);
@@ -25,7 +25,7 @@ public class Pump extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.output, 60f * pumpAmount, StatUnit.liquidSecond);
+        stats.add(BlockStat.output, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
     }
 
     @Override
@@ -33,19 +33,19 @@ public class Pump extends LiquidBlock{
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 
-        float tiles = 0f;
+        float amount = 0f;
         Liquid liquidDrop = null;
 
         for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
             if(canPump(other)){
                 liquidDrop = other.floor().liquidDrop;
-                tiles++;
+                amount += other.floor().liquidMultiplier;
             }
         }
 
         if(liquidDrop != null){
-            float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", tiles * pumpAmount / size / size * 60f, 0), x, y, valid);
-            float dx = x * tilesize + offset() - width/2f - 4f, dy = y * tilesize + offset() + size * tilesize / 2f + 5;
+            float width = drawPlaceText(Core.bundle.formatFloat("bar.pumpspeed", amount * pumpAmount * 60f, 0), x, y, valid);
+            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5;
             Draw.mixcol(Color.darkGray, 1f);
             Draw.rect(liquidDrop.icon(Cicon.small), dx, dy - 1);
             Draw.reset();
@@ -63,10 +63,8 @@ public class Pump extends LiquidBlock{
         if(isMultiblock()){
             Liquid last = null;
             for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-                if(other.floor().liquidDrop == null)
-                    continue;
-                if(other.floor().liquidDrop != last && last != null)
-                    return false;
+                if(other.floor().liquidDrop == null) continue;
+                if(other.floor().liquidDrop != last && last != null) return false;
                 last = other.floor().liquidDrop;
             }
             return last != null;
@@ -79,7 +77,9 @@ public class Pump extends LiquidBlock{
         return tile != null && tile.floor().liquidDrop != null;
     }
 
-    public class PumpEntity extends LiquidBlockEntity{
+    public class PumpBuild extends LiquidBuild{
+        public float amount = 0f;
+        public Liquid liquidDrop = null;
 
         @Override
         public void draw(){
@@ -92,24 +92,29 @@ public class Pump extends LiquidBlock{
         }
 
         @Override
-        public void updateTile(){
-            float tiles = 0f;
-            Liquid liquidDrop = null;
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
 
-            if(isMultiblock()){
-                for(Tile other : tile.getLinkedTiles(tempTiles)){
-                    if(canPump(other)){
-                        liquidDrop = other.floor().liquidDrop;
-                        tiles++;
-                    }
+            amount = 0f;
+            liquidDrop = null;
+
+            for(Tile other : tile.getLinkedTiles(tempTiles)){
+                if(canPump(other)){
+                    liquidDrop = other.floor().liquidDrop;
+                    amount += other.floor().liquidMultiplier;
                 }
-            }else{
-                tiles = 1f;
-                liquidDrop = tile.floor().liquidDrop;
             }
+        }
 
-            if(cons.valid() && liquidDrop != null){
-                float maxPump = Math.min(liquidCapacity - liquids.total(), tiles * pumpAmount * delta() / size / size) * efficiency();
+        @Override
+        public boolean shouldConsume(){
+            return liquidDrop != null && liquids.get(liquidDrop) < liquidCapacity - 0.01f && enabled;
+        }
+
+        @Override
+        public void updateTile(){
+            if(consValid() && liquidDrop != null){
+                float maxPump = Math.min(liquidCapacity - liquids.total(), amount * pumpAmount * edelta());
                 liquids.add(liquidDrop, maxPump);
             }
 

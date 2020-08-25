@@ -13,7 +13,7 @@ public class OverlayFragment{
     private WidgetGroup group = new WidgetGroup();
 
     public OverlayFragment(){
-        group.touchable(Touchable.childrenOnly);
+        group.touchable = Touchable.childrenOnly;
         inv = new BlockInventoryFragment();
         config = new BlockConfigFragment();
     }

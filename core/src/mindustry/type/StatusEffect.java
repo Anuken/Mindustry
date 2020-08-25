@@ -15,10 +15,14 @@ public class StatusEffect extends MappableContent{
     public float damageMultiplier = 1f;
     /** Unit armor multiplier. */
     public float armorMultiplier = 1f;
-    /** Unit speed multiplier (buggy) */
+    /** Unit speed multiplier */
     public float speedMultiplier = 1f;
+    /** Unit speed multiplier */
+    public float reloadMultiplier = 1f;
     /** Damage per frame. */
     public float damage;
+    /** Chance of effect appearing. */
+    public float effectChance = 0.15f;
     /** If true, the effect never disappears. */
     public boolean permanent;
     /** Tint color of effect. */
@@ -48,11 +52,12 @@ public class StatusEffect extends MappableContent{
         if(damage > 0){
             unit.damageContinuousPierce(damage);
         }else if(damage < 0){ //heal unit
-            unit.heal(damage * Time.delta());
+            unit.heal(damage * Time.delta);
         }
 
-        if(effect != Fx.none && Mathf.chanceDelta(0.15f)){
-            effect.at(unit.x() + Mathf.range(unit.bounds() / 2f), unit.y() + Mathf.range(unit.bounds() / 2f));
+        if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
+            Tmp.v1.rnd(unit.type().hitsize/2f);
+            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y);
         }
     }
 

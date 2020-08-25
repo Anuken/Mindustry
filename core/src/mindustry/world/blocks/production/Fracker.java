@@ -33,16 +33,11 @@ public class Fracker extends SolidPump{
         return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
-    public class FrackerEntity extends SolidPumpEntity{
+    public class FrackerBuild extends SolidPumpBuild{
         public float accumulator;
 
         @Override
         public void drawCracks(){}
-
-        @Override
-        public boolean shouldConsume(){
-            return liquids.get(result) < liquidCapacity - 0.01f;
-        }
 
         @Override
         public void draw(){

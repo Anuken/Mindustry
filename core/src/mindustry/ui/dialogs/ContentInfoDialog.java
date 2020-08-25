@@ -7,7 +7,7 @@ import mindustry.ctype.UnlockableContent;
 public class ContentInfoDialog extends BaseDialog{
 
     public ContentInfoDialog(){
-        super("$info.title");
+        super("@info.title");
 
         addCloseButton();
     }

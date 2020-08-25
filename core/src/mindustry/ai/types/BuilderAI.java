@@ -1,9 +1,6 @@
 package mindustry.ai.types;
 
-import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -21,6 +18,8 @@ public class BuilderAI extends AIController{
         if(builder.moving()){
             builder.lookAt(builder.vel().angle());
         }
+
+        builder.updateBuilding(true);
 
         //approach request if building
         if(builder.buildPlan() != null){
@@ -62,20 +61,5 @@ public class BuilderAI extends AIController{
                 }
             }
         }
-    }
-
-    protected void moveTo(Position target, float circleLength){
-        vec.set(target).sub(unit);
-
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
-
-        vec.setLength(unit.type().speed * Time.delta() * length);
-        if(length < -0.5f){
-            vec.rotate(180f);
-        }else if(length < 0){
-            vec.setZero();
-        }
-
-        unit.moveAt(vec);
     }
 }

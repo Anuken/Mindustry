@@ -31,9 +31,9 @@ public class ForceProjector extends Block{
     public float basePowerDraw = 0.2f;
     public @Load("@-top") TextureRegion topRegion;
 
-    private static ForceProjectorEntity paramEntity;
-    private static final Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramEntity.team() && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
+    static ForceProjectorEntity paramEntity;
+    static final Cons<Shielderc> shieldConsumer = trait -> {
+        if(trait.team() != paramEntity.team && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
@@ -48,6 +48,7 @@ public class ForceProjector extends Block{
         hasPower = true;
         hasLiquids = true;
         hasItems = true;
+        //TODO this isn't good enough, shields are still clipped
         expanded = true;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
     }
@@ -122,11 +123,11 @@ public class ForceProjector extends Block{
             if(buildup >= breakage && !broken){
                 broken = true;
                 buildup = breakage;
-                Fx.shieldBreak.at(x, y, radius);
+                Fx.shieldBreak.at(x, y, radius, team.color);
             }
 
             if(hit > 0f){
-                hit -= 1f / 5f * Time.delta();
+                hit -= 1f / 5f * Time.delta;
             }
 
             float realRadius = realRadius();
@@ -162,8 +163,6 @@ public class ForceProjector extends Block{
 
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(x, y, 6, radius);
-
-                    Draw.z(Layer.shields + 0.01f);
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));

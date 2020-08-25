@@ -63,7 +63,7 @@ public class Universe{
 
     /** Update planet rotations, global time and relevant state. */
     public void update(){
-        secondCounter += Time.delta() / 60f;
+        secondCounter += Time.delta / 60f;
 
         if(secondCounter >= 1){
             seconds += (int)secondCounter;
@@ -161,6 +161,21 @@ public class Universe{
         Events.fire(new TurnEvent());
 
         save();
+    }
+
+    /** This method is expensive to call; only do so sparingly. */
+    public ItemSeq getGlobalResources(){
+        ItemSeq count = new ItemSeq();
+
+        for(Planet planet : content.planets()){
+            for(Sector sector : planet.sectors){
+                if(sector.hasSave()){
+                    count.add(sector.calculateItems());
+                }
+            }
+        }
+
+        return count;
     }
 
     public float secondsMod(float mod, float scale){

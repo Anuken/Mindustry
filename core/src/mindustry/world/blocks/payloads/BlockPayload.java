@@ -30,7 +30,13 @@ public class BlockPayload implements Payload{
     }
 
     public void place(Tile tile, int rotation){
-        tile.setBlock(entity.block(), entity.team(), rotation, () -> entity);
+        tile.setBlock(entity.block(), entity.team, rotation, () -> entity);
+        entity.dropped();
+    }
+
+    @Override
+    public boolean canBeTaken(Payloadc picker){
+        return entity.block.size <= 2;
     }
 
     @Override

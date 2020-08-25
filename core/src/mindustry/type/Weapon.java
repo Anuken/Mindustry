@@ -32,7 +32,7 @@ public class Weapon{
     /** amount of shots per fire */
     public int shots = 1;
     /** spacing in degrees between multiple shots, if applicable */
-    public float spacing = 12f;
+    public float spacing = 0;
     /** inaccuracy of degrees of each shot */
     public float inaccuracy = 0f;
     /** intensity and duration of each shot's screen shake */
@@ -43,6 +43,8 @@ public class Weapon{
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
     public float x = 5f, y = 0f;
+    /** radius of occlusion drawn under the weapon; <0 to diable */
+    public float occlusion = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
     /** delay in ticks between shots */
@@ -51,6 +53,8 @@ public class Weapon{
     public float shootCone = 5f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
+    /** min velocity required for this weapon to shoot */
+    public float minShootVelocity = -1f;
     /** internal value used for alternation - do not change! */
     public int otherSide = -1;
     /** sound used for shooting */

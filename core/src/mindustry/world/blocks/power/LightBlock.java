@@ -2,6 +2,7 @@ package mindustry.world.blocks.power;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -24,11 +25,12 @@ public class LightBlock extends Block{
         configurable = true;
         saveConfig = true;
 
-        config(Integer.class, (LightEntity tile, Integer value) -> tile.color = value);
+        config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);
     }
 
-    public class LightEntity extends Building{
+    public class LightBuild extends Building{
         public int color = Pal.accent.rgba();
+        public float smoothTime = 1f;
 
         @Override
         public void draw(){
@@ -41,6 +43,11 @@ public class LightBlock extends Block{
         }
 
         @Override
+        public void updateTile(){
+            smoothTime = Mathf.lerpDelta(smoothTime, timeScale, 0.1f);
+        }
+
+        @Override
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, () -> {
                 ui.picker.show(Tmp.c1.set(color).a(0.5f), false, res -> configure(res.rgba()));
@@ -50,7 +57,7 @@ public class LightBlock extends Block{
 
         @Override
         public void drawLight(){
-            Drawf.light(team, x, y, radius, Tmp.c1.set(color), brightness * efficiency());
+            Drawf.light(team, x, y, radius * Math.min(smoothTime, 2f), Tmp.c1.set(color), brightness * efficiency());
         }
 
         @Override
