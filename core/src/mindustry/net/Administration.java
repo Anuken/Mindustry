@@ -19,13 +19,14 @@ import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. */
+    public Seq<String> bannedIPs = new Seq<>();
+    public Seq<String> whitelist = new Seq<>();
+    public Seq<ChatFilter> chatFilters = new Seq<>();
+    public Seq<ActionFilter> actionFilters = new Seq<>();
+    public Seq<String> subnetBans = new Seq<>();
+
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    private Seq<String> bannedIPs = new Seq<>();
-    private Seq<String> whitelist = new Seq<>();
-    private Seq<ChatFilter> chatFilters = new Seq<>();
-    private Seq<ActionFilter> actionFilters = new Seq<>();
-    private Seq<String> subnetBans = new Seq<>();
     private IntIntMap lastPlaced = new IntIntMap();
 
     public Administration(){

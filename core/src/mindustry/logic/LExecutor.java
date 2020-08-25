@@ -21,7 +21,8 @@ public class LExecutor{
         varTime = 1;
 
     public static final int
-        maxGraphicsBuffer = 512,
+        maxGraphicsBuffer = 256,
+        maxDisplayBuffer = 512,
         maxTextBuffer = 256;
 
     public LInstruction[] instructions = {};
@@ -462,8 +463,10 @@ public class LExecutor{
             Building build = exec.building(target);
             if(build instanceof LogicDisplayBuild){
                 LogicDisplayBuild d = (LogicDisplayBuild)build;
-                for(int i = 0; i < exec.graphicsBuffer.size; i++){
-                    d.commands.addLast(exec.graphicsBuffer.items[i]);
+                if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
+                    for(int i = 0; i < exec.graphicsBuffer.size; i++){
+                        d.commands.addLast(exec.graphicsBuffer.items[i]);
+                    }
                 }
                 exec.graphicsBuffer.clear();
             }
