@@ -25,7 +25,14 @@ public class GroundAI extends AIController{
         }
 
         if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
-            moveToCore(FlagTarget.enemyCores);
+            boolean move = true;
+
+            if(state.rules.waves && unit.team == state.rules.defaultTeam){
+                Tile spawner = getClosestSpawner();
+                if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
+            }
+
+            if(move) moveToCore(FlagTarget.enemyCores);
         }
 
         if(command() == UnitCommand.rally){
