@@ -614,6 +614,18 @@ public class UnitTypes implements ContentList{
             destructibleWreck = false;
             armor = 13f;
 
+            BulletType fragBullet = new FlakBulletType(4f, 5){{
+                shootEffect = Fx.shootBig;
+                ammoMultiplier = 4f;
+                splashDamage = 40f;
+                splashDamageRadius = 25f;
+                collidesGround = true;
+                lifetime = 38f;
+
+                status = StatusEffects.blasted;
+                statusDuration = 60f;
+            }};
+
             weapons.add(
             new Weapon("large-laser-mount"){{
                 shake = 4f;
@@ -628,12 +640,12 @@ public class UnitTypes implements ContentList{
                 rotate = true;
 
                 bullet = new LaserBulletType(){{
-                    damage = 80f;
+                    damage = 90f;
                     sideAngle = 20f;
                     sideWidth = 1.5f;
                     sideLength = 80f;
                     width = 25f;
-                    length = 220f;
+                    length = 200f;
                     shootEffect = Fx.shockwave;
                     colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
                 }};
@@ -642,25 +654,25 @@ public class UnitTypes implements ContentList{
                 x = 11f;
                 y = 27f;
                 rotateSpeed = 2f;
-                reload = 4f;
+                reload = 10f;
                 shootSound = Sounds.flame;
                 occlusion = 7f;
                 rotate = true;
                 recoil = 0.5f;
 
-                bullet = Bullets.fragPlastic;
+                bullet = fragBullet;
             }},
             new Weapon("large-artillery"){{
                 y = -13f;
                 x = 20f;
-                reload = 18f;
+                reload = 12f;
                 ejectEffect = Fx.shellEjectSmall;
                 rotateSpeed = 7f;
                 shake = 1f;
                 shootSound = Sounds.shoot;
                 rotate = true;
                 occlusion = 12f;
-                bullet = Bullets.fragPlastic;
+                bullet = fragBullet;
             }});
         }};
 
