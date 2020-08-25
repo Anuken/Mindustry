@@ -96,7 +96,7 @@ public class LAssembler{
                         if(c == '"'){
                             inString = !inString;
                         }else if(c == ' ' && !inString){
-                            tokens.add(line.substring(lastIdx, i).replace("\\n", "\n"));
+                            tokens.add(line.substring(lastIdx, i));
                             lastIdx = i + 1;
                         }
                     }
@@ -104,6 +104,32 @@ public class LAssembler{
                     arr = tokens.toArray(String.class);
                 }else{
                     arr = new String[]{line};
+                }
+
+                String type = arr[0];
+
+                //legacy stuff
+                if(type.equals("bop")){
+                    arr[0] = "op";
+
+                    //field order for bop used to be op a, b, result, but now it's op result a b
+                    String res = arr[4];
+                    arr[4] = arr[3];
+                    arr[3] = arr[2];
+                    arr[2] = res;
+                }else if(type.equals("uop")){
+                    arr[0] = "op";
+
+                    if(arr[1].equals("negate")){
+                        arr = new String[]{
+                            "op", "mul", arr[3], arr[2], "-1"
+                        };
+                    }else{
+                        //field order for uop used to be op a, result, but now it's op result a
+                        String res = arr[3];
+                        arr[3] = arr[2];
+                        arr[2] = res;
+                    }
                 }
 
                 LStatement st = LogicIO.read(arr);
@@ -121,6 +147,7 @@ public class LAssembler{
                     }
                 }
             }catch(Exception parseFailed){
+                parseFailed.printStackTrace();
                 //when parsing fails, add a dummy invalid statement
                 statements.add(new InvalidStatement());
             }
@@ -135,7 +162,7 @@ public class LAssembler{
 
         //string case
         if(symbol.startsWith("\"") && symbol.endsWith("\"")){
-            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1)).id;
+            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n")).id;
         }
 
         try{

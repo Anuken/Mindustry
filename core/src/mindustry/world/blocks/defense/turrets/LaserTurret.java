@@ -65,7 +65,7 @@ public class LaserTurret extends PowerTurret{
                     bullet = null;
                 }
             }else if(reload > 0){
-                Liquid liquid = liquids().current();
+                Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
                 float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier;

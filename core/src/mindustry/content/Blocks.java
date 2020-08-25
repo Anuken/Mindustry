@@ -19,7 +19,6 @@ import mindustry.world.blocks.experimental.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.logic.MessageBlock;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -78,6 +77,7 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
 
     //units
+    commandCenter,
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
     repairPoint, resupplyPoint,
@@ -1701,6 +1701,12 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
+        commandCenter = new CommandCenter("command-center"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
+            size = 2;
+            health = size * size * 55;
+        }};
+
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             blockUnitBuildSpeed = 1.2f;
@@ -1772,10 +1778,10 @@ public class Blocks implements ContentList{
         }};
 
         exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
-            requirements(Category.units, with(Items.lead, 2000, Items.silicon, 750, Items.titanium, 950, Items.thorium, 450, Items.plastanium, 350, Items.phasefabric, 250));
+            requirements(Category.units, with(Items.lead, 2000, Items.silicon, 750, Items.titanium, 950, Items.thorium, 450, Items.plastanium, 350, Items.phasefabric, 450));
 
             size = 7;
-            consumes.power(12f);
+            consumes.power(13f);
             consumes.liquid(Liquids.cryofluid, 1f);
             liquidCapacity = 60f;
 
@@ -1787,7 +1793,7 @@ public class Blocks implements ContentList{
         }};
 
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
-            requirements(Category.units, with(Items.lead, 4000, Items.silicon, 1500, Items.thorium, 500, Items.plastanium, 50, Items.phasefabric, 600, Items.surgealloy, 500));
+            requirements(Category.units, with(Items.lead, 4000, Items.silicon, 1500, Items.thorium, 500, Items.plastanium, 450, Items.phasefabric, 600, Items.surgealloy, 500));
 
             size = 9;
             consumes.power(25f);
@@ -1863,7 +1869,6 @@ public class Blocks implements ContentList{
         //looked up by name, no ref needed
         new LegacyMechPad("legacy-mech-pad");
         new LegacyUnitFactory("legacy-unit-factory");
-        new LegacyCommandCenter("legacy-command-center");
 
         //endregion
         //region campaign
@@ -1922,7 +1927,7 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 0.08f);
             hasLiquids = true;
 
-            instructionsPerTick = 15;
+            instructionsPerTick = 25;
 
             range = 8 * 40;
 

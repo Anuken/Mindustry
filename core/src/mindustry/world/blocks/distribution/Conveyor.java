@@ -163,7 +163,7 @@ public class Conveyor extends Block implements Autotiler{
 
             if(front() != null && front() != null){
                 next = front();
-                nextc = next instanceof ConveyorBuild && next.team() == team ? (ConveyorBuild)next : null;
+                nextc = next instanceof ConveyorBuild && next.team == team ? (ConveyorBuild)next : null;
                 aligned = nextc != null && rotation == next.rotation;
             }
         }

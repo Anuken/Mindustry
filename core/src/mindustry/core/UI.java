@@ -225,10 +225,13 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public TextureRegionDrawable getIcon(String name){
-        if(Icon.icons.containsKey(name)){
-            return Icon.icons.get(name);
-        }
+        if(Icon.icons.containsKey(name)) return Icon.icons.get(name);
         return Core.atlas.getDrawable("error");
+    }
+
+    public TextureRegionDrawable getIcon(String name, String def){
+        if(Icon.icons.containsKey(name)) return Icon.icons.get(name);
+        return getIcon(def);
     }
 
     public void loadAnd(Runnable call){

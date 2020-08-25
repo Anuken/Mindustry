@@ -204,6 +204,24 @@ public class TechTree implements ContentList{
                                             });
                                         });
                                     });
+
+                                    node(microProcessor, () -> {
+                                        node(logicProcessor, () -> {
+                                            node(hyperProcessor, () -> {
+
+                                            });
+                                        });
+
+                                        node(switchBlock, () -> {
+                                            node(logicDisplay, () -> {
+
+                                            });
+
+                                            node(memoryCell, () -> {
+
+                                            });
+                                        });
+                                    });
                                 });
                             });
                         });
@@ -340,6 +358,10 @@ public class TechTree implements ContentList{
             });
 
             node(groundFactory, () -> {
+                node(commandCenter, () -> {
+
+                });
+
                 node(dagger, () -> {
                     node(mace, () -> {
                         node(fortress, () -> {

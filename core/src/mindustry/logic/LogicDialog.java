@@ -36,7 +36,7 @@ public class LogicDialog extends BaseDialog{
                     t.button("@schematic.copy.import", Icon.download, style, () -> {
                         dialog.hide();
                         try{
-                            canvas.load(Core.app.getClipboardText());
+                            canvas.load(Core.app.getClipboardText().replace("\r\n", "\n"));
                         }catch(Throwable e){
                             ui.showException(e);
                         }
@@ -61,7 +61,12 @@ public class LogicDialog extends BaseDialog{
                 for(Prov<LStatement> prov : LogicIO.allStatements){
                     LStatement example = prov.get();
                     if(example instanceof InvalidStatement) continue;
-                    t.button(example.name(), Styles.cleart, () -> {
+
+                    TextButtonStyle style = new TextButtonStyle(Styles.cleart);
+                    style.fontColor = example.category().color;
+                    style.font = Fonts.outline;
+
+                    t.button(example.name(), style, () -> {
                         canvas.add(prov.get());
                         dialog.hide();
                     }).size(140f, 50f);

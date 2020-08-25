@@ -534,7 +534,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 1.9f;
             flying = true;
             lowAltitude = true;
-            health = 8000;
+            health = 7000;
             armor = 9f;
             engineOffset = 21;
             engineSize = 5.3f;
@@ -545,10 +545,10 @@ public class UnitTypes implements ContentList{
                 height = 8f;
                 shrinkY = 0f;
                 drag = -0.01f;
-                splashDamageRadius = 40f;
-                splashDamage = 40f;
+                splashDamageRadius = 20f;
+                splashDamage = 30f;
                 ammoMultiplier = 4f;
-                lifetime = 80f;
+                lifetime = 50f;
                 hitEffect = Fx.blastExplosion;
                 despawnEffect = Fx.blastExplosion;
 
@@ -583,17 +583,17 @@ public class UnitTypes implements ContentList{
                 y = 2f;
                 x = 10f;
                 shootY = 12f;
-                reload = 10;
+                reload = 12;
                 shake = 1f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.shellEjectSmall;
                 shootSound = Sounds.shootBig;
                 rotate = true;
                 occlusion = 8f;
-                bullet = new BasicBulletType(7f, 60){{
+                bullet = new BasicBulletType(7f, 50){{
                     width = 12f;
                     height = 18f;
-                    lifetime = 30f;
+                    lifetime = 25f;
                     shootEffect = Fx.shootBig;
                 }};
             }}
@@ -621,19 +621,19 @@ public class UnitTypes implements ContentList{
                 x = 18f;
                 y = 5f;
                 rotateSpeed = 2f;
-                reload = 50f;
+                reload = 45f;
                 recoil = 4f;
                 shootSound = Sounds.laser;
                 occlusion = 20f;
                 rotate = true;
 
                 bullet = new LaserBulletType(){{
-                    damage = 75f;
+                    damage = 80f;
                     sideAngle = 20f;
                     sideWidth = 1.5f;
                     sideLength = 80f;
                     width = 25f;
-                    length = 200f;
+                    length = 220f;
                     shootEffect = Fx.shockwave;
                     colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
                 }};

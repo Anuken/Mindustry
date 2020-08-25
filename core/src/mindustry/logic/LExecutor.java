@@ -377,40 +377,26 @@ public class LExecutor{
         }
     }
 
-    public static class BinaryOpI implements LInstruction{
-        public BinaryOp op = BinaryOp.add;
+    public static class OpI implements LInstruction{
+        public LogicOp op = LogicOp.add;
         public int a, b, dest;
 
-        public BinaryOpI(BinaryOp op, int a, int b, int dest){
+        public OpI(LogicOp op, int a, int b, int dest){
             this.op = op;
             this.a = a;
             this.b = b;
             this.dest = dest;
         }
 
-        BinaryOpI(){}
+        OpI(){}
 
         @Override
         public void run(LExecutor exec){
-            exec.setnum(dest, op.function.get(exec.num(a), exec.num(b)));
-        }
-    }
-
-    public static class UnaryOpI implements LInstruction{
-        public UnaryOp op = UnaryOp.negate;
-        public int value, dest;
-
-        public UnaryOpI(UnaryOp op, int value, int dest){
-            this.op = op;
-            this.value = value;
-            this.dest = dest;
-        }
-
-        UnaryOpI(){}
-
-        @Override
-        public void run(LExecutor exec){
-            exec.setnum(dest, op.function.get(exec.num(value)));
+            if(op.unary){
+                exec.setnum(dest, op.function1.get(exec.num(a)));
+            }else{
+                exec.setnum(dest, op.function2.get(exec.num(a), exec.num(b)));
+            }
         }
     }
 

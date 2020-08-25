@@ -152,9 +152,9 @@ public class ItemTurret extends Turret{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte amount = read.b();
+            int amount = read.ub();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(read.b());
+                Item item = Vars.content.item(read.ub());
                 short a = read.s();
                 totalAmmo += a;
                 ammo.add(new ItemEntry(item, a));

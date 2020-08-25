@@ -1,0 +1,1 @@
+{version:2,fields:[{name:effectTimer,type:float,size:4},{name:intensity,type:float,size:4},{name:life,type:float,size:4},{name:opacity,type:float,size:4},{name:weather,type:mindustry.type.Weather,size:-1},{name:windVector,type:arc.math.geom.Vec2,size:-1},{name:x,type:float,size:4},{name:y,type:float,size:4}]}

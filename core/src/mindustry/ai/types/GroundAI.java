@@ -1,11 +1,13 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import mindustry.ai.Pathfinder.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -18,14 +20,24 @@ public class GroundAI extends AIController{
 
         Building core = unit.closestEnemyCore();
 
-        if(core != null){
-            if(unit.within(core,unit.range() / 1.1f)){
-                target = core;
-            }
+        if(core != null && unit.within(core, unit.range() / 1.1f)){
+            target = core;
+        }
 
-            if(!unit.within(core, unit.range() * 0.5f)){
-                moveToCore(FlagTarget.enemyCores);
+        if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
+            moveToCore(FlagTarget.enemyCores);
+        }
+
+        if(command() == UnitCommand.rally){
+            Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
+
+            if(target != null && !unit.within(target, 70f)){
+                moveToCore(FlagTarget.rallyPoints);
             }
+        }
+
+        if(unit.type().canBoost){
+            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
         if(!Units.invalidateTarget(target, unit, unit.range())){
@@ -55,7 +67,7 @@ public class GroundAI extends AIController{
     protected void moveToCore(FlagTarget path){
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, unit.team(), path);
+        Tile targetTile = pathfinder.getTargetTile(tile, unit.team, path);
 
         if(tile == targetTile) return;
 
