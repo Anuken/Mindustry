@@ -485,7 +485,7 @@ public class UnitTypes implements ContentList{
 
         zenith = new UnitType("zenith"){{
             health = 700;
-            speed = 1.9f;
+            speed = 1.7f;
             accel = 0.04f;
             drag = 0.016f;
             flying = true;
@@ -638,7 +638,7 @@ public class UnitTypes implements ContentList{
                     colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
                 }};
             }},
-            new Weapon("missiles-mount"){{
+            new Weapon("large-artillery"){{
                 x = 11f;
                 y = 27f;
                 rotateSpeed = 2f;
@@ -648,7 +648,7 @@ public class UnitTypes implements ContentList{
                 rotate = true;
                 recoil = 0.5f;
 
-                bullet = Bullets.pyraFlame;
+                bullet = Bullets.fragPlastic;
             }},
             new Weapon("large-artillery"){{
                 y = -13f;
@@ -660,28 +660,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.shoot;
                 rotate = true;
                 occlusion = 12f;
-                bullet = new ArtilleryBulletType(3.2f, 12){{
-                    trailMult = 0.8f;
-                    hitEffect = Fx.massiveExplosion;
-                    knockback = 1.5f;
-                    lifetime = 140f;
-                    height = 12f;
-                    width = 12f;
-                    collidesTiles = false;
-                    ammoMultiplier = 4f;
-                    splashDamageRadius = 60f;
-                    splashDamage = 60f;
-                    backColor = Pal.missileYellowBack;
-                    frontColor = Pal.missileYellow;
-                    trailEffect = Fx.artilleryTrail;
-                    trailSize = 6f;
-                    hitShake = 4f;
-
-                    shootEffect = Fx.shootBig2;
-
-                    status = StatusEffects.blasted;
-                    statusDuration = 60f;
-                }};
+                bullet = Bullets.fragPlastic;
             }});
         }};
 
