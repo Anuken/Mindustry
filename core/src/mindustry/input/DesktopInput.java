@@ -43,6 +43,8 @@ public class DesktopInput extends InputHandler{
     /** Whether player is currently deleting removal requests. */
     private boolean deleting = false, shouldShoot = false;
 
+    private boolean panning = false;
+
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
@@ -178,20 +180,33 @@ public class DesktopInput extends InputHandler{
             ui.listfrag.toggle();
         }
 
-        //TODO awful UI state checking code
-        if((player.dead() || state.isPaused()) && !ui.chatfrag.shown()){
-            if(!(scene.getKeyboardFocus() instanceof TextField) && !scene.hasDialog()){
-                //move camera around
-                float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
-                Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+        boolean panCam = false;
+        float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
 
-                if(Core.input.keyDown(Binding.mouse_move)){
-                    Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
-                    Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
-                }
+        if(input.keyDown(Binding.pan)){
+            panCam = true;
+            panning = true;
+        }
+
+        if(Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0){
+            panning = false;
+        }
+
+        //TODO awful UI state checking code
+        if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && (!(scene.getKeyboardFocus() instanceof TextField) && !scene.hasDialog())){
+            if(input.keyDown(Binding.mouse_move)){
+                panCam = true;
             }
-        }else if(!player.dead()){
+            panning = false;
+
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+        }else if(!player.dead() && !panning){
             Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
+        }
+
+        if(panCam){
+            Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
+            Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
         }
 
         shouldShoot = !scene.hasMouse();

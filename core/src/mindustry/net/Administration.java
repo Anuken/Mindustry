@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.*;
@@ -576,7 +577,8 @@ public class Administration{
         motd("The message displayed to people on connection.", "off"),
         autosave("Whether the periodically save the map when playing.", false),
         autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
-        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5);
+        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
+        debug("Enable debug logging", false, () -> Log.setLogLevel(debug() ? LogLevel.debug : LogLevel.info));
 
         public static final Config[] all = values();
 
@@ -634,6 +636,10 @@ public class Administration{
         public void set(Object value){
             Core.settings.put(key, value);
             changed.run();
+        }
+
+        private static boolean debug(){
+            return Config.debug.bool();
         }
     }
 

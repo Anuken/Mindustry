@@ -64,6 +64,9 @@ public class ServerControl implements ApplicationListener{
             "globalrules", "{reactorExplosions: false}"
         );
 
+        //update log level
+        Config.debug.set(Config.debug.bool());
+
         Log.setLogger((level, text) -> {
             String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr");
             System.out.println(result);
