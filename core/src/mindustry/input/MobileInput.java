@@ -555,7 +555,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
         Tile linked = cursor.build == null ? cursor : cursor.build.tile();
 
-        checkTargets(worldx, worldy);
+        if(!player.dead()){
+            checkTargets(worldx, worldy);
+        }
 
         //remove if request present
         if(hasRequest(cursor)){
