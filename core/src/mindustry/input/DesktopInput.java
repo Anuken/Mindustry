@@ -48,6 +48,15 @@ public class DesktopInput extends InputHandler{
     @Override
     public void buildUI(Group group){
         group.fill(t -> {
+            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
+            t.bottom();
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
+            }).margin(6f);
+        });
+
+        group.fill(t -> {
             t.bottom();
             t.visible(() -> {
                 t.color.a = Mathf.lerpDelta(t.color.a, player.builder().isBuilding() ? 1f : 0f, 0.15f);
@@ -77,15 +86,6 @@ public class DesktopInput extends InputHandler{
                 b.table(a -> {
                     a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
-            }).margin(6f);
-        });
-
-        group.fill(t -> {
-            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore());
-            t.bottom();
-            t.table(Styles.black6, b -> {
-                b.defaults().left();
-                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
             }).margin(6f);
         });
     }
@@ -188,12 +188,12 @@ public class DesktopInput extends InputHandler{
             panning = true;
         }
 
-        if(Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0){
+        if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0) && (!scene.hasField())){
             panning = false;
         }
 
         //TODO awful UI state checking code
-        if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && (!(scene.getKeyboardFocus() instanceof TextField) && !scene.hasDialog())){
+        if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && (!scene.hasField() && !scene.hasDialog())){
             if(input.keyDown(Binding.mouse_move)){
                 panCam = true;
             }

@@ -307,6 +307,8 @@ public class LogicBlock extends Block{
                     }
 
                     asm.putConst("@this", this);
+                    asm.putConst("@thisx", x);
+                    asm.putConst("@thisy", y);
 
                     executor.load(asm);
                 }catch(Exception e){
