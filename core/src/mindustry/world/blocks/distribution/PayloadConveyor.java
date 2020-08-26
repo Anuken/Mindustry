@@ -96,6 +96,8 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void updateTile(){
+            if(!enabled) return;
+
             progress = Time.time() % moveTime;
 
             updatePayload();
