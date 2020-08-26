@@ -114,29 +114,29 @@ public class LiquidModule extends BlockModule{
 
     @Override
     public void write(Writes write){
-        byte amount = 0;
+        int amount = 0;
         for(float liquid : liquids){
             if(liquid > 0) amount++;
         }
 
-        write.b(amount); //amount of liquids
+        write.s(amount); //amount of liquids
 
         for(int i = 0; i < liquids.length; i++){
             if(liquids[i] > 0){
-                write.b(i); //liquid ID
-                write.f(liquids[i]); //item amount
+                write.s(i); //liquid ID
+                write.f(liquids[i]); //liquid amount
             }
         }
     }
 
     @Override
-    public void read(Reads read){
+    public void read(Reads read, boolean legacy){
         Arrays.fill(liquids, 0);
         total = 0f;
-        int count = read.ub();
+        int count = legacy ? read.ub() : read.s();
 
         for(int j = 0; j < count; j++){
-            int liquidid = read.ub();
+            int liquidid = legacy ? read.ub() : read.s();
             float amount = read.f();
             liquids[liquidid] = amount;
             if(amount > 0){
