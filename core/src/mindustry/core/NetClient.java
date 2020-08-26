@@ -366,6 +366,9 @@ public class NetClient implements ApplicationListener{
 
     @Remote
     public static void playerDisconnect(int playerid){
+        if(netClient != null){
+            netClient.addRemovedEntity(playerid);
+        }
         Groups.player.removeByID(playerid);
     }
 

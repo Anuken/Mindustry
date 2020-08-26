@@ -31,6 +31,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
     @Import boolean dead;
     @Import Team team;
+    @Import int id;
 
     private UnitController controller;
     private UnitType type;
@@ -389,6 +390,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(dead || net.client()) return;
 
         //deaths are synced; this calls killed()
-        Call.unitDeath(base());
+        Call.unitDeath(id);
     }
 }

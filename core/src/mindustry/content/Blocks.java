@@ -1341,7 +1341,7 @@ public class Blocks implements ContentList{
 
         unloader = new Unloader("unloader"){{
             requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
-            speed = 7f;
+            speed = 6f;
         }};
 
         //endregion
