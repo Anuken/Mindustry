@@ -587,7 +587,7 @@ public class DesktopInput extends InputHandler{
         //limit speed to minimum formation speed to preserve formation
         if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
             //add a tiny multiplier to let units catch up just in case
-            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.98f;
+            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.95f;
         }
 
         float speed = baseSpeed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
