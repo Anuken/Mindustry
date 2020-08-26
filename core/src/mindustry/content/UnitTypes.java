@@ -389,7 +389,7 @@ public class UnitTypes implements ContentList{
             legLength = 30f;
             legExtension = -15;
             legBaseOffset = 10f;
-            landShake = 2f;
+            landShake = 1f;
             legSpeed = 0.1f;
             legLengthScl = 1f;
             rippleScale = 2f;

@@ -275,10 +275,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 damageContinuous(floor.damageTaken);
             }
 
-            if(!net.client() && tile.solid()){
+            if(tile.solid()){
                 if(type.canBoost){
                     elevation = 1f;
-                }else{
+                }else if(!net.client()){
                     kill();
                 }
             }

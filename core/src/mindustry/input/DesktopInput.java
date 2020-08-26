@@ -566,6 +566,8 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void updateState(){
+        super.updateState();
+
         if(state.isMenu()){
             droppingItem = false;
             mode = none;

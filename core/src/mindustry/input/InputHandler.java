@@ -236,6 +236,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             player.clearUnit();
             player.deathTimer = 61f;
+            ((CoreBuild)((BlockUnitc)unit).tile()).requestSpawn(player);
+
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
@@ -372,7 +374,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void updateState(){
-
+        if(state.isMenu()){
+            controlledType = null;
+        }
     }
 
     public void drawBottom(){
