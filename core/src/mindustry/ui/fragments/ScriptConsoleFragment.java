@@ -44,7 +44,7 @@ public class ScriptConsoleFragment extends Table{
         font = Fonts.def;
 
         visible(() -> {
-            if(input.keyTap(Binding.console)  && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
+            if(input.keyTap(Binding.console)  && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null) && !ui.chatfrag.shown()){
                 shown = !shown;
                 if(shown && !open && enableConsole){
                     toggle();
@@ -216,6 +216,10 @@ public class ScriptConsoleFragment extends Table{
 
     public boolean open(){
         return open;
+    }
+
+    public boolean shown(){
+        return shown;
     }
 
     public void addMessage(String message){
