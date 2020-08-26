@@ -107,6 +107,13 @@ public class PointDefenseTurret extends Block{
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.rect(region, x, y, rotation - 90);
+            if(team.id == 1 || team.id == 2){
+                Draw.rect(teamRegions[team.id], x, y, rotation - 90);
+            }else{
+                Draw.color(team.color);
+                Draw.rect(teamRegion, x, y, rotation - 90);
+            }
+            Draw.color();
         }
 
         @Override

@@ -75,6 +75,15 @@ public abstract class Turret extends Block{
     public @Load("@-heat") TextureRegion heatRegion;
 
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
+    public Cons<TurretBuild> teamDrawer = tile -> {
+        if(tile.team.id == 1 || tile.team.id == 2){
+            Draw.rect(teamRegions[tile.team.id], tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
+        }else{
+            Draw.color(tile.team.color);
+            Draw.rect(teamRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
+        }
+        Draw.color();
+    };
     public Cons<TurretBuild> heatDrawer = tile -> {
         if(tile.heat <= 0.00001f) return;
         Draw.color(heatColor, tile.heat);
@@ -203,9 +212,8 @@ public abstract class Turret extends Block{
 
             drawer.get(this);
 
-            if(heatRegion != Core.atlas.find("error")){
-                heatDrawer.get(this);
-            }
+            if(teamRegion != Core.atlas.find("error")) teamDrawer.get(this);
+            if(heatRegion != Core.atlas.find("error")) heatDrawer.get(this);
         }
 
         @Override
