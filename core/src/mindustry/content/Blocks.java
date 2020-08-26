@@ -1240,9 +1240,6 @@ public class Blocks implements ContentList{
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
 
-            //more than the laser drill
-            liquidBoostIntensity = 1.8f;
-
             consumes.power(3f);
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).update(false).boost();
         }};
