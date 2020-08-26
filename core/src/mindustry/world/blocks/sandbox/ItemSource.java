@@ -23,6 +23,7 @@ public class ItemSource extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         saveConfig = true;
+        noUpdateDisabled = true;
 
         config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);

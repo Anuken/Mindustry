@@ -406,7 +406,7 @@ public class UnitTypes implements ContentList{
             BulletType sapper = new SapBulletType(){{
                 sapStrength = 0.8f;
                 length = 55f;
-                damage = 35;
+                damage = 34;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
@@ -663,7 +663,7 @@ public class UnitTypes implements ContentList{
             BulletType fragBullet = new FlakBulletType(4f, 5){{
                 shootEffect = Fx.shootBig;
                 ammoMultiplier = 4f;
-                splashDamage = 40f;
+                splashDamage = 42f;
                 splashDamageRadius = 25f;
                 collidesGround = true;
                 lifetime = 38f;
@@ -700,7 +700,7 @@ public class UnitTypes implements ContentList{
                 x = 11f;
                 y = 27f;
                 rotateSpeed = 2f;
-                reload = 10f;
+                reload = 9f;
                 shootSound = Sounds.flame;
                 occlusion = 7f;
                 rotate = true;
