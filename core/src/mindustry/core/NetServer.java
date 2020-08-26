@@ -696,8 +696,8 @@ public class NetServer implements ApplicationListener{
     public static void adminRequest(Player player, Player other, AdminAction action){
 
         if(!player.admin){
-            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action without proper security access.",
-            player.name, player.con.address);
+            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
+            player.name, player.con.address, action.name(), other == null ? null : other.name);
             return;
         }
 

@@ -29,6 +29,7 @@ public class PayloadConveyor extends Block{
         rotate = true;
         update = true;
         outputsPayload = true;
+        noUpdateDisabled = true;
     }
 
     @Override

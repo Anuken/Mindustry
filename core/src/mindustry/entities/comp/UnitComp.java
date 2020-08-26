@@ -224,7 +224,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //apply knockback based on spawns
         if(team != state.rules.waveTeam){
-            float relativeSize = state.rules.dropZoneRadius + bounds()/2f + 1f;
+            float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));

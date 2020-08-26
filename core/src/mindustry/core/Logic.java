@@ -325,6 +325,10 @@ public class Logic implements ApplicationListener{
         Events.fire(Trigger.update);
         universe.updateGlobal();
 
+        if(Core.settings.modified() && !state.isPlaying()){
+            Core.settings.forceSave();
+        }
+
         if(state.isGame()){
             if(!net.client()){
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
