@@ -101,7 +101,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(map == null) throw new RuntimeException("Mapping is not enabled for group " + id + "!");
         T t = map.get(id);
         if(t != null){ //remove if present in map already
-            remove(t);
+            t.remove();
         }
     }
 
