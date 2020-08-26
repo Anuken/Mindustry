@@ -1789,6 +1789,7 @@ public class Blocks implements ContentList{
 
             upgrades = new UnitType[][]{
                 {UnitTypes.zenith, UnitTypes.antumbra},
+                {UnitTypes.spiroct, UnitTypes.arkyid},
             };
         }};
 

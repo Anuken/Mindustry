@@ -376,18 +376,17 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        //TODO implement
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
             speed = 0.5f;
             hitsize = 9f;
-            health = 140;
+            health = 7000;
+            armor = 6f;
 
             legCount = 6;
             legMoveSpace = 1f;
             legPairOffset = 3;
-            legLength = 34f;
-            rotateShooting = false;
+            legLength = 30f;
             legExtension = -15;
             legBaseOffset = 10f;
             landShake = 2f;
@@ -399,29 +398,76 @@ public class UnitTypes implements ContentList{
             legSplashDamage = 32;
             legSplashRange = 30;
 
+            hovering = true;
+            allowLegStep = true;
+            visualElevation = 0.4f;
+            groundLayer = Layer.legUnit;
+
+            BulletType sapper = new SapBulletType(){{
+                sapStrength = 0.6f;
+                length = 55f;
+                damage = 25;
+                shootEffect = Fx.shootSmall;
+                hitColor = color = Color.valueOf("bf92f9");
+                despawnEffect = Fx.none;
+                width = 0.54f;
+                lifetime = 30f;
+                knockback = -1f;
+            }};
+
             weapons.add(
-            new Weapon("missiles-mount"){{
-                reload = 20f;
+            new Weapon("spiroct-weapon"){{
+                reload = 9f;
                 x = 4f;
+                y = 8f;
                 rotate = true;
-                shake = 1f;
-                bullet = new MissileBulletType(2.7f, 12, "missile"){{
-                    width = 8f;
-                    height = 8f;
-                    shrinkY = 0f;
-                    drag = -0.003f;
-                    homingRange = 60f;
-                    keepVelocity = false;
-                    splashDamageRadius = 25f;
-                    splashDamage = 10f;
-                    lifetime = 120f;
-                    trailColor = Color.gray;
-                    backColor = Pal.bulletYellowBack;
-                    frontColor = Pal.bulletYellow;
-                    hitEffect = Fx.blastExplosion;
-                    despawnEffect = Fx.blastExplosion;
-                    weaveScale = 8f;
-                    weaveMag = 2f;
+                bullet = sapper;
+            }},
+            new Weapon("spiroct-weapon"){{
+                reload = 15f;
+                x = 9f;
+                y = 6f;
+                rotate = true;
+                bullet = sapper;
+            }},
+            new Weapon("spiroct-weapon"){{
+                reload = 23f;
+                x = 14f;
+                y = 0f;
+                rotate = true;
+                bullet = sapper;
+            }},
+            new Weapon("large-purple-mount"){{
+                y = -7f;
+                x = 9f;
+                shootY = 7f;
+                reload = 45;
+                shake = 3f;
+                rotateSpeed = 2f;
+                ejectEffect = Fx.shellEjectSmall;
+                shootSound = Sounds.shootBig;
+                rotate = true;
+                occlusion = 8f;
+                recoil = 3f;
+
+                bullet = new ArtilleryBulletType(2f, 12){{
+                    hitEffect = Fx.sapExplosion;
+                    knockback = 0.8f;
+                    lifetime = 70f;
+                    width = height = 19f;
+                    collidesTiles = false;
+                    ammoMultiplier = 4f;
+                    splashDamageRadius = 90f;
+                    splashDamage = 55f;
+                    backColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 3;
+                    lightningLength = 10;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 5f;
+
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10;
                 }};
             }});
         }};
@@ -582,7 +628,7 @@ public class UnitTypes implements ContentList{
             new Weapon("large-bullet-mount"){{
                 y = 2f;
                 x = 10f;
-                shootY = 12f;
+                shootY = 10f;
                 reload = 12;
                 shake = 1f;
                 rotateSpeed = 2f;
