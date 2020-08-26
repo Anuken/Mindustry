@@ -27,7 +27,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
 
     //legs + building
-    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid;
+    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
 
     //air (no special traits)
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
@@ -376,21 +376,20 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        //TODO implement
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
             speed = 0.5f;
-            hitsize = 9f;
-            health = 140;
+            hitsize = 21f;
+            health = 7600;
+            armor = 6f;
 
             legCount = 6;
             legMoveSpace = 1f;
             legPairOffset = 3;
-            legLength = 34f;
-            rotateShooting = false;
+            legLength = 30f;
             legExtension = -15;
             legBaseOffset = 10f;
-            landShake = 2f;
+            landShake = 1f;
             legSpeed = 0.1f;
             legLengthScl = 1f;
             rippleScale = 2f;
@@ -399,29 +398,76 @@ public class UnitTypes implements ContentList{
             legSplashDamage = 32;
             legSplashRange = 30;
 
+            hovering = true;
+            allowLegStep = true;
+            visualElevation = 0.4f;
+            groundLayer = Layer.legUnit;
+
+            BulletType sapper = new SapBulletType(){{
+                sapStrength = 0.8f;
+                length = 55f;
+                damage = 34;
+                shootEffect = Fx.shootSmall;
+                hitColor = color = Color.valueOf("bf92f9");
+                despawnEffect = Fx.none;
+                width = 0.55f;
+                lifetime = 30f;
+                knockback = -1f;
+            }};
+
             weapons.add(
-            new Weapon("missiles-mount"){{
-                reload = 20f;
+            new Weapon("spiroct-weapon"){{
+                reload = 9f;
                 x = 4f;
+                y = 8f;
                 rotate = true;
-                shake = 1f;
-                bullet = new MissileBulletType(2.7f, 12, "missile"){{
-                    width = 8f;
-                    height = 8f;
-                    shrinkY = 0f;
-                    drag = -0.003f;
-                    homingRange = 60f;
-                    keepVelocity = false;
-                    splashDamageRadius = 25f;
-                    splashDamage = 10f;
-                    lifetime = 120f;
-                    trailColor = Color.gray;
-                    backColor = Pal.bulletYellowBack;
-                    frontColor = Pal.bulletYellow;
-                    hitEffect = Fx.blastExplosion;
-                    despawnEffect = Fx.blastExplosion;
-                    weaveScale = 8f;
-                    weaveMag = 2f;
+                bullet = sapper;
+            }},
+            new Weapon("spiroct-weapon"){{
+                reload = 15f;
+                x = 9f;
+                y = 6f;
+                rotate = true;
+                bullet = sapper;
+            }},
+            new Weapon("spiroct-weapon"){{
+                reload = 23f;
+                x = 14f;
+                y = 0f;
+                rotate = true;
+                bullet = sapper;
+            }},
+            new Weapon("large-purple-mount"){{
+                y = -7f;
+                x = 9f;
+                shootY = 7f;
+                reload = 45;
+                shake = 3f;
+                rotateSpeed = 2f;
+                ejectEffect = Fx.shellEjectSmall;
+                shootSound = Sounds.shootBig;
+                rotate = true;
+                occlusion = 8f;
+                recoil = 3f;
+
+                bullet = new ArtilleryBulletType(2f, 12){{
+                    hitEffect = Fx.sapExplosion;
+                    knockback = 0.8f;
+                    lifetime = 70f;
+                    width = height = 19f;
+                    collidesTiles = false;
+                    ammoMultiplier = 4f;
+                    splashDamageRadius = 95f;
+                    splashDamage = 55f;
+                    backColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 3;
+                    lightningLength = 10;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 5f;
+
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10;
                 }};
             }});
         }};
@@ -485,7 +531,7 @@ public class UnitTypes implements ContentList{
 
         zenith = new UnitType("zenith"){{
             health = 700;
-            speed = 1.9f;
+            speed = 1.7f;
             accel = 0.04f;
             drag = 0.016f;
             flying = true;
@@ -582,7 +628,7 @@ public class UnitTypes implements ContentList{
             new Weapon("large-bullet-mount"){{
                 y = 2f;
                 x = 10f;
-                shootY = 12f;
+                shootY = 10f;
                 reload = 12;
                 shake = 1f;
                 rotateSpeed = 2f;
@@ -614,6 +660,18 @@ public class UnitTypes implements ContentList{
             destructibleWreck = false;
             armor = 13f;
 
+            BulletType fragBullet = new FlakBulletType(4f, 5){{
+                shootEffect = Fx.shootBig;
+                ammoMultiplier = 4f;
+                splashDamage = 42f;
+                splashDamageRadius = 25f;
+                collidesGround = true;
+                lifetime = 38f;
+
+                status = StatusEffects.blasted;
+                statusDuration = 60f;
+            }};
+
             weapons.add(
             new Weapon("large-laser-mount"){{
                 shake = 4f;
@@ -628,60 +686,39 @@ public class UnitTypes implements ContentList{
                 rotate = true;
 
                 bullet = new LaserBulletType(){{
-                    damage = 80f;
+                    damage = 90f;
                     sideAngle = 20f;
                     sideWidth = 1.5f;
                     sideLength = 80f;
                     width = 25f;
-                    length = 220f;
+                    length = 200f;
                     shootEffect = Fx.shockwave;
                     colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
                 }};
             }},
-            new Weapon("missiles-mount"){{
+            new Weapon("large-artillery"){{
                 x = 11f;
                 y = 27f;
                 rotateSpeed = 2f;
-                reload = 4f;
+                reload = 9f;
                 shootSound = Sounds.flame;
                 occlusion = 7f;
                 rotate = true;
                 recoil = 0.5f;
 
-                bullet = Bullets.pyraFlame;
+                bullet = fragBullet;
             }},
             new Weapon("large-artillery"){{
                 y = -13f;
                 x = 20f;
-                reload = 18f;
+                reload = 12f;
                 ejectEffect = Fx.shellEjectSmall;
                 rotateSpeed = 7f;
                 shake = 1f;
                 shootSound = Sounds.shoot;
                 rotate = true;
                 occlusion = 12f;
-                bullet = new ArtilleryBulletType(3.2f, 12){{
-                    trailMult = 0.8f;
-                    hitEffect = Fx.massiveExplosion;
-                    knockback = 1.5f;
-                    lifetime = 140f;
-                    height = 12f;
-                    width = 12f;
-                    collidesTiles = false;
-                    ammoMultiplier = 4f;
-                    splashDamageRadius = 60f;
-                    splashDamage = 60f;
-                    backColor = Pal.missileYellowBack;
-                    frontColor = Pal.missileYellow;
-                    trailEffect = Fx.artilleryTrail;
-                    trailSize = 6f;
-                    hitShake = 4f;
-
-                    shootEffect = Fx.shootBig2;
-
-                    status = StatusEffects.blasted;
-                    statusDuration = 60f;
-                }};
+                bullet = fragBullet;
             }});
         }};
 

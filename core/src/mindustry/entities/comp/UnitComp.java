@@ -275,10 +275,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 damageContinuous(floor.damageTaken);
             }
 
-            if(!net.client() && tile.solid()){
+            if(tile.solid()){
                 if(type.canBoost){
                     elevation = 1f;
-                }else{
+                }else if(!net.client()){
                     kill();
                 }
             }
@@ -314,7 +314,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void destroy(){
         float explosiveness = 2f + item().explosiveness * stack().amount;
         float flammability = item().flammability * stack().amount;
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame, state.rules.damageExplosions);
 
         float shake = hitSize / 3f;
 

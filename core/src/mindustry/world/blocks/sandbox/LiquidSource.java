@@ -24,6 +24,7 @@ public class LiquidSource extends Block{
         configurable = true;
         outputsLiquid = true;
         saveConfig = true;
+        noUpdateDisabled = true;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
         configClear((LiquidSourceBuild tile) -> tile.source = null);

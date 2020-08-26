@@ -14,7 +14,7 @@ import static mindustry.Vars.net;
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
 
-    @Import float x, y;
+    @Import float x, y, speedMultiplier;
     @Import Vec2 vel;
 
     @SyncLocal float elevation;
@@ -56,7 +56,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
 
     float floorSpeedMultiplier(){
         Floor on = isFlying() || hovering ? Blocks.air.asFloor() : floorOn();
-        return on.speedMultiplier;
+        return on.speedMultiplier * speedMultiplier;
     }
 
     @Override

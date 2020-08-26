@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.*;
@@ -18,13 +19,14 @@ import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. */
+    public Seq<String> bannedIPs = new Seq<>();
+    public Seq<String> whitelist = new Seq<>();
+    public Seq<ChatFilter> chatFilters = new Seq<>();
+    public Seq<ActionFilter> actionFilters = new Seq<>();
+    public Seq<String> subnetBans = new Seq<>();
+
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    private Seq<String> bannedIPs = new Seq<>();
-    private Seq<String> whitelist = new Seq<>();
-    private Seq<ChatFilter> chatFilters = new Seq<>();
-    private Seq<ActionFilter> actionFilters = new Seq<>();
-    private Seq<String> subnetBans = new Seq<>();
     private IntIntMap lastPlaced = new IntIntMap();
 
     public Administration(){
@@ -72,6 +74,7 @@ public class Administration{
         });
 
         //block interaction rate limit
+        //TODO when someone disconnects, a different player is mistakenly kicked for spamming actions
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
@@ -576,7 +579,8 @@ public class Administration{
         motd("The message displayed to people on connection.", "off"),
         autosave("Whether the periodically save the map when playing.", false),
         autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
-        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5);
+        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
+        debug("Enable debug logging", false, () -> Log.setLogLevel(debug() ? LogLevel.debug : LogLevel.info));
 
         public static final Config[] all = values();
 
@@ -634,6 +638,10 @@ public class Administration{
         public void set(Object value){
             Core.settings.put(key, value);
             changed.run();
+        }
+
+        private static boolean debug(){
+            return Config.debug.bool();
         }
     }
 

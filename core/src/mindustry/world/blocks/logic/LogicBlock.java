@@ -25,7 +25,7 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
-    public static final int maxInstructions = 2000;
+    public static final int maxInstructions = 1500;
 
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
@@ -307,6 +307,8 @@ public class LogicBlock extends Block{
                     }
 
                     asm.putConst("@this", this);
+                    asm.putConst("@thisx", x);
+                    asm.putConst("@thisy", y);
 
                     executor.load(asm);
                 }catch(Exception e){

@@ -1784,11 +1784,11 @@ public class Blocks implements ContentList{
             consumes.power(13f);
             consumes.liquid(Liquids.cryofluid, 1f);
             liquidCapacity = 60f;
-
             blockUnitBuildSpeed = 3f;
 
             upgrades = new UpgradePlan[]{
-                new UpgradePlan(UnitTypes.zenith, UnitTypes.antumbra, with(Items.silicon, 400, Items.titanium, 300, Items.plastanium, 200, Items.surgealloy, 100)),
+                new UpgradePlan(UnitTypes.zenith, UnitTypes.antumbra, with(Items.silicon, 250, Items.titanium, 200, Items.plastanium, 200, Items.surgealloy, 100)),
+                new UpgradePlan(UnitTypes.spiroct, UnitTypes.arkyid, with(Items.silicon, 250, Items.titanium, 200, Items.plastanium, 200, Items.surgealloy, 100)),
             };
         }};
 

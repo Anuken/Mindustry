@@ -884,7 +884,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             power += this.power.status * block.consumes.getPower().capacity;
         }
 
-        if(block.hasLiquids){
+        if(block.hasLiquids && state.rules.damageExplosions){
 
             liquids.each((liquid, amount) -> {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
@@ -900,7 +900,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame, state.rules.damageExplosions);
+
         if(!floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
         }
