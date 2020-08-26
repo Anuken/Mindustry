@@ -21,7 +21,6 @@ import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
@@ -260,7 +259,6 @@ public class Drill extends Block{
 
             timeDrilled += warmup * delta();
 
-
             if(items.total() < itemCapacity && dominantItems > 0 && consValid()){
 
                 float speed = 1f;
@@ -295,7 +293,6 @@ public class Drill extends Block{
                 drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
             }
 
-            
         }
 
         protected void updateCooling(){

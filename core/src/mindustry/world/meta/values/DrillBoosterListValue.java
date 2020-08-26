@@ -46,7 +46,6 @@ public class DrillBoosterListValue implements StatValue{
             }
         }).colspan(table.getColumns());
         table.row();
-
     }
 
     void sep(Table table, String text){
