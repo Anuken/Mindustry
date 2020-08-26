@@ -27,7 +27,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
 
     //legs + building
-    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid;
+    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
 
     //air (no special traits)
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
@@ -379,8 +379,8 @@ public class UnitTypes implements ContentList{
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
             speed = 0.5f;
-            hitsize = 9f;
-            health = 7000;
+            hitsize = 21f;
+            health = 7600;
             armor = 6f;
 
             legCount = 6;
@@ -404,13 +404,13 @@ public class UnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.6f;
+                sapStrength = 0.8f;
                 length = 55f;
-                damage = 25;
+                damage = 35;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
-                width = 0.54f;
+                width = 0.55f;
                 lifetime = 30f;
                 knockback = -1f;
             }};
@@ -457,7 +457,7 @@ public class UnitTypes implements ContentList{
                     width = height = 19f;
                     collidesTiles = false;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 90f;
+                    splashDamageRadius = 95f;
                     splashDamage = 55f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
