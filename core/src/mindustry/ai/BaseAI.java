@@ -63,6 +63,7 @@ public class BaseAI{
                 int range = 150;
 
                 Position pos = randomPosition();
+
                 //when there are no random positions, do nothing.
                 if(pos == null) return;
 
