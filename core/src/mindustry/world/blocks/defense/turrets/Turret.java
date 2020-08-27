@@ -81,8 +81,8 @@ public abstract class Turret extends Block{
         }else{
             Draw.color(tile.team.color);
             Draw.rect(teamRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
+            Draw.color();
         }
-        Draw.color();
     };
     public Cons<TurretBuild> heatDrawer = tile -> {
         if(tile.heat <= 0.00001f) return;
