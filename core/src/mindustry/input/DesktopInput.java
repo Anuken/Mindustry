@@ -338,22 +338,24 @@ public class DesktopInput extends InputHandler{
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
+        //TODO localize these
+
         table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
-        }).tooltip("Schematics");
+        }).tooltip("@schematics");
 
         table.button(Icon.tree, Styles.clearPartiali, () -> {
             ui.research.show();
-        }).visible(() -> state.isCampaign()).tooltip("Research");
+        }).visible(() -> state.isCampaign()).tooltip("@research");
 
         table.button(Icon.map, Styles.clearPartiali, () -> {
             ui.planet.show();
-        }).visible(() -> state.isCampaign()).tooltip("Planet Map");
+        }).visible(() -> state.isCampaign()).tooltip("@planetmap");
 
         table.button(Icon.up, Styles.clearPartiali, () -> {
             ui.planet.show(state.getSector(), player.team().core());
         }).visible(() -> state.isCampaign())
-        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)).tooltip("Launch Core");
+        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)).tooltip("@launchcore");
     }
 
     void pollInput(){

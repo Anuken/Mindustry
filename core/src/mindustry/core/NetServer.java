@@ -779,6 +779,10 @@ public class NetServer implements ApplicationListener{
         }
 
         if(state.isGame() && net.server()){
+            if(state.rules.pvp){
+                state.serverPaused = isWaitingForPlayers();
+            }
+
             sync();
         }
     }

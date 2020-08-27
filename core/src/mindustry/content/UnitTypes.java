@@ -72,7 +72,6 @@ public class UnitTypes implements ContentList{
         mace = new UnitType("mace"){{
             speed = 0.4f;
             hitsize = 9f;
-            range = 10f;
             health = 500;
             armor = 4f;
 
@@ -84,12 +83,11 @@ public class UnitTypes implements ContentList{
                 reload = 14f;
                 recoil = 1f;
                 ejectEffect = Fx.none;
-                bullet = new BulletType(3f, 30f){{
+                bullet = new BulletType(3.9f, 30f){{
                     ammoMultiplier = 3f;
                     hitSize = 7f;
-                    lifetime = 42f;
+                    lifetime = 12f;
                     pierce = true;
-                    drag = 0.05f;
                     statusDuration = 60f * 4;
                     shootEffect = Fx.shootSmallFlame;
                     hitEffect = Fx.hitFlameSmall;
@@ -380,7 +378,7 @@ public class UnitTypes implements ContentList{
             drag = 0.1f;
             speed = 0.5f;
             hitsize = 21f;
-            health = 7600;
+            health = 8000;
             armor = 6f;
 
             legCount = 6;

@@ -93,6 +93,18 @@ public class PausedDialog extends BaseDialog{
                 cont.row();
 
                 cont.buttonRow("@load", Icon.download, load::show).disabled(b -> net.active());
+            }else if(state.isCampaign()){
+                cont.buttonRow("@launchcore", Icon.up, () -> {
+                    hide();
+                    ui.planet.show(state.getSector(), player.team().core());
+                }).disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements));
+
+                cont.row();
+
+                cont.buttonRow("@planetmap", Icon.map, () -> {
+                    hide();
+                    ui.planet.show();
+                });
             }else{
                 cont.row();
             }
