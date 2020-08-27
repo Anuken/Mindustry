@@ -167,10 +167,6 @@ public class ContentLoader{
     }
 
     public void handleContent(Content content){
-        if(content instanceof Item && content.id > 255){
-            throw new IllegalArgumentException("You may not have more than 255 different items total. Remove some mods.");
-        }
-
         this.lastAdded = content;
         contentMap[content.getContentType().ordinal()].add(content);
     }

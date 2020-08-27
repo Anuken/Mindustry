@@ -139,12 +139,17 @@ public class ItemTurret extends Turret{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.b(ammo.size);
             for(AmmoEntry entry : ammo){
                 ItemEntry i = (ItemEntry)entry;
-                write.b(i.item.id);
+                write.s(i.item.id);
                 write.s(i.amount);
             }
         }
@@ -154,7 +159,7 @@ public class ItemTurret extends Turret{
             super.read(read, revision);
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(read.ub());
+                Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
                 short a = read.s();
                 totalAmmo += a;
                 ammo.add(new ItemEntry(item, a));
