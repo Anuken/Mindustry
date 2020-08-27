@@ -144,7 +144,6 @@ abstract class BuilderComp implements Unitc{
     boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
         if(state.rules.infiniteResources || team().rules().infiniteResources || request.breaking || core == null) return false;
-        //TODO these are bad criteria
         return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item)) && !request.initialized);
     }
 

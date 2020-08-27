@@ -429,8 +429,6 @@ public class TechTree implements ContentList{
                 });
             });
 
-            //TODO research sectors
-
             node(groundZero, () -> {
                 node(frozenForest, Seq.with(
                     new SectorComplete(groundZero),
@@ -579,7 +577,7 @@ public class TechTree implements ContentList{
         public ItemStack[] requirements;
         /** Requirements that have been fulfilled. Always the same length as the requirement array. */
         public final ItemStack[] finishedRequirements;
-        /** Extra objectives needed to research this. TODO implement */
+        /** Extra objectives needed to research this. */
         public Seq<Objective> objectives = new Seq<>();
         /** Time required to research this content, in seconds. */
         public float time;
