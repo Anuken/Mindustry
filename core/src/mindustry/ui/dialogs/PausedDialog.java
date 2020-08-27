@@ -44,16 +44,7 @@ public class PausedDialog extends BaseDialog{
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
-            cont.button("@back", Icon.left, this::hide).colspan(2).width(dw * 2 + 20f);
-
-            cont.row();
-            //if(state.isCampaign()){
-            //    cont.button("@techtree", Icon.tree, ui.tech::show);
-            //}else{
-            //    cont.button("@database", Icon.book, ui.database::show);
-            //}
-            //TODO remove
-            cont.button("nothing", Icon.warning, () -> ui.showInfo("no"));
+            cont.button("@back", Icon.left, this::hide);
             cont.button("@settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){
