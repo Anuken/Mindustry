@@ -305,6 +305,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 try{
                     SteamID lobby = smat.getLobbyByIndex(i);
                     Host out = new Host(
+                        -1, //invalid ping
                         smat.getLobbyData(lobby, "name"),
                         "steam:" + lobby.handle(),
                         smat.getLobbyData(lobby, "mapname"),
@@ -314,7 +315,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         smat.getLobbyData(lobby, "versionType"),
                         Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
                         smat.getLobbyMemberLimit(lobby),
-                        ""
+                        "",
+                        null
                     );
                     hosts.add(out);
                 }catch(Exception e){

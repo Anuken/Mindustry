@@ -12,8 +12,8 @@ import mindustry.gen.*;
 import static mindustry.Vars.*;
 
 public class BlockConfigFragment extends Fragment{
-    private Table table = new Table();
-    private Building configTile;
+    Table table = new Table();
+    Building configTile;
 
     @Override
     public void build(Group parent){

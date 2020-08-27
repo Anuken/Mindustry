@@ -34,8 +34,10 @@ public abstract class SaveFileReader{
     "titan-factory", "legacy-unit-factory",
     "fortress-factory", "legacy-unit-factory",
 
-    "command-center", "legacy-command-center"
+    "mass-conveyor", "payload-conveyor"
     );
+
+    protected int lastRegionLength;
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
         counter.resetCount();
@@ -90,6 +92,7 @@ public abstract class SaveFileReader{
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
     public int readChunk(DataInput input, boolean isShort, IORunner<DataInput> runner) throws IOException{
         int length = isShort ? input.readUnsignedShort() : input.readInt();
+        lastRegionLength = length;
         runner.accept(input);
         return length;
     }

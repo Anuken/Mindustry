@@ -19,7 +19,7 @@ public class Battery extends PowerDistributor{
         consumesPower = true;
     }
 
-    public class BatteryEntity extends Building{
+    public class BatteryBuild extends Building{
         @Override
         public void draw(){
             Draw.color(emptyLightColor, fullLightColor, power.status);

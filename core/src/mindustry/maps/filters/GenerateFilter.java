@@ -44,7 +44,9 @@ public abstract class GenerateFilter{
 
     /** localized display name */
     public String name(){
-        return Core.bundle.get("filter." + getClass().getSimpleName().toLowerCase().replace("filter", ""), getClass().getSimpleName().replace("Filter", ""));
+        Class c = getClass();
+        if(c.isAnonymousClass()) c = c.getSuperclass();
+        return Core.bundle.get("filter." + c.getSimpleName().toLowerCase().replace("filter", ""), c.getSimpleName().replace("Filter", ""));
     }
 
     /** set the seed to a random number */

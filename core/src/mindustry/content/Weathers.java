@@ -255,6 +255,8 @@ public class Weathers implements ContentList{
             {
                 attrs.set(Attribute.spores, 0.5f);
                 attrs.set(Attribute.light, -0.1f);
+                status = StatusEffects.sporeSlowed;
+                statusGround = false;
             }
 
             @Override

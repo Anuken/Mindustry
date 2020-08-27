@@ -77,7 +77,7 @@ public class Pump extends LiquidBlock{
         return tile != null && tile.floor().liquidDrop != null;
     }
 
-    public class PumpEntity extends LiquidBlockEntity{
+    public class PumpBuild extends LiquidBuild{
         public float amount = 0f;
         public Liquid liquidDrop = null;
 
@@ -108,7 +108,7 @@ public class Pump extends LiquidBlock{
 
         @Override
         public boolean shouldConsume(){
-            return liquidDrop != null && liquids.get(liquidDrop) < liquidCapacity - 0.01f;
+            return liquidDrop != null && liquids.get(liquidDrop) < liquidCapacity - 0.01f && enabled;
         }
 
         @Override

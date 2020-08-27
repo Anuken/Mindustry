@@ -7,6 +7,7 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
@@ -24,6 +25,13 @@ public abstract class LStatement{
     public abstract LCategory category();
     public abstract LInstruction build(LAssembler builder);
 
+    public LStatement copy(){
+        StringBuilder build = new StringBuilder();
+        write(build);
+        Seq<LStatement> read = LAssembler.read(build.toString());
+        return read.size == 0 ? null : read.first();
+    }
+
     //protected methods are only for internal UI layout utilities
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
@@ -38,6 +46,12 @@ public abstract class LStatement{
 
     protected void fields(Table table, String value, Cons<String> setter){
         field(table, value, setter).width(85f);
+    }
+
+    protected void row(Table table){
+        if(LCanvas.useRows()){
+            table.row();
+        }
     }
 
     protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
@@ -87,10 +101,15 @@ public abstract class LStatement{
         });
         t.actions(Actions.alpha(0), Actions.fadeIn(0.3f, Interp.fade));
 
-        hideCons.get(t, hide);
+        t.top().pane(inner -> {
+            inner.top();
+            hideCons.get(inner, hide);
+        }).top();
 
         t.pack();
     }
+
+    public void afterRead(){}
 
     public void write(StringBuilder builder){
         LogicIO.write(this,builder);
@@ -105,6 +124,6 @@ public abstract class LStatement{
     }
 
     public String name(){
-        return getClass().getSimpleName().replace("Statement", "");
+        return Strings.insertSpaces(getClass().getSimpleName().replace("Statement", ""));
     }
 }

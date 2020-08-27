@@ -38,6 +38,10 @@ public class Rules{
     public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
+    /** Whether friendly explosions can occur and set fire/damage other blocks. */
+    public boolean damageExplosions = true;
+    /** Whether fire is enabled. */
+    public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
     /** How fast unit pads build units. */
@@ -92,6 +96,8 @@ public class Rules{
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors */
     public Team waveTeam = Team.crux;
+    /** name of the custom mode that this ruleset describes, or null. */
+    public @Nullable String modeName;
     /** special tags for additional info */
     public StringMap tags = new StringMap();
 

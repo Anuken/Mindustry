@@ -37,18 +37,18 @@ public class MapGenerateDialog extends BaseDialog{
     private Pixmap pixmap;
     private Texture texture;
     private GenerateInput input = new GenerateInput();
-    private Seq<GenerateFilter> filters = new Seq<>();
+    Seq<GenerateFilter> filters = new Seq<>();
     private int scaling = mobile ? 3 : 1;
     private Table filterTable;
 
     private AsyncExecutor executor = new AsyncExecutor(1);
     private AsyncResult<Void> result;
-    private boolean generating;
+    boolean generating;
     private GenTile returnTile = new GenTile();
 
     private GenTile[][] buffer1, buffer2;
     private Cons<Seq<GenerateFilter>> applier;
-    private CachedTile ctile = new CachedTile(){
+    CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
         protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
@@ -178,7 +178,7 @@ public class MapGenerateDialog extends BaseDialog{
                 add(new Image(Styles.black8));
                 add(new Image(Icon.refresh, Scaling.none));
                 visible(() -> generating && !updateEditorOnChange);
-            }}).grow().padRight(10);
+            }}).uniformX().grow().padRight(10);
             t.pane(p -> filterTable = p.marginRight(6)).update(pane -> {
                 if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
                     return;
@@ -191,7 +191,7 @@ public class MapGenerateDialog extends BaseDialog{
                 }else{
                     Core.scene.setScrollFocus(null);
                 }
-            }).grow().get().setScrollingDisabled(true, false);
+            }).grow().uniformX().get().setScrollingDisabled(true, false);
         }).grow();
 
         buffer1 = create();
@@ -213,7 +213,7 @@ public class MapGenerateDialog extends BaseDialog{
     }
 
     void rebuildFilters(){
-        int cols = Math.max((int)(Math.max(filterTable.parent.getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Scl.scl(290f)), 1);
+        int cols = Math.max((int)(Core.graphics.getWidth()/2f / Scl.scl(290f)), 1);
         filterTable.clearChildren();
         filterTable.top().left();
         int i = 0;
@@ -221,41 +221,45 @@ public class MapGenerateDialog extends BaseDialog{
         for(GenerateFilter filter : filters){
 
             //main container
-            filterTable.table(Tex.button, c -> {
+            filterTable.table(Tex.pane, c -> {
+                c.margin(0);
+
                 //icons to perform actions
-                c.table(t -> {
-                    t.top();
-                    t.add(filter.name()).padTop(5).color(Pal.accent).growX().left();
+                c.table(Tex.whiteui, t -> {
+                    t.setColor(Pal.gray);
 
-                    t.row();
+                    t.top().left();
+                    t.add(filter.name()).left().padLeft(6).width(100f).wrap();
 
-                    t.table(b -> {
-                        ImageButtonStyle style = Styles.cleari;
-                        b.defaults().size(50f);
-                        b.button(Icon.refresh, style, () -> {
-                            filter.randomize();
-                            update();
-                        });
+                    t.add().growX();
 
-                        b.button(Icon.upOpen, style, () -> {
-                            int idx = filters.indexOf(filter);
-                            filters.swap(idx, Math.max(0, idx - 1));
-                            rebuildFilters();
-                            update();
-                        });
-                        b.button(Icon.downOpen, style, () -> {
-                            int idx = filters.indexOf(filter);
-                            filters.swap(idx, Math.min(filters.size - 1, idx + 1));
-                            rebuildFilters();
-                            update();
-                        });
-                        b.button(Icon.trash, style, () -> {
-                            filters.remove(filter);
-                            rebuildFilters();
-                            update();
-                        });
+                    ImageButtonStyle style = Styles.geni;
+                    t.defaults().size(42f);
+
+                    t.button(Icon.refresh, style, () -> {
+                        filter.randomize();
+                        update();
                     });
-                }).fillX();
+
+                    t.button(Icon.upOpen, style, () -> {
+                        int idx = filters.indexOf(filter);
+                        filters.swap(idx, Math.max(0, idx - 1));
+                        rebuildFilters();
+                        update();
+                    });
+                    t.button(Icon.downOpen, style, () -> {
+                        int idx = filters.indexOf(filter);
+                        filters.swap(idx, Math.min(filters.size - 1, idx + 1));
+                        rebuildFilters();
+                        update();
+                    });
+                    t.button(Icon.cancel, style, () -> {
+                        filters.remove(filter);
+                        rebuildFilters();
+                        update();
+                    });
+                }).growX();
+
                 c.row();
                 //all the options
                 c.table(f -> {
@@ -269,7 +273,7 @@ public class MapGenerateDialog extends BaseDialog{
                         }).growX().left();
                         f.row();
                     }
-                }).grow().left().pad(2).top();
+                }).grow().left().pad(6).top();
             }).width(280f).pad(3).top().left().fillY();
             if(++i % cols == 0){
                 filterTable.row();
@@ -403,6 +407,9 @@ public class MapGenerateDialog extends BaseDialog{
     private class GenTile{
         public byte team;
         public short block, floor, ore;
+
+        GenTile(){
+        }
 
         public void set(Block floor, Block wall, Block ore, Team team){
             this.floor = floor.id;

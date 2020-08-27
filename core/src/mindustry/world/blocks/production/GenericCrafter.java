@@ -78,7 +78,7 @@ public class GenericCrafter extends Block{
         return outputItem != null;
     }
 
-    public class GenericCrafterEntity extends Building{
+    public class GenericCrafterBuild extends Building{
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -93,7 +93,7 @@ public class GenericCrafter extends Block{
             if(outputItem != null && items.get(outputItem.item) >= itemCapacity){
                 return false;
             }
-            return outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f);
+            return (outputLiquid == null || !(liquids.get(outputLiquid.liquid) >= liquidCapacity - 0.001f)) && enabled;
         }
 
         @Override

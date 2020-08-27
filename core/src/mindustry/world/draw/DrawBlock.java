@@ -9,7 +9,7 @@ import mindustry.world.blocks.production.GenericCrafter.*;
 public class DrawBlock{
 
     /** Draws the block. */
-    public void draw(GenericCrafterEntity entity){
+    public void draw(GenericCrafterBuild entity){
         Draw.rect(entity.block.region, entity.x, entity.y, entity.block.rotate ? entity.rotdeg() : 0);
     }
 

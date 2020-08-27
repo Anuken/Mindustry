@@ -1,4 +1,4 @@
-package mindustry.world.blocks.storage;
+package mindustry.world.blocks.logic;
 
 import arc.*;
 import arc.Input.*;
@@ -29,7 +29,7 @@ public class MessageBlock extends Block{
         solid = true;
         destructible = true;
 
-        config(String.class, (MessageBlockEntity tile, String text) -> {
+        config(String.class, (MessageBuild tile, String text) -> {
             if(net.server() && text.length() > maxTextLength){
                 throw new ValidateException(player, "Player has gone above text limit.");
             }
@@ -53,7 +53,7 @@ public class MessageBlock extends Block{
         });
     }
 
-    public class MessageBlockEntity extends Building{
+    public class MessageBuild extends Building{
         public StringBuilder message = new StringBuilder();
 
         @Override

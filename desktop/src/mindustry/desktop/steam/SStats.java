@@ -51,7 +51,7 @@ public class SStats implements SteamUserStatsCallback{
         this.updated = true;
     }
 
-    private void checkUpdate(){
+    void checkUpdate(){
         if(campaign()){
             SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
 
@@ -87,11 +87,11 @@ public class SStats implements SteamUserStatsCallback{
         });
 
         //TODO achievement invalid
-        Events.on(ZoneConfigureCompleteEvent.class, e -> {
+        //Events.on(ZoneConfigureCompleteEvent.class, e -> {
             //if(!content.sectors().contains(z -> !z.canConfigure())){
             //    configAllZones.complete();
             //}
-        });
+        //});
 
         Events.run(Trigger.newGame, () -> Core.app.post(() -> {
             if(campaign() && player.core() != null && player.core().items.total() >= 10 * 1000){

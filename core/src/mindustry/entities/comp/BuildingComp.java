@@ -39,9 +39,9 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
 @Component(base = true)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Senseable, Controllable{
     //region vars and initialization
-    static final float timeToSleep = 60f * 1;
+    static final float timeToSleep = 60f * 1, timeToUncontrol = 60f * 6;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
     static final Seq<Building> tempTileEnts = new Seq<>();
     static final Seq<Tile> tempTiles = new Seq<>();
@@ -57,6 +57,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient byte dump;
     transient int rotation;
     transient boolean enabled = true;
+    transient float enabledControlTime;
 
     PowerModule power;
     ItemModule items;
@@ -330,15 +331,20 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region handler methods
 
+    /** Called when this block is dropped as a payload. */
+    public void dropped(){
+
+    }
+
     /** This is for logic blocks. */
     public void handleString(Object value){
 
     }
 
     public void created(){}
-    
+
     public boolean shouldConsume(){
-        return true;
+        return enabled;
     }
 
     public boolean productionValid(){
@@ -404,7 +410,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         int trns = block.size/2 + 1;
         Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
-        if(next != null && next.build != null && next.build.team() == team && next.build.acceptPayload(base(), todump)){
+        if(next != null && next.build != null && next.build.team == team && next.build.acceptPayload(base(), todump)){
             next.build.handlePayload(base(), todump);
             return true;
         }
@@ -425,7 +431,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             Building other = proximity.get((i + dump) % proximity.size);
 
-            if(other.team() == team && other.acceptPayload(base(), todump)){
+            if(other.team == team && other.acceptPayload(base(), todump)){
                 other.handlePayload(base(), todump);
                 incrementDump(proximity.size);
                 return true;
@@ -504,34 +510,31 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         next = next.getLiquidDestination(base(), liquid);
 
-        if(next.team() == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
+        if(next.team == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
+            float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
+            float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
+            float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
+            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f);
 
-            if(next.acceptLiquid(base(), liquid, 0f)){
-                float ofract = next.liquids().get(liquid) / next.block.liquidCapacity;
-                float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
-                float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
-                flow = Math.min(flow, next.block.liquidCapacity - next.liquids().get(liquid) - 0.001f);
+            if(flow > 0f && ofract <= fract && next.acceptLiquid(base(), liquid, flow)){
+                next.handleLiquid(base(), liquid, flow);
+                liquids.remove(liquid, flow);
+                return flow;
+            }else if(next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
+                //TODO these are incorrect effect positions
+                float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
 
-                if(flow > 0f && ofract <= fract && next.acceptLiquid(base(), liquid, flow)){
-                    next.handleLiquid(base(), liquid, flow);
-                    liquids.remove(liquid, flow);
-                    return flow;
-                }else if(ofract > 0.1f && fract > 0.1f){
-                    //TODO these are incorrect effect positions
-                    float fx = (x + next.x) / 2f, fy = (y + next.y) / 2f;
-
-                    Liquid other = next.liquids().current();
-                    if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
-                        damage(1 * Time.delta);
-                        next.damage(1 * Time.delta);
-                        if(Mathf.chance(0.1 * Time.delta)){
-                            Fx.fire.at(fx, fy);
-                        }
-                    }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
-                        liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
-                        if(Mathf.chance(0.2f * Time.delta)){
-                            Fx.steam.at(fx, fy);
-                        }
+                Liquid other = next.liquids.current();
+                if((other.flammability > 0.3f && liquid.temperature > 0.7f) || (liquid.flammability > 0.3f && other.temperature > 0.7f)){
+                    damage(1 * Time.delta);
+                    next.damage(1 * Time.delta);
+                    if(Mathf.chance(0.1 * Time.delta)){
+                        Fx.fire.at(fx, fy);
+                    }
+                }else if((liquid.temperature > 0.7f && other.temperature < 0.55f) || (other.temperature > 0.7f && liquid.temperature < 0.55f)){
+                    liquids.remove(liquid, Math.min(liquids.get(liquid), 0.7f * Time.delta));
+                    if(Mathf.chance(0.2f * Time.delta)){
+                        Fx.steam.at(fx, fy);
                     }
                 }
             }
@@ -562,7 +565,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
-            if(other.team() == team && other.acceptItem(base(), item) && canDump(other, item)){
+            if(other.team == team && other.acceptItem(base(), item) && canDump(other, item)){
                 other.handleItem(base(), item);
                 return;
             }
@@ -580,7 +583,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
-            if(other.team() == team && other.acceptItem(base(), item) && canDump(other, item)){
+            if(other.team == team && other.acceptItem(base(), item) && canDump(other, item)){
                 other.handleItem(base(), item);
                 return true;
             }
@@ -613,7 +616,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 for(int ii = 0; ii < content.items().size; ii++){
                     Item item = content.item(ii);
 
-                    if(other.team() == team && items.has(item) && other.acceptItem(base(), item) && canDump(other, item)){
+                    if(other.team == team && items.has(item) && other.acceptItem(base(), item) && canDump(other, item)){
                         other.handleItem(base(), item);
                         items.remove(item, 1);
                         incrementDump(proximity.size);
@@ -621,7 +624,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                     }
                 }
             }else{
-                if(other.team() == team && other.acceptItem(base(), todump) && canDump(other, todump)){
+                if(other.team == team && other.acceptItem(base(), todump) && canDump(other, todump)){
                     other.handleItem(base(), todump);
                     items.remove(todump, 1);
                     incrementDump(proximity.size);
@@ -647,7 +650,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success. */
     public boolean moveForward(Item item){
         Building other = front();
-        if(other != null && other.team() == team && other.acceptItem(base(), item)){
+        if(other != null && other.team == team && other.acceptItem(base(), item)){
             other.handleItem(base(), item);
             return true;
         }
@@ -751,6 +754,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void drawSelect(){
     }
 
+    public void drawDisabled(){
+        Draw.color(Color.scarlet);
+        Draw.alpha(0.8f);
+
+        float size = 6f;
+        Draw.rect(Icon.cancel.getRegion(), x, y, size, size);
+
+        Draw.reset();
+    }
+
     public void draw(){
         Draw.rect(block.region, x, y, block.rotate ? rotdeg() : 0);
 
@@ -843,8 +856,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
-    /** Called when the block is tapped.*/
-    public void tapped(Player player){
+    /** Called when the block is tapped by the local player. */
+    public void tapped(){
 
     }
 
@@ -871,7 +884,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             power += this.power.status * block.consumes.getPower().capacity;
         }
 
-        if(block.hasLiquids){
+        if(block.hasLiquids && state.rules.damageExplosions){
 
             liquids.each((liquid, amount) -> {
                 float splash = Mathf.clamp(amount / 4f, 0f, 10f);
@@ -887,7 +900,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             });
         }
 
-        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame, state.rules.damageExplosions);
+
         if(!floor().solid && !floor().isLiquid){
             Effect.rubble(x, y, block.size);
         }
@@ -1070,6 +1084,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return true;
     }
 
+    public boolean canPickup(){
+        return true;
+    }
+
     public void removeFromProximity(){
         onProximityRemoved();
         tmpTiles.clear();
@@ -1168,15 +1186,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
-    public double sense(LSensor sensor){
-        if(sensor == LSensor.health) return health;
-        if(sensor == LSensor.efficiency) return efficiency();
-        if(sensor == LSensor.totalItems && items != null) return items.total();
-        if(sensor == LSensor.totalLiquids && liquids != null) return liquids.total();
-        if(sensor == LSensor.totalPower && power != null) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-        if(sensor == LSensor.powerNetIn && power != null) return power.graph.getPowerProduced();
-        if(sensor == LSensor.powerNetOut && power != null) return power.graph.getPowerNeeded();
-        if(sensor == LSensor.powerNetStored && power != null) return power.graph.getLastPowerStored();
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.x) return x;
+        if(sensor == LAccess.y) return y;
+        if(sensor == LAccess.team) return team.id;
+        if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.efficiency) return efficiency();
+        if(sensor == LAccess.rotation) return rotation;
+        if(sensor == LAccess.totalItems && items != null) return items.total();
+        if(sensor == LAccess.totalLiquids && liquids != null) return liquids.total();
+        if(sensor == LAccess.totalPower && power != null && block.consumes.hasPower()) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+        if(sensor == LAccess.itemCapacity) return block.itemCapacity;
+        if(sensor == LAccess.liquidCapacity) return block.liquidCapacity;
+        if(sensor == LAccess.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
+        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getPowerProduced();
+        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getPowerNeeded();
+        if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
+        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getBatteryCapacity();
         return 0;
     }
 
@@ -1185,6 +1211,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(content instanceof Item && items != null) return items.get((Item)content);
         if(content instanceof Liquid && liquids != null) return liquids.get((Liquid)content);
         return 0;
+    }
+
+    @Override
+    public void control(LAccess type, double p1, double p2, double p3, double p4){
+        if(type == LAccess.enabled){
+            enabled = !Mathf.zero((float)p1);
+            enabledControlTime = timeToUncontrol;
+        }
     }
 
     @Override
@@ -1209,6 +1243,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;
+        }
+
+        if(block.autoResetEnabled){
+            enabledControlTime -= Time.delta;
+
+            if(enabledControlTime <= 0){
+                enabled = true;
+            }
         }
 
         if(sound != null){

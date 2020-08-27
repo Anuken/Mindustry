@@ -31,39 +31,39 @@ public class MobileInput extends InputHandler implements GestureListener{
     /** Maximum speed the player can pan. */
     private static final float maxPanSpeed = 1.3f;
     /** Distance to edge of screen to start panning. */
-    private final float edgePan = Scl.scl(60f);
+    public final float edgePan = Scl.scl(60f);
 
     //gesture data
-    private Vec2 vector = new Vec2(), movement = new Vec2(), targetPos = new Vec2();
-    private float lastZoom = -1;
+    public Vec2 vector = new Vec2(), movement = new Vec2(), targetPos = new Vec2();
+    public float lastZoom = -1;
 
     /** Position where the player started dragging a line. */
-    private int lineStartX, lineStartY, lastLineX, lastLineY;
+    public int lineStartX, lineStartY, lastLineX, lastLineY;
 
     /** Animation scale for line. */
-    private float lineScale;
+    public float lineScale;
     /** Animation data for crosshair. */
-    private float crosshairScale;
-    private Teamc lastTarget;
+    public float crosshairScale;
+    public Teamc lastTarget;
     /** Used for shifting build requests. */
-    private float shiftDeltaX, shiftDeltaY;
+    public float shiftDeltaX, shiftDeltaY;
 
     /** Place requests to be removed. */
-    private Seq<BuildPlan> removals = new Seq<>();
+    public Seq<BuildPlan> removals = new Seq<>();
     /** Whether or not the player is currently shifting all placed tiles. */
-    private boolean selecting;
+    public boolean selecting;
     /** Whether the player is currently in line-place mode. */
-    private boolean lineMode, schematicMode;
+    public boolean lineMode, schematicMode;
     /** Current place mode. */
-    private PlaceMode mode = none;
+    public PlaceMode mode = none;
     /** Whether no recipe was available when switching to break mode. */
-    private Block lastBlock;
+    public Block lastBlock;
     /** Last placed request. Used for drawing block overlay. */
-    private BuildPlan lastPlaced;
+    public BuildPlan lastPlaced;
     /** Down tracking for panning.*/
-    private boolean down = false;
+    public boolean down = false;
 
-    private Teamc target, moveTarget;
+    public Teamc target, moveTarget;
 
     //region utility methods
 
@@ -77,7 +77,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if(tile != null && player.team().isEnemy(tile.team())){
+            if(tile != null && player.team().isEnemy(tile.team)){
                 player.miner().mineTile(null);
                 target = tile;
             }else if(tile != null && player.unit().type().canHeal && tile.team == player.team() && tile.damaged()){
@@ -532,10 +532,10 @@ public class MobileInput extends InputHandler implements GestureListener{
             lineMode = true;
 
             if(mode == breaking){
-                Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
+                if(!state.isPaused()) Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
             }else if(block != null){
                 updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
-                Fx.tapBlock.at(cursor.worldx() + block.offset, cursor.worldy() + block.offset, block.size);
+                if(!state.isPaused()) Fx.tapBlock.at(cursor.worldx() + block.offset, cursor.worldy() + block.offset, block.size);
             }
         }
 
@@ -555,7 +555,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
         Tile linked = cursor.build == null ? cursor : cursor.build.tile();
 
-        checkTargets(worldx, worldy);
+        if(!player.dead()){
+            checkTargets(worldx, worldy);
+        }
 
         //remove if request present
         if(hasRequest(cursor)){
@@ -572,9 +574,18 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
 
             //apply command on double tap
-            if(count == 2 && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 2f) &&
-                player.unit() instanceof Commanderc){
-                Call.unitCommand(player);
+            if(count == 2 && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 2f)){
+                if(player.unit() instanceof Commanderc){
+                    Call.unitCommand(player);
+                }
+
+                if(player.unit() instanceof Payloadc){
+                    if(((Payloadc)player.unit()).hasPayload()){
+                        tryDropPayload();
+                    }else{
+                        tryPickupPayload();
+                    }
+                }
             }
         }
 
@@ -785,6 +796,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         Rect rect = Tmp.r3;
 
         UnitType type = unit.type();
+        if(type == null) return;
+
         boolean flying = type.flying;
         boolean omni = !(unit instanceof WaterMovec);
         boolean legs = unit.isGrounded();
@@ -803,7 +816,16 @@ public class MobileInput extends InputHandler implements GestureListener{
         targetPos.set(Core.camera.position);
         float attractDst = 15f;
         float strafePenalty = legs ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(unit.vel.angle(), unit.rotation) / 180f);
-        float speed = type.speed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+
+        float baseSpeed = unit.type().speed;
+
+        //limit speed to minimum formation speed to preserve formation
+        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+            //add a tiny multiplier to let units catch up just in case
+            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.98f;
+        }
+
+        float speed = baseSpeed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
@@ -830,19 +852,9 @@ public class MobileInput extends InputHandler implements GestureListener{
         movement.set(targetPos).sub(player).limit(speed);
         movement.setAngle(Mathf.slerp(movement.angle(), unit.vel.angle(), 0.05f));
 
-        //pathfind for ground units
-        if(!flying && !type.canBoost && !(unit instanceof WaterMovec)){
-            Tile on = unit.tileOn();
-            if(on != null && !on.solid()){
-                Tile to = pathfinder.getTargetTile(unit.tileOn(), unit.team, targetPos);
-                if(to != null){
-                    movement.set(to).sub(unit).setLength(speed);
-                }
-            }
-        }
-
         if(player.within(targetPos, attractDst)){
             movement.setZero();
+            unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
         }
 
         float expansion = 3f;
@@ -895,7 +907,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;
-                player.shooting = true;
+                player.shooting = !boosted;
 
                 unit.aim(player.mouseX, player.mouseY);
             }

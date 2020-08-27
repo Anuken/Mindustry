@@ -149,7 +149,10 @@ public class Fonts{
 
         Core.assets.load("tech", Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
             size = 18;
-        }})).loaded = f -> Fonts.tech = (Font)f;
+        }})).loaded = f -> {
+            Fonts.tech = (Font)f;
+            ((Font)f).getData().down *= 1.5f;
+        };
     }
 
     /** Merges the UI and font atlas together for better performance. */

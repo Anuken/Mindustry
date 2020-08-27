@@ -3,6 +3,7 @@ package mindustry.type;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -15,7 +16,7 @@ import static mindustry.Vars.*;
 
 public abstract class Weather extends MappableContent{
     /** Default duration of this weather event in ticks. */
-    public float duration = 15f * Time.toMinutes;
+    public float duration = 9f * Time.toMinutes;
     public Attributes attrs = new Attributes();
 
     //internals
@@ -23,6 +24,7 @@ public abstract class Weather extends MappableContent{
     public Prov<WeatherState> type = WeatherState::create;
     public StatusEffect status = StatusEffects.none;
     public float statusDuration = 60f * 2;
+    public boolean statusAir = true, statusGround = true;
 
     public Weather(String name, Prov<WeatherState> type){
         super(name);
@@ -68,7 +70,11 @@ public abstract class Weather extends MappableContent{
             if(state.effectTimer <= 0){
                 state.effectTimer = statusDuration - 5f;
 
-                Groups.unit.each(u -> u.apply(status, statusDuration));
+                Groups.unit.each(u -> {
+                    if(u.checkTarget(statusAir, statusGround)){
+                        u.apply(status, statusDuration);
+                    }
+                });
             }else{
                 state.effectTimer -= Time.delta;
             }
@@ -105,7 +111,7 @@ public abstract class Weather extends MappableContent{
 
         /** Creates a weather entry with some approximate weather values. */
         public WeatherEntry(Weather weather){
-            this(weather, weather.duration/2f, weather.duration * 1.5f, weather.duration/2f, weather.duration * 1.5f);
+            this(weather, weather.duration * 1f, weather.duration * 3f, weather.duration / 2f, weather.duration * 1.5f);
         }
 
         public WeatherEntry(Weather weather, float minFrequency, float maxFrequency, float minDuration, float maxDuration){
@@ -131,6 +137,7 @@ public abstract class Weather extends MappableContent{
 
         Weather weather;
         float intensity = 1f, opacity = 0f, life, effectTimer;
+        Vec2 windVector = new Vec2();
 
         void init(Weather weather){
             this.weather = weather;

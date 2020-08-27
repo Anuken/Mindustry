@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -43,8 +44,8 @@ public class Reconstructor extends UnitBlock{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", (ReconstructorEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
-        bars.add("units", (ReconstructorEntity e) ->
+        bars.add("progress", (ReconstructorBuild entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        bars.add("units", (ReconstructorBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",
@@ -77,7 +78,7 @@ public class Reconstructor extends UnitBlock{
         super.init();
     }
 
-    public class ReconstructorEntity extends UnitBlockEntity{
+    public class ReconstructorBuild extends UnitBuild{
 
         public float fraction(){
             return progress / constructTime;
@@ -187,5 +188,28 @@ public class Reconstructor extends UnitBlock{
             UnitType[] r =  Structs.find(upgrades, arr -> arr[0] == type);
             return r == null ? null : r[1];
         }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(progress);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            if(revision == 1){
+                progress = read.f();
+            }
+
+        }
+
     }
 }

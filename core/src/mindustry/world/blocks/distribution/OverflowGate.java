@@ -21,6 +21,7 @@ public class OverflowGate extends Block{
         solid = true;
         update = true;
         group = BlockGroup.transportation;
+        instantTransfer = true;
         unloadable = false;
         canOverdrive = false;
     }
@@ -30,7 +31,7 @@ public class OverflowGate extends Block{
         return true;
     }
 
-    public class OverflowGateEntity extends Building{
+    public class OverflowGateBuild extends Building{
         public Item lastItem;
         public Tile lastInput;
         public float time;
@@ -75,7 +76,7 @@ public class OverflowGate extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return team == source.team() && lastItem == null && items.total() == 0;
+            return team == source.team && lastItem == null && items.total() == 0;
         }
 
         @Override
@@ -90,17 +91,17 @@ public class OverflowGate extends Block{
             int from = relativeToEdge(src);
             if(from == -1) return null;
             Building to = nearby((from + 2) % 4);
-            boolean canForward = to != null && to.acceptItem(this, item) && to.team() == team && !(to.block() instanceof OverflowGate);
+            boolean canForward = to != null && to.acceptItem(this, item) && to.team == team && !(to.block() instanceof OverflowGate);
+            boolean inv = invert == enabled;
 
-
-            if(!canForward || invert){
+            if(!canForward || inv){
                 Building a = nearby(Mathf.mod(from - 1, 4));
                 Building b = nearby(Mathf.mod(from + 1, 4));
-                boolean ac = a != null && a.acceptItem(this, item) && !(a.block() instanceof OverflowGate) && a.team() == team;
-                boolean bc = b != null && b.acceptItem(this, item) && !(b.block() instanceof OverflowGate) && b.team() == team;
+                boolean ac = a != null && a.acceptItem(this, item) && !(a.block() instanceof OverflowGate) && a.team == team;
+                boolean bc = b != null && b.acceptItem(this, item) && !(b.block() instanceof OverflowGate) && b.team == team;
 
                 if(!ac && !bc){
-                    return invert && canForward ? to : null;
+                    return inv && canForward ? to : null;
                 }
 
                 if(ac && !bc){

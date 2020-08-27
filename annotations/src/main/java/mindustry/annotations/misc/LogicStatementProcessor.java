@@ -71,26 +71,23 @@ public class LogicStatementProcessor extends BaseProcessor{
 
                 writer.addStatement("out.append(\" \")");
                 writer.addStatement("out.append((($T)obj).$L$L)", c.mirror(), field.name(),
-                    field.mirror().toString().equals("java.lang.String") ?
-                        ".replace(\"\\n\", \"\\\\n\")" :
-                        Seq.with(typeu.directSupertypes(field.mirror())).contains(t -> t.toString().contains("java.lang.Enum")) ? ".name()" :
-                        "");
+                    Seq.with(typeu.directSupertypes(field.mirror())).contains(t -> t.toString().contains("java.lang.Enum")) ? ".name()" :
+                    "");
 
                 //reading primitives, strings and enums is supported; nothing else is
-                reader.addStatement("result.$L = $L(tokens[$L])$L",
+                reader.addStatement("if(tokens.length > $L) result.$L = $L(tokens[$L])",
+                index + 1,
                 field.name(),
                 field.mirror().toString().equals("java.lang.String") ?
                 "" : (field.tname().isPrimitive() ? field.tname().box().toString() :
                 field.mirror().toString()) + ".valueOf", //if it's not a string, it must have a valueOf method
-                index + 1,
-                    field.mirror().toString().equals("java.lang.String") ?
-                    ".replace(\"\\\\n\", \"\\n\")" :
-                    ""
+                index + 1
                 );
 
                 index ++;
             }
 
+            reader.addStatement("result.afterRead()");
             reader.addStatement("return result");
         }
 

@@ -6,6 +6,8 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class FlyingAI extends AIController{
 
     @Override
@@ -18,13 +20,22 @@ public class FlyingAI extends AIController{
             unit.wobble();
         }
 
-        if(target != null && unit.hasWeapons()){
+        if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
             if(unit.type().weapons.first().rotate){
-                moveTo(unit.range() * 0.8f);
+                moveTo(target, unit.range() * 0.8f);
                 unit.lookAt(target);
             }else{
                 attack(80f);
             }
+        }
+
+        if(target == null && command() == UnitCommand.attack && state.rules.waves && unit.team == state.rules.defaultTeam){
+            moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 120f);
+        }
+
+        if(command() == UnitCommand.rally){
+            target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
+            moveTo(target, 60f);
         }
     }
 
@@ -43,41 +54,6 @@ public class FlyingAI extends AIController{
     }
 
     //TODO clean up
-
-    protected void circle(float circleLength){
-        circle(circleLength, unit.type().speed);
-    }
-
-    protected void circle(float circleLength, float speed){
-        if(target == null) return;
-
-        vec.set(target).sub(unit);
-
-        if(vec.len() < circleLength){
-            vec.rotate((circleLength - vec.len()) / circleLength * 180f);
-        }
-
-        vec.setLength(speed * Time.delta);
-
-        unit.moveAt(vec);
-    }
-
-    protected void moveTo(float circleLength){
-        if(target == null) return;
-
-        vec.set(target).sub(unit);
-
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
-
-        vec.setLength(unit.type().speed * Time.delta * length);
-        if(length < -0.5f){
-            vec.rotate(180f);
-        }else if(length < 0){
-            vec.setZero();
-        }
-
-        unit.moveAt(vec);
-    }
 
     protected void attack(float circleLength){
         vec.set(target).sub(unit);

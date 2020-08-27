@@ -256,5 +256,8 @@ public class FloorRenderer implements Disposable{
         /** Maps cache layer ID to cache ID in the batch.
          * -1 means that this cache is unoccupied. */
         int[] caches = new int[CacheLayer.all.length];
+
+        Chunk(){
+        }
     }
 }

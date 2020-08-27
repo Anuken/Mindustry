@@ -30,24 +30,26 @@ public class Damage{
     private static Unit tmpUnit;
 
     /** Creates a dynamic explosion based on specified parameters. */
-    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
-        for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
-            int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
-            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
-        }
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color, boolean damage){
+        if(damage){
+            for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
+                int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
+                Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            }
 
-        for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-            Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
-        }
+            for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
+                Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
+            }
 
-        int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
+            int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
 
-        for(int i = 0; i < waves; i++){
-            int f = i;
-            Time.run(i * 2f, () -> {
-                Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
-                Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
-            });
+            for(int i = 0; i < waves; i++){
+                int f = i;
+                Time.run(i * 2f, () -> {
+                    Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
+                    Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
+                });
+            }
         }
 
         if(explosiveness > 15f){
@@ -87,7 +89,7 @@ public class Damage{
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team() != team && tile.collide(hitter)){
+            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team != team && tile.collide(hitter)){
                 tile.collision(hitter);
                 collidedBlocks.add(tile.pos());
                 hitter.type.hit(hitter, tile.x, tile.y);

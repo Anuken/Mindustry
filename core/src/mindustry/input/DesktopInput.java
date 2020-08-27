@@ -13,7 +13,6 @@ import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -28,24 +27,33 @@ import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
 public class DesktopInput extends InputHandler{
-    private Vec2 movement = new Vec2();
+    public Vec2 movement = new Vec2();
     /** Current cursor type. */
-    private Cursor cursorType = SystemCursor.arrow;
+    public Cursor cursorType = SystemCursor.arrow;
     /** Position where the player started dragging a line. */
-    private int selectX, selectY, schemX, schemY;
+    public int selectX, selectY, schemX, schemY;
     /** Last known line positions.*/
-    private int lastLineX, lastLineY, schematicX, schematicY;
+    public int lastLineX, lastLineY, schematicX, schematicY;
     /** Whether selecting mode is active. */
-    private PlaceMode mode;
+    public PlaceMode mode;
     /** Animation scale for line. */
-    private float selectScale;
+    public float selectScale;
     /** Selected build request for movement. */
-    private @Nullable BuildPlan sreq;
+    public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
-    private boolean deleting = false, shouldShoot = false;
+    public boolean deleting = false, shouldShoot = false, panning = false;
 
     @Override
     public void buildUI(Group group){
+        group.fill(t -> {
+            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
+            t.bottom();
+            t.table(Styles.black6, b -> {
+                b.defaults().left();
+                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
+            }).margin(6f);
+        });
+
         group.fill(t -> {
             t.bottom();
             t.visible(() -> {
@@ -76,15 +84,6 @@ public class DesktopInput extends InputHandler{
                 b.table(a -> {
                     a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
                 });
-            }).margin(6f);
-        });
-
-        group.fill(t -> {
-            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore());
-            t.bottom();
-            t.table(Styles.black6, b -> {
-                b.defaults().left();
-                b.label(() -> Core.bundle.format("respawn", Core.keybinds.get(Binding.respawn).key.toString())).style(Styles.outlineLabel);
             }).margin(6f);
         });
     }
@@ -133,14 +132,12 @@ public class DesktopInput extends InputHandler{
         }
 
         //draw schematic requests
-        for(BuildPlan request : selectRequests){
-            request.animScale = 1f;
-            drawRequest(request);
-        }
+        selectRequests.each(req -> {
+            req.animScale = 1f;
+            drawRequest(req);
+        });
 
-        for(BuildPlan request : selectRequests){
-            drawOverRequest(request);
-        }
+        selectRequests.each(this::drawOverRequest);
 
         if(player.isBuilder()){
             //draw things that may be placed soon
@@ -177,27 +174,40 @@ public class DesktopInput extends InputHandler{
     public void update(){
         super.update();
 
-        if(net.active() && Core.input.keyTap(Binding.player_list)){
+        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content))){
             ui.listfrag.toggle();
         }
 
-        //TODO awful UI state checking code
-        if((player.dead() || state.isPaused()) && !ui.chatfrag.shown()){
-            if(!(scene.getKeyboardFocus() instanceof TextField) && !scene.hasDialog()){
-                //move camera around
-                float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
-                Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+        boolean panCam = false;
+        float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
 
-                if(Core.input.keyDown(Binding.mouse_move)){
-                    Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
-                    Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
-                }
+        if(input.keyDown(Binding.pan)){
+            panCam = true;
+            panning = true;
+        }
+
+        if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0 || input.keyDown(Binding.mouse_move)) && (!scene.hasField())){
+            panning = false;
+        }
+
+        //TODO awful UI state checking code
+        if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && (!scene.hasField() && !scene.hasDialog())){
+            if(input.keyDown(Binding.mouse_move)){
+                panCam = true;
             }
-        }else if(!player.dead()){
+            panning = false;
+
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+        }else if(!player.dead() && !panning){
             Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
         }
 
-        shouldShoot = true;
+        if(panCam){
+            Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
+            Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
+        }
+
+        shouldShoot = !scene.hasMouse();
 
         if(!scene.hasMouse()){
             if(Core.input.keyDown(Binding.control) && Core.input.keyTap(Binding.select)){
@@ -556,6 +566,8 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void updateState(){
+        super.updateState();
+
         if(state.isMenu()){
             droppingItem = false;
             mode = none;
@@ -567,10 +579,18 @@ public class DesktopInput extends InputHandler{
 
     protected void updateMovement(Unit unit){
         boolean omni = !(unit instanceof WaterMovec);
-        boolean legs = unit.isGrounded();
+        boolean ground = unit.isGrounded();
 
-        float strafePenalty = legs ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
-        float speed = unit.type().speed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
+        float baseSpeed = unit.type().speed;
+
+        //limit speed to minimum formation speed to preserve formation
+        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+            //add a tiny multiplier to let units catch up just in case
+            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.95f;
+        }
+
+        float speed = baseSpeed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -586,8 +606,8 @@ public class DesktopInput extends InputHandler{
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(unit.moving()){
-                unit.lookAt(unit.vel().angle());
+            if(!movement.isZero()){
+                unit.lookAt(unit.vel.isZero() ? movement.angle() : unit.vel.angle());
             }
         }
 
@@ -595,8 +615,8 @@ public class DesktopInput extends InputHandler{
             unit.moveAt(movement);
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
-            if(!movement.isZero() && legs){
-                unit.vel.rotateTo(movement.angle(), unit.type().rotateSpeed * Time.delta);
+            if(!movement.isZero() && ground){
+                unit.vel.rotateTo(movement.angle(), unit.type().rotateSpeed);
             }
         }
 
@@ -609,24 +629,13 @@ public class DesktopInput extends InputHandler{
 
         //update payload input
         if(unit instanceof Payloadc){
-            Payloadc pay = (Payloadc)unit;
 
-            if(Core.input.keyTap(Binding.pickupCargo) && pay.payloads().size < unit.type().payloadCapacity){
-                Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && u.mass() < unit.mass() && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
-                if(target != null){
-                    Call.pickupUnitPayload(player, target);
-                }else if(!pay.hasPayload()){
-                    Building tile = world.buildWorld(pay.x(), pay.y());
-
-                    if(tile != null && tile.team() == unit.team){
-                        Call.pickupBlockPayload(player, tile);
-                    }
-                }
+            if(Core.input.keyTap(Binding.pickupCargo)){
+                tryPickupPayload();
             }
 
             if(Core.input.keyTap(Binding.dropCargo)){
-                Call.dropPayload(player, player.x, player.y);
-                pay.dropLastPayload();
+                tryDropPayload();
             }
         }
 

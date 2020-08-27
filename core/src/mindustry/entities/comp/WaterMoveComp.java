@@ -10,6 +10,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
@@ -36,6 +37,20 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     }
 
     @Override
+    @Replace
+    public void lookAt(float angle){
+        if(onLiquid()){
+            rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta);
+        }
+    }
+
+    @Override
+    @Replace
+    public boolean canShoot(){
+        return onLiquid();
+    }
+
+    @Override
     public void add(){
         tleft.clear();
         tright.clear();
@@ -47,8 +62,8 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
         Draw.z(Layer.debris);
 
-        Floor floor = floorOn();
-        Color color = Tmp.c1.set(floor.mapColor).mul(1.5f);
+        Floor floor = tileOn() == null ? Blocks.air.asFloor() : tileOn().floor();
+        Color color = Tmp.c1.set(floor.mapColor.equals(Color.black) ? Blocks.water.mapColor : floor.mapColor).mul(1.5f);
         trailColor.lerp(color, Mathf.clamp(Time.delta * 0.04f));
 
         tleft.draw(trailColor, type.trailScl);
@@ -78,6 +93,11 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
         return on.isDeep() ? 1.3f : 1f;
+    }
+
+    public boolean onLiquid(){
+        Tile tile = tileOn();
+        return tile != null && tile.floor().isLiquid;
     }
 }
 

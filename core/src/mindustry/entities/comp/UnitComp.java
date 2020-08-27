@@ -31,6 +31,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
     @Import boolean dead;
     @Import Team team;
+    @Import int id;
 
     private UnitController controller;
     private UnitType type;
@@ -70,9 +71,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public double sense(LSensor sensor){
-        if(sensor == LSensor.totalItems) return stack().amount;
-        if(sensor == LSensor.health) return health;
+    public double sense(LAccess sensor){
+        if(sensor == LAccess.totalItems) return stack().amount;
+        if(sensor == LAccess.rotation) return rotation;
+        if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.x) return x;
+        if(sensor == LAccess.y) return y;
+        if(sensor == LAccess.team) return team.id;
+        if(sensor == LAccess.shooting) return isShooting() ? 1 : 0;
+        if(sensor == LAccess.shootX) return aimX();
+        if(sensor == LAccess.shootY) return aimY();
         return 0;
     }
 
@@ -216,7 +224,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //apply knockback based on spawns
         if(team != state.rules.waveTeam){
-            float relativeSize = state.rules.dropZoneRadius + bounds()/2f + 1f;
+            float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     vel().add(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
@@ -268,10 +276,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 damageContinuous(floor.damageTaken);
             }
 
-            if(!net.client() && tile.solid()){
+            if(tile.solid()){
                 if(type.canBoost){
                     elevation = 1f;
-                }else{
+                }else if(!net.client()){
                     kill();
                 }
             }
@@ -280,6 +288,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //AI only updates on the server
         if(!net.client() && !dead && !deactivated){
             controller.updateUnit();
+        }
+
+        //clear controller when it becomes invalid
+        if(!controller.isValidController()){
+            resetController();
         }
 
         //do not control anything when deactivated
@@ -302,7 +315,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void destroy(){
         float explosiveness = 2f + item().explosiveness * stack().amount;
         float flammability = item().flammability * stack().amount;
-        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame);
+        Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame, state.rules.damageExplosions);
 
         float shake = hitSize / 3f;
 
@@ -377,6 +390,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(dead || net.client()) return;
 
         //deaths are synced; this calls killed()
-        Call.unitDeath(base());
+        Call.unitDeath(id);
     }
 }

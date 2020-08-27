@@ -94,7 +94,6 @@ public class Control implements ApplicationListener, Loadable{
             tutorial.reset();
 
             hiscore = false;
-
             saves.resetSave();
         });
 
@@ -114,9 +113,13 @@ public class Control implements ApplicationListener, Loadable{
             Call.gameOver(event.winner);
         });
 
+        //add player when world loads regardless
+        Events.on(WorldLoadEvent.class, e -> {
+            player.add();
+        });
+
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
-            player.add();
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
@@ -149,12 +152,6 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(UnitDestroyEvent.class, e -> {
             if(e.unit.team() != player.team()){
                 state.stats.enemyUnitsDestroyed++;
-            }
-        });
-
-        Events.on(ZoneRequireCompleteEvent.class, e -> {
-            if(e.objective.display() != null){
-                ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", e.zoneForMet.localizedName, e.objective.display()));
             }
         });
 
@@ -257,7 +254,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     //TODO move
-    public void handleLaunch(CoreEntity tile){
+    public void handleLaunch(CoreBuild tile){
         LaunchCorec ent = LaunchCore.create();
         ent.set(tile);
         ent.block(Blocks.coreShard);

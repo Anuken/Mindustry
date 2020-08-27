@@ -21,6 +21,7 @@ public class PowerDiode extends Block{
         solid = true;
         insulated = true;
         group = BlockGroup.power;
+        noUpdateDisabled = true;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class PowerDiode extends Block{
         return (tile != null && tile.block().hasPower) ? tile.power.graph.getLastPowerStored() / tile.power.graph.getTotalBatteryCapacity() : 0f;
     }
 
-    public class PowerDiodeEntity extends Building{
+    public class PowerDiodeBuild extends Building{
         @Override
         public void draw(){
             Draw.rect(region, x, y, 0);
@@ -53,7 +54,7 @@ public class PowerDiode extends Block{
         public void updateTile(){
             super.updateTile();
 
-            if(front() == null || back() == null || !back().block().hasPower || !front().block().hasPower || back().team() != front().team()) return;
+            if(front() == null || back() == null || !back().block().hasPower || !front().block().hasPower || back().team != front().team) return;
 
             PowerGraph backGraph = back().power.graph;
             PowerGraph frontGraph = front().power.graph;

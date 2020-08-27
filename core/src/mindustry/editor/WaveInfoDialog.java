@@ -23,7 +23,7 @@ import static mindustry.game.SpawnGroup.*;
 
 public class WaveInfoDialog extends BaseDialog{
     private int displayed = 20;
-    private Seq<SpawnGroup> groups = new Seq<>();
+    Seq<SpawnGroup> groups = new Seq<>();
 
     private Table table;
     private int start = 0;

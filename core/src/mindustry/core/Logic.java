@@ -89,7 +89,7 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             if(state.isCampaign()){
                 long seconds = state.rules.sector.getSecondsPassed();
-                CoreEntity core = state.rules.defaultTeam.core();
+                CoreBuild core = state.rules.defaultTeam.core();
 
                 //apply fractional damage based on how many turns have passed for this sector
                 float turnsPassed = seconds / (turnDuration / 60f);
@@ -303,6 +303,11 @@ public class Logic implements ApplicationListener{
     }
 
     @Remote(called = Loc.both)
+    public static void updateGameOver(Team winner){
+        state.gameOver = true;
+    }
+
+    @Remote(called = Loc.both)
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);
@@ -320,6 +325,10 @@ public class Logic implements ApplicationListener{
         Events.fire(Trigger.update);
         universe.updateGlobal();
 
+        if(Core.settings.modified() && !state.isPlaying()){
+            Core.settings.forceSave();
+        }
+
         if(state.isGame()){
             if(!net.client()){
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
@@ -331,7 +340,9 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
-                state.secinfo.update();
+                if(state.isCampaign()){
+                    state.secinfo.update();
+                }
 
                 if(state.isCampaign()){
                     universe.update();

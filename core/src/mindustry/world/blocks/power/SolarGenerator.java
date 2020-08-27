@@ -21,15 +21,15 @@ public class SolarGenerator extends PowerGenerator{
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
-    public class SolarGeneratorEntity extends GeneratorEntity{
+    public class SolarGeneratorBuild extends GeneratorBuild{
         @Override
         public void updateTile(){
-            productionEfficiency =
+            productionEfficiency = enabled ?
                 Mathf.maxZero(Attribute.light.env() +
                 (state.rules.solarPowerMultiplier < 0 ?
                     (state.rules.lighting ? 1f - state.rules.ambientLight.a : 1f) :
                     state.rules.solarPowerMultiplier
-                ));
+                )) : 0f;
         }
     }
 }

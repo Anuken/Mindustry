@@ -7,8 +7,9 @@ const log = function(context, obj){
 }
 
 const readString = path => Vars.mods.getScripts().readString(path)
-
 const readBytes = path => Vars.mods.getScripts().readBytes(path)
+const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
+const loadSound = path => Vars.mods.getScripts().loadSound(path)
 
 var scriptName = "base.js"
 var modName = "none"
@@ -23,6 +24,16 @@ const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
 
+//these are not sctrictly necessary, but are kept for edge cases
+const run = method => new java.lang.Runnable(){run: method}
+const boolf = method => new Boolf(){get: method}
+const boolp = method => new Boolp(){get: method}
+const floatf = method => new Floatf(){get: method}
+const floatp = method => new Floatp(){get: method}
+const cons = method => new Cons(){get: method}
+const prov = method => new Prov(){get: method}
+const func = method => new Func(){get: method}
+
 const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
 Call = Packages.mindustry.gen.Call
 
@@ -30,6 +41,7 @@ importPackage(Packages.arc)
 importPackage(Packages.arc.func)
 importPackage(Packages.arc.graphics)
 importPackage(Packages.arc.graphics.g2d)
+importPackage(Packages.arc.graphics.gl)
 importPackage(Packages.arc.math)
 importPackage(Packages.arc.math.geom)
 importPackage(Packages.arc.scene)
@@ -82,6 +94,7 @@ importPackage(Packages.mindustry.world.blocks.environment)
 importPackage(Packages.mindustry.world.blocks.experimental)
 importPackage(Packages.mindustry.world.blocks.legacy)
 importPackage(Packages.mindustry.world.blocks.liquid)
+importPackage(Packages.mindustry.world.blocks.logic)
 importPackage(Packages.mindustry.world.blocks.payloads)
 importPackage(Packages.mindustry.world.blocks.power)
 importPackage(Packages.mindustry.world.blocks.production)
@@ -113,14 +126,12 @@ const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
 const BuildinghangeEvent = Packages.mindustry.game.EventType.BuildinghangeEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
-const TapConfigEvent = Packages.mindustry.game.EventType.TapConfigEvent
-const TapEvent = Packages.mindustry.game.EventType.TapEvent
+const ConfigEvent = Packages.mindustry.game.EventType.ConfigEvent
 const DepositEvent = Packages.mindustry.game.EventType.DepositEvent
 const WithdrawEvent = Packages.mindustry.game.EventType.WithdrawEvent
 const SectorCaptureEvent = Packages.mindustry.game.EventType.SectorCaptureEvent
-const ZoneConfigureCompleteEvent = Packages.mindustry.game.EventType.ZoneConfigureCompleteEvent
-const ZoneRequireCompleteEvent = Packages.mindustry.game.EventType.ZoneRequireCompleteEvent
 const PlayerChatEvent = Packages.mindustry.game.EventType.PlayerChatEvent
+const ClientPreConnectEvent = Packages.mindustry.game.EventType.ClientPreConnectEvent
 const CommandIssueEvent = Packages.mindustry.game.EventType.CommandIssueEvent
 const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent

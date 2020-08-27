@@ -24,6 +24,7 @@ public class PayloadAcceptor extends Block{
         super(name);
 
         update = true;
+        sync = true;
     }
 
     public static boolean blends(Building tile, int direction){
@@ -46,7 +47,7 @@ public class PayloadAcceptor extends Block{
             );
     }
 
-    public class PayloadAcceptorEntity<T extends Payload> extends Building{
+    public class PayloadAcceptorBuild<T extends Payload> extends Building{
         public @Nullable T payload;
         public Vec2 payVector = new Vec2();
         public float payRotation;

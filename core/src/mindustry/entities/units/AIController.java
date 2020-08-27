@@ -2,7 +2,9 @@ package mindustry.entities.units;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -31,6 +33,10 @@ public class AIController implements UnitController{
     public void updateUnit(){
         updateTargeting();
         updateMovement();
+    }
+
+    protected UnitCommand command(){
+        return unit.team.data().command;
     }
 
     protected void updateMovement(){
@@ -113,6 +119,45 @@ public class AIController implements UnitController{
 
     protected void init(){
 
+    }
+
+    protected @Nullable Tile getClosestSpawner(){
+        return Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
+    }
+
+    protected void circle(Position target, float circleLength){
+        circle(target, circleLength, unit.type().speed);
+    }
+
+    protected void circle(Position target, float circleLength, float speed){
+        if(target == null) return;
+
+        vec.set(target).sub(unit);
+
+        if(vec.len() < circleLength){
+            vec.rotate((circleLength - vec.len()) / circleLength * 180f);
+        }
+
+        vec.setLength(speed * Time.delta);
+
+        unit.moveAt(vec);
+    }
+
+    protected void moveTo(Position target, float circleLength){
+        if(target == null) return;
+
+        vec.set(target).sub(unit);
+
+        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
+
+        vec.setLength(unit.type().speed * Time.delta * length);
+        if(length < -0.5f){
+            vec.rotate(180f);
+        }else if(length < 0){
+            vec.setZero();
+        }
+
+        unit.moveAt(vec);
     }
 
     @Override

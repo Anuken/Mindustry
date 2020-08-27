@@ -8,6 +8,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 
 public class LogicDisplay extends Block{
@@ -20,35 +22,36 @@ public class LogicDisplay extends Block{
         commandLineRect = 5,
         commandPoly = 6,
         commandLinePoly = 7,
-        commandFlush = 8;
+        commandTriangle = 8;
+
+    public int maxSides = 25;
 
     public int displaySize = 64;
 
     public LogicDisplay(String name){
         super(name);
         update = true;
+        solid = true;
     }
 
-    public class LogicDisplayEntity extends Building{
+    public class LogicDisplayBuild extends Building{
         public FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
-        public LongQueue commands = new LongQueue();
-
-        public LogicDisplayEntity(){
-
-        }
+        public LongQueue commands = new LongQueue(LExecutor.maxDisplayBuffer);
 
         @Override
         public void draw(){
             super.draw();
 
-            if(buffer == null){
-                buffer = new FrameBuffer(displaySize, displaySize);
-                //clear the buffer - some OSs leave garbage in it
-                buffer.begin(Color.clear);
-                buffer.end();
-            }
+            Draw.draw(Draw.z(), () -> {
+                if(buffer == null){
+                    buffer = new FrameBuffer(displaySize, displaySize);
+                    //clear the buffer - some OSs leave garbage in it
+                    buffer.begin(Pal.darkerMetal);
+                    buffer.end();
+                }
+            });
 
             if(!commands.isEmpty()){
                 Draw.draw(Draw.z(), () -> {
@@ -63,16 +66,17 @@ public class LogicDisplay extends Block{
                         long c = commands.removeFirst();
                         byte type = DisplayCmd.type(c);
                         int x = DisplayCmd.x(c), y = DisplayCmd.y(c),
-                        p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c);
+                        p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c), p4 = DisplayCmd.p4(c);
 
                         switch(type){
                             case commandClear: Core.graphics.clear(x/255f, y/255f, p1/255f, 1f); break;
                             case commandLine: Lines.line(x, y, p1, p2); break;
                             case commandRect: Fill.crect(x, y, p1, p2); break;
                             case commandLineRect: Lines.rect(x, y, p1, p2); break;
-                            case commandPoly: Fill.poly(x, y, p1, p2, p3); break;
-                            case commandLinePoly: Lines.poly(x, y, p1, p2, p3); break;
-                            case commandColor: this.color = Color.toFloatBits(x, y, p1, 255); Draw.color(this.color); break;
+                            case commandPoly: Fill.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
+                            case commandLinePoly: Lines.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
+                            case commandTriangle: Fill.tri(x, y, p1, p2, p3, p4); break;
+                            case commandColor: this.color = Color.toFloatBits(x, y, p1, p2); Draw.color(this.color); break;
                             case commandStroke: this.stroke = x; Lines.stroke(x); break;
                         }
                     }
@@ -85,11 +89,15 @@ public class LogicDisplay extends Block{
                 });
             }
 
-            Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * Draw.scl, -buffer.getHeight() * Draw.scl);
+            Draw.draw(Draw.z(), () -> {
+                if(buffer != null){
+                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * Draw.scl, -buffer.getHeight() * Draw.scl);
+                }
+            });
         }
     }
 
-    public enum CommandType{
+    public enum GraphicsType{
         clear,
         color,
         stroke,
@@ -98,19 +106,17 @@ public class LogicDisplay extends Block{
         lineRect,
         poly,
         linePoly,
-        flush;
+        triangle;
 
-        public static final CommandType[] all = values();
-        public static final CommandType[] allNormal = Seq.select(all, t -> t != flush).toArray(CommandType.class);
+        public static final GraphicsType[] all = values();
     }
 
     @Struct
     static class DisplayCmdStruct{
         public byte type;
 
-        //each coordinate is only 8 bits, limiting size to 256x256
-        //anything larger than that would be excessive anyway
+        //9 bits are required for full 360 degrees
         @StructField(9)
-        public int x, y, p1, p2, p3;
+        public int x, y, p1, p2, p3, p4;
     }
 }

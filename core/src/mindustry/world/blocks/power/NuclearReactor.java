@@ -61,10 +61,10 @@ public class NuclearReactor extends PowerGenerator{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("heat", (NuclearReactorEntity entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
+        bars.add("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
     }
 
-    public class NuclearReactorEntity extends GeneratorEntity{
+    public class NuclearReactorBuild extends GeneratorBuild{
         public float heat;
 
         @Override
@@ -76,12 +76,14 @@ public class NuclearReactor extends PowerGenerator{
             float fullness = (float)fuel / itemCapacity;
             productionEfficiency = fullness;
 
-            if(fuel > 0){
+            if(fuel > 0 && enabled){
                 heat += fullness * heating * Math.min(delta(), 4f);
 
                 if(timer(timerFuel, itemDuration / timeScale())){
                     consume();
                 }
+            }else{
+                productionEfficiency = 0f;
             }
 
             Liquid liquid = cliquid.liquid;
@@ -109,8 +111,8 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         @Override
-        public double sense(LSensor sensor){
-            if(sensor == LSensor.heat) return heat;
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return heat;
             return super.sense(sensor);
         }
 

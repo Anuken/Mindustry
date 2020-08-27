@@ -22,7 +22,7 @@ public class Incinerator extends Block{
         solid = true;
     }
 
-    public class IncineratorEntity extends Building{
+    public class IncineratorBuild extends Building{
         public float heat;
 
         @Override

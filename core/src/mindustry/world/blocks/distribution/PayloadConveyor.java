@@ -29,6 +29,7 @@ public class PayloadConveyor extends Block{
         rotate = true;
         update = true;
         outputsPayload = true;
+        noUpdateDisabled = true;
     }
 
     @Override
@@ -48,7 +49,7 @@ public class PayloadConveyor extends Block{
         }
     }
 
-    public class PayloadConveyorEntity extends Building{
+    public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
         public @Nullable Building next;
@@ -85,7 +86,7 @@ public class PayloadConveyor extends Block{
 
             int ntrns = 1 + size/2;
             Tile next = tile.getNearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
-            blocked = (next != null && next.solid()) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
+            blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
         }
 
         @Override
@@ -95,6 +96,8 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void updateTile(){
+            if(!enabled) return;
+
             progress = Time.time() % moveTime;
 
             updatePayload();

@@ -6,8 +6,8 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
@@ -34,8 +34,9 @@ import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
-    private static final int maxSnapshotSize = 430, timerBlockSync = 0;
-    private static final float serverSyncTime = 12, blockSyncTime = 60 * 8;
+    /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
+    private static final int maxSnapshotSize = 800, timerBlockSync = 0;
+    private static final float serverSyncTime = 12, blockSyncTime = 60 * 6;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Vec2 vector = new Vec2();
     private static final Rect viewport = new Rect();
@@ -332,6 +333,8 @@ public class NetServer implements ApplicationListener{
 
                 Call.sendMessage(Strings.format("[lightgray]A player has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
                             target.name, votes, votesRequired()));
+
+                checkPass();
             }
 
             boolean checkPass(){
@@ -524,9 +527,13 @@ public class NetServer implements ApplicationListener{
     public static void serverPacketUnreliable(Player player, String type, String contents){
         serverPacketReliable(player, type, contents);
     }
+    
+    private static boolean invalid(float f){
+        return Float.isInfinite(f) || Float.isNaN(f);
+    }
 
     @Remote(targets = Loc.client, unreliable = true)
-    public static void clientShapshot(
+    public static void clientSnapshot(
         Player player,
         int snapshotID,
         boolean dead,
@@ -535,12 +542,22 @@ public class NetServer implements ApplicationListener{
         float rotation, float baseRotation,
         float xVelocity, float yVelocity,
         Tile mining,
-        boolean boosting, boolean shooting, boolean chatting,
+        boolean boosting, boolean shooting, boolean chatting, boolean building,
         @Nullable BuildPlan[] requests,
         float viewX, float viewY, float viewWidth, float viewHeight
     ){
         NetConnection con = player.con;
         if(con == null || snapshotID < con.lastReceivedClientSnapshot) return;
+
+        //validate coordinates just in case
+        if(invalid(x)) x = 0f;
+        if(invalid(y)) y = 0f;
+        if(invalid(xVelocity)) xVelocity = 0f;
+        if(invalid(yVelocity)) yVelocity = 0f;
+        if(invalid(pointerX)) pointerX = 0f;
+        if(invalid(pointerY)) pointerY = 0f;
+        if(invalid(rotation)) rotation = 0f;
+        if(invalid(baseRotation)) baseRotation = 0f;
 
         boolean verifyPosition = !player.dead() && netServer.admins.getStrict() && headless;
 
@@ -556,6 +573,10 @@ public class NetServer implements ApplicationListener{
             shooting = false;
         }
 
+        if(!player.dead() && (player.unit().type().flying || !player.unit().type().canBoost)){
+            boosting = false;
+        }
+
         //TODO these need to be assigned elsewhere
         player.mouseX = pointerX;
         player.mouseY = pointerY;
@@ -568,6 +589,7 @@ public class NetServer implements ApplicationListener{
 
         if(player.isBuilder()){
             player.builder().clearBuilding();
+            player.builder().updateBuilding(building);
         }
 
         if(player.isMiner()){
@@ -605,9 +627,12 @@ public class NetServer implements ApplicationListener{
         if(!player.dead()){
             Unit unit = player.unit();
 
-            unit.vel.set(xVelocity, yVelocity).limit(unit.type().speed);
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
-            float maxSpeed = player.unit().type().speed;
+            float maxSpeed = ((player.unit().type().canBoost && player.unit().isFlying()) ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
+            if(unit.isGrounded()){
+                maxSpeed *= unit.floorSpeedMultiplier();
+            }
+            unit.vel.set(xVelocity, yVelocity).limit(maxSpeed);
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
             if(con.lastUnit != unit){
@@ -671,8 +696,8 @@ public class NetServer implements ApplicationListener{
     public static void adminRequest(Player player, Player other, AdminAction action){
 
         if(!player.admin){
-            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action without proper security access.",
-            player.name, player.con.address);
+            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
+            player.name, player.con.address, action.name(), other == null ? null : other.name);
             return;
         }
 
@@ -706,13 +731,15 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client)
     public static void connectConfirm(Player player){
+        player.add();
+
         if(player.con == null || player.con.hasConnected) return;
 
-        player.add();
         player.con.hasConnected = true;
+
         if(Config.showConnectMessages.bool()){
             Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-            Log.info("&lm[@] &y@ has connected. ", player.uuid(), player.name);
+            Log.info("&lm[@] &y@ has connected.", player.uuid(), player.name);
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
@@ -723,7 +750,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public boolean isWaitingForPlayers(){
-        if(state.rules.pvp){
+        if(state.rules.pvp && !state.gameOver){
             int used = 0;
             for(TeamData t : state.teams.getActive()){
                 if(Groups.player.count(p -> p.team() == t.team) > 0){
@@ -778,11 +805,11 @@ public class NetServer implements ApplicationListener{
         syncStream.reset();
 
         short sent = 0;
-        for(Building entity : Groups.tile){
+        for(Building entity : Groups.build){
             if(!entity.block().sync) continue;
             sent ++;
 
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.pos());
             entity.writeAll(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
@@ -803,11 +830,11 @@ public class NetServer implements ApplicationListener{
 
     public void writeEntitySnapshot(Player player) throws IOException{
         syncStream.reset();
-        Seq<CoreEntity> cores = state.teams.cores(player.team());
+        Seq<CoreBuild> cores = state.teams.cores(player.team());
 
         dataStream.writeByte(cores.size);
 
-        for(CoreEntity entity : cores){
+        for(CoreBuild entity : cores){
             dataStream.writeInt(entity.tile().pos());
             entity.items.write(Writes.get(dataStream));
         }
@@ -816,7 +843,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
