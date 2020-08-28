@@ -128,6 +128,8 @@ public class UI implements ApplicationListener, Loadable{
     public void update(){
         if(disableUI || Core.scene == null) return;
 
+        Events.fire(Trigger.uiDrawBegin);
+
         Core.scene.act();
         Core.scene.draw();
 
@@ -143,6 +145,8 @@ public class UI implements ApplicationListener, Loadable{
             control.tutorial.draw();
             Draw.flush();
         }
+
+        Events.fire(Trigger.uiDrawEnd);
     }
 
     @Override
@@ -221,10 +225,13 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public TextureRegionDrawable getIcon(String name){
-        if(Icon.icons.containsKey(name)){
-            return Icon.icons.get(name);
-        }
+        if(Icon.icons.containsKey(name)) return Icon.icons.get(name);
         return Core.atlas.getDrawable("error");
+    }
+
+    public TextureRegionDrawable getIcon(String name, String def){
+        if(Icon.icons.containsKey(name)) return Icon.icons.get(name);
+        return getIcon(def);
     }
 
     public void loadAnd(Runnable call){

@@ -1,7 +1,10 @@
 package mindustry.mod;
 
 import arc.*;
+import arc.assets.*;
+import arc.audio.*;
 import arc.files.*;
+import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -23,7 +26,7 @@ public class Scripts implements Disposable{
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
-    private LoadedMod currentMod = null;
+    LoadedMod currentMod = null;
 
     public Scripts(){
         Time.mark();
@@ -73,7 +76,7 @@ public class Scripts implements Disposable{
         Log.log(level, "[@]: @", source, message);
     }
 
-    //utility mod functions
+    //region utility mod functions
 
     public String readString(String path){
         return Vars.tree.get(path, true).readString();
@@ -82,6 +85,38 @@ public class Scripts implements Disposable{
     public byte[] readBytes(String path){
         return Vars.tree.get(path, true).readBytes();
     }
+
+    public Sound loadSound(String soundName){
+        if(Vars.headless) return new MockSound();
+
+        String name = "sounds/" + soundName;
+        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+
+        if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
+        ModLoadingSound sound = new ModLoadingSound();
+        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
+        desc.loaded = result -> sound.sound = (Sound)result;
+        desc.errored = Throwable::printStackTrace;
+
+        return sound;
+    }
+
+    public Music loadMusic(String soundName){
+        if(Vars.headless) return new MockMusic();
+
+        String name = "music/" + soundName;
+        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+
+        if(Core.assets.contains(path, Music.class)) return Core.assets.get(path, Music.class);
+        ModLoadingMusic sound = new ModLoadingMusic();
+        AssetDescriptor<?> desc = Core.assets.load(path, Music.class);
+        desc.loaded = result -> sound.music = (Music)result;
+        desc.errored = Throwable::printStackTrace;
+
+        return sound;
+    }
+
+    //endregion
 
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;

@@ -99,7 +99,7 @@ public class WaveSpawner{
 
     private void eachFlyerSpawn(Floatc2 cons){
         for(Tile tile : spawns){
-            float angle = Angles.angle(tile.x, tile.y, world.width() / 2, world.height() / 2);
+            float angle = Angles.angle(world.width() / 2, world.height() / 2, tile.x, tile.y);
 
             float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
             float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);

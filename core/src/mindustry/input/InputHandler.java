@@ -14,7 +14,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import mindustry.ai.formations.*;
 import mindustry.ai.formations.patterns.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -63,13 +62,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean isBuilding = true, buildWasAutoPaused = false;
     public @Nullable UnitType controlledType;
 
-    protected @Nullable Schematic lastSchematic;
-    protected GestureDetector detector;
-    protected PlaceLine line = new PlaceLine();
-    protected BuildPlan resultreq;
-    protected BuildPlan brequest = new BuildPlan();
-    protected Seq<BuildPlan> lineRequests = new Seq<>();
-    protected Seq<BuildPlan> selectRequests = new Seq<>();
+    public @Nullable Schematic lastSchematic;
+    public GestureDetector detector;
+    public PlaceLine line = new PlaceLine();
+    public BuildPlan resultreq;
+    public BuildPlan brequest = new BuildPlan();
+    public Seq<BuildPlan> lineRequests = new Seq<>();
+    public Seq<BuildPlan> selectRequests = new Seq<>();
 
     //methods to override
 
@@ -108,6 +107,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void pickupUnitPayload(Player player, Unit target){
+        if(player == null) return;
+
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
@@ -120,10 +121,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void pickupBlockPayload(Player player, Building tile){
+        if(player == null) return;
+
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
-        if(tile != null && tile.team() == unit.team && pay.payloads().size < unit.type().payloadCapacity
+        if(tile != null && tile.team == unit.team && pay.payloads().size < unit.type().payloadCapacity
             && unit.within(tile, tilesize * tile.block.size * 1.2f)){
             //pick up block directly
             if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2 && tile.canPickup()){
@@ -143,6 +146,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void dropPayload(Player player, float x, float y){
+        if(player == null) return;
+
         Payloadc pay = (Payloadc)player.unit();
 
         //allow a slight margin of error
@@ -156,6 +161,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void dropItem(Player player, float angle){
+        if(player == null) return;
+
         if(net.server() && player.unit().stack.amount <= 0){
             throw new ValidateException(player, "Player cannot drop an item.");
         }
@@ -179,6 +186,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building tile){
         if(player == null || tile == null) return;
+
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile(), action -> {
                 action.itemAmount = player.unit().stack.amount;
@@ -217,6 +225,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void unitControl(Player player, @Nullable Unit unit){
+        if(player == null) return;
+
         //clear player unit when they possess a core
         if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreBuild)){
             Fx.spawn.at(player);
@@ -226,10 +236,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             player.clearUnit();
             player.deathTimer = 61f;
+            ((CoreBuild)((BlockUnitc)unit).tile()).requestSpawn(player);
+
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated()){
+        }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated() && !unit.dead){
             player.unit(unit);
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
@@ -257,23 +269,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(commander.isCommanding()){
             commander.clearCommand();
         }else{
-            FormationPattern pattern = new SquareFormation();
-            Formation formation = new Formation(new Vec3(player.x, player.y, player.unit().rotation), pattern);
-            formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
 
-            units.clear();
-
+            commander.commandNearby(new SquareFormation());
             Fx.commandSend.at(player);
-            Units.nearby(player.team(), player.x, player.y, 200f, u -> {
-                if(u.isAI()){
-                    units.add(u);
-                }
-            });
-
-            units.sort(u -> u.dst2(player.unit()));
-            units.truncate(player.unit().type().commandLimit);
-
-            commander.command(formation, units);
         }
 
     }
@@ -306,7 +304,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead()){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated());
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated() && !u.dead);
 
             if(unit != null){
                 Call.unitControl(player, unit);
@@ -316,7 +314,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void checkUnit(){
         if(controlledType != null){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated());
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated() && !u.dead);
             if(unit == null && controlledType == UnitTypes.block){
                 unit = world.buildWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.buildWorld(player.x, player.y)).unit() : null;
             }
@@ -376,7 +374,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void updateState(){
-
+        if(state.isMenu()){
+            controlledType = null;
+        }
     }
 
     public void drawBottom(){
@@ -542,11 +542,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(test.get(req)) return req;
         }
 
-        for(BuildPlan req : selectRequests){
-            if(test.get(req)) return req;
-        }
-
-        return null;
+        return selectRequests.find(test);
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
@@ -877,7 +873,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(tile instanceof ControlBlock && tile.team() == player.team()){
+        if(tile instanceof ControlBlock && tile.team == player.team()){
             return ((ControlBlock)tile).unit();
         }
 

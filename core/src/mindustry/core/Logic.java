@@ -303,6 +303,11 @@ public class Logic implements ApplicationListener{
     }
 
     @Remote(called = Loc.both)
+    public static void updateGameOver(Team winner){
+        state.gameOver = true;
+    }
+
+    @Remote(called = Loc.both)
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);
@@ -319,6 +324,10 @@ public class Logic implements ApplicationListener{
     public void update(){
         Events.fire(Trigger.update);
         universe.updateGlobal();
+
+        if(Core.settings.modified() && !state.isPlaying()){
+            Core.settings.forceSave();
+        }
 
         if(state.isGame()){
             if(!net.client()){

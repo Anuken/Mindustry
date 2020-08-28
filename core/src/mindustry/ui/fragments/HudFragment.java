@@ -29,7 +29,7 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
-    private static final float dsize = 47.2f;
+    private static final float dsize = 47f;
 
     public final PlacementFragment blockfrag = new PlacementFragment();
 
@@ -122,6 +122,8 @@ public class HudFragment extends Fragment{
                     }).update(i -> {
                         if(net.active() && mobile){
                             i.getStyle().imageUp = Icon.chat;
+                        }else if(state.isCampaign()){
+                            i.getStyle().imageUp = Icon.tree;
                         }else{
                             i.getStyle().imageUp = Icon.book;
                         }

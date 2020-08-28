@@ -8,7 +8,8 @@ import arc.input.*;
 public enum Binding implements KeyBind{
     move_x(new Axis(KeyCode.a, KeyCode.d), "general"),
     move_y(new Axis(KeyCode.s, KeyCode.w)),
-    mouse_move(KeyCode.mouseForward),
+    mouse_move(KeyCode.mouseBack),
+    pan(KeyCode.mouseForward),
 
     boost(KeyCode.shiftLeft),
     control(KeyCode.controlLeft),

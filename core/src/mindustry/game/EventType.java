@@ -30,7 +30,12 @@ public class EventType{
         openWiki,
         teamCoreDamage,
         socketConfigChanged,
-        update
+        update,
+        draw,
+        preDraw,
+        postDraw,
+        uiDrawBegin,
+        uiDrawEnd
     }
 
     public static class WinEvent{}
@@ -77,7 +82,6 @@ public class EventType{
         }
     }
 
-
     public static class CommandIssueEvent{
         public final Building tile;
         public final UnitCommand command;
@@ -103,27 +107,6 @@ public class EventType{
         public PlayerChatEvent(Player player, String message){
             this.player = player;
             this.message = message;
-        }
-    }
-
-    /** Called when a zone's requirements are met. */
-    public static class ZoneRequireCompleteEvent{
-        public final SectorPreset zoneMet, zoneForMet;
-        public final Objectives.Objective objective;
-
-        public ZoneRequireCompleteEvent(SectorPreset zoneMet, SectorPreset zoneForMet, Objectives.Objective objective){
-            this.zoneMet = zoneMet;
-            this.zoneForMet = zoneForMet;
-            this.objective = objective;
-        }
-    }
-
-    /** Called when a zone's requirements are met. */
-    public static class ZoneConfigureCompleteEvent{
-        public final SectorPreset zone;
-
-        public ZoneConfigureCompleteEvent(SectorPreset zone){
-            this.zone = zone;
         }
     }
 

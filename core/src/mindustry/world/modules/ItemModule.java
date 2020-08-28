@@ -276,30 +276,30 @@ public class ItemModule extends BlockModule{
 
     @Override
     public void write(Writes write){
-        byte amount = 0;
+        int amount = 0;
         for(int item : items){
             if(item > 0) amount++;
         }
 
-        write.b(amount); //amount of items
+        write.s(amount); //amount of items
 
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                write.b(i); //item ID
+                write.s(i); //item ID
                 write.i(items[i]); //item amount
             }
         }
     }
 
     @Override
-    public void read(Reads read){
+    public void read(Reads read, boolean legacy){
         //just in case, reset items
         Arrays.fill(items, 0);
-        byte count = read.b();
+        int count = legacy ? read.ub() : read.s();
         total = 0;
 
         for(int j = 0; j < count; j++){
-            int itemid = read.b();
+            int itemid = legacy ? read.ub() : read.s();
             int itemamount = read.i();
             items[content.item(itemid).id] = itemamount;
             total += itemamount;

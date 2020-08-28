@@ -35,6 +35,12 @@ public class DefaultWaves{
                 max = 4;
             }},
 
+            new SpawnGroup(UnitTypes.pulsar){{
+                begin = 13;
+                spacing = 3;
+                unitScaling = 0.5f;
+            }},
+
             new SpawnGroup(UnitTypes.mace){{
                 begin = 7;
                 spacing = 3;

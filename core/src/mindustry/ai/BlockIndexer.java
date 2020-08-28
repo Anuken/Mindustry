@@ -185,7 +185,7 @@ public class BlockIndexer{
 
                 if(other == null) continue;
 
-                if(other.team() == team && pred.get(other) && intSet.add(other.pos())){
+                if(other.team == team && pred.get(other) && intSet.add(other.pos())){
                     cons.get(other);
                     any = true;
                 }
@@ -212,11 +212,11 @@ public class BlockIndexer{
     }
 
     public void notifyTileDamaged(Building entity){
-        if(damagedTiles[entity.team().id] == null){
-            damagedTiles[entity.team().id] = new BuildingArray();
+        if(damagedTiles[entity.team.id] == null){
+            damagedTiles[entity.team.id] = new BuildingArray();
         }
 
-        damagedTiles[entity.team().id].add(entity);
+        damagedTiles[entity.team.id].add(entity);
     }
 
     public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
@@ -251,7 +251,7 @@ public class BlockIndexer{
 
                         if(e == null) continue;
 
-                        if(e.team() != team || !pred.get(e) || !e.block().targetable)
+                        if(e.team != team || !pred.get(e) || !e.block().targetable)
                             continue;
 
                         float ndst = e.dst2(x, y);
@@ -390,7 +390,7 @@ public class BlockIndexer{
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
                     Building result = world.build(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
-                    if(result != null && result.team() == team){
+                    if(result != null && result.team == team){
                         bits.set(quadrantX, quadrantY);
                         break outer;
                     }

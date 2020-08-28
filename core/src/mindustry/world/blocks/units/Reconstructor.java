@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -187,5 +188,28 @@ public class Reconstructor extends UnitBlock{
             UnitType[] r =  Structs.find(upgrades, arr -> arr[0] == type);
             return r == null ? null : r[1];
         }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(progress);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            if(revision == 1){
+                progress = read.f();
+            }
+
+        }
+
     }
 }

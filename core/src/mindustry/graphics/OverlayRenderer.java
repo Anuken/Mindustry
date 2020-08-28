@@ -111,7 +111,7 @@ public class OverlayRenderer{
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
                     Draw.color(Color.darkGray);
                     Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
-                    Draw.color(Pal.accent, core.team().color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
+                    Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
                     Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 }
             });
@@ -134,8 +134,11 @@ public class OverlayRenderer{
             Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             Building tile = world.buildWorld(vec.x, vec.y);
 
-            if(tile != null && tile.team() == player.team()){
+            if(tile != null && tile.team == player.team()){
                 tile.drawSelect();
+                if(!tile.enabled && tile.block.drawDisabled){
+                   tile.drawDisabled();
+                }
 
                 if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.team())){
                     control.input.drawArrow(tile.block(), tile.tileX(), tile.tileY(), tile.rotation, true);

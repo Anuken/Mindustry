@@ -113,7 +113,7 @@ public class ItemLiquidGenerator extends PowerGenerator{
                 }
             }
 
-            totalTime += heat;
+            totalTime += heat * Time.delta;
 
             //liquid takes priority over solids
             if(hasLiquids && liquid != null && liquids.get(liquid) >= 0.001f){

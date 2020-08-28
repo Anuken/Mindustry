@@ -23,14 +23,14 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Saves{
-    private Seq<SaveSlot> saves = new Seq<>();
-    private @Nullable SaveSlot current;
+    Seq<SaveSlot> saves = new Seq<>();
+    @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
-    private AsyncExecutor previewExecutor = new AsyncExecutor(1);
+    AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
 
-    private long totalPlaytime;
+    long totalPlaytime;
     private long lastTimestamp;
 
     public Saves(){

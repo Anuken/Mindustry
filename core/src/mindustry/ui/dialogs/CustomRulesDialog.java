@@ -20,7 +20,7 @@ import static mindustry.Vars.*;
 
 public class CustomRulesDialog extends BaseDialog{
     private Table main;
-    private Rules rules;
+    Rules rules;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
     private BaseDialog banDialog;

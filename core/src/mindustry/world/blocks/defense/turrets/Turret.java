@@ -237,7 +237,7 @@ public abstract class Turret extends Block{
                         canShoot = unit.isShooting();
                     }else if(logicControlled()){ //logic behavior
                         canShoot = logicShooting;
-                    }else{ //default AI behavior
+                    }else if(peekAmmo() != null){ //default AI behavior
                         BulletType type = peekAmmo();
                         float speed = type.speed;
                         //slow bullets never intersect
@@ -436,7 +436,7 @@ public abstract class Turret extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            if(revision == 1){
+            if(revision >= 1){
                 reload = read.f();
                 rotation = read.f();
             }

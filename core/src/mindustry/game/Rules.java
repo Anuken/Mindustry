@@ -42,6 +42,10 @@ public class Rules{
     public boolean schematicAllowed = true;
     /** Whether copying is allowed */
     public boolean copyAllowed = true;
+    /** Whether friendly explosions can occur and set fire/damage other blocks. */
+    public boolean damageExplosions = true;
+    /** Whether fire is enabled. */
+    public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
     /** How fast unit pads build units. */

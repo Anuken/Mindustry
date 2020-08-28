@@ -23,6 +23,7 @@ public class ItemSource extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         saveConfig = true;
+        noUpdateDisabled = true;
 
         config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);
@@ -69,7 +70,7 @@ public class ItemSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> outputItem, item -> configure(item));
+            ItemSelection.buildTable(table, content.items(), () -> outputItem, this::configure);
         }
 
         @Override

@@ -33,8 +33,10 @@ public class Fx{
         float scl = 1f + e.fout() * 2f;
 
         UnitType unit = e.data();
-        rect(unit.region, e.x, e.y,
-        unit.region.getWidth() * Draw.scl * scl, unit.region.getHeight() * Draw.scl * scl, 180f);
+        TextureRegion region = unit.icon(Cicon.full);
+
+        rect(region, e.x, e.y,
+            region.getWidth() * Draw.scl * scl, region.getHeight() * Draw.scl * scl, 180f);
 
     }),
 
@@ -507,6 +509,29 @@ public class Fx{
         stroke(1f * e.fout());
 
         randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+        });
+
+    }),
+
+    sapExplosion = new Effect(25, e -> {
+
+        color(Pal.sapBullet);
+        e.scaled(6, i -> {
+            stroke(3f * i.fout());
+            Lines.circle(e.x, e.y, 3f + i.fin() * 80f);
+        });
+
+        color(Color.gray);
+
+        randLenVectors(e.id, 9, 2f + 70 * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+        });
+
+        color(Pal.sapBulletBack);
+        stroke(1f * e.fout());
+
+        randLenVectors(e.id + 1, 8, 1f + 60f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
         });
 

@@ -25,8 +25,8 @@ public class Conveyor extends Block implements Autotiler{
     private static final float itemSpace = 0.4f;
     private static final int capacity = 4;
 
-    private final Vec2 tr1 = new Vec2();
-    private final Vec2 tr2 = new Vec2();
+    final Vec2 tr1 = new Vec2();
+    final Vec2 tr2 = new Vec2();
 
     public @Load(value = "@-#1-#2", lengths = {7, 4}) TextureRegion[][] regions;
 
@@ -163,23 +163,22 @@ public class Conveyor extends Block implements Autotiler{
 
             if(front() != null && front() != null){
                 next = front();
-                nextc = next instanceof ConveyorBuild && next.team() == team ? (ConveyorBuild)next : null;
+                nextc = next instanceof ConveyorBuild && next.team == team ? (ConveyorBuild)next : null;
                 aligned = nextc != null && rotation == next.rotation;
             }
         }
 
         @Override
         public void unitOn(Unit unit){
-            if(clogHeat > 0.5f){
-                return;
-            }
+
+            if(clogHeat > 0.5f) return;
 
             noSleep();
 
-            float mspeed = speed * tilesize / 2.4f;
+            float mspeed = speed * tilesize * 55f;
             float centerSpeed = 0.1f;
             float centerDstScl = 3f;
-            float tx = Geometry.d4[rotation].x, ty = Geometry.d4[rotation].y;
+            float tx = Geometry.d4x(rotation), ty = Geometry.d4y(rotation);
 
             float centerx = 0f, centery = 0f;
 

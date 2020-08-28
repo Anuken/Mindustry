@@ -10,7 +10,7 @@ public enum BlockFlag{
     turret,
     /** Repair point. */
     repair,
-    /** Rally point. TODO remove*/
+    /** Rally point. */
     rally,
     /** Any block that boosts unit capacity. */
     unitModifier;
