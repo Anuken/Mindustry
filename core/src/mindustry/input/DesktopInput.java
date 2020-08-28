@@ -42,6 +42,8 @@ public class DesktopInput extends InputHandler{
     public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
     public boolean deleting = false, shouldShoot = false, panning = false;
+    /** Mouse pan speed. */
+    public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 9f;
 
     @Override
     public void buildUI(Group group){
@@ -179,7 +181,7 @@ public class DesktopInput extends InputHandler{
         }
 
         boolean panCam = false;
-        float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
+        float camSpeed = !Core.input.keyDown(Binding.boost) ? panSpeed : panBoostSpeed;
 
         if(input.keyDown(Binding.pan)){
             panCam = true;
@@ -203,8 +205,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(panCam){
-            Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
-            Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
+            Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * panScale, -1, 1) * camSpeed;
+            Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * panScale, -1, 1) * camSpeed;
         }
 
         shouldShoot = !scene.hasMouse();

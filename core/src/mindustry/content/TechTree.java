@@ -583,8 +583,6 @@ public class TechTree implements ContentList{
         public float time;
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
-        /** Research progress, in seconds. */
-        public float progress;
 
         TechNode(@Nullable TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
             if(ccontext != null){
@@ -595,7 +593,6 @@ public class TechTree implements ContentList{
             this.content = content;
             this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
-            this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
             this.time = Seq.with(requirements).mapFloat(i -> i.item.cost * i.amount).sum() * 10;
             this.finishedRequirements = new ItemStack[requirements.length];
 
@@ -620,7 +617,6 @@ public class TechTree implements ContentList{
 
         /** Flushes research progress to settings. */
         public void save(){
-            Core.settings.put("research-" + content.name, progress);
 
             //save finished requirements by item type
             for(ItemStack stack : finishedRequirements){

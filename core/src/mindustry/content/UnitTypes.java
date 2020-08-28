@@ -582,7 +582,7 @@ public class UnitTypes implements ContentList{
             armor = 9f;
             engineOffset = 21;
             engineSize = 5.3f;
-            hitsize = 58f;
+            hitsize = 56f;
 
             BulletType missiles = new MissileBulletType(2.7f, 10){{
                 width = 8f;
