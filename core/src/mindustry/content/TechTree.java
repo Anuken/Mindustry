@@ -585,9 +585,7 @@ public class TechTree implements ContentList{
         public final Seq<TechNode> children = new Seq<>();
 
         TechNode(@Nullable TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
-            if(ccontext != null){
-                ccontext.children.add(this);
-            }
+            if(ccontext != null) ccontext.children.add(this);
 
             this.parent = ccontext;
             this.content = content;
