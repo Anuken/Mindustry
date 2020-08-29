@@ -173,7 +173,7 @@ public class MapView extends Element implements GestureListener{
         this.grid = grid;
     }
 
-    public void center() {
+    public void center(){
         offsetx = offsety = 0;
     }
 
