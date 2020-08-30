@@ -34,7 +34,7 @@ public class Units{
 
     @Remote(called = Loc.server)
     public static void unitDespawn(Unit unit){
-        Fx.unitDespawn.at(unit.x, unit.y, 0, unit);
+        Fx.unitDespawn.at(unit.x, unit.y, 0, unit.team.color, unit);
         unit.remove();
     }
 

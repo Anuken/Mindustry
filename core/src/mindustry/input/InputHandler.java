@@ -167,7 +167,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot drop an item.");
         }
 
-        Fx.dropItem.at(player.x, player.y, angle, Color.white, player.unit().item());
+        Fx.dropItem.at(player.x, player.y, angle, player.unit().team.color, player.unit().item());
         player.unit().clearItem();
     }
 
@@ -243,9 +243,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated() && !unit.dead){
             player.unit(unit);
-            Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
+            Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, player.unit().team.color, unit));
             if(!player.dead()){
-                Fx.unitSpirit.at(player.x, player.y, 0f, unit);
+                Fx.unitSpirit.at(player.x, player.y, 0f, player.unit().team.color, unit);
             }
         }
     }

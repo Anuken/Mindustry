@@ -68,7 +68,7 @@ public class BuildBlock extends Block{
                 tile.build.playerPlaced();
             }
         }
-        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
+        Fx.placeBlock.at(tile.drawx(), tile.drawy(), tile.team().color, block.size);
     }
 
     static boolean shouldPlay(){
@@ -174,7 +174,7 @@ public class BuildBlock extends Block{
             }
 
             Draw.draw(Layer.blockBuilding, () -> {
-                Shaders.blockbuild.color = Pal.accent;
+                Shaders.blockbuild.color = team.color;
 
                 Block target = cblock == null ? previous : cblock;
 

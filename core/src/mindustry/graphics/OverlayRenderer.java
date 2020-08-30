@@ -77,7 +77,7 @@ public class OverlayRenderer{
         if(select != null) lastSelect = select;
         if(select == null) select = lastSelect;
         if(select != null && select.isAI()){
-            Draw.mixcol(Pal.accent, 1f);
+            Draw.mixcol(player.unit().team.color, 1f);
             Draw.alpha(unitFade);
 
             if(select instanceof BlockUnitc){
@@ -111,7 +111,7 @@ public class OverlayRenderer{
                 if(dst < state.rules.enemyCoreBuildRadius * 2.2f){
                     Draw.color(Color.darkGray);
                     Lines.circle(core.x, core.y - 2, state.rules.enemyCoreBuildRadius);
-                    Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
+                    Draw.color(player.unit().team.color, core.team.color, 0.5f + Mathf.absin(Time.time(), 10f, 0.5f));
                     Lines.circle(core.x, core.y, state.rules.enemyCoreBuildRadius);
                 }
             });
@@ -142,7 +142,7 @@ public class OverlayRenderer{
 
                 if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.team())){
                     control.input.drawArrow(tile.block(), tile.tileX(), tile.tileY(), tile.rotation, true);
-                    Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
+                    Draw.color(player.unit().team.color, 0.3f + Mathf.absin(4f, 0.2f));
                     Fill.square(tile.x, tile.y, tile.block().size * tilesize/2f);
                     Draw.color();
                 }
@@ -154,7 +154,7 @@ public class OverlayRenderer{
             Vec2 v = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
             float size = 8;
             Draw.rect(player.unit().item().icon(Cicon.medium), v.x, v.y, size, size);
-            Draw.color(Pal.accent);
+            Draw.color(player.unit().team.color);
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time(), 5f, 1f));
             Draw.reset();
 

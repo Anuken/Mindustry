@@ -34,6 +34,7 @@ public class Fx{
 
         UnitType unit = e.data();
         TextureRegion region = unit.icon(Cicon.full);
+        color(e.color);
 
         rect(region, e.x, e.y,
             region.getWidth() * Draw.scl * scl, region.getHeight() * Draw.scl * scl, 180f);
@@ -53,7 +54,7 @@ public class Fx{
 
         Unit select = e.data();
 
-        mixcol(Pal.accent, 1f);
+        mixcol(e.color, 1f);
         alpha(e.fout());
         rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
         alpha(1f);
@@ -72,7 +73,7 @@ public class Fx{
         float p = Draw.scl;
         Draw.scl *= scl;
 
-        mixcol(Pal.accent, 1f);
+        mixcol(e.color, 1f);
         rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
         reset();
 
@@ -83,7 +84,7 @@ public class Fx{
         if(!(e.data instanceof Position)) return;
         Position to = e.data();
 
-        color(Pal.accent);
+        color(e.color);
 
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow2In);
         float x = Tmp.v1.x, y = Tmp.v1.y;
@@ -106,7 +107,7 @@ public class Fx{
         float x = Tmp.v1.x, y = Tmp.v1.y;
         float size = 1f;
 
-        stroke(e.fslope() * 2f * size, Pal.accent);
+        stroke(e.fslope() * 2f * size, Color.gray);
         Lines.circle(x, y, e.fslope() * 2f * size);
 
         color(e.color);
@@ -161,7 +162,7 @@ public class Fx{
     }),
 
     placeBlock = new Effect(16, e -> {
-        color(Pal.accent);
+        color(e.color);
         stroke(3f - e.fin() * 2f);
         Lines.square(e.x, e.y, tilesize / 2f * e.rotation + e.fin() * 3f);
     }),
@@ -233,7 +234,7 @@ public class Fx{
 
     spawn = new Effect(30, e -> {
         stroke(2f * e.fout());
-        color(Pal.accent);
+        color(e.color);
         Lines.poly(e.x, e.y, 4, 5f + e.fin() * 12f);
     }),
 
