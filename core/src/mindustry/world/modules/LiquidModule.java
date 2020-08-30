@@ -43,6 +43,8 @@ public class LiquidModule extends BlockModule{
 
     /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
     public float getFlowRate(){
+        //low throughput means no display
+        if(currentFlowRate < 0.0001) return -1f;
         return currentFlowRate * 60;
     }
 
