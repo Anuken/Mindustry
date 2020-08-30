@@ -68,7 +68,7 @@ public class BuildBlock extends Block{
                 tile.build.playerPlaced();
             }
         }
-        Fx.placeBlock.at(tile.drawx(), tile.drawy(), tile.team().color, block.size);
+        Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size, tile.team().color);
     }
 
     static boolean shouldPlay(){

@@ -381,7 +381,7 @@ public class UnitType extends UnlockableContent{
 
             Draw.mixcol();
 
-            Lines.stroke(1f, Pal.accent);
+            Lines.stroke(1f, unit.team.color);
             Lines.circle(
             unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
