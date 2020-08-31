@@ -82,11 +82,20 @@ public class OverlayRenderer{
 
             if(select instanceof BlockUnitc){
                 //special selection for block "units"
-                Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block().size * tilesize/2f);
+                Lines.stroke(unitFade + 1);
+                Lines.square(select.x, select.y, ((BlockUnitc)select).tile().block().size * tilesize/2f);
             }else{
+                Draw.mixcol(player.unit().team.color, 0.4f);
                 Draw.rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+                Draw.rect(select.type().region, select.x(), select.y(), select.rotation() - 90);
+                if(select.type().cellRegion != Core.atlas.find("error")){
+                    Draw.color(player.unit().team.color);
+                    Draw.rect(select.type().cellRegion, select.x(), select.y(), select.rotation() - 90);
+                    Draw.color();
+                }
             }
 
+            Draw.mixcol(player.unit().team.color, 1f);
             Lines.stroke(unitFade);
             Lines.square(select.x, select.y, select.hitSize() * 1.5f, Time.time() * 2f);
             Draw.reset();
