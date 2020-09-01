@@ -387,6 +387,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     }
 
+    public void drawOverSelect(){
+
+    }
+
     public void drawSelected(int x, int y, Block block, Color color){
         Drawf.selected(x, y, block, color);
     }

@@ -223,7 +223,7 @@ public class UnitFactory extends UnitBlock{
             if(currentPlan != -1 && !Units.canCreate(team, plans[currentPlan].unit)){
                 return false;
             }
-            return enabled;
+            return enabled && payload == null;
         }
 
         @Override

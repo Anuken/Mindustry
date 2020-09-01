@@ -141,22 +141,24 @@ public class OverlayRenderer{
         //draw selected block
         if(input.block == null && !Core.scene.hasMouse()){
             Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
-            Building tile = world.buildWorld(vec.x, vec.y);
+            Building build = world.buildWorld(vec.x, vec.y);
 
-            if(tile != null && tile.team == player.team()){
-                tile.drawSelect();
-                if(!tile.enabled && tile.block.drawDisabled){
-                   tile.drawDisabled();
+            if(build != null && build.team == player.team()){
+                build.drawSelect();
+                if(!build.enabled && build.block.drawDisabled){
+                   build.drawDisabled();
                 }
 
-                if(Core.input.keyDown(Binding.rotateplaced) && tile.block().rotate && tile.interactable(player.team())){
-                    control.input.drawArrow(tile.block(), tile.tileX(), tile.tileY(), tile.rotation, true);
-                    Draw.color(player.unit().team.color, 0.3f + Mathf.absin(4f, 0.2f));
-                    Fill.square(tile.x, tile.y, tile.block().size * tilesize/2f);
+                if(Core.input.keyDown(Binding.rotateplaced) && build.block().rotate && build.interactable(player.team())){
+                    control.input.drawArrow(build.block(), build.tileX(), build.tileY(), build.rotation, true);
+                    Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
+                    Fill.square(build.x, build.y, build.block().size * tilesize/2f);
                     Draw.color();
                 }
             }
         }
+
+        input.drawOverSelect();
 
         //draw selection overlay when dropping item
         if(input.isDroppingItem()){

@@ -53,10 +53,11 @@ public class Fx{
         if(!(e.data instanceof Unit)) return;
 
         Unit select = e.data();
+        boolean block = select instanceof BlockUnitc;
 
         mixcol(e.color, 1f);
         alpha(e.fout());
-        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
+        rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type().icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
         Lines.stroke(e.fslope() * 1f);
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);

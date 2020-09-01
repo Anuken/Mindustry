@@ -162,7 +162,11 @@ public class ItemTurret extends Turret{
                 Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
                 short a = read.s();
                 totalAmmo += a;
-                ammo.add(new ItemEntry(item, a));
+
+                //only add ammo if this is a valid ammo type
+                if(ammoTypes.containsKey(item)){
+                    ammo.add(new ItemEntry(item, a));
+                }
             }
         }
     }
