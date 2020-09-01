@@ -68,13 +68,7 @@ public class BeControl{
             }else{
                 Core.app.post(() -> done.get(false));
             }
-        }, error -> Core.app.post(() -> {
-            if(!headless){
-                ui.showException(error);
-            }else{
-                error.printStackTrace();
-            }
-        }));
+        }, error -> {}); //ignore errors
     }
 
     /** @return whether a new update is available */

@@ -143,6 +143,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         main.button("@configure",
             () -> loadoutDialog.show(Blocks.coreShard.itemCapacity, rules.loadout,
+                i -> true,
                 () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
                 () -> {}, () -> {}
         )).left().width(300f);

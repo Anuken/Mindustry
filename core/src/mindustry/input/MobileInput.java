@@ -277,7 +277,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     public void drawBottom(){
         Lines.stroke(1f);
 
-        //draw removals
+        //draw requests about to be removed
         for(BuildPlan request : removals){
             Tile tile = request.tile();
 
@@ -292,6 +292,43 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
+        Draw.mixcol();
+        Draw.color(Pal.accent);
+
+        //Draw lines
+        if(lineMode){
+            int tileX = tileX(Core.input.mouseX());
+            int tileY = tileY(Core.input.mouseY());
+
+            if(mode == placing && block != null){
+                //draw placing
+                for(int i = 0; i < lineRequests.size; i++){
+                    BuildPlan request = lineRequests.get(i);
+                    if(i == lineRequests.size - 1 && request.block.rotate){
+                        drawArrow(block, request.x, request.y, request.rotation);
+                    }
+                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
+                    drawSelected(request.x, request.y, request.block, Pal.accent);
+                }
+            }else if(mode == breaking){
+                drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
+            }
+        }
+
+        Draw.reset();
+    }
+
+    @Override
+    public void drawTop(){
+
+        //draw schematic selection
+        if(mode == schematicSelect){
+            drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
+        }
+    }
+
+    @Override
+    public void drawOverSelect(){
         //draw list of requests
         for(BuildPlan request : selectRequests){
             Tile tile = request.tile();
@@ -322,29 +359,6 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        Draw.mixcol();
-        Draw.color(Pal.accent);
-
-        //Draw lines
-        if(lineMode){
-            int tileX = tileX(Core.input.mouseX());
-            int tileY = tileY(Core.input.mouseY());
-
-            if(mode == placing && block != null){
-                //draw placing
-                for(int i = 0; i < lineRequests.size; i++){
-                    BuildPlan request = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && request.block.rotate){
-                        drawArrow(block, request.x, request.y, request.rotation);
-                    }
-                    request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
-                    drawSelected(request.x, request.y, request.block, Pal.accent);
-                }
-            }else if(mode == breaking){
-                drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
-            }
-        }
-
         //draw targeting crosshair
         if(target != null && !state.isEditor()){
             if(target != lastTarget){
@@ -364,15 +378,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         Draw.reset();
-    }
-
-    @Override
-    public void drawTop(){
-
-        //draw schematic selection
-        if(mode == schematicSelect){
-            drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
-        }
     }
 
     @Override

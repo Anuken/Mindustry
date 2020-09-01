@@ -20,6 +20,7 @@ public class LiquidModule extends BlockModule{
     private Liquid current = content.liquid(0);
     private float smoothLiquid;
 
+    private boolean hadFlow;
     private @Nullable WindowedMean flow;
     private float lastAdded, currentFlowRate;
 
@@ -29,6 +30,8 @@ public class LiquidModule extends BlockModule{
             if(flowTimer.get(1, pollScl)){
 
                 if(flow == null) flow = new WindowedMean(windowSize);
+                if(lastAdded > 0.0001f) hadFlow = true;
+
                 flow.add(lastAdded);
                 lastAdded = 0;
                 if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
@@ -38,14 +41,17 @@ public class LiquidModule extends BlockModule{
         }else{
             currentFlowRate = -1f;
             flow = null;
+            hadFlow = false;
         }
     }
 
     /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
     public float getFlowRate(){
-        //low throughput means no display
-        if(currentFlowRate < 0.0001) return -1f;
         return currentFlowRate * 60;
+    }
+
+    public boolean hadFlow(){
+        return hadFlow;
     }
 
     public float smoothAmount(){

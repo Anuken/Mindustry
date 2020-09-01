@@ -56,6 +56,8 @@ public class Block extends UnlockableContent{
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
+    /** whether to display flow rate */
+    public boolean displayFlow = true;
     /** whether this block is visible in the editor */
     public boolean inEditor = true;
     /** the last configuration value applied to this block. */

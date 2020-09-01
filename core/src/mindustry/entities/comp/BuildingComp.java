@@ -967,7 +967,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             table.row();
             table.table(this::displayConsumption).growX();
 
-            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow");
+            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow") && block.displayFlow;
 
             if(displayFlow){
                 String ps = " " + StatUnit.perSecond.localized();
@@ -1005,9 +1005,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 if(liquids != null){
                     table.row();
                     table.table(l -> {
-                        l.left();
-                        l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
-                        l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                        boolean[] had = {false};
+
+                        Runnable rebuild = () -> {
+                            l.clearChildren();
+                            l.left();
+                            l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
+                            l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                        };
+
+                        l.update(() -> {
+                           if(!had[0] && liquids.hadFlow()){
+                               had[0] = true;
+                               rebuild.run();
+                           }
+                        });
                     }).left();
                 }
             }
