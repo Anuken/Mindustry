@@ -1504,12 +1504,13 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 3f;
+            force = 4f;
             scaledForce = 5.5f;
             range = 170f;
-            damage = 0.08f;
+            damage = 0.1f;
             health = 160 * size * size;
             rotateSpeed = 10;
+            range = 85f;
 
             consumes.powerCond(3f, (TractorBeamEntity e) -> e.target != null);
         }};
@@ -1560,11 +1561,12 @@ public class Blocks implements ContentList{
         segment = new PointDefenseTurret("segment"){{
             requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 25));
 
+            range = 95f;
             hasPower = true;
             consumes.power(3f);
             size = 2;
             shootLength = 5f;
-            bulletDamage = 12f;
+            bulletDamage = 16f;
             reloadTime = 20f;
             health = 190 * size * size;
         }};
