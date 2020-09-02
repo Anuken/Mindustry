@@ -400,7 +400,7 @@ public class UnitTypes implements ContentList{
 
             hovering = true;
             allowLegStep = true;
-            visualElevation = 0.4f;
+            visualElevation = 0.65f;
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
@@ -474,7 +474,7 @@ public class UnitTypes implements ContentList{
 
         toxopid = new UnitType("toxopid"){{
             drag = 0.1f;
-            speed = 0.6f;
+            speed = 0.5f;
             hitsize = 21f;
             health = 23000;
             armor = 14f;
@@ -489,7 +489,7 @@ public class UnitTypes implements ContentList{
             legBaseOffset = 8f;
             landShake = 1f;
             legSpeed = 0.1f;
-            legLengthScl = 1f;
+            legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
 
@@ -498,7 +498,7 @@ public class UnitTypes implements ContentList{
 
             hovering = true;
             allowLegStep = true;
-            visualElevation = 0.43f;
+            visualElevation = 0.95f;
             groundLayer = Layer.legUnit;
 
             weapons.add(
