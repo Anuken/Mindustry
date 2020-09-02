@@ -381,6 +381,8 @@ public class UnitTypes implements ContentList{
             health = 8000;
             armor = 6f;
 
+            rotateSpeed = 2.9f;
+
             legCount = 6;
             legMoveSpace = 1f;
             legPairOffset = 3;
@@ -413,6 +415,105 @@ public class UnitTypes implements ContentList{
                 knockback = -1f;
             }};
 
+            weapons.add(
+            new Weapon("spiroct-weapon"){{
+                reload = 9f;
+                x = 4f;
+                y = 8f;
+                rotate = true;
+                bullet = sapper;
+            }},
+            new Weapon("spiroct-weapon"){{
+                reload = 15f;
+                x = 9f;
+                y = 6f;
+                rotate = true;
+                bullet = sapper;
+            }},
+            new Weapon("spiroct-weapon"){{
+                reload = 23f;
+                x = 14f;
+                y = 0f;
+                rotate = true;
+                bullet = sapper;
+            }},
+            new Weapon("large-purple-mount"){{
+                y = -7f;
+                x = 9f;
+                shootY = 7f;
+                reload = 45;
+                shake = 3f;
+                rotateSpeed = 2f;
+                ejectEffect = Fx.shellEjectSmall;
+                shootSound = Sounds.shootBig;
+                rotate = true;
+                occlusion = 8f;
+                recoil = 3f;
+
+                bullet = new ArtilleryBulletType(2f, 12){{
+                    hitEffect = Fx.sapExplosion;
+                    knockback = 0.8f;
+                    lifetime = 70f;
+                    width = height = 19f;
+                    collidesTiles = false;
+                    ammoMultiplier = 4f;
+                    splashDamageRadius = 95f;
+                    splashDamage = 55f;
+                    backColor = Pal.sapBulletBack;
+                    frontColor = lightningColor = Pal.sapBullet;
+                    lightning = 3;
+                    lightningLength = 10;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    shake = 5f;
+
+                    status = StatusEffects.sapped;
+                    statusDuration = 60f * 10;
+                }};
+            }});
+        }};
+
+        toxopid = new UnitType("toxopid"){{
+            drag = 0.1f;
+            speed = 0.6f;
+            hitsize = 21f;
+            health = 18000;
+            armor = 9f;
+
+            rotateSpeed = 2.2f;
+
+            legCount = 8;
+            legMoveSpace = 0.8f;
+            legPairOffset = 3;
+            legLength = 75f;
+            legExtension = -20;
+            legBaseOffset = 8f;
+            landShake = 1f;
+            legSpeed = 0.1f;
+            legLengthScl = 1f;
+            rippleScale = 3f;
+            legSpeed = 0.19f;
+
+            legSplashDamage = 80;
+            legSplashRange = 60;
+
+            hovering = true;
+            allowLegStep = true;
+            visualElevation = 0.43f;
+            groundLayer = Layer.legUnit;
+
+            BulletType sapper = new SapBulletType(){{
+                sapStrength = 0.8f;
+                length = 55f;
+                damage = 34;
+                shootEffect = Fx.shootSmall;
+                hitColor = color = Color.valueOf("bf92f9");
+                despawnEffect = Fx.none;
+                width = 0.55f;
+                lifetime = 30f;
+                knockback = -1f;
+            }};
+
+            if(false)
             weapons.add(
             new Weapon("spiroct-weapon"){{
                 reload = 9f;
