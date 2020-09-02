@@ -1808,6 +1808,7 @@ public class Blocks implements ContentList{
 
             upgrades = new UnitType[][]{
                 {UnitTypes.antumbra, UnitTypes.eclipse},
+                {UnitTypes.arkyid, UnitTypes.toxopid},
             };
         }};
 
