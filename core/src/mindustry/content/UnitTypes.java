@@ -404,7 +404,7 @@ public class UnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.8f;
+                sapStrength = 0.83f;
                 length = 55f;
                 damage = 34;
                 shootEffect = Fx.shootSmall;
@@ -455,10 +455,10 @@ public class UnitTypes implements ContentList{
                     knockback = 0.8f;
                     lifetime = 70f;
                     width = height = 19f;
-                    collidesTiles = false;
+                    collidesTiles = true;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 95f;
-                    splashDamage = 55f;
+                    splashDamage = 65f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 3;
@@ -476,8 +476,8 @@ public class UnitTypes implements ContentList{
             drag = 0.1f;
             speed = 0.6f;
             hitsize = 21f;
-            health = 18000;
-            armor = 9f;
+            health = 23000;
+            armor = 14f;
 
             rotateSpeed = 2.2f;
 
@@ -501,72 +501,91 @@ public class UnitTypes implements ContentList{
             visualElevation = 0.43f;
             groundLayer = Layer.legUnit;
 
-            BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.8f;
-                length = 55f;
-                damage = 34;
-                shootEffect = Fx.shootSmall;
-                hitColor = color = Color.valueOf("bf92f9");
-                despawnEffect = Fx.none;
-                width = 0.55f;
-                lifetime = 30f;
-                knockback = -1f;
-            }};
-
-            if(false)
             weapons.add(
-            new Weapon("spiroct-weapon"){{
-                reload = 9f;
-                x = 4f;
-                y = 8f;
-                rotate = true;
-                bullet = sapper;
-            }},
-            new Weapon("spiroct-weapon"){{
-                reload = 15f;
-                x = 9f;
-                y = 6f;
-                rotate = true;
-                bullet = sapper;
-            }},
-            new Weapon("spiroct-weapon"){{
-                reload = 23f;
-                x = 14f;
-                y = 0f;
-                rotate = true;
-                bullet = sapper;
-            }},
             new Weapon("large-purple-mount"){{
-                y = -7f;
-                x = 9f;
+                y = -5f;
+                x = 11f;
                 shootY = 7f;
-                reload = 45;
-                shake = 3f;
+                reload = 30;
+                shake = 4f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.shellEjectSmall;
                 shootSound = Sounds.shootBig;
                 rotate = true;
-                occlusion = 8f;
+                occlusion = 12f;
                 recoil = 3f;
+                shots = 2;
+                spacing = 17f;
 
-                bullet = new ArtilleryBulletType(2f, 12){{
+                bullet = new ShrapnelBulletType(){{
+                    length = 90f;
+                    damage = 110f;
+                    width = 25f;
+                    serrationLenScl = 7f;
+                    serrationSpaceOffset = 60f;
+                    serrationFadeOffset = 0f;
+                    serrations = 10;
+                    serrationWidth = 6f;
+                    fromColor = Pal.sapBullet;
+                    toColor = Pal.sapBulletBack;
+                    shootEffect = smokeEffect = Fx.sparkShoot;
+                }};
+            }});
+
+            weapons.add(new Weapon("toxopid-cannon"){{
+                y = -14f;
+                x = 0f;
+                shootY = 22f;
+                mirror = false;
+                reload = 180;
+                shake = 10f;
+                recoil = 10f;
+                rotateSpeed = 1f;
+                ejectEffect = Fx.shellEjectBig;
+                shootSound = Sounds.shootBig;
+                rotate = true;
+                occlusion = 30f;
+
+                bullet = new ArtilleryBulletType(3f, 70){{
                     hitEffect = Fx.sapExplosion;
                     knockback = 0.8f;
-                    lifetime = 70f;
-                    width = height = 19f;
-                    collidesTiles = false;
+                    lifetime = 80f;
+                    width = height = 25f;
+                    collidesTiles = collides = true;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 95f;
-                    splashDamage = 55f;
+                    splashDamage = 90f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
-                    lightning = 3;
-                    lightningLength = 10;
+                    lightning = 5;
+                    lightningLength = 20;
                     smokeEffect = Fx.shootBigSmoke2;
-                    shake = 5f;
+                    hitShake = 10f;
 
                     status = StatusEffects.sapped;
                     statusDuration = 60f * 10;
+
+                    fragLifeMin = 0.3f;
+                    fragBullets = 12;
+
+                    fragBullet = new ArtilleryBulletType(2.3f, 30){{
+                        hitEffect = Fx.sapExplosion;
+                        knockback = 0.8f;
+                        lifetime = 90f;
+                        width = height = 20f;
+                        collidesTiles = false;
+                        splashDamageRadius = 90f;
+                        splashDamage = 55f;
+                        backColor = Pal.sapBulletBack;
+                        frontColor = lightningColor = Pal.sapBullet;
+                        lightning = 2;
+                        lightningLength = 5;
+                        smokeEffect = Fx.shootBigSmoke2;
+                        hitShake = 5f;
+
+                        status = StatusEffects.sapped;
+                        statusDuration = 60f * 10;
+                    }};
                 }};
             }});
         }};
@@ -752,7 +771,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 1f;
             flying = true;
             lowAltitude = true;
-            health = 18000;
+            health = 20000;
             engineOffset = 38;
             engineSize = 7.3f;
             hitsize = 58f;

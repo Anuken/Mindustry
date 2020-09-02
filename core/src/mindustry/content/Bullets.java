@@ -275,7 +275,7 @@ public class Bullets implements ContentList{
             shrinkY = 0f;
             drag = -0.01f;
             splashDamageRadius = 28f;
-            splashDamage = 40f;
+            splashDamage = 35f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             lightning = 2;

@@ -15,7 +15,7 @@ public class ShrapnelBulletType extends BulletType{
     public Color fromColor = Color.white, toColor = Pal.lancerLaser;
 
     public int serrations = 7;
-    public float serrationLenScl = 10f, serrationWidth = 4f, serrationSpacing = 8f, serrationSpaceOffset = 80f;
+    public float serrationLenScl = 10f, serrationWidth = 4f, serrationSpacing = 8f, serrationSpaceOffset = 80f, serrationFadeOffset = 0.5f;
 
     public ShrapnelBulletType(){
         speed = 0.01f;
@@ -24,6 +24,7 @@ public class ShrapnelBulletType extends BulletType{
         lifetime = 10f;
         despawnEffect = Fx.none;
         pierce = true;
+        keepVelocity = false;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class ShrapnelBulletType extends BulletType{
         Draw.color(fromColor, toColor, b.fin());
         for(int i = 0; i < serrations; i++){
             Tmp.v1.trns(b.rotation(), i * serrationSpacing);
-            float sl = Mathf.clamp(b.fout() - 0.5f) * (serrationSpaceOffset - i * serrationLenScl);
+            float sl = Mathf.clamp(b.fout() - serrationFadeOffset) * (serrationSpaceOffset - i * serrationLenScl);
             Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, serrationWidth, sl, b.rotation() + 90);
             Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, serrationWidth, sl, b.rotation() - 90);
         }
