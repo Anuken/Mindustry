@@ -1561,13 +1561,13 @@ public class Blocks implements ContentList{
         segment = new PointDefenseTurret("segment"){{
             requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 25));
 
-            range = 95f;
+            range = 100f;
             hasPower = true;
             consumes.power(3f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 16f;
-            reloadTime = 20f;
+            reloadTime = 15f;
             health = 190 * size * size;
         }};
 

@@ -381,7 +381,7 @@ public class UnitTypes implements ContentList{
             health = 8000;
             armor = 6f;
 
-            rotateSpeed = 2.9f;
+            rotateSpeed = 2.7f;
 
             legCount = 6;
             legMoveSpace = 1f;
@@ -391,7 +391,7 @@ public class UnitTypes implements ContentList{
             legBaseOffset = 10f;
             landShake = 1f;
             legSpeed = 0.1f;
-            legLengthScl = 1f;
+            legLengthScl = 0.96f;
             rippleScale = 2f;
             legSpeed = 0.2f;
 
@@ -479,7 +479,7 @@ public class UnitTypes implements ContentList{
             health = 23000;
             armor = 14f;
 
-            rotateSpeed = 2.2f;
+            rotateSpeed = 1.9f;
 
             legCount = 8;
             legMoveSpace = 0.8f;
@@ -602,6 +602,8 @@ public class UnitTypes implements ContentList{
             faceTarget = false;
             engineOffset = 5.5f;
             range = 140f;
+            crashDamageMultiplier = 4f;
+
             weapons.add(new Weapon(){{
                 y = 0f;
                 x = 2f;
@@ -855,6 +857,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 5.7f;
             itemCapacity = 30;
             range = 50f;
+            isCounted = false;
 
             mineTier = 1;
             mineSpeed = 2.5f;
@@ -875,6 +878,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 6.5f;
             hitsize = 8f;
             lowAltitude = true;
+            isCounted = false;
 
             mineTier = 2;
             mineSpeed = 3.5f;

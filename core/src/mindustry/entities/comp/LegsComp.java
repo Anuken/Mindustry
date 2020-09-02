@@ -33,7 +33,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Override
     public void update(){
         if(Mathf.dst(deltaX(), deltaY()) > 0.001f){
-            baseRotation = Mathf.slerpDelta(baseRotation, Mathf.angle(deltaX(), deltaY()), 0.1f);
+            baseRotation = Angles.moveToward(baseRotation, Mathf.angle(deltaX(), deltaY()), type.rotateSpeed);
         }
 
         float rot = baseRotation;
