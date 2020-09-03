@@ -47,7 +47,8 @@ public class FormationAI extends AIController implements FormationMember{
         Vec2 realtarget = vec.set(target);
 
         if(unit.isGrounded() && Vars.world.raycast(unit.tileX(), unit.tileY(), leader.tileX(), leader.tileY(), Vars.world::solid)){
-            realtarget.set(Vars.pathfinder.getTargetTile(unit.tileOn(), unit.team, leader));
+            //TODO pathfind
+            //realtarget.set(Vars.pathfinder.getTargetTile(unit.tileOn(), unit.team, leader));
         }
 
         unit.moveAt(realtarget.sub(unit).limit(unit.type().speed));

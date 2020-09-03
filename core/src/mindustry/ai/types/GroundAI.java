@@ -1,9 +1,8 @@
 package mindustry.ai.types;
 
-import mindustry.ai.Pathfinder.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -24,7 +23,7 @@ public class GroundAI extends AIController{
             }
 
             if(!unit.within(core, unit.range() * 0.5f)){
-                moveToCore(FlagTarget.enemyCores);
+                moveTo(Pathfinder.fieldCore);
             }
         }
 
@@ -52,40 +51,17 @@ public class GroundAI extends AIController{
         }*/
     }
 
-    protected void moveToCore(FlagTarget path){
+    protected void moveTo(int pathType){
+        int costType =
+            unit instanceof Legsc ? Pathfinder.costLegs :
+            unit instanceof WaterMovec ? Pathfinder.costWater :
+            Pathfinder.costGround;
+
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, unit.team(), path);
+        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathType));
 
         if(tile == targetTile) return;
-
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
-    }
-
-    protected void moveAwayFromCore(){
-        Team enemy = null;
-        for(Team team : unit.team().enemies()){
-            if(team.active()){
-                enemy = team;
-                break;
-            }
-        }
-
-        if(enemy == null){
-            for(Team team : unit.team().enemies()){
-                enemy = team;
-                break;
-            }
-        }
-
-        if(enemy == null) return;
-
-        Tile tile = unit.tileOn();
-        if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, enemy, FlagTarget.enemyCores);
-        Building core = unit.closestCore();
-
-        if(tile == targetTile || core == null || unit.within(core, 120f)) return;
 
         unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }

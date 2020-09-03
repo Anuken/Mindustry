@@ -23,6 +23,38 @@ public class Pathfinder implements Runnable{
     private static final int impassable = -1;
     private static final int fieldTimeout = 1000 * 60 * 2;
 
+    public static final int
+        fieldCore = 0,
+        fieldRally = 1;
+
+    public static final Seq<Prov<Flowfield>> fieldTypes = Seq.with(
+        EnemyCoreField::new,
+        RallyField::new
+    );
+
+    public static final int
+        costGround = 0,
+        costLegs = 1,
+        costWater = 2;
+
+    public static final Seq<PathCost> costTypes = Seq.with(
+        (team, tile) -> (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.solid(tile) ? impassable : 1 +
+            PathTile.health(tile) * 5 +
+            (PathTile.nearSolid(tile) ? 2 : 0) +
+            (PathTile.nearLiquid(tile) ? 6 : 0) +
+            (PathTile.deep(tile) ? 70 : 0),
+
+        (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
+            (PathTile.solid(tile) ? 5 : 0),
+
+        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 2 + //TODO cannot go through blocks
+            (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
+            (PathTile.deep(tile) ? -1 : 0)
+    );
+
+    //maps team, cost, type to flow field
+    private Flowfield[][][] cache;
+
     /** tile data, see PathTileStruct */
     private int[][] tiles;
     /** unordered array of path data for iteration only. DO NOT iterate or access this in the main thread. */
@@ -34,6 +66,8 @@ public class Pathfinder implements Runnable{
     private IntSeq tmpArray = new IntSeq();
 
     public Pathfinder(){
+        clearCache();
+
         Events.on(WorldLoadEvent.class, event -> {
             stop();
 
@@ -41,13 +75,14 @@ public class Pathfinder implements Runnable{
             tiles = new int[world.width()][world.height()];
             threadList = new Seq<>();
             mainList = new Seq<>();
+            clearCache();
 
             for(Tile tile : world.tiles){
                 tiles[tile.x][tile.y] = packTile(tile);
             }
 
             //special preset which may help speed things up; this is optional
-            //preloadPath(state.rules.waveTeam, FlagTarget.enemyCores);
+            preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
 
             start();
         });
@@ -57,8 +92,8 @@ public class Pathfinder implements Runnable{
         Events.on(BuildinghangeEvent.class, event -> updateTile(event.tile));
     }
 
-    public Flowfield getField(Team team, PathCost cost){
-
+    private void clearCache(){
+        cache = new Flowfield[256][5][5];
     }
 
     /** Packs a tile into its internal representation. */
@@ -189,34 +224,26 @@ public class Pathfinder implements Runnable{
    //     return getTargetTile(tile, team, getTarget(target));
    // }
 
-    public @Nullable Tile getTargetTile(Tile tile, Prov<Flowfield> fieldtype){
-        if(true){ //TODO cache this
-            Flowfield field = fieldtype.get();
-            IntSeq out = new IntSeq();
-            field.getPositions(out);
-            createPath(field, out);
-        }
+    public Flowfield getField(Team team, int costType, int fieldType){
+        if(cache[team.id][costType][fieldType] == null){
+            Flowfield field = fieldTypes.get(fieldType).get();
+            field.team = team;
+            field.cost = costTypes.get(costType);
+            field.targets.clear();
+            field.getPositions(field.targets);
 
-        if(false){ //TODO if field exists
-            //TODO fetch it from the cache
-            //return getTargetTile(tile, path);
+            cache[team.id][costType][fieldType] = field;
+            queue.post(() -> registerPath(field));
         }
-
-        return tile;
+        return cache[team.id][costType][fieldType];
     }
 
     /** Gets next tile to travel to. Main thread only. */
     public @Nullable Tile getTargetTile(Tile tile, Flowfield path){
         if(tile == null) return null;
 
-        if(path == null){
-            //if this combination is not found, create it on request
-            //TODO do above task
-            //if(fieldMapUsed[team.id].add(target)){
-                //grab targets since this is run on main thread
-            //    IntSeq targets = target.getPositions(team, new IntSeq());
-            //    queue.post(() -> createPath(team, target, targets));
-            //}
+        //uninitialized flowfields are not applicable
+        if(!path.initialized){
             return tile;
         }
 
@@ -306,9 +333,10 @@ public class Pathfinder implements Runnable{
     }
 
     private void preloadPath(Flowfield path){
-        IntSeq out = new IntSeq();
-        path.getPositions(out);
-        updateFrontier(createPath(path, out), -1);
+        path.targets.clear();
+        path.getPositions(path.targets);
+        registerPath(path);
+        updateFrontier(path, -1);
     }
 
     /**
@@ -316,7 +344,7 @@ public class Pathfinder implements Runnable{
      * Created a new flowfield that aims to get to a certain target for a certain team.
      * Pathfinding thread only.
      */
-    private Flowfield createPath(Flowfield path, IntSeq targets){
+    private void registerPath(Flowfield path){
         path.lastUpdateTime = Time.millis();
         path.setup(tiles.length, tiles[0].length);
 
@@ -331,12 +359,6 @@ public class Pathfinder implements Runnable{
             //}
         });
 
-        //grab targets from passed array
-        synchronized(path.targets){
-            path.targets.clear();
-            path.targets.addAll(targets);
-        }
-
         //fill with impassables by default
         for(int x = 0; x < world.width(); x++){
             for(int y = 0; y < world.height(); y++){
@@ -350,8 +372,6 @@ public class Pathfinder implements Runnable{
             path.weights[Point2.x(pos)][Point2.y(pos)] = 0;
             path.frontier.addFirst(pos);
         }
-
-        return path;
     }
 
     /** Update the frontier for a path. Pathfinding thread only. */
@@ -385,21 +405,6 @@ public class Pathfinder implements Runnable{
             }
         }
     }
-
-    public static final PathCost
-
-    groundCost = (team, tile) -> (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.solid(tile) ? impassable : 1 +
-        PathTile.health(tile) * 5 +
-        (PathTile.nearSolid(tile) ? 2 : 0) +
-        (PathTile.nearLiquid(tile) ? 6 : 0) +
-        (PathTile.deep(tile) ? 70 : 0),
-
-    legsCost = (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
-        (PathTile.solid(tile) ? 5 : 0),
-
-    waterCost = (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 2 + //TODO cannot go through blocks
-        (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
-        (PathTile.deep(tile) ? -1 : 0);
 
     public static class EnemyCoreField extends Flowfield{
         @Override
@@ -451,7 +456,7 @@ public class Pathfinder implements Runnable{
         /** Team this path is for. Set before using. */
         protected Team team = Team.derelict;
         /** Function for calculating path cost. Set before using. */
-        protected PathCost cost = groundCost;
+        protected PathCost cost = costTypes.get(costGround);
 
         /** costs of getting to a specific tile */
         int[][] weights;
