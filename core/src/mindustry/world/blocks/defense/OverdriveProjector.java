@@ -60,7 +60,7 @@ public class OverdriveProjector extends Block{
         }
     }
 
-    public class OverdriveEntity extends Building{
+    public class OverdriveBuild extends Building{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
