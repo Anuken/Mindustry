@@ -25,8 +25,6 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
-    public static final int maxInstructions = 1500;
-
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
@@ -271,7 +269,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str, maxInstructions);
+                    LAssembler asm = LAssembler.assemble(str, LExecutor.maxInstructions);
 
                     //store connections
                     for(LogicLink link : links){
@@ -316,7 +314,7 @@ public class LogicBlock extends Block{
                     e.printStackTrace();
 
                     //handle malformed code and replace it with nothing
-                    executor.load("", maxInstructions);
+                    executor.load("", LExecutor.maxInstructions);
                 }
             }
         }

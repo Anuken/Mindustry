@@ -38,32 +38,35 @@ public class Pathfinder implements Runnable{
         costWater = 2;
 
     public static final Seq<PathCost> costTypes = Seq.with(
+        //ground
         (team, tile) -> (PathTile.team(tile) == team.id || PathTile.team(tile) == 0) && PathTile.solid(tile) ? impassable : 1 +
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
             (PathTile.deep(tile) ? 70 : 0),
 
+        //legs
         (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
             (PathTile.solid(tile) ? 5 : 0),
 
-        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? impassable : 2 + //TODO cannot go through blocks
+        //water
+        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 + //TODO cannot go through blocks - pathfinding isn't great
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? -1 : 0)
     );
 
     //maps team, cost, type to flow field
-    private Flowfield[][][] cache;
+    Flowfield[][][] cache;
 
     /** tile data, see PathTileStruct */
-    private int[][] tiles;
+    int[][] tiles;
     /** unordered array of path data for iteration only. DO NOT iterate or access this in the main thread. */
-    private Seq<Flowfield> threadList = new Seq<>(), mainList = new Seq<>();
+    Seq<Flowfield> threadList = new Seq<>(), mainList = new Seq<>();
     /** handles task scheduling on the update thread. */
-    private TaskQueue queue = new TaskQueue();
+    TaskQueue queue = new TaskQueue();
     /** Current pathfinding thread */
-    private @Nullable Thread thread;
-    private IntSeq tmpArray = new IntSeq();
+    @Nullable Thread thread;
+    IntSeq tmpArray = new IntSeq();
 
     public Pathfinder(){
         clearCache();
@@ -89,7 +92,7 @@ public class Pathfinder implements Runnable{
 
         Events.on(ResetEvent.class, event -> stop());
 
-        Events.on(BuildinghangeEvent.class, event -> updateTile(event.tile));
+        Events.on(TileChangeEvent.class, event -> updateTile(event.tile));
     }
 
     private void clearCache(){
@@ -115,7 +118,7 @@ public class Pathfinder implements Runnable{
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,
-            tile.staticDarkness() < 2,
+            tile.staticDarkness() >= 2,
             nearLiquid,
             nearGround,
             nearSolid,
@@ -220,10 +223,6 @@ public class Pathfinder implements Runnable{
         }
     }
 
-    //public @Nullable Tile getTargetTile(Tile tile, Team team, Position target){
-   //     return getTargetTile(tile, team, getTarget(target));
-   // }
-
     public Flowfield getField(Team team, int costType, int fieldType){
         if(cache[team.id][costType][fieldType] == null){
             Flowfield field = fieldTypes.get(fieldType).get();
@@ -277,8 +276,8 @@ public class Pathfinder implements Runnable{
             Tile other = world.tile(dx, dy);
             if(other == null) continue;
 
-            if(values[dx][dy] < value && (current == null || values[dx][dy] < tl) && !other.solid() && other.floor().drownTime <= 0 &&
-            !(point.x != 0 && point.y != 0 && (world.solid(tile.x + point.x, tile.y) || world.solid(tile.x, tile.y + point.y)))){ //diagonal corner trap
+            if(values[dx][dy] < value && (current == null || values[dx][dy] < tl) && path.passable(dx, dy) &&
+            !(point.x != 0 && point.y != 0 && (!path.passable(tile.x + point.x, tile.y) || !path.passable(tile.x, tile.y + point.y)))){ //diagonal corner trap
                 current = other;
                 tl = values[dx][dy];
             }
@@ -390,10 +389,12 @@ public class Pathfinder implements Runnable{
             }
 
             if(cost != impassable){
-                //TODO this is probably slow.
                 for(Point2 point : Geometry.d4){
 
                     int dx = tile.x + point.x, dy = tile.y + point.y;
+
+                    if(dx < 0 || dy < 0 || dx >= tiles.length || dy >= tiles[0].length) continue;
+
                     int otherCost = path.cost.getCost(path.team, tiles[dx][dy]);
 
                     if((path.weights[dx][dy] > cost + otherCost || path.searches[dx][dy] < path.search) && otherCost != impassable){
@@ -478,6 +479,10 @@ public class Pathfinder implements Runnable{
             this.searches = new int[width][height];
             this.frontier.ensureCapacity((width + height) * 3);
             this.initialized = true;
+        }
+
+        protected boolean passable(int x, int y){
+            return cost.getCost(team, pathfinder.tiles[x][y]) != impassable;
         }
 
         /** Gets targets to pathfind towards. This must run on the main thread. */

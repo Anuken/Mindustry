@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -33,14 +34,14 @@ public class GroundAI extends AIController{
                 if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
             }
 
-            if(move) moveToCore(FlagTarget.enemyCores);
+            if(move) moveTo(Pathfinder.fieldCore);
         }
 
         if(command() == UnitCommand.rally){
             Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
 
             if(target != null && !unit.within(target, 70f)){
-                moveToCore(FlagTarget.rallyPoints);
+                moveTo(Pathfinder.fieldRally);
             }
         }
 
@@ -82,7 +83,7 @@ public class GroundAI extends AIController{
         if(tile == null) return;
         Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathType));
 
-        if(tile == targetTile) return;
+        if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
 
         unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }

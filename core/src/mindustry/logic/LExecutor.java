@@ -15,6 +15,8 @@ import mindustry.world.blocks.logic.MessageBlock.*;
 import static mindustry.Vars.*;
 
 public class LExecutor{
+    public static final int maxInstructions = 1000;
+
     //special variables
     public static final int
         varCounter = 0,

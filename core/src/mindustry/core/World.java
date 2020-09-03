@@ -317,7 +317,7 @@ public class World{
 
     public void notifyChanged(Tile tile){
         if(!generating){
-            Core.app.post(() -> Events.fire(new BuildinghangeEvent(tile)));
+            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
         }
     }
 

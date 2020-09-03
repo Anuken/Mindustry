@@ -478,6 +478,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public <T extends Unit & Legsc> void drawLegs(T unit){
+        applyColor(unit);
 
         Leg[] legs = unit.legs();
 
@@ -570,6 +571,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void applyColor(Unit unit){
+        Draw.color();
         Draw.mixcol(Color.white, unit.hitTime);
         if(unit.drownTime > 0 && unit.floorOn().isDeep()){
             Draw.mixcol(unit.floorOn().mapColor, unit.drownTime * 0.8f);

@@ -82,7 +82,7 @@ public class BlockRenderer implements Disposable{
             dark.end();
         });
 
-        Events.on(BuildinghangeEvent.class, event -> {
+        Events.on(TileChangeEvent.class, event -> {
             shadowEvents.add(event.tile);
 
             int avgx = (int)(camera.position.x / tilesize);

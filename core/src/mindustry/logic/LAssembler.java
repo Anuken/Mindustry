@@ -8,7 +8,6 @@ import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.type.*;
-import mindustry.world.blocks.logic.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
@@ -66,7 +65,7 @@ public class LAssembler{
     }
 
     public static Seq<LStatement> read(String data){
-        return read(data, LogicBlock.maxInstructions);
+        return read(data, LExecutor.maxInstructions);
     }
 
     public static Seq<LStatement> read(String data, int max){

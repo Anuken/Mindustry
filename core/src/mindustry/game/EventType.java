@@ -170,11 +170,10 @@ public class EventType{
         }
     }
 
-    /** Called from the logic thread. Do not access graphics here! */
-    public static class BuildinghangeEvent{
+    public static class TileChangeEvent{
         public final Tile tile;
 
-        public BuildinghangeEvent(Tile tile){
+        public TileChangeEvent(Tile tile){
             this.tile = tile;
         }
     }
