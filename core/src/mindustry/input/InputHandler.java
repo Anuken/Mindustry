@@ -62,13 +62,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public boolean isBuilding = true, buildWasAutoPaused = false;
     public @Nullable UnitType controlledType;
 
-    protected @Nullable Schematic lastSchematic;
-    protected GestureDetector detector;
-    protected PlaceLine line = new PlaceLine();
-    protected BuildPlan resultreq;
-    protected BuildPlan brequest = new BuildPlan();
-    protected Seq<BuildPlan> lineRequests = new Seq<>();
-    protected Seq<BuildPlan> selectRequests = new Seq<>();
+    public @Nullable Schematic lastSchematic;
+    public GestureDetector detector;
+    public PlaceLine line = new PlaceLine();
+    public BuildPlan resultreq;
+    public BuildPlan brequest = new BuildPlan();
+    public Seq<BuildPlan> lineRequests = new Seq<>();
+    public Seq<BuildPlan> selectRequests = new Seq<>();
 
     //methods to override
 
@@ -126,7 +126,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
-        if(tile != null && tile.team() == unit.team && pay.payloads().size < unit.type().payloadCapacity
+        if(tile != null && tile.team == unit.team && pay.payloads().size < unit.type().payloadCapacity
             && unit.within(tile, tilesize * tile.block.size * 1.2f)){
             //pick up block directly
             if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2 && tile.canPickup()){
@@ -236,6 +236,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             player.clearUnit();
             player.deathTimer = 61f;
+            ((CoreBuild)((BlockUnitc)unit).tile()).requestSpawn(player);
+
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
@@ -372,7 +374,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void updateState(){
-
+        if(state.isMenu()){
+            controlledType = null;
+        }
     }
 
     public void drawBottom(){
@@ -380,6 +384,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawTop(){
+
+    }
+
+    public void drawOverSelect(){
 
     }
 
@@ -538,11 +546,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if(test.get(req)) return req;
         }
 
-        for(BuildPlan req : selectRequests){
-            if(test.get(req)) return req;
-        }
-
-        return null;
+        return selectRequests.find(test);
     }
 
     protected void drawBreakSelection(int x1, int y1, int x2, int y2){
@@ -873,7 +877,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(tile instanceof ControlBlock && tile.team() == player.team()){
+        if(tile instanceof ControlBlock && tile.team == player.team()){
             return ((ControlBlock)tile).unit();
         }
 

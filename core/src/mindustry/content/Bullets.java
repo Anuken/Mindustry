@@ -163,7 +163,7 @@ public class Bullets implements ContentList{
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 20f;
+            splashDamage = 22f;
             splashDamageRadius = 20f;
             fragBullet = flakGlassFrag;
             fragBullets = 5;
@@ -240,7 +240,7 @@ public class Bullets implements ContentList{
             explodeRange = 20f;
         }};
 
-        missileExplosive = new MissileBulletType(3f, 10){{
+        missileExplosive = new MissileBulletType(3.7f, 10){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
@@ -255,7 +255,7 @@ public class Bullets implements ContentList{
             statusDuration = 60f;
         }};
 
-        missileIncendiary = new MissileBulletType(3f, 12){{
+        missileIncendiary = new MissileBulletType(3.7f, 12){{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             width = 7f;
@@ -269,17 +269,17 @@ public class Bullets implements ContentList{
             status = StatusEffects.burning;
         }};
 
-        missileSurge = new MissileBulletType(3f, 20){{
+        missileSurge = new MissileBulletType(3.7f, 20){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
             drag = -0.01f;
             splashDamageRadius = 28f;
-            splashDamage = 40f;
+            splashDamage = 35f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             lightning = 2;
-            lightningLength = 14;
+            lightningLength = 10;
         }};
 
         standardCopper = new BasicBulletType(2.5f, 9){{

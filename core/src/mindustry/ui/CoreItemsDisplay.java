@@ -11,6 +11,7 @@ import static mindustry.Vars.*;
 
 public class CoreItemsDisplay extends Table{
     private final ObjectSet<Item> usedItems = new ObjectSet<>();
+    private CoreBuild core;
 
     public CoreItemsDisplay(){
         rebuild();
@@ -26,19 +27,15 @@ public class CoreItemsDisplay extends Table{
         margin(4);
 
         update(() -> {
-            CoreBuild core = Vars.player.team().core();
+            core = Vars.player.team().core();
 
-            for(Item item : content.items()){
-                if(core != null && core.items.get(item) > 0 && usedItems.add(item)){
-                    rebuild();
-                    break;
-                }
+            if(content.items().contains(item -> core != null && core.items.get(item) > 0 && usedItems.add(item))){
+                rebuild();
             }
         });
 
         int i = 0;
 
-        CoreBuild core = Vars.player.team().core();
         for(Item item : content.items()){
             if(usedItems.contains(item)){
                 image(item.icon(Cicon.small)).padRight(3);

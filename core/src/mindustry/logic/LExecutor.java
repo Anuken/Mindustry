@@ -21,7 +21,8 @@ public class LExecutor{
         varTime = 1;
 
     public static final int
-        maxGraphicsBuffer = 512,
+        maxGraphicsBuffer = 256,
+        maxDisplayBuffer = 512,
         maxTextBuffer = 256;
 
     public LInstruction[] instructions = {};
@@ -41,7 +42,8 @@ public class LExecutor{
         vars[varTime].numval = Time.millis();
 
         //reset to start
-        if(vars[varCounter].numval >= instructions.length) vars[varCounter].numval = 0;
+        if(vars[varCounter].numval >= instructions.length
+            || vars[varCounter].numval < 0) vars[varCounter].numval = 0;
 
         if(vars[varCounter].numval < instructions.length){
             instructions[(int)(vars[varCounter].numval++)].run(this);
@@ -177,9 +179,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             int address = exec.numi(index);
 
-            if(address >= 0 && address < exec.links.length){
-                exec.setobj(output, exec.links[address]);
-            }
+            exec.setobj(output, address >= 0 && address < exec.links.length ? exec.links[address] : null);
         }
     }
 
@@ -379,40 +379,26 @@ public class LExecutor{
         }
     }
 
-    public static class BinaryOpI implements LInstruction{
-        public BinaryOp op = BinaryOp.add;
+    public static class OpI implements LInstruction{
+        public LogicOp op = LogicOp.add;
         public int a, b, dest;
 
-        public BinaryOpI(BinaryOp op, int a, int b, int dest){
+        public OpI(LogicOp op, int a, int b, int dest){
             this.op = op;
             this.a = a;
             this.b = b;
             this.dest = dest;
         }
 
-        BinaryOpI(){}
+        OpI(){}
 
         @Override
         public void run(LExecutor exec){
-            exec.setnum(dest, op.function.get(exec.num(a), exec.num(b)));
-        }
-    }
-
-    public static class UnaryOpI implements LInstruction{
-        public UnaryOp op = UnaryOp.negate;
-        public int value, dest;
-
-        public UnaryOpI(UnaryOp op, int value, int dest){
-            this.op = op;
-            this.value = value;
-            this.dest = dest;
-        }
-
-        UnaryOpI(){}
-
-        @Override
-        public void run(LExecutor exec){
-            exec.setnum(dest, op.function.get(exec.num(value)));
+            if(op.unary){
+                exec.setnum(dest, op.function1.get(exec.num(a)));
+            }else{
+                exec.setnum(dest, op.function2.get(exec.num(a), exec.num(b)));
+            }
         }
     }
 
@@ -478,8 +464,10 @@ public class LExecutor{
             Building build = exec.building(target);
             if(build instanceof LogicDisplayBuild){
                 LogicDisplayBuild d = (LogicDisplayBuild)build;
-                for(int i = 0; i < exec.graphicsBuffer.size; i++){
-                    d.commands.addLast(exec.graphicsBuffer.items[i]);
+                if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
+                    for(int i = 0; i < exec.graphicsBuffer.size; i++){
+                        d.commands.addLast(exec.graphicsBuffer.items[i]);
+                    }
                 }
                 exec.graphicsBuffer.clear();
             }

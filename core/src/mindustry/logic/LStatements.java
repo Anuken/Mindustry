@@ -1,7 +1,6 @@
 package mindustry.logic;
 
 import arc.func.*;
-import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -56,15 +55,23 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("getlink")
-    public static class GetLinkStatement extends LStatement{
-        public String output = "result", address = "0";
+    @RegisterStatement("read")
+    public static class ReadStatement extends LStatement{
+        public String output = "result", target = "cell1", address = "0";
 
         @Override
         public void build(Table table){
+            table.add(" read ");
+
             field(table, output, str -> output = str);
 
-            table.add(" = link# ");
+            table.add(" = ");
+
+            fields(table, target, str -> target = str);
+
+            row(table);
+
+            table.add(" at ");
 
             field(table, address, str -> address = str);
         }
@@ -76,7 +83,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new GetLinkI(builder.var(output), builder.var(address));
+            return new ReadI(builder.var(target), builder.var(address), builder.var(output));
         }
     }
 
@@ -109,38 +116,6 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new WriteI(builder.var(target), builder.var(address), builder.var(input));
-        }
-    }
-
-    @RegisterStatement("read")
-    public static class ReadStatement extends LStatement{
-        public String output = "result", target = "cell1", address = "0";
-
-        @Override
-        public void build(Table table){
-            table.add(" read ");
-
-            field(table, output, str -> output = str);
-
-            table.add(" = ");
-
-            fields(table, target, str -> target = str);
-
-            row(table);
-
-            table.add(" at ");
-
-            field(table, address, str -> address = str);
-        }
-
-        @Override
-        public LCategory category(){
-            return LCategory.io;
-        }
-
-        @Override
-        public LInstruction build(LAssembler builder){
-            return new ReadI(builder.var(target), builder.var(address), builder.var(output));
         }
     }
 
@@ -253,6 +228,26 @@ public class LStatements{
         }
     }
 
+    @RegisterStatement("print")
+    public static class PrintStatement extends LStatement{
+        public String value = "\"frog\"";
+
+        @Override
+        public void build(Table table){
+            field(table, value, str -> value = str).width(0f).growX().padRight(3);
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new PrintI(builder.var(value));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.io;
+        }
+    }
+
     @RegisterStatement("drawflush")
     public static class DrawFlushStatement extends LStatement{
         public String target = "display1";
@@ -274,26 +269,6 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("print")
-    public static class PrintStatement extends LStatement{
-        public String value = "\"frog\"";
-
-        @Override
-        public void build(Table table){
-            field(table, value, str -> value = str).width(0f).growX().padRight(3);
-        }
-
-        @Override
-        public LInstruction build(LAssembler builder){
-            return new PrintI(builder.var(value));
-        }
-
-        @Override
-        public LCategory category(){
-            return LCategory.control;
-        }
-    }
-
     @RegisterStatement("printflush")
     public static class PrintFlushStatement extends LStatement{
         public String target = "message1";
@@ -312,6 +287,30 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new PrintFlushI(builder.var(target));
+        }
+    }
+
+    @RegisterStatement("getlink")
+    public static class GetLinkStatement extends LStatement{
+        public String output = "result", address = "0";
+
+        @Override
+        public void build(Table table){
+            field(table, output, str -> output = str);
+
+            table.add(" = link# ");
+
+            field(table, address, str -> address = str);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.blocks;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new GetLinkI(builder.var(output), builder.var(address));
         }
     }
 
@@ -561,62 +560,51 @@ public class LStatements{
         }
     }
 
-    @RegisterStatement("bop")
-    public static class BinaryOpStatement extends LStatement{
-        public BinaryOp op = BinaryOp.add;
-        public String a = "a", b = "b", dest = "result";
+    @RegisterStatement("op")
+    public static class OperationStatement extends LStatement{
+        public LogicOp op = LogicOp.add;
+        public String dest = "result", a = "a", b = "b";
 
         @Override
         public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
             field(table, dest, str -> dest = str);
 
             table.add(" = ");
 
-            row(table);
+            if(op.unary){
+                opButton(table);
 
-            field(table, a, str -> a = str);
+                field(table, a, str -> a = str);
+            }else{
+                row(table);
 
+                field(table, a, str -> a = str);
+
+                opButton(table);
+
+                field(table, b, str -> b = str);
+            }
+        }
+
+        void opButton(Table table){
             table.button(b -> {
                 b.label(() -> op.symbol);
-                b.clicked(() -> showSelect(b, BinaryOp.all, op, o -> op = o));
+                b.clicked(() -> showSelect(b, LogicOp.all, op, o -> {
+                    op = o;
+                    rebuild(table);
+                }));
             }, Styles.logict, () -> {}).size(60f, 40f).pad(4f).color(table.color);
-
-            field(table, b, str -> b = str);
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new BinaryOpI(op,builder.var(a), builder.var(b), builder.var(dest));
-        }
-
-        @Override
-        public LCategory category(){
-            return LCategory.operations;
-        }
-    }
-
-    @RegisterStatement("uop")
-    public static class UnaryOpStatement extends LStatement{
-        public UnaryOp op = UnaryOp.negate;
-        public String value = "b", dest = "result";
-
-        @Override
-        public void build(Table table){
-            field(table, dest, str -> dest = str);
-
-            table.add(" = ");
-
-            table.button(b -> {
-                b.label(() -> op.symbol);
-                b.clicked(() -> showSelect(b, UnaryOp.all, op, o -> op = o));
-            }, Styles.logict, () -> {}).size(50f, 40f).pad(3f).color(table.color);
-
-            field(table, value, str -> value = str);
-        }
-
-        @Override
-        public LInstruction build(LAssembler builder){
-            return new UnaryOpI(op, builder.var(value), builder.var(dest));
+            return new OpI(op,builder.var(a), builder.var(b), builder.var(dest));
         }
 
         @Override
@@ -666,7 +654,7 @@ public class LStatements{
             field(table, compare, str -> compare = str);
 
             table.add().growX();
-            table.add(new JumpButton(Color.white, () -> dest, s -> dest = s)).size(30).right().padLeft(-8);
+            table.add(new JumpButton(() -> dest, s -> dest = s)).size(30).right().padLeft(-8);
         }
 
         //elements need separate conversion logic

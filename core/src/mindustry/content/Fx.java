@@ -52,10 +52,11 @@ public class Fx{
         if(!(e.data instanceof Unit)) return;
 
         Unit select = e.data();
+        boolean block = select instanceof BlockUnitc;
 
         mixcol(Pal.accent, 1f);
         alpha(e.fout());
-        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
+        rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type().icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
         Lines.stroke(e.fslope() * 1f);
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);
@@ -509,6 +510,29 @@ public class Fx{
         stroke(1f * e.fout());
 
         randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+        });
+
+    }),
+
+    sapExplosion = new Effect(25, e -> {
+
+        color(Pal.sapBullet);
+        e.scaled(6, i -> {
+            stroke(3f * i.fout());
+            Lines.circle(e.x, e.y, 3f + i.fin() * 80f);
+        });
+
+        color(Color.gray);
+
+        randLenVectors(e.id, 9, 2f + 70 * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+        });
+
+        color(Pal.sapBulletBack);
+        stroke(1f * e.fout());
+
+        randLenVectors(e.id + 1, 8, 1f + 60f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
         });
 

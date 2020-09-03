@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -71,7 +72,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
         Runnable rebuildItems = () -> rebuild.get(items);
 
         buttons.button("@resources", Icon.terrain, () -> {
-            loadout.show(core.itemCapacity, stacks, stacks::clear, () -> {}, () -> {
+            loadout.show(core.itemCapacity, stacks, UnlockableContent::unlocked, stacks::clear, () -> {}, () -> {
                 universe.updateLaunchResources(stacks);
                 update.run();
                 rebuildItems.run();

@@ -30,7 +30,12 @@ public class EventType{
         openWiki,
         teamCoreDamage,
         socketConfigChanged,
-        update
+        update,
+        draw,
+        preDraw,
+        postDraw,
+        uiDrawBegin,
+        uiDrawEnd
     }
 
     public static class WinEvent{}
@@ -76,7 +81,6 @@ public class EventType{
             this.stack = stack;
         }
     }
-
 
     public static class CommandIssueEvent{
         public final Building tile;

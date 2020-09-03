@@ -108,15 +108,20 @@ public class Unloader extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
-            write.b(sortItem == null ? -1 : sortItem.id);
+            write.s(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte id = read.b();
+            int id = revision == 1 ? read.s() : read.b();
             sortItem = id == -1 ? null : content.items().get(id);
         }
     }

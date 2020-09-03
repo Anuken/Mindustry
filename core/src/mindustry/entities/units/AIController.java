@@ -2,7 +2,9 @@ package mindustry.entities.units;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -31,6 +33,10 @@ public class AIController implements UnitController{
     public void updateUnit(){
         updateTargeting();
         updateMovement();
+    }
+
+    protected UnitCommand command(){
+        return unit.team.data().command;
     }
 
     protected void updateMovement(){
@@ -113,6 +119,10 @@ public class AIController implements UnitController{
 
     protected void init(){
 
+    }
+
+    protected @Nullable Tile getClosestSpawner(){
+        return Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
     }
 
     protected void circle(Position target, float circleLength){

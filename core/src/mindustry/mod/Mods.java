@@ -425,6 +425,7 @@ public class Mods implements Loadable{
     /** This must be run on the main thread! */
     public void loadScripts(){
         Time.mark();
+        boolean[] any = {false};
 
         try{
             eachEnabled(mod -> {
@@ -438,6 +439,7 @@ public class Mods implements Loadable{
                             if(scripts == null){
                                 scripts = platform.createScripts();
                             }
+                            any[0] = true;
                             scripts.run(mod, main);
                         }catch(Throwable e){
                             Core.app.post(() -> {
@@ -454,7 +456,9 @@ public class Mods implements Loadable{
             content.setCurrentMod(null);
         }
 
-        Log.info("Time to initialize modded scripts: @", Time.elapsed());
+        if(any[0]){
+            Log.info("Time to initialize modded scripts: @", Time.elapsed());
+        }
     }
 
     /** Creates all the content found in mod files. */
@@ -588,59 +592,68 @@ public class Mods implements Loadable{
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
         Time.mark();
 
-        Fi zip = sourceFile.isDirectory() ? sourceFile : new ZipFi(sourceFile);
-        if(zip.list().length == 1 && zip.list()[0].isDirectory()){
-            zip = zip.list()[0];
-        }
+        ZipFi rootZip = null;
 
-        Fi metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
-        if(!metaf.exists()){
-            Log.warn("Mod @ doesn't have a 'mod.json'/'mod.hjson'/'plugin.json' file, skipping.", sourceFile);
-            throw new IllegalArgumentException("Invalid file: No mod.json found.");
-        }
-
-        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
-        meta.cleanup();
-        String camelized = meta.name.replace(" ", "");
-        String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
-        String baseName = meta.name.toLowerCase().replace(" ", "-");
-
-        if(mods.contains(m -> m.name.equals(baseName))){
-            throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
-        }
-
-        Mod mainMod;
-
-        Fi mainFile = zip;
-        String[] path = (mainClass.replace('.', '/') + ".class").split("/");
-        for(String str : path){
-            if(!str.isEmpty()){
-                mainFile = mainFile.child(str);
-            }
-        }
-
-        //make sure the main class exists before loading it; if it doesn't just don't put it there
-        if(mainFile.exists()){
-            //mobile versions don't support class mods
-            if(mobile){
-                throw new IllegalArgumentException("Java class mods are not supported on mobile.");
+        try{
+            Fi zip = sourceFile.isDirectory() ? sourceFile : (rootZip = new ZipFi(sourceFile));
+            if(zip.list().length == 1 && zip.list()[0].isDirectory()){
+                zip = zip.list()[0];
             }
 
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{sourceFile.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
-            Class<?> main = classLoader.loadClass(mainClass);
-            metas.put(main, meta);
-            mainMod = (Mod)main.getDeclaredConstructor().newInstance();
-        }else{
-            mainMod = null;
-        }
+            Fi metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
+            if(!metaf.exists()){
+                Log.warn("Mod @ doesn't have a 'mod.json'/'mod.hjson'/'plugin.json' file, skipping.", sourceFile);
+                throw new IllegalArgumentException("Invalid file: No mod.json found.");
+            }
 
-        //all plugins are hidden implicitly
-        if(mainMod instanceof Plugin){
-            meta.hidden = true;
-        }
+            ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
+            meta.cleanup();
+            String camelized = meta.name.replace(" ", "");
+            String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
+            String baseName = meta.name.toLowerCase().replace(" ", "-");
 
-        Log.info("Loaded mod '@' in @", meta.name, Time.elapsed());
-        return new LoadedMod(sourceFile, zip, mainMod, meta);
+            if(mods.contains(m -> m.name.equals(baseName))){
+                throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+            }
+
+            Mod mainMod;
+
+            Fi mainFile = zip;
+            String[] path = (mainClass.replace('.', '/') + ".class").split("/");
+            for(String str : path){
+                if(!str.isEmpty()){
+                    mainFile = mainFile.child(str);
+                }
+            }
+
+            //make sure the main class exists before loading it; if it doesn't just don't put it there
+            if(mainFile.exists()){
+                //mobile versions don't support class mods
+                if(mobile){
+                    throw new IllegalArgumentException("Java class mods are not supported on mobile.");
+                }
+
+                URLClassLoader classLoader = new URLClassLoader(new URL[]{sourceFile.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
+                Class<?> main = classLoader.loadClass(mainClass);
+                metas.put(main, meta);
+                mainMod = (Mod)main.getDeclaredConstructor().newInstance();
+            }else{
+                mainMod = null;
+            }
+
+            //all plugins are hidden implicitly
+            if(mainMod instanceof Plugin){
+                meta.hidden = true;
+            }
+
+            Log.info("Loaded mod '@' in @", meta.name, Time.elapsed());
+            return new LoadedMod(sourceFile, zip, mainMod, meta);
+
+        }catch(Exception e){
+            //delete root zip file so it can be closed on windows
+            if(rootZip != null) rootZip.delete();
+            throw e;
+        }
     }
 
     /** Represents a mod's state. May be a jar file, folder or zip. */

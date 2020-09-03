@@ -36,6 +36,8 @@ public class LiquidJunction extends LiquidBlock{
 
         @Override
         public Building getLiquidDestination(Building source, Liquid liquid){
+            if(!enabled) return this;
+
             int dir = source.relativeTo(tile.x, tile.y);
             dir = (dir + 4) % 4;
             Building next = nearby(dir);

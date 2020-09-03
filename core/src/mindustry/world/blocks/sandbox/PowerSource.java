@@ -14,7 +14,7 @@ public class PowerSource extends PowerNode{
     public class PowerSourceBuild extends PowerNodeBuild{
         @Override
         public float getPowerProduction(){
-            return 10000f;
+            return enabled ? 10000f : 0f;
         }
     }
 

@@ -32,6 +32,8 @@ public enum BlockStat{
     drillTier(StatCategory.crafting),
     drillSpeed(StatCategory.crafting),
     maxUnits(StatCategory.crafting),
+    linkRange(StatCategory.crafting),
+    instructions(StatCategory.crafting),
 
     speedIncrease(StatCategory.shooting),
     repairTime(StatCategory.shooting),
