@@ -126,7 +126,7 @@ public class MapEditor{
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
             if(!hasOverlap(x, y)){
-                tile(x, y).setBlock(drawBlock, drawTeam, 0);
+                tile(x, y).setBlock(drawBlock, drawTeam, rotation);
             }
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;

@@ -143,7 +143,7 @@ public class CoreBlock extends StorageBlock{
 
         if(!canPlaceOn(world.tile(x, y), player.team())){
 
-            drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements) && !state.rules.infiniteResources) ?
+            drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements)) || state.rules.infiniteResources ?
                 "bar.corereq" :
                 "bar.noresources"
             ), x, y, valid);

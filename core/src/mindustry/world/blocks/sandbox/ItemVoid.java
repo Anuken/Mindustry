@@ -17,7 +17,7 @@ public class ItemVoid extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return true;
+            return enabled;
         }
     }
 }

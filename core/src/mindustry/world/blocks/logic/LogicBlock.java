@@ -36,6 +36,7 @@ public class LogicBlock extends Block{
         update = true;
         solid = true;
         configurable = true;
+        sync = true;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
@@ -361,15 +362,17 @@ public class LogicBlock extends Block{
                 updateCode();
             }
 
-            accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
+            if(enabled){
+                accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
 
-            if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
+                if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
 
-            for(int i = 0; i < (int)accumulator; i++){
-                if(executor.initialized()){
-                    executor.runOnce();
+                for(int i = 0; i < (int)accumulator; i++){
+                    if(executor.initialized()){
+                        executor.runOnce();
+                    }
+                    accumulator --;
                 }
-                accumulator --;
             }
         }
 

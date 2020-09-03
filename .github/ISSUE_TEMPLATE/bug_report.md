@@ -13,11 +13,13 @@ assignees: ''
 
 **Issue**: *Explain your issue in detail.*
 
-**Steps to reproduce**: *How you happened across the issue, and what you were doing at the time.*
+**Steps to reproduce**: *How you happened across the issue, and what exactly you did to make the bug happen.*
 
-**Link to mod(s) used, if applicable**: *The mod repositories or zip files that are related to the issue.*
+**Link(s) to mod(s) used**: *The mod repositories or zip files that are related to the issue, if applicable.*
 
-**Crash report, if applicable**: *The contents of relevant crash report files.*
+**Save file**: *The save file you were playing on when the bug happened, if applicable.*
+
+**Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*
 
 ---
 

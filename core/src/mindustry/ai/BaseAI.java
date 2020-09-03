@@ -63,6 +63,7 @@ public class BaseAI{
                 int range = 150;
 
                 Position pos = randomPosition();
+
                 //when there are no random positions, do nothing.
                 if(pos == null) return;
 
@@ -159,7 +160,10 @@ public class BaseAI{
 
     private void tryWalls(){
         Block wall = Blocks.copperWall;
-        Tile spawn = state.rules.defaultTeam.core() != null ? state.rules.defaultTeam.core().tile : data.team.core().tile;
+        Building spawnt = state.rules.defaultTeam.core() != null ? state.rules.defaultTeam.core() : data.team.core();
+        Tile spawn = spawnt == null ? null : spawnt.tile;
+
+        if(spawn == null) return;
 
         for(int wx = lastX; wx <= lastX + lastW; wx++){
             for(int wy = lastY; wy <= lastY + lastH; wy++){

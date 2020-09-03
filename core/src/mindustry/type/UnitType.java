@@ -127,7 +127,7 @@ public class UnitType extends UnlockableContent{
     public void display(Unit unit, Table table){
         table.table(t -> {
             t.left();
-            t.add(new Image(icon(Cicon.medium))).size(8 * 4);
+            t.add(new Image(icon(Cicon.medium))).size(8 * 4).scaling(Scaling.fit);
             t.labelWrap(localizedName).left().width(190f).padLeft(5);
         }).growX().left();
         table.row();
@@ -261,7 +261,7 @@ public class UnitType extends UnlockableContent{
             drawControl(unit);
         }
 
-        if(unit.isFlying()){
+        if(unit.isFlying() || visualElevation > 0){
             Draw.z(Math.min(Layer.darkness, z - 1f));
             drawShadow(unit);
         }
@@ -478,7 +478,6 @@ public class UnitType extends UnlockableContent{
     }
 
     public <T extends Unit & Legsc> void drawLegs(T unit){
-        //Draw.z(Layer.groundUnit - 0.02f);
 
         Leg[] legs = unit.legs();
 
@@ -494,8 +493,9 @@ public class UnitType extends UnlockableContent{
             Draw.rect(baseRegion, unit.x, unit.y, rotation);
         }
 
-        //TODO figure out layering
-        for(int i = 0; i < legs.length; i++){
+        //legs are drawn front first
+        for(int j = legs.length - 1; j >= 0; j--){
+            int i = (j % 2 == 0 ? j/2 : legs.length - 1 - j/2);
             Leg leg = legs[i];
             float angle = unit.legAngle(rotation, i);
             boolean flip = i >= legs.length/2f;

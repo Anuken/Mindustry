@@ -7,6 +7,8 @@ public class LiquidRouter extends LiquidBlock{
 
     public LiquidRouter(String name){
         super(name);
+
+        noUpdateDisabled = true;
     }
 
     public class LiquidRouterEntity extends LiquidBuild{

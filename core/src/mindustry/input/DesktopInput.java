@@ -42,6 +42,8 @@ public class DesktopInput extends InputHandler{
     public @Nullable BuildPlan sreq;
     /** Whether player is currently deleting removal requests. */
     public boolean deleting = false, shouldShoot = false, panning = false;
+    /** Mouse pan speed. */
+    public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 9f;
 
     @Override
     public void buildUI(Group group){
@@ -179,7 +181,7 @@ public class DesktopInput extends InputHandler{
         }
 
         boolean panCam = false;
-        float camSpeed = !Core.input.keyDown(Binding.boost) ? 3f : 8f;
+        float camSpeed = !Core.input.keyDown(Binding.boost) ? panSpeed : panBoostSpeed;
 
         if(input.keyDown(Binding.pan)){
             panCam = true;
@@ -203,8 +205,8 @@ public class DesktopInput extends InputHandler{
         }
 
         if(panCam){
-            Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * 0.005f, -1, 1) * camSpeed;
-            Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * 0.005f, -1, 1) * camSpeed;
+            Core.camera.position.x += Mathf.clamp((Core.input.mouseX() - Core.graphics.getWidth() / 2f) * panScale, -1, 1) * camSpeed;
+            Core.camera.position.y += Mathf.clamp((Core.input.mouseY() - Core.graphics.getHeight() / 2f) * panScale, -1, 1) * camSpeed;
         }
 
         shouldShoot = !scene.hasMouse();
@@ -338,22 +340,24 @@ public class DesktopInput extends InputHandler{
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
+        //TODO localize these
+
         table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
-        }).tooltip("Schematics");
+        }).tooltip("@schematics");
 
         table.button(Icon.tree, Styles.clearPartiali, () -> {
             ui.research.show();
-        }).visible(() -> state.isCampaign()).tooltip("Research");
+        }).visible(() -> state.isCampaign()).tooltip("@research");
 
         table.button(Icon.map, Styles.clearPartiali, () -> {
             ui.planet.show();
-        }).visible(() -> state.isCampaign()).tooltip("Planet Map");
+        }).visible(() -> state.isCampaign()).tooltip("@planetmap");
 
         table.button(Icon.up, Styles.clearPartiali, () -> {
             ui.planet.show(state.getSector(), player.team().core());
         }).visible(() -> state.isCampaign())
-        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)).tooltip("Launch Core");
+        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)).tooltip("@launchcore");
     }
 
     void pollInput(){

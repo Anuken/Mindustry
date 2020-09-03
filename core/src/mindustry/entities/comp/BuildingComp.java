@@ -135,8 +135,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public final void writeBase(Writes write){
         write.f(health);
-        write.b(rotation);
+        write.b(rotation | 0b10000000);
         write.b(team.id);
+        write.b(0); //extra padding for later use
         if(items != null) items.write(write);
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
@@ -145,12 +146,20 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public final void readBase(Reads read){
         health = read.f();
-        rotation = read.b();
+        byte rot = read.b();
         team = Team.get(read.b());
-        if(items != null) items.read(read);
-        if(power != null) power.read(read);
-        if(liquids != null) liquids.read(read);
-        if(cons != null) cons.read(read);
+
+        rotation = rot & 0b01111111;
+        boolean legacy = true;
+        if((rot & 0b10000000) != 0){
+            read.b(); //padding
+            legacy = false;
+        }
+
+        if(items != null) items.read(read, legacy);
+        if(power != null) power.read(read, legacy);
+        if(liquids != null) liquids.read(read, legacy);
+        if(cons != null) cons.read(read, legacy);
     }
 
     public void writeAll(Writes write){
@@ -958,7 +967,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             table.row();
             table.table(this::displayConsumption).growX();
 
-            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow");
+            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow") && block.displayFlow;
 
             if(displayFlow){
                 String ps = " " + StatUnit.perSecond.localized();
@@ -996,9 +1005,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 if(liquids != null){
                     table.row();
                     table.table(l -> {
-                        l.left();
-                        l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
-                        l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                        boolean[] had = {false};
+
+                        Runnable rebuild = () -> {
+                            l.clearChildren();
+                            l.left();
+                            l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
+                            l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                        };
+
+                        l.update(() -> {
+                           if(!had[0] && liquids.hadFlow()){
+                               had[0] = true;
+                               rebuild.run();
+                           }
+                        });
                     }).left();
                 }
             }

@@ -20,7 +20,7 @@ if(System.getenv("JITPACK") == "true") hasSdk = false
 if(hasSdk){
 	include 'android'
 }else{
-    println("No local.properties found. Not loading Android module.")
+    println("No Android SDK found. Skipping Android module.")
 }
 
 if(!hasProperty("release")){

@@ -21,6 +21,7 @@ public class PowerDiode extends Block{
         solid = true;
         insulated = true;
         group = BlockGroup.power;
+        noUpdateDisabled = true;
     }
 
     @Override

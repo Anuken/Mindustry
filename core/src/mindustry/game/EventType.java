@@ -82,7 +82,6 @@ public class EventType{
         }
     }
 
-
     public static class CommandIssueEvent{
         public final Building tile;
         public final UnitCommand command;

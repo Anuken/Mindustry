@@ -92,15 +92,16 @@ public class OverflowGate extends Block{
             if(from == -1) return null;
             Building to = nearby((from + 2) % 4);
             boolean canForward = to != null && to.acceptItem(this, item) && to.team == team && !(to.block() instanceof OverflowGate);
+            boolean inv = invert == enabled;
 
-            if(!canForward || invert){
+            if(!canForward || inv){
                 Building a = nearby(Mathf.mod(from - 1, 4));
                 Building b = nearby(Mathf.mod(from + 1, 4));
                 boolean ac = a != null && a.acceptItem(this, item) && !(a.block() instanceof OverflowGate) && a.team == team;
                 boolean bc = b != null && b.acceptItem(this, item) && !(b.block() instanceof OverflowGate) && b.team == team;
 
                 if(!ac && !bc){
-                    return invert && canForward ? to : null;
+                    return inv && canForward ? to : null;
                 }
 
                 if(ac && !bc){

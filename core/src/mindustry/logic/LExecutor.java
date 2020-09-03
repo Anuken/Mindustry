@@ -42,7 +42,8 @@ public class LExecutor{
         vars[varTime].numval = Time.millis();
 
         //reset to start
-        if(vars[varCounter].numval >= instructions.length) vars[varCounter].numval = 0;
+        if(vars[varCounter].numval >= instructions.length
+            || vars[varCounter].numval < 0) vars[varCounter].numval = 0;
 
         if(vars[varCounter].numval < instructions.length){
             instructions[(int)(vars[varCounter].numval++)].run(this);

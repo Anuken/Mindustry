@@ -22,7 +22,7 @@ public class LiquidVoid extends Block{
     public class LiquidVoidBuild extends Building{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid, float amount){
-            return true;
+            return enabled;
         }
 
         @Override

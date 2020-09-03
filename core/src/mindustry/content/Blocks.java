@@ -1341,7 +1341,7 @@ public class Blocks implements ContentList{
 
         unloader = new Unloader("unloader"){{
             requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
-            speed = 7f;
+            speed = 6f;
         }};
 
         //endregion
@@ -1504,12 +1504,13 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 3f;
+            force = 4f;
             scaledForce = 5.5f;
             range = 170f;
-            damage = 0.08f;
+            damage = 0.1f;
             health = 160 * size * size;
             rotateSpeed = 10;
+            range = 85f;
 
             consumes.powerCond(3f, (TractorBeamEntity e) -> e.target != null);
         }};
@@ -1560,12 +1561,13 @@ public class Blocks implements ContentList{
         segment = new PointDefenseTurret("segment"){{
             requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 25));
 
+            range = 100f;
             hasPower = true;
             consumes.power(3f);
             size = 2;
             shootLength = 5f;
-            bulletDamage = 12f;
-            reloadTime = 20f;
+            bulletDamage = 16f;
+            reloadTime = 15f;
             health = 190 * size * size;
         }};
 
@@ -1800,10 +1802,9 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.cryofluid, 3f);
             liquidCapacity = 180f;
 
-            blockUnitBuildSpeed = 3f;
-
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.antumbra, UnitTypes.eclipse, with(Items.silicon, 500, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150)),
+                new UpgradePlan(UnitTypes.arkyid, UnitTypes.toxopid, with(Items.silicon, 500, Items.plastanium, 350, Items.surgealloy, 400, Items.phasefabric, 250)),
             };
         }};
 

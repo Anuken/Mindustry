@@ -19,8 +19,17 @@ public class Units{
     private static boolean boolResult;
 
     @Remote(called = Loc.server)
-    public static void unitDeath(Unit unit){
-        unit.killed();
+    public static void unitDeath(int uid){
+        Unit unit = Groups.unit.getByID(uid);
+
+        //if there's no unit don't add it later and get it stuck as a ghost
+        if(netClient != null){
+            netClient.addRemovedEntity(uid);
+        }
+
+        if(unit != null){
+            unit.killed();
+        }
     }
 
     @Remote(called = Loc.server)
