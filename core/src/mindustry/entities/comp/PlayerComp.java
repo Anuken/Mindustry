@@ -34,6 +34,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @Import float x, y;
 
     @NonNull @ReadOnly Unit unit = Nulls.unit;
+    transient private Unit lastReadUnit = Nulls.unit;
     transient @Nullable NetConnection con;
 
     @ReadOnly Team team = Team.sharded;
@@ -54,13 +55,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit instanceof Minerc;
     }
 
-    public @Nullable
-    CoreBuild closestCore(){
+    public @Nullable CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable
-    CoreBuild core(){
+    public @Nullable CoreBuild core(){
         return team.core();
     }
 
@@ -93,6 +92,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void afterSync(){
+        //simulate a unit change after sync
+        Unit set = unit;
+        unit = lastReadUnit;
+        unit(set);
+        lastReadUnit = unit;
+
         unit.aim(mouseX, mouseY);
         //this is only necessary when the thing being controlled isn't synced
         unit.controlWeapons(shooting, shooting);
@@ -165,6 +170,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     public void unit(Unit unit){
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
         if(this.unit == unit) return;
+
         if(this.unit != Nulls.unit){
             //un-control the old unit
             this.unit.controller(this.unit.type().createController());
