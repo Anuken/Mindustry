@@ -89,6 +89,7 @@ public class Effect{
     public void render(int id, Color color, float life, float rotation, float x, float y, Object data){
         container.set(id, color, life, lifetime, rotation, x, y, data);
         Draw.z(ground ? Layer.debris : Layer.effect);
+        Draw.reset();
         renderer.get(container);
         Draw.reset();
     }
