@@ -130,6 +130,61 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        vestige = new UnitType("vestige"){{
+            speed = 0.35f;
+            hitsize = 20f;
+            rotateSpeed = 1.9f;
+            targetAir = false;
+            health = 9000;
+            armor = 14f;
+
+            weapons.add(
+            new Weapon("chaos"){{
+                y = 1f;
+                x = 16f;
+                shootY = 8f;
+                reload = 50f;
+                recoil = 5f;
+                shake = 2f;
+                ejectEffect = Fx.shellEjectBig;
+                shootSound = Sounds.artillery;
+                shots = 3;
+                inaccuracy = 3f;
+                shotDelay = 4f;
+
+                bullet = new BasicBulletType(7f, 40){{
+                    width = 11f;
+                    height = 20f;
+                    lifetime = 25f;
+                    shootEffect = Fx.shootBig;
+                    lightning = 2;
+                    lightningLength = 6;
+                    lightningColor = Pal.surge;
+                    //standard bullet damage is far too much for lightning
+                    lightningDamage = 17;
+                }};
+            }},
+
+            new Weapon("mount-weapon"){{
+                reload = 13f;
+                x = 8.5f;
+                y = 6f;
+                rotate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+            }},
+            new Weapon("mount-weapon"){{
+                reload = 16f;
+                x = 8.5f;
+                y = -7f;
+                rotate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+            }}
+
+            );
+        }};
+
         //endregion
         //region ground support
 

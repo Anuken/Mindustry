@@ -1504,7 +1504,7 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 4f;
+            force = 4.5f;
             scaledForce = 5.5f;
             range = 170f;
             damage = 0.1f;
@@ -1566,7 +1566,7 @@ public class Blocks implements ContentList{
             consumes.power(3f);
             size = 2;
             shootLength = 5f;
-            bulletDamage = 16f;
+            bulletDamage = 18f;
             reloadTime = 15f;
             health = 190 * size * size;
         }};

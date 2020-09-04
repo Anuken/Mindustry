@@ -224,7 +224,7 @@ public class ForceProjector extends Block{
         @Replace
         @Override
         public float clipSize(){
-            return build.realRadius() * 2.5f;
+            return build.realRadius() * 3f;
         }
     }
 }
