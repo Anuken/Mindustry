@@ -168,7 +168,7 @@ public class Administration{
         Core.settings.put("playerlimit", limit);
     }
 
-    public boolean getStrict(){
+    public boolean isStrict(){
         return Config.strict.bool();
     }
 

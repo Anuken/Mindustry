@@ -585,8 +585,11 @@ public class NetClient implements ApplicationListener{
             }
 
             Unit unit = player.dead() ? Nulls.unit : player.unit();
+            int uid = player.dead() ? -1 : unit.id;
 
-            Call.clientSnapshot(lastSent++,
+            Call.clientSnapshot(
+            lastSent++,
+            uid,
             player.dead(),
             unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
@@ -597,7 +600,8 @@ public class NetClient implements ApplicationListener{
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
-            Core.camera.width * viewScale, Core.camera.height * viewScale);
+            Core.camera.width * viewScale, Core.camera.height * viewScale
+            );
         }
 
         if(timer.get(1, 60)){
