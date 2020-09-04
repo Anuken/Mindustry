@@ -15,7 +15,7 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 
 ### Building
 
-Bleeding-edge builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases). Old builds might still be on [jenkins](https://jenkins.hellomouse.net/job/mindustry/).
+Bleeding-edge builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases).
 
 If you'd rather compile on your own, follow these instructions.
 First, make sure you have [JDK 14](https://adoptopenjdk.net/) installed. Open a terminal in the root directory, `cd` to the Mindustry folder and run the following commands:
