@@ -11,8 +11,6 @@ import mindustry.world.modules.ItemModule.*;
 import java.util.*;
 
 public class ItemSeq implements Iterable<ItemStack>, Serializable{
-    private final static ItemStack tmp = new ItemStack();
-
     protected final int[] values;
     public int total;
 

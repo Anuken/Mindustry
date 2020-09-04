@@ -36,7 +36,11 @@ public class MinimapRenderer implements Disposable{
         });
 
         //make sure to call on the graphics thread
-        Events.on(BuildinghangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
+        Events.on(TileChangeEvent.class, event -> {
+            if(!ui.editor.isShown()){
+                update(event.tile);
+            }
+        });
     }
 
     public Pixmap getPixmap(){

@@ -70,12 +70,13 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc{
 
     boolean dropUnit(UnitPayload payload){
         Unit u = payload.unit;
-        Fx.unitDrop.at(this);
 
         //can't drop ground units
         if(((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f) || (!floorOn().isLiquid && u instanceof WaterMovec)){
             return false;
         }
+
+        Fx.unitDrop.at(this);
 
         //clients do not drop payloads
         if(Vars.net.client()) return true;

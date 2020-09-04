@@ -163,7 +163,6 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("@rules.title.environment");
-        number("@rules.solarpowermultiplier", f -> rules.solarPowerMultiplier = f, () -> rules.solarPowerMultiplier);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
         main.button(b -> {

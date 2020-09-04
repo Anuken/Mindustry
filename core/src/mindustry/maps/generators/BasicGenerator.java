@@ -39,63 +39,6 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     }
 
-    //for visual testing only
-    public void cliffs2(){
-        for(Tile tile : tiles){
-            tile.setBlock(Blocks.air);
-            tile.cost = tile.floor().isLiquid ? 0 : (byte)(noise(tile.x, tile.y, 4, 0.5f, 90f, 1) * 5);
-        }
-
-        for(Tile tile : tiles){
-            if(tile.floor().isLiquid) continue;
-
-            int rotation = 0;
-            for(int i = 0; i < 8; i++){
-                Tile other = tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
-                if(other != null && other.cost < tile.cost){ //down slope
-                    rotation |= (1 << i);
-                }
-            }
-
-            tile.data = (byte)rotation;
-        }
-
-        for(Tile tile : tiles){
-            if(tile.data != 0){
-                int rotation = tile.data;
-                tile.setBlock(Blocks.cliff);
-                tile.setOverlay(Blocks.air);
-                tile.data = (byte)rotation;
-            }
-        }
-    }
-
-    public void cliffs(){
-        for(Tile tile : tiles){
-            if(!tile.block().isStatic()) continue;
-
-            int rotation = 0;
-            for(int i = 0; i < 8; i++){
-                Tile other = tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
-                if(other != null && !other.block().isStatic()){
-                    rotation |= (1 << i);
-                }
-            }
-
-            if(rotation != 0){
-                tile.setBlock(Blocks.cliff);
-            }
-
-            tile.data = (byte)rotation;
-        }
-
-        for(Tile tile : tiles){
-            if(tile.block() != Blocks.cliff && tile.block().isStatic()){
-                tile.setBlock(Blocks.air);
-            }
-        }
-    }
-
     public void median(int radius){
         median(radius, 0.5);
     }
@@ -336,13 +279,13 @@ public abstract class BasicGenerator implements WorldGenerator{
         while(!arr.isEmpty()){
             int i = arr.pop();
             int x = Point2.x(i), y = Point2.y(i);
-            tiles.getn(x, y).cost = 2;
+            tiles.getn(x, y).data = 2;
             for(Point2 point : Geometry.d4){
                 int newx = x + point.x, newy = y + point.y;
                 if(tiles.in(newx, newy)){
                     Tile child = tiles.getn(newx, newy);
-                    if(child.block() == Blocks.air && child.cost != 2){
-                        child.cost = 2;
+                    if(child.block() == Blocks.air && child.data != 2){
+                        child.data = 2;
                         arr.add(child.pos());
                     }
                 }
@@ -350,7 +293,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
 
         for(Tile tile : tiles){
-            if(tile.cost != 2 && tile.block() == Blocks.air){
+            if(tile.data != 2 && tile.block() == Blocks.air){
                 tile.setBlock(tile.floor().wall);
             }
         }
