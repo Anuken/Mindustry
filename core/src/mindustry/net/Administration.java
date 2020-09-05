@@ -92,7 +92,7 @@ public class Administration{
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
                         action.player.kick("You are interacting with too many blocks.", 1000 * 30);
-                    }else{
+                    }else if(action.player.getInfo().messageTimer.get(60f * 2f)){
                         action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
                     }
 
@@ -660,6 +660,7 @@ public class Administration{
         public transient String lastSentMessage;
         public transient int messageInfractions;
         public transient Ratekeeper rate = new Ratekeeper();
+        public transient Interval messageTimer = new Interval();
 
         PlayerInfo(String id){
             this.id = id;

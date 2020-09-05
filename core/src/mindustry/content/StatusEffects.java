@@ -121,13 +121,14 @@ public class StatusEffects implements ContentList{
 
         boss = new StatusEffect("boss"){{
             permanent = true;
+            damageMultiplier = 1.5f;
+            armorMultiplier = 1.5f;
         }};
 
         shocked = new StatusEffect("shocked");
 
         blasted = new StatusEffect("blasted");
 
-        //no effects, just small amounts of damage.
         corroded = new StatusEffect("corroded"){{
             damage = 0.1f;
         }};

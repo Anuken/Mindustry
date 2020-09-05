@@ -15,7 +15,7 @@ public class UnitTypes implements ContentList{
     //region definitions
 
     //ground
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, vestige, cataclyst;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova;
@@ -130,16 +130,17 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        vestige = new UnitType("vestige"){{
+        scepter = new UnitType("scepter"){{
             speed = 0.35f;
             hitsize = 20f;
-            rotateSpeed = 1.9f;
+            rotateSpeed = 2.1f;
             targetAir = false;
             health = 9000;
-            armor = 14f;
+            armor = 11f;
+            mechLegMoveScl = 1.3f;
 
             weapons.add(
-            new Weapon("chaos"){{
+            new Weapon("scepter-weapon"){{
                 y = 1f;
                 x = 16f;
                 shootY = 8f;
@@ -180,6 +181,58 @@ public class UnitTypes implements ContentList{
                 rotate = true;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
+            }}
+
+            );
+        }};
+
+        reign = new UnitType("reign"){{
+            speed = 0.35f;
+            hitsize = 26f;
+            rotateSpeed = 1.65f;
+            targetAir = false;
+            health = 24000;
+            armor = 14f;
+            mechLegMoveScl = 1.75f;
+
+            weapons.add(
+            new Weapon("reign-weapon"){{
+                y = 1f;
+                x = 21.5f;
+                shootY = 11f;
+                reload = 18f;
+                recoil = 5f;
+                shake = 4f;
+                ejectEffect = Fx.shellEjectBig;
+                shootSound = Sounds.artillery;
+
+                bullet = new BasicBulletType(13f, 80){{
+                    pierce = true;
+                    width = 11f;
+                    height = 30f;
+                    lifetime = 15f;
+                    shootEffect = Fx.shootBig;
+                    fragVelocityMin = 0.4f;
+
+                    hitEffect = Fx.blastExplosion;
+                    splashDamage = 25f;
+                    splashDamageRadius = 30f;
+
+                    fragBullets = 2;
+                    fragLifeMin = 0f;
+                    fragCone = 30f;
+
+                    fragBullet = new BasicBulletType(9f, 10){{
+                        width = 10f;
+                        height = 10f;
+                        pierce = true;
+
+                        lifetime = 20f;
+                        hitEffect = Fx.flakExplosion;
+                        splashDamage = 23f;
+                        splashDamageRadius = 15f;
+                    }};
+                }};
             }}
 
             );

@@ -133,7 +133,7 @@ public class ForceProjector extends Block{
             if(buildup >= breakage && !broken){
                 broken = true;
                 buildup = breakage;
-                Fx.shieldBreak.at(x, y, radius, team.color);
+                Fx.shieldBreak.at(x, y, realRadius(), team.color);
             }
 
             if(hit > 0f){
