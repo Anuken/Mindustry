@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.net.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -41,6 +42,8 @@ public class ScriptMainGenerator{
 
         classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
         || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()));
+        classes.add(NetConnection.class);
+
         classes.distinct();
         classes.sortComparing(Class::getName);
         ObjectSet<String> used = ObjectSet.with();
@@ -53,11 +56,11 @@ public class ScriptMainGenerator{
             used.add(type.getPackage().getName());
         }
 
+        Log.info("Imported @ packages.", used.size);
+
         for(Class type : EventType.class.getClasses()){
             result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getName().replace('$', '.')).append("\n");
         }
-
-        //Log.info(result);
 
         new Fi("core/assets/scripts/global.js").writeString(result.toString());
     }
