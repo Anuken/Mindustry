@@ -327,6 +327,7 @@ public class Blocks implements ContentList{
 
         duneRocks = new StaticWall("dunerocks"){{
             variants = 2;
+            ignarock.asFloor().wall = this;
         }};
 
         sandRocks = new StaticWall("sandrocks"){{

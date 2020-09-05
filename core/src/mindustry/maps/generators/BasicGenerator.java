@@ -274,18 +274,20 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void inverseFloodFill(Tile start){
+        GridBits used = new GridBits(tiles.width, tiles.height);
+
         IntSeq arr = new IntSeq();
         arr.add(start.pos());
         while(!arr.isEmpty()){
             int i = arr.pop();
             int x = Point2.x(i), y = Point2.y(i);
-            tiles.getn(x, y).data = 2;
+            used.set(x, y);
             for(Point2 point : Geometry.d4){
                 int newx = x + point.x, newy = y + point.y;
                 if(tiles.in(newx, newy)){
                     Tile child = tiles.getn(newx, newy);
-                    if(child.block() == Blocks.air && child.data != 2){
-                        child.data = 2;
+                    if(child.block() == Blocks.air && !used.get(child.x, child.y)){
+                        used.set(child.x, child.y);
                         arr.add(child.pos());
                     }
                 }
@@ -293,7 +295,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         }
 
         for(Tile tile : tiles){
-            if(tile.data != 2 && tile.block() == Blocks.air){
+            if(!used.get(tile.x, tile.y) && tile.block() == Blocks.air){
                 tile.setBlock(tile.floor().wall);
             }
         }
