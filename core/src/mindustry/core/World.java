@@ -192,9 +192,7 @@ public class World{
             }
         }
 
-        if(!headless){
-            addDarkness(tiles);
-        }
+        addDarkness(tiles);
 
         Groups.resize(-finalWorldBounds, -finalWorldBounds, tiles.width * tilesize + finalWorldBounds * 2, tiles.height * tilesize + finalWorldBounds * 2);
 

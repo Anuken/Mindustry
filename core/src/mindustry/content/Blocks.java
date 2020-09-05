@@ -209,6 +209,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.slag;
             isLiquid = true;
             cacheLayer = CacheLayer.slag;
+            attributes.set(Attribute.heat, 0.85f);
         }};
 
         stone = new Floor("stone"){{
@@ -1131,6 +1132,7 @@ public class Blocks implements ContentList{
             powerProduction = 1.8f;
             generateEffect = Fx.redgeneratespark;
             size = 2;
+            floating = true;
         }};
 
         turbineGenerator = new BurnerGenerator("turbine-generator"){{

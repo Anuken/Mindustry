@@ -336,7 +336,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.laser;
 
                 bullet = new LaserBulletType(){{
-                    damage = 30f;
+                    damage = 40f;
                     recoil = 1f;
                     sideAngle = 45f;
                     sideWidth = 1f;
