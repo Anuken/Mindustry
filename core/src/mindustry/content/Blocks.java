@@ -768,14 +768,14 @@ public class Blocks implements ContentList{
         phaseWall = new Wall("phase-wall"){{
             requirements(Category.defense, with(Items.phasefabric, 6));
             health = 150 * wallHealthMultiplier;
-            flashWhite = deflect = true;
+            flashHit = deflect = true;
         }};
 
         phaseWallLarge = new Wall("phase-wall-large"){{
             requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
-            flashWhite = deflect = true;
+            flashHit = deflect = true;
         }};
 
         surgeWall = new Wall("surge-wall"){{
