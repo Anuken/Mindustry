@@ -40,7 +40,7 @@ public class Effect{
     }
 
     public Effect(float life, Cons<EffectContainer> renderer){
-        this(life, 28f, renderer);
+        this(life, 32f, renderer);
     }
 
     public Effect ground(){
@@ -89,6 +89,7 @@ public class Effect{
     public void render(int id, Color color, float life, float rotation, float x, float y, Object data){
         container.set(id, color, life, lifetime, rotation, x, y, data);
         Draw.z(ground ? Layer.debris : Layer.effect);
+        Draw.reset();
         renderer.get(container);
         Draw.reset();
     }

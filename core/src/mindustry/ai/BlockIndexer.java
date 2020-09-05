@@ -37,7 +37,7 @@ public class BlockIndexer{
     /** All ores available on this map. */
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
-    private Seq<Team> activeTeams = new Seq<>();
+    private Seq<Team> activeTeams = new Seq<>(Team.class);
     /** Maps teams to a map of flagged tiles by flag. */
     private TileArray[][] flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
     /** Max units by team. */
@@ -52,7 +52,7 @@ public class BlockIndexer{
     private Seq<Building> breturnArray = new Seq<>();
 
     public BlockIndexer(){
-        Events.on(BuildinghangeEvent.class, event -> {
+        Events.on(TileChangeEvent.class, event -> {
             if(typeMap.get(event.tile.pos()) != null){
                 TileIndex index = typeMap.get(event.tile.pos());
                 for(BlockFlag flag : index.flags){
@@ -73,6 +73,7 @@ public class BlockIndexer{
             damagedTiles = new BuildingArray[Team.all.length];
             flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
             unitCaps = new int[Team.all.length];
+            activeTeams = new Seq<>(Team.class);
 
             for(int i = 0; i < flagMap.length; i++){
                 for(int j = 0; j < BlockFlag.all.length; j++){
@@ -220,7 +221,10 @@ public class BlockIndexer{
     }
 
     public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
-        for(Team enemy : team.enemies()){
+        for(int i = 0; i < activeTeams.size; i++){
+            Team enemy = activeTeams.items[i];
+
+            if(enemy == team) continue;
 
             Building entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){

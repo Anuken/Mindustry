@@ -1,7 +1,7 @@
 package mindustry.ai.types;
 
 import mindustry.*;
-import mindustry.ai.Pathfinder.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -59,7 +59,7 @@ public class SuicideAI extends GroundAI{
 
         }else{
             if(core != null){
-                moveToCore(FlagTarget.enemyCores);
+                moveTo(Pathfinder.fieldCore);
             }
 
             if(unit.moving()) unit.lookAt(unit.vel().angle());

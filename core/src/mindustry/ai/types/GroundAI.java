@@ -1,10 +1,9 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import mindustry.ai.Pathfinder.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -35,14 +34,14 @@ public class GroundAI extends AIController{
                 if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
             }
 
-            if(move) moveToCore(FlagTarget.enemyCores);
+            if(move) moveTo(Pathfinder.fieldCore);
         }
 
         if(command() == UnitCommand.rally){
             Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
 
             if(target != null && !unit.within(target, 70f)){
-                moveToCore(FlagTarget.rallyPoints);
+                moveTo(Pathfinder.fieldRally);
             }
         }
 
@@ -74,40 +73,17 @@ public class GroundAI extends AIController{
         }*/
     }
 
-    protected void moveToCore(FlagTarget path){
-        Tile tile = unit.tileOn();
-        if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, unit.team, path);
-
-        if(tile == targetTile) return;
-
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
-    }
-
-    protected void moveAwayFromCore(){
-        Team enemy = null;
-        for(Team team : unit.team().enemies()){
-            if(team.active()){
-                enemy = team;
-                break;
-            }
-        }
-
-        if(enemy == null){
-            for(Team team : unit.team().enemies()){
-                enemy = team;
-                break;
-            }
-        }
-
-        if(enemy == null) return;
+    protected void moveTo(int pathType){
+        int costType =
+            unit instanceof Legsc ? Pathfinder.costLegs :
+            unit instanceof WaterMovec ? Pathfinder.costWater :
+            Pathfinder.costGround;
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, enemy, FlagTarget.enemyCores);
-        Building core = unit.closestCore();
+        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathType));
 
-        if(tile == targetTile || core == null || unit.within(core, 120f)) return;
+        if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
 
         unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }

@@ -19,9 +19,11 @@ public class Wall extends Block{
     public float lightningChance = -0.001f;
     public float lightningDamage = 20f;
     public int lightningLength = 17;
+    public Color lightningColor = Pal.surge;
 
     public float chanceDeflect = 10f;
-    public boolean flashWhite;
+    public boolean flashHit;
+    public Color flashColor = Color.white;
     public boolean deflect;
 
     public Wall(String name){
@@ -68,10 +70,10 @@ public class Wall extends Block{
             }
 
             //draw flashing white overlay if enabled
-            if(flashWhite){
+            if(flashHit){
                 if(hit < 0.0001f) return;
 
-                Draw.color(Color.white);
+                Draw.color(flashColor);
                 Draw.alpha(hit * 0.5f);
                 Draw.blend(Blending.additive);
                 Fill.rect(x, y, tilesize * size, tilesize * size);
@@ -91,7 +93,7 @@ public class Wall extends Block{
             //create lightning if necessary
             if(lightningChance > 0){
                 if(Mathf.chance(lightningChance)){
-                    Lightning.create(team, Pal.surge, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
+                    Lightning.create(team, lightningColor, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
                 }
             }
 

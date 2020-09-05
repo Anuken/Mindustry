@@ -327,6 +327,7 @@ public class Blocks implements ContentList{
 
         duneRocks = new StaticWall("dunerocks"){{
             variants = 2;
+            ignarock.asFloor().wall = this;
         }};
 
         sandRocks = new StaticWall("sandrocks"){{
@@ -767,14 +768,14 @@ public class Blocks implements ContentList{
         phaseWall = new Wall("phase-wall"){{
             requirements(Category.defense, with(Items.phasefabric, 6));
             health = 150 * wallHealthMultiplier;
-            flashWhite = deflect = true;
+            flashHit = deflect = true;
         }};
 
         phaseWallLarge = new Wall("phase-wall-large"){{
             requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
             health = 150 * 4 * wallHealthMultiplier;
             size = 2;
-            flashWhite = deflect = true;
+            flashHit = deflect = true;
         }};
 
         surgeWall = new Wall("surge-wall"){{
@@ -1086,14 +1087,14 @@ public class Blocks implements ContentList{
 
         powerNode = new PowerNode("power-node"){{
             requirements(Category.power, with(Items.copper, 1, Items.lead, 3));
-            maxNodes = 20;
+            maxNodes = 10;
             laserRange = 6;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
             requirements(Category.power, with(Items.titanium, 5, Items.lead, 10, Items.silicon, 3));
             size = 2;
-            maxNodes = 30;
+            maxNodes = 15;
             laserRange = 9.5f;
         }};
 
@@ -1504,7 +1505,7 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 4f;
+            force = 4.5f;
             scaledForce = 5.5f;
             range = 170f;
             damage = 0.1f;
@@ -1566,7 +1567,7 @@ public class Blocks implements ContentList{
             consumes.power(3f);
             size = 2;
             shootLength = 5f;
-            bulletDamage = 16f;
+            bulletDamage = 18f;
             reloadTime = 15f;
             health = 190 * size * size;
         }};
@@ -1791,6 +1792,7 @@ public class Blocks implements ContentList{
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.zenith, UnitTypes.antumbra, with(Items.silicon, 250, Items.titanium, 200, Items.plastanium, 200, Items.surgealloy, 100)),
                 new UpgradePlan(UnitTypes.spiroct, UnitTypes.arkyid, with(Items.silicon, 250, Items.titanium, 200, Items.plastanium, 200, Items.surgealloy, 100)),
+                new UpgradePlan(UnitTypes.fortress, UnitTypes.scepter, with(Items.silicon, 250, Items.titanium, 200, Items.plastanium, 200, Items.surgealloy, 100)),
             };
         }};
 
@@ -1805,6 +1807,7 @@ public class Blocks implements ContentList{
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.antumbra, UnitTypes.eclipse, with(Items.silicon, 500, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150)),
                 new UpgradePlan(UnitTypes.arkyid, UnitTypes.toxopid, with(Items.silicon, 500, Items.plastanium, 350, Items.surgealloy, 400, Items.phasefabric, 250)),
+                new UpgradePlan(UnitTypes.scepter, UnitTypes.reign, with(Items.silicon, 500, Items.plastanium, 350, Items.surgealloy, 400, Items.phasefabric, 250)),
             };
         }};
 

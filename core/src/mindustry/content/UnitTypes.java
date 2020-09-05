@@ -15,7 +15,7 @@ public class UnitTypes implements ContentList{
     //region definitions
 
     //ground
-    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, vestige, cataclyst;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
     //ground + builder
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova;
@@ -128,6 +128,114 @@ public class UnitTypes implements ContentList{
                     frontColor = Pal.bulletYellow;
                 }};
             }});
+        }};
+
+        scepter = new UnitType("scepter"){{
+            speed = 0.35f;
+            hitsize = 20f;
+            rotateSpeed = 2.1f;
+            targetAir = false;
+            health = 9000;
+            armor = 11f;
+            mechLegMoveScl = 1.3f;
+
+            weapons.add(
+            new Weapon("scepter-weapon"){{
+                y = 1f;
+                x = 16f;
+                shootY = 8f;
+                reload = 50f;
+                recoil = 5f;
+                shake = 2f;
+                ejectEffect = Fx.shellEjectBig;
+                shootSound = Sounds.artillery;
+                shots = 3;
+                inaccuracy = 3f;
+                shotDelay = 4f;
+
+                bullet = new BasicBulletType(7f, 40){{
+                    width = 11f;
+                    height = 20f;
+                    lifetime = 25f;
+                    shootEffect = Fx.shootBig;
+                    lightning = 2;
+                    lightningLength = 6;
+                    lightningColor = Pal.surge;
+                    //standard bullet damage is far too much for lightning
+                    lightningDamage = 17;
+                }};
+            }},
+
+            new Weapon("mount-weapon"){{
+                reload = 13f;
+                x = 8.5f;
+                y = 6f;
+                rotate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+            }},
+            new Weapon("mount-weapon"){{
+                reload = 16f;
+                x = 8.5f;
+                y = -7f;
+                rotate = true;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.standardCopper;
+            }}
+
+            );
+        }};
+
+        reign = new UnitType("reign"){{
+            speed = 0.35f;
+            hitsize = 26f;
+            rotateSpeed = 1.65f;
+            targetAir = false;
+            health = 24000;
+            armor = 14f;
+            mechLegMoveScl = 1.75f;
+
+            weapons.add(
+            new Weapon("reign-weapon"){{
+                y = 1f;
+                x = 21.5f;
+                shootY = 11f;
+                reload = 9f;
+                recoil = 5f;
+                shake = 4f;
+                ejectEffect = Fx.shellEjectBig;
+                shootSound = Sounds.artillery;
+
+                bullet = new BasicBulletType(13f, 45){{
+                    pierce = true;
+                    width = 14f;
+                    height = 32f;
+                    lifetime = 15f;
+                    shootEffect = Fx.shootBig;
+                    fragVelocityMin = 0.4f;
+
+                    hitEffect = Fx.blastExplosion;
+                    splashDamage = 18f;
+                    splashDamageRadius = 30f;
+
+                    fragBullets = 2;
+                    fragLifeMin = 0f;
+                    fragCone = 30f;
+
+                    fragBullet = new BasicBulletType(9f, 15){{
+                        width = 10f;
+                        height = 10f;
+                        pierce = true;
+
+                        lifetime = 20f;
+                        hitEffect = Fx.flakExplosion;
+                        splashDamage = 15f;
+                        splashDamageRadius = 15f;
+                    }};
+                }};
+            }}
+
+            );
         }};
 
         //endregion

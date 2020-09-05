@@ -468,6 +468,17 @@ public class EntityProcess extends BaseProcessor{
                                 mbuilder.addStatement("$L = $L", field.name(), field.name() + EntityIO.targetSuf);
                             }
                         }
+
+                        //SPECIAL CASE: method to snap to current position so interpolation doesn't go wild
+                        if(first.name().equals("snapInterpolation")){
+                            mbuilder.addStatement("updateSpacing = 16");
+                            mbuilder.addStatement("lastUpdated = $T.millis()", Time.class);
+                            for(Svar field : syncedFields){
+                                //reset last+current state to target position
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.lastSuf, field.name());
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.targetSuf, field.name());
+                            }
+                        }
                     }
 
                     for(Smethod elem : entry.value){

@@ -348,6 +348,7 @@ public class MapGenerateDialog extends BaseDialog{
 
         result = executor.submit(() -> {
             try{
+                world.setGenerating(true);
                 generating = true;
 
                 if(!filters.isEmpty()){
@@ -400,7 +401,7 @@ public class MapGenerateDialog extends BaseDialog{
                 generating = false;
                 e.printStackTrace();
             }
-            return null;
+            world.setGenerating(false);
         });
     }
 

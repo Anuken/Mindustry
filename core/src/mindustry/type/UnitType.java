@@ -62,6 +62,7 @@ public class UnitType extends UnlockableContent{
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
+    public float mechLegMoveScl = 1f;
 
     public int itemCapacity = 30;
     public int ammoCapacity = 220;
@@ -254,8 +255,8 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unit unit){
-        Mechc legs = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer;
+        Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
+        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitsize/4000f, 0, 0.01f);
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
@@ -268,11 +269,11 @@ public class UnitType extends UnlockableContent{
 
         Draw.z(z - 0.02f);
 
-        if(legs != null){
-            drawMech((Unit & Mechc)legs);
+        if(mech != null){
+            drawMech((Unit & Mechc)mech);
 
-            float ft = Mathf.sin(legs.walkTime(), 3f, 3f);
-            legOffset.trns(legs.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation));
+            float ft = Mathf.sin(mech.walkTime(), 3f * mechLegMoveScl, 3f);
+            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation));
             unit.trns(legOffset.x, legOffset.y);
         }
 
@@ -300,7 +301,7 @@ public class UnitType extends UnlockableContent{
             drawShield(unit);
         }
 
-        if(legs != null){
+        if(mech != null){
             unit.trns(-legOffset.x, -legOffset.y);
         }
 
@@ -478,6 +479,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public <T extends Unit & Legsc> void drawLegs(T unit){
+        applyColor(unit);
 
         Leg[] legs = unit.legs();
 
@@ -539,7 +541,7 @@ public class UnitType extends UnlockableContent{
         Draw.mixcol(Color.white, unit.hitTime);
 
         float e = unit.elevation;
-        float sin = Mathf.lerp(Mathf.sin(unit.walkTime(), 3f, 1f), 0f, e);
+        float sin = Mathf.lerp(Mathf.sin(unit.walkTime(), 3f * mechLegMoveScl, 1f), 0f, e);
         float ft = sin*(2.5f + (unit.hitSize-8f)/2f);
         float boostTrns = e * 2f;
 
@@ -570,6 +572,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void applyColor(Unit unit){
+        Draw.color();
         Draw.mixcol(Color.white, unit.hitTime);
         if(unit.drownTime > 0 && unit.floorOn().isDeep()){
             Draw.mixcol(unit.floorOn().mapColor, unit.drownTime * 0.8f);

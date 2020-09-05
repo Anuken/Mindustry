@@ -33,6 +33,11 @@ public class ShrapnelBulletType extends BulletType{
     }
 
     @Override
+    public float range(){
+        return length;
+    }
+
+    @Override
     public void draw(Bullet b){
         float realLength = b.fdata;
 

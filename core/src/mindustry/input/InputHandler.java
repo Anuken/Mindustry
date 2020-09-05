@@ -242,7 +242,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
         }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated() && !unit.dead){
-            player.unit(unit);
+            if(!net.client()){
+                player.unit(unit);
+            }
+
             Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
                 Fx.unitSpirit.at(player.x, player.y, 0f, unit);

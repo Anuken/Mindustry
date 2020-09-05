@@ -181,6 +181,12 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public boolean canPickup(){
+            //cores can never be picked up
+            return false;
+        }
+
+        @Override
         public void drawLight(){
             Drawf.light(team, x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
         }
