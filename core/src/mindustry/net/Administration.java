@@ -93,6 +93,13 @@ public class Administration{
                     if(rate.occurences > Config.interactRateKick.num()){
                         action.player.kick("You are interacting with too many blocks.", 1000 * 30);
                     }else if(action.player.getInfo().messageTimer.get(60f * 2f)){
+
+                        //I don't know what causes this so I'll make it log an error instead
+                        new Exception("!!REPORT TO ANUKE: " + action.player.name + " was (likely) incorrectly ratelimited. " +
+                            "action=" + action.type +
+                            " player=" + action.player.name + "#" + action.player.id +
+                            " tile=" + action.tile).printStackTrace();
+
                         action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
                     }
 
