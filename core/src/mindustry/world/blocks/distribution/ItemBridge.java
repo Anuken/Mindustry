@@ -41,7 +41,6 @@ public class ItemBridge extends Block{
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
-        canOverdrive = false;
         noUpdateDisabled = true;
 
         //point2 config is relative

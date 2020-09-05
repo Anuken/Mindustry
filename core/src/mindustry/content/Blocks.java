@@ -1086,14 +1086,14 @@ public class Blocks implements ContentList{
 
         powerNode = new PowerNode("power-node"){{
             requirements(Category.power, with(Items.copper, 1, Items.lead, 3));
-            maxNodes = 20;
+            maxNodes = 10;
             laserRange = 6;
         }};
 
         powerNodeLarge = new PowerNode("power-node-large"){{
             requirements(Category.power, with(Items.titanium, 5, Items.lead, 10, Items.silicon, 3));
             size = 2;
-            maxNodes = 30;
+            maxNodes = 15;
             laserRange = 9.5f;
         }};
 
