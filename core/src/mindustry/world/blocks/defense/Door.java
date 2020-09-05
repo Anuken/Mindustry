@@ -23,6 +23,7 @@ public class Door extends Wall{
     public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;
     public Effect closefx = Fx.doorclose;
+    public Sound doorSound = Sounds.door;
     public @Load("@-open") TextureRegion openRegion;
 
     public Door(String name){
@@ -32,7 +33,7 @@ public class Door extends Wall{
         consumesTap = true;
 
         config(Boolean.class, (DoorBuild base, Boolean open) -> {
-            Sounds.door.at(base);
+            doorSound.at(base);
 
             for(DoorBuild entity : base.chained){
                 //skip doors with things in them
