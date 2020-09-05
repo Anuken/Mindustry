@@ -13,7 +13,10 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
@@ -34,6 +37,10 @@ public class PointDefenseTurret extends Block{
     public float shootCone = 5f;
     public float bulletDamage = 10f;
     public float shootLength = 3f;
+    /** How much reload is lowered by for each unit of liquid of heat capacity. */
+    public float coolantMultiplier = 5f;
+    /** Effect displayed when coolant is used. */
+    public Effect coolEffect = Fx.fuelburn;
 
     public PointDefenseTurret(String name){
         super(name);
@@ -58,6 +65,16 @@ public class PointDefenseTurret extends Block{
 
         stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
         stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
+
+        stats.add(BlockStat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
+    }
+
+    @Override
+    public void init(){
+        hasLiquids = true;
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
+
+        super.init();
     }
 
     public class PointDefenseEntity extends Building{
@@ -96,6 +113,8 @@ public class PointDefenseTurret extends Block{
             }else{
                 target = null;
             }
+
+            updateCooling();
         }
 
         @Override
@@ -107,6 +126,20 @@ public class PointDefenseTurret extends Block{
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.rect(region, x, y, rotation - 90);
+        }
+
+        protected void updateCooling(){
+            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+
+            Liquid liquid = liquids.current();
+
+            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity));
+            reload -= used * liquid.heatCapacity * coolantMultiplier;
+            liquids.remove(liquid, used);
+
+            if(Mathf.chance(0.06 * used)){
+                coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+            }
         }
 
         @Override

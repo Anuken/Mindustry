@@ -7,11 +7,15 @@ import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
@@ -31,6 +35,10 @@ public class TractorBeamTurret extends Block{
     public float scaledForce = 0f;
     public float damage = 0f;
     public boolean targetAir = true, targetGround = false;
+    /** How much reload is lowered by for each unit of liquid of heat capacity. */
+    public float coolantMultiplier = 5f;
+    /** Effect displayed when coolant is used. */
+    public Effect coolEffect = Fx.fuelburn;
 
     public TractorBeamTurret(String name){
         super(name);
@@ -58,6 +66,16 @@ public class TractorBeamTurret extends Block{
         stats.add(BlockStat.targetsAir, targetAir);
         stats.add(BlockStat.targetsGround, targetGround);
         stats.add(BlockStat.damage, damage * 60f, StatUnit.perSecond);
+
+        stats.add(BlockStat.booster, new BoosterListValue(1f, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
+    }
+
+    @Override
+    public void init(){
+        hasLiquids = true;
+        consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
+
+        super.init();
     }
 
     public class TractorBeamEntity extends Building{
@@ -95,6 +113,27 @@ public class TractorBeamTurret extends Block{
                 target = null;
                 strength = Mathf.lerpDelta(strength, 0, 0.1f);
             }
+        }
+
+        @Override
+        public float efficiency() {
+            return super.efficiency() * currentCoolantMultiplier();
+        }
+
+        protected float currentCoolantMultiplier(){
+            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+
+            Liquid liquid = liquids.current();
+
+            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, (1f / coolantMultiplier) / liquid.heatCapacity));
+            
+            liquids.remove(liquid, used);
+
+            if(Mathf.chance(0.06 * used)){
+                coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+            }
+
+            return 1f + (used * liquid.heatCapacity * coolantMultiplier);
         }
 
         @Override
