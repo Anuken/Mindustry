@@ -1792,6 +1792,7 @@ public class Blocks implements ContentList{
             upgrades = new UnitType[][]{
                 {UnitTypes.zenith, UnitTypes.antumbra},
                 {UnitTypes.spiroct, UnitTypes.arkyid},
+                {UnitTypes.fortress, UnitTypes.scepter},
             };
         }};
 
@@ -1809,6 +1810,7 @@ public class Blocks implements ContentList{
             upgrades = new UnitType[][]{
                 {UnitTypes.antumbra, UnitTypes.eclipse},
                 {UnitTypes.arkyid, UnitTypes.toxopid},
+                {UnitTypes.scepter, UnitTypes.reign},
             };
         }};
 
