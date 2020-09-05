@@ -200,36 +200,36 @@ public class UnitTypes implements ContentList{
                 y = 1f;
                 x = 21.5f;
                 shootY = 11f;
-                reload = 18f;
+                reload = 9f;
                 recoil = 5f;
                 shake = 4f;
                 ejectEffect = Fx.shellEjectBig;
                 shootSound = Sounds.artillery;
 
-                bullet = new BasicBulletType(13f, 80){{
+                bullet = new BasicBulletType(13f, 45){{
                     pierce = true;
-                    width = 11f;
-                    height = 30f;
+                    width = 14f;
+                    height = 32f;
                     lifetime = 15f;
                     shootEffect = Fx.shootBig;
                     fragVelocityMin = 0.4f;
 
                     hitEffect = Fx.blastExplosion;
-                    splashDamage = 25f;
+                    splashDamage = 18f;
                     splashDamageRadius = 30f;
 
                     fragBullets = 2;
                     fragLifeMin = 0f;
                     fragCone = 30f;
 
-                    fragBullet = new BasicBulletType(9f, 10){{
+                    fragBullet = new BasicBulletType(9f, 15){{
                         width = 10f;
                         height = 10f;
                         pierce = true;
 
                         lifetime = 20f;
                         hitEffect = Fx.flakExplosion;
-                        splashDamage = 23f;
+                        splashDamage = 15f;
                         splashDamageRadius = 15f;
                     }};
                 }};
