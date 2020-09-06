@@ -61,7 +61,7 @@ public class TractorBeamTurret extends Block{
         stats.add(BlockStat.damage, damage * 60f, StatUnit.perSecond);
     }
 
-    public class TractorBeamEntity extends Building{
+    public class TractorBeamBuild extends Building{
         public float rotation = 90;
         public @Nullable Unit target;
         public float lastX, lastY, strength;

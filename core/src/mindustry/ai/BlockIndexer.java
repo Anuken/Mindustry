@@ -148,7 +148,7 @@ public class BlockIndexer{
 
         BuildingArray set = damagedTiles[team.id];
         for(Building build : set){
-            if((!build.isValid() || build.team != team || !build.damaged()) || build.block instanceof BuildBlock){
+            if((!build.isValid() || build.team != team || !build.damaged()) || build.block instanceof ConstructBlock){
                 breturnArray.add(build);
             }
         }

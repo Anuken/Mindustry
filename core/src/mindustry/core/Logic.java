@@ -15,7 +15,7 @@ import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
@@ -41,9 +41,9 @@ public class Logic implements ApplicationListener{
             //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
             if(tile.build == null || !tile.block().rebuildable || net.client()) return;
 
-            if(block instanceof BuildBlock){
+            if(block instanceof ConstructBlock){
 
-                BuildEntity entity = tile.bc();
+                ConstructBuild entity = tile.bc();
 
                 //update block to reflect the fact that something was being constructed
                 if(entity.cblock != null && entity.cblock.synthetic()){

@@ -60,7 +60,7 @@ public class PointDefenseTurret extends Block{
         stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
     }
 
-    public class PointDefenseEntity extends Building{
+    public class PointDefenseBuild extends Building{
         public float rotation = 90, reload;
         public @Nullable Bullet target;
 

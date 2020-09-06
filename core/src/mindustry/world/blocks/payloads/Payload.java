@@ -6,7 +6,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public interface Payload{
     int payloadUnit = 0, payloadBlock = 1;
@@ -27,7 +27,7 @@ public interface Payload{
 
     /** @return whether this payload fits on a standard 3x3 conveyor. */
     default boolean fits(){
-        return true;
+        return size() / tilesize <= 2.4f;
     }
 
     /** writes the payload for saving. */

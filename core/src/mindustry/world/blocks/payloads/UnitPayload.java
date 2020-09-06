@@ -16,11 +16,6 @@ public class UnitPayload implements Payload{
     }
 
     @Override
-    public boolean fits(){
-        return unit.hitSize <= 16f;
-    }
-
-    @Override
     public void write(Writes write){
         write.b(payloadUnit);
         write.b(unit.classId());

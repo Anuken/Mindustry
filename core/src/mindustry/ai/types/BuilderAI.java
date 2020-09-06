@@ -5,7 +5,7 @@ import mindustry.entities.units.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.world.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -26,7 +26,7 @@ public class BuilderAI extends AIController{
             BuildPlan req = builder.buildPlan();
 
             boolean valid =
-                (req.tile().build instanceof BuildEntity && req.tile().<BuildEntity>bc().cblock == req.block) ||
+                (req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
                 (req.breaking ?
                     Build.validBreak(unit.team(), req.x, req.y) :
                     Build.validPlace(req.block, unit.team(), req.x, req.y, req.rotation));

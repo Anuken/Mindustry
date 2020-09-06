@@ -27,7 +27,7 @@ public class ShockMine extends Block{
         rebuildable = false;
     }
 
-    public class ShockMineEntity extends Building{
+    public class ShockMineBuild extends Building{
 
         @Override
         public void drawTeam(){

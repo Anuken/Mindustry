@@ -23,28 +23,29 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class BuildBlock extends Block{
+/** A block in the process of construction. */
+public class ConstructBlock extends Block{
     public static final int maxSize = 16;
-    private static final BuildBlock[] buildBlocks = new BuildBlock[maxSize];
+    private static final ConstructBlock[] consBlocks = new ConstructBlock[maxSize];
 
     private static long lastTime = 0;
     private static int pitchSeq = 0;
     private static long lastPlayed;
 
-    public BuildBlock(int size){
+    public ConstructBlock(int size){
         super("build" + size);
         this.size = size;
         update = true;
         health = 20;
         consumesTap = true;
         solidifes = true;
-        buildBlocks[size - 1] = this;
+        consBlocks[size - 1] = this;
     }
 
     /** Returns a BuildBlock by size. */
-    public static BuildBlock get(int size){
-        if(size > maxSize) throw new IllegalArgumentException("No. Don't place BuildBlocks of size greater than " + maxSize);
-        return buildBlocks[size - 1];
+    public static ConstructBlock get(int size){
+        if(size > maxSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxSize);
+        return consBlocks[size - 1];
     }
 
     @Remote(called = Loc.server)
@@ -117,7 +118,7 @@ public class BuildBlock extends Block{
         return true;
     }
 
-    public class BuildEntity extends Building{
+    public class ConstructBuild extends Building{
         /**
          * The recipe of the block that is being constructed.
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.

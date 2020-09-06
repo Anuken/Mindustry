@@ -31,7 +31,7 @@ import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -405,7 +405,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean requestMatches(BuildPlan request){
         Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>bc().cblock == request.block;
+        return tile != null && tile.block() instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){

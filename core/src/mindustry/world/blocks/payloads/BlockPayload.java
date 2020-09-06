@@ -40,11 +40,6 @@ public class BlockPayload implements Payload{
     }
 
     @Override
-    public boolean fits(){
-        return entity.block().size < 3;
-    }
-
-    @Override
     public void write(Writes write){
         write.b(payloadBlock);
         write.s(entity.block().id);

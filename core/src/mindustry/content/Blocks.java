@@ -131,8 +131,8 @@ public class Blocks implements ContentList{
 
         //Registers build blocks
         //no reference is needed here since they can be looked up by name later
-        for(int i = 1; i <= BuildBlock.maxSize; i++){
-            new BuildBlock(i);
+        for(int i = 1; i <= ConstructBlock.maxSize; i++){
+            new ConstructBlock(i);
         }
 
         deepwater = new Floor("deepwater"){{
@@ -1513,7 +1513,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 10;
             range = 85f;
 
-            consumes.powerCond(3f, (TractorBeamEntity e) -> e.target != null);
+            consumes.powerCond(3f, (TractorBeamBuild e) -> e.target != null);
         }};
 
         swarmer = new ItemTurret("swarmer"){{

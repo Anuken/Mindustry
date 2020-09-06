@@ -16,7 +16,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 
 import java.util.*;
 
@@ -74,7 +74,7 @@ abstract class BuilderComp implements Unitc{
             rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
         }
 
-        if(!(tile.block() instanceof BuildBlock)){
+        if(!(tile.block() instanceof ConstructBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
                 boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
@@ -94,18 +94,18 @@ abstract class BuilderComp implements Unitc{
             return;
         }
 
-        if(tile.build instanceof BuildEntity && !current.initialized){
+        if(tile.build instanceof ConstructBuild && !current.initialized){
             Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team(), (Builderc)this, current.breaking)));
             current.initialized = true;
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !infinite) || !(tile.build instanceof BuildEntity)){
+        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild)){
             return;
         }
 
         //otherwise, update it.
-        BuildEntity entity = tile.bc();
+        ConstructBuild entity = tile.bc();
 
         if(current.breaking){
             entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
@@ -179,8 +179,8 @@ abstract class BuilderComp implements Unitc{
             plans.remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
-        if(tile != null && tile.build instanceof BuildEntity){
-            place.progress = tile.<BuildEntity>bc().progress;
+        if(tile != null && tile.build instanceof ConstructBuild){
+            place.progress = tile.<ConstructBuild>bc().progress;
         }
         if(tail){
             plans.addLast(place);
