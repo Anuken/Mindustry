@@ -81,6 +81,16 @@ public class LAssembler{
 
             if(index++ > max) break;
 
+            int indent = 0;
+            for(int i = 0; i < line.length(); i++){
+                if(!(line.charAt(i) == '\t') || line.charAt(i) == ' ')) break;
+                indent++;
+            }
+
+            if(indent > 0){
+                line = line.substring(indent);
+            }
+            
             try{
                 String[] arr;
 
