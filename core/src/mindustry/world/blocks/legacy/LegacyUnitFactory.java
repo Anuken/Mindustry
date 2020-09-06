@@ -13,7 +13,7 @@ public class LegacyUnitFactory extends LegacyBlock{
         solid = false;
     }
 
-    public class LegacyUnitFactoryEntity extends Building{
+    public class LegacyUnitFactoryBuild extends Building{
 
         @Override
         public void read(Reads read, byte revision){

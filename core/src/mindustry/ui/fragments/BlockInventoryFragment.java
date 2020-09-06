@@ -31,12 +31,12 @@ public class BlockInventoryFragment extends Fragment{
     private static final float holdWithdraw = 20f;
     private static final float holdShrink = 120f;
 
-    private Table table = new Table();
-    private Building tile;
-    private float holdTime = 0f, emptyTime;
-    private boolean holding;
-    private float[] shrinkHoldTimes = new float[content.items().size];
-    private Item lastItem;
+    Table table = new Table();
+    Building tile;
+    float holdTime = 0f, emptyTime;
+    boolean holding;
+    float[] shrinkHoldTimes = new float[content.items().size];
+    Item lastItem;
 
     {
         Events.on(WorldLoadEvent.class, e -> hide());

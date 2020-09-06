@@ -36,7 +36,11 @@ public class MinimapRenderer implements Disposable{
         });
 
         //make sure to call on the graphics thread
-        Events.on(BuildinghangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
+        Events.on(TileChangeEvent.class, event -> {
+            if(!ui.editor.isShown()){
+                update(event.tile);
+            }
+        });
     }
 
     public Pixmap getPixmap(){
@@ -172,7 +176,7 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void drawLabel(float x, float y, String text, Color color){
-        BitmapFont font = Fonts.outline;
+        Font font = Fonts.outline;
         GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.getData().setScale(1 / 1.5f / Scl.scl(1f));

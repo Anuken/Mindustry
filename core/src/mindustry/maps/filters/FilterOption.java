@@ -58,7 +58,7 @@ public abstract class FilterOption{
         @Override
         public void build(Table table){
             if(!display){
-                table.add("$filter.option." + name);
+                table.add("@filter.option." + name);
             }else{
                 table.label(() -> Core.bundle.get("filter.option." + name) + ": " + (int)getter.get());
             }
@@ -107,7 +107,7 @@ public abstract class FilterOption{
                 dialog.show();
             }).pad(4).margin(12f);
 
-            table.add("$filter.option." + name);
+            table.add("@filter.option." + name);
         }
     }
 }

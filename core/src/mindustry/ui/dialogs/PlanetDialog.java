@@ -11,7 +11,6 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.core.*;
@@ -31,19 +30,21 @@ import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private final FrameBuffer buffer = new FrameBuffer(2, 2, true);
-    private final PlanetRenderer planets = renderer.planets;
+    final PlanetRenderer planets = renderer.planets;
     private final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
     private final Table stable  = new Table().background(Styles.black3);
 
     private int launchRange;
     private float zoom = 1f, selectAlpha = 1f;
-    private @Nullable Sector selected, hovered, launchSector;
-    private CoreEntity launcher;
-    private Mode mode = look;
+    @Nullable Sector selected, hovered, launchSector;
+    private CoreBuild launcher;
+    Mode mode = look;
     private boolean launching;
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
+
+        shouldPause = true;
 
         getCell(buttons).padBottom(-4);
         buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
@@ -85,18 +86,21 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public Dialog show(){
         mode = look;
         selected = hovered = launchSector = null;
-        launching= false;
+        launching = false;
+        if(planets.planet.getLastSector() != null){
+            lookAt(planets.planet.getLastSector());
+        }
         return super.show();
     }
 
-    public void show(Sector sector, CoreEntity launcher){
+    public void show(Sector sector, CoreBuild launcher){
         this.launcher = launcher;
         selected = null;
         hovered = null;
         launching = false;
 
         //update view to sector
-        planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
+        lookAt(sector);
         zoom = 1f;
         planets.zoom = 2f;
         selectAlpha = 0f;
@@ -108,11 +112,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         super.show();
     }
 
+    private void lookAt(Sector sector){
+        planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
+    }
+
     boolean canLaunch(Sector sector){
         return mode == launch &&
             (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
-            //TODO completely untested
-            || (sector.preset != null && sector.preset.unlocked() && sector.preset.requirements.contains(r -> r.zone() != null && r.zone() == sector.preset))); //is an unlocked preset
+            || (sector.preset != null && sector.preset.unlocked())); //is an unlocked preset
     }
 
     @Override
@@ -284,7 +291,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     //TODO localize
-    private void updateSelected(){
+    void updateSelected(){
         Sector sector = selected;
 
         if(sector == null){
@@ -342,32 +349,20 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 t.left();
 
                 t.table(res -> {
-                    ObjectIntMap<Item> map = sector.save.meta.secinfo.getCurrentItems(sector);
+                    ItemSeq items = sector.calculateItems();
 
                     int i = 0;
-                    for(Item item : content.items()){
-                        int amount = Math.min(map.get(item), sector.save.meta.secinfo.storageCapacity);
-                        if(amount > 0){
-                            res.image(item.icon(Cicon.small)).padRight(3);
-                            res.add(UI.formatAmount(amount)).color(Color.lightGray);
-                            if(++i % 2 == 0){
-                                res.row();
-                            }
+                    for(ItemStack stack : items){
+                        res.image(stack.item.icon(Cicon.small)).padRight(3);
+                        res.add(UI.formatAmount(stack.amount)).color(Color.lightGray);
+                        if(++i % 2 == 0){
+                            res.row();
                         }
                     }
                 });
 
             }).row();
         }
-
-        //display how many turns this sector has been attacked
-        //TODO implement properly
-        /*
-        if(sector.getTurnsPassed() > 0 && sector.hasBase()){
-            stable.row();
-
-            stable.add("[scarlet]" + Iconc.warning + " " + sector.getTurnsPassed() + "x attacks");
-        }*/
 
         stable.row();
 

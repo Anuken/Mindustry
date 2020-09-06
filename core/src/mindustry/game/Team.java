@@ -36,12 +36,12 @@ public class Team implements Comparable<Team>{
         blue = new Team(5, "blue", Color.royal.cpy());
 
     static{
-        Mathf.random.setSeed(8);
+        Mathf.rand.setSeed(8);
         //create the whole 256 placeholder teams
         for(int i = 6; i < all.length; i++){
             new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.6f, 1f), 100f * Mathf.random(0.8f, 1f), 1f));
         }
-        Mathf.random.setSeed(new Rand().nextLong());
+        Mathf.rand.setSeed(new Rand().nextLong());
     }
 
     public static Team get(int id){
@@ -91,7 +91,7 @@ public class Team implements Comparable<Team>{
         return state.teams.get(this);
     }
 
-    public @Nullable CoreEntity core(){
+    public @Nullable CoreBuild core(){
         return data().core();
     }
 
@@ -103,7 +103,7 @@ public class Team implements Comparable<Team>{
         return state.teams.areEnemies(this, other);
     }
 
-    public Seq<CoreEntity> cores(){
+    public Seq<CoreBuild> cores(){
         return state.teams.cores(this);
     }
 

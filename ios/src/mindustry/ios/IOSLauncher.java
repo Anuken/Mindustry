@@ -236,10 +236,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             ui.load.runLoadSave(slot);
                         }
                     }catch(IOException e){
-                        ui.showException("$save.import.fail", e);
+                        ui.showException("@save.import.fail", e);
                     }
                 }else{
-                    ui.showErrorMessage("$save.import.invalid");
+                    ui.showErrorMessage("@save.import.invalid");
                 }
 
             }

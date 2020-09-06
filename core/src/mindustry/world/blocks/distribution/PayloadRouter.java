@@ -24,7 +24,7 @@ public class PayloadRouter extends PayloadConveyor{
         Draw.rect(overRegion, req.drawx(), req.drawy());
     }
 
-    public class PayloadRouterEntity extends PayloadConveyorEntity{
+    public class PayloadRouterBuild extends PayloadConveyorBuild{
         public float smoothRot;
 
         @Override
@@ -37,7 +37,7 @@ public class PayloadRouter extends PayloadConveyor{
         public void moved(){
             int rotations = 0;
             do{
-                tile.rotation((tile.rotation() + 1) % 4);
+                rotation = (rotation + 1) % 4;
                 onProximityUpdate();
             }while((blocked || next == null) && ++rotations < 4);
         }

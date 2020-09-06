@@ -5,17 +5,19 @@ import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
 public class WaveSpawner{
-    private static final float margin = 40f, coreMargin = tilesize * 3; //how far away from the edge flying units spawn
+    private static final float margin = 40f, coreMargin = tilesize * 3.5f;
 
     private Seq<Tile> spawns = new Seq<>();
     private boolean spawning = false;
@@ -41,6 +43,8 @@ public class WaveSpawner{
         spawning = true;
 
         for(SpawnGroup group : state.rules.spawns){
+            if(group.type == null) continue;
+
             int spawned = group.getUnitsSpawned(state.wave - 1);
 
             if(group.type.flying){
@@ -87,7 +91,7 @@ public class WaveSpawner{
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
             Building firstCore = state.teams.playerCores().first();
             for(Building core : state.rules.waveTeam.cores()){
-                Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block().size * tilesize);
+                Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block().size * tilesize /2f * Mathf.sqrt2);
                 cons.accept(core.x + Tmp.v1.x, core.y + Tmp.v1.y, false);
             }
         }
@@ -95,7 +99,7 @@ public class WaveSpawner{
 
     private void eachFlyerSpawn(Floatc2 cons){
         for(Tile tile : spawns){
-            float angle = Angles.angle(tile.x, tile.y, world.width() / 2, world.height() / 2);
+            float angle = Angles.angle(world.width() / 2, world.height() / 2, tile.x, tile.y);
 
             float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
             float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
@@ -125,14 +129,18 @@ public class WaveSpawner{
     }
 
     private void spawnEffect(Unit unit){
-        Fx.unitSpawn.at(unit.x(), unit.y(), 0f, unit);
-        Time.run(30f, () -> {
-            unit.add();
-            Fx.spawn.at(unit);
-        });
+        Call.spawnEffect(unit.x, unit.y, unit.type());
+        Time.run(30f, unit::add);
     }
 
     private interface SpawnConsumer{
         void accept(float x, float y, boolean shockwave);
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
+    public static void spawnEffect(float x, float y, UnitType type){
+        Fx.unitSpawn.at(x, y, 0f, type);
+
+        Time.run(30f, () -> Fx.spawn.at(x, y));
     }
 }

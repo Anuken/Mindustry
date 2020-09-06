@@ -72,18 +72,6 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void rotation(int rotation){
-        if(state.isGame()){
-            super.rotation(rotation);
-            return;
-        }
-
-        if(rotation == rotation()) return;
-        op(OpType.rotation, rotation());
-        super.rotation(rotation);
-    }
-
-    @Override
     public void setOverlay(Block overlay){
         if(state.isGame()){
             super.setOverlay(overlay);
@@ -109,9 +97,9 @@ public class EditorTile extends Tile{
     }
     
     @Override
-    protected void changeEntity(Team team, Prov<Building> entityprov){
+    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
         if(state.isGame()){
-            super.changeEntity(team, entityprov);
+            super.changeEntity(team, entityprov, rotation);
             return;
         }
 
@@ -123,7 +111,7 @@ public class EditorTile extends Tile{
         Block block = block();
 
         if(block.hasEntity()){
-            build = entityprov.get().init(this, team, false);
+            build = entityprov.get().init(this, team, false, rotation);
             build.cons(new ConsumeModule(build));
             if(block.hasItems) build.items = new ItemModule();
             if(block.hasLiquids) build.liquids(new LiquidModule());

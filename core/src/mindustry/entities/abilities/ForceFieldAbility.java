@@ -1,5 +1,6 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -30,6 +31,7 @@ public class ForceFieldAbility implements Ability{
             //break shield
             if(paramUnit.shield <= trait.damage()){
                 paramUnit.shield -= cooldown * regen;
+
                 Fx.shieldBreak.at(paramUnit.x, paramUnit.y, radius, paramUnit.team.color);
             }
 
@@ -70,8 +72,18 @@ public class ForceFieldAbility implements Ability{
 
         if(unit.shield > 0){
             Draw.z(Layer.shields);
+
             Draw.color(unit.team.color, Color.white, Mathf.clamp(unit.shieldAlpha));
-            Fill.poly(unit.x, unit.y, 6, realRad);
+
+            if(Core.settings.getBool("animatedshields")){
+                Fill.poly(unit.x, unit.y, 6, realRad);
+            }else{
+                Lines.stroke(1.5f);
+                Draw.alpha(0.09f);
+                Fill.poly(unit.x, unit.y, 6, radius);
+                Draw.alpha(1f);
+                Lines.poly(unit.x, unit.y, 6, radius);
+            }
         }
     }
 

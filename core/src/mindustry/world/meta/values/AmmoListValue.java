@@ -51,27 +51,27 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 }
 
                 if((type.status == StatusEffects.burning || type.status == StatusEffects.melting) || type.incendAmount > 0){
-                    sep(bt, "$bullet.incendiary");
+                    sep(bt, "@bullet.incendiary");
                 }
 
                 if(type.status == StatusEffects.freezing){
-                    sep(bt, "$bullet.freezing");
+                    sep(bt, "@bullet.freezing");
                 }
 
                 if(type.status == StatusEffects.tarred){
-                    sep(bt, "$bullet.tarred");
+                    sep(bt, "@bullet.tarred");
                 }
 
                 if(type.homingPower > 0.01f){
-                    sep(bt, "$bullet.homing");
+                    sep(bt, "@bullet.homing");
                 }
 
                 if(type.lightning > 0){
-                    sep(bt, "$bullet.shock");
+                    sep(bt, "@bullet.shock");
                 }
 
                 if(type.fragBullet != null){
-                    sep(bt, "$bullet.frag");
+                    sep(bt, "@bullet.frag");
                 }
             }).left().padTop(-9);
             table.row();

@@ -29,13 +29,7 @@ abstract class BuilderComp implements Unitc{
     @Import float x, y, rotation;
 
     @SyncLocal Queue<BuildPlan> plans = new Queue<>();
-    transient boolean updateBuilding = true;
-
-    @Override
-    public void controller(UnitController next){
-        //reset building state so AI controlled units will always start off building
-        updateBuilding = true;
-    }
+    @SyncLocal transient boolean updateBuilding = true;
 
     @Override
     public void update(){
@@ -49,7 +43,7 @@ abstract class BuilderComp implements Unitc{
         while(it.hasNext()){
             BuildPlan req = it.next();
             Tile tile = world.tile(req.x, req.y);
-            if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && (tile.rotation() == req.rotation || !req.block.rotate) && tile.block() == req.block)){
+            if(tile == null || (req.breaking && tile.block() == Blocks.air) || (!req.breaking && ((tile.build != null && tile.build.rotation == req.rotation) || !req.block.rotate) && tile.block() == req.block)){
                 it.remove();
             }
         }
@@ -76,7 +70,7 @@ abstract class BuilderComp implements Unitc{
 
         Tile tile = world.tile(current.x, current.y);
 
-        if(!within(tile, finalPlaceDst)){
+        if(within(tile, finalPlaceDst)){
             rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
         }
 
@@ -85,12 +79,12 @@ abstract class BuilderComp implements Unitc{
                 boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
                 if(hasAll){
-                    Build.beginPlace(current.block, team(), current.x, current.y, current.rotation);
+                    Call.beginPlace(current.block, team(), current.x, current.y, current.rotation);
                 }else{
                     current.stuck = true;
                 }
             }else if(!current.initialized && current.breaking && Build.validBreak(team(), current.x, current.y)){
-                Build.beginBreak(team(), current.x, current.y);
+                Call.beginBreak(team(), current.x, current.y);
             }else{
                 plans.removeFirst();
                 return;
@@ -116,11 +110,7 @@ abstract class BuilderComp implements Unitc{
         if(current.breaking){
             entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
-                if(current.hasConfig){
-                    Call.tileConfig(null, tile.build, current.config);
-                }
-            }
+            entity.construct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.config);
         }
 
         current.stuck = Mathf.equal(current.progress, entity.progress);
@@ -150,7 +140,6 @@ abstract class BuilderComp implements Unitc{
     boolean shouldSkip(BuildPlan request, @Nullable Building core){
         //requests that you have at least *started* are considered
         if(state.rules.infiniteResources || team().rules().infiniteResources || request.breaking || core == null) return false;
-        //TODO these are bad criteria
         return (request.stuck && !core.items.has(request.block.requirements)) || (Structs.contains(request.block.requirements, i -> !core.items.has(i.item)) && !request.initialized);
     }
 
@@ -198,6 +187,10 @@ abstract class BuilderComp implements Unitc{
         }else{
             plans.addFirst(place);
         }
+    }
+
+    boolean activelyBuilding(){
+        return isBuilding() && updateBuilding;
     }
 
     /** Return the build request currently active, or the one at the top of the queue.*/

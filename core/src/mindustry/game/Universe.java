@@ -140,7 +140,7 @@ public class Universe{
                         sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
 
                         //check if the sector has been attacked too many times...
-                        if(sector.hasBase() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                        if(sector.hasBase() && sector.hasWaves() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
                             //fire event for losing the sector
                             Events.fire(new SectorLoseEvent(sector));
 
@@ -161,6 +161,21 @@ public class Universe{
         Events.fire(new TurnEvent());
 
         save();
+    }
+
+    /** This method is expensive to call; only do so sparingly. */
+    public ItemSeq getGlobalResources(){
+        ItemSeq count = new ItemSeq();
+
+        for(Planet planet : content.planets()){
+            for(Sector sector : planet.sectors){
+                if(sector.hasSave()){
+                    count.add(sector.calculateItems());
+                }
+            }
+        }
+
+        return count;
     }
 
     public float secondsMod(float mod, float scale){

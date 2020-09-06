@@ -25,10 +25,10 @@ public class LightBlock extends Block{
         configurable = true;
         saveConfig = true;
 
-        config(Integer.class, (LightEntity tile, Integer value) -> tile.color = value);
+        config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);
     }
 
-    public class LightEntity extends Building{
+    public class LightBuild extends Building{
         public int color = Pal.accent.rgba();
         public float smoothTime = 1f;
 

@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
@@ -71,15 +72,21 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc{
         Unit u = payload.unit;
 
         //can't drop ground units
-        if((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f){
+        if(((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f) || (!floorOn().isLiquid && u instanceof WaterMovec)){
             return false;
         }
+
+        Fx.unitDrop.at(this);
+
+        //clients do not drop payloads
+        if(Vars.net.client()) return true;
 
         u.set(this);
         u.trns(Tmp.v1.rnd(Mathf.random(2f)));
         u.rotation(rotation);
+        //reset the ID to a new value to make sure it's synced
+        u.id = EntityGroup.nextId();
         u.add();
-        Fx.unitDrop.at(u);
 
         return true;
     }
@@ -89,7 +96,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc{
         Building tile = payload.entity;
         int tx = Vars.world.toTile(x - tile.block().offset), ty = Vars.world.toTile(y - tile.block().offset);
         Tile on = Vars.world.tile(tx, ty);
-        if(on != null && Build.validPlace(tile.block(), tile.team(), tx, ty, tile.rotation())){
+        if(on != null && Build.validPlace(tile.block(), tile.team, tx, ty, tile.rotation)){
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
 

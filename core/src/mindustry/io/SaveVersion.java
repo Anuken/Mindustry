@@ -168,8 +168,8 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
-            boolean saverot = tile.block().saveRotation;
-            byte packed = (byte)((tile.build != null ? 1 : 0) | (saverot ? 2 : 0));
+            boolean savedata = tile.block().saveData;
+            byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
 
             //make note of whether there was an entity/rotation here
             stream.writeByte(packed);
@@ -185,8 +185,8 @@ public abstract class SaveVersion extends SaveFileReader{
                 }else{
                     stream.writeBoolean(false);
                 }
-            }else if(saverot){
-                stream.writeByte(tile.rotation());
+            }else if(savedata){
+                stream.writeByte(tile.data);
             }else{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
@@ -244,7 +244,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 boolean isCenter = true;
                 byte packedCheck = stream.readByte();
                 boolean hadEntity = (packedCheck & 1) != 0;
-                boolean hadRotation = (packedCheck & 2) != 0;
+                boolean hadData = (packedCheck & 2) != 0;
 
                 if(hadEntity){
                     isCenter = stream.readBoolean();
@@ -271,9 +271,9 @@ public abstract class SaveVersion extends SaveFileReader{
                             skipChunk(stream, true);
                         }
                     }
-                }else if(hadRotation){
+                }else if(hadData){
                     tile.setBlock(block);
-                    tile.rotation(stream.readByte());
+                    tile.data = stream.readByte();
                 }else{
                     int consecutives = stream.readUnsignedByte();
 
@@ -331,6 +331,11 @@ public abstract class SaveVersion extends SaveFileReader{
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
                 byte typeid = in.readByte();
+                if(EntityMapping.map(typeid) == null){
+                    in.skipBytes(lastRegionLength - 1);
+                    return;
+                }
+
                 Entityc entity = (Entityc)EntityMapping.map(typeid).get();
                 entity.read(Reads.get(in));
                 entity.add();

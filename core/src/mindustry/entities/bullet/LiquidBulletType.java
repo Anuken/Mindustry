@@ -25,7 +25,7 @@ public class LiquidBulletType extends BulletType{
         }
 
         lifetime = 74f;
-        statusDuration = 90f;
+        statusDuration = 60f * 2f;
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLiquid;
         smokeEffect = Fx.none;
@@ -69,7 +69,7 @@ public class LiquidBulletType extends BulletType{
         super.despawned(b);
 
         //don't create liquids when the projectile despawns
-        hitEffect.at(b.x, b.y, liquid.color);
+        hitEffect.at(b.x, b.y, b.rotation(), liquid.color);
     }
 
     @Override

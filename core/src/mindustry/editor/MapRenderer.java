@@ -110,18 +110,13 @@ public class MapRenderer implements Disposable{
         if(wall != Blocks.air && wall.synthetic()){
             region = !Core.atlas.isFound(wall.editorIcon()) || !center ? Core.atlas.find("clear-editor") : wall.editorIcon();
 
-            if(wall.rotate){
-                mesh.draw(idxWall, region,
-                wx * tilesize + wall.offset, wy * tilesize + wall.offset,
-                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.rotdeg() - 90);
-            }else{
-                float width = region.getWidth() * Draw.scl, height = region.getHeight() * Draw.scl;
+            float width = region.getWidth() * Draw.scl, height = region.getHeight() * Draw.scl;
 
-                mesh.draw(idxWall, region,
-                wx * tilesize + wall.offset + (tilesize - width) / 2f,
-                wy * tilesize + wall.offset + (tilesize - height) / 2f,
-                width, height);
-            }
+            mesh.draw(idxWall, region,
+            wx * tilesize + wall.offset + (tilesize - width) / 2f,
+            wy * tilesize + wall.offset + (tilesize - height) / 2f,
+            width, height,
+            tile.build == null || !wall.rotate ? 0 : tile.build.rotdeg() - 90);
         }else{
             region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length - 1)];
 

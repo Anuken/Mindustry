@@ -1,8 +1,14 @@
 [
   {
-    "address": "mindustry.us.to:6568"
+    "address": "mindustry.us.to"
   },
   {
-    "address": "mindustry.nydus.app:6060"
+    "address": "nydustry.nydus.app:6060"
+  },
+  {
+    "address": "mindustry.pl:6000"
+  },
+  {
+    "address": "routerchain.ddns.net"
   }
 ]

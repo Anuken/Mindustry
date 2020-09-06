@@ -11,10 +11,13 @@ import mindustry.type.*;
 import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
+import static mindustry.content.SectorPresets.*;
+import static mindustry.content.SectorPresets.craters;
 import static mindustry.content.UnitTypes.*;
+import static mindustry.type.ItemStack.*;
 
 public class TechTree implements ContentList{
-    private static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
+    static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
 
     public static Seq<TechNode> all;
     public static TechNode root;
@@ -35,7 +38,6 @@ public class TechTree implements ContentList{
                         node(distributor);
                         node(sorter, () -> {
                             node(invertedSorter);
-                            node(message);
                             node(overflowGate, () -> {
                                 node(underflowGate);
                             });
@@ -108,18 +110,18 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(Items.coal, () -> {
-                    node(Items.graphite, () -> {
+                node(Items.coal, with(Items.lead, 3000), () -> {
+                    node(Items.graphite, with(Items.coal, 1000), () -> {
                         node(graphitePress, () -> {
-                            node(Items.titanium, () -> {
+                            node(Items.titanium, with(Items.graphite, 6000, Items.copper, 10000, Items.lead, 10000), () -> {
                                 node(pneumaticDrill, () -> {
-                                    node(Items.sporePod, () -> {
+                                    node(Items.sporePod, with(Items.coal, 5000, Items.graphite, 5000, Items.lead, 5000), () -> {
                                         node(cultivator, () -> {
 
                                         });
                                     });
 
-                                    node(Items.thorium, () -> {
+                                    node(Items.thorium, with(Items.titanium, 10000, Items.lead, 15000, Items.copper, 30000), () -> {
                                         node(laserDrill, () -> {
                                             node(blastDrill, () -> {
 
@@ -135,9 +137,9 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(Items.pyratite, () -> {
+                            node(Items.pyratite, with(Items.coal, 6000, Items.lead, 10000, Items.sand, 5000), () -> {
                                 node(pyratiteMixer, () -> {
-                                    node(Items.blastCompound, () -> {
+                                    node(Items.blastCompound, with(Items.pyratite, 3000, Items.sporePod, 3000), () -> {
                                         node(blastMixer, () -> {
 
                                         });
@@ -145,10 +147,10 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(Items.silicon, () -> {
+                            node(Items.silicon, with(Items.coal, 4000, Items.sand, 4000), () -> {
                                 node(siliconSmelter, () -> {
 
-                                    node(Liquids.oil, () -> {
+                                    node(Liquids.oil, with(Items.coal, 8000, Items.pyratite, 6000, Items.sand, 20000), () -> {
                                         node(sporePress, () -> {
                                             node(coalCentrifuge, () -> {
                                                 node(multiPress, () -> {
@@ -158,9 +160,9 @@ public class TechTree implements ContentList{
                                                 });
                                             });
 
-                                            node(Items.plastanium, () -> {
+                                            node(Items.plastanium, with(Items.titanium, 10000, Items.silicon, 10000), () -> {
                                                 node(plastaniumCompressor, () -> {
-                                                    node(Items.phasefabric, () -> {
+                                                    node(Items.phasefabric, with(Items.thorium, 15000, Items.sand, 30000, Items.silicon, 5000), () -> {
                                                         node(phaseWeaver, () -> {
 
                                                         });
@@ -170,13 +172,13 @@ public class TechTree implements ContentList{
                                         });
                                     });
 
-                                    node(Items.metaglass, () -> {
+                                    node(Items.metaglass, with(Items.sand, 6000, Items.lead, 10000), () -> {
                                         node(kiln, () -> {
                                             node(incinerator, () -> {
-                                                node(Items.scrap, () -> {
-                                                    node(Liquids.slag, () -> {
+                                                node(Items.scrap, with(Items.copper, 20000, Items.sand, 10000), () -> {
+                                                    node(Liquids.slag, with(Items.scrap, 4000), () -> {
                                                         node(melter, () -> {
-                                                            node(Items.surgealloy, () -> {
+                                                            node(Items.surgealloy, with(Items.thorium, 20000, Items.silicon, 30000, Items.lead, 40000), () -> {
                                                                 node(surgeSmelter, () -> {
 
                                                                 });
@@ -190,13 +192,33 @@ public class TechTree implements ContentList{
                                                                 });
                                                             });
 
-                                                            node(Liquids.cryofluid, () -> {
+                                                            node(Liquids.cryofluid, with(Items.titanium, 8000, Items.metaglass, 5000), () -> {
                                                                 node(cryofluidMixer, () -> {
 
                                                                 });
                                                             });
                                                         });
                                                     });
+                                                });
+                                            });
+                                        });
+                                    });
+
+                                    node(microProcessor, () -> {
+                                        node(switchBlock, () -> {
+                                            node(message, () -> {
+                                                node(logicDisplay, () -> {
+
+                                                });
+
+                                                node(memoryCell, () -> {
+
+                                                });
+                                            });
+
+                                            node(logicProcessor, () -> {
+                                                node(hyperProcessor, () -> {
+
                                                 });
                                             });
                                         });
@@ -337,6 +359,10 @@ public class TechTree implements ContentList{
             });
 
             node(groundFactory, () -> {
+                node(commandCenter, () -> {
+
+                });
+
                 node(dagger, () -> {
                     node(mace, () -> {
                         node(fortress, () -> {
@@ -403,18 +429,86 @@ public class TechTree implements ContentList{
                 });
             });
 
-            //TODO research sectors
-            /*
-            node(SectorPresets.groundZero, () -> {
-                node(SectorPresets.nuclearComplex, () -> {
-                    node(SectorPresets.craters, () -> {
-                        node(SectorPresets.saltFlats, () -> {
+            node(groundZero, () -> {
+                node(frozenForest, Seq.with(
+                    new SectorComplete(groundZero),
+                    new Research(junction),
+                    new Research(router)
+                ), () -> {
+                    node(craters, Seq.with(
+                        new SectorComplete(frozenForest),
+                        new Research(mender),
+                        new Research(combustionGenerator)
+                    ), () -> {
+                        node(ruinousShores, Seq.with(
+                            new SectorComplete(craters),
+                            new Research(graphitePress),
+                            new Research(combustionGenerator),
+                            new Research(kiln),
+                            new Research(mechanicalPump)
+                        ), () -> {
 
+                            node(tarFields, Seq.with(
+                                new SectorComplete(ruinousShores),
+                                new Research(coalCentrifuge),
+                                new Research(conduit),
+                                new Research(wave)
+                            ), () -> {
+                                node(desolateRift, Seq.with(
+                                    new SectorComplete(tarFields),
+                                    new Research(thermalGenerator),
+                                    new Research(thoriumReactor)
+                                ), () -> {
+
+                                });
+                            });
+
+                            node(saltFlats, Seq.with(
+                                new SectorComplete(ruinousShores),
+                                new Research(groundFactory),
+                                new Research(airFactory),
+                                new Research(door),
+                                new Research(waterExtractor)
+                            ), () -> {
+
+                            });
+                        });
+
+                        node(overgrowth, Seq.with(
+                            new SectorComplete(craters),
+                            new SectorComplete(fungalPass),
+                            new Research(cultivator),
+                            new Research(sporePress),
+                            new Research(UnitTypes.mace),
+                            new Research(UnitTypes.flare)
+                        ), () -> {
+
+                        });
+                    });
+
+                    node(stainedMountains, Seq.with(
+                        new SectorComplete(frozenForest),
+                        new Research(pneumaticDrill),
+                        new Research(powerNode),
+                        new Research(turbineGenerator)
+                    ), () -> {
+                        node(fungalPass, Seq.with(
+                            new SectorComplete(stainedMountains),
+                            new Research(groundFactory),
+                            new Research(door),
+                            new Research(siliconSmelter)
+                        ), () -> {
+                            node(nuclearComplex, Seq.with(
+                                new SectorComplete(fungalPass),
+                                new Research(thermalGenerator),
+                                new Research(laserDrill)
+                            ), () -> {
+
+                            });
                         });
                     });
                 });
             });
-             */
         });
     }
 
@@ -440,7 +534,17 @@ public class TechTree implements ContentList{
             requirements = ItemStack.empty;
         }
 
+        return node(content, requirements, children);
+    }
+
+    private static TechNode node(UnlockableContent content, ItemStack[] requirements, Runnable children){
         return new TechNode(content, requirements, children);
+    }
+
+    private static TechNode node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
+        TechNode node = new TechNode(content, empty, children);
+        node.objectives = objectives;
+        return node;
     }
 
     private static TechNode node(UnlockableContent block){
@@ -461,7 +565,7 @@ public class TechTree implements ContentList{
     }
 
     public static class TechNode{
-        private static TechNode context;
+        static TechNode context;
 
         /** Depth in tech tree. */
         public int depth;
@@ -471,26 +575,29 @@ public class TechTree implements ContentList{
         public UnlockableContent content;
         /** Item requirements for this content. */
         public ItemStack[] requirements;
-        /** Extra objectives needed to research this. TODO implement */
+        /** Requirements that have been fulfilled. Always the same length as the requirement array. */
+        public final ItemStack[] finishedRequirements;
+        /** Extra objectives needed to research this. */
         public Seq<Objective> objectives = new Seq<>();
         /** Time required to research this content, in seconds. */
         public float time;
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
-        /** Research progress, in seconds. */
-        public float progress;
 
         TechNode(@Nullable TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
-            if(ccontext != null){
-                ccontext.children.add(this);
-            }
+            if(ccontext != null) ccontext.children.add(this);
 
             this.parent = ccontext;
             this.content = content;
             this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
-            this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
             this.time = Seq.with(requirements).mapFloat(i -> i.item.cost * i.amount).sum() * 10;
+            this.finishedRequirements = new ItemStack[requirements.length];
+
+            //load up the requirements that have been finished if settings are available
+            for(int i = 0; i < requirements.length; i++){
+                finishedRequirements[i] = new ItemStack(requirements[i].item, Core.settings == null ? 0 : Core.settings.getInt("req-" + content.name + "-" + requirements[i].item.name));
+            }
 
             //add dependencies as objectives.
             content.getDependencies(d -> objectives.add(new Research(d)));
@@ -508,7 +615,11 @@ public class TechTree implements ContentList{
 
         /** Flushes research progress to settings. */
         public void save(){
-            Core.settings.put("research-" + content.name, progress);
+
+            //save finished requirements by item type
+            for(ItemStack stack : finishedRequirements){
+                Core.settings.put("req-" + content.name + "-" + stack.item.name, stack.amount);
+            }
         }
     }
 }

@@ -147,6 +147,12 @@ public class EntityIO{
 
                     io(field.type, "");
 
+                    //just assign the two values so jumping does not occur on de-possession
+                    if(sf){
+                        st(field.name + lastSuf + " = this." + field.name);
+                        st(field.name + targetSuf + " = this." + field.name);
+                    }
+
                     econt();
                 }
             }

@@ -68,7 +68,7 @@ public class JsonIO{
         return json.prettyPrint(in);
     }
 
-    private static void apply(Json json){
+    static void apply(Json json){
         json.setIgnoreUnknownFields(true);
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);

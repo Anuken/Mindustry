@@ -43,7 +43,7 @@ public class ItemTurret extends Turret{
             public void build(Building tile, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
-                    () -> tile != null && !((ItemTurretEntity)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretEntity)tile).ammo.peek()).item == item)));
+                    () -> tile != null && !((ItemTurretBuild)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretBuild)tile).ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
@@ -51,7 +51,7 @@ public class ItemTurret extends Turret{
             @Override
             public boolean valid(Building entity){
                 //valid when there's any ammo in the turret
-                return !((ItemTurretEntity)entity).ammo.isEmpty();
+                return !((ItemTurretBuild)entity).ammo.isEmpty();
             }
 
             @Override
@@ -61,7 +61,7 @@ public class ItemTurret extends Turret{
         });
     }
 
-    public class ItemTurretEntity extends TurretEntity{
+    public class ItemTurretBuild extends TurretBuild{
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();
@@ -139,12 +139,17 @@ public class ItemTurret extends Turret{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.b(ammo.size);
             for(AmmoEntry entry : ammo){
                 ItemEntry i = (ItemEntry)entry;
-                write.b(i.item.id);
+                write.s(i.item.id);
                 write.s(i.amount);
             }
         }
@@ -152,12 +157,16 @@ public class ItemTurret extends Turret{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte amount = read.b();
+            int amount = read.ub();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(read.b());
+                Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
                 short a = read.s();
                 totalAmmo += a;
-                ammo.add(new ItemEntry(item, a));
+
+                //only add ammo if this is a valid ammo type
+                if(ammoTypes.containsKey(item)){
+                    ammo.add(new ItemEntry(item, a));
+                }
             }
         }
     }

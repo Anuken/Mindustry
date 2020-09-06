@@ -64,7 +64,7 @@ public class SectorInfo{
         //update core items
         coreItems.clear();
 
-        CoreEntity entity = state.rules.defaultTeam.core();
+        CoreBuild entity = state.rules.defaultTeam.core();
 
         if(entity != null){
             ItemModule items = entity.items;
@@ -97,7 +97,7 @@ public class SectorInfo{
             updateCoreDeltas();
         }
 
-        CoreEntity ent = state.rules.defaultTeam.core();
+        CoreBuild ent = state.rules.defaultTeam.core();
 
         //refresh throughput
         if(time.get(refreshPeriod)){
@@ -140,19 +140,8 @@ public class SectorInfo{
         }
     }
 
-    /** @return the items in this sector now, taking into account production and items received. */
-    public ObjectIntMap<Item> getCurrentItems(Sector sector){
-        ObjectIntMap<Item> map = new ObjectIntMap<>();
-        map.putAll(coreItems);
-        long seconds = sector.getSecondsPassed();
-        production.each((item, stat) -> map.increment(item, (int)(stat.mean * seconds)));
-        //increment based on received items
-        sector.getReceivedItems().each(stack -> map.increment(stack.item, stack.amount));
-        return map;
-    }
-
     private void updateCoreDeltas(){
-        CoreEntity ent = state.rules.defaultTeam.core();
+        CoreBuild ent = state.rules.defaultTeam.core();
         for(int i = 0; i < lastCoreItems.length; i++){
             lastCoreItems[i] = ent == null ? 0 : ent.items.get(i);
         }
@@ -171,5 +160,9 @@ public class SectorInfo{
 
         /** mean in terms of items produced per refresh rate (currently, per second) */
         public float mean;
+
+        public String toString(){
+            return mean + "";
+        }
     }
 }

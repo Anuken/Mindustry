@@ -1,7 +1,6 @@
 package mindustry.android;
 
 import android.*;
-import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
@@ -25,6 +24,7 @@ import mindustry.ui.dialogs.*;
 
 import java.io.*;
 import java.lang.System;
+import java.lang.Thread.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -38,6 +38,20 @@ public class AndroidLauncher extends AndroidApplication{
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
+
+        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
+            CrashSender.log(error);
+
+            //try to forward exception to system handler
+            if(handler != null){
+                handler.uncaughtException(thread, error);
+            }else{
+                error.printStackTrace();
+                System.exit(1);
+            }
+        });
+
         super.onCreate(savedInstanceState);
         if(doubleScaleTablets && isTablet(this.getContext())){
             Scl.setAddition(0.5f);
@@ -48,24 +62,6 @@ public class AndroidLauncher extends AndroidApplication{
             @Override
             public void hide(){
                 moveTaskToBack(true);
-            }
-
-            @Override
-            public String getUUID(){
-                try{
-                    String s = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
-                    int len = s.length();
-                    byte[] data = new byte[len / 2];
-                    for(int i = 0; i < len; i += 2){
-                        data[i / 2] = (byte)((Character.digit(s.charAt(i), 16) << 4)
-                        + Character.digit(s.charAt(i + 1), 16));
-                    }
-                    String result = new String(Base64Coder.encode(data));
-                    if(result.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
-                    return result;
-                }catch(Exception e){
-                    return super.getUUID();
-                }
             }
 
             @Override
@@ -112,7 +108,7 @@ public class AndroidLauncher extends AndroidApplication{
                     });
                 }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    chooser = new FileChooser(open ? "$open" : "$save", file -> file.extension().equalsIgnoreCase(extension), open, file -> {
+                    chooser = new FileChooser(open ? "@open" : "@save", file -> file.extension().equalsIgnoreCase(extension), open, file -> {
                         if(!open){
                             cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
                         }else{
@@ -146,7 +142,6 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
-            errorHandler = CrashSender::log;
             stencil = 8;
         }});
         checkFiles(getIntent());
@@ -221,10 +216,10 @@ public class AndroidLauncher extends AndroidApplication{
                                 SaveSlot slot = control.saves.importSave(file);
                                 ui.load.runLoadSave(slot);
                             }catch(IOException e){
-                                ui.showException("$save.import.fail", e);
+                                ui.showException("@save.import.fail", e);
                             }
                         }else{
-                            ui.showErrorMessage("$save.import.invalid");
+                            ui.showErrorMessage("@save.import.invalid");
                         }
                     }else if(map){ //open map
                         Fi file = Core.files.local("temp-map." + mapExtension);

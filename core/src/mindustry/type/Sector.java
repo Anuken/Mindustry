@@ -3,6 +3,7 @@ package mindustry.type;
 import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
+import arc.struct.ObjectIntMap.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -88,7 +89,7 @@ public class Sector{
      * Only sectors adjacent to non-wave sectors can be landed on.
      * TODO also preset sectors*/
     public boolean unlocked(){
-        return hasBase() || Structs.contains(tile.tiles, p -> planet.getSector(p).isCaptured()) || (preset != null && preset.unlocked());
+        return hasBase() || (preset != null && preset.alwaysUnlocked);
     }
 
     /** @return whether the player has a base here. */
@@ -148,12 +149,74 @@ public class Sector{
     }
 
     //TODO this should be stored in a more efficient structure, and be updated each turn
-    public Seq<ItemStack> getReceivedItems(){
-        return Core.settings.getJson(key("received-items"), Seq.class, ItemStack.class, Seq::new);
+    public ItemSeq getExtraItems(){
+        return Core.settings.getJson(key("extra-items"), ItemSeq.class, ItemSeq::new);
     }
 
-    public void setReceivedItems(Seq<ItemStack> stacks){
-        Core.settings.putJson(key("received-items"), ItemStack.class, stacks);
+    public void setExtraItems(ItemSeq stacks){
+        Core.settings.putJson(key("extra-items"),  stacks);
+    }
+
+    public void addItem(Item item, int amount){
+        removeItem(item, -amount);
+    }
+
+    public void removeItem(Item item, int amount){
+        if(isBeingPlayed()){
+            if(state.rules.defaultTeam.core() != null){
+                state.rules.defaultTeam.items().remove(item, amount);
+            }
+        }else{
+            ItemSeq recv = getExtraItems();
+
+            recv.remove(item, amount);
+
+            setExtraItems(recv);
+        }
+    }
+
+    public ItemSeq calculateItems(){
+        ItemSeq count = new ItemSeq();
+
+        //for sectors being played on, add items directly
+        if(isBeingPlayed()){
+            count.add(state.rules.defaultTeam.items());
+        }else if(save != null){
+            //add items already present
+            for(Entry<Item> ent : save.meta.secinfo.coreItems){
+                count.add(ent.key, ent.value);
+            }
+
+            count.add(calculateReceivedItems());
+
+            int capacity = save.meta.secinfo.storageCapacity;
+
+            //validation
+            for(Item item : content.items()){
+                //ensure positive items
+                if(count.get(item) < 0) count.set(item, 0);
+                //cap the items
+                if(count.get(item) > capacity) count.set(item, capacity);
+            }
+        }
+
+        return count;
+    }
+
+    public ItemSeq calculateReceivedItems(){
+        ItemSeq count = new ItemSeq();
+
+        if(save != null){
+            long seconds = getSecondsPassed();
+
+            //add produced items
+            save.meta.secinfo.production.each((item, stat) -> count.add(item, (int)(stat.mean * seconds)));
+
+            //add received items
+            getExtraItems().each(count::add);
+        }
+
+        return count;
     }
 
     //TODO these methods should maybe move somewhere else and/or be contained in a data object
@@ -325,6 +388,8 @@ public class Sector{
         /** Has sandstorms. */
         desert,
         /** Has an enemy base. */
-        base
+        base,
+        /** Has spore weather. */
+        spores
     }
 }

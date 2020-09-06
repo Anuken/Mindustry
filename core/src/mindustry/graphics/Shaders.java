@@ -24,11 +24,12 @@ public class Shaders{
     public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
-    public static MeshShader mesh = new MeshShader();
+    public static MeshShader mesh;
     public static Shader unlit;
     public static Shader screenspace;
 
     public static void init(){
+        mesh = new MeshShader();
         blockbuild = new BlockBuild();
         try{
             shield = new ShieldShader();

@@ -19,7 +19,7 @@ public class PowerGraph{
     private final ObjectSet<Building> all = new ObjectSet<>();
 
     private final WindowedMean powerBalance = new WindowedMean(60);
-    private float lastPowerProduced, lastPowerNeeded, lastUsageFraction;
+    private float lastPowerProduced, lastPowerNeeded, lastUsageFraction, lastPowerStored;
 
     private long lastFrameUpdated = -1;
     private final int graphID;
@@ -43,6 +43,10 @@ public class PowerGraph{
 
     public float getLastPowerProduced(){
         return lastPowerProduced;
+    }
+
+    public float getLastPowerStored(){
+        return lastPowerStored;
     }
 
     public float getSatisfaction(){
@@ -196,6 +200,7 @@ public class PowerGraph{
 
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
+        lastPowerStored = getBatteryStored();
 
         powerBalance.add((lastPowerProduced - lastPowerNeeded) / Time.delta);
 

@@ -35,7 +35,8 @@ public class SectorDamage{
         if(core != null && !frontier.isEmpty()){
             for(Tile spawner : frontier){
                 //find path from spawn to core
-                Seq<Tile> path = Astar.pathfind(spawner, core.tile, t -> t.cost, t -> !(t.block().isStatic() && t.solid()));
+                //TODO this is broken
+                Seq<Tile> path = Astar.pathfind(spawner, core.tile, SectorDamage::cost, t -> !(t.block().isStatic() && t.solid()));
                 int amount = (int)(path.size * fraction);
                 for(int i = 0; i < amount; i++){
                     Tile t = path.get(i);
@@ -44,7 +45,7 @@ public class SectorDamage{
                         //just remove all the buildings in the way - as long as they're not cores!
                         if(other.build != null && other.team() == state.rules.defaultTeam && !(other.block() instanceof CoreBlock)){
                             if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                Effects.rubble(other.build.x, other.build.y, other.block().size);
+                                Effect.rubble(other.build.x, other.build.y, other.block().size);
                             }
 
                             other.remove();
@@ -86,7 +87,7 @@ public class SectorDamage{
                             if(other.build.health < 0){
                                 //rubble
                                 if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                    Effects.rubble(other.build.x, other.build.y, other.block().size);
+                                    Effect.rubble(other.build.x, other.build.y, other.block().size);
                                 }
 
                                 other.remove();
@@ -104,8 +105,12 @@ public class SectorDamage{
                 }
             }
         }
+    }
 
-
-
+    static float cost(Tile tile){
+        return 1f +
+            (tile.block().isStatic() && tile.solid() ? 200f : 0f) +
+            (tile.build != null ? tile.build.health / 40f : 0f) +
+            (tile.floor().isLiquid ? 10f : 0f);
     }
 }
