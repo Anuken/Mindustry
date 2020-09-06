@@ -173,6 +173,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
     public static void rotateBlock(Player player, Building tile, boolean direction){
+        if(tile == null) return;
+
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.rotate, tile.tile(), action -> action.rotation = Mathf.mod(tile.rotation + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
