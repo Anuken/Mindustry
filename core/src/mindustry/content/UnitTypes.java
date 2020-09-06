@@ -138,6 +138,7 @@ public class UnitTypes implements ContentList{
             health = 9000;
             armor = 11f;
             mechLegMoveScl = 1.3f;
+            canDrown = false;
 
             weapons.add(
             new Weapon("scepter-weapon"){{
@@ -194,6 +195,7 @@ public class UnitTypes implements ContentList{
             health = 24000;
             armor = 14f;
             mechLegMoveScl = 1.75f;
+            canDrown = false;
 
             weapons.add(
             new Weapon("reign-weapon"){{
@@ -206,7 +208,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectBig;
                 shootSound = Sounds.artillery;
 
-                bullet = new BasicBulletType(13f, 45){{
+                bullet = new BasicBulletType(13f, 55){{
                     pierce = true;
                     width = 14f;
                     height = 32f;
@@ -674,7 +676,7 @@ public class UnitTypes implements ContentList{
                     statusDuration = 60f * 10;
 
                     fragLifeMin = 0.3f;
-                    fragBullets = 12;
+                    fragBullets = 9;
 
                     fragBullet = new ArtilleryBulletType(2.3f, 30){{
                         hitEffect = Fx.sapExplosion;
@@ -683,7 +685,7 @@ public class UnitTypes implements ContentList{
                         width = height = 20f;
                         collidesTiles = false;
                         splashDamageRadius = 90f;
-                        splashDamage = 55f;
+                        splashDamage = 45f;
                         backColor = Pal.sapBulletBack;
                         frontColor = lightningColor = Pal.sapBullet;
                         lightning = 2;

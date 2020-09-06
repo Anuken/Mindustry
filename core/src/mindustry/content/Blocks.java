@@ -509,7 +509,7 @@ public class Blocks implements ContentList{
         siliconCrucible = new AttributeSmelter("silicon-crucible"){{
             requirements(Category.crafting, with(Items.titanium, 120, Items.metaglass, 80, Items.plastanium, 35, Items.silicon, 60));
             craftEffect = Fx.smeltsmoke;
-            outputItem = new ItemStack(Items.silicon, 6);
+            outputItem = new ItemStack(Items.silicon, 8);
             craftTime = 90f;
             size = 3;
             hasPower = true;
@@ -1564,13 +1564,13 @@ public class Blocks implements ContentList{
         segment = new PointDefenseTurret("segment"){{
             requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 25));
 
-            range = 100f;
+            range = 125f;
             hasPower = true;
             consumes.power(3f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 18f;
-            reloadTime = 15f;
+            reloadTime = 11f;
             health = 190 * size * size;
         }};
 

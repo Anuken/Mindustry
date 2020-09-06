@@ -91,6 +91,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    @Replace
+    public boolean canDrown(){
+        return isGrounded() && !hovering && type.canDrown && !(this instanceof WaterMovec);
+    }
+
+    @Override
     public int itemCapacity(){
         return type.itemCapacity;
     }
