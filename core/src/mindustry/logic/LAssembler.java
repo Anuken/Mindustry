@@ -83,7 +83,7 @@ public class LAssembler{
 
             int indent = 0;
             for(int i = 0; i < line.length(); i++){
-                if(!(line.charAt(i) == '\t') || line.charAt(i) == ' ')) break;
+                if(!(line.charAt(i) == '\t' || line.charAt(i) == ' ')) break;
                 indent++;
             }
 
