@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -30,6 +31,7 @@ public class MassDriver extends Block{
     public Effect shootEffect = Fx.shootBig2;
     public Effect smokeEffect = Fx.shootBigSmoke2;
     public Effect receiveEffect = Fx.mineBig;
+    public Sound shootSound = Sounds.shootBig;
     public float shake = 3f;
     public @Load("@-base") TextureRegion baseRegion;
 
@@ -265,6 +267,8 @@ public class MassDriver extends Block{
             y + Angles.trnsy(angle, translation), angle);
 
             Effect.shake(shake, shake, this);
+            
+            shootSound.at(tile, Mathf.random(0.9f, 1.1f));
         }
 
         public void handlePayload(Bullet bullet, DriverBulletData data){
