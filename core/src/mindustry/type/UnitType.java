@@ -49,7 +49,7 @@ public class UnitType extends UnlockableContent{
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float sway = 1f;
-    public float payloadCapacity = 1;
+    public float payloadCapacity = 8;
     public int commandLimit = 24;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;

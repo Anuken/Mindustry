@@ -8,15 +8,33 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
 /** An entity that holds a payload. */
 @Component
-abstract class PayloadComp implements Posc, Rotc, Hitboxc{
+abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import float x, y, rotation;
+    @Import UnitType type;
 
     Seq<Payload> payloads = new Seq<>();
+
+    float payloadUsed(){
+        return payloads.sumf(Payload::size);
+    }
+
+    boolean canPickup(Unit unit){
+        return payloadUsed() + unit.hitSize <= type.payloadCapacity;
+    }
+
+    boolean canPickup(Building build){
+        return payloadUsed() + build.block.size * Vars.tilesize <= type.payloadCapacity;
+    }
+
+    boolean canPickupPayload(Payload pay){
+        return payloadUsed() + pay.size() <= type.payloadCapacity;
+    }
 
     boolean hasPayload(){
         return payloads.size > 0;

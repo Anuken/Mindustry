@@ -35,8 +35,8 @@ public class BlockPayload implements Payload{
     }
 
     @Override
-    public boolean canBeTaken(Payloadc picker){
-        return entity.block.size <= 2;
+    public float size(){
+        return entity.block.size * tilesize;
     }
 
     @Override

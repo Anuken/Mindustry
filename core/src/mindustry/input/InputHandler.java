@@ -112,8 +112,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
-        if(target.isAI() && target.isGrounded() && pay.payloads().size < unit.type().payloadCapacity
-            && target.mass() < unit.mass()
+        if(target.isAI() && target.isGrounded() && pay.canPickup(target)
             && target.within(unit, unit.type().hitsize * 1.5f + target.type().hitsize)){
             pay.pickup(target);
         }
@@ -126,14 +125,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
-        if(tile != null && tile.team == unit.team && pay.payloads().size < unit.type().payloadCapacity
+        if(tile != null && tile.team == unit.team && pay.canPickup(tile)
             && unit.within(tile, tilesize * tile.block.size * 1.2f)){
             //pick up block directly
-            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2 && tile.canPickup()){
+            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.canPickup()){
                 pay.pickup(tile);
             }else{ //pick up block payload
                 Payload current = tile.getPayload();
-                if(current != null && current.canBeTaken(pay)){
+                if(current != null && pay.canPickupPayload(current)){
                     Payload taken = tile.takePayload();
                     if(taken != null){
                         pay.addPayload(taken);
@@ -339,15 +338,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(!(unit instanceof Payloadc)) return;
         Payloadc pay = (Payloadc)unit;
 
-        if(pay.payloads().size >= unit.type().payloadCapacity) return;
-
-        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && u.mass() < unit.mass() && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
         if(target != null){
             Call.pickupUnitPayload(player, target);
-        }else if(!pay.hasPayload()){
+        }else{
             Building tile = world.buildWorld(pay.x(), pay.y());
 
-            if(tile != null && tile.team == unit.team){
+            if(tile != null && tile.team == unit.team && pay.canPickup(tile)){
                 Call.pickupBlockPayload(player, tile);
             }
         }
@@ -356,10 +353,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void tryDropPayload(){
         Unit unit = player.unit();
         if(!(unit instanceof Payloadc)) return;
-        Payloadc pay = (Payloadc)unit;
 
         Call.dropPayload(player, player.x, player.y);
-        pay.dropLastPayload();
     }
 
     public float getMouseX(){
