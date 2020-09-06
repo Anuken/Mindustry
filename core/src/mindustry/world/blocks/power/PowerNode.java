@@ -33,6 +33,8 @@ public class PowerNode extends PowerBlock{
     public @Load("laser-end") TextureRegion laserEnd;
     public float laserRange = 6;
     public int maxNodes = 3;
+    public Color laserColor1 = Color.white;
+    public Color laserColor2 = Pal.powerLight;
 
     public PowerNode(String name){
         super(name);
@@ -158,7 +160,7 @@ public class PowerNode extends PowerBlock{
 
         float fract = 1f - satisfaction;
 
-        Draw.color(Color.white, Pal.powerLight, fract * 0.86f + Mathf.absin(3f, 0.1f));
+        Draw.color(laserColor1, laserColor2, fract * 0.86f + Mathf.absin(3f, 0.1f));
         Draw.alpha(opacity);
         Drawf.laser(team, laser, laserEnd, x1, y1, x2, y2, 0.25f);
         Draw.color();

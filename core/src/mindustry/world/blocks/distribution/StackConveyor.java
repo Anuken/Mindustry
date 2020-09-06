@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -27,6 +28,8 @@ public class StackConveyor extends Block implements Autotiler{
     public float speed = 0f;
     public boolean splitOut = true;
     public float recharge = 2f;
+    public Effect loadEffect = Fx.plasticburn;
+    public Effect unloadEffect = Fx.plasticburn;
 
     public StackConveyor(String name){
         super(name);
@@ -221,11 +224,11 @@ public class StackConveyor extends Block implements Autotiler{
 
         protected void poofIn(){
             link = tile.pos();
-            Fx.plasticburn.at(this);
+            loadEffect.at(this);
         }
 
         protected void poofOut(){
-            Fx.plasticburn.at(this);
+            unloadEffect.at(this);
             link = -1;
         }
 
