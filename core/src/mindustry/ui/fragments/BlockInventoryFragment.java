@@ -45,8 +45,10 @@ public class BlockInventoryFragment extends Fragment{
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Building tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.team())) return;
-        amount = Mathf.clamp(amount, 0, player.unit().itemCapacity());
+        amount = Math.min(player.unit().maxAccepted(item), amount);
         int fa = amount;
+
+        if(amount == 0) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
