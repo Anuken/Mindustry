@@ -25,15 +25,15 @@ public class SectorPresets implements ContentList{
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
-            captureWave = 40;
+            captureWave = 20;
         }};
 
         craters = new SectorPreset("craters", serpulo, 18){{
-            captureWave = 40;
+            captureWave = 30;
         }};
 
         ruinousShores = new SectorPreset("ruinousShores", serpulo, 19){{
-            captureWave = 40;
+            captureWave = 30;
         }};
 
         stainedMountains = new SectorPreset("stainedMountains", serpulo, 20){{
