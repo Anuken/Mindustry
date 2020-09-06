@@ -215,11 +215,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void tileConfig(Player player, Building tile, @Nullable Object value){
+    public static void tileConfig(@Nullable Player player, Building tile, @Nullable Object value){
         if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
-        tile.configured(player, value);
+        tile.configured(player == null || player.dead() ? null : player.unit(), value);
         Core.app.post(() -> Events.fire(new ConfigEvent(tile, player, value)));
     }
 
@@ -645,13 +645,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     protected void drawRequest(BuildPlan request){
         request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
-
-        if(request.block.saveConfig && request.block.lastConfig != null && !request.hasConfig){
-            Object conf = request.config;
-            request.config = request.block.lastConfig;
-            request.block.drawRequestConfig(request, allRequests());
-            request.config = conf;
-        }
     }
 
     /** Draws a placement icon for a specific block. */
@@ -720,7 +713,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lineRequests.clear();
         iterateLine(x1, y1, x2, y2, l -> {
             rotation = l.rotation;
-            BuildPlan req = new BuildPlan(l.x, l.y, l.rotation, block);
+            BuildPlan req = new BuildPlan(l.x, l.y, l.rotation, block, block.nextConfig());
             req.animScale = 1f;
             lineRequests.add(req);
         });
@@ -993,13 +986,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(req != null){
             player.builder().plans().remove(req);
         }
-        player.builder().addBuild(new BuildPlan(x, y, rotation, block));
+        player.builder().addBuild(new BuildPlan(x, y, rotation, block, block.nextConfig()));
     }
 
     public void breakBlock(int x, int y){
         Tile tile = world.tile(x, y);
-        //TODO hacky
-        if(tile != null && tile.build != null) tile = tile.build.tile();
+        if(tile != null && tile.build != null) tile = tile.build.tile;
         player.builder().addBuild(new BuildPlan(tile.x, tile.y));
     }
 

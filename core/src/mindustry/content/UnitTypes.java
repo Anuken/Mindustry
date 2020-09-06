@@ -325,7 +325,7 @@ public class UnitTypes implements ContentList{
             mineSpeed = 7f;
             drawShields = false;
 
-            abilities.add(new ForceFieldAbility(60f, 0.2f, 300f, 60f * 7));
+            abilities.add(new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6));
 
             weapons.add(new Weapon("beam-weapon"){{
                 shake = 2f;

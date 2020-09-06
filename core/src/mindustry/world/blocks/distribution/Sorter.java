@@ -51,7 +51,7 @@ public class Sorter extends Block{
         public @Nullable Item sortItem;
 
         @Override
-        public void configured(Player player, Object value){
+        public void configured(Unit player, Object value){
             super.configured(player, value);
 
             if(!headless){

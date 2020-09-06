@@ -813,9 +813,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called after the block is placed by this client. */
     @CallSuper
     public void playerPlaced(){
-        if(block.saveConfig && block.lastConfig != null){
-            configure(block.lastConfig);
-        }
+
     }
 
     /** Called after the block is placed by anyone. */
@@ -856,7 +854,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** Called when arbitrary configuration is applied to a tile. */
-    public void configured(@Nullable Player player, @Nullable Object value){
+    public void configured(@Nullable Unit builder, @Nullable Object value){
         //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 

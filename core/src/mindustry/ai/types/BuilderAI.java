@@ -49,11 +49,7 @@ public class BuilderAI extends AIController{
                     blocks.removeFirst();
                 }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid.
                     //add build request.
-                    BuildPlan req = new BuildPlan(block.x, block.y, block.rotation, content.block(block.block));
-                    if(block.config != null){
-                        req.configure(block.config);
-                    }
-                    builder.addBuild(req);
+                    builder.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
                 }else{
                     //shift head of queue to tail, try something else next time
                     blocks.removeFirst();
