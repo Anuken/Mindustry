@@ -37,7 +37,7 @@ public class Vars implements Loadable{
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
     /** Maximum extra padding around deployment schematics. */
-    public static final int maxLoadoutSchematicPad = 4;
+    public static final int maxLoadoutSchematicPad = 5;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
@@ -134,7 +134,7 @@ public class Vars implements Loadable{
     /** whether typing into the console is enabled - developers only */
     public static boolean enableConsole = false;
     /** whether to clear sector saves when landing */
-    public static boolean clearSectors = false;
+    public static boolean clearSectors = true;
     /** whether any light rendering is enabled */
     public static boolean enableLight = true;
     /** Whether to draw shadows of blocks at map edges and static blocks.

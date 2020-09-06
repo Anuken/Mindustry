@@ -83,10 +83,22 @@ public class BaseGenerator{
             }
         });
 
+        //replace walls with the correct type
+        pass(tile -> {
+            if(tile.block() instanceof Wall && tile.team() == team && tile.block() != wall && tile.block() != wallLarge){
+                tile.setBlock(tile.block().size == 2 ? wallLarge : wall, team);
+            }
+        });
+
         if(wallAngle > 0){
 
             //small walls
             pass(tile -> {
+                //no walls around cores
+                if(cores.contains(t -> t.within(tile, (3 + 4) * tilesize))){
+                    return;
+                }
+
                 if(tile.block().alwaysReplace){
                     boolean any = false;
 
