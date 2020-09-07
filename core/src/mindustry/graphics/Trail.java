@@ -18,10 +18,6 @@ public class Trail{
         points = new Seq<>(length);
     }
 
-    public void clear(){
-        points.clear();
-    }
-
     public void draw(Color color, float width){
         Draw.color(color);
 

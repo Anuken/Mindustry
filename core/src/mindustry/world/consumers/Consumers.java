@@ -52,8 +52,8 @@ public class Consumers{
     }
 
     /** Creates a consumer which only consumes power when the condition is met. */
-    public <T extends Building> ConsumePower powerCond(float usage, Boolf<T> cons){
-        return add(new ConditionalConsumePower(usage, (Boolf<Building>)cons));
+    public ConsumePower powerCond(float usage, Boolf<Building> cons){
+        return add(new ConditionalConsumePower(usage, cons));
     }
 
     /**

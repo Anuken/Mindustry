@@ -16,7 +16,7 @@ public class Links{
             new LinkEntry("changelog", "https://github.com/Anuken/Mindustry/releases", Icon.list, Pal.accent.cpy()),
             new LinkEntry("trello", "https://trello.com/b/aE2tcUwF", Icon.trello, Color.valueOf("026aa7")),
             new LinkEntry("wiki", "https://mindustrygame.github.io/wiki/", Icon.book, Color.valueOf("0f142f")),
-            new LinkEntry("suggestions", "https://github.com/Anuken/Mindustry-Suggestions/issues/new/choose/", Icon.add, Color.valueOf("ebebeb")),
+            new LinkEntry("feathub", "https://github.com/Anuken/Mindustry-Suggestions/issues/new/choose/", Icon.add, Color.valueOf("ebebeb")),
             new LinkEntry("reddit", "https://www.reddit.com/r/Mindustry/", Icon.redditAlien, Color.valueOf("ee593b")),
             new LinkEntry("itch.io", "https://anuke.itch.io/mindustry", Icon.itchio, Color.valueOf("fa5c5c")),
             new LinkEntry("google-play", "https://play.google.com/store/apps/details?id=io.anuke.mindustry", Icon.googleplay, Color.valueOf("689f38")),

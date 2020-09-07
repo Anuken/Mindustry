@@ -40,6 +40,11 @@ public class Fracker extends SolidPump{
         public void drawCracks(){}
 
         @Override
+        public boolean shouldConsume(){
+            return liquids.get(result) < liquidCapacity - 0.01f;
+        }
+
+        @Override
         public void draw(){
             Draw.rect(region, x, y);
             super.drawCracks();

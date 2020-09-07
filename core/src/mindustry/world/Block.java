@@ -74,16 +74,12 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
-    /** for static blocks only: if true, tile data() is saved in world data. */
-    public boolean saveData;
     /** whether you can break this with rightclick */
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
     /** whether this water can only be placed on water */
     public boolean requiresWater = false;
-    /** whether this water can be placed on any liquids, anywhere */
-    public boolean placeableLiquid = false;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
@@ -92,8 +88,6 @@ public class Block extends UnlockableContent{
     public boolean squareSprite = true;
     /** whether this block absorbs laser attacks. */
     public boolean absorbLasers = false;
-    /** if false, the status is never drawn */
-    public boolean enableDrawStatus = true;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -217,7 +211,7 @@ public class Block extends UnlockableContent{
         if(tile.build != null){
             tile.build.draw();
         }else{
-            Draw.rect(region, tile.drawx(), tile.drawy());
+            Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation * 90 : 0);
         }
     }
 
@@ -240,7 +234,7 @@ public class Block extends UnlockableContent{
         if(renderer.pixelator.enabled()) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
-        Font font = Fonts.outline;
+        BitmapFont font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
@@ -267,8 +261,7 @@ public class Block extends UnlockableContent{
         return width;
     }
 
-    public float sumAttribute(@Nullable Attribute attr, int x, int y){
-        if(attr == null) return 0;
+    public float sumAttribute(Attribute attr, int x, int y){
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
@@ -590,14 +583,6 @@ public class Block extends UnlockableContent{
     }
 
     @Override
-    public void getDependencies(Cons<UnlockableContent> cons){
-        //just requires items
-        for(ItemStack stack : requirements){
-            cons.get(stack.item);
-        }
-    }
-
-    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayBlock(table, this);
     }
@@ -614,10 +599,6 @@ public class Block extends UnlockableContent{
         //initialize default health based on size
         if(health == -1){
             health = size * size * 40;
-        }
-
-        if(group == BlockGroup.transportation || consumes.has(ConsumeType.item) || category == Category.distribution){
-            acceptsItems = true;
         }
 
         offset = ((size + 1) % 2) * tilesize / 2f;

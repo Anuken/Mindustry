@@ -37,7 +37,7 @@ public class PayloadRouter extends PayloadConveyor{
         public void moved(){
             int rotations = 0;
             do{
-                rotation = (rotation + 1) % 4;
+                tile.rotation((tile.rotation() + 1) % 4);
                 onProximityUpdate();
             }while((blocked || next == null) && ++rotations < 4);
         }

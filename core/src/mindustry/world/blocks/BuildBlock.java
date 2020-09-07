@@ -154,7 +154,7 @@ public class BuildBlock extends Block{
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.builder().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock), false);
+                player.builder().addBuild(new BuildPlan(tile.x, tile.y, tile.rotation(), cblock), false);
             }
         }
 
@@ -163,14 +163,14 @@ public class BuildBlock extends Block{
             Fx.blockExplosionSmoke.at(tile);
 
             if(!tile.floor().solid && !tile.floor().isLiquid){
-                Effect.rubble(x, y, size);
+                Effects.rubble(x, y, size);
             }
         }
 
         @Override
         public void draw(){
             if(!(previous == null || cblock == null || previous == cblock) && Core.atlas.isFound(previous.icon(Cicon.full))){
-                Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? rotdeg() : 0);
+                Draw.rect(previous.icon(Cicon.full), x, y, previous.rotate ? tile.rotdeg() : 0);
             }
 
             Draw.draw(Layer.blockBuilding, () -> {
@@ -183,14 +183,14 @@ public class BuildBlock extends Block{
                         Shaders.blockbuild.region = region;
                         Shaders.blockbuild.progress = progress;
 
-                        Draw.rect(region, x, y, target.rotate ? rotdeg() : 0);
+                        Draw.rect(region, x, y, target.rotate ? tile.rotdeg() : 0);
                         Draw.flush();
                     }
                 }
             });
         }
 
-        public boolean construct(Unit builder, @Nullable Building core, float amount, boolean configured){
+        public boolean construct(Unitc builder, @Nullable Building core, float amount, boolean configured){
             if(cblock == null){
                 kill();
                 return false;
@@ -211,10 +211,10 @@ public class BuildBlock extends Block{
             maxProgress = core == null || team.rules().infiniteResources ? maxProgress : checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-            builderID = builder.id;
+            builderID = builder.id();
 
             if(progress >= 1f || state.rules.infiniteResources){
-                constructed(tile, cblock, builderID, (byte)rotation, builder.team, configured);
+                constructed(tile, cblock, builderID, tile.rotation(), builder.team(), configured);
                 return true;
             }
             return false;

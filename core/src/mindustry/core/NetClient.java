@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -12,7 +11,6 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
-import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -65,7 +63,7 @@ public class NetClient implements ApplicationListener{
             reset();
 
             ui.loadfrag.hide();
-            ui.loadfrag.show("@connecting.data");
+            ui.loadfrag.show("$connecting.data");
 
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
@@ -82,7 +80,7 @@ public class NetClient implements ApplicationListener{
             c.uuid = platform.getUUID();
 
             if(c.uuid == null){
-                ui.showErrorMessage("@invalidid");
+                ui.showErrorMessage("$invalidid");
                 ui.loadfrag.hide();
                 disconnectQuietly();
                 return;
@@ -106,14 +104,14 @@ public class NetClient implements ApplicationListener{
 
             if(packet.reason != null){
                 if(packet.reason.equals("closed")){
-                    ui.showSmall("@disconnect", "@disconnect.closed");
+                    ui.showSmall("$disconnect", "$disconnect.closed");
                 }else if(packet.reason.equals("timeout")){
-                    ui.showSmall("@disconnect", "@disconnect.timeout");
+                    ui.showSmall("$disconnect", "$disconnect.timeout");
                 }else if(packet.reason.equals("error")){
-                    ui.showSmall("@disconnect", "@disconnect.error");
+                    ui.showSmall("$disconnect", "$disconnect.error");
                 }
             }else{
-                ui.showErrorMessage("@disconnect");
+                ui.showErrorMessage("$disconnect");
             }
         });
 
@@ -263,7 +261,7 @@ public class NetClient implements ApplicationListener{
             if(reason.extraText() != null){
                 ui.showText(reason.toString(), reason.extraText());
             }else{
-                ui.showText("@disconnect", reason.toString());
+                ui.showText("$disconnect", reason.toString());
             }
         }
         ui.loadfrag.hide();
@@ -273,7 +271,7 @@ public class NetClient implements ApplicationListener{
     public static void kick(String reason){
         netClient.disconnectQuietly();
         logic.reset();
-        ui.showText("@disconnect", reason, Align.left);
+        ui.showText("$disconnect", reason, Align.left);
         ui.loadfrag.hide();
     }
 
@@ -316,6 +314,7 @@ public class NetClient implements ApplicationListener{
         ui.showLabel(message, duration, worldx, worldy);
     }
 
+    /*
     @Remote(variants = Variant.both, unreliable = true)
     public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
         if(effect == null) return;
@@ -326,7 +325,7 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
         onEffect(effect, x, y, rotation, color);
-    }
+    }*/
 
     @Remote(variants = Variant.both)
     public static void infoToast(String message, float duration){
@@ -348,7 +347,7 @@ public class NetClient implements ApplicationListener{
 
         net.setClientLoaded(false);
 
-        ui.loadfrag.show("@connecting.data");
+        ui.loadfrag.show("$connecting.data");
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
@@ -482,7 +481,7 @@ public class NetClient implements ApplicationListener{
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
                 quiet = true;
-                ui.showErrorMessage("@disconnect.data");
+                ui.showErrorMessage("$disconnect.data");
                 net.disconnect();
                 timeoutTime = 0f;
             }

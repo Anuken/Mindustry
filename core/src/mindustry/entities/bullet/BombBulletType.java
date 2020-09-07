@@ -18,10 +18,6 @@ public class BombBulletType extends BasicBulletType{
         hitSound = Sounds.explosion;
     }
 
-    public BombBulletType(float damage, float radius){
-        this(damage, radius, "shell");
-    }
-
     public BombBulletType(){
         this(1f, 1f, "shell");
     }

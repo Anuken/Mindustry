@@ -9,7 +9,7 @@ import mindustry.type.*;
 public class Planets implements ContentList{
     public static Planet
     sun,
-    serpulo;
+    starter; //TODO rename
 
     @Override
     public void load(){
@@ -31,11 +31,11 @@ public class Planets implements ContentList{
             );
         }};
 
-        serpulo = new Planet("serpulo", sun, 3, 1){{
-            generator = new SerpuloPlanetGenerator();
+        //TODO rename
+        starter = new Planet("TODO", sun, 3, 1){{
+            generator = new TODOPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             atmosphereColor = Color.valueOf("3c1b8f");
-            startSector = 15;
         }};
     }
 }

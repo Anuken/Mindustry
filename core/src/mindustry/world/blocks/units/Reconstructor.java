@@ -1,6 +1,5 @@
 package mindustry.world.blocks.units;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -42,19 +41,7 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-
         bars.add("progress", (ReconstructorEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
-        bars.add("units", (ReconstructorEntity e) ->
-        new Bar(
-            () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
-                Core.bundle.format("bar.unitcap",
-                Fonts.getUnicodeStr(e.unit().name),
-                teamIndex.countType(e.team, e.unit()),
-                Units.getCap(e.team)
-            ),
-            () -> Pal.power,
-            () -> e.unit() == null ? 0f : (float)teamIndex.countType(e.team, e.unit()) / Units.getCap(e.team)
-        ));
     }
 
     @Override
@@ -86,7 +73,7 @@ public class Reconstructor extends UnitBlock{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null
-                && relativeTo(source) != rotation
+                && relativeTo(source) != rotation()
                 && payload instanceof UnitPayload
                 && hasUpgrade(((UnitPayload)payload).unit.type());
         }
@@ -102,7 +89,7 @@ public class Reconstructor extends UnitBlock{
 
             //draw input
             for(int i = 0; i < 4; i++){
-                if(blends(i) && i != rotation){
+                if(blends(i) && i != rotation()){
                     Draw.rect(inRegion, x, y, i * 90);
                 }
             }
@@ -146,7 +133,7 @@ public class Reconstructor extends UnitBlock{
                         if(progress >= constructTime){
                             payload.unit = upgrade(payload.unit.type()).create(payload.unit.team());
                             progress = 0;
-                            Effect.shake(2f, 3f, this);
+                            Effects.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
                             consume();
                         }
@@ -158,29 +145,12 @@ public class Reconstructor extends UnitBlock{
             time += edelta() * speedScl * state.rules.unitBuildSpeedMultiplier;
         }
 
-        @Override
-        public boolean shouldConsume(){
-            //do not consume when cap reached
-            if(constructing()){
-                return Units.canCreate(team, upgrade(payload.unit.type()));
-            }
-            return false;
-        }
-
-        public UnitType unit(){
-            if(payload == null) return null;
-
-            UnitType t = upgrade(payload.unit.type());
-            return t != null && t.unlockedNow() ? t : null;
-        }
-
         public boolean constructing(){
             return payload != null && hasUpgrade(payload.unit.type());
         }
 
         public boolean hasUpgrade(UnitType type){
-            UnitType t = upgrade(type);
-            return t != null && t.unlockedNow();
+            return upgrade(type) != null;
         }
 
         public UnitType upgrade(UnitType type){

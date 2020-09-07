@@ -71,10 +71,10 @@ public class Router extends Block{
         }
 
         Building getTileTarget(Item item, Tile from, boolean set){
-            int counter = rotation;
+            int counter = tile.rotation();
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
-                if(set) rotation = ((byte)((rotation + 1) % proximity.size));
+                if(set) tile.rotation((byte)((tile.rotation() + 1) % proximity.size));
                 if(other.tile() == from && from.block() == Blocks.overflowGate) continue;
                 if(other.acceptItem(this, item)){
                     return other;

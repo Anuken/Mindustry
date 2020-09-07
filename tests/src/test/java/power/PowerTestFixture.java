@@ -86,7 +86,7 @@ public class PowerTestFixture{
             Reflect.set(Tile.class, tile, "floor", Blocks.sand);
 
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
-            tile.build = block.newEntity().init(tile, Team.sharded, false, 0);
+            tile.build = block.newEntity().init(tile, Team.sharded, false);
             if(block.hasPower){
                 tile.build.power.graph = new PowerGraph(){
                     //assume there's always something consuming power

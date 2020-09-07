@@ -16,7 +16,7 @@ public class FadeInFragment extends Fragment{
         parent.addChild(new Element(){
             {
                 setFillParent(true);
-                this.touchable = Touchable.disabled;
+                touchable(Touchable.disabled);
             }
 
              @Override

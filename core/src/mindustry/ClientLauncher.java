@@ -33,8 +33,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void setup(){
-        loadLogger();
-
         loader = new LoadRenderer();
         Events.fire(new ClientCreateEvent());
 

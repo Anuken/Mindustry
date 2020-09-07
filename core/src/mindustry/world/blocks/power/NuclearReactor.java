@@ -117,7 +117,7 @@ public class NuclearReactor extends PowerGenerator{
 
             if((fuel < 5 && heat < 0.5f) || !state.rules.reactorExplosions) return;
 
-            Effect.shake(6f, 16f, x, y);
+            Effects.shake(6f, 16f, x, y);
             Fx.nuclearShockwave.at(x, y);
             for(int i = 0; i < 6; i++){
                 Time.run(Mathf.random(40), () -> Fx.nuclearcloud.at(x, y));

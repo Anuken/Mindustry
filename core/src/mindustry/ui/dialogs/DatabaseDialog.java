@@ -19,7 +19,7 @@ import static mindustry.Vars.ui;
 public class DatabaseDialog extends BaseDialog{
 
     public DatabaseDialog(){
-        super("@database");
+        super("$database");
 
         shouldPause = true;
         addCloseButton();
@@ -42,7 +42,7 @@ public class DatabaseDialog extends BaseDialog{
             Seq<Content> array = allContent[j].select(c -> c instanceof UnlockableContent && !((UnlockableContent)c).isHidden());
             if(array.size == 0) continue;
 
-            table.add("@content." + type.name() + ".name").growX().left().color(Pal.accent);
+            table.add("$content." + type.name() + ".name").growX().left().color(Pal.accent);
             table.row();
             table.image().growX().pad(5).padLeft(0).padRight(0).height(3).color(Pal.accent);
             table.row();
@@ -62,14 +62,14 @@ public class DatabaseDialog extends BaseDialog{
                     image.addListener(listener);
                     if(!Vars.mobile && unlocked(unlock)){
                         image.addListener(new HandCursorListener());
-                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
+                        image.update(() -> image.getColor().lerp(!listener.isOver() ? Color.lightGray : Color.white, 0.4f * Time.delta));
                     }
 
                     if(unlocked(unlock)){
                         image.clicked(() -> {
                             if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(unlock.name) != 0){
                                 Core.app.setClipboardText((char)Fonts.getUnicode(unlock.name) + "");
-                                ui.showInfoFade("@copied");
+                                ui.showInfoFade("$copied");
                             }else{
                                 Vars.ui.content.show(unlock);
                             }

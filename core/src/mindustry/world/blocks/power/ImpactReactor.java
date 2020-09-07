@@ -126,7 +126,7 @@ public class ImpactReactor extends PowerGenerator{
 
             Sounds.explosionbig.at(tile);
 
-            Effect.shake(6f, 16f, x, y);
+            Effects.shake(6f, 16f, x, y);
             Fx.impactShockwave.at(x, y);
             for(int i = 0; i < 6; i++){
                 Time.run(Mathf.random(80), () -> Fx.impactcloud.at(x, y));

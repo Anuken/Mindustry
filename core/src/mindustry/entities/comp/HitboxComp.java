@@ -11,7 +11,7 @@ import mindustry.gen.*;
 abstract class HitboxComp implements Posc, QuadTreeObject{
     @Import float x, y;
 
-    transient float lastX, lastY, deltaX, deltaY, hitSize;
+    transient float lastX, lastY, hitSize;
 
     @Override
     public void update(){
@@ -33,8 +33,6 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
     }
 
     void updateLastPosition(){
-        deltaX = x - lastX;
-        deltaY = y - lastY;
         lastX = x;
         lastY = y;
     }
@@ -43,12 +41,20 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
 
     }
 
+    float deltaX(){
+        return x - lastX;
+    }
+
+    float deltaY(){
+        return y - lastY;
+    }
+
     float deltaLen(){
-        return Mathf.len(deltaX, deltaY);
+        return Mathf.len(deltaX(), deltaY());
     }
 
     float deltaAngle(){
-        return Mathf.angle(deltaX, deltaY);
+        return Mathf.angle(deltaX(), deltaY());
     }
 
     boolean collides(Hitboxc other){

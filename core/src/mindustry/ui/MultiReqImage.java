@@ -19,14 +19,14 @@ public class MultiReqImage extends Stack{
 
         time += Time.delta / 60f;
 
-        displays.each(req -> req.visible = false);
+        displays.each(req -> req.visible(false));
 
         ReqImage valid = displays.find(ReqImage::valid);
         if(valid != null){
-            valid.visible = true;
+            valid.visible(true);
         }else{
             if(displays.size > 0){
-                displays.get((int)time % displays.size).visible = true;
+                displays.get((int)(time) % displays.size).visible(true);
             }
         }
     }

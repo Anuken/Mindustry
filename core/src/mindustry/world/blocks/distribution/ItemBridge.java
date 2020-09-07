@@ -134,8 +134,6 @@ public class ItemBridge extends Block{
 
         @Override
         public void playerPlaced(){
-            super.playerPlaced();
-
             Tile link = findLink(tile.x, tile.y);
             if(linkValid(tile, link)){
                 link.build.configure(tile.pos());
@@ -148,9 +146,9 @@ public class ItemBridge extends Block{
         public void drawSelect(){
             if(linkValid(tile, world.tile(link))){
                 drawInput(world.tile(link));
+            }else{
+                incoming.each(pos -> drawInput(world.tile(pos)));
             }
-
-            incoming.each(pos -> drawInput(world.tile(pos)));
 
             Draw.reset();
         }
@@ -158,6 +156,7 @@ public class ItemBridge extends Block{
         private void drawInput(Tile other){
             if(!linkValid(tile, other, false)) return;
             boolean linked = other.pos() == link;
+            if(!linked && !(other.<ItemBridgeEntity>bc().link == tile.pos())) return;
 
             Tmp.v2.trns(tile.angleTo(other), 2f);
             float tx = tile.drawx(), ty = tile.drawy();
@@ -318,7 +317,7 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            if(team != source.team) return false;
+            if(team != source.team()) return false;
 
             Tile other = world.tile(link);
 
@@ -328,7 +327,7 @@ public class ItemBridge extends Block{
 
                 if(rel == rel2) return false;
             }else{
-                return linked(source) && items.total() < itemCapacity;
+                return source.block() instanceof ItemBridge && linkValid(source.tile(), tile) && items.total() < itemCapacity;
             }
 
             return items.total() < itemCapacity;
@@ -350,15 +349,11 @@ public class ItemBridge extends Block{
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
                 if(rel == rel2) return false;
-            }else if(!(linked(source))){
+            }else if(!(source.block() instanceof ItemBridge && linkValid(source.tile(), tile))){
                 return false;
             }
 
             return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
-        }
-
-        private boolean linked(Building source){
-            return source instanceof ItemBridgeEntity && linkValid(source.tile(), tile) && ((ItemBridgeEntity)source).link == pos();
         }
 
         @Override

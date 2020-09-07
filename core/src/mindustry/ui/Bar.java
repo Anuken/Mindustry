@@ -91,7 +91,7 @@ public class Bar extends Element{
 
         Draw.color();
 
-        Font font = Fonts.outline;
+        BitmapFont font = Fonts.outline;
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 

@@ -2,6 +2,7 @@ package mindustry.core;
 
 import arc.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -66,7 +67,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)tile.build.rotation, block.id, tile.build.config()));
+            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, tile.rotation(), block.id, tile.build.config()));
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {
@@ -87,27 +88,31 @@ public class Logic implements ApplicationListener{
 
         //when loading a 'damaged' sector, propagate the damage
         Events.on(WorldLoadEvent.class, e -> {
-            if(state.isCampaign()){
+            if(state.isCampaign() && state.rules.sector.getSecondsPassed() > 0 && state.rules.sector.hasBase()){
                 long seconds = state.rules.sector.getSecondsPassed();
                 CoreEntity core = state.rules.defaultTeam.core();
 
                 //apply fractional damage based on how many turns have passed for this sector
                 float turnsPassed = seconds / (turnDuration / 60f);
 
-                if(state.rules.sector.hasWaves() && turnsPassed > 0 && state.rules.sector.hasBase()){
+                if(state.rules.sector.hasWaves()){
                     SectorDamage.apply(turnsPassed / sectorDestructionTurns);
                 }
 
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){
-                    //update correct storage capacity
-                    state.rules.sector.save.meta.secinfo.storageCapacity = core.storageCapacity;
 
-                    //add new items received
-                    state.rules.sector.calculateReceivedItems().each((item, amount) -> core.items.add(item, amount));
+                    //add produced items
+                    //TODO move to received items
+                    state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
+                        core.items.add(item, (int)(stat.mean * seconds));
+                    });
+
+                    //add received items
+                    state.rules.sector.getReceivedItems().each(stack -> core.items.add(stack.item, stack.amount));
 
                     //clear received items
-                    state.rules.sector.setExtraItems(new ItemSeq());
+                    state.rules.sector.setReceivedItems(new Seq<>());
 
                     //validation
                     for(Item item : content.items()){
@@ -269,15 +274,15 @@ public class Logic implements ApplicationListener{
         Time.runTask(30f, () -> {
             Sector origin = sector.save.meta.secinfo.origin;
             if(origin != null){
-                ItemSeq stacks = origin.getExtraItems();
+                Seq<ItemStack> stacks = origin.getReceivedItems();
 
                 //add up all items into list
                 for(Building entity : state.teams.playerCores()){
-                    entity.items.each(stacks::add);
+                    entity.items.each((item, amount) -> ItemStack.insert(stacks, item, amount));
                 }
 
                 //save received items
-                origin.setExtraItems(stacks);
+                origin.setReceivedItems(stacks);
             }
 
             //remove all the cores
@@ -358,10 +363,6 @@ public class Logic implements ApplicationListener{
                 if(!net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
                 }
-
-                //apply weather attributes
-                state.envAttrs.clear();
-                Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
                 Groups.update();
             }

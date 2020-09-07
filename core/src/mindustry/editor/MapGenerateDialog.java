@@ -51,41 +51,41 @@ public class MapGenerateDialog extends BaseDialog{
     private CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
-        protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+        protected void changeEntity(Team team, Prov<Building> entityprov){
 
         }
     };
 
     /** @param applied whether or not to use the applied in-game mode. */
     public MapGenerateDialog(MapEditor editor, boolean applied){
-        super("@editor.generate");
+        super("$editor.generate");
         this.editor = editor;
         this.applied = applied;
 
         shown(this::setup);
         addCloseButton();
         if(applied){
-            buttons.button("@editor.apply", () -> {
+            buttons.button("$editor.apply", () -> {
                 ui.loadAnd(() -> {
                     apply();
                     hide();
                 });
             }).size(160f, 64f);
         }else{
-            buttons.button("@settings.reset", () -> {
+            buttons.button("$settings.reset", () -> {
                 filters.set(maps.readFilters(""));
                 rebuildFilters();
                 update();
             }).size(160f, 64f);
         }
-        buttons.button("@editor.randomize", () -> {
+        buttons.button("$editor.randomize", () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
         }).size(160f, 64f);
 
-        buttons.button("@add", Icon.add, this::showAdd).height(64f).width(140f);
+        buttons.button("$add", Icon.add, this::showAdd).height(64f).width(140f);
 
         if(!applied){
             hidden(this::apply);
@@ -123,7 +123,7 @@ public class MapGenerateDialog extends BaseDialog{
                     Tile tile = editor.tile(x, y);
                     input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
                     filter.apply(input);
-                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.team());
+                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.team(), tile.rotation());
                 }
             }
 
@@ -134,6 +134,7 @@ public class MapGenerateDialog extends BaseDialog{
                         Tile tile = editor.tile(x, y);
                         GenTile write = writeTiles[x][y];
 
+                        tile.rotation(write.rotation);
                         tile.setFloor((Floor)content.block(write.floor));
                         tile.setBlock(content.block(write.block));
                         tile.setTeam(Team.get(write.team));
@@ -213,7 +214,7 @@ public class MapGenerateDialog extends BaseDialog{
     }
 
     void rebuildFilters(){
-        int cols = Math.max((int)(Math.max(filterTable.parent.getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Scl.scl(290f)), 1);
+        int cols = Math.max((int)(Math.max(filterTable.getParent().getWidth(), Core.graphics.getWidth()/2f * 0.9f) / Scl.scl(290f)), 1);
         filterTable.clearChildren();
         filterTable.top().left();
         int i = 0;
@@ -277,12 +278,12 @@ public class MapGenerateDialog extends BaseDialog{
         }
 
         if(filters.isEmpty()){
-            filterTable.add("@filters.empty").wrap().width(200f);
+            filterTable.add("$filters.empty").wrap().width(200f);
         }
     }
 
     void showAdd(){
-        BaseDialog selection = new BaseDialog("@add");
+        BaseDialog selection = new BaseDialog("$add");
         selection.setFillParent(false);
         selection.cont.defaults().size(210f, 60f);
         int i = 0;
@@ -300,7 +301,7 @@ public class MapGenerateDialog extends BaseDialog{
             if(++i % 2 == 0) selection.cont.row();
         }
 
-        selection.cont.button("@filter.defaultores", () -> {
+        selection.cont.button("$filter.defaultores", () -> {
             maps.addDefaultOres(filters);
             rebuildFilters();
             update();
@@ -364,7 +365,7 @@ public class MapGenerateDialog extends BaseDialog{
                         GenTile tile = buffer1[px][py];
                         input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
                         filter.apply(input);
-                        buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team));
+                        buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team), tile.rotation);
                     });
 
                     pixmap.each((px, py) -> buffer1[px][py].set(buffer2[px][py]));
@@ -401,14 +402,15 @@ public class MapGenerateDialog extends BaseDialog{
     }
 
     private class GenTile{
-        public byte team;
+        public byte team, rotation;
         public short block, floor, ore;
 
-        public void set(Block floor, Block wall, Block ore, Team team){
+        public void set(Block floor, Block wall, Block ore, Team team, int rotation){
             this.floor = floor.id;
             this.block = wall.id;
             this.ore = ore.id;
             this.team = (byte)team.id;
+            this.rotation = (byte)rotation;
         }
 
         public void set(GenTile other){
@@ -416,10 +418,11 @@ public class MapGenerateDialog extends BaseDialog{
             this.block = other.block;
             this.ore = other.ore;
             this.team = other.team;
+            this.rotation = other.rotation;
         }
 
         public GenTile set(Tile other){
-            set(other.floor(), other.block(), other.overlay(), other.team());
+            set(other.floor(), other.block(), other.overlay(), other.team(), other.rotation());
             return this;
         }
 
@@ -427,6 +430,7 @@ public class MapGenerateDialog extends BaseDialog{
             ctile.setFloor((Floor)content.block(floor));
             ctile.setBlock(content.block(block));
             ctile.setOverlay(content.block(ore));
+            ctile.rotation(rotation);
             ctile.setTeam(Team.get(team));
             return ctile;
         }

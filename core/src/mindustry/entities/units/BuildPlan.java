@@ -3,7 +3,6 @@ package mindustry.entities.units;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -133,10 +132,6 @@ public class BuildPlan{
 
     public @Nullable Tile tile(){
         return world.tile(x, y);
-    }
-
-    public @Nullable Building build(){
-        return world.build(x, y);
     }
 
     @Override

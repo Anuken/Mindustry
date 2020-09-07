@@ -13,9 +13,8 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
+abstract class WeaponsComp implements Teamc, Posc, Rotc{
     @Import float x, y, rotation, reloadMultiplier;
-    @Import Vec2 vel;
 
     /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
     static final float minAimDst = 18f;
@@ -24,7 +23,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
 
     /** weapon mount array, never null */
     @SyncLocal WeaponMount[] mounts = {};
-    @ReadOnly transient float aimX, aimY;
+    @ReadOnly transient float range, aimX, aimY;
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
     float ammo;
@@ -35,10 +34,16 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         }
     }
 
+    boolean inRange(Position other){
+        return within(other, range);
+    }
+
     void setupWeapons(UnitType def){
         mounts = new WeaponMount[def.weapons.size];
+        range = def.range;
         for(int i = 0; i < mounts.length; i++){
             mounts[i] = new WeaponMount(def.weapons.get(i));
+            range = Math.max(range, def.weapons.get(i).bullet.range());
         }
     }
 
@@ -97,7 +102,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
 
                 mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation;
                 mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
-            }else if(!weapon.rotate){
+            }else{
                 mount.rotation = 0;
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
@@ -106,7 +111,6 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
             if(mount.shoot && //must be shooting
                 (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && //check ammo
                 (!weapon.alternate || mount.side == weapon.flipSprite) &&
-                vel.len() >= mount.weapon.minShootVelocity && //check velocity requirements
                 mount.reload <= 0.0001f && //reload has to be 0
                 Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
             ){
@@ -156,7 +160,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         }
         boolean parentize = ammo.keepVelocity;
 
-        Effect.shake(weapon.shake, weapon.shake, x, y);
+        Effects.shake(weapon.shake, weapon.shake, x, y);
         weapon.ejectEffect.at(x, y, rotation * side);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);

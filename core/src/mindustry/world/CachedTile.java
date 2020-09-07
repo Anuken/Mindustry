@@ -21,7 +21,7 @@ public class CachedTile extends Tile{
     }
 
     @Override
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeEntity(Team team, Prov<Building> entityprov){
         build = null;
 
         Block block = block();

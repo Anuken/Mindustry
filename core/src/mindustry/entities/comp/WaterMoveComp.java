@@ -35,13 +35,6 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
         }
     }
 
-    @Override
-    public void add(){
-        tleft.clear();
-        tright.clear();
-    }
-
-    @Override
     public void draw(){
         float z = Draw.z();
 

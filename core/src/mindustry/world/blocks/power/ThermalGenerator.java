@@ -37,12 +37,8 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     public class ThermalGeneratorEntity extends GeneratorEntity{
-        public float sum;
-
         @Override
         public void updateTile(){
-            productionEfficiency = sum + attribute.env();
-
             if(productionEfficiency > 0.1f && Mathf.chance(0.05 * delta())){
                 generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
             }
@@ -57,7 +53,14 @@ public class ThermalGenerator extends PowerGenerator{
         public void onProximityAdded(){
             super.onProximityAdded();
 
-            sum = sumAttribute(attribute, tile.x, tile.y);
+            productionEfficiency = sumAttribute(attribute, tile.x, tile.y);
+        }
+
+        @Override
+        public float getPowerProduction(){
+            //in this case, productionEfficiency means 'total heat'
+            //thus, it may be greater than 1.0
+            return powerProduction * productionEfficiency;
         }
     }
 }

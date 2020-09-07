@@ -161,7 +161,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         //autosave periodically
-        Events.run(Trigger.update, () -> {
+        Events.on(Trigger.update, () -> {
             if(state.isPlaying() && Config.autosave.bool()){
                 if(autosaveCount.get(Config.autosaveSpacing.num() * 60)){
                     int max = Config.autosaveAmount.num();
@@ -194,7 +194,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        Events.run(Trigger.socketConfigChanged, () -> {
+        Events.on(Trigger.socketConfigChanged, () -> {
             toggleSocket(false);
             toggleSocket(Config.socketInput.bool());
         });

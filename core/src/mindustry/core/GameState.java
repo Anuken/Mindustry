@@ -7,7 +7,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.*;
 import mindustry.type.*;
-import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -24,8 +23,6 @@ public class GameState{
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */
     public Stats stats = new Stats();
-    /** Global attributes of the environment, calculated by weather. */
-    public Attributes envAttrs = new Attributes();
     /** Sector information. Only valid in the campaign. */
     public SectorInfo secinfo = new SectorInfo();
     /** Team data. Gets reset every new game. */

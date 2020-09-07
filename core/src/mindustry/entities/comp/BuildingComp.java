@@ -53,8 +53,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient Seq<Building> proximity = new Seq<>(8);
     transient boolean updateFlow;
     transient byte dump;
-    transient int rotation;
-    transient boolean enabled = true;
 
     PowerModule power;
     ItemModule items;
@@ -70,11 +68,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     private transient boolean initialized;
 
     /** Sets this tile entity data to this and adds it if necessary. */
-    public Building init(Tile tile, Team team, boolean shouldAdd, int rotation){
+    public Building init(Tile tile, Team team, boolean shouldAdd){
         if(!initialized){
             create(tile.block(), team);
         }
-        this.rotation = rotation;
         this.tile = tile;
 
         set(tile.drawx(), tile.drawy());
@@ -132,7 +129,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public final void writeBase(Writes write){
         write.f(health);
-        write.b(rotation);
+        write.b(rotation());
         write.b(team.id);
         if(items != null) items.write(write);
         if(power != null) power.write(write);
@@ -234,25 +231,25 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Multiblock front. */
     public @Nullable Building front(){
         int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
+        return nearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
     }
 
     /** Multiblock back. */
     public @Nullable Building back(){
         int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation + 2).x * trns, Geometry.d4(rotation + 2).y * trns);
+        return nearby(Geometry.d4(rotation() + 2).x * trns, Geometry.d4(rotation() + 2).y * trns);
     }
 
     /** Multiblock left. */
     public @Nullable Building left(){
         int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation + 1).x * trns, Geometry.d4(rotation + 1).y * trns);
+        return nearby(Geometry.d4(rotation() + 1).x * trns, Geometry.d4(rotation() + 1).y * trns);
     }
 
     /** Multiblock right. */
     public @Nullable Building right(){
         int trns = block.size/2 + 1;
-        return nearby(Geometry.d4(rotation + 3).x * trns, Geometry.d4(rotation + 3).y * trns);
+        return nearby(Geometry.d4(rotation() + 3).x * trns, Geometry.d4(rotation() + 3).y * trns);
     }
 
     public int pos(){
@@ -260,7 +257,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float rotdeg(){
-        return rotation * 90;
+        return tile.rotdeg();
+    }
+
+    public int rotation(){
+        return tile.rotation();
+    }
+
+    public void rotation(int rotation){
+        tile.rotation(rotation);
     }
 
     public Floor floor(){
@@ -393,7 +398,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      */
     public boolean movePayload(@NonNull Payload todump){
         int trns = block.size/2 + 1;
-        Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
+        Tile next = tile.getNearby(Geometry.d4(rotation()).x * trns, Geometry.d4(rotation()).y * trns);
 
         if(next != null && next.build != null && next.build.team() == team && next.build.acceptPayload(base(), todump)){
             next.build.handlePayload(base(), todump);
@@ -476,7 +481,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float moveLiquidForward(float leakResistance, Liquid liquid){
-        Tile next = tile.getNearby(rotation);
+        Tile next = tile.getNearby(rotation());
 
         if(next == null) return 0;
 
@@ -658,8 +663,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void updatePowerGraph(){
 
         for(Building other : getPowerConnections(tempTileEnts)){
-            if(other.power != null){
-                other.power.graph.addGraph(power.graph);
+            if(other.power() != null){
+                other.power().graph.addGraph(power.graph);
             }
         }
     }
@@ -683,7 +688,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(power == null) return out;
 
         for(Building other : proximity){
-            if(other != null && other.power != null
+            if(other != null && other.power() != null
             && !(block.consumesPower && other.block.consumesPower && !block.outputsPower && !other.block.outputsPower)
             && !power.links.contains(other.pos())){
                 out.add(other);
@@ -698,11 +703,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float getProgressIncrease(float baseTime){
-        return 1f / baseTime * edelta();
-    }
-
-    public float getDisplayEfficiency(){
-        return getProgressIncrease(1f) / edelta();
+        return 1f / baseTime * delta() * efficiency();
     }
 
     /** @return whether this block should play its active sound.*/
@@ -716,11 +717,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void drawStatus(){
-        if(block.enableDrawStatus && block.consumes.any()){
+        if(block.consumes.any()){
             float brcx = tile.drawx() + (block.size * tilesize / 2f) - (tilesize / 2f);
             float brcy = tile.drawy() - (block.size * tilesize / 2f) + (tilesize / 2f);
 
-            Draw.z(Layer.power + 1);
+            Draw.z(Layer.blockOver);
             Draw.color(Pal.gray);
             Fill.square(brcx, brcy, 2.5f, 45);
             Draw.color(cons.status().color);
@@ -799,7 +800,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 Building other = world.build(x, y);
                 if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, base()) && !PowerNode.insulated(other, base())
                     && !other.proximity().contains(this.<Building>base()) &&
-                !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
+                !(block.outputsPower && proximity.contains(p -> p.power() != null && p.power().graph == other.power().graph))){
                     tempTiles.add(other.tile());
                 }
             });
@@ -880,7 +881,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         Damage.dynamicExplosion(x, y, flammability, explosiveness * 3.5f, power, tilesize * block.size / 2f, Pal.darkFlame);
         if(!floor().solid && !floor().isLiquid){
-            Effect.rubble(x, y, block.size);
+            Effects.rubble(x, y, block.size);
         }
     }
 

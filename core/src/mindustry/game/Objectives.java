@@ -3,52 +3,72 @@ package mindustry.game;
 import arc.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.ctype.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 /** Holds objective classes. */
 public class Objectives{
 
-    public static class Research implements Objective{
-        public @NonNull UnlockableContent content;
+    public static class Unlock implements Objective{
+        public @NonNull Block block;
 
-        public Research(UnlockableContent content){
-            this.content = content;
+        public Unlock(Block block){
+            this.block = block;
         }
 
-        protected Research(){}
+        protected Unlock(){}
 
         @Override
         public boolean complete(){
-            return content.unlocked();
+            return block.unlocked();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.research", content.emoji() + " " + content.localizedName);
+            return Core.bundle.format("requirement.unlock", block.localizedName);
         }
     }
 
-    public static class SectorComplete extends SectorObjective{
+    public static class SectorWave extends SectorObjective{
+        public int wave;
 
-        public SectorComplete(SectorPreset zone){
+        public SectorWave(SectorPreset zone, int wave){
+            this.preset = zone;
+            this.wave = wave;
+        }
+
+        protected SectorWave(){}
+
+        @Override
+        public boolean complete(){
+            return preset.bestWave() >= wave;
+        }
+
+        @Override
+        public String display(){
+            return Core.bundle.format("requirement.wave", wave, preset.localizedName);
+        }
+    }
+
+    public static class Launched extends SectorObjective{
+
+        public Launched(SectorPreset zone){
             this.preset = zone;
         }
 
-        protected SectorComplete(){}
+        protected Launched(){}
 
         @Override
         public boolean complete(){
-            return preset.sector.isCaptured();
+            return preset.hasLaunched();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.capture", preset.localizedName);
+            return Core.bundle.format("requirement.core", preset.localizedName);
         }
     }
 
-    //TODO merge
     public abstract static class SectorObjective implements Objective{
         public @NonNull SectorPreset preset;
     }

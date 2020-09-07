@@ -31,6 +31,7 @@ public class GenericCrafter extends Block{
         update = true;
         solid = true;
         hasItems = true;
+        health = 60;
         idleSound = Sounds.machine;
         sync = true;
         idleSoundVolume = 0.03f;

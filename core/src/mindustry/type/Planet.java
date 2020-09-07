@@ -1,6 +1,5 @@
 package mindustry.type;
 
-import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -51,8 +50,6 @@ public class Planet extends UnlockableContent{
     public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
-    /** The default starting sector displayed to the map dialog. */
-    public int startSector = 0;
     /** Whether the bloom render effect is enabled. */
     public boolean bloom = false;
     /** For suns, this is the color that shines on other planets. Does nothing for children. */
@@ -123,14 +120,6 @@ public class Planet extends UnlockableContent{
 
         //calculate solar system
         for(solarSystem = this; solarSystem.parent != null; solarSystem = solarSystem.parent);
-    }
-
-    public @Nullable Sector getLastSector(){
-        return sectors.get(Math.min(Core.settings.getInt(name + "-last-sector", startSector), sectors.size - 1));
-    }
-
-    public void setLastSector(Sector sector){
-        Core.settings.put(name + "-last-sector", sector.id);
     }
 
     public void preset(int index, SectorPreset preset){

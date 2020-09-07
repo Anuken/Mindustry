@@ -1,7 +1,6 @@
 package mindustry.ctype;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
@@ -43,10 +42,6 @@ public abstract class UnlockableContent extends MappableContent{
 
     }
 
-    public String emoji(){
-        return Fonts.getUnicodeStr(name);
-    }
-
     /** Returns a specific content icon, or the region {contentType}-{name} if not found.*/
     public TextureRegion icon(Cicon icon){
         if(cicons[icon.ordinal()] == null){
@@ -58,12 +53,6 @@ public abstract class UnlockableContent extends MappableContent{
                 Core.atlas.find(name + "1")))));
         }
         return cicons[icon.ordinal()];
-    }
-
-    /** Iterates through any implicit dependencies of this content.
-     * For blocks, this would be the items required to build it. */
-    public void getDependencies(Cons<UnlockableContent> cons){
-
     }
 
     /** This should show all necessary info about this content in the specified table. */

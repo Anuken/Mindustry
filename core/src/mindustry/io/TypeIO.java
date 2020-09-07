@@ -10,7 +10,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
-import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -75,9 +74,6 @@ public class TypeIO{
             write.b(9);
             write.b((byte)map.content.getContentType().ordinal());
             write.s(map.content.id);
-        }else if(object instanceof Boolean){
-            write.b((byte)10);
-            write.bool((Boolean)object);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -96,7 +92,6 @@ public class TypeIO{
             case 7: return new Point2(read.i(), read.i());
             case 8: byte len = read.b(); Point2[] out = new Point2[len]; for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i()); return out;
             case 9: return TechTree.getNotNull(content.getByID(ContentType.all[read.b()], read.s()));
-            case 10: return read.bool();
             default: throw new IllegalArgumentException("Unknown object type: " + type);
         }
     }
@@ -385,20 +380,12 @@ public class TypeIO{
         return AdminAction.values()[read.b()];
     }
 
-    public static void writeUnitType(Writes write, UnitType effect){
+    public static void writeUnitDef(Writes write, UnitType effect){
         write.s(effect.id);
     }
 
-    public static UnitType readUnitType(Reads read){
+    public static UnitType readUnitDef(Reads read){
         return content.getByID(ContentType.unit, read.s());
-    }
-
-    public static void writeEffect(Writes write, Effect effect){
-        write.s(effect.id);
-    }
-
-    public static Effect readEffect(Reads read){
-        return Effect.get(read.us());
     }
 
     public static void writeColor(Writes write, Color color){

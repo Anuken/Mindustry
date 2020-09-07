@@ -33,7 +33,7 @@ public class Cultivator extends GenericCrafter{
         super.setBars();
         bars.add("multiplier", (CultivatorEntity entity) -> new Bar(() ->
         Core.bundle.formatFloat("bar.efficiency",
-        ((entity.boost + 1f + attribute.env()) * entity.warmup) * 100f, 1),
+        ((entity.boost + 1f) * entity.warmup) * 100f, 1),
         () -> Pal.ammo,
         () -> entity.warmup));
     }
@@ -101,7 +101,7 @@ public class Cultivator extends GenericCrafter{
 
         @Override
         public float getProgressIncrease(float baseTime){
-            return super.getProgressIncrease(baseTime) * (1f + boost + attribute.env());
+            return super.getProgressIncrease(baseTime) * (1f + boost);
         }
 
         @Override

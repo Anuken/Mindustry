@@ -22,7 +22,7 @@ public class Build{
             return;
         }
 
-        Tile tile = world.tileBuilding(x, y);
+        Tile tile = world.Building(x, y);
         //this should never happen, but it doesn't hurt to check for links
         float prevPercent = 1f;
 
@@ -30,7 +30,7 @@ public class Build{
             prevPercent = tile.build.healthf();
         }
 
-        int rotation = tile.build != null ? tile.build.rotation : 0;
+        int rotation = tile.rotation();
         Block previous = tile.block();
         Block sub = BuildBlock.get(previous.size);
 
@@ -114,7 +114,7 @@ public class Build{
                 return type.bounds(x, y, Tmp.r1).grow(0.01f).contains(tile.block.bounds(tile.centerX(), tile.centerY(), Tmp.r2));
             }
 
-            if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
+            if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type)){
                 return false;
             }
 
@@ -131,7 +131,7 @@ public class Build{
                         other == null ||
                         !other.block().alwaysReplace ||
                         !other.floor().placeableOn ||
-                        (other.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) ||
+                        (other.floor().isDeep() && !type.floating && !type.requiresWater) ||
                         (type.requiresWater && tile.floor().liquidDrop != Liquids.water)
                     ){
                         return false;
@@ -141,12 +141,12 @@ public class Build{
             return true;
         }else{
             return tile.interactable(team)
-                && (contactsShallows(tile.x, tile.y, type) || type.requiresWater || type.placeableLiquid)
-                && (!tile.floor().isDeep() || type.floating || type.requiresWater || type.placeableLiquid)
+                && (contactsShallows(tile.x, tile.y, type) || type.requiresWater)
+                && (!tile.floor().isDeep() || type.floating || type.requiresWater)
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
                 && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type))
-                && !(type == tile.block() && (tile.build != null && rotation == tile.build.rotation) && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
+                && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                 && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile, team);
         }
     }

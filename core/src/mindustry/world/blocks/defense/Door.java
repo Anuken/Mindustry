@@ -4,7 +4,6 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -13,7 +12,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.pathfinder;
 
 public class Door extends Wall{
     protected final static Rect rect = new Rect();
@@ -29,14 +28,11 @@ public class Door extends Wall{
         solidifes = true;
         consumesTap = true;
 
-        config(Boolean.class, (DoorEntity base, Boolean open) -> {
-            Sounds.door.at(base);
-
-            for(DoorEntity entity : base.chained){
-                entity.open = open;
-                pathfinder.updateTile(entity.tile());
-                entity.effect();
-            }
+        config(Boolean.class, (DoorEntity entity, Boolean open) -> {
+            entity.open = open;
+            pathfinder.updateTile(entity.tile());
+            (open ? closefx : openfx).at(entity);
+            Sounds.door.at(entity);
         });
     }
 
@@ -47,45 +43,6 @@ public class Door extends Wall{
 
     public class DoorEntity extends Building{
         public boolean open = false;
-        public ObjectSet<DoorEntity> chained = new ObjectSet<>();
-
-        @Override
-        public void onProximityAdded(){
-            super.onProximityAdded();
-            updateChained();
-        }
-
-        @Override
-        public void onProximityRemoved(){
-            super.onProximityRemoved();
-
-            for(Building b : proximity){
-                if(b instanceof DoorEntity){
-                    ((DoorEntity)b).updateChained();
-                }
-            }
-        }
-
-        public void effect(){
-            (open ? closefx : openfx).at(this);
-        }
-
-        public void updateChained(){
-            chained = new ObjectSet<>();
-            flow(chained);
-        }
-
-        public void flow(ObjectSet<DoorEntity> set){
-            if(!set.add(this)) return;
-
-            this.chained = set;
-
-            for(Building b : proximity){
-                if(b instanceof DoorEntity){
-                    ((DoorEntity)b).flow(set);
-                }
-            }
-        }
 
         @Override
         public void draw(){

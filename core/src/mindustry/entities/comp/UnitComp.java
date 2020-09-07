@@ -50,16 +50,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         lookAt(x, y);
     }
 
-    public boolean inRange(Position other){
-        return within(other, type.range);
-    }
-
     public boolean hasWeapons(){
         return type.hasWeapons();
-    }
-
-    public float range(){
-        return type.range;
     }
 
     @Replace
@@ -138,6 +130,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.type = type;
         this.maxHealth = type.health;
         this.drag = type.drag;
+        this.elevation = type.flying ? 1f : 0;
         this.armor = type.armor;
         this.hitSize = type.hitsize;
         this.hovering = type.hovering;
@@ -181,7 +174,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void landed(){
         if(type.landShake > 0f){
-            Effect.shake(type.landShake, type.landShake, this);
+            Effects.shake(type.landShake, type.landShake, this);
         }
 
         type.landed(base());
@@ -252,14 +245,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             if(floor.damageTaken > 0f){
                 damageContinuous(floor.damageTaken);
             }
-
-            if(!net.client() && tile.solid()){
-                if(type.canBoost){
-                    elevation = 1f;
-                }else{
-                    kill();
-                }
-            }
         }
 
         //AI only updates on the server
@@ -291,9 +276,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         float shake = hitSize / 3f;
 
-        Effect.scorch(x, y, (int)(hitSize / 5));
+        Effects.scorch(x, y, (int)(hitSize / 5));
         Fx.explosion.at(this);
-        Effect.shake(shake, shake, this);
+        Effects.shake(shake, shake, this);
         type.deathSound.at(this);
 
         Events.fire(new UnitDestroyEvent(base()));
@@ -312,7 +297,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(type.wreckRegions[i].found()){
                     float range = type.hitsize/4f;
                     Tmp.v1.rnd(range);
-                    Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    Effects.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
                 }
             }
         }

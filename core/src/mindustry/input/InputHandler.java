@@ -167,11 +167,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
     public static void rotateBlock(Player player, Building tile, boolean direction){
         if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.rotate, tile.tile(), action -> action.rotation = Mathf.mod(tile.rotation + Mathf.sign(direction), 4)))){
+            !netServer.admins.allowAction(player, ActionType.rotate, tile.tile(), action -> action.rotation = Mathf.mod(tile.rotation() + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
-        tile.rotation = Mathf.mod(tile.rotation + Mathf.sign(direction), 4);
+        tile.rotation(Mathf.mod(tile.rotation() + Mathf.sign(direction), 4));
         tile.updateProximity();
         tile.noSleep();
     }
@@ -195,14 +195,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
 
         tile.getStackOffset(item, stackTrns);
-        tile.handleStack(item, accepted, player.unit());
 
         createItemTransfer(
             item,
             amount,
             player.x + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y + Angles.trnsy(player.unit().rotation + 180f, backTrns),
             new Vec2(tile.x + stackTrns.x, tile.y + stackTrns.y),
-            () -> {}
+            () -> tile.handleStack(item, accepted, player.unit())
         );
     }
 
@@ -262,7 +261,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(commander.isCommanding()){
             commander.clearCommand();
         }else{
-            SquareFormation pattern = new SquareFormation();
+            FormationPattern pattern = new SquareFormation();
             Formation formation = new Formation(new Vec3(player.x, player.y, player.unit().rotation), pattern);
             formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
 
@@ -277,8 +276,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             units.sort(u -> u.dst2(player.unit()));
             units.truncate(player.unit().type().commandLimit);
-
-            if(units.any()) pattern.spacing = units.max(u -> u.hitSize).hitSize * 2f;
 
             commander.command(formation, units);
         }
@@ -398,18 +395,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
 
-        ui.showTextInput("@schematic.add", "@name", "", text -> {
+        ui.showTextInput("$schematic.add", "$name", "", text -> {
             Schematic replacement = schematics.all().find(s -> s.name().equals(text));
             if(replacement != null){
-                ui.showConfirm("@confirm", "@schematic.replace", () -> {
+                ui.showConfirm("$confirm", "$schematic.replace", () -> {
                     schematics.overwrite(replacement, lastSchematic);
-                    ui.showInfoFade("@schematic.saved");
+                    ui.showInfoFade("$schematic.saved");
                     ui.schematics.showInfo(replacement);
                 });
             }else{
                 lastSchematic.tags.put("name", text);
                 schematics.add(lastSchematic);
-                ui.showInfoFade("@schematic.saved");
+                ui.showInfoFade("$schematic.saved");
                 ui.schematics.showInfo(lastSchematic);
             }
         });
@@ -534,7 +531,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
-                Tile tile = world.tileBuilding(x, y);
+                Tile tile = world.Building(x, y);
                 if(tile == null || !validBreak(tile.x, tile.y)) continue;
 
                 drawBreaking(tile.x, tile.y);
@@ -650,7 +647,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int wx = x1 + x * Mathf.sign(x2 - x1);
                 int wy = y1 + y * Mathf.sign(y2 - y1);
 
-                Tile tile = world.tileBuilding(wx, wy);
+                Tile tile = world.Building(wx, wy);
 
                 if(tile == null) continue;
 
@@ -893,7 +890,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
             uiGroup = new WidgetGroup();
-            uiGroup.touchable = Touchable.childrenOnly;
+            uiGroup.touchable(Touchable.childrenOnly);
             uiGroup.setFillParent(true);
             ui.hudGroup.addChild(uiGroup);
             buildUI(uiGroup);

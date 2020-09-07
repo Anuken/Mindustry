@@ -108,12 +108,12 @@ public class OverflowGate extends Block{
                 }else if(bc && !ac){
                     to = b;
                 }else{
-                    if(rotation == 0){
+                    if(tile.rotation() == 0){
                         to = a;
-                        if(flip) rotation =1;
+                        if(flip) tile.rotation((byte) 1);
                     }else{
                         to = b;
-                        if(flip) rotation = 0;
+                        if(flip) tile.rotation((byte) 0);
                     }
                 }
             }
@@ -128,15 +128,12 @@ public class OverflowGate extends Block{
 
         @Override
         public void write(Writes write){
-            super.write(write);
-
             write.i(lastInput == null ? -1 : lastInput.pos());
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-
             if(revision == 1){
                 new DirectionalItemBuffer(25).read(read);
             }else if(revision == 3){

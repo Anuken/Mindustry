@@ -64,7 +64,7 @@ public class PowerTests extends PowerTestFixture{
             assertEquals(producedPower * Time.delta, powerGraph.getPowerProduced(), Mathf.FLOAT_ROUNDING_ERROR);
             assertEquals(requiredPower * Time.delta, powerGraph.getPowerNeeded(), Mathf.FLOAT_ROUNDING_ERROR);
 
-            //Update and check for the expected power status of the consumer
+            // Update and check for the expected power status of the consumer
             powerGraph.update();
             assertEquals(expectedSatisfaction, directConsumerTile.build.power.status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
         }

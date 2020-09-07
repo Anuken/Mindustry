@@ -24,10 +24,8 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
-import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.blocks.units.*;
 
 import static mindustry.Vars.*;
 
@@ -80,7 +78,6 @@ public class UnitType extends UnlockableContent{
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
     public boolean canHeal = false;
-    public boolean singleTarget = false;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -102,10 +99,9 @@ public class UnitType extends UnlockableContent{
 
     public Unit create(Team team){
         Unit unit = constructor.get();
-        unit.team = team;
+        unit.team(team);
         unit.type(this);
-        unit.ammo = ammoCapacity; //fill up on ammo upon creation
-        unit.elevation = flying ? 1f : 0;
+        unit.ammo(ammoCapacity); //fill up on ammo upon creation
         unit.heal();
         return unit;
     }
@@ -155,23 +151,6 @@ public class UnitType extends UnlockableContent{
     }
 
     @Override
-    public void getDependencies(Cons<UnlockableContent> cons){
-        //units require reconstructors being researched
-        for(Block block : content.blocks()){
-            if(block instanceof Reconstructor){
-                Reconstructor r = (Reconstructor)block;
-                for(UnitType[] recipe : r.upgrades){
-                    //result of reconstruction is this, so it must be a dependency
-                    if(recipe[1] == this){
-                        cons.get(block);
-                    }
-                }
-            }
-        }
-    }
-
-
-    @Override
     public void displayInfo(Table table){
         ContentDisplay.displayUnit(table, this);
     }
@@ -181,13 +160,10 @@ public class UnitType extends UnlockableContent{
     public void init(){
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
 
-        singleTarget = weapons.size <= 1;
-
         //set up default range
         if(range < 0){
-            range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                range = Math.min(range, weapon.bullet.range() + hitsize/2f);
+                range = Math.max(range, weapon.bullet.range());
             }
         }
 
@@ -385,7 +361,7 @@ public class UnitType extends UnlockableContent{
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime);
 
-            if(unit.isLocal() && !renderer.pixelator.enabled()){
+            if(unit.isLocal()){
                 Fonts.outline.draw(unit.stack.amount + "",
                 unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
                 unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,

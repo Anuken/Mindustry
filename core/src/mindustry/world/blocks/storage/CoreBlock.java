@@ -9,7 +9,6 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -78,10 +77,10 @@ public class CoreBlock extends StorageBlock{
 
         bars.add("capacity", (CoreEntity e) ->
             new Bar(
-                () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
+                () -> Core.bundle.format("bar.capacity", ui.formatAmount(e.storageCapacity)),
                 () -> Pal.items,
             () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
-        ));
+            ));
     }
 
     @Override
@@ -97,7 +96,6 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team){
-        if(tile == null) return false;
         CoreEntity core = team.core();
         //must have all requirements
         if(core == null || (!state.rules.infiniteResources && !core.items.has(requirements))) return false;
@@ -139,9 +137,7 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        if(world.tile(x, y) == null) return;
-
-        if(!canPlaceOn(world.tile(x, y), player.team())){
+        if(!canPlaceOn(world.tile(x, y),player.team())){
 
             drawPlaceText(Core.bundle.get((player.team().core() != null && player.team().core().items.has(requirements) && !state.rules.infiniteResources) ?
                 "bar.corereq" :

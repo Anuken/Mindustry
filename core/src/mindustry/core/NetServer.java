@@ -582,7 +582,7 @@ public class NetServer implements ApplicationListener{
                 //auto-skip done requests
                 if(req.breaking && tile.block() == Blocks.air){
                     continue;
-                }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || (tile.build != null && tile.build.rotation == req.rotation))){
+                }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || tile.rotation() == req.rotation)){
                     continue;
                 }else if(con.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
                     continue;
@@ -687,7 +687,6 @@ public class NetServer implements ApplicationListener{
             logic.skipWave();
         }else if(action == AdminAction.ban){
             netServer.admins.banPlayerIP(other.con.address);
-            netServer.admins.banPlayerID(other.con.uuid);
             other.kick(KickReason.banned);
             Log.info("&lc@ has banned @.", player.name, other.name);
         }else if(action == AdminAction.kick){
@@ -740,7 +739,7 @@ public class NetServer implements ApplicationListener{
 
         if(!headless && !closing && net.server() && state.isMenu()){
             closing = true;
-            ui.loadfrag.show("@server.closing");
+            ui.loadfrag.show("$server.closing");
             Time.runTask(5f, () -> {
                 net.closeServer();
                 ui.loadfrag.hide();

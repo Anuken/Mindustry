@@ -13,9 +13,6 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.world.*;
-
-import static mindustry.Vars.*;
 
 public abstract class BulletType extends Content{
     public float lifetime = 40f;
@@ -101,11 +98,6 @@ public abstract class BulletType extends Content{
     public float weaveMag = -1f;
     public float hitShake = 0f;
 
-    public int puddles;
-    public float puddleRange;
-    public float puddleAmount = 5f;
-    public Liquid puddleLiquid = Liquids.water;
-
     public float lightRadius = 16f;
     public float lightOpacity = 0.3f;
     public Color lightColor = Pal.powerLight;
@@ -142,20 +134,13 @@ public abstract class BulletType extends Content{
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
-        Effect.shake(hitShake, hitShake, b);
+        Effects.shake(hitShake, hitShake, b);
 
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragCone/2);
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
-            }
-        }
-
-        if(puddleLiquid != null && puddles > 0){
-            for(int i = 0; i < puddles; i++){
-                Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
-                Puddles.deposit(tile, puddleLiquid, puddleAmount);
             }
         }
 

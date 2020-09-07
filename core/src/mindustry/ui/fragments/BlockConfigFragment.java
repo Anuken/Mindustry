@@ -17,7 +17,7 @@ public class BlockConfigFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        table.visible = false;
+        table.visible(false);
         parent.addChild(table);
 
         //hacky way to hide block config when in menu
@@ -27,7 +27,7 @@ public class BlockConfigFragment extends Fragment{
             public void act(float delta){
                 super.act(delta);
                 if(state.isMenu()){
-                    table.visible = false;
+                    table.visible(false);
                     configTile = null;
                 }
             }
@@ -35,7 +35,7 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public boolean isShown(){
-        return table.visible && configTile != null;
+        return table.isVisible() && configTile != null;
     }
 
     public Building getSelectedTile(){
@@ -46,7 +46,7 @@ public class BlockConfigFragment extends Fragment{
         if(tile.configTapped()){
             configTile = tile;
 
-            table.visible = true;
+            table.visible(true);
             table.clear();
             tile.buildConfiguration(table);
             table.pack();

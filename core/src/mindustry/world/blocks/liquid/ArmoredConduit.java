@@ -25,16 +25,15 @@ public class ArmoredConduit extends Conduit{
             super.draw();
 
             // draw the cap when a conduit would normally leak
-            Building next = front();
+            Building next = tile.front();
             if(next != null && next.team() == team && next.block().hasLiquids) return;
 
-            Draw.rect(capRegion, x, y, rotdeg());
+            Draw.rect(capRegion, x, y, tile.rotdeg());
         }
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid, float amount){
-            return super.acceptLiquid(source, liquid, amount) && (source.block() instanceof Conduit) ||
-                Edges.getFacingEdge(source.tile(), tile).absoluteRelativeTo(tile.x, tile.y) == rotation;
+            return super.acceptLiquid(source, liquid, amount) && (source.block() instanceof Conduit) || Edges.getFacingEdge(source.tile(), tile).absoluteRelativeTo(tile.x, tile.y) == tile.rotation();
         }
     }
 }

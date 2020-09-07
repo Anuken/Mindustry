@@ -171,10 +171,9 @@ public class Packets{
             TypeIO.writeString(buffer, name);
             TypeIO.writeString(buffer, usid);
 
-            byte[] b = Base64Coder.decode(uuid);
-            buffer.put(b);
+            buffer.put(Base64Coder.decode(uuid));
             CRC32 crc = new CRC32();
-            crc.update(Base64Coder.decode(uuid), 0, b.length);
+            crc.update(Base64Coder.decode(uuid));
             buffer.putLong(crc.getValue());
 
             buffer.put(mobile ? (byte)1 : 0);

@@ -65,7 +65,7 @@ public class BlockInventoryFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        table.name = "inventory";
+        table.setName("inventory");
         table.setTransform(true);
         parent.setTransform(true);
         parent.addChild(table);
@@ -90,7 +90,7 @@ public class BlockInventoryFragment extends Fragment{
             table.clearListeners();
             table.update(null);
         }), Actions.visible(false));
-        table.touchable = Touchable.disabled;
+        table.touchable(Touchable.disabled);
         tile = null;
     }
 
@@ -103,7 +103,7 @@ public class BlockInventoryFragment extends Fragment{
         table.clearChildren();
         table.clearActions();
         table.background(Tex.inventory);
-        table.touchable = Touchable.enabled;
+        table.touchable(Touchable.enabled);
         table.update(() -> {
 
             if(state.isMenu() || tile == null || !tile.isValid() || !tile.block().isAccessible() || emptyTime >= holdShrink){
@@ -209,7 +209,7 @@ public class BlockInventoryFragment extends Fragment{
 
         updateTablePosition();
 
-        table.visible = true;
+        table.visible(true);
 
         if(actions){
             table.setScale(0f, 1f);

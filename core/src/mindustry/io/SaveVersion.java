@@ -168,11 +168,8 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
-            boolean savedata = tile.block().saveData;
-            byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
-
-            //make note of whether there was an entity/rotation here
-            stream.writeByte(packed);
+            //make note of whether there was an entity here
+            stream.writeBoolean(tile.build != null);
 
             //only write the entity for multiblocks once - in the center
             if(tile.build != null){
@@ -185,8 +182,6 @@ public abstract class SaveVersion extends SaveFileReader{
                 }else{
                     stream.writeBoolean(false);
                 }
-            }else if(savedata){
-                stream.writeByte(tile.data);
             }else{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
@@ -242,9 +237,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
-                byte packedCheck = stream.readByte();
-                boolean hadEntity = (packedCheck & 1) != 0;
-                boolean hadData = (packedCheck & 2) != 0;
+                boolean hadEntity = stream.readBoolean();
 
                 if(hadEntity){
                     isCenter = stream.readBoolean();
@@ -271,9 +264,6 @@ public abstract class SaveVersion extends SaveFileReader{
                             skipChunk(stream, true);
                         }
                     }
-                }else if(hadData){
-                    tile.setBlock(block);
-                    tile.data = stream.readByte();
                 }else{
                     int consecutives = stream.readUnsignedByte();
 
