@@ -1924,7 +1924,7 @@ public class Blocks implements ContentList{
 
             instructionsPerTick = 5;
 
-            range = 8 * 20;
+            range = 8 * 22;
 
             size = 2;
         }};
@@ -1937,7 +1937,7 @@ public class Blocks implements ContentList{
 
             instructionsPerTick = 25;
 
-            range = 8 * 40;
+            range = 8 * 42;
 
             size = 3;
         }};

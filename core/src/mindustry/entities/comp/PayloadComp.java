@@ -21,19 +21,19 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     Seq<Payload> payloads = new Seq<>();
 
     float payloadUsed(){
-        return payloads.sumf(Payload::size);
+        return payloads.sumf(p -> p.size() * p.size());
     }
 
     boolean canPickup(Unit unit){
-        return payloadUsed() + unit.hitSize <= type.payloadCapacity;
+        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity;
     }
 
     boolean canPickup(Building build){
-        return payloadUsed() + build.block.size * Vars.tilesize <= type.payloadCapacity;
+        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity;
     }
 
     boolean canPickupPayload(Payload pay){
-        return payloadUsed() + pay.size() <= type.payloadCapacity;
+        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity;
     }
 
     boolean hasPayload(){
