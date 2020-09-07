@@ -81,6 +81,8 @@ public class LAssembler{
 
             if(index++ > max) break;
 
+            line = line.replace("\t", "").trim();
+            
             try{
                 String[] arr;
 
