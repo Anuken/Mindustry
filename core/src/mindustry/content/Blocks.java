@@ -913,7 +913,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 75;
             speed = 4f / 60f;
-            itemCapacity = 10;
+            itemCapacity = 5;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
