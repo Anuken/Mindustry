@@ -42,14 +42,14 @@ public class UnitType extends UnlockableContent{
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, armor = 0f;
-    public float crashDamageMultiplier = 4f;
+    public float crashDamageMultiplier = 3f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float sway = 1f;
-    public int payloadCapacity = 1;
+    public float payloadCapacity = 8;
     public int commandLimit = 24;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
@@ -62,12 +62,14 @@ public class UnitType extends UnlockableContent{
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
+    public float mechLegMoveScl = 1f;
 
     public int itemCapacity = 30;
     public int ammoCapacity = 220;
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
+    public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
     public float hitsize = 6f;
@@ -80,6 +82,7 @@ public class UnitType extends UnlockableContent{
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
     public boolean canHeal = false;
+    public boolean singleTarget = false;
 
     public ObjectSet<StatusEffect> immunities = new ObjectSet<>();
     public Sound deathSound = Sounds.bang;
@@ -101,9 +104,10 @@ public class UnitType extends UnlockableContent{
 
     public Unit create(Team team){
         Unit unit = constructor.get();
-        unit.team(team);
+        unit.team = team;
         unit.type(this);
-        unit.ammo(ammoCapacity); //fill up on ammo upon creation
+        unit.ammo = ammoCapacity; //fill up on ammo upon creation
+        unit.elevation = flying ? 1f : 0;
         unit.heal();
         return unit;
     }
@@ -125,7 +129,7 @@ public class UnitType extends UnlockableContent{
     public void display(Unit unit, Table table){
         table.table(t -> {
             t.left();
-            t.add(new Image(icon(Cicon.medium))).size(8 * 4);
+            t.add(new Image(icon(Cicon.medium))).size(8 * 4).scaling(Scaling.fit);
             t.labelWrap(localizedName).left().width(190f).padLeft(5);
         }).growX().left();
         table.row();
@@ -179,10 +183,13 @@ public class UnitType extends UnlockableContent{
     public void init(){
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
 
+        singleTarget = weapons.size <= 1;
+
         //set up default range
         if(range < 0){
+            range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                range = Math.max(range, weapon.bullet.range());
+                range = Math.min(range, weapon.bullet.range() + hitsize/2f);
             }
         }
 
@@ -249,25 +256,25 @@ public class UnitType extends UnlockableContent{
     //region drawing
 
     public void draw(Unit unit){
-        Mechc legs = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer;
+        Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
+        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitsize/4000f, 0, 0.01f);
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
         }
 
-        if(unit.isFlying()){
+        if(unit.isFlying() || visualElevation > 0){
             Draw.z(Math.min(Layer.darkness, z - 1f));
             drawShadow(unit);
         }
 
         Draw.z(z - 0.02f);
 
-        if(legs != null){
-            drawMech((Unit & Mechc)legs);
+        if(mech != null){
+            drawMech((Unit & Mechc)mech);
 
-            float ft = Mathf.sin(legs.walkTime(), 3f, 3f);
-            legOffset.trns(legs.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation));
+            float ft = Mathf.sin(mech.walkTime(), 3f * mechLegMoveScl, 3f);
+            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation));
             unit.trns(legOffset.x, legOffset.y);
         }
 
@@ -295,7 +302,7 @@ public class UnitType extends UnlockableContent{
             drawShield(unit);
         }
 
-        if(legs != null){
+        if(mech != null){
             unit.trns(-legOffset.x, -legOffset.y);
         }
 
@@ -305,9 +312,11 @@ public class UnitType extends UnlockableContent{
 
         if(abilities.size > 0){
             for(Ability a : abilities){
-                a.draw(unit);
                 Draw.reset();
+                a.draw(unit);
             }
+
+            Draw.reset();
         }
     }
 
@@ -380,7 +389,7 @@ public class UnitType extends UnlockableContent{
             unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY),
             (3f + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime);
 
-            if(unit.isLocal()){
+            if(unit.isLocal() && !renderer.pixelator.enabled()){
                 Fonts.outline.draw(unit.stack.amount + "",
                 unit.x + Angles.trnsx(unit.rotation + 180f, itemOffsetY),
                 unit.y + Angles.trnsy(unit.rotation + 180f, itemOffsetY) - 3,
@@ -471,7 +480,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public <T extends Unit & Legsc> void drawLegs(T unit){
-        //Draw.z(Layer.groundUnit - 0.02f);
+        applyColor(unit);
 
         Leg[] legs = unit.legs();
 
@@ -487,8 +496,9 @@ public class UnitType extends UnlockableContent{
             Draw.rect(baseRegion, unit.x, unit.y, rotation);
         }
 
-        //TODO figure out layering
-        for(int i = 0; i < legs.length; i++){
+        //legs are drawn front first
+        for(int j = legs.length - 1; j >= 0; j--){
+            int i = (j % 2 == 0 ? j/2 : legs.length - 1 - j/2);
             Leg leg = legs[i];
             float angle = unit.legAngle(rotation, i);
             boolean flip = i >= legs.length/2f;
@@ -509,10 +519,10 @@ public class UnitType extends UnlockableContent{
             Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 
             Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, CapStyle.none, 0);
+            Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, false, 0);
 
             Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
-            Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, CapStyle.none, 0);
+            Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, false, 0);
 
             if(jointRegion.found()){
                 Draw.rect(jointRegion, leg.joint.x, leg.joint.y);
@@ -532,7 +542,7 @@ public class UnitType extends UnlockableContent{
         Draw.mixcol(Color.white, unit.hitTime);
 
         float e = unit.elevation;
-        float sin = Mathf.lerp(Mathf.sin(unit.walkTime(), 3f, 1f), 0f, e);
+        float sin = Mathf.lerp(Mathf.sin(unit.walkTime(), 3f * mechLegMoveScl, 1f), 0f, e);
         float ft = sin*(2.5f + (unit.hitSize-8f)/2f);
         float boostTrns = e * 2f;
 
@@ -563,6 +573,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void applyColor(Unit unit){
+        Draw.color();
         Draw.mixcol(Color.white, unit.hitTime);
         if(unit.drownTime > 0 && unit.floorOn().isDeep()){
             Draw.mixcol(unit.floorOn().mapColor, unit.drownTime * 0.8f);

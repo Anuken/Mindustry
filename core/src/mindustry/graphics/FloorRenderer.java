@@ -206,7 +206,7 @@ public class FloorRenderer implements Disposable{
                     floor = tile.floor();
                 }
 
-                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls && !(tile.isDarkened() && tile.rotation() >= 5)){
+                if(tile.block().cacheLayer == layer && layer == CacheLayer.walls && !(tile.isDarkened() && tile.data >= 5)){
                     tile.block().drawBase(tile);
                 }else if(floor.cacheLayer == layer && (world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                     floor.drawBase(tile);
@@ -256,5 +256,8 @@ public class FloorRenderer implements Disposable{
         /** Maps cache layer ID to cache ID in the batch.
          * -1 means that this cache is unoccupied. */
         int[] caches = new int[CacheLayer.all.length];
+
+        Chunk(){
+        }
     }
 }

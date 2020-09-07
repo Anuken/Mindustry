@@ -21,16 +21,14 @@ import static mindustry.Vars.*;
 public class Tile implements Position, QuadTreeObject, Displayable{
     static final ObjectSet<Building> tileSet = new ObjectSet<>();
 
-    /** Tile traversal cost. */
-    public short cost = 1;
+    /** Extra data for very specific blocks. */
+    public byte data;
     /** Tile entity, usually null. */
     public @Nullable Building build;
     public short x, y;
     protected @NonNull Block block;
     protected @NonNull Floor floor;
     protected @NonNull Floor overlay;
-    /** Rotation of blocks, or other data. Not guaranteed to be in any specific range. */
-    protected byte rotation;
     protected boolean changing = false;
 
     public Tile(int x, int y){
@@ -47,7 +45,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.block = wall;
 
         //update entity and create it if needed
-        changeEntity(Team.derelict, wall::newEntity);
+        changeEntity(Team.derelict, wall::newEntity, 0);
         changed();
     }
 
@@ -150,7 +148,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Team team(){
-        return build == null ? Team.derelict : build.team();
+        return build == null ? Team.derelict : build.team;
     }
 
     public void setTeam(Team team){
@@ -182,10 +180,13 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public void setBlock(@NonNull Block type, Team team, int rotation, Prov<Building> entityprov){
         changing = true;
 
+        if(type.isStatic() || this.block.isStatic()){
+            recache();
+        }
+
         this.block = type;
-        this.rotation = rotation == 0 ? 0 : (byte)Mathf.mod(rotation, 4);
         preChanged();
-        changeEntity(team, entityprov);
+        changeEntity(team, entityprov, (byte)Mathf.mod(rotation, 4));
 
         if(build != null){
             build.team(team);
@@ -290,6 +291,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     /** set()-s this tile, except it's synced across the network */
+    public void setNet(Block block){
+        Call.setTile(this, block, Team.derelict, 0);
+    }
+
+    /** set()-s this tile, except it's synced across the network */
     public void setNet(Block block, Team team, int rotation){
         Call.setTile(this, block, team, rotation);
     }
@@ -302,18 +308,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     /** set()-s this tile, except it's synced across the network */
     public void setFloorNet(Block floor){
         setFloorNet(floor, Blocks.air);
-    }
-
-    public byte rotation(){
-        return rotation;
-    }
-
-    public int rotdeg(){
-        return rotation * 90;
-    }
-
-    public void rotation(int rotation){
-        this.rotation = (byte)rotation;
     }
 
     public short overlayID(){
@@ -443,23 +437,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return null;
     }
 
-    // ▲ ▲ ▼ ▼ ◀ ▶ ◀ ▶ B A
-    public @Nullable Building front(){
-        return getNearbyEntity((rotation + 4) % 4);
-    }
-
-    public @Nullable Building right(){
-        return getNearbyEntity((rotation + 3) % 4);
-    }
-
-    public @Nullable Building back(){
-        return getNearbyEntity((rotation + 2) % 4);
-    }
-
-    public @Nullable Building left(){
-        return getNearbyEntity((rotation + 1) % 4);
-    }
-
     public boolean interactable(Team team){
         return state.teams.canInteract(team, team());
     }
@@ -469,45 +446,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public int staticDarkness(){
-        return block.solid && block.fillsTile && !block.synthetic() ? rotation : 0;
-    }
-
-    public void updateOcclusion(){
-        cost = 1;
-        boolean occluded = false;
-
-        //check for occlusion
-        for(int i = 0; i < 8; i++){
-            Point2 point = Geometry.d8[i];
-            Tile tile = world.tile(x + point.x, y + point.y);
-            if(tile != null && tile.floor.isLiquid){
-                cost += 4;
-            }
-            if(tile != null && tile.solid()){
-                occluded = true;
-                break;
-            }
-        }
-
-        if(occluded){
-            cost += 2;
-        }
-
-        if(block.synthetic() && solid()){
-            cost += Mathf.clamp(block.health / 6f, 0, 1000);
-        }
-
-        if(floor.isLiquid){
-            cost += 10;
-        }
-
-        if(floor.drownTime > 0){
-            cost += 70;
-        }
-
-        if(cost < 0){
-            cost = Byte.MAX_VALUE;
-        }
+        return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
     protected void preChanged(){
@@ -532,8 +471,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                                 other.block = Blocks.air;
 
                                 //manually call changed event
-                                other.updateOcclusion();
-                                world.notifyChanged(other);
+                                other.fireChanged();
                             }
                         }
                     }
@@ -548,7 +486,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
-    protected void changeEntity(Team team, Prov<Building> entityprov){
+    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
         if(build != null){
             int size = build.block.size;
             build.remove();
@@ -571,7 +509,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
 
         if(block.hasEntity()){
-            build = entityprov.get().init(this, team, block.update);
+            build = entityprov.get().init(this, team, block.update, rotation);
         }
     }
 
@@ -590,14 +528,16 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             }
         }
 
-        updateOcclusion();
-
-        world.notifyChanged(this);
+        fireChanged();
 
         //recache when static block is added
         if(block.isStatic()){
             recache();
         }
+    }
+
+    protected void fireChanged(){
+        world.notifyChanged(this);
     }
 
     @Override

@@ -40,20 +40,20 @@ In general, if you are using IntelliJ, you should be warned about platform incom
 
 
 #### Use `arc` collections and classes when possible.
-Instead of using `java.util.List`, `java.util.HashMap`, and other standard Java collections, use `Array`, `ObjectMap` and other equivalents from `arc.struct`.
+Instead of using `java.util.List`, `java.util.HashMap`, and other standard Java collections, use `Seq`, `ObjectMap` and other equivalents from `arc.struct`.
 Why? Because that's what the rest of the codebase uses, and the standard collections have a lot of cruft and usability issues associated with them.  
 In the rare case that concurrency is required, you may use the standard Java classes for that purpose (e.g. `CopyOnWriteArrayList`).  
 
 What you'll usually need to change:
 - `HashSet` -> `ObjectSet`
 - `HashMap` -> `ObjectMap`
-- `List` / `ArrayList` / `Stack` -> `Array`
+- `List` / `ArrayList` / `Stack` -> `Seq`
 - `java.util.Queue` -> `arc.struct.Queue`
 - *Many others*
 
 
 #### Avoid boxed types (Integer, Boolean)
-Never create variables or collections with boxed types `Array<Integer>` or `ObjectMap<Integer, ...>`. Use the collections specialized for this task, e.g. `IntArray` and `IntMap`.
+Never create variables or collections with boxed types `Seq<Integer>` or `ObjectMap<Integer, ...>`. Use the collections specialized for this task, e.g. `IntSeq` and `IntMap`.
 
 
 #### Do not allocate anything if possible.
@@ -68,3 +68,6 @@ If something needs to be encapsulated in the future, IntelliJ can handle it with
 
 #### Do not create methods unless necessary.
 Unless a block of code is very large or used in more than 1-2 places, don't split it up into a separate method. Making unnecessary methods only creates confusion, and may slightly decrease performance.  
+
+## Other Notes
+If you would like your name to appear in the game's credits, add it to the [list of contributors](https://github.com/Anuken/Mindustry/blob/master/core/assets/contributors) as part of your PR.

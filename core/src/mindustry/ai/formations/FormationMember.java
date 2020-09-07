@@ -11,4 +11,6 @@ import arc.math.geom.*;
 public interface FormationMember{
     /** Returns the target location of this formation member. */
     Vec3 formationPos();
+
+    float formationSize();
 }

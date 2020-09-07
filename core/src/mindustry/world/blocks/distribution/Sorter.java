@@ -28,8 +28,8 @@ public class Sorter extends Block{
         unloadable = false;
         saveConfig = true;
 
-        config(Item.class, (SorterEntity tile, Item item) -> tile.sortItem = item);
-        configClear((SorterEntity tile) -> tile.sortItem = null);
+        config(Item.class, (SorterBuild tile, Item item) -> tile.sortItem = item);
+        configClear((SorterBuild tile) -> tile.sortItem = null);
     }
 
     @Override
@@ -44,14 +44,14 @@ public class Sorter extends Block{
 
     @Override
     public int minimapColor(Tile tile){
-        return tile.<SorterEntity>bc().sortItem == null ? 0 : tile.<SorterEntity>bc().sortItem.color.rgba();
+        return tile.<SorterBuild>bc().sortItem == null ? 0 : tile.<SorterBuild>bc().sortItem.color.rgba();
     }
 
-    public class SorterEntity extends Building{
-        @Nullable Item sortItem;
+    public class SorterBuild extends Building{
+        public @Nullable Item sortItem;
 
         @Override
-        public void configured(Player player, Object value){
+        public void configured(Unit player, Object value){
             super.configured(player, value);
 
             if(!headless){
@@ -76,7 +76,7 @@ public class Sorter extends Block{
         public boolean acceptItem(Building source, Item item){
             Building to = getTileTarget(item, source, false);
 
-            return to != null && to.acceptItem(this, item) && to.team() == team;
+            return to != null && to.acceptItem(this, item) && to.team == team;
         }
 
         @Override
@@ -86,17 +86,17 @@ public class Sorter extends Block{
             to.handleItem(this, item);
         }
 
-        boolean isSame(Building other){
-            //uncomment code below to prevent sorter/gate chaining
-            return other != null && (other.block() instanceof Sorter/* || other.block() instanceof OverflowGate */);
+        public boolean isSame(Building other){
+            // comment code below to allow sorter/gate chaining
+            return other != null && other.block().instantTransfer;
         }
 
-        Building getTileTarget(Item item, Building source, boolean flip){
+        public Building getTileTarget(Item item, Building source, boolean flip){
             int dir = source.relativeTo(tile.x, tile.y);
             if(dir == -1) return null;
             Building to;
 
-            if((item == sortItem) != invert){
+            if(((item == sortItem) != invert) == enabled){
                 //prevent 3-chains
                 if(isSame(source) && isSame(nearby(dir))){
                     return null;
@@ -117,12 +117,12 @@ public class Sorter extends Block{
                 }else if(!bc){
                     return null;
                 }else{
-                    if(rotation() == 0){
+                    if(rotation == 0){
                         to = a;
-                        if(flip) rotation((byte)1);
+                        if(flip) this.rotation = (byte)1;
                     }else{
                         to = b;
-                        if(flip) rotation((byte)0);
+                        if(flip) this.rotation = (byte)0;
                     }
                 }
             }
@@ -132,7 +132,7 @@ public class Sorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> sortItem, item -> configure(item));
+            ItemSelection.buildTable(table, content.items(), () -> sortItem, this::configure);
         }
 
         @Override

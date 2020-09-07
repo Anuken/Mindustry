@@ -33,11 +33,11 @@ public class PlanetRenderer implements Disposable{
     /** The sun/main planet of the solar system from which everything is rendered. */
     public final Planet solarSystem = Planets.sun;
     /** Planet being looked at. */
-    public Planet planet = Planets.starter;
+    public Planet planet = Planets.serpulo;
     /** Camera used for rendering. */
     public Camera3D cam = new Camera3D();
     /** Raw vertex batch. */
-    public final VertexBatch3D batch = new VertexBatch3D(10000, false, true, 0);
+    public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
 
     public float zoom = 1f;
 

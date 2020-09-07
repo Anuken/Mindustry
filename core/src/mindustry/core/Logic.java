@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.math.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -16,7 +15,7 @@ import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
@@ -42,9 +41,9 @@ public class Logic implements ApplicationListener{
             //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
             if(tile.build == null || !tile.block().rebuildable || net.client()) return;
 
-            if(block instanceof BuildBlock){
+            if(block instanceof ConstructBlock){
 
-                BuildEntity entity = tile.bc();
+                ConstructBuild entity = tile.bc();
 
                 //update block to reflect the fact that something was being constructed
                 if(entity.cblock != null && entity.cblock.synthetic()){
@@ -67,7 +66,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, tile.rotation(), block.id, tile.build.config()));
+            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)tile.build.rotation, block.id, tile.build.config()));
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {
@@ -88,31 +87,27 @@ public class Logic implements ApplicationListener{
 
         //when loading a 'damaged' sector, propagate the damage
         Events.on(WorldLoadEvent.class, e -> {
-            if(state.isCampaign() && state.rules.sector.getSecondsPassed() > 0 && state.rules.sector.hasBase()){
+            if(state.isCampaign()){
                 long seconds = state.rules.sector.getSecondsPassed();
-                CoreEntity core = state.rules.defaultTeam.core();
+                CoreBuild core = state.rules.defaultTeam.core();
 
                 //apply fractional damage based on how many turns have passed for this sector
                 float turnsPassed = seconds / (turnDuration / 60f);
 
-                if(state.rules.sector.hasWaves()){
+                if(state.rules.sector.hasWaves() && turnsPassed > 0 && state.rules.sector.hasBase()){
                     SectorDamage.apply(turnsPassed / sectorDestructionTurns);
                 }
 
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){
+                    //update correct storage capacity
+                    state.rules.sector.save.meta.secinfo.storageCapacity = core.storageCapacity;
 
-                    //add produced items
-                    //TODO move to received items
-                    state.rules.sector.save.meta.secinfo.production.each((item, stat) -> {
-                        core.items.add(item, (int)(stat.mean * seconds));
-                    });
-
-                    //add received items
-                    state.rules.sector.getReceivedItems().each(stack -> core.items.add(stack.item, stack.amount));
+                    //add new items received
+                    state.rules.sector.calculateReceivedItems().each((item, amount) -> core.items.add(item, amount));
 
                     //clear received items
-                    state.rules.sector.setReceivedItems(new Seq<>());
+                    state.rules.sector.setExtraItems(new ItemSeq());
 
                     //validation
                     for(Item item : content.items()){
@@ -274,15 +269,15 @@ public class Logic implements ApplicationListener{
         Time.runTask(30f, () -> {
             Sector origin = sector.save.meta.secinfo.origin;
             if(origin != null){
-                Seq<ItemStack> stacks = origin.getReceivedItems();
+                ItemSeq stacks = origin.getExtraItems();
 
                 //add up all items into list
                 for(Building entity : state.teams.playerCores()){
-                    entity.items.each((item, amount) -> ItemStack.insert(stacks, item, amount));
+                    entity.items.each(stacks::add);
                 }
 
                 //save received items
-                origin.setReceivedItems(stacks);
+                origin.setExtraItems(stacks);
             }
 
             //remove all the cores
@@ -308,6 +303,11 @@ public class Logic implements ApplicationListener{
     }
 
     @Remote(called = Loc.both)
+    public static void updateGameOver(Team winner){
+        state.gameOver = true;
+    }
+
+    @Remote(called = Loc.both)
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);
@@ -325,6 +325,10 @@ public class Logic implements ApplicationListener{
         Events.fire(Trigger.update);
         universe.updateGlobal();
 
+        if(Core.settings.modified() && !state.isPlaying()){
+            Core.settings.forceSave();
+        }
+
         if(state.isGame()){
             if(!net.client()){
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
@@ -336,7 +340,9 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
-                state.secinfo.update();
+                if(state.isCampaign()){
+                    state.secinfo.update();
+                }
 
                 if(state.isCampaign()){
                     universe.update();
@@ -363,6 +369,10 @@ public class Logic implements ApplicationListener{
                 if(!net.client() && state.wavetime <= 0 && state.rules.waves){
                     runWave();
                 }
+
+                //apply weather attributes
+                state.envAttrs.clear();
+                Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
                 Groups.update();
             }

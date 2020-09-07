@@ -47,7 +47,8 @@ public class FormationAI extends AIController implements FormationMember{
         Vec2 realtarget = vec.set(target);
 
         if(unit.isGrounded() && Vars.world.raycast(unit.tileX(), unit.tileY(), leader.tileX(), leader.tileY(), Vars.world::solid)){
-            realtarget.set(Vars.pathfinder.getTargetTile(unit.tileOn(), unit.team, leader));
+            //TODO pathfind
+            //realtarget.set(Vars.pathfinder.getTargetTile(unit.tileOn(), unit.team, leader));
         }
 
         unit.moveAt(realtarget.sub(unit).limit(unit.type().speed));
@@ -58,6 +59,15 @@ public class FormationAI extends AIController implements FormationMember{
         if(formation != null){
             formation.removeMember(this);
         }
+    }
+
+    @Override
+    public float formationSize(){
+        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+            //TODO return formation size
+            //eturn ((Commanderc)unit).formation().
+        }
+        return unit.hitSize * 1.7f;
     }
 
     @Override

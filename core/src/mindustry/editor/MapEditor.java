@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.editor.DrawOperation.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -125,7 +126,7 @@ public class MapEditor{
             x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
             y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
             if(!hasOverlap(x, y)){
-                tile(x, y).setBlock(drawBlock, drawTeam, 0);
+                tile(x, y).setBlock(drawBlock, drawTeam, rotation);
             }
         }else{
             boolean isFloor = drawBlock.isFloor() && drawBlock != Blocks.air;
@@ -136,13 +137,11 @@ public class MapEditor{
                 if(isFloor){
                     tile.setFloor(drawBlock.asFloor());
                 }else{
-                    tile.setBlock(drawBlock);
-                    if(drawBlock.synthetic()){
-                        tile.setTeam(drawTeam);
+                    if(drawBlock.rotate && tile.build != null && tile.build.rotation != rotation){
+                        addTileOp(TileOp.get(tile.x, tile.y, (byte)OpType.rotation.ordinal(), (byte)rotation));
                     }
-                    if(drawBlock.rotate){
-                        tile.rotation((byte)rotation);
-                    }
+
+                    tile.setBlock(drawBlock, drawTeam, rotation);
                 }
             };
 

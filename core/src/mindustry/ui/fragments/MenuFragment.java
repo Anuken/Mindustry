@@ -60,12 +60,12 @@ public class MenuFragment extends Fragment{
             parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45));
             parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45));
         }else if(becontrol.active()){
-            parent.fill(c -> c.bottom().right().button("$be.check", Icon.refresh, () -> {
+            parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
                 becontrol.checkUpdate(result -> {
                     ui.loadfrag.hide();
                     if(!result){
-                        ui.showInfo("$be.noupdates");
+                        ui.showInfo("@be.noupdates");
                     }
                 });
             }).size(200, 60).update(t -> {
@@ -100,15 +100,15 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton(Icon.play, "$campaign", () -> checkPlay(ui.planet::show)),
-            custom = new MobileButton(Icon.rightOpenOut, "$customgame", () -> checkPlay(ui.custom::show)),
-            maps = new MobileButton(Icon.download, "$loadgame", () -> checkPlay(ui.load::show)),
-            join = new MobileButton(Icon.add, "$joingame", () -> checkPlay(ui.join::show)),
-            editor = new MobileButton(Icon.terrain, "$editor", () -> checkPlay(ui.maps::show)),
-            tools = new MobileButton(Icon.settings, "$settings", ui.settings::show),
-            mods = new MobileButton(Icon.book, "$mods", ui.mods::show),
-            donate = new MobileButton(Icon.link, "$website", () -> Core.app.openURI("https://anuke.itch.io/mindustry")),
-            exit = new MobileButton(Icon.exit, "$quit", () -> Core.app.exit());
+            play = new MobileButton(Icon.play, "@campaign", () -> checkPlay(ui.planet::show)),
+            custom = new MobileButton(Icon.rightOpenOut, "@customgame", () -> checkPlay(ui.custom::show)),
+            maps = new MobileButton(Icon.download, "@loadgame", () -> checkPlay(ui.load::show)),
+            join = new MobileButton(Icon.add, "@joingame", () -> checkPlay(ui.join::show)),
+            editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
+            tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
+            mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
+            donate = new MobileButton(Icon.link, "@website", () -> Core.app.openURI("https://anuke.itch.io/mindustry")),
+            exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
             container.marginTop(60f);
@@ -164,20 +164,20 @@ public class MenuFragment extends Fragment{
             t.defaults().width(width).height(70f);
 
             buttons(t,
-                new Buttoni("$play", Icon.play,
-                    new Buttoni("$campaign", Icon.play, () -> checkPlay(ui.planet::show)),
-                    new Buttoni("$joingame", Icon.add, () -> checkPlay(ui.join::show)),
-                    new Buttoni("$customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                    new Buttoni("$loadgame", Icon.download, () -> checkPlay(ui.load::show)),
-                    new Buttoni("$tutorial", Icon.info, () -> checkPlay(control::playTutorial))
+                new Buttoni("@play", Icon.play,
+                    new Buttoni("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
+                    new Buttoni("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
+                    new Buttoni("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
+                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show)),
+                    new Buttoni("@tutorial", Icon.info, () -> checkPlay(control::playTutorial))
                 ),
-                new Buttoni("$editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.book, platform::openWorkshop) : null,
+                new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.book, platform::openWorkshop) : null,
                 new Buttoni(Core.bundle.get("mods"), Icon.bookOpen, ui.mods::show),
                 //not enough space for this button
-                //new Buttoni("$schematics", Icon.paste, ui.schematics::show),
-                new Buttoni("$settings", Icon.settings, ui.settings::show),
-                new Buttoni("$about.button", Icon.info, ui.about::show),
-                new Buttoni("$quit", Icon.exit, Core.app::exit)
+                //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
+                new Buttoni("@settings", Icon.settings, ui.settings::show),
+                new Buttoni("@about.button", Icon.info, ui.about::show),
+                new Buttoni("@quit", Icon.exit, Core.app::exit)
             );
 
         }).width(width).growY();
@@ -196,7 +196,7 @@ public class MenuFragment extends Fragment{
         if(!mods.hasContentErrors()){
             run.run();
         }else{
-            ui.showInfo("$mod.noerrorplay");
+            ui.showInfo("@mod.noerrorplay");
         }
     }
 

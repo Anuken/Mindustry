@@ -63,7 +63,7 @@ public class Bar extends Element{
         if(fraction == null) return;
 
         float computed = Mathf.clamp(fraction.get());
-        if(!Mathf.equal(lastValue, computed)){
+        if(lastValue > computed){
             blink = 1f;
             lastValue = computed;
         }
@@ -91,7 +91,7 @@ public class Bar extends Element{
 
         Draw.color();
 
-        BitmapFont font = Fonts.outline;
+        Font font = Fonts.outline;
         GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         lay.setText(font, name);
 

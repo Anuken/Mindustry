@@ -29,46 +29,26 @@ public class Objectives{
         }
     }
 
-    public static class SectorWave extends SectorObjective{
-        public int wave;
+    public static class SectorComplete extends SectorObjective{
 
-        public SectorWave(SectorPreset zone, int wave){
+        public SectorComplete(SectorPreset zone){
             this.preset = zone;
-            this.wave = wave;
         }
 
-        protected SectorWave(){}
+        protected SectorComplete(){}
 
         @Override
         public boolean complete(){
-            return preset.bestWave() >= wave;
+            return preset.sector.isCaptured();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.wave", wave, preset.localizedName);
+            return Core.bundle.format("requirement.capture", preset.localizedName);
         }
     }
 
-    public static class Launched extends SectorObjective{
-
-        public Launched(SectorPreset zone){
-            this.preset = zone;
-        }
-
-        protected Launched(){}
-
-        @Override
-        public boolean complete(){
-            return preset.hasLaunched();
-        }
-
-        @Override
-        public String display(){
-            return Core.bundle.format("requirement.core", preset.localizedName);
-        }
-    }
-
+    //TODO merge
     public abstract static class SectorObjective implements Objective{
         public @NonNull SectorPreset preset;
     }

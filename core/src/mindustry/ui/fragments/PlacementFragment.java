@@ -22,6 +22,8 @@ import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
+import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -93,7 +95,7 @@ public class PlacementFragment extends Fragment{
 
         if(Core.input.keyDown(Binding.pick) && player.isBuilder()){ //mouse eyedropper select
             Building tile = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            Block tryRecipe = tile == null ? null : tile.block();
+            Block tryRecipe = tile == null ? null : tile.block() instanceof ConstructBlock ? ((ConstructBuild)tile).cblock : tile.block;
             Object tryConfig = tile == null ? null : tile.config();
 
             for(BuildPlan req : player.builder().plans()){
@@ -160,7 +162,7 @@ public class PlacementFragment extends Fragment{
                         blockSelectEnd = true;
                     }
                     Seq<Block> blocks = getByCategory(currentCategory);
-                    if(!unlocked(blocks.get(i))) return true;
+                    if(i >= blocks.size || !unlocked(blocks.get(i))) return true;
                     input.block = (i < blocks.size) ? blocks.get(i) : null;
                     selectedBlocks.put(currentCategory, input.block);
                     blockSelectSeqMillis = Time.millis();
@@ -216,7 +218,7 @@ public class PlacementFragment extends Fragment{
                             if(unlocked(block)){
                                 if(Core.input.keyDown(KeyCode.shiftLeft) && Fonts.getUnicode(block.name) != 0){
                                     Core.app.setClipboardText((char)Fonts.getUnicode(block.name) + "");
-                                    ui.showInfoFade("$copied");
+                                    ui.showInfoFade("@copied");
                                 }else{
                                     control.input.block = control.input.block == block ? null : block;
                                     selectedBlocks.put(currentCategory, control.input.block);
@@ -337,7 +339,7 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "$unit.nobuild" : displayBlock.unplaceableMessage()).width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "@unit.nobuild" : displayBlock.unplaceableMessage()).width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }

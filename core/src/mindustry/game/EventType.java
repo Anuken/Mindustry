@@ -5,6 +5,7 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -29,7 +30,12 @@ public class EventType{
         openWiki,
         teamCoreDamage,
         socketConfigChanged,
-        update
+        update,
+        draw,
+        preDraw,
+        postDraw,
+        uiDrawBegin,
+        uiDrawEnd
     }
 
     public static class WinEvent{}
@@ -76,7 +82,6 @@ public class EventType{
         }
     }
 
-
     public static class CommandIssueEvent{
         public final Building tile;
         public final UnitCommand command;
@@ -87,6 +92,14 @@ public class EventType{
         }
     }
 
+    public static class ClientPreConnectEvent{
+        public final Host host;
+
+        public ClientPreConnectEvent(Host host){
+            this.host = host;
+        }
+    }
+
     public static class PlayerChatEvent{
         public final Player player;
         public final String message;
@@ -94,27 +107,6 @@ public class EventType{
         public PlayerChatEvent(Player player, String message){
             this.player = player;
             this.message = message;
-        }
-    }
-
-    /** Called when a zone's requirements are met. */
-    public static class ZoneRequireCompleteEvent{
-        public final SectorPreset zoneMet, zoneForMet;
-        public final Objectives.Objective objective;
-
-        public ZoneRequireCompleteEvent(SectorPreset zoneMet, SectorPreset zoneForMet, Objectives.Objective objective){
-            this.zoneMet = zoneMet;
-            this.zoneForMet = zoneForMet;
-            this.objective = objective;
-        }
-    }
-
-    /** Called when a zone's requirements are met. */
-    public static class ZoneConfigureCompleteEvent{
-        public final SectorPreset zone;
-
-        public ZoneConfigureCompleteEvent(SectorPreset zone){
-            this.zone = zone;
         }
     }
 
@@ -157,24 +149,13 @@ public class EventType{
         }
     }
 
-    /** Called when the player taps a block. */
-    public static class TapEvent{
-        public final Building tile;
-        public final Player player;
-
-        public TapEvent(Building tile, Player player){
-            this.tile = tile;
-            this.player = player;
-        }
-    }
-
-    /** Called when the player sets a specific block. */
-    public static class TapConfigEvent{
+    /** Called when the configures sets a specific block. */
+    public static class ConfigEvent{
         public final Building tile;
         public final Player player;
         public final Object value;
 
-        public TapConfigEvent(Building tile, Player player, Object value){
+        public ConfigEvent(Building tile, Player player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;
@@ -189,11 +170,10 @@ public class EventType{
         }
     }
 
-    /** Called from the logic thread. Do not access graphics here! */
-    public static class BuildinghangeEvent{
+    public static class TileChangeEvent{
         public final Tile tile;
 
-        public BuildinghangeEvent(Tile tile){
+        public TileChangeEvent(Tile tile){
             this.tile = tile;
         }
     }
@@ -244,12 +224,14 @@ public class EventType{
         public final Team team;
         public final @Nullable Unit unit;
         public final boolean breaking;
+        public final @Nullable Object config;
 
-        public BlockBuildEndEvent(Tile tile, @Nullable Unit unit, Team team, boolean breaking){
+        public BlockBuildEndEvent(Tile tile, @Nullable Unit unit, Team team, boolean breaking, @Nullable Object config){
             this.tile = tile;
             this.team = team;
             this.unit = unit;
             this.breaking = breaking;
+            this.config = config;
         }
     }
 

@@ -23,9 +23,9 @@ public class Tutorial{
     private static final int mineCopper = 18;
     private static final int blocksToBreak = 3, blockOffset = -6;
 
-    private ObjectSet<String> events = new ObjectSet<>();
-    private ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
-    private int sentence;
+    ObjectSet<String> events = new ObjectSet<>();
+    ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
+    int sentence;
     public TutorialStage stage = TutorialStage.values()[0];
 
     public Tutorial(){

@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import mindustry.*;
@@ -18,27 +19,17 @@ import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. */
+    public Seq<String> bannedIPs = new Seq<>();
+    public Seq<String> whitelist = new Seq<>();
+    public Seq<ChatFilter> chatFilters = new Seq<>();
+    public Seq<ActionFilter> actionFilters = new Seq<>();
+    public Seq<String> subnetBans = new Seq<>();
+
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    private Seq<String> bannedIPs = new Seq<>();
-    private Seq<String> whitelist = new Seq<>();
-    private Seq<ChatFilter> chatFilters = new Seq<>();
-    private Seq<ActionFilter> actionFilters = new Seq<>();
-    private Seq<String> subnetBans = new Seq<>();
-    private IntIntMap lastPlaced = new IntIntMap();
 
     public Administration(){
         load();
-
-        Events.on(ResetEvent.class, e -> lastPlaced = new IntIntMap());
-
-        //keep track of who placed what on the server
-        Events.on(BlockBuildEndEvent.class, e -> {
-            //players should be able to configure their own tiles
-            if(net.server() && e.unit != null && e.unit.isPlayer()){
-                lastPlaced.put(e.tile.pos(), e.unit.getPlayer().id());
-            }
-        });
 
         //anti-spam
         addChatFilter((player, message) -> {
@@ -72,22 +63,20 @@ public class Administration{
         });
 
         //block interaction rate limit
+        //TODO when someone disconnects, a different player is mistakenly kicked for spamming actions
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
-                action.type != ActionType.tapTile &&
-                Config.antiSpam.bool() &&
-                //make sure players can configure their own stuff, e.g. in schematics
-                lastPlaced.get(action.tile.pos(), -1) != action.player.id()){
+                Config.antiSpam.bool()){
 
                 Ratekeeper rate = action.player.getInfo().rate;
                 if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
                     return true;
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
-                        player.kick("You are interacting with too many blocks.", 1000 * 30);
-                    }else{
-                        player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
+                        action.player.kick("You are interacting with too many blocks.", 1000 * 30);
+                    }else if(action.player.getInfo().messageTimer.get(60f * 2f)){
+                        action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
                     }
 
                     return false;
@@ -162,7 +151,7 @@ public class Administration{
         Core.settings.put("playerlimit", limit);
     }
 
-    public boolean getStrict(){
+    public boolean isStrict(){
         return Config.strict.bool();
     }
 
@@ -573,7 +562,8 @@ public class Administration{
         motd("The message displayed to people on connection.", "off"),
         autosave("Whether the periodically save the map when playing.", false),
         autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
-        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5);
+        autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
+        debug("Enable debug logging", false, () -> Log.setLogLevel(debug() ? LogLevel.debug : LogLevel.info));
 
         public static final Config[] all = values();
 
@@ -632,6 +622,10 @@ public class Administration{
             Core.settings.put(key, value);
             changed.run();
         }
+
+        private static boolean debug(){
+            return Config.debug.bool();
+        }
     }
 
     public static class PlayerInfo{
@@ -649,6 +643,7 @@ public class Administration{
         public transient String lastSentMessage;
         public transient int messageInfractions;
         public transient Ratekeeper rate = new Ratekeeper();
+        public transient Interval messageTimer = new Interval();
 
         PlayerInfo(String id){
             this.id = id;
@@ -720,7 +715,7 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, tapTile, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
     }
 
 }

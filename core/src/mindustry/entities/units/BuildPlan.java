@@ -3,6 +3,7 @@ package mindustry.entities.units;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.gen.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -15,8 +16,6 @@ public class BuildPlan{
     public @Nullable Block block;
     /** Whether this is a break request.*/
     public boolean breaking;
-    /** Whether this request comes with a config int. If yes, any blocks placed with this request will not call playerPlaced.*/
-    public boolean hasConfig;
     /** Config int. Not used unless hasConfig is true.*/
     public Object config;
     /** Original position, only used in schematics.*/
@@ -39,6 +38,16 @@ public class BuildPlan{
         this.breaking = false;
     }
 
+    /** This creates a build request with a config. */
+    public BuildPlan(int x, int y, int rotation, Block block, Object config){
+        this.x = x;
+        this.y = y;
+        this.rotation = rotation;
+        this.block = block;
+        this.breaking = false;
+        this.config = config;
+    }
+
     /** This creates a remove request. */
     public BuildPlan(int x, int y){
         this.x = x;
@@ -52,7 +61,8 @@ public class BuildPlan{
 
     }
 
-    public static Object pointConfig(Object config, Cons<Point2> cons){
+    /** Transforms the internal position of this config using the specified function, and return the result. */
+    public static Object pointConfig(Block block, Object config, Cons<Point2> cons){
         if(config instanceof Point2){
             config = ((Point2)config).cpy();
             cons.get((Point2)config);
@@ -64,14 +74,15 @@ public class BuildPlan{
                 cons.get(result[i++]);
             }
             config = result;
+        }else if(block != null){
+            config = block.pointConfig(config, cons);
         }
         return config;
     }
 
-    /** If this requests's config is a Point2 or an array of Point2s, this returns a copy of them for transformation.
-     * Otherwise does nothing. */
+    /** Transforms the internal position of this config using the specified function. */
     public void pointConfig(Cons<Point2> cons){
-        this.config = pointConfig(this.config, cons);
+        this.config = pointConfig(block, this.config, cons);
     }
 
     public BuildPlan copy(){
@@ -81,7 +92,6 @@ public class BuildPlan{
         copy.rotation = rotation;
         copy.block = block;
         copy.breaking = breaking;
-        copy.hasConfig = hasConfig;
         copy.config = config;
         copy.originalX = originalX;
         copy.originalY = originalY;
@@ -124,14 +134,12 @@ public class BuildPlan{
         return y*tilesize + block.offset;
     }
 
-    public BuildPlan configure(Object config){
-        this.config = config;
-        this.hasConfig = true;
-        return this;
-    }
-
     public @Nullable Tile tile(){
         return world.tile(x, y);
+    }
+
+    public @Nullable Building build(){
+        return world.build(x, y);
     }
 
     @Override

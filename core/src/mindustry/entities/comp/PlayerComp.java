@@ -34,6 +34,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     @Import float x, y;
 
     @NonNull @ReadOnly Unit unit = Nulls.unit;
+    transient private Unit lastReadUnit = Nulls.unit;
     transient @Nullable NetConnection con;
 
     @ReadOnly Team team = Team.sharded;
@@ -54,11 +55,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit instanceof Minerc;
     }
 
-    public @Nullable CoreEntity closestCore(){
+    public @Nullable CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable CoreEntity core(){
+    public @Nullable CoreBuild core(){
         return team.core();
     }
 
@@ -91,6 +92,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Override
     public void afterSync(){
+        //simulate a unit change after sync
+        Unit set = unit;
+        unit = lastReadUnit;
+        unit(set);
+        lastReadUnit = unit;
+
         unit.aim(mouseX, mouseY);
         //this is only necessary when the thing being controlled isn't synced
         unit.controlWeapons(shooting, shooting);
@@ -104,7 +111,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             clearUnit();
         }
 
-        CoreEntity core = closestCore();
+        CoreBuild core = closestCore();
 
         if(!dead()){
             set(unit);
@@ -114,7 +121,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             //update some basic state to sync things
             if(unit.type().canBoost){
                 Tile tile = unit.tileOn();
-                unit.elevation(Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f));
+                unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
         }else if(core != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
@@ -163,6 +170,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     public void unit(Unit unit){
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
         if(this.unit == unit) return;
+
         if(this.unit != Nulls.unit){
             //un-control the old unit
             this.unit.controller(this.unit.type().createController());
@@ -171,6 +179,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         if(unit != Nulls.unit){
             unit.team(team);
             unit.controller(this);
+
+            //this player just became remote, snap the interpolation so it doesn't go wild
+            if(unit.isRemote()){
+                unit.snapInterpolation();
+            }
         }
 
         Events.fire(new UnitChangeEvent(base(), unit));
@@ -205,7 +218,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         Draw.z(Layer.playerName);
         float z = Drawf.text();
 
-        BitmapFont font = Fonts.def;
+        Font font = Fonts.def;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         final float nameHeight = 11;
         final float textHeight = 15;

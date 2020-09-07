@@ -14,6 +14,7 @@ public enum BlockStat{
     itemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),
     launchTime(StatCategory.items),
+    maxConsecutive(StatCategory.items),
 
     liquidCapacity(StatCategory.liquids),
 
@@ -31,6 +32,8 @@ public enum BlockStat{
     drillTier(StatCategory.crafting),
     drillSpeed(StatCategory.crafting),
     maxUnits(StatCategory.crafting),
+    linkRange(StatCategory.crafting),
+    instructions(StatCategory.crafting),
 
     speedIncrease(StatCategory.shooting),
     repairTime(StatCategory.shooting),

@@ -14,11 +14,11 @@ public class MapLoadDialog extends BaseDialog{
     private Map selected = null;
 
     public MapLoadDialog(Cons<Map> loader){
-        super("$editor.loadmap");
+        super("@editor.loadmap");
 
         shown(this::rebuild);
 
-        TextButton button = new TextButton("$load");
+        TextButton button = new TextButton("@load");
         button.setDisabled(() -> selected == null);
         button.clicked(() -> {
             if(selected != null){
@@ -28,7 +28,7 @@ public class MapLoadDialog extends BaseDialog{
         });
 
         buttons.defaults().size(200f, 50f);
-        buttons.button("$cancel", this::hide);
+        buttons.button("@cancel", this::hide);
         buttons.add(button);
     }
 
@@ -64,9 +64,9 @@ public class MapLoadDialog extends BaseDialog{
         }
 
         if(maps.all().size == 0){
-            table.add("$maps.none").center();
+            table.add("@maps.none").center();
         }else{
-            cont.add("$editor.loadmap");
+            cont.add("@editor.loadmap");
         }
 
         cont.row();

@@ -1,23 +1,30 @@
 package mindustry.ui;
 
 import arc.graphics.*;
+import arc.math.*;
+import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
 /** Displays a list of items, e.g. launched items.*/
 public class ItemsDisplay extends Table{
-    private StringBuilder builder = new StringBuilder();
 
     public ItemsDisplay(){
-        rebuild();
+        rebuild(new ItemSeq());
     }
 
-    public void rebuild(){
+    public void rebuild(ItemSeq items){
+        rebuild(items, null);
+    }
+
+    public void rebuild(ItemSeq items, @Nullable boolean[] shine){
         clear();
         top().left();
         margin(0);
@@ -31,33 +38,26 @@ public class ItemsDisplay extends Table{
                 t.marginRight(30f);
                 t.left();
                 for(Item item : content.items()){
-                    if(item.unlocked()){
-                        t.label(() -> format(item)).left();
-                        t.image(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
-                        t.add(item.localizedName).color(Color.lightGray).left();
-                        t.row();
+                    if(!items.has(item)) continue;
+
+                    Label label = t.add(UI.formatAmount(items.get(item))).left().get();
+                    t.image(item.icon(Cicon.small)).size(8 * 3).padLeft(4).padRight(4);
+                    t.add(item.localizedName).color(Color.lightGray).left();
+                    t.row();
+
+                    if(shine != null && shine[item.id]){
+                        label.setColor(Pal.accent);
+                        label.actions(Actions.color(Color.white, 0.75f, Interp.fade));
                     }
                 }
             }).get().setScrollingDisabled(true, false), false).setDuration(0.3f);
 
-            c.button("$launcheditems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
-                t.setText(state.isMenu() ? "$launcheditems" : "$launchinfo");
+            c.button("@globalitems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
                 t.setChecked(col.isCollapsed());
                 ((Image)t.getChildren().get(1)).setDrawable(col.isCollapsed() ? Icon.upOpen : Icon.downOpen);
             }).padBottom(4).left().fillX().margin(12f).minWidth(200f);
             c.row();
             c.add(col);
         });
-    }
-
-    private String format(Item item){
-        builder.setLength(0);
-        builder.append("[TODO implement]");
-        //builder.append(UI.formatAmount(data.getItem(item)));
-        if(state.isGame() && player.team().data().hasCore() && player.team().core().items.get(item) > 0){
-            builder.append(" [unlaunched]+ ");
-            builder.append(UI.formatAmount(state.teams.get(player.team()).core().items.get(item)));
-        }
-        return builder.toString();
     }
 }

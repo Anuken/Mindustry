@@ -19,21 +19,22 @@ public class ArmoredConduit extends Conduit{
         return otherblock.outputsLiquid && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
-    public class ArmoredConduitEntity extends ConduitEntity{
+    public class ArmoredConduitBuild extends ConduitBuild{
         @Override
         public void draw(){
             super.draw();
 
             // draw the cap when a conduit would normally leak
-            Building next = tile.front();
-            if(next != null && next.team() == team && next.block().hasLiquids) return;
+            Building next = front();
+            if(next != null && next.team == team && next.block().hasLiquids) return;
 
-            Draw.rect(capRegion, x, y, tile.rotdeg());
+            Draw.rect(capRegion, x, y, rotdeg());
         }
 
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid, float amount){
-            return super.acceptLiquid(source, liquid, amount) && (source.block() instanceof Conduit) || Edges.getFacingEdge(source.tile(), tile).absoluteRelativeTo(tile.x, tile.y) == tile.rotation();
+            return super.acceptLiquid(source, liquid, amount) && (source.block() instanceof Conduit) ||
+                Edges.getFacingEdge(source.tile(), tile).absoluteRelativeTo(tile.x, tile.y) == rotation;
         }
     }
 }

@@ -27,7 +27,7 @@ public class ChatFragment extends Table{
     private boolean shown = false;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
-    private BitmapFont font;
+    private Font font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
@@ -62,7 +62,7 @@ public class ChatFragment extends Table{
 
         update(() -> {
 
-            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null || ui.minimapfrag.shown())){
+            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null || ui.minimapfrag.shown()) && !ui.scriptfrag.shown()){
                 toggle();
             }
 
@@ -124,7 +124,7 @@ public class ChatFragment extends Table{
         Draw.color(shadowColor);
 
         if(shown){
-            Fill.crect(offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            Fill.crect(offsetx, chatfield.y, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -171,7 +171,7 @@ public class ChatFragment extends Table{
         String message = chatfield.getText();
         clearChatInput();
 
-        if(message.replaceAll(" ", "").isEmpty()) return;
+        if(message.replace(" ", "").isEmpty()) return;
 
         history.insert(1, message);
 

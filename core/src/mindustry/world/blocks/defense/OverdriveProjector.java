@@ -60,7 +60,7 @@ public class OverdriveProjector extends Block{
         }
     }
 
-    public class OverdriveEntity extends Building{
+    public class OverdriveBuild extends Building{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
@@ -76,10 +76,10 @@ public class OverdriveProjector extends Block{
             charge += heat * Time.delta;
 
             if(hasBoost){
-                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
             }
 
-            if(timer(timerUse, useTime) && efficiency() > 0){
+            if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
                 consume();
             }
 

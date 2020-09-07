@@ -3,6 +3,7 @@ package mindustry.tools;
 import arc.*;
 import arc.backend.headless.mock.*;
 import arc.files.*;
+import arc.math.geom.*;
 import arc.mock.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
@@ -17,6 +18,7 @@ import mindustry.net.Net;
 import mindustry.type.*;
 import mindustry.type.Sector.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -81,8 +83,21 @@ public class SectorDataGenerator{
                     }
                 }
 
-                CoreEntity entity = Team.sharded.core();
+                CoreBuild entity = Team.sharded.core();
                 int cx = entity.tileX(), cy = entity.tileY();
+
+                boolean path = pathfind(true);
+                boolean groundPath = pathfind(false);
+
+                if(!path){
+                    Log.err("Sector &ly@&lr has no core path!", sector.id);
+                }
+
+                if(!groundPath){
+                    Log.debug("&lbSector &ly@&lb is naval-only", sector.id);
+
+                    data.attributes |= (1 << SectorAttribute.navalPath.ordinal());
+                }
 
                 int nearTiles = 0;
                 int waterCheckRad = 5;
@@ -124,6 +139,7 @@ public class SectorDataGenerator{
                 boolean hasSnow = data.floors[0].name.contains("ice") || data.floors[0].name.contains("snow");
                 boolean hasRain = !hasSnow && data.floors[0].name.contains("water");
                 boolean hasDesert = !hasSnow && !hasRain && data.floors[0].name.contains("sand");
+                boolean hasSpores = data.floors[0].name.contains("spore") || data.floors[0].name.contains("moss") || data.floors[0].name.contains("tainted");
 
                 if(hasSnow){
                     data.attributes |= (1 << SectorAttribute.snowy.ordinal());
@@ -137,6 +153,10 @@ public class SectorDataGenerator{
                     data.attributes |= (1 << SectorAttribute.desert.ordinal());
                 }
 
+                if(hasSpores){
+                    data.attributes |= (1 << SectorAttribute.spores.ordinal());
+                }
+
                 data.resources = content.asArray().sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id))).toArray(UnlockableContent.class);
 
                 //50% water -> naval attribute
@@ -145,7 +165,7 @@ public class SectorDataGenerator{
                 }
 
                 if(count[0]++ % 10 == 0){
-                    Log.info("&lyDone with sector &lm@/@", count[0], planet.sectors.size);
+                    Log.info("&ly[ &lg@% &ly] Done with sector &lm@/@ ", (int)((float)count[0] / planet.sectors.size * 100), count[0], planet.sectors.size);
                 }
 
                 return data;
@@ -157,5 +177,52 @@ public class SectorDataGenerator{
                 list.each(s -> s.write(write));
             }
         }
+    }
+
+    private static boolean pathfind(boolean allowWater){
+        CoreBuild entity = Team.sharded.core();
+
+        IntSet enemies = new IntSet();
+        world.tiles.eachTile(t -> {
+            if((t.team() == Team.crux && t.block() instanceof CoreBlock) || t.overlay() == Blocks.spawn){
+                enemies.add(t.pos());
+            }
+        });
+
+        GridBits used = new GridBits(world.width(), world.height());
+
+        IntQueue queue = new IntQueue();
+        queue.addFirst(entity.pos());
+        boolean any = false;
+
+        outer:
+        while(!queue.isEmpty()){
+            int pos = queue.removeFirst();
+            int x = Point2.x(pos), y = Point2.y(pos);
+            used.set(x, y);
+
+            for(Point2 p : Geometry.d4){
+                int nx = p.x + x, ny = p.y + y;
+
+                if(world.tiles.in(nx, ny) && !used.get(nx, ny)){
+                    Tile tile = world.tile(nx, ny);
+
+                    //skip full solids
+                    if((tile.block().isStatic() && tile.solid()) || (!allowWater && tile.floor().isLiquid)) continue;
+
+                    int newpos = Point2.pack(nx, ny);
+
+                    used.set(nx, ny);
+                    queue.addLast(newpos);
+
+                    if(enemies.contains(newpos)){
+                        any = true;
+                        break outer;
+                    }
+                }
+            }
+        }
+
+        return any;
     }
 }

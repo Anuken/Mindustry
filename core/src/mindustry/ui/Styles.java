@@ -25,13 +25,13 @@ import static mindustry.gen.Tex.*;
 public class Styles{
     public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver;
     public static ButtonStyle defaultb, waveb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt;
-    public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
+    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
+    public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, logici, geni, colori, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
     public static SliderStyle defaultSlider, vSlider;
     public static LabelStyle defaultLabel, outlineLabel, techLabel;
-    public static TextFieldStyle defaultField, areaField;
+    public static TextFieldStyle defaultField, nodeField, areaField, nodeArea;
     public static CheckBoxStyle defaultCheck;
     public static DialogStyle defaultDialog, fullDialog;
 
@@ -93,6 +93,14 @@ public class Styles{
             down = flatOver;
             up = black;
         }};
+        logict = new TextButtonStyle(){{
+            over = flatOver;
+            font = Fonts.def;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            down = flatOver;
+            up = underlineWhite;
+        }};
         discordt = new TextButtonStyle(){{
             font = Fonts.def;
             fontColor = Color.white;
@@ -149,7 +157,16 @@ public class Styles{
             disabled = buttonDisabled;
             disabledFontColor = Color.gray;
         }};
-
+        fullTogglet = new TextButtonStyle(){{
+            font = Fonts.def;
+            fontColor = Color.white;
+            checked = flatOver;
+            down = flatOver;
+            up = black;
+            over = flatOver;
+            disabled = black;
+            disabledFontColor = Color.gray;
+        }};
         defaulti = new ImageButtonStyle(){{
             down = buttonDown;
             up = button;
@@ -179,6 +196,18 @@ public class Styles{
         selecti = new ImageButtonStyle(){{
             checked = buttonSelect;
             up = none;
+        }};
+        logici = new ImageButtonStyle(){{
+            //imageDownColor = Pal.accent;
+            imageUpColor = Color.black;
+        }};
+        geni = new ImageButtonStyle(){{
+            imageDownColor = Pal.accent;
+            imageUpColor = Color.black;
+        }};
+        colori = new ImageButtonStyle(){{
+            //imageDownColor = Pal.accent;
+            imageUpColor = Color.white;
         }};
         cleari = new ImageButtonStyle(){{
             down = flatOver;
@@ -289,12 +318,37 @@ public class Styles{
             messageFont = Fonts.def;
             messageFontColor = Color.gray;
         }};
+
+        nodeField = new TextFieldStyle(){{
+            font = Fonts.chat;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            disabledBackground = underlineDisabled;
+            selection = Tex.selection;
+            background = underlineWhite;
+            invalidBackground = underlineRed;
+            cursor = Tex.cursor;
+            messageFont = Fonts.def;
+            messageFontColor = Color.gray;
+        }};
+
         areaField = new TextFieldStyle(){{
             font = Fonts.chat;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             selection = Tex.selection;
             background = underline;
+            cursor = Tex.cursor;
+            messageFont = Fonts.def;
+            messageFontColor = Color.gray;
+        }};
+
+        nodeArea = new TextFieldStyle(){{
+            font = Fonts.chat;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            selection = Tex.selection;
+            background = underlineWhite;
             cursor = Tex.cursor;
             messageFont = Fonts.def;
             messageFontColor = Color.gray;

@@ -102,7 +102,7 @@ public class World{
     }
 
     @Nullable
-    public Tile Building(int x, int y){
+    public Tile tileBuilding(int x, int y){
         Tile tile = tiles.get(x, y);
         if(tile == null) return null;
         if(tile.build != null) return tile.build.tile();
@@ -185,16 +185,12 @@ public class World{
                 continue;
             }
 
-            tile.updateOcclusion();
-
             if(tile.build != null){
                 tile.build.updateProximity();
             }
         }
 
-        if(!headless){
-            addDarkness(tiles);
-        }
+        addDarkness(tiles);
 
         Groups.resize(-finalWorldBounds, -finalWorldBounds, tiles.width * tilesize + finalWorldBounds * 2, tiles.height * tilesize + finalWorldBounds * 2);
 
@@ -277,7 +273,7 @@ public class World{
         }catch(Throwable e){
             Log.err(e);
             if(!headless){
-                ui.showErrorMessage("$map.invalid");
+                ui.showErrorMessage("@map.invalid");
                 Core.app.post(() -> state.set(State.menu));
                 invalidMap = true;
             }
@@ -291,17 +287,17 @@ public class World{
 
         if(!headless){
             if(state.teams.playerCores().size == 0 && !checkRules.pvp){
-                ui.showErrorMessage("$map.nospawn");
+                ui.showErrorMessage("@map.nospawn");
                 invalidMap = true;
             }else if(checkRules.pvp){ //pvp maps need two cores to be valid
                 if(state.teams.getActive().count(TeamData::hasCore) < 2){
                     invalidMap = true;
-                    ui.showErrorMessage("$map.nospawn.pvp");
+                    ui.showErrorMessage("@map.nospawn.pvp");
                 }
             }else if(checkRules.attackMode){ //attack maps need two cores to be valid
                 invalidMap = state.teams.get(state.rules.waveTeam).noCores();
                 if(invalidMap){
-                    ui.showErrorMessage("$map.nospawn.attack");
+                    ui.showErrorMessage("@map.nospawn.attack");
                 }
             }
         }else{
@@ -317,7 +313,7 @@ public class World{
 
     public void notifyChanged(Tile tile){
         if(!generating){
-            Core.app.post(() -> Events.fire(new BuildinghangeEvent(tile)));
+            Core.app.post(() -> Events.fire(new TileChangeEvent(tile)));
         }
     }
 
@@ -418,7 +414,7 @@ public class World{
             int idx = tile.y * tiles.width + tile.x;
 
             if(tile.isDarkened()){
-                tile.rotation(dark[idx]);
+                tile.data = dark[idx];
             }
 
             if(dark[idx] == 4){
@@ -432,7 +428,7 @@ public class World{
                     }
                 }
 
-                if(full) tile.rotation(5);
+                if(full) tile.data = 5;
             }
         }
     }
@@ -472,7 +468,7 @@ public class World{
 
         Tile tile = world.tile(x, y);
         if(tile != null && tile.block().solid && tile.block().fillsTile && !tile.block().synthetic()){
-            dark = Math.max(dark, tile.rotation());
+            dark = Math.max(dark, tile.data);
         }
 
         return dark;
@@ -483,6 +479,9 @@ public class World{
     }
 
     private class Context implements WorldContext{
+
+        Context(){
+        }
 
         @Override
         public Tile tile(int index){

@@ -42,7 +42,6 @@ import static mindustry.Vars.*;
 public class Schematics implements Loadable{
     private static final Schematic tmpSchem = new Schematic(new Seq<>(), new StringMap(), 0, 0);
     private static final Schematic tmpSchem2 = new Schematic(new Seq<>(), new StringMap(), 0, 0);
-    public static final String base64Header = "bXNjaAB";
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 1;
@@ -248,7 +247,7 @@ public class Schematics implements Loadable{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Seq<BuildPlan> requests = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block).configure(t.config));
+            Seq<BuildPlan> requests = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
 
             Draw.flush();
             //scale each request to fit schematic
@@ -279,7 +278,7 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Seq<BuildPlan> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
+        return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config).original(t.x, t.y, schem.width, schem.height))
             .removeAll(s -> !s.block.isVisible() || !s.block.unlockedNow());
     }
 
@@ -347,7 +346,7 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
 
-                if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof BuildBlock)){
+                if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof ConstructBlock)){
                     int top = linked.block().size/2;
                     int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
@@ -375,11 +374,11 @@ public class Schematics implements Loadable{
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
 
-                if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
+                if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof ConstructBlock)
                     && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
                     Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation()));
+                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }
@@ -418,8 +417,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, team, 0);
-            tile.rotation(st.rotation);
+            tile.setBlock(st.block, team, st.rotation);
 
             Object config = st.config;
             if(tile.build != null){
@@ -438,8 +436,7 @@ public class Schematics implements Loadable{
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
-            tile.setBlock(st.block, team, 0);
-            tile.rotation(st.rotation);
+            tile.setBlock(st.block, team, st.rotation);
 
             Object config = st.config;
             if(tile.build != null){
@@ -586,7 +583,7 @@ public class Schematics implements Loadable{
         int ox = schem.width/2, oy = schem.height/2;
 
         schem.tiles.each(req -> {
-            req.config = BuildPlan.pointConfig(req.config, p -> {
+            req.config = BuildPlan.pointConfig(req.block, req.config, p -> {
                 int cx = p.x, cy = p.y;
                 int lx = cx;
 

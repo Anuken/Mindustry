@@ -16,7 +16,7 @@ public class BlockUnloader extends BlockLoader{
         return true;
     }
 
-    public class BlockUnloaderEntity extends BlockLoaderEntity{
+    public class BlockUnloaderBuild extends BlockLoaderBuild{
 
         @Override
         public boolean acceptItem(Building source, Item item){

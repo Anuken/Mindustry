@@ -13,8 +13,9 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class WeaponsComp implements Teamc, Posc, Rotc{
+abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     @Import float x, y, rotation, reloadMultiplier;
+    @Import Vec2 vel;
 
     /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
     static final float minAimDst = 18f;
@@ -23,7 +24,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
 
     /** weapon mount array, never null */
     @SyncLocal WeaponMount[] mounts = {};
-    @ReadOnly transient float range, aimX, aimY;
+    @ReadOnly transient float aimX, aimY;
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
     float ammo;
@@ -34,16 +35,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         }
     }
 
-    boolean inRange(Position other){
-        return within(other, range);
-    }
-
     void setupWeapons(UnitType def){
         mounts = new WeaponMount[def.weapons.size];
-        range = def.range;
         for(int i = 0; i < mounts.length; i++){
             mounts[i] = new WeaponMount(def.weapons.get(i));
-            range = Math.max(range, def.weapons.get(i).bullet.range());
         }
     }
 
@@ -81,9 +76,15 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         aimY = y;
     }
 
+    boolean canShoot(){
+        return true;
+    }
+
     /** Update shooting and rotation for this unit. */
     @Override
     public void update(){
+        boolean can = canShoot();
+
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
@@ -96,21 +97,24 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
             }
 
             //rotate if applicable
-            if(weapon.rotate && (mount.rotate || mount.shoot)){
+            if(weapon.rotate && (mount.rotate || mount.shoot) && can){
                 float axisX = this.x + Angles.trnsx(rotation - 90,  weapon.x, weapon.y),
                     axisY = this.y + Angles.trnsy(rotation - 90,  weapon.x, weapon.y);
 
                 mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation;
                 mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
-            }else{
+            }else if(!weapon.rotate){
                 mount.rotation = 0;
                 mount.targetRotation = angleTo(mount.aimX, mount.aimY);
             }
 
             //shoot if applicable
             if(mount.shoot && //must be shooting
+                can && //must be able to shoot
                 (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && //check ammo
                 (!weapon.alternate || mount.side == weapon.flipSprite) &&
+                //TODO checking for velocity this way isn't entirely correct
+                (vel.len() >= mount.weapon.minShootVelocity || (net.active() && !isLocal())) && //check velocity requirements
                 mount.reload <= 0.0001f && //reload has to be 0
                 Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
             ){
@@ -160,7 +164,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc{
         }
         boolean parentize = ammo.keepVelocity;
 
-        Effects.shake(weapon.shake, weapon.shake, x, y);
+        Effect.shake(weapon.shake, weapon.shake, x, y);
         weapon.ejectEffect.at(x, y, rotation * side);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);

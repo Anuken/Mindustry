@@ -48,7 +48,7 @@ public class ServerControl implements ApplicationListener{
     private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
-    private Gamemode lastMode = Gamemode.survival;
+    private Gamemode lastMode;
     private @Nullable Map nextMapOverride;
     private Interval autosaveCount = new Interval();
 
@@ -58,12 +58,20 @@ public class ServerControl implements ApplicationListener{
 
     public ServerControl(String[] args){
         Core.settings.defaults(
-            "shufflemode", "normal",
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
             "globalrules", "{reactorExplosions: false}"
         );
+
+        //update log level
+        Config.debug.set(Config.debug.bool());
+
+        try{
+            lastMode = Gamemode.valueOf(Core.settings.getString("lastServerMode", "survival"));
+        }catch(Exception e){ //handle enum parse exception
+            lastMode = Gamemode.survival;
+        }
 
         Log.setLogger((level, text) -> {
             String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr");
@@ -87,6 +95,21 @@ public class ServerControl implements ApplicationListener{
         registerCommands();
 
         Core.app.post(() -> {
+            //try to load auto-update save if possible
+            if(Config.autoUpdate.bool()){
+                Fi fi = saveDirectory.child("autosavebe." + saveExtension);
+                if(fi.exists()){
+                    try{
+                        SaveIO.load(fi);
+                        info("Auto-save loaded.");
+                        state.set(State.playing);
+                        netServer.openServer();
+                    }catch(Throwable e){
+                        Log.err(e);
+                    }
+                }
+            }
+
             Seq<String> commands = new Seq<>();
 
             if(args.length > 0){
@@ -140,10 +163,13 @@ public class ServerControl implements ApplicationListener{
             nextMapOverride = null;
             if(map != null){
                 Call.infoMessage((state.rules.pvp
-                ? "[yellow]The " + event.winner.name + " team is victorious![]" : "[scarlet]Game over![]")
+                ? "[accent]The " + event.winner.name + " team is victorious![]\n" : "[scarlet]Game over![]\n")
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
+
+                state.gameOver = true;
+                Call.updateGameOver(event.winner);
 
                 info("Selected next map to be @.", map.name());
 
@@ -161,7 +187,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         //autosave periodically
-        Events.on(Trigger.update, () -> {
+        Events.run(Trigger.update, () -> {
             if(state.isPlaying() && Config.autosave.bool()){
                 if(autosaveCount.get(Config.autosaveSpacing.num() * 60)){
                     int max = Config.autosaveAmount.num();
@@ -194,7 +220,7 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        Events.on(Trigger.socketConfigChanged, () -> {
+        Events.run(Trigger.socketConfigChanged, () -> {
             toggleSocket(false);
             toggleSocket(Config.socketInput.bool());
         });
@@ -208,6 +234,10 @@ public class ServerControl implements ApplicationListener{
                 Log.err("Error applying custom rules, proceeding without them.", t);
             }
         });
+
+        //autosave settings once a minute
+        float saveInterval = 60;
+        Timer.schedule(() -> Core.settings.forceSave(), saveInterval, saveInterval);
 
         if(!mods.list().isEmpty()){
             info("&lc@ mods loaded.", mods.list().size);
@@ -280,6 +310,7 @@ public class ServerControl implements ApplicationListener{
 
             logic.reset();
             lastMode = preset;
+            Core.settings.put("lastServerMode", lastMode.name());
             try{
                 world.loadMap(result, result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);
@@ -517,6 +548,7 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     Log.info("&lc@&lg set to &lc@.", c.name(), c.get());
+                    Core.settings.forceSave();
                 }
             }catch(IllegalArgumentException e){
                 err("Unknown config: '@'. Run the command with no arguments to get a list of valid configs.", arg[0]);
@@ -924,7 +956,7 @@ public class ServerControl implements ApplicationListener{
                 players.add(p);
                 p.clearUnit();
             }
-            
+
             logic.reset();
 
             Call.worldDataBegin();

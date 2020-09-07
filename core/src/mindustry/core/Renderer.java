@@ -87,6 +87,10 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    public boolean isLanding(){
+        return landTime > 0;
+    }
+
     public float weatherAlpha(){
         return weatherAlpha;
     }
@@ -134,7 +138,7 @@ public class Renderer implements ApplicationListener{
         }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
-            ui.showErrorMessage("$error.bloom");
+            ui.showErrorMessage("@error.bloom");
         }
     }
 
@@ -181,6 +185,8 @@ public class Renderer implements ApplicationListener{
     }
 
     public void draw(){
+        Events.fire(Trigger.preDraw);
+
         camera.update();
 
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
@@ -200,6 +206,8 @@ public class Renderer implements ApplicationListener{
         blocks.processBlocks();
 
         Draw.sort(true);
+
+        Events.fire(Trigger.draw);
 
         if(pixelator.enabled()){
             pixelator.register();
@@ -250,6 +258,8 @@ public class Renderer implements ApplicationListener{
         Draw.reset();
         Draw.flush();
         Draw.sort(false);
+
+        Events.fire(Trigger.postDraw);
     }
 
     private void drawBackground(){
@@ -314,7 +324,7 @@ public class Renderer implements ApplicationListener{
         int memory = w * h * 4 / 1024 / 1024;
 
         if(memory >= 65){
-            ui.showInfo("$screenshot.invalid");
+            ui.showInfo("@screenshot.invalid");
             return;
         }
 

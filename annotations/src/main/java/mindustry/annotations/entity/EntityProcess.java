@@ -285,8 +285,6 @@ public class EntityProcess extends BaseProcessor{
 
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-                if(isFinal && !typeIsBase) builder.addModifiers(Modifier.FINAL);
-
                 //add serialize() boolean
                 builder.addMethod(MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC).returns(boolean.class).addStatement("return " + ann.serialize()).build());
 
@@ -468,6 +466,17 @@ public class EntityProcess extends BaseProcessor{
                                 //reset last+current state to target position
                                 mbuilder.addStatement("$L = $L", field.name() + EntityIO.lastSuf, field.name() + EntityIO.targetSuf);
                                 mbuilder.addStatement("$L = $L", field.name(), field.name() + EntityIO.targetSuf);
+                            }
+                        }
+
+                        //SPECIAL CASE: method to snap to current position so interpolation doesn't go wild
+                        if(first.name().equals("snapInterpolation")){
+                            mbuilder.addStatement("updateSpacing = 16");
+                            mbuilder.addStatement("lastUpdated = $T.millis()", Time.class);
+                            for(Svar field : syncedFields){
+                                //reset last+current state to target position
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.lastSuf, field.name());
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.targetSuf, field.name());
                             }
                         }
                     }
