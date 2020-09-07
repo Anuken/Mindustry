@@ -1135,7 +1135,7 @@ public class Blocks implements ContentList{
 
         turbineGenerator = new BurnerGenerator("turbine-generator"){{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
-            powerProduction = 6f;
+            powerProduction = 5.5f;
             itemDuration = 90f;
             consumes.liquid(Liquids.water, 0.05f);
             hasLiquids = true;
@@ -1144,14 +1144,14 @@ public class Blocks implements ContentList{
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
             requirements(Category.power, with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
-            powerProduction = 17f;
-            itemDuration = 200f;
+            powerProduction = 18f;
+            itemDuration = 220f;
             hasLiquids = true;
             hasItems = true;
             size = 3;
 
             consumes.item(Items.pyratite).optional(true, false);
-            consumes.liquid(Liquids.cryofluid, 0.14f);
+            consumes.liquid(Liquids.cryofluid, 0.1f);
         }};
 
         rtgGenerator = new DecayGenerator("rtg-generator"){{
@@ -1612,6 +1612,7 @@ public class Blocks implements ContentList{
             reloadTime = 60f;
             ammoEjectBack = 5f;
             ammoUseEffect = Fx.shellEjectBig;
+            ammoPerShot = 2;
             cooldown = 0.03f;
             velocityInaccuracy = 0.2f;
             restitution = 0.02f;

@@ -134,7 +134,7 @@ public class Vars implements Loadable{
     /** whether typing into the console is enabled - developers only */
     public static boolean enableConsole = false;
     /** whether to clear sector saves when landing */
-    public static boolean clearSectors = true;
+    public static boolean clearSectors = false;
     /** whether any light rendering is enabled */
     public static boolean enableLight = true;
     /** Whether to draw shadows of blocks at map edges and static blocks.
