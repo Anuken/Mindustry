@@ -431,16 +431,16 @@ public class Control implements ApplicationListener, Loadable{
                 ui.showStartupInfo("[accent]v6[] is currently in [accent]pre-alpha[].\n" +
                 "[lightgray]This means:[]\n" +
                 "- Content is missing\n" +
-                "- [scarlet]Mobile[] is not supported.\n" +
                 "- Most [scarlet]Unit AI[] does not work\n" +
-                "- Many units are [scarlet]missing[] or unfinished\n" +
+                "- Many units are unfinished\n" +
                 "- The campaign is completely unfinished\n" +
                 "- Everything you see is subject to change or removal." +
                 "\n\nReport bugs or crashes on [accent]Github[].");
             }));
         }
 
-        //play tutorial on stop
+        //play tutorial on start
+        //TODO no tutorial right now
         if(!settings.getBool("playedtutorial", false)){
             //Core.app.post(() -> Core.app.post(this::playTutorial));
         }

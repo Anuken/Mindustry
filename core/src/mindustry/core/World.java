@@ -185,8 +185,6 @@ public class World{
                 continue;
             }
 
-            tile.updateOcclusion();
-
             if(tile.build != null){
                 tile.build.updateProximity();
             }

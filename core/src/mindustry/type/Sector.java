@@ -390,6 +390,8 @@ public class Sector{
         /** Has an enemy base. */
         base,
         /** Has spore weather. */
-        spores
+        spores,
+        /** Path from core to spawns requires traversing water. */
+        navalPath
     }
 }

@@ -101,13 +101,12 @@ public class Blocks implements ContentList{
                 hasShadow = false;
             }
 
-            public void drawBase(Tile tile){}
-            public void load(){}
-            public void init(){}
-            public boolean isHidden(){
-                return true;
-            }
+            @Override public void drawBase(Tile tile){}
+            @Override public void load(){}
+            @Override public void init(){}
+            @Override public boolean isHidden(){ return true; }
 
+            @Override
             public TextureRegion[] variantRegions(){
                 if(variantRegions == null){
                     variantRegions = new TextureRegion[]{Core.atlas.find("clear")};
@@ -211,9 +210,7 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.slag;
         }};
 
-        stone = new Floor("stone"){{
-
-        }};
+        stone = new Floor("stone");
 
         craters = new Floor("craters"){{
             variants = 3;
@@ -265,9 +262,7 @@ public class Blocks implements ContentList{
         ((ShallowLiquid)sandWater).set(Blocks.water, Blocks.sand);
         ((ShallowLiquid)darksandWater).set(Blocks.water, Blocks.darksand);
 
-        holostone = new Floor("holostone"){{
-
-        }};
+        holostone = new Floor("holostone");
 
         grass = new Floor("grass"){{
             attributes.set(Attribute.water, 0.1f);
@@ -334,8 +329,7 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
-        saltRocks = new StaticWall("saltrocks"){{
-        }};
+        saltRocks = new StaticWall("saltrocks");
 
         sporePine = new StaticTree("spore-pine"){{
             variants = 0;
@@ -349,15 +343,11 @@ public class Blocks implements ContentList{
             variants = 0;
         }};
 
-        shrubs = new StaticWall("shrubs"){{
+        shrubs = new StaticWall("shrubs");
 
-        }};
+        whiteTreeDead = new TreeBlock("white-tree-dead");
 
-        whiteTreeDead = new TreeBlock("white-tree-dead"){{
-        }};
-
-        whiteTree = new TreeBlock("white-tree"){{
-        }};
+        whiteTree = new TreeBlock("white-tree");
 
         sporeCluster = new Rock("spore-cluster"){{
             variants = 3;
@@ -1157,7 +1147,7 @@ public class Blocks implements ContentList{
         rtgGenerator = new DecayGenerator("rtg-generator"){{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phasefabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
-            powerProduction = 4f;
+            powerProduction = 4.5f;
             itemDuration = 500f;
         }};
 
@@ -1177,7 +1167,7 @@ public class Blocks implements ContentList{
             size = 3;
             health = 700;
             itemDuration = 360f;
-            powerProduction = 14f;
+            powerProduction = 15f;
             consumes.item(Items.thorium);
             heating = 0.02f;
             consumes.liquid(Liquids.cryofluid, heating / coolantPower).update(false);

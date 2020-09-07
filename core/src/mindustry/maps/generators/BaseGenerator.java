@@ -200,20 +200,16 @@ public class BaseGenerator{
     }
 
     boolean isTaken(Block block, int x, int y){
-        if(block.isMultiblock()){
-            int offsetx = -(block.size - 1) / 2;
-            int offsety = -(block.size - 1) / 2;
+        int offsetx = -(block.size - 1) / 2;
+        int offsety = -(block.size - 1) / 2;
+        int pad = 1;
 
-            for(int dx = 0; dx < block.size; dx++){
-                for(int dy = 0; dy < block.size; dy++){
-                    if(overlaps(dx + offsetx + x, dy + offsety + y)){
-                        return true;
-                    }
+        for(int dx = -pad; dx < block.size + pad; dx++){
+            for(int dy = -pad; dy < block.size + pad; dy++){
+                if(overlaps(dx + offsetx + x, dy + offsety + y)){
+                    return true;
                 }
             }
-
-        }else{
-            return overlaps(x, y);
         }
 
         return false;

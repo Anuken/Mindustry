@@ -449,10 +449,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
-    //TODO remove this method?
-    public void updateOcclusion(){
-    }
-
     protected void preChanged(){
         if(build != null){
             //only call removed() for the center block - this only gets called once.
@@ -475,8 +471,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                                 other.block = Blocks.air;
 
                                 //manually call changed event
-                                other.updateOcclusion();
-                                world.notifyChanged(other);
+                                other.fireChanged();
                             }
                         }
                     }
@@ -533,14 +528,16 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             }
         }
 
-        updateOcclusion();
-
-        world.notifyChanged(this);
+        fireChanged();
 
         //recache when static block is added
         if(block.isStatic()){
             recache();
         }
+    }
+
+    protected void fireChanged(){
+        world.notifyChanged(this);
     }
 
     @Override
