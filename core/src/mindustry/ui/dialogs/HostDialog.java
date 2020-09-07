@@ -14,6 +14,7 @@ import static mindustry.Vars.*;
 
 public class HostDialog extends BaseDialog{
     float w = 300;
+    TextField portField;
 
     public HostDialog(){
         super("@hostserver");
@@ -39,6 +40,24 @@ public class HostDialog extends BaseDialog{
 
         cont.row();
 
+        cont.table(t -> {
+            t.add("@server.port").padRight(10);
+            portField = t.field(String.valueOf(Core.settings.getInt("port", port)), text -> {
+                Core.settings.put("port", Integer.parseInt(text));
+            }).pad(8).grow().get();
+            portField.setMaxLength(5);
+            portField.setValidator(text -> {
+                try {
+                    int port = Integer.parseInt(text);
+                    return port >= 1 && port <= 65535;
+                } catch(NumberFormatException e){
+                    return false;
+                }
+            });
+        }).width(w).height(70f).pad(4).colspan(3);
+
+        cont.row();
+
         cont.add().width(65f);
 
         cont.button("@host", () -> {
@@ -48,7 +67,7 @@ public class HostDialog extends BaseDialog{
             }
 
             runHost();
-        }).width(w).height(70f);
+        }).width(w).height(70f).disabled(b -> !portField.isValid());
 
         cont.button("?", () -> ui.showInfo("@host.info")).size(65f, 70f).padLeft(6f);
 
@@ -63,7 +82,7 @@ public class HostDialog extends BaseDialog{
         ui.loadfrag.show("@hosting");
         Time.runTask(5f, () -> {
             try{
-                net.host(Vars.port);
+                net.host(Core.settings.getInt("port", port));
                 player.admin(true);
 
                 if(steam){
