@@ -26,6 +26,7 @@ public class BaseGenerator{
     private Tiles tiles;
     private Team team;
     private ObjectMap<Item, OreBlock> ores = new ObjectMap<>();
+    private ObjectMap<Item, Floor> oreFloors = new ObjectMap<>();
     private Seq<Tile> cores;
 
     public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector){
@@ -41,6 +42,8 @@ public class BaseGenerator{
         for(Block block : content.blocks()){
             if(block instanceof OreBlock && block.asFloor().itemDrop != null){
                 ores.put(block.asFloor().itemDrop, (OreBlock)block);
+            }else if(block.isFloor() && block.asFloor().itemDrop != null && !oreFloors.containsKey(block.asFloor().itemDrop)){
+                oreFloors.put(block.asFloor().itemDrop, block.asFloor());
             }
         }
 
@@ -73,7 +76,8 @@ public class BaseGenerator{
         pass(tile -> {
             if(!tile.block().alwaysReplace) return;
 
-            if((tile.drop() != null || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
+            if(((tile.overlay().asFloor().itemDrop != null || (tile.drop() != null && Mathf.chance(nonResourceChance)))
+                || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
                 Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
                 if(!parts.isEmpty()){
                     tryPlace(parts.random(), tile.x, tile.y);
@@ -94,10 +98,6 @@ public class BaseGenerator{
 
             //small walls
             pass(tile -> {
-                //no walls around cores
-                if(cores.contains(t -> t.within(tile, (3 + 4) * tilesize))){
-                    return;
-                }
 
                 if(tile.block().alwaysReplace){
                     boolean any = false;
@@ -175,19 +175,20 @@ public class BaseGenerator{
         }
 
         if(part.required instanceof Item){
+            Item item = (Item)part.required;
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
 
                         if(!tiles.getn(ex, ey).floor().isLiquid){
-                            tiles.getn(ex, ey).setOverlay(ores.get((Item)part.required));
+                            set(tiles.getn(ex, ey), item);
                         }
 
                         Tile rand = tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
                         if(!rand.floor().isLiquid){
                             //random ores nearby to make it look more natural
-                            rand.setOverlay(ores.get((Item)part.required));
+                            set(rand, item);
                         }
                     });
                 }
@@ -196,7 +197,30 @@ public class BaseGenerator{
 
         Schematics.place(result, cx + result.width/2, cy + result.height/2, team);
 
+        //fill drills with items after placing
+        if(part.required instanceof Item){
+            Item item = (Item)part.required;
+            for(Stile tile : result.tiles){
+                if(tile.block instanceof Drill){
+
+                    Building build = world.tile(tile.x + cx, tile.y + cy).build;
+
+                    if(build != null){
+                        build.items.add(item, build.block.itemCapacity);
+                    }
+                }
+            }
+        }
+
         return true;
+    }
+
+    void set(Tile tile, Item item){
+        if(ores.containsKey(item)){
+            tile.setOverlay(ores.get(item));
+        }else if(oreFloors.containsKey(item)){
+            tile.setFloor(oreFloors.get(item));
+        }
     }
 
     boolean isTaken(Block block, int x, int y){

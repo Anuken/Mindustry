@@ -326,7 +326,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         setOverlay(content.block(ore));
     }
 
-    public void setOverlay(Block block){
+    public void setOverlay(@NonNull Block block){
         this.overlay = (Floor)block;
 
         recache();
