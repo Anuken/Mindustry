@@ -26,9 +26,10 @@ public class Unloader extends Block{
         configurable = true;
         saveConfig = true;
         itemCapacity = 0;
+        noUpdateDisabled = true;
 
-        config(Item.class, (UnloaderEntity tile, Item item) -> tile.sortItem = item);
-        configClear((UnloaderEntity tile) -> tile.sortItem = null);
+        config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
+        configClear((UnloaderBuild tile) -> tile.sortItem = null);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class Unloader extends Block{
         bars.remove("items");
     }
 
-    public class UnloaderEntity extends Building{
+    public class UnloaderBuild extends Building{
         public Item sortItem = null;
         public Building dumpingTo;
 
@@ -82,7 +83,7 @@ public class Unloader extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>bc().sortItem, item -> configure(item));
+            ItemSelection.buildTable(table, content.items(), () -> sortItem, this::configure);
         }
 
         @Override
@@ -107,15 +108,20 @@ public class Unloader extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
-            write.b(sortItem == null ? -1 : sortItem.id);
+            write.s(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte id = read.b();
+            int id = revision == 1 ? read.s() : read.b();
             sortItem = id == -1 ? null : content.items().get(id);
         }
     }

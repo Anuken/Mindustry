@@ -20,7 +20,7 @@ public class MapsDialog extends BaseDialog{
     private BaseDialog dialog;
 
     public MapsDialog(){
-        super("$maps");
+        super("@maps");
 
         buttons.remove();
 
@@ -43,14 +43,14 @@ public class MapsDialog extends BaseDialog{
         buttons.clearChildren();
 
         if(Core.graphics.isPortrait()){
-            buttons.button("$back", Icon.left, this::hide).size(210f*2f, 64f).colspan(2);
+            buttons.button("@back", Icon.left, this::hide).size(210f*2f, 64f).colspan(2);
             buttons.row();
         }else{
-            buttons.button("$back", Icon.left, this::hide).size(210f, 64f);
+            buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
         }
 
-        buttons.button("$editor.newmap", Icon.add, () -> {
-            ui.showTextInput("$editor.newmap", "$editor.mapname", "", text -> {
+        buttons.button("@editor.newmap", Icon.add, () -> {
+            ui.showTextInput("@editor.newmap", "@editor.mapname", "", text -> {
                 Runnable show = () -> ui.loadAnd(() -> {
                     hide();
                     ui.editor.show();
@@ -59,19 +59,19 @@ public class MapsDialog extends BaseDialog{
                 });
 
                 if(maps.byName(text) != null){
-                    ui.showErrorMessage("$editor.exists");
+                    ui.showErrorMessage("@editor.exists");
                 }else{
                     show.run();
                 }
             });
         }).size(210f, 64f);
 
-        buttons.button("$editor.importmap", Icon.upload, () -> {
+        buttons.button("@editor.importmap", Icon.upload, () -> {
             platform.showFileChooser(true, mapExtension, file -> {
                 ui.loadAnd(() -> {
                     maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
-                            ui.showErrorMessage("$editor.errorimage");
+                            ui.showErrorMessage("@editor.errorimage");
                             return;
                         }
 
@@ -88,7 +88,7 @@ public class MapsDialog extends BaseDialog{
 
                         //this will never actually get called, but it remains just in case
                         if(name == null){
-                            ui.showErrorMessage("$editor.errorname");
+                            ui.showErrorMessage("@editor.errorname");
                             return;
                         }
 
@@ -97,7 +97,7 @@ public class MapsDialog extends BaseDialog{
                         if(conflict != null && !conflict.custom){
                             ui.showInfo(Core.bundle.format("editor.import.exists", name));
                         }else if(conflict != null){
-                            ui.showConfirm("$confirm", Core.bundle.format("editor.overwrite.confirm", map.name()), () -> {
+                            ui.showConfirm("@confirm", Core.bundle.format("editor.overwrite.confirm", map.name()), () -> {
                                 maps.tryCatchMapError(() -> {
                                     maps.removeMap(conflict);
                                     maps.importMap(map.file);
@@ -142,13 +142,13 @@ public class MapsDialog extends BaseDialog{
             button.row();
             button.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize - 20f);
             button.row();
-            button.add(map.custom ? "$custom" : map.workshop ? "$workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName() : "$builtin").color(Color.gray).padTop(3);
+            button.add(map.custom ? "@custom" : map.workshop ? "@workshop" : map.mod != null ? "[lightgray]" + map.mod.meta.displayName() : "@builtin").color(Color.gray).padTop(3);
 
             i++;
         }
 
         if(Vars.maps.all().size == 0){
-            maps.add("$maps.none");
+            maps.add("@maps.none");
         }
 
         cont.add(buttons).growX();
@@ -157,7 +157,7 @@ public class MapsDialog extends BaseDialog{
     }
 
     void showMapInfo(Map map){
-        dialog = new BaseDialog("$editor.mapinfo");
+        dialog = new BaseDialog("@editor.mapinfo");
         dialog.addCloseButton();
 
         float mapsize = Core.graphics.isPortrait() ? 160f : 300f;
@@ -176,37 +176,37 @@ public class MapsDialog extends BaseDialog{
             t.top();
             t.defaults().padTop(10).left();
 
-            t.add("$editor.mapname").padRight(10).color(Color.gray).padTop(0);
+            t.add("@editor.mapname").padRight(10).color(Color.gray).padTop(0);
             t.row();
             t.add(map.name()).growX().wrap().padTop(2);
             t.row();
-            t.add("$editor.author").padRight(10).color(Color.gray);
+            t.add("@editor.author").padRight(10).color(Color.gray);
             t.row();
             t.add(!map.custom && map.author().isEmpty() ? "Anuke" : map.author()).growX().wrap().padTop(2);
             t.row();
-            t.add("$editor.description").padRight(10).color(Color.gray).top();
+            t.add("@editor.description").padRight(10).color(Color.gray).top();
             t.row();
             t.add(map.description()).growX().wrap().padTop(2);
         }).height(mapsize).width(mapsize);
 
         table.row();
 
-        table.button("$editor.openin", Icon.export, () -> {
+        table.button("@editor.openin", Icon.export, () -> {
             try{
                 Vars.ui.editor.beginEditMap(map.file);
                 dialog.hide();
                 hide();
             }catch(Exception e){
                 e.printStackTrace();
-                ui.showErrorMessage("$error.mapnotfound");
+                ui.showErrorMessage("@error.mapnotfound");
             }
         }).fillX().height(54f).marginLeft(10);
 
-        table.button(map.workshop && steam ? "$view.workshop" : "$delete", map.workshop && steam ? Icon.link : Icon.trash, () -> {
+        table.button(map.workshop && steam ? "@view.workshop" : "@delete", map.workshop && steam ? Icon.link : Icon.trash, () -> {
             if(map.workshop && steam){
                 platform.viewListing(map);
             }else{
-                ui.showConfirm("$confirm", Core.bundle.format("map.delete", map.name()), () -> {
+                ui.showConfirm("@confirm", Core.bundle.format("map.delete", map.name()), () -> {
                     maps.removeMap(map);
                     dialog.hide();
                     setup();

@@ -13,7 +13,7 @@ public class GameOverDialog extends BaseDialog{
     private Team winner;
 
     public GameOverDialog(){
-        super("$gameover");
+        super("@gameover");
         setFillParent(true);
         shown(this::rebuild);
     }
@@ -29,7 +29,7 @@ public class GameOverDialog extends BaseDialog{
     }
 
     void rebuild(){
-        title.setText(state.launched ? "$launch.title" : "$gameover");
+        title.setText(state.launched ? "@launch.title" : "@gameover");
         buttons.clear();
         cont.clear();
 
@@ -37,13 +37,13 @@ public class GameOverDialog extends BaseDialog{
 
         if(state.rules.pvp){
             cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
-            buttons.button("$menu", () -> {
+            buttons.button("@menu", () -> {
                 hide();
                 logic.reset();
             }).size(130f, 60f);
         }else{
             if(control.isHighScore()){
-                cont.add("$highscore").pad(6);
+                cont.add("@highscore").pad(6);
                 cont.row();
             }
 
@@ -65,7 +65,7 @@ public class GameOverDialog extends BaseDialog{
                     t.row();
                 }
                 if(state.isCampaign() && !state.stats.itemsDelivered.isEmpty()){
-                    t.add("$stat.delivered");
+                    t.add("@stat.delivered");
                     t.row();
                     for(Item item : content.items()){
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
@@ -86,13 +86,13 @@ public class GameOverDialog extends BaseDialog{
             }).pad(12);
 
             if(state.isCampaign()){
-                buttons.button("$continue", () -> {
+                buttons.button("@continue", () -> {
                     hide();
                     logic.reset();
                     ui.planet.show();
                 }).size(130f, 60f);
             }else{
-                buttons.button("$menu", () -> {
+                buttons.button("@menu", () -> {
                     hide();
                     logic.reset();
                 }).size(130f, 60f);

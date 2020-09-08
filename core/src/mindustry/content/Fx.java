@@ -26,15 +26,17 @@ public class Fx{
     none = new Effect(0, 0f, e -> {}),
 
     unitSpawn = new Effect(30f, e -> {
-        if(!(e.data instanceof Unit)) return;
+        if(!(e.data instanceof UnitType)) return;
 
         alpha(e.fin());
 
         float scl = 1f + e.fout() * 2f;
 
-        Unit unit = e.data();
-        rect(unit.type().region, e.x, e.y,
-        unit.type().region.getWidth() * Draw.scl * scl, unit.type().region.getHeight() * Draw.scl * scl, 180f);
+        UnitType unit = e.data();
+        TextureRegion region = unit.icon(Cicon.full);
+
+        rect(region, e.x, e.y,
+            region.getWidth() * Draw.scl * scl, region.getHeight() * Draw.scl * scl, 180f);
 
     }),
 
@@ -50,10 +52,11 @@ public class Fx{
         if(!(e.data instanceof Unit)) return;
 
         Unit select = e.data();
+        boolean block = select instanceof BlockUnitc;
 
         mixcol(Pal.accent, 1f);
         alpha(e.fout());
-        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
+        rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type().icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
         Lines.stroke(e.fslope() * 1f);
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);
@@ -102,7 +105,7 @@ public class Fx{
         Tmp.v1.set(e.x, e.y).interpolate(Tmp.v2.set(to), e.fin(), Interp.pow3)
         .add(Tmp.v2.sub(e.x, e.y).nor().rotate90(1).scl(Mathf.randomSeedRange(e.id, 1f) * e.fslope() * 10f));
         float x = Tmp.v1.x, y = Tmp.v1.y;
-        float size = Math.min(0.8f + e.rotation / 5f, 2);
+        float size = 1f;
 
         stroke(e.fslope() * 2f * size, Pal.accent);
         Lines.circle(x, y, e.fslope() * 2f * size);
@@ -369,7 +372,7 @@ public class Fx{
     hitLiquid = new Effect(16, e -> {
         color(e.color);
 
-        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation + 180f, 60f, (x, y) -> {
+        randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 60f, (x, y) -> {
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
 
@@ -507,6 +510,29 @@ public class Fx{
         stroke(1f * e.fout());
 
         randLenVectors(e.id + 1, 4, 1f + 23f * e.finpow(), (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+        });
+
+    }),
+
+    sapExplosion = new Effect(25, e -> {
+
+        color(Pal.sapBullet);
+        e.scaled(6, i -> {
+            stroke(3f * i.fout());
+            Lines.circle(e.x, e.y, 3f + i.fin() * 80f);
+        });
+
+        color(Color.gray);
+
+        randLenVectors(e.id, 9, 2f + 70 * e.finpow(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+        });
+
+        color(Pal.sapBulletBack);
+        stroke(1f * e.fout());
+
+        randLenVectors(e.id + 1, 8, 1f + 60f * e.finpow(), (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
         });
 
@@ -654,13 +680,11 @@ public class Fx{
 
     }),
 
-    wet = new Effect(40f, e -> {
+    wet = new Effect(80f, e -> {
         color(Liquids.water.color);
+        alpha(Mathf.clamp(e.fin() * 2f));
 
-        randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, e.fout() * 1f);
-        });
-
+        Fill.circle(e.x, e.y, e.fout() * 1f);
     }),
 
     sapped = new Effect(40f, e -> {
@@ -670,6 +694,12 @@ public class Fx{
             Fill.square(e.x + x, e.y + y, e.fslope() * 1.1f, 45f);
         });
 
+    }),
+
+    sporeSlowed = new Effect(40f, e -> {
+        color(Pal.spore);
+
+        Fill.circle(e.x, e.y, e.fslope() * 1.1f);
     }),
 
     oily = new Effect(42f, e -> {
@@ -871,7 +901,7 @@ public class Fx{
 
     }),
 
-    shootSmallFlame = new Effect(32f, e -> {
+    shootSmallFlame = new Effect(32f, 80f, e -> {
         color(Pal.lightFlame, Pal.darkFlame, Color.gray, e.fin());
 
         randLenVectors(e.id, 8, e.finpow() * 60f, e.rotation, 10f, (x, y) -> {
@@ -880,7 +910,7 @@ public class Fx{
 
     }),
 
-    shootPyraFlame = new Effect(33f, e -> {
+    shootPyraFlame = new Effect(33f, 80f, e -> {
         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
         randLenVectors(e.id, 10, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
@@ -889,7 +919,7 @@ public class Fx{
 
     }),
 
-    shootLiquid = new Effect(40f, e -> {
+    shootLiquid = new Effect(40f, 80f, e -> {
         color(e.color, Color.white, e.fout() / 6f + Mathf.randomSeedRange(e.id, 0.1f));
 
         randLenVectors(e.id, 6, e.finpow() * 60f, e.rotation, 11f, (x, y) -> {

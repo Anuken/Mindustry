@@ -56,6 +56,8 @@ public class Block extends UnlockableContent{
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
+    /** whether to display flow rate */
+    public boolean displayFlow = true;
     /** whether this block is visible in the editor */
     public boolean inEditor = true;
     /** the last configuration value applied to this block. */
@@ -92,6 +94,14 @@ public class Block extends UnlockableContent{
     public boolean squareSprite = true;
     /** whether this block absorbs laser attacks. */
     public boolean absorbLasers = false;
+    /** if false, the status is never drawn */
+    public boolean enableDrawStatus = true;
+    /** whether to draw disabled status */
+    public boolean drawDisabled = true;
+    /** whether to automatically reset enabled status after a logic block has not interacted for a while. */
+    public boolean autoResetEnabled = true;
+    /** if true, the block stops updating when disabled */
+    public boolean noUpdateDisabled = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -265,7 +275,8 @@ public class Block extends UnlockableContent{
         return width;
     }
 
-    public float sumAttribute(Attribute attr, int x, int y){
+    public float sumAttribute(@Nullable Attribute attr, int x, int y){
+        if(attr == null) return 0;
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
@@ -314,6 +325,10 @@ public class Block extends UnlockableContent{
             stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
 
+        if(instantTransfer){
+            stats.add(BlockStat.maxConsecutive, 2, StatUnit.none);
+        }
+
         consumes.display(stats);
 
         // Note: Power stats are added by the consumers.
@@ -359,6 +374,13 @@ public class Block extends UnlockableContent{
         return this;
     }
 
+    public Object nextConfig(){
+        if(saveConfig && lastConfig != null){
+            return lastConfig;
+        }
+        return null;
+    }
+
     public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
@@ -374,7 +396,7 @@ public class Block extends UnlockableContent{
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
-        if(req.hasConfig){
+        if(req.config != null){
             drawRequestConfig(req, list);
         }
     }
@@ -398,6 +420,11 @@ public class Block extends UnlockableContent{
 
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
 
+    }
+
+    /** Transforms the internal position of this config using the specified function, and return the result. */
+    public Object pointConfig(Object config, Cons<Point2> transformer){
+        return config;
     }
 
     /** Configure when a null value is passed.*/

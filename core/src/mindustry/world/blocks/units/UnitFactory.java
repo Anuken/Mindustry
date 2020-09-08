@@ -41,12 +41,12 @@ public class UnitFactory extends UnitBlock{
         outputsPayload = true;
         rotate = true;
 
-        config(Integer.class, (UnitFactoryEntity tile, Integer i) -> {
+        config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
             tile.currentPlan = i < 0 || i >= plans.length ? -1 : i;
             tile.progress = 0;
         });
 
-        consumes.add(new ConsumeItemDynamic((UnitFactoryEntity e) -> e.currentPlan != -1 ? plans[e.currentPlan].requirements : ItemStack.empty));
+        consumes.add(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans[e.currentPlan].requirements : ItemStack.empty));
     }
 
     @Override
@@ -65,9 +65,9 @@ public class UnitFactory extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", (UnitFactoryEntity e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
+        bars.add("progress", (UnitFactoryBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
 
-        bars.add("units", (UnitFactoryEntity e) ->
+        bars.add("units", (UnitFactoryBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",
@@ -118,7 +118,7 @@ public class UnitFactory extends UnitBlock{
         UnitPlan(){}
     }
 
-    public class UnitFactoryEntity extends UnitBlockEntity{
+    public class UnitFactoryBuild extends UnitBuild{
         public int currentPlan = -1;
 
         public float fraction(){
@@ -132,7 +132,7 @@ public class UnitFactory extends UnitBlock{
             if(units.any()){
                 ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(units.indexOf(unit)));
             }else{
-                table.table(Styles.black3, t -> t.add("$none").color(Color.lightGray));
+                table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }
         }
 
@@ -155,7 +155,7 @@ public class UnitFactory extends UnitBlock{
                     i.setScaling(Scaling.fit);
                     i.setColor(currentPlan == -1 ? Color.lightGray : Color.white);
                 }).size(32).padBottom(-4).padRight(2);
-                t.label(() -> currentPlan == -1 ? "$none" : plans[currentPlan].unit.localizedName).color(Color.lightGray);
+                t.label(() -> currentPlan == -1 ? "@none" : plans[currentPlan].unit.localizedName).color(Color.lightGray);
             }).left();
         }
 
@@ -223,7 +223,7 @@ public class UnitFactory extends UnitBlock{
             if(currentPlan != -1 && !Units.canCreate(team, plans[currentPlan].unit)){
                 return false;
             }
-            return super.shouldConsume();
+            return enabled && payload == null;
         }
 
         @Override

@@ -17,7 +17,7 @@ import mindustry.world.blocks.production.*;
 import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
-    public float moveTime = 70f;
+    public float moveTime = 60f;
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
@@ -29,6 +29,7 @@ public class PayloadConveyor extends Block{
         rotate = true;
         update = true;
         outputsPayload = true;
+        noUpdateDisabled = true;
     }
 
     @Override
@@ -48,7 +49,7 @@ public class PayloadConveyor extends Block{
         }
     }
 
-    public class PayloadConveyorEntity extends Building{
+    public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
         public @Nullable Building next;
@@ -85,7 +86,7 @@ public class PayloadConveyor extends Block{
 
             int ntrns = 1 + size/2;
             Tile next = tile.getNearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
-            blocked = (next != null && next.solid()) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
+            blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
         }
 
         @Override
@@ -95,7 +96,9 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void updateTile(){
-            progress = Time.time() % moveTime;
+            if(!enabled) return;
+
+            progress = time() % moveTime;
 
             updatePayload();
 
@@ -136,7 +139,7 @@ public class PayloadConveyor extends Block{
             super.draw();
         }
 
-        @Override 
+        @Override
         public void draw(){
             super.draw();
 
@@ -182,6 +185,10 @@ public class PayloadConveyor extends Block{
             if(item != null){
                 item.draw();
             }
+        }
+
+        public float time(){
+            return Time.time();
         }
 
         @Override
@@ -241,15 +248,14 @@ public class PayloadConveyor extends Block{
             }
         }
 
-        boolean blends(int direction){
+        protected boolean blends(int direction){
             if(direction == rotation){
                 return !blocked || next != null;
-            }else{
-                return PayloadAcceptor.blends(this, direction);
             }
+            return PayloadAcceptor.blends(this, direction);
         }
 
-        TextureRegion clipRegion(Rect bounds, Rect sprite, TextureRegion region){
+        protected TextureRegion clipRegion(Rect bounds, Rect sprite, TextureRegion region){
             Rect over = Tmp.r3;
 
             boolean overlaps = Intersector.intersectRectangles(bounds, sprite, over);
@@ -273,11 +279,11 @@ public class PayloadConveyor extends Block{
             return out;
         }
 
-        int curStep(){
-            return (int)((Time.time()) / moveTime);
+        public int curStep(){
+            return (int)((time()) / moveTime);
         }
 
-        float fract(){
+        public float fract(){
             return interp.apply(progress / moveTime);
         }
     }

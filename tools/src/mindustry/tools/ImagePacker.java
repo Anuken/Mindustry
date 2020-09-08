@@ -123,7 +123,7 @@ public class ImagePacker{
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
         Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids(), Vars.content.units());
-        cont.removeAll(u -> u instanceof BuildBlock || u == Blocks.air);
+        cont.removeAll(u -> u instanceof ConstructBlock || u == Blocks.air);
 
         int minid = 0xF8FF;
         for(String key : map.keys()){

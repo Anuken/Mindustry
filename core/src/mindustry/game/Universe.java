@@ -140,7 +140,7 @@ public class Universe{
                         sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
 
                         //check if the sector has been attacked too many times...
-                        if(sector.hasBase() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                        if(sector.hasBase() && sector.hasWaves() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
                             //fire event for losing the sector
                             Events.fire(new SectorLoseEvent(sector));
 

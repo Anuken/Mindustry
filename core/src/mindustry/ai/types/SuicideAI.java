@@ -1,7 +1,7 @@
 package mindustry.ai.types;
 
 import mindustry.*;
-import mindustry.ai.Pathfinder.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -17,7 +17,7 @@ public class SuicideAI extends GroundAI{
         }
 
         if(retarget()){
-            targetClosest();
+            target = target(unit.x, unit.y, unit.range(), unit.type().targetAir, unit.type().targetGround);
         }
 
         Building core = unit.closestEnemyCore();
@@ -39,7 +39,7 @@ public class SuicideAI extends GroundAI{
             boolean blocked = Vars.world.raycast(unit.tileX(), unit.tileY(), target.tileX(), target.tileY(), (x, y) -> {
                 Tile tile = Vars.world.tile(x, y);
                 if(tile != null && tile.build == target) return false;
-                if(tile != null && tile.build != null && tile.build.team() != unit.team()){
+                if(tile != null && tile.build != null && tile.build.team != unit.team()){
                     blockedByBlock = true;
                     return true;
                 }else{
@@ -59,7 +59,7 @@ public class SuicideAI extends GroundAI{
 
         }else{
             if(core != null){
-                moveToCore(FlagTarget.enemyCores);
+                moveTo(Pathfinder.fieldCore);
             }
 
             if(unit.moving()) unit.lookAt(unit.vel().angle());

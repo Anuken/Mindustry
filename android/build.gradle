@@ -8,7 +8,7 @@ buildscript{
     }
 
     dependencies{
-        //IMPORTANT NOTICE: any version of the plugin after 3.4.1 will break builds for every API level < 24, perhaps even higher.
+        //IMPORTANT NOTICE: any version of the plugin after 3.4.1 will break builds
         //it appears abstract methods don't get desugared properly (if at all)
         classpath 'com.android.tools.build:gradle:3.4.1'
     }
@@ -33,6 +33,8 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
+
+    if(localArc()) compileOnly fileTree(dir: '../../Arc/backends/backend-android/libs', include: ['*.jar'])
 }
 
 task deploy(type: Copy){

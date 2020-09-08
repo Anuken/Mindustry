@@ -30,7 +30,7 @@ public class LiquidConverter extends GenericCrafter{
         stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount * craftTime, false);
     }
 
-    public class LiquidConverterEntity extends GenericCrafterEntity{
+    public class LiquidConverterBuild extends GenericCrafterBuild{
         @Override
         public void drawLight(){
             if(hasLiquids && drawLiquidLight && outputLiquid.liquid.lightColor.a > 0.001f){

@@ -15,7 +15,7 @@ import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
@@ -41,9 +41,9 @@ public class Logic implements ApplicationListener{
             //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
             if(tile.build == null || !tile.block().rebuildable || net.client()) return;
 
-            if(block instanceof BuildBlock){
+            if(block instanceof ConstructBlock){
 
-                BuildEntity entity = tile.bc();
+                ConstructBuild entity = tile.bc();
 
                 //update block to reflect the fact that something was being constructed
                 if(entity.cblock != null && entity.cblock.synthetic()){
@@ -89,7 +89,7 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             if(state.isCampaign()){
                 long seconds = state.rules.sector.getSecondsPassed();
-                CoreEntity core = state.rules.defaultTeam.core();
+                CoreBuild core = state.rules.defaultTeam.core();
 
                 //apply fractional damage based on how many turns have passed for this sector
                 float turnsPassed = seconds / (turnDuration / 60f);
@@ -303,6 +303,11 @@ public class Logic implements ApplicationListener{
     }
 
     @Remote(called = Loc.both)
+    public static void updateGameOver(Team winner){
+        state.gameOver = true;
+    }
+
+    @Remote(called = Loc.both)
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);
@@ -320,6 +325,10 @@ public class Logic implements ApplicationListener{
         Events.fire(Trigger.update);
         universe.updateGlobal();
 
+        if(Core.settings.modified() && !state.isPlaying()){
+            Core.settings.forceSave();
+        }
+
         if(state.isGame()){
             if(!net.client()){
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
@@ -331,7 +340,9 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
-                state.secinfo.update();
+                if(state.isCampaign()){
+                    state.secinfo.update();
+                }
 
                 if(state.isCampaign()){
                     universe.update();

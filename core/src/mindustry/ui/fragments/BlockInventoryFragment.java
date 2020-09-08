@@ -31,12 +31,12 @@ public class BlockInventoryFragment extends Fragment{
     private static final float holdWithdraw = 20f;
     private static final float holdShrink = 120f;
 
-    private Table table = new Table();
-    private Building tile;
-    private float holdTime = 0f, emptyTime;
-    private boolean holding;
-    private float[] shrinkHoldTimes = new float[content.items().size];
-    private Item lastItem;
+    Table table = new Table();
+    Building tile;
+    float holdTime = 0f, emptyTime;
+    boolean holding;
+    float[] shrinkHoldTimes = new float[content.items().size];
+    Item lastItem;
 
     {
         Events.on(WorldLoadEvent.class, e -> hide());
@@ -45,8 +45,10 @@ public class BlockInventoryFragment extends Fragment{
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Building tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.team())) return;
-        amount = Mathf.clamp(amount, 0, player.unit().itemCapacity());
+        amount = Math.min(player.unit().maxAccepted(item), amount);
         int fa = amount;
+
+        if(amount == 0) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {

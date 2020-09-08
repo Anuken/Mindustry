@@ -37,7 +37,7 @@ public class BlockIndexer{
     /** All ores available on this map. */
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
-    private Seq<Team> activeTeams = new Seq<>();
+    private Seq<Team> activeTeams = new Seq<>(Team.class);
     /** Maps teams to a map of flagged tiles by flag. */
     private TileArray[][] flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
     /** Max units by team. */
@@ -52,7 +52,7 @@ public class BlockIndexer{
     private Seq<Building> breturnArray = new Seq<>();
 
     public BlockIndexer(){
-        Events.on(BuildinghangeEvent.class, event -> {
+        Events.on(TileChangeEvent.class, event -> {
             if(typeMap.get(event.tile.pos()) != null){
                 TileIndex index = typeMap.get(event.tile.pos());
                 for(BlockFlag flag : index.flags){
@@ -73,6 +73,7 @@ public class BlockIndexer{
             damagedTiles = new BuildingArray[Team.all.length];
             flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
             unitCaps = new int[Team.all.length];
+            activeTeams = new Seq<>(Team.class);
 
             for(int i = 0; i < flagMap.length; i++){
                 for(int j = 0; j < BlockFlag.all.length; j++){
@@ -147,7 +148,7 @@ public class BlockIndexer{
 
         BuildingArray set = damagedTiles[team.id];
         for(Building build : set){
-            if((!build.isValid() || build.team != team || !build.damaged()) || build.block instanceof BuildBlock){
+            if((!build.isValid() || build.team != team || !build.damaged()) || build.block instanceof ConstructBlock){
                 breturnArray.add(build);
             }
         }
@@ -185,7 +186,7 @@ public class BlockIndexer{
 
                 if(other == null) continue;
 
-                if(other.team() == team && pred.get(other) && intSet.add(other.pos())){
+                if(other.team == team && pred.get(other) && intSet.add(other.pos())){
                     cons.get(other);
                     any = true;
                 }
@@ -212,15 +213,18 @@ public class BlockIndexer{
     }
 
     public void notifyTileDamaged(Building entity){
-        if(damagedTiles[entity.team().id] == null){
-            damagedTiles[entity.team().id] = new BuildingArray();
+        if(damagedTiles[entity.team.id] == null){
+            damagedTiles[entity.team.id] = new BuildingArray();
         }
 
-        damagedTiles[entity.team().id].add(entity);
+        damagedTiles[entity.team.id].add(entity);
     }
 
     public Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
-        for(Team enemy : team.enemies()){
+        for(int i = 0; i < activeTeams.size; i++){
+            Team enemy = activeTeams.items[i];
+
+            if(enemy == team) continue;
 
             Building entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
@@ -251,7 +255,7 @@ public class BlockIndexer{
 
                         if(e == null) continue;
 
-                        if(e.team() != team || !pred.get(e) || !e.block().targetable)
+                        if(e.team != team || !pred.get(e) || !e.block().targetable)
                             continue;
 
                         float ndst = e.dst2(x, y);
@@ -390,7 +394,7 @@ public class BlockIndexer{
                 for(int y = quadrantY * quadrantSize; y < world.height() && y < (quadrantY + 1) * quadrantSize; y++){
                     Building result = world.build(x, y);
                     //when a targetable block is found, mark this quadrant as occupied and stop searching
-                    if(result != null && result.team() == team){
+                    if(result != null && result.team == team){
                         bits.set(quadrantX, quadrantY);
                         break outer;
                     }

@@ -23,9 +23,10 @@ public class ItemSource extends Block{
         group = BlockGroup.transportation;
         configurable = true;
         saveConfig = true;
+        noUpdateDisabled = true;
 
-        config(Item.class, (ItemSourceEntity tile, Item item) -> tile.outputItem = item);
-        configClear((ItemSourceEntity tile) -> tile.outputItem = null);
+        config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
+        configClear((ItemSourceBuild tile) -> tile.outputItem = null);
     }
 
     @Override
@@ -44,18 +45,20 @@ public class ItemSource extends Block{
         return true;
     }
 
-    public class ItemSourceEntity extends Building{
+    public class ItemSourceBuild extends Building{
         Item outputItem;
 
         @Override
         public void draw(){
             super.draw();
 
-            if(outputItem == null) return;
-
-            Draw.color(outputItem.color);
-            Draw.rect("center", x, y);
-            Draw.color();
+            if(outputItem == null){
+                Draw.rect("cross", x, y);
+            }else{
+                Draw.color(outputItem.color);
+                Draw.rect("center", x, y);
+                Draw.color();
+            }
         }
 
         @Override
@@ -69,7 +72,7 @@ public class ItemSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> outputItem, item -> configure(item));
+            ItemSelection.buildTable(table, content.items(), () -> outputItem, this::configure);
         }
 
         @Override

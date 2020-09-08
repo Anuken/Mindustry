@@ -54,7 +54,7 @@ public abstract class BulletType extends Content{
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
-    public float statusDuration = 60 * 10f;
+    public float statusDuration = 60 * 8f;
     /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
@@ -74,7 +74,7 @@ public abstract class BulletType extends Content{
 
     public float fragCone = 360f;
     public int fragBullets = 9;
-    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
+    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
@@ -92,6 +92,7 @@ public abstract class BulletType extends Content{
     public float homingPower = 0f;
     public float homingRange = 50f;
 
+    public Color lightningColor = Pal.surge;
     public int lightning;
     public int lightningLength = 5;
     /** Use a negative value to use default bullet damage. */
@@ -142,13 +143,13 @@ public abstract class BulletType extends Content{
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
-        Effects.shake(hitShake, hitShake, b);
+        Effect.shake(hitShake, hitShake, b);
 
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragCone/2);
-                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
+                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
 
@@ -172,7 +173,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b, Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 
@@ -246,6 +247,10 @@ public abstract class BulletType extends Content{
         return create(parent.owner(), parent.team, x, y, angle);
     }
 
+    public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
+        return create(parent.owner(), parent.team, x, y, angle, velocityScl, lifeScale);
+    }
+
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
         return create(parent.owner(), parent.team, x, y, angle, velocityScl);
     }
@@ -264,13 +269,13 @@ public abstract class BulletType extends Content{
         bullet.damage = damage < 0 ? this.damage : damage;
         bullet.add();
 
-        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
+        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX() / Time.delta, ((Hitboxc)owner).deltaY() / Time.delta);
         return bullet;
 
     }
 
     public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
-        Call.createBullet(this, team, x, y, damage, angle, velocityScl, lifetimeScl);
+        Call.createBullet(this, team, x, y, angle, damage, velocityScl, lifetimeScl);
     }
 
     @Remote(called = Loc.server, unreliable = true)

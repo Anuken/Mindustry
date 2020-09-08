@@ -40,7 +40,7 @@ public class BlockLoader extends PayloadAcceptor{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((BlockLoaderEntity)entity)::fraction));
+        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((BlockLoaderBuild)entity)::fraction));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class BlockLoader extends PayloadAcceptor{
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
-    public class BlockLoaderEntity extends PayloadAcceptorEntity<BlockPayload>{
+    public class BlockLoaderBuild extends PayloadAcceptorBuild<BlockPayload>{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){

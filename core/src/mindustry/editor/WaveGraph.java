@@ -137,7 +137,7 @@ public class WaveGraph extends Table{
             ButtonGroup<Button> group = new ButtonGroup<>();
 
             for(Mode m : Mode.all){
-                t.button("$wavemode." + m.name(), Styles.fullTogglet, () -> {
+                t.button("@wavemode." + m.name(), Styles.fullTogglet, () -> {
                     mode = m;
                 }).group(group).height(35f).update(b -> b.setChecked(m == mode)).width(130f);
             }

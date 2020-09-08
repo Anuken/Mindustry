@@ -23,8 +23,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /** Extra data for very specific blocks. */
     public byte data;
-    /** Tile traversal cost. */
-    public short cost = 1;
     /** Tile entity, usually null. */
     public @Nullable Building build;
     public short x, y;
@@ -150,7 +148,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Team team(){
-        return build == null ? Team.derelict : build.team();
+        return build == null ? Team.derelict : build.team;
     }
 
     public void setTeam(Team team){
@@ -181,6 +179,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public void setBlock(@NonNull Block type, Team team, int rotation, Prov<Building> entityprov){
         changing = true;
+
+        if(type.isStatic() || this.block.isStatic()){
+            recache();
+        }
 
         this.block = type;
         preChanged();
@@ -286,6 +288,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     /** remove()-s this tile, except it's synced across the network */
     public void removeNet(){
         Call.removeTile(this);
+    }
+
+    /** set()-s this tile, except it's synced across the network */
+    public void setNet(Block block){
+        Call.setTile(this, block, Team.derelict, 0);
     }
 
     /** set()-s this tile, except it's synced across the network */
@@ -442,44 +449,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return block.solid && block.fillsTile && !block.synthetic() ? data : 0;
     }
 
-    public void updateOcclusion(){
-        cost = 1;
-        boolean occluded = false;
-
-        //check for occlusion
-        for(int i = 0; i < 8; i++){
-            Point2 point = Geometry.d8[i];
-            Tile tile = world.tile(x + point.x, y + point.y);
-            if(tile != null && tile.floor.isLiquid){
-                cost += 4;
-            }
-            if(tile != null && tile.solid()){
-                occluded = true;
-                break;
-            }
-        }
-
-        if(occluded){
-            cost += 2;
-        }
-
-        if(block.synthetic() && solid()){
-            cost += Mathf.clamp(block.health / 6f, 0, 1000);
-        }
-
-        if(floor.isLiquid){
-            cost += 10;
-        }
-
-        if(floor.drownTime > 0){
-            cost += 70;
-        }
-
-        if(cost < 0){
-            cost = Byte.MAX_VALUE;
-        }
-    }
-
     protected void preChanged(){
         if(build != null){
             //only call removed() for the center block - this only gets called once.
@@ -502,8 +471,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                                 other.block = Blocks.air;
 
                                 //manually call changed event
-                                other.updateOcclusion();
-                                world.notifyChanged(other);
+                                other.fireChanged();
                             }
                         }
                     }
@@ -560,14 +528,16 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             }
         }
 
-        updateOcclusion();
-
-        world.notifyChanged(this);
+        fireChanged();
 
         //recache when static block is added
         if(block.isStatic()){
             recache();
         }
+    }
+
+    protected void fireChanged(){
+        world.notifyChanged(this);
     }
 
     @Override

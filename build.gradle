@@ -180,6 +180,19 @@ allprojects{
     }
 }
 
+//compile with java 8 compatibility for everything except the annotati project
+configure(subprojects - project(":annotations")){
+    tasks.withType(JavaCompile){
+        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+            options.compilerArgs.addAll(['--release', '8'])
+        }
+    }
+
+    tasks.withType(Javadoc){
+       options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
 project(":desktop"){
     apply plugin: "java"
 
@@ -310,6 +323,7 @@ project(":tests"){
         workingDir = new File("../core/assets")
         testLogging {
             exceptionFormat = 'full'
+            showStandardStreams = true
         }
     }
 }

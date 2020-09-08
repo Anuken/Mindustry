@@ -126,7 +126,7 @@ public class Generators{
             Image colors = new Image(content.blocks().size, 1);
 
             for(Block block : content.blocks()){
-                if(block.isAir() || block instanceof BuildBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
+                if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
 
                 block.load();
 
@@ -382,7 +382,9 @@ public class Generators{
                 }
 
                 for(Cicon icon : Cicon.scaled){
-                    Image scaled = new Image(icon.size, icon.size);
+                    Vec2 size = Scaling.fit.apply(image.width, image.height, icon.size, icon.size);
+                    Image scaled = new Image((int)size.x, (int)size.y);
+
                     scaled.drawScaled(image);
                     scaled.save("../ui/unit-" + type.name + "-" + icon.name());
                 }

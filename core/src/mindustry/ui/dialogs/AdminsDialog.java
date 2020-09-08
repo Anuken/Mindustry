@@ -10,7 +10,7 @@ import static mindustry.Vars.*;
 public class AdminsDialog extends BaseDialog{
 
     public AdminsDialog(){
-        super("$server.admins");
+        super("@server.admins");
 
         addCloseButton();
 
@@ -29,7 +29,7 @@ public class AdminsDialog extends BaseDialog{
         pane.setFadeScrollBars(false);
 
         if(netServer.admins.getAdmins().size == 0){
-            table.add("$server.admins.none");
+            table.add("@server.admins.none");
         }
 
         for(PlayerInfo info : netServer.admins.getAdmins()){
@@ -39,7 +39,7 @@ public class AdminsDialog extends BaseDialog{
             res.labelWrap("[lightgray]" + info.lastName).width(w - h - 24f);
             res.add().growX();
             res.button(Icon.cancel, () -> {
-                ui.showConfirm("$confirm", "$confirmunadmin", () -> {
+                ui.showConfirm("@confirm", "@confirmunadmin", () -> {
                     netServer.admins.unAdminPlayer(info.id);
                     Groups.player.each(player -> {
                         if(player != null && !player.isLocal() && player.uuid().equals(info.id)){
