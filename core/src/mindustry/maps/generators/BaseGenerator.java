@@ -15,6 +15,7 @@ import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -29,7 +30,7 @@ public class BaseGenerator{
     private ObjectMap<Item, Floor> oreFloors = new ObjectMap<>();
     private Seq<Tile> cores;
 
-    public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector){
+    public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector, float difficulty){
         this.tiles = tiles;
         this.team = team;
         this.cores = cores;
@@ -50,10 +51,16 @@ public class BaseGenerator{
         //TODO limit base size
         float costBudget = 1000;
 
-        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1);
-        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2);
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1 && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2 && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
 
-        float bracket = 0.1f;
+        //sort by cost for correct fraction
+        wallsSmall.sort(b -> b.buildCost);
+        wallsLarge.sort(b -> b.buildCost);
+
+        //TODO proper difficulty selection
+        float bracket = difficulty;
+        float bracketRange = 0.2f;
         int wallAngle = 70; //180 for full coverage
         double resourceChance = 0.5;
         double nonResourceChance = 0.0005;
@@ -80,14 +87,15 @@ public class BaseGenerator{
                 || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
                 Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
                 if(!parts.isEmpty()){
-                    tryPlace(parts.random(), tile.x, tile.y);
+                    tryPlace(parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y);
                 }
             }else if(Mathf.chance(nonResourceChance)){
-                tryPlace(bases.parts.random(), tile.x, tile.y);
+                tryPlace(bases.parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y);
             }
         });
 
-        //replace walls with the correct type
+        //replace walls with the correct type (disabled)
+        if(false)
         pass(tile -> {
             if(tile.block() instanceof Wall && tile.team() == team && tile.block() != wall && tile.block() != wallLarge){
                 tile.setBlock(tile.block().size == 2 ? wallLarge : wall, team);

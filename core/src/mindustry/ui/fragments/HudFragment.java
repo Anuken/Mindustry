@@ -219,7 +219,7 @@ public class HudFragment extends Fragment{
         //core items
         parent.fill(t -> {
             t.top().add(coreItems);
-            t.visible(() -> Core.settings.getBool("coreitems") && !mobile && !state.isPaused());
+            t.visible(() -> Core.settings.getBool("coreitems") && !mobile && !state.isPaused() && shown);
         });
 
         //spawner warning

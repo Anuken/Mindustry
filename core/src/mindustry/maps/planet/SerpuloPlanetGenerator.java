@@ -284,11 +284,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         float difficulty = sector.baseCoverage;
 
         if(sector.hasEnemyBase()){
-            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector);
+            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);
 
             state.rules.attackMode = true;
         }else{
-            state.rules.winWave = 15 * (int)Math.max(difficulty, 1);
+            state.rules.winWave = 15 * (int)Math.max(difficulty * 5, 1);
         }
 
         state.rules.waves = true;
@@ -296,11 +296,13 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         //TODO better waves
         state.rules.spawns = defaultWaves.get();
 
+        float waveScaling = 1f + difficulty*2;
+
         //scale up the spawning base on difficulty (this is just for testing)
         for(SpawnGroup group : state.rules.spawns){
-            group.unitAmount *= difficulty;
+            group.unitAmount *= waveScaling;
             if(group.unitScaling != SpawnGroup.never){
-                group.unitScaling /= difficulty;
+                group.unitScaling /= waveScaling;
             }
         }
     }

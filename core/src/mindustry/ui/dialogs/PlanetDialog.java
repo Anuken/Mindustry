@@ -127,10 +127,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //draw all sector stuff
         for(Sector sec : planet.sectors){
+
             if(selectAlpha > 0.01f){
                 if(canLaunch(sec) || sec.unlocked()){
                     if(sec.baseCoverage > 0){
-                        planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.1f * sec.baseCoverage * selectAlpha), -0.002f);
+                        planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.5f * sec.baseCoverage * selectAlpha), -0.002f);
                     }
 
                     Color color =
