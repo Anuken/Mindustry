@@ -340,8 +340,6 @@ public class DesktopInput extends InputHandler{
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
-        //TODO localize these
-
         table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
         }).tooltip("@schematics");

@@ -749,7 +749,7 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+            Player playert = Groups.player.find(p -> p.name.equalsIgnoreCase(arg[1]));
             if(playert != null){
                 target = playert.getInfo();
             }else{
@@ -763,7 +763,7 @@ public class ServerControl implements ApplicationListener{
                 }else{
                     netServer.admins.unAdminPlayer(target.id);
                 }
-                if(playert != null) playert.admin(add);
+                if(playert != null) playert.admin = add;
                 info("Changed admin status of player: &ly@", target.lastName);
             }else{
                 err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");

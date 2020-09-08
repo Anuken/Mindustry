@@ -239,7 +239,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //simulate falling down
-        if(dead){
+        if(dead || health <= 0){
             //less drag when dead
             drag = 0.01f;
 

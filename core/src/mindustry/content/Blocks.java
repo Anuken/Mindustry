@@ -222,12 +222,12 @@ public class Blocks implements ContentList{
         }};
 
         ignarock = new Floor("ignarock"){{
-            attributes.set(Attribute.water, -0.1f);
+            attributes.set(Attribute.water, -0.25f);
         }};
 
         hotrock = new Floor("hotrock"){{
             attributes.set(Attribute.heat, 0.5f);
-            attributes.set(Attribute.water, -0.2f);
+            attributes.set(Attribute.water, -0.5f);
             blendGroup = ignarock;
 
             emitLight = true;
@@ -237,7 +237,7 @@ public class Blocks implements ContentList{
 
         magmarock = new Floor("magmarock"){{
             attributes.set(Attribute.heat, 0.75f);
-            attributes.set(Attribute.water, -0.5f);
+            attributes.set(Attribute.water, -0.75f);
             updateEffect = Fx.magmasmoke;
             blendGroup = ignarock;
 
@@ -1679,7 +1679,7 @@ public class Blocks implements ContentList{
             activeSoundVolume = 2f;
 
             shootType = new ContinuousLaserBulletType(70){{
-                length = 220f;
+                length = 200f;
                 hitEffect = Fx.hitMeltdown;
                 drawSize = 420f;
 
