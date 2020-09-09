@@ -25,6 +25,7 @@ public enum LAccess{
     shootY,
     shooting,
     team,
+    type,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access

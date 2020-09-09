@@ -255,18 +255,22 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
-            double output = 0;
-
             if(target instanceof Senseable){
+                Senseable se = (Senseable)target;
                 if(sense instanceof Content){
-                    output = ((Senseable)target).sense(((Content)sense));
+                    exec.setnum(to, se.sense(((Content)sense)));
                 }else if(sense instanceof LAccess){
-                    output = ((Senseable)target).sense(((LAccess)sense));
+                    Object objOut = se.senseObject((LAccess)sense);
+
+                    if(objOut == Senseable.noSensed){
+                        //numeric output
+                        exec.setnum(to, se.sense((LAccess)sense));
+                    }else{
+                        //object output
+                        exec.setobj(to, objOut);
+                    }
                 }
             }
-
-            exec.setnum(to, output);
-
         }
     }
 
@@ -399,7 +403,17 @@ public class LExecutor{
             if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{
-                exec.setnum(dest, op.function2.get(exec.num(a), exec.num(b)));
+                Var va = exec.vars[a];
+                Var vb = exec.vars[b];
+
+                if(op.objFunction2 != null && (va.isobj || vb.isobj)){
+                    //use object function if provided, and one of the variables is an object
+                    exec.setnum(dest, op.objFunction2.get(exec.obj(a), exec.obj(b)));
+                }else{
+                    //otherwise use the numeric function
+                    exec.setnum(dest, op.function2.get(exec.num(a), exec.num(b)));
+                }
+
             }
         }
     }
@@ -554,8 +568,21 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(address != -1 && op.function.get(exec.num(value), exec.num(compare))){
-                exec.vars[varCounter].numval = address;
+            if(address != -1){
+                Var va = exec.vars[value];
+                Var vb = exec.vars[compare];
+                boolean cmp = false;
+
+                if(op.objFunction != null && (va.isobj || vb.isobj)){
+                    //use object function if provided, and one of the variables is an object
+                    cmp = op.objFunction.get(exec.obj(value), exec.obj(compare));
+                }else{
+                    cmp = op.function.get(exec.num(value), exec.num(compare));
+                }
+
+                if(cmp){
+                    exec.vars[varCounter].numval = address;
+                }
             }
         }
     }

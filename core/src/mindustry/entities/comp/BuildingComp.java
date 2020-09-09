@@ -1227,6 +1227,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.type) return block;
+
+        return noSensed;
+    }
+
+    @Override
     public double sense(Content content){
         if(content instanceof Item && items != null) return items.get((Item)content);
         if(content instanceof Liquid && liquids != null) return liquids.get((Liquid)content);

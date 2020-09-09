@@ -86,6 +86,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.type) return type;
+
+        return noSensed;
+    }
+
+    @Override
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
         return 0;
