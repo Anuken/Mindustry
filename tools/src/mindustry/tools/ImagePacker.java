@@ -107,10 +107,7 @@ public class ImagePacker{
 
         Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
 
-        Time.mark();
         Generators.generate();
-        Log.info("&ly[Generator]&lc Total time to generate: &lg@&lcms", Time.elapsed());
-        Log.info("&ly[Generator]&lc Total images created: &lg@", Image.total());
         Image.dispose();
 
         //format:

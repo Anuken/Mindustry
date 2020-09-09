@@ -42,11 +42,11 @@ public class Blocks implements ContentList{
     pebbles, tendrils,
 
     //ores
-    oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
+    oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium, oreLithium,
 
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
-    melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
+    melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge, powercellFactory,
 
     //sandbox
     powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, illuminator,
@@ -65,7 +65,7 @@ public class Blocks implements ContentList{
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
+    impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode, powercell,
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
@@ -444,6 +444,12 @@ public class Blocks implements ContentList{
             oreScale = 24.904762f;
         }};
 
+        oreLithium = new OreBlock(Items.lithium){{
+            oreDefault = true;
+            oreThreshold = 0.864f;
+            oreScale = 21.904762f;
+        }};
+
         oreThorium = new OreBlock(Items.thorium){{
             oreDefault = true;
             oreThreshold = 0.882f;
@@ -479,6 +485,20 @@ public class Blocks implements ContentList{
             consumes.power(1.8f);
             consumes.item(Items.coal, 3);
             consumes.liquid(Liquids.water, 0.1f);
+        }};
+
+        powercellFactory = new GenericCrafter("powercell-factory"){{
+            requirements(Category.crafting, with(Items.titanium, 100, Items.silicon, 30, Items.lead, 90, Items.graphite, 60));
+
+            craftEffect = Fx.pulverizeMedium;
+            outputItem = new ItemStack(Items.powercell, 1);
+            craftTime = 40f;
+            size = 3;
+            hasItems = true;
+            hasPower = true;
+
+            consumes.power(2f);
+            consumes.items(new ItemStack(Items.lithium, 6), new ItemStack(Items.lead, 4), new ItemStack(Items.copper, 5));
         }};
 
         siliconSmelter = new GenericSmelter("silicon-smelter"){{
@@ -533,8 +553,7 @@ public class Blocks implements ContentList{
             size = 2;
             health = 320;
             hasPower = hasLiquids = true;
-            craftEffect = Fx.formsmoke;
-            updateEffect = Fx.plasticburn;
+            craftEffect = Fx.none;
             drawer = new DrawGlow();
 
             consumes.liquid(Liquids.oil, 0.25f);
@@ -1108,6 +1127,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.titanium, 20, Items.lead, 40, Items.silicon, 20));
             size = 3;
             consumes.powerBuffered(50000f);
+            
         }};
 
         combustionGenerator = new BurnerGenerator("combustion-generator"){{
