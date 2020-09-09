@@ -1210,6 +1210,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(sensor == LAccess.y) return y;
         if(sensor == LAccess.team) return team.id;
         if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.maxHealth) return maxHealth();
         if(sensor == LAccess.efficiency) return efficiency();
         if(sensor == LAccess.rotation) return rotation;
         if(sensor == LAccess.totalItems && items != null) return items.total();

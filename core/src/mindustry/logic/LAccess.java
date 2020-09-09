@@ -15,6 +15,7 @@ public enum LAccess{
     powerNetIn,
     powerNetOut,
     health,
+    maxHealth,
     heat,
     efficiency,
     rotation,

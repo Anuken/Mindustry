@@ -75,6 +75,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(sensor == LAccess.totalItems) return stack().amount;
         if(sensor == LAccess.rotation) return rotation;
         if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.maxHealth) return maxHealth;
         if(sensor == LAccess.x) return x;
         if(sensor == LAccess.y) return y;
         if(sensor == LAccess.team) return team.id;
