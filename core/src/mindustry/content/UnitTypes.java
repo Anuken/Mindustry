@@ -17,11 +17,8 @@ public class UnitTypes implements ContentList{
     //ground
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
-    //ground + builder
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova;
-
     //ground + builder + miner + commander
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType pulsar, quasar;
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType nova, pulsar, quasar;
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
@@ -252,6 +249,7 @@ public class UnitTypes implements ContentList{
             health = 110f;
             buildSpeed = 0.8f;
             armor = 1f;
+            commandLimit = 8;
 
             abilities.add(new HealFieldAbility(10f, 60f * 4, 60f));
 
@@ -279,7 +277,7 @@ public class UnitTypes implements ContentList{
 
             mineTier = 2;
             mineSpeed = 5f;
-            commandLimit = 8;
+            commandLimit = 15;
 
             abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 5, 60f));
 
@@ -319,6 +317,8 @@ public class UnitTypes implements ContentList{
             canBoost = true;
             armor = 9f;
             landShake = 2f;
+
+            commandLimit = 24;
 
             speed = 0.4f;
             hitsize = 10f;

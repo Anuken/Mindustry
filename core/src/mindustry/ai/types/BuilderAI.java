@@ -1,6 +1,8 @@
 package mindustry.ai.types;
 
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -10,6 +12,9 @@ import mindustry.world.blocks.ConstructBlock.*;
 import static mindustry.Vars.*;
 
 public class BuilderAI extends AIController{
+    float buildRadius = 700;
+    boolean found = false;
+    @Nullable Builderc following;
 
     @Override
     public void updateUnit(){
@@ -21,8 +26,23 @@ public class BuilderAI extends AIController{
 
         builder.updateBuilding(true);
 
-        //approach request if building
+        if(following != null){
+            //try to follow and mimic someone
+
+            //validate follower
+            if(!following.isValid() || !following.activelyBuilding()){
+                following = null;
+                builder.plans().clear();
+                return;
+            }
+
+            //set to follower's first build plan, whatever that is
+            builder.plans().clear();
+            builder.plans().addFirst(following.buildPlan());
+        }
+
         if(builder.buildPlan() != null){
+            //approach request if building
             BuildPlan req = builder.buildPlan();
 
             boolean valid =
@@ -39,8 +59,35 @@ public class BuilderAI extends AIController{
                 builder.plans().removeFirst();
             }
         }else{
+
+            //follow someone and help them build
+            if(timer.get(timerTarget2, 60f)){
+                found = false;
+
+                Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
+                    if(found) return;
+
+                    if(u instanceof Builderc && u != unit && ((Builderc)u).activelyBuilding()){
+                        Builderc b = (Builderc)u;
+                        BuildPlan plan = b.buildPlan();
+
+                        Building build = world.build(plan.x, plan.y);
+                        if(build instanceof ConstructBuild){
+                            ConstructBuild cons = (ConstructBuild)build;
+                            float dist = Math.min(cons.dst(unit) - buildingRange, 0);
+
+                            //make sure you can reach the request in time
+                            if(dist / unit.type().speed < cons.buildCost * 0.9f){
+                                following = b;
+                                found = true;
+                            }
+                        }
+                    }
+                });
+            }
+
             //find new request
-            if(!unit.team().data().blocks.isEmpty()){
+            if(!unit.team().data().blocks.isEmpty() && following == null){
                 Queue<BlockPlan> blocks = unit.team().data().blocks;
                 BlockPlan block = blocks.first();
 
@@ -56,6 +103,7 @@ public class BuilderAI extends AIController{
                     blocks.addLast(block);
                 }
             }
+
         }
     }
 }
