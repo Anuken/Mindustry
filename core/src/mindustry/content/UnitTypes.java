@@ -1066,6 +1066,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 3.3f;
             immunities = ObjectSet.with(StatusEffects.wet);
             trailLength = 20;
+            rotateShooting = false;
 
             armor = 2f;
 
@@ -1121,6 +1122,7 @@ public class UnitTypes implements ContentList{
             trailX = 5.5f;
             trailY = -4f;
             trailScl = 1.9f;
+            rotateShooting = false;
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
@@ -1157,6 +1159,7 @@ public class UnitTypes implements ContentList{
             hitsize = 14f;
             armor = 6f;
             immunities = ObjectSet.with(StatusEffects.wet);
+            rotateShooting = false;
 
             trailLength = 22;
             trailX = 7f;
