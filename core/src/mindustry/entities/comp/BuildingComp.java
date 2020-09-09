@@ -1210,6 +1210,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(sensor == LAccess.y) return y;
         if(sensor == LAccess.team) return team.id;
         if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.maxHealth) return maxHealth();
         if(sensor == LAccess.efficiency) return efficiency();
         if(sensor == LAccess.rotation) return rotation;
         if(sensor == LAccess.totalItems && items != null) return items.total();
@@ -1223,6 +1224,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
         if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getBatteryCapacity();
         return 0;
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.type) return block;
+
+        return noSensed;
     }
 
     @Override

@@ -75,13 +75,13 @@ public class DesktopInput extends InputHandler{
         });
 
         group.fill(t -> {
-            t.visible(() -> Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty());
+            t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
-                b.label( () -> Core.bundle.format("schematic.flip",
-                Core.keybinds.get(Binding.schematic_flip_x).key.toString(),
-                Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format("schematic.flip",
+                    Core.keybinds.get(Binding.schematic_flip_x).key.toString(),
+                    Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel).visible(() -> Core.settings.getBool("hints"));
                 b.row();
                 b.table(a -> {
                     a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);

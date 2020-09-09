@@ -78,6 +78,8 @@ public class Vars implements Loadable{
     public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
+    /** range for moving items */
+    public static final float itemTransferRange = 220f;
     /** duration of time between turns in ticks */
     public static final float turnDuration = 20 * Time.toMinutes;
     /** turns needed to destroy a sector completely */

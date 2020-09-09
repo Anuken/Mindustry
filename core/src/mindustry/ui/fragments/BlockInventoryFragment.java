@@ -44,7 +44,7 @@ public class BlockInventoryFragment extends Fragment{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Building tile, Item item, int amount){
-        if(player == null || tile == null || !tile.interactable(player.team())) return;
+        if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange)) return;
         amount = Math.min(player.unit().maxAccepted(item), amount);
         int fa = amount;
 
@@ -165,7 +165,7 @@ public class BlockInventoryFragment extends Fragment{
 
                 container.add(i);
 
-                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused();
+                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused() && player.within(tile, itemTransferRange);
 
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
