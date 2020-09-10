@@ -115,20 +115,22 @@ public class StackConveyor extends Block implements Autotiler{
 
             Draw.z(Layer.blockOver);
 
-            Building from = world.build(link);
+            Tile from = world.tile(link);
 
             if(link == -1 || from == null) return;
 
+            int fromRot = from.build == null ? rotation : from.build.rotation;
+
             //offset
-            Tmp.v1.set(from);
-            Tmp.v2.set(tile);
+            Tmp.v1.set(from.worldx(), from.worldy());
+            Tmp.v2.set(x, y);
             Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interp.linear);
 
             //rotation
-            float a = (from.rotation%4) * 90;
+            float a = (fromRot%4) * 90;
             float b = (rotation%4) * 90;
-            if((from.rotation%4) == 3 && (rotation%4) == 0) a = -1 * 90;
-            if((from.rotation%4) == 0 && (rotation%4) == 3) a =  4 * 90;
+            if((fromRot%4) == 3 && (rotation%4) == 0) a = -1 * 90;
+            if((fromRot%4) == 0 && (rotation%4) == 3) a =  4 * 90;
 
             //stack
             Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
