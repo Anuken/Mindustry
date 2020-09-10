@@ -43,8 +43,8 @@ public class PayloadConveyor extends Block{
 
         for(int i = 0; i < 4; i++){
             Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
-            if(other != null && other.block().outputsPayload && other.block().size == size){
-                Drawf.selected(other.tileX(), other.tileY(), other.block(), Pal.accent);
+            if(other != null && other.block.outputsPayload && other.block.size == size){
+                Drawf.selected(other.tileX(), other.tileY(), other.block, Pal.accent);
             }
         }
     }
@@ -71,13 +71,13 @@ public class PayloadConveyor extends Block{
             //next block must be aligned and of the same size
             if(accept != null && (
                 //same size
-                (accept.block().size == size && tileX() + Geometry.d4(rotation).x * size == accept.tileX() && tileY() + Geometry.d4(rotation).y * size == accept.tileY()) ||
+                (accept.block.size == size && tileX() + Geometry.d4(rotation).x * size == accept.tileX() && tileY() + Geometry.d4(rotation).y * size == accept.tileY()) ||
 
                 //differing sizes
-                (accept.block().size > size &&
+                (accept.block.size > size &&
                     (rotation % 2 == 0 ? //check orientation
-                    Math.abs(accept.y - y) <= (accept.block().size * tilesize - size * tilesize)/2f : //check Y alignment
-                    Math.abs(accept.x - x) <= (accept.block().size * tilesize - size * tilesize)/2f   //check X alignment
+                    Math.abs(accept.y - y) <= (accept.block.size * tilesize - size * tilesize)/2f : //check Y alignment
+                    Math.abs(accept.x - x) <= (accept.block.size * tilesize - size * tilesize)/2f   //check X alignment
                 )))){
                 next = accept;
             }else{

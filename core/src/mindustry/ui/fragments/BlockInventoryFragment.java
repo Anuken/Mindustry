@@ -79,7 +79,7 @@ public class BlockInventoryFragment extends Fragment{
             return;
         }
         this.tile = t;
-        if(tile == null || !tile.block().isAccessible() || tile.items.total() == 0)
+        if(tile == null || !tile.block.isAccessible() || tile.items.total() == 0)
             return;
         rebuild(true);
     }
@@ -108,7 +108,7 @@ public class BlockInventoryFragment extends Fragment{
         table.touchable = Touchable.enabled;
         table.update(() -> {
 
-            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block().isAccessible() || emptyTime >= holdShrink){
+            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block.isAccessible() || emptyTime >= holdShrink){
                 hide();
             }else{
                 if(tile.items.total() == 0){
@@ -131,7 +131,7 @@ public class BlockInventoryFragment extends Fragment{
                 }
 
                 updateTablePosition();
-                if(tile.block().hasItems){
+                if(tile.block.hasItems){
                     boolean dirty = false;
                     if(shrinkHoldTimes.length != content.items().size) shrinkHoldTimes = new float[content.items().size];
 
@@ -157,7 +157,7 @@ public class BlockInventoryFragment extends Fragment{
         table.margin(4f);
         table.defaults().size(8 * 5).pad(4f);
 
-        if(tile.block().hasItems){
+        if(tile.block.hasItems){
 
             for(int i = 0; i < content.items().size; i++){
                 Item item = content.item(i);
@@ -233,7 +233,7 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     private void updateTablePosition(){
-        Vec2 v = Core.input.mouseScreen(tile.x + tile.block().size * tilesize / 2f, tile.y + tile.block().size * tilesize / 2f);
+        Vec2 v = Core.input.mouseScreen(tile.x + tile.block.size * tilesize / 2f, tile.y + tile.block.size * tilesize / 2f);
         table.pack();
         table.setPosition(v.x, v.y, Align.topLeft);
     }

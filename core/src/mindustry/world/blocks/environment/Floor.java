@@ -112,7 +112,7 @@ public class Floor extends Block{
         if(wall == null) wall = Blocks.air;
 
         if(decoration == Blocks.air){
-            decoration = content.blocks().min(b -> b instanceof Rock && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
+            decoration = content.blocks().min(b -> b instanceof Boulder && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
         }
     }
 

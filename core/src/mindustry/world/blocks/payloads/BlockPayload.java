@@ -22,7 +22,7 @@ public class BlockPayload implements Payload{
     }
 
     public Block block(){
-        return entity.block();
+        return entity.block;
     }
 
     public void place(Tile tile){
@@ -30,7 +30,7 @@ public class BlockPayload implements Payload{
     }
 
     public void place(Tile tile, int rotation){
-        tile.setBlock(entity.block(), entity.team, rotation, () -> entity);
+        tile.setBlock(entity.block, entity.team, rotation, () -> entity);
         entity.dropped();
     }
 
@@ -42,7 +42,7 @@ public class BlockPayload implements Payload{
     @Override
     public void write(Writes write){
         write.b(payloadBlock);
-        write.s(entity.block().id);
+        write.s(entity.block.id);
         write.b(entity.version());
         entity.writeAll(write);
     }
@@ -54,7 +54,7 @@ public class BlockPayload implements Payload{
 
     @Override
     public void draw(){
-        Drawf.shadow(entity.x, entity.y, entity.block().size * tilesize * 2f);
-        Draw.rect(entity.block().icon(Cicon.full), entity.x, entity.y);
+        Drawf.shadow(entity.x, entity.y, entity.block.size * tilesize * 2f);
+        Draw.rect(entity.block.icon(Cicon.full), entity.x, entity.y);
     }
 }

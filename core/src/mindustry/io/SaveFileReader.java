@@ -42,7 +42,13 @@ public abstract class SaveFileReader{
     "shalerocks", "shale-wall",
     "snowrocks", "snow-wall",
     "saltrocks", "salt-wall",
-    "dirtwall", "dirt-wall"
+    "dirtwall", "dirt-wall",
+
+    "ignarock", "basalt",
+    "holostone", "dacite",
+    "holostone-wall", "dacite-wall",
+    "rock", "boulder",
+    "snowrock", "snow-boulder"
     );
 
     protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();

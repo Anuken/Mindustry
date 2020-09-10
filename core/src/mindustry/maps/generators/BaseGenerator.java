@@ -75,7 +75,7 @@ public class BaseGenerator{
             //fill core with every type of item (even non-material)
             Building entity = tile.build;
             for(Item item : content.items()){
-                entity.items.add(item, entity.block().itemCapacity);
+                entity.items.add(item, entity.block.itemCapacity);
             }
         }
 

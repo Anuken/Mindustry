@@ -558,7 +558,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
-        Tile linked = cursor.build == null ? cursor : cursor.build.tile();
+        Tile linked = cursor.build == null ? cursor : cursor.build.tile;
 
         if(!player.dead()){
             checkTargets(worldx, worldy);

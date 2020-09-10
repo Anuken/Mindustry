@@ -93,7 +93,7 @@ public class WaveSpawner{
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
             Building firstCore = state.teams.playerCores().first();
             for(Building core : state.rules.waveTeam.cores()){
-                Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block().size * tilesize /2f * Mathf.sqrt2);
+                Tmp.v1.set(firstCore).sub(core).limit(coreMargin + core.block.size * tilesize /2f * Mathf.sqrt2);
 
                 boolean valid = false;
                 int steps = 0;

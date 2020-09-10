@@ -105,7 +105,9 @@ public class World{
     public Tile tileBuilding(int x, int y){
         Tile tile = tiles.get(x, y);
         if(tile == null) return null;
-        if(tile.build != null) return tile.build.tile();
+        if(tile.build != null){
+            return tile.build.tile();
+        }
         return tile;
     }
 

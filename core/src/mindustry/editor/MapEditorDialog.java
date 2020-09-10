@@ -576,21 +576,19 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(Core.input.ctrl()){
             //alt mode select
-            for(int i = 0; i < view.getTool().altModes.length + 1; i++){
-                if(Core.input.keyTap(KeyCode.valueOf("num" + (i + 1)))){
-                    view.getTool().mode = i - 1;
+            for(int i = 0; i < view.getTool().altModes.length; i++){
+                if(i + 1 < KeyCode.numbers.length && Core.input.keyTap(KeyCode.numbers[i + 1])){
+                    view.getTool().mode = i;
                 }
             }
         }else{
-            //tool select
-            for(int i = 0; i < EditorTool.values().length; i++){
-                if(Core.input.keyTap(KeyCode.valueOf("num" + (i + 1)))){
-                    view.setTool(EditorTool.values()[i]);
+            for(EditorTool tool : EditorTool.all){
+                if(Core.input.keyTap(tool.key)){
+                    view.setTool(tool);
                     break;
                 }
             }
         }
-
 
         if(Core.input.keyTap(KeyCode.escape)){
             if(!menu.isShown()){
@@ -619,7 +617,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 for(int x = 0; x < editor.width(); x++){
                     for(int y = 0; y < editor.height(); y++){
                         Tile tile = editor.tile(x, y);
-                        if(tile.block().breakable && tile.block() instanceof Rock){
+                        if(tile.block().breakable && tile.block() instanceof Boulder){
                             tile.setBlock(Blocks.air);
                             editor.renderer().updatePoint(x, y);
                         }

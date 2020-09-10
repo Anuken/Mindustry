@@ -35,9 +35,9 @@ public class Blocks implements ContentList{
 
     //environment
     air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, ice, snow, darksandTaintedWater,
-    holostone, stoneWall, dirtWall, sporeWall, iceWall, cliffs, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowWall, rock, snowrock, saltWall,
+    dacite, stoneWall, dirtWall, sporeWall, iceWall, daciteWall, cliffs, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
+    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, grass, salt,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, boulder, snowBoulder, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
 
@@ -221,14 +221,14 @@ public class Blocks implements ContentList{
             blendGroup = stone;
         }};
 
-        ignarock = new Floor("ignarock"){{
+        basalt = new Floor("basalt"){{
             attributes.set(Attribute.water, -0.25f);
         }};
 
         hotrock = new Floor("hotrock"){{
             attributes.set(Attribute.heat, 0.5f);
             attributes.set(Attribute.water, -0.5f);
-            blendGroup = ignarock;
+            blendGroup = basalt;
 
             emitLight = true;
             lightRadius = 30f;
@@ -239,7 +239,7 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.heat, 0.75f);
             attributes.set(Attribute.water, -0.75f);
             updateEffect = Fx.magmasmoke;
-            blendGroup = ignarock;
+            blendGroup = basalt;
 
             emitLight = true;
             lightRadius = 60f;
@@ -264,7 +264,7 @@ public class Blocks implements ContentList{
         ((ShallowLiquid)sandWater).set(Blocks.water, Blocks.sand);
         ((ShallowLiquid)darksandWater).set(Blocks.water, Blocks.darksand);
 
-        holostone = new Floor("holostone");
+        dacite = new Floor("dacite");
 
         grass = new Floor("grass"){{
             attributes.set(Attribute.water, 0.1f);
@@ -305,15 +305,19 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
-        rock = new Rock("rock"){{
+        boulder = new Boulder("boulder"){{
             variants = 2;
         }};
 
-        snowrock = new Rock("snowrock"){{
+        snowBoulder = new Boulder("snow-boulder"){{
             variants = 2;
         }};
 
         dirtWall = new StaticWall("dirt-wall"){{
+            variants = 2;
+        }};
+
+        daciteWall = new StaticWall("dacite-wall"){{
             variants = 2;
         }};
 
@@ -328,7 +332,7 @@ public class Blocks implements ContentList{
 
         duneWall = new StaticWall("dune-wall"){{
             variants = 2;
-            ignarock.asFloor().wall = this;
+            basalt.asFloor().wall = this;
         }};
 
         sandWall = new StaticWall("sand-wall"){{
@@ -355,7 +359,7 @@ public class Blocks implements ContentList{
 
         whiteTree = new TreeBlock("white-tree");
 
-        sporeCluster = new Rock("spore-cluster"){{
+        sporeCluster = new Boulder("spore-cluster"){{
             variants = 3;
         }};
 
@@ -368,11 +372,15 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
-        shaleBoulder = new Rock("shale-boulder"){{
+        shaleBoulder = new Boulder("shale-boulder"){{
             variants = 2;
         }};
 
-        sandBoulder = new Rock("sand-boulder"){{
+        sandBoulder = new Boulder("sand-boulder"){{
+            variants = 2;
+        }};
+
+        daciteBoulder = new Boulder("dacite-boulder"){{
             variants = 2;
         }};
 
@@ -513,7 +521,7 @@ public class Blocks implements ContentList{
             itemCapacity = 30;
             boostScale = 0.15f;
 
-            consumes.items(new ItemStack(Items.coal, 3), new ItemStack(Items.sand, 6), new ItemStack(Items.pyratite, 1));
+            consumes.items(new ItemStack(Items.coal, 4), new ItemStack(Items.sand, 6), new ItemStack(Items.pyratite, 1));
             consumes.power(4f);
         }};
 

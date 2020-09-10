@@ -135,10 +135,10 @@ public class PowerNode extends PowerBlock{
         Drawf.circles(x * tilesize + offset, y * tilesize + offset, laserRange * tilesize);
 
         getPotentialLinks(tile, other -> {
-            Drawf.square(other.x, other.y, other.block().size * tilesize / 2f + 2f, Pal.place);
+            Drawf.square(other.x, other.y, other.block.size * tilesize / 2f + 2f, Pal.place);
 
             insulators(tile.x, tile.y, other.tileX(), other.tileY(), cause -> {
-                Drawf.square(cause.x, cause.y, cause.block().size * tilesize / 2f + 2f, Pal.plastanium);
+                Drawf.square(cause.x, cause.y, cause.block.size * tilesize / 2f + 2f, Pal.plastanium);
             });
         });
 
@@ -185,9 +185,9 @@ public class PowerNode extends PowerBlock{
 
     protected void getPotentialLinks(Tile tile, Cons<Building> others){
         Boolf<Building> valid = other -> other != null && other.tile() != tile && other.power != null &&
-            ((!other.block().outputsPower && other.block().consumesPower) || (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) &&
+            ((!other.block.outputsPower && other.block.consumesPower) || (other.block.outputsPower && !other.block.consumesPower) || other.block instanceof PowerNode) &&
             overlaps(tile.x * tilesize + offset, tile.y * tilesize + offset, other.tile(), laserRange * tilesize) && other.team == player.team()
-            && !other.proximity().contains(e -> e.tile() == tile) && !graphs.contains(other.power.graph);
+            && !other.proximity.contains(e -> e.tile == tile) && !graphs.contains(other.power.graph);
 
         tempTileEnts.clear();
         graphs.clear();
@@ -203,7 +203,7 @@ public class PowerNode extends PowerBlock{
         });
 
         tempTileEnts.sort((a, b) -> {
-            int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+            int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
             if(type != 0) return type;
             return Float.compare(a.dst2(tile), b.dst2(tile));
         });
@@ -237,11 +237,11 @@ public class PowerNode extends PowerBlock{
     }
 
     public boolean linkValid(Building tile, Building link, boolean checkMaxNodes){
-        if(tile == link || link == null || !link.block().hasPower || tile.team != link.team) return false;
+        if(tile == link || link == null || !link.block.hasPower || tile.team != link.team) return false;
 
-        if(overlaps(tile, link, laserRange * tilesize) || (link.block() instanceof PowerNode && overlaps(link, tile, ((PowerNode)link.block()).laserRange * tilesize))){
-            if(checkMaxNodes && link.block() instanceof PowerNode){
-                return link.power.links.size < ((PowerNode)link.block()).maxNodes || link.power.links.contains(tile.pos());
+        if(overlaps(tile, link, laserRange * tilesize) || (link.block instanceof PowerNode && overlaps(link, tile, ((PowerNode)link.block).laserRange * tilesize))){
+            if(checkMaxNodes && link.block instanceof PowerNode){
+                return link.power.links.size < ((PowerNode)link.block).maxNodes || link.power.links.contains(tile.pos());
             }
             return true;
         }
@@ -266,7 +266,7 @@ public class PowerNode extends PowerBlock{
         world.raycastEach(x, y, x2, y2, (wx, wy) -> {
 
             Building tile = world.build(wx, wy);
-            if(tile != null && tile.block().insulated){
+            if(tile != null && tile.block.insulated){
                 iterator.get(tile);
             }
 
@@ -280,8 +280,8 @@ public class PowerNode extends PowerBlock{
         public void placed(){
             if(net.client()) return;
 
-            Boolf<Building> valid = other -> other != null && other != this && ((!other.block().outputsPower && other.block().consumesPower) ||
-                (other.block().outputsPower && !other.block().consumesPower) || other.block() instanceof PowerNode) && linkValid(this, other)
+            Boolf<Building> valid = other -> other != null && other != this && ((!other.block.outputsPower && other.block.consumesPower) ||
+                (other.block.outputsPower && !other.block.consumesPower) || other.block instanceof PowerNode) && linkValid(this, other)
                 && !other.proximity().contains(this) && other.power.graph != power.graph;
 
             tempTileEnts.clear();
@@ -295,7 +295,7 @@ public class PowerNode extends PowerBlock{
             });
 
             tempTileEnts.sort((a, b) -> {
-                int type = -Boolean.compare(a.block() instanceof PowerNode, b.block() instanceof PowerNode);
+                int type = -Boolean.compare(a.block instanceof PowerNode, b.block instanceof PowerNode);
                 if(type != 0) return type;
                 return Float.compare(a.dst2(tile), b.dst2(tile));
             });
@@ -373,7 +373,7 @@ public class PowerNode extends PowerBlock{
                         boolean linked = linked(link);
 
                         if(linked){
-                            Drawf.square(link.x, link.y, link.block().size * tilesize / 2f + 1f, Pal.place);
+                            Drawf.square(link.x, link.y, link.block.size * tilesize / 2f + 1f, Pal.place);
                         }
                     }
                 }
@@ -395,7 +395,7 @@ public class PowerNode extends PowerBlock{
 
                 if(!linkValid(this, link)) continue;
 
-                if(link.block() instanceof PowerNode && !(link.pos() < tile.pos())) continue;
+                if(link.block instanceof PowerNode && !(link.pos() < tile.pos())) continue;
 
                 drawLaserTo(link);
             }
@@ -408,7 +408,7 @@ public class PowerNode extends PowerBlock{
         }
 
         protected void drawLaserTo(Building target){
-            drawLaser(team, x, y, target.x, target.y, power.graph.getSatisfaction(), size, target.block().size);
+            drawLaser(team, x, y, target.x, target.y, power.graph.getSatisfaction(), size, target.block.size);
         }
 
         @Override

@@ -456,7 +456,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             build.removeFromProximity();
 
             //remove this tile's dangling entities
-            if(build.block().isMultiblock()){
+            if(build.block.isMultiblock()){
                 int cx = build.tileX(), cy = build.tileY();
                 int size = build.block.size;
                 int offsetx = -(size - 1) / 2;
@@ -521,7 +521,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(Point2 p : Geometry.d4){
                     Building tile = world.build(x + p.x, y + p.y);
-                    if(tile != null && !tile.tile().changing){
+                    if(tile != null && !tile.tile.changing){
                         tile.onProximityUpdate();
                     }
                 }

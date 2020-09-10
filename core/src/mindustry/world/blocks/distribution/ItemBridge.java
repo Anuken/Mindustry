@@ -214,7 +214,7 @@ public class ItemBridge extends Block{
                 return true;
             }
 
-            if(linkValid(tile, other.tile())){
+            if(linkValid(tile, other.tile)){
                 if(link == other.pos()){
                     configure(-1);
                 }else{
@@ -358,7 +358,7 @@ public class ItemBridge extends Block{
         }
 
         protected boolean linked(Building source){
-            return source instanceof ItemBridgeBuild && linkValid(source.tile(), tile) && ((ItemBridgeBuild)source).link == pos();
+            return source instanceof ItemBridgeBuild && linkValid(source.tile, tile) && ((ItemBridgeBuild)source).link == pos();
         }
 
         @Override
@@ -369,7 +369,7 @@ public class ItemBridge extends Block{
         protected boolean checkDump(Building to){
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
-                Tile edge = Edges.getFacingEdge(to.tile(), tile);
+                Tile edge = Edges.getFacingEdge(to.tile, tile);
                 int i = relativeTo(edge.x, edge.y);
 
                 IntSetIterator it = incoming.iterator();

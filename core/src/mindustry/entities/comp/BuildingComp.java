@@ -829,7 +829,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, base()) && !PowerNode.insulated(other, base())
                     && !other.proximity().contains(this.<Building>base()) &&
                 !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
-                    tempTiles.add(other.tile());
+                    tempTiles.add(other.tile);
                 }
             });
             tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));

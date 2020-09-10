@@ -574,7 +574,7 @@ public class ApplicationTests{
                     }catch(Throwable t){
                         fail("Failed to update block '" + tile.block() + "'.", t);
                     }
-                    assertEquals(tile.block(), tile.build.block());
+                    assertEquals(tile.block(), tile.build.block);
                     assertEquals(tile.block().health, tile.build.health());
                 }
             }

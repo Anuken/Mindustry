@@ -182,7 +182,7 @@ public class Control implements ApplicationListener, Loadable{
 
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
+            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effect.shake(5f, 5f, core);

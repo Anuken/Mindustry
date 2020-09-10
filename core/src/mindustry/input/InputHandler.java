@@ -128,7 +128,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(tile != null && tile.team == unit.team
             && unit.within(tile, tilesize * tile.block.size * 1.2f)){
             //pick up block directly
-            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
+            if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
                 pay.pickup(tile);
             }else{ //pick up block payload
                 Payload current = tile.getPayload();
@@ -189,7 +189,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null || tile == null || !player.within(tile, buildingRange)) return;
 
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile(), action -> {
+            !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile, action -> {
                 action.itemAmount = player.unit().stack.amount;
                 action.item = player.unit().item();
             }))){
@@ -219,7 +219,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void tileConfig(@Nullable Player player, Building tile, @Nullable Object value){
         if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
+            !netServer.admins.allowAction(player, ActionType.configure, tile.tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
         tile.configured(player == null || player.dead() ? null : player.unit(), value);
         Core.app.post(() -> Events.fire(new ConfigEvent(tile, player, value)));
     }
@@ -753,7 +753,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean consumed = false, showedInventory = false;
 
         //check if tapped block is configurable
-        if(tile.block().configurable && tile.interactable(player.team())){
+        if(tile.block.configurable && tile.interactable(player.team())){
             consumed = true;
             if(((!frag.config.isShown() && tile.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
@@ -780,10 +780,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //consume tap event if necessary
-        if(tile.interactable(player.team()) && tile.block().consumesTap){
+        if(tile.interactable(player.team()) && tile.block.consumesTap){
             consumed = true;
-        }else if(tile.interactable(player.team()) && tile.block().synthetic() && !consumed){
-            if(tile.block().hasItems && tile.items.total() > 0){
+        }else if(tile.interactable(player.team()) && tile.block.synthetic() && !consumed){
+            if(tile.block.hasItems && tile.items.total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
                 showedInventory = true;
@@ -953,7 +953,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         ItemStack stack = player.unit().stack;
 
-        if(tile != null && tile.acceptStack(stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
+        if(tile != null && tile.acceptStack(stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block.hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));

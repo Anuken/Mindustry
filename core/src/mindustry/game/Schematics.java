@@ -347,9 +347,9 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
 
-                if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof ConstructBlock)){
-                    int top = linked.block().size/2;
-                    int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
+                if(linked != null && linked.block.isVisible() && !(linked.block instanceof ConstructBlock)){
+                    int top = linked.block.size/2;
+                    int bot = linked.block.size % 2 == 1 ? -linked.block.size/2 : -(linked.block.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
                     miny = Math.min(linked.tileY() + bot, miny);
                     maxx = Math.max(linked.tileX() + top, maxx);
@@ -375,11 +375,11 @@ public class Schematics implements Loadable{
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
 
-                if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof ConstructBlock)
-                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
+                if(tile != null && !counted.contains(tile.pos()) && !(tile.block instanceof ConstructBlock)
+                    && (tile.block.isVisible() || (tile.block instanceof CoreBlock))){
                     Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
+                    tiles.add(new Stile(tile.block, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }

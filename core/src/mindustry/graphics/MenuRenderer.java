@@ -59,8 +59,8 @@ public class MenuRenderer implements Disposable{
             new Block[]{Blocks.moss, Blocks.sporePine}
         );
         Block[] selected2 = Structs.select(
-            new Block[]{Blocks.ignarock, Blocks.duneWall},
-            new Block[]{Blocks.ignarock, Blocks.duneWall},
+            new Block[]{Blocks.basalt, Blocks.duneWall},
+            new Block[]{Blocks.basalt, Blocks.duneWall},
             new Block[]{Blocks.stone, Blocks.stoneWall},
             new Block[]{Blocks.stone, Blocks.stoneWall},
             new Block[]{Blocks.moss, Blocks.sporeWall},
@@ -113,7 +113,7 @@ public class MenuRenderer implements Disposable{
                     if(heat > base){
                         ore = Blocks.air;
                         wall = Blocks.air;
-                        floor = Blocks.ignarock;
+                        floor = Blocks.basalt;
 
                         if(heat > base + 0.1){
                             floor = Blocks.hotrock;

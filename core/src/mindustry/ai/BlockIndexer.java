@@ -255,15 +255,15 @@ public class BlockIndexer{
 
                         if(e == null) continue;
 
-                        if(e.team != team || !pred.get(e) || !e.block().targetable)
+                        if(e.team != team || !pred.get(e) || !e.block.targetable)
                             continue;
 
                         float ndst = e.dst2(x, y);
                         if(ndst < range2 && (closest == null ||
                         //this one is closer, and it is at least of equal priority
-                        (ndst < dst && (!usePriority || closest.block().priority.ordinal() <= e.block().priority.ordinal())) ||
+                        (ndst < dst && (!usePriority || closest.block.priority.ordinal() <= e.block.priority.ordinal())) ||
                         //priority is used, and new block has higher priority regardless of range
-                        (usePriority && closest.block().priority.ordinal() < e.block().priority.ordinal()))){
+                        (usePriority && closest.block.priority.ordinal() < e.block.priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }

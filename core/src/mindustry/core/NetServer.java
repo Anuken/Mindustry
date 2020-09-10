@@ -809,7 +809,7 @@ public class NetServer implements ApplicationListener{
 
         short sent = 0;
         for(Building entity : Groups.build){
-            if(!entity.block().sync) continue;
+            if(!entity.block.sync) continue;
             sent ++;
 
             dataStream.writeInt(entity.pos());
@@ -838,7 +838,7 @@ public class NetServer implements ApplicationListener{
         dataStream.writeByte(cores.size);
 
         for(CoreBuild entity : cores){
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.tile.pos());
             entity.items.write(Writes.get(dataStream));
         }
 
