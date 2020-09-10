@@ -3,6 +3,7 @@ package mindustry.world.blocks.power;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.Items;
 import mindustry.gen.*;
 
 import static mindustry.Vars.tilesize;

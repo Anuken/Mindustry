@@ -65,7 +65,7 @@ public class Blocks implements ContentList{
 
     //power
     combustionGenerator, thermalGenerator, turbineGenerator, differentialGenerator, rtgGenerator, solarPanel, largeSolarPanel, thoriumReactor,
-    impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode, powercell,
+    impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode, powercell, powercellConverterSmall,  powercellConverterLarge,
 
     //production
     mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
@@ -499,6 +499,32 @@ public class Blocks implements ContentList{
 
             consumes.power(2f);
             consumes.items(new ItemStack(Items.lithium, 6), new ItemStack(Items.lead, 4), new ItemStack(Items.copper, 5));
+        }};
+
+        powercellConverterSmall= new PowerCellConverter("powercell-converter-small"){{
+            requirements(Category.crafting, with(Items.titanium, 10, Items.silicon, 10, Items.lead, 5, Items.copper, 5));
+
+            size = 1;
+            itemDuration = 160f;
+            hasItems = true;
+            hasPower = true;
+
+            powerProduction = 4f;
+
+            consumes.item(Items.powercell, 1);
+        }};
+
+        powercellConverterLarge = new PowerCellConverter("powercell-converter-large"){{
+            requirements(Category.crafting, with(Items.titanium, 40, Items.silicon, 25, Items.lead, 15, Items.copper, 10));
+
+            size = 2;
+            itemDuration = 60f;
+            hasItems = true;
+            hasPower = true;
+
+            powerProduction = 12f;
+
+            consumes.item(Items.powercell, 1);
         }};
 
         siliconSmelter = new GenericSmelter("silicon-smelter"){{
