@@ -709,7 +709,7 @@ public class Mods implements Loadable{
         public boolean isSupported(){
             if(isOutdated()) return false;
 
-            int major = getMinMinor(), minor = getMinMinor();
+            int major = getMinMajor(), minor = getMinMinor();
 
             if(Version.build <= 0) return true;
 
@@ -719,7 +719,7 @@ public class Mods implements Loadable{
         /** @return whether this mod is outdated, e.g. not compatible with v6. */
         public boolean isOutdated(){
             //must be at least 105 to indicate v6 compat
-            return getMinMinor() < 105;
+            return getMinMajor() < 105;
         }
 
         public int getMinMajor(){
@@ -749,7 +749,7 @@ public class Mods implements Loadable{
                 }
             }
 
-            return Strings.parseInt(ver, 0);
+            return 0;
         }
 
         @Override
