@@ -32,7 +32,17 @@ public abstract class SaveFileReader{
 
     "mass-conveyor", "payload-conveyor",
     "vestige", "scepter",
-    "turbine-generator", "steam-generator"
+    "turbine-generator", "steam-generator",
+
+    "rocks", "stone-wall",
+    "sporerocks", "spore-wall",
+    "icerocks", "ice-wall",
+    "dunerocks", "dune-wall",
+    "sandrocks", "sand-wall",
+    "shalerocks", "shale-wall",
+    "snowrocks", "snow-wall",
+    "saltrocks", "salt-wall",
+    "dirtwall", "dirt-wall"
     );
 
     protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();

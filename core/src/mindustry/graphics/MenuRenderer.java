@@ -50,21 +50,21 @@ public class MenuRenderer implements Disposable{
         Simplex s3 = new Simplex(offset + 2);
         RidgedPerlin rid = new RidgedPerlin(1 + offset, 1);
         Block[] selected = Structs.select(
-            new Block[]{Blocks.sand, Blocks.sandRocks},
-            new Block[]{Blocks.shale, Blocks.shaleRocks},
-            new Block[]{Blocks.ice, Blocks.icerocks},
-            new Block[]{Blocks.sand, Blocks.sandRocks},
-            new Block[]{Blocks.shale, Blocks.shaleRocks},
-            new Block[]{Blocks.ice, Blocks.icerocks},
+            new Block[]{Blocks.sand, Blocks.sandWall},
+            new Block[]{Blocks.shale, Blocks.shaleWall},
+            new Block[]{Blocks.ice, Blocks.iceWall},
+            new Block[]{Blocks.sand, Blocks.sandWall},
+            new Block[]{Blocks.shale, Blocks.shaleWall},
+            new Block[]{Blocks.ice, Blocks.iceWall},
             new Block[]{Blocks.moss, Blocks.sporePine}
         );
         Block[] selected2 = Structs.select(
-            new Block[]{Blocks.ignarock, Blocks.duneRocks},
-            new Block[]{Blocks.ignarock, Blocks.duneRocks},
-            new Block[]{Blocks.stone, Blocks.rocks},
-            new Block[]{Blocks.stone, Blocks.rocks},
-            new Block[]{Blocks.moss, Blocks.sporerocks},
-            new Block[]{Blocks.salt, Blocks.saltRocks}
+            new Block[]{Blocks.ignarock, Blocks.duneWall},
+            new Block[]{Blocks.ignarock, Blocks.duneWall},
+            new Block[]{Blocks.stone, Blocks.stoneWall},
+            new Block[]{Blocks.stone, Blocks.stoneWall},
+            new Block[]{Blocks.moss, Blocks.sporeWall},
+            new Block[]{Blocks.salt, Blocks.saltWall}
         );
 
         Block ore1 = ores.random();
@@ -146,7 +146,7 @@ public class MenuRenderer implements Disposable{
                         floor = Mathf.chance(0.2) ? Blocks.sporeMoss : Blocks.moss;
 
                         if(wall != Blocks.air){
-                            wall = Blocks.sporerocks;
+                            wall = Blocks.sporeWall;
                         }
                     }
                 }

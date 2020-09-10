@@ -34,10 +34,10 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, ice, snow, darksandTaintedWater,
-    holostone, rocks, sporerocks, icerocks, cliffs, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
-    iceSnow, sandWater, darksandWater, duneRocks, sandRocks, moss, sporeMoss, shale, shaleRocks, shaleBoulder, sandBoulder, grass, salt,
-    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowrocks, rock, snowrock, saltRocks,
+    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, ice, snow, darksandTaintedWater,
+    holostone, stoneWall, dirtWall, sporeWall, iceWall, cliffs, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
+    iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, grass, salt,
+    metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, ignarock, magmarock, hotrock, snowWall, rock, snowrock, saltWall,
     darkPanel1, darkPanel2, darkPanel3, darkPanel4, darkPanel5, darkPanel6, darkMetal,
     pebbles, tendrils,
 
@@ -258,6 +258,8 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.oil, 1.5f);
         }};
 
+        dirt = new Floor("dirt");
+
         ((ShallowLiquid)darksandTaintedWater).set(Blocks.taintedWater, Blocks.darksand);
         ((ShallowLiquid)sandWater).set(Blocks.water, Blocks.sand);
         ((ShallowLiquid)darksandWater).set(Blocks.water, Blocks.darksand);
@@ -295,11 +297,11 @@ public class Blocks implements ContentList{
             fillsTile = false;
         }};
 
-        rocks = new StaticWall("rocks"){{
+        stoneWall = new StaticWall("stone-wall"){{
             variants = 2;
         }};
 
-        sporerocks = new StaticWall("sporerocks"){{
+        sporeWall = new StaticWall("spore-wall"){{
             variants = 2;
         }};
 
@@ -311,25 +313,29 @@ public class Blocks implements ContentList{
             variants = 2;
         }};
 
-        icerocks = new StaticWall("icerocks"){{
+        dirtWall = new StaticWall("dirt-wall"){{
+            variants = 2;
+        }};
+
+        iceWall = new StaticWall("ice-wall"){{
             variants = 2;
             iceSnow.asFloor().wall = this;
         }};
 
-        snowrocks = new StaticWall("snowrocks"){{
+        snowWall = new StaticWall("snow-wall"){{
             variants = 2;
         }};
 
-        duneRocks = new StaticWall("dunerocks"){{
+        duneWall = new StaticWall("dune-wall"){{
             variants = 2;
             ignarock.asFloor().wall = this;
         }};
 
-        sandRocks = new StaticWall("sandrocks"){{
+        sandWall = new StaticWall("sand-wall"){{
             variants = 2;
         }};
 
-        saltRocks = new StaticWall("saltrocks");
+        saltWall = new StaticWall("salt-wall");
 
         sporePine = new StaticTree("spore-pine"){{
             variants = 0;
@@ -358,7 +364,7 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.oil, 1f);
         }};
 
-        shaleRocks = new StaticWall("shalerocks"){{
+        shaleWall = new StaticWall("shale-wall"){{
             variants = 2;
         }};
 
@@ -379,7 +385,7 @@ public class Blocks implements ContentList{
         sporeMoss = new Floor("spore-moss"){{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
-            wall = sporerocks;
+            wall = sporeWall;
         }};
 
         metalFloor = new Floor("metal-floor"){{
