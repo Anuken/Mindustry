@@ -749,7 +749,7 @@ public class Mods implements Loadable{
                 }
             }
 
-            return 0;
+            return Strings.parseInt(ver, 0);
         }
 
         @Override
