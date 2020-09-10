@@ -24,6 +24,7 @@ public enum LogicOp{
     min("min", Math::min),
     atan2("atan2", (x, y) -> Mathf.atan2((float)x, (float)y) * Mathf.radDeg),
     dst("dst", (x, y) -> Mathf.dst((float)x, (float)y)),
+    noise("noise", LExecutor.noise::rawNoise2D),
 
     not("not", a -> ~(int)(a)),
     abs("abs", a -> Math.abs(a)),

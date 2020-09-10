@@ -105,57 +105,107 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.builder().removeBuild(x, y, breaking);
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void pickupUnitPayload(Player player, Unit target){
+    @Remote(targets = Loc.both, called = Loc.server)
+    public static void requestUnitPayload(Player player, Unit target){
         if(player == null) return;
 
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
         if(target.isAI() && target.isGrounded() && pay.canPickup(target)
-            && target.within(unit, unit.type().hitsize * 1.5f + target.type().hitsize)){
-            pay.pickup(target);
+        && target.within(unit, unit.type().hitsize * 2f + target.type().hitsize * 2f)){
+            Call.pickedUnitPayload(player, target);
         }
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void pickupBlockPayload(Player player, Building tile){
+    @Remote(targets = Loc.both, called = Loc.server)
+    public static void requestBlockPayload(Player player, Building tile){
         if(player == null) return;
 
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
         if(tile != null && tile.team == unit.team
-            && unit.within(tile, tilesize * tile.block.size * 1.2f)){
+        && unit.within(tile, tilesize * tile.block.size * 1.2f + tilesize * 5f)){
             //pick up block directly
             if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
-                pay.pickup(tile);
+                Call.pickedBlockPayload(player, tile, true);
             }else{ //pick up block payload
                 Payload current = tile.getPayload();
                 if(current != null && pay.canPickupPayload(current)){
-                    Payload taken = tile.takePayload();
-                    if(taken != null){
-                        pay.addPayload(taken);
-                        Fx.unitPickup.at(tile);
-                    }
+                    Call.pickedBlockPayload(player, tile, false);
                 }
             }
         }
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void dropPayload(Player player, float x, float y){
+    @Remote(targets = Loc.server, called = Loc.server)
+    public static void pickedUnitPayload(Player player, Unit target){
+        if(player == null || target == null || !(player.unit() instanceof Payloadc)){
+            if(target != null){
+                target.remove();
+            }
+            return;
+        }
+
+        ((Payloadc)player.unit()).pickup(target);
+    }
+
+    @Remote(targets = Loc.server, called = Loc.server)
+    public static void pickedBlockPayload(Player player, Building tile, boolean onGround){
+        if(player == null || tile == null || !(player.unit() instanceof Payloadc)){
+            if(tile != null && onGround){
+                Fx.unitPickup.at(tile);
+                tile.tile.remove();
+            }
+            return;
+        }
+
+        Unit unit = player.unit();
+        Payloadc pay = (Payloadc)unit;
+
+        if(onGround){
+            if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
+                pay.pickup(tile);
+            }else{
+                Fx.unitPickup.at(tile);
+                tile.tile.remove();
+            }
+        }else{
+            Payload current = tile.getPayload();
+            if(current != null && pay.canPickupPayload(current)){
+                Payload taken = tile.takePayload();
+                if(taken != null){
+                    pay.addPayload(taken);
+                    Fx.unitPickup.at(tile);
+                }
+            }
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server)
+    public static void requestDropPayload(Player player, float x, float y){
+        if(player == null || net.client()) return;
+
+        Payloadc pay = (Payloadc)player.unit();
+
+        //apply margin of error
+        Tmp.v1.set(x, y).sub(pay).limit(tilesize * 4f).add(pay);
+        float cx = Tmp.v1.x, cy = Tmp.v1.y;
+
+        Call.payloadDropped(player, cx, cy);
+    }
+
+    @Remote(called = Loc.server, targets = Loc.server)
+    public static void payloadDropped(Player player, float x, float y){
         if(player == null) return;
 
         Payloadc pay = (Payloadc)player.unit();
 
-        //allow a slight margin of error
-        if(pay.within(x, y, tilesize * 2f)){
-            float prevx = pay.x(), prevy = pay.y();
-            pay.set(x, y);
-            pay.dropLastPayload();
-            pay.set(prevx, prevy);
-        }
+        float prevx = pay.x(), prevy = pay.y();
+        pay.set(x, y);
+        pay.dropLastPayload();
+        pay.set(prevx, prevy);
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
@@ -340,12 +390,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
         if(target != null){
-            Call.pickupUnitPayload(player, target);
+            Call.requestUnitPayload(player, target);
         }else{
             Building tile = world.buildWorld(pay.x(), pay.y());
 
             if(tile != null && tile.team == unit.team){
-                Call.pickupBlockPayload(player, tile);
+                Call.requestBlockPayload(player, tile);
             }
         }
     }
@@ -354,7 +404,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Unit unit = player.unit();
         if(!(unit instanceof Payloadc)) return;
 
-        Call.dropPayload(player, player.x, player.y);
+        Call.requestDropPayload(player, player.x, player.y);
     }
 
     public float getMouseX(){

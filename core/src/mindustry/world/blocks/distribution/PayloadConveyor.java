@@ -30,6 +30,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        sync = true;
     }
 
     @Override
@@ -210,8 +211,6 @@ public class PayloadConveyor extends Block{
             updatePayload();
         }
 
-
-
         @Override
         public void write(Writes write){
             super.write(write);
@@ -225,7 +224,7 @@ public class PayloadConveyor extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            progress = read.f();
+            read.f(); //why is progress written?
             itemRotation = read.f();
             item = Payload.read(read);
         }
