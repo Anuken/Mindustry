@@ -795,7 +795,7 @@ drill-top
   orig: 64, 64
   offset: 0, 0
   index: -1
-turbine-generator-liquid
+steam-generator-liquid
   rotate: false
   xy: 739, 875
   size: 64, 64
@@ -1537,16 +1537,51 @@ solar-panel-large
   orig: 96, 96
   offset: 0, 0
   index: -1
-surge-tower
+steam-generator
   rotate: false
   xy: 2063, 2687
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-thermal-generator
+steam-generator-cap
+  rotate: false
+  xy: 1955, 2621
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+steam-generator-top
+  rotate: false
+  xy: 2021, 2621
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+steam-generator-turbine0
   rotate: false
   xy: 1955, 2555
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+steam-generator-turbine1
+  rotate: false
+  xy: 2021, 2555
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+surge-tower
+  rotate: false
+  xy: 1955, 2489
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+thermal-generator
+  rotate: false
+  xy: 1989, 2357
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -1570,41 +1605,6 @@ thorium-reactor-top
   xy: 1073, 1693
   size: 96, 96
   orig: 96, 96
-  offset: 0, 0
-  index: -1
-turbine-generator
-  rotate: false
-  xy: 2021, 2489
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-turbine-generator-cap
-  rotate: false
-  xy: 1989, 2423
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-turbine-generator-top
-  rotate: false
-  xy: 1989, 2357
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-turbine-generator-turbine0
-  rotate: false
-  xy: 1989, 2291
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-turbine-generator-turbine1
-  rotate: false
-  xy: 2087, 2621
-  size: 64, 64
-  orig: 64, 64
   offset: 0, 0
   index: -1
 alloy-smelter
@@ -2519,7 +2519,7 @@ surge-wall
   index: -1
 surge-wall-large
   rotate: false
-  xy: 1955, 2621
+  xy: 2021, 2489
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -2533,7 +2533,7 @@ thorium-wall
   index: -1
 thorium-wall-large
   rotate: false
-  xy: 2021, 2555
+  xy: 1989, 2291
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -2554,7 +2554,7 @@ titanium-wall
   index: -1
 titanium-wall-large
   rotate: false
-  xy: 1955, 2489
+  xy: 2087, 2621
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -3462,6 +3462,13 @@ block-sporerocks-full
   orig: 32, 32
   offset: 0, 0
   index: -1
+block-steam-generator-full
+  rotate: false
+  xy: 3447, 3027
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
 block-stone-full
   rotate: false
   xy: 989, 1485
@@ -3471,7 +3478,7 @@ block-stone-full
   index: -1
 block-swarmer-full
   rotate: false
-  xy: 3447, 3027
+  xy: 3513, 2995
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -3502,13 +3509,6 @@ titanium-conveyor-0-0
   xy: 1057, 1519
   size: 32, 32
   orig: 32, 32
-  offset: 0, 0
-  index: -1
-block-turbine-generator-full
-  rotate: false
-  xy: 3513, 2995
-  size: 64, 64
-  orig: 64, 64
   offset: 0, 0
   index: -1
 block-water-extractor-full
@@ -5382,7 +5382,7 @@ splash-9
   index: -1
 swarmer
   rotate: false
-  xy: 2021, 2621
+  xy: 1989, 2423
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -10249,9 +10249,16 @@ sporerocks-icon-editor
   orig: 32, 32
   offset: 0, 0
   index: -1
-surge-tower-icon-editor
+steam-generator-icon-editor
   rotate: false
   xy: 3161, 323
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+surge-tower-icon-editor
+  rotate: false
+  xy: 3227, 323
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -10265,14 +10272,14 @@ surge-wall-icon-editor
   index: -1
 surge-wall-large-icon-editor
   rotate: false
-  xy: 3227, 323
+  xy: 3293, 323
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 swarmer-icon-editor
   rotate: false
-  xy: 3293, 323
+  xy: 3359, 323
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -10300,7 +10307,7 @@ tetrative-reconstructor-icon-editor
   index: -1
 thermal-generator-icon-editor
   rotate: false
-  xy: 3359, 323
+  xy: 3425, 323
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -10328,7 +10335,7 @@ thorium-wall-icon-editor
   index: -1
 thorium-wall-large-icon-editor
   rotate: false
-  xy: 3425, 323
+  xy: 3491, 323
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -10355,13 +10362,6 @@ titanium-wall-icon-editor
   offset: 0, 0
   index: -1
 titanium-wall-large-icon-editor
-  rotate: false
-  xy: 3491, 323
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: -1
-turbine-generator-icon-editor
   rotate: false
   xy: 3557, 323
   size: 64, 64
@@ -16816,700 +16816,700 @@ block-sporerocks-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-stone-large
+block-steam-generator-large
   rotate: false
   xy: 2119, 245
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-stone-medium
+block-steam-generator-medium
   rotate: false
   xy: 1561, 33
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-stone-small
+block-steam-generator-small
   rotate: false
   xy: 3113, 212
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-stone-tiny
+block-steam-generator-tiny
   rotate: false
   xy: 2495, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-stone-xlarge
+block-steam-generator-xlarge
   rotate: false
   xy: 1759, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-surge-tower-large
+block-stone-large
   rotate: false
   xy: 2161, 287
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-surge-tower-medium
+block-stone-medium
   rotate: false
   xy: 1595, 67
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-surge-tower-small
+block-stone-small
   rotate: false
   xy: 3139, 238
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-surge-tower-tiny
+block-stone-tiny
   rotate: false
   xy: 2513, 22
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-surge-tower-xlarge
+block-stone-xlarge
   rotate: false
   xy: 1809, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-surge-wall-large
+block-surge-tower-large
   rotate: false
   xy: 2203, 329
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-surge-wall-large-large
-  rotate: false
-  xy: 2119, 203
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-block-surge-wall-large-medium
+block-surge-tower-medium
   rotate: false
   xy: 1629, 101
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-surge-wall-large-small
+block-surge-tower-small
   rotate: false
   xy: 3087, 160
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-surge-wall-large-tiny
+block-surge-tower-tiny
   rotate: false
   xy: 2531, 40
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-surge-wall-large-xlarge
+block-surge-tower-xlarge
   rotate: false
   xy: 1859, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-surge-wall-medium
+block-surge-wall-large
   rotate: false
-  xy: 1663, 135
-  size: 32, 32
-  orig: 32, 32
+  xy: 2119, 203
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
-block-surge-wall-small
-  rotate: false
-  xy: 3113, 186
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-block-surge-wall-tiny
-  rotate: false
-  xy: 2513, 4
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-block-surge-wall-xlarge
-  rotate: false
-  xy: 1909, 413
-  size: 48, 48
-  orig: 48, 48
-  offset: 0, 0
-  index: -1
-block-swarmer-large
+block-surge-wall-large-large
   rotate: false
   xy: 2161, 245
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-swarmer-medium
+block-surge-wall-large-medium
+  rotate: false
+  xy: 1663, 135
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+block-surge-wall-large-small
+  rotate: false
+  xy: 3113, 186
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+block-surge-wall-large-tiny
+  rotate: false
+  xy: 2513, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+block-surge-wall-large-xlarge
+  rotate: false
+  xy: 1909, 413
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+block-surge-wall-medium
   rotate: false
   xy: 1595, 33
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-swarmer-small
+block-surge-wall-small
   rotate: false
   xy: 3139, 212
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-swarmer-tiny
+block-surge-wall-tiny
   rotate: false
   xy: 2531, 22
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-swarmer-xlarge
+block-surge-wall-xlarge
   rotate: false
   xy: 1959, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-switch-large
+block-swarmer-large
   rotate: false
   xy: 2203, 287
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-switch-medium
+block-swarmer-medium
   rotate: false
   xy: 1629, 67
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-switch-small
+block-swarmer-small
   rotate: false
   xy: 3113, 160
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-switch-tiny
+block-swarmer-tiny
   rotate: false
   xy: 2531, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-switch-xlarge
+block-swarmer-xlarge
   rotate: false
   xy: 2009, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-tainted-water-large
+block-switch-large
   rotate: false
   xy: 2245, 329
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-tainted-water-medium
+block-switch-medium
   rotate: false
   xy: 1663, 101
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-tainted-water-small
+block-switch-small
   rotate: false
   xy: 3139, 186
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-tainted-water-tiny
+block-switch-tiny
   rotate: false
   xy: 2549, 37
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-tainted-water-xlarge
+block-switch-xlarge
   rotate: false
   xy: 2059, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-tar-large
+block-tainted-water-large
   rotate: false
   xy: 2161, 203
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-tar-medium
+block-tainted-water-medium
   rotate: false
   xy: 1697, 135
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-tar-small
+block-tainted-water-small
   rotate: false
   xy: 3139, 160
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-tar-tiny
+block-tainted-water-tiny
   rotate: false
   xy: 2549, 19
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-tar-xlarge
+block-tainted-water-xlarge
   rotate: false
   xy: 2109, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-tendrils-large
+block-tar-large
   rotate: false
   xy: 2203, 245
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-tendrils-medium
+block-tar-medium
   rotate: false
   xy: 1629, 33
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-tendrils-small
+block-tar-small
   rotate: false
   xy: 2827, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-tendrils-tiny
+block-tar-tiny
   rotate: false
   xy: 2549, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-tendrils-xlarge
+block-tar-xlarge
   rotate: false
   xy: 2159, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-tetrative-reconstructor-large
+block-tendrils-large
   rotate: false
   xy: 2245, 287
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-tetrative-reconstructor-medium
+block-tendrils-medium
   rotate: false
   xy: 1663, 67
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-tetrative-reconstructor-small
+block-tendrils-small
   rotate: false
   xy: 2853, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-tetrative-reconstructor-tiny
+block-tendrils-tiny
   rotate: false
   xy: 2567, 37
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-tetrative-reconstructor-xlarge
+block-tendrils-xlarge
   rotate: false
   xy: 2209, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-thermal-generator-large
+block-tetrative-reconstructor-large
   rotate: false
   xy: 2287, 329
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-thermal-generator-medium
+block-tetrative-reconstructor-medium
   rotate: false
   xy: 1697, 101
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-thermal-generator-small
+block-tetrative-reconstructor-small
   rotate: false
   xy: 2879, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-thermal-generator-tiny
+block-tetrative-reconstructor-tiny
   rotate: false
   xy: 2567, 19
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-thermal-generator-xlarge
+block-tetrative-reconstructor-xlarge
   rotate: false
   xy: 2259, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-thermal-pump-large
+block-thermal-generator-large
   rotate: false
   xy: 2203, 203
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-thermal-pump-medium
+block-thermal-generator-medium
   rotate: false
   xy: 1731, 135
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-thermal-pump-small
+block-thermal-generator-small
   rotate: false
   xy: 2905, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-thermal-pump-tiny
+block-thermal-generator-tiny
   rotate: false
   xy: 2567, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-thermal-pump-xlarge
+block-thermal-generator-xlarge
   rotate: false
   xy: 2309, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-thorium-reactor-large
+block-thermal-pump-large
   rotate: false
   xy: 2245, 245
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-thorium-reactor-medium
+block-thermal-pump-medium
   rotate: false
   xy: 1663, 33
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-thorium-reactor-small
+block-thermal-pump-small
   rotate: false
   xy: 2931, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-thorium-reactor-tiny
+block-thermal-pump-tiny
   rotate: false
   xy: 2585, 17
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-thorium-reactor-xlarge
+block-thermal-pump-xlarge
   rotate: false
   xy: 2359, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-thorium-wall-large
+block-thorium-reactor-large
   rotate: false
   xy: 2287, 287
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-thorium-wall-large-large
-  rotate: false
-  xy: 2329, 329
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-block-thorium-wall-large-medium
+block-thorium-reactor-medium
   rotate: false
   xy: 1697, 67
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-thorium-wall-large-small
+block-thorium-reactor-small
   rotate: false
   xy: 2957, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-thorium-wall-large-tiny
+block-thorium-reactor-tiny
   rotate: false
   xy: 2603, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-thorium-wall-large-xlarge
+block-thorium-reactor-xlarge
   rotate: false
   xy: 2409, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-thorium-wall-medium
+block-thorium-wall-large
   rotate: false
-  xy: 1731, 101
-  size: 32, 32
-  orig: 32, 32
+  xy: 2329, 329
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
-block-thorium-wall-small
-  rotate: false
-  xy: 2983, 134
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-block-thorium-wall-tiny
-  rotate: false
-  xy: 2621, 16
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-block-thorium-wall-xlarge
-  rotate: false
-  xy: 2459, 413
-  size: 48, 48
-  orig: 48, 48
-  offset: 0, 0
-  index: -1
-block-thruster-large
+block-thorium-wall-large-large
   rotate: false
   xy: 2245, 203
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-thruster-medium
+block-thorium-wall-large-medium
+  rotate: false
+  xy: 1731, 101
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+block-thorium-wall-large-small
+  rotate: false
+  xy: 2983, 134
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+block-thorium-wall-large-tiny
+  rotate: false
+  xy: 2621, 16
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+block-thorium-wall-large-xlarge
+  rotate: false
+  xy: 2459, 413
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+block-thorium-wall-medium
   rotate: false
   xy: 1765, 135
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-thruster-small
+block-thorium-wall-small
   rotate: false
   xy: 3009, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-thruster-tiny
+block-thorium-wall-tiny
   rotate: false
   xy: 2639, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-thruster-xlarge
+block-thorium-wall-xlarge
   rotate: false
   xy: 2509, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-titanium-conveyor-large
+block-thruster-large
   rotate: false
   xy: 2287, 245
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-titanium-conveyor-medium
+block-thruster-medium
   rotate: false
   xy: 1697, 33
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-titanium-conveyor-small
+block-thruster-small
   rotate: false
   xy: 3035, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-titanium-conveyor-tiny
+block-thruster-tiny
   rotate: false
   xy: 3317, 225
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-titanium-conveyor-xlarge
+block-thruster-xlarge
   rotate: false
   xy: 2559, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-titanium-wall-large
+block-titanium-conveyor-large
   rotate: false
   xy: 2329, 287
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-titanium-wall-large-large
-  rotate: false
-  xy: 2371, 329
-  size: 40, 40
-  orig: 40, 40
-  offset: 0, 0
-  index: -1
-block-titanium-wall-large-medium
+block-titanium-conveyor-medium
   rotate: false
   xy: 1731, 67
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-titanium-wall-large-small
+block-titanium-conveyor-small
   rotate: false
   xy: 3061, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-titanium-wall-large-tiny
+block-titanium-conveyor-tiny
   rotate: false
   xy: 3317, 207
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-titanium-wall-large-xlarge
+block-titanium-conveyor-xlarge
   rotate: false
   xy: 2609, 413
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-titanium-wall-medium
+block-titanium-wall-large
   rotate: false
-  xy: 1765, 101
-  size: 32, 32
-  orig: 32, 32
+  xy: 2371, 329
+  size: 40, 40
+  orig: 40, 40
   offset: 0, 0
   index: -1
-block-titanium-wall-small
-  rotate: false
-  xy: 3087, 134
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
-block-titanium-wall-tiny
-  rotate: false
-  xy: 3335, 225
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-block-titanium-wall-xlarge
-  rotate: false
-  xy: 2659, 413
-  size: 48, 48
-  orig: 48, 48
-  offset: 0, 0
-  index: -1
-block-turbine-generator-large
+block-titanium-wall-large-large
   rotate: false
   xy: 2287, 203
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-turbine-generator-medium
+block-titanium-wall-large-medium
+  rotate: false
+  xy: 1765, 101
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+block-titanium-wall-large-small
+  rotate: false
+  xy: 3087, 134
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+block-titanium-wall-large-tiny
+  rotate: false
+  xy: 3335, 225
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+block-titanium-wall-large-xlarge
+  rotate: false
+  xy: 2659, 413
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+block-titanium-wall-medium
   rotate: false
   xy: 1799, 135
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-turbine-generator-small
+block-titanium-wall-small
   rotate: false
   xy: 3113, 134
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-turbine-generator-tiny
+block-titanium-wall-tiny
   rotate: false
   xy: 3317, 189
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-turbine-generator-xlarge
+block-titanium-wall-xlarge
   rotate: false
   xy: 2709, 413
   size: 48, 48

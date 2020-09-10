@@ -125,10 +125,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
-        if(tile != null && tile.team == unit.team && pay.canPickup(tile)
+        if(tile != null && tile.team == unit.team
             && unit.within(tile, tilesize * tile.block.size * 1.2f)){
             //pick up block directly
-            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.canPickup()){
+            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
                 pay.pickup(tile);
             }else{ //pick up block payload
                 Payload current = tile.getPayload();
@@ -344,7 +344,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else{
             Building tile = world.buildWorld(pay.x(), pay.y());
 
-            if(tile != null && tile.team == unit.team && pay.canPickup(tile)){
+            if(tile != null && tile.team == unit.team){
                 Call.pickupBlockPayload(player, tile);
             }
         }

@@ -28,6 +28,7 @@ import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -486,8 +487,9 @@ public class Schematics implements Loadable{
             IntMap<Block> blocks = new IntMap<>();
             byte length = stream.readByte();
             for(int i = 0; i < length; i++){
-                Block block = Vars.content.getByName(ContentType.block, stream.readUTF());
-                blocks.put(i, block == null ? Blocks.air : block);
+                String name = stream.readUTF();
+                Block block = Vars.content.getByName(ContentType.block, SaveFileReader.fallback.get(name, name));
+                blocks.put(i, block == null || block instanceof LegacyBlock ? Blocks.air : block);
             }
 
             int total = stream.readInt();

@@ -8,11 +8,7 @@ import mindustry.world.*;
 import java.io.*;
 
 public abstract class SaveFileReader{
-    protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
-    protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
-    protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
-    protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
-    protected final ObjectMap<String, String> fallback = ObjectMap.of(
+    public static final ObjectMap<String, String> fallback = ObjectMap.of(
     "dart-mech-pad", "legacy-mech-pad",
     "dart-ship-pad", "legacy-mech-pad",
     "javelin-ship-pad", "legacy-mech-pad",
@@ -35,8 +31,14 @@ public abstract class SaveFileReader{
     "fortress-factory", "legacy-unit-factory",
 
     "mass-conveyor", "payload-conveyor",
-    "vestige", "scepter"
+    "vestige", "scepter",
+    "turbine-generator", "steam-generator"
     );
+
+    protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
+    protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
+    protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
+    protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
 
     protected int lastRegionLength;
 

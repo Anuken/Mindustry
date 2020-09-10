@@ -193,19 +193,24 @@ public class PayloadConveyor extends Block{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
+            if(source == this){
+                return this.item == null && payload.fits();
+            }
             //accepting payloads from units isn't supported
-            return this.item == null && progress <= 5f && source != this && payload.fits();
+            return this.item == null && progress <= 5f && payload.fits();
         }
 
         @Override
         public void handlePayload(Building source, Payload payload){
             this.item = payload;
             this.stepAccepted = curStep();
-            this.itemRotation = source.angleTo(this);
+            this.itemRotation = source == this ? rotdeg() : source.angleTo(this);
             this.animation = 0;
 
             updatePayload();
         }
+
+
 
         @Override
         public void write(Writes write){

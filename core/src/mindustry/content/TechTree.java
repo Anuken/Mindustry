@@ -261,7 +261,7 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(turbineGenerator, () -> {
+                            node(steamGenerator, () -> {
                                 node(thermalGenerator, () -> {
                                     node(differentialGenerator, () -> {
                                         node(thoriumReactor, () -> {
@@ -490,7 +490,7 @@ public class TechTree implements ContentList{
                         new SectorComplete(frozenForest),
                         new Research(pneumaticDrill),
                         new Research(powerNode),
-                        new Research(turbineGenerator)
+                        new Research(steamGenerator)
                     ), () -> {
                         node(fungalPass, Seq.with(
                             new SectorComplete(stainedMountains),
