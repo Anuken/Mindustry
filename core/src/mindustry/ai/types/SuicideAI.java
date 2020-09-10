@@ -3,8 +3,10 @@ package mindustry.ai.types;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class SuicideAI extends GroundAI{
     static boolean blockedByBlock;
@@ -58,7 +60,13 @@ public class SuicideAI extends GroundAI{
             }
 
         }else{
-            if(core != null){
+            if(command() == UnitCommand.rally){
+                Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
+
+                if(target != null && !unit.within(target, 70f)){
+                    moveTo(Pathfinder.fieldRally);
+                }
+            }else if(command() == UnitCommand.attack && core != null){
                 moveTo(Pathfinder.fieldCore);
             }
 

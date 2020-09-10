@@ -740,8 +740,6 @@ public class Mods implements Loadable{
         }
 
         public int getMinMinor(){
-            int minor = 0;
-
             String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
 
             if(ver.contains(".")){
@@ -751,7 +749,7 @@ public class Mods implements Loadable{
                 }
             }
 
-            return 0;
+            return Strings.parseInt(ver, 0);
         }
 
         @Override
