@@ -709,7 +709,7 @@ public class Mods implements Loadable{
         public boolean isSupported(){
             if(isOutdated()) return false;
 
-            int major = getMinMinor(), minor = getMinMinor();
+            int major = getMinMajor(), minor = getMinMinor();
 
             if(Version.build <= 0) return true;
 
