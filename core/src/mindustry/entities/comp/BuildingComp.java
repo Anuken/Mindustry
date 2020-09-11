@@ -1219,10 +1219,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(sensor == LAccess.itemCapacity) return block.itemCapacity;
         if(sensor == LAccess.liquidCapacity) return block.liquidCapacity;
         if(sensor == LAccess.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
-        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getPowerProduced();
-        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getPowerNeeded();
+        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getLastScaledPowerIn() * 60;
+        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getLastScaledPowerOut() * 60;
         if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
-        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getBatteryCapacity();
+        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getLastCapacity();
         return 0;
     }
 

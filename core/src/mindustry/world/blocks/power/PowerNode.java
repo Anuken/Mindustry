@@ -111,9 +111,9 @@ public class PowerNode extends PowerBlock{
 
         bars.add("batteries", entity -> new Bar(() ->
         Core.bundle.format("bar.powerstored",
-            (UI.formatAmount((int)entity.power.graph.getLastPowerStored())), UI.formatAmount((int)entity.power.graph.getTotalBatteryCapacity())),
+            (UI.formatAmount((int)entity.power.graph.getLastPowerStored())), UI.formatAmount((int)entity.power.graph.getLastCapacity())),
             () -> Pal.powerBar,
-            () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getTotalBatteryCapacity())));
+            () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())));
     }
 
     @Override

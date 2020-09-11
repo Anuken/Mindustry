@@ -306,6 +306,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.add("[accent]" + (sector.preset == null ? sector.id : sector.preset.localizedName)).row();
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(sector.save != null ? sector.save.getPlayTime() : "@sectors.unexplored").row();
+        if(sector.hasWaves() || sector.hasEnemyBase()){
+            stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
+        }
 
         if(sector.hasBase() && sector.hasWaves()){
             //TODO localize when finalized

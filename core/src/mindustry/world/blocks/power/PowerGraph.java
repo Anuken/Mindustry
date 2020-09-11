@@ -20,6 +20,7 @@ public class PowerGraph{
 
     private final WindowedMean powerBalance = new WindowedMean(60);
     private float lastPowerProduced, lastPowerNeeded, lastUsageFraction, lastPowerStored;
+    private float lastScaledPowerIn, lastScaledPowerOut, lastCapacity;
 
     private long lastFrameUpdated = -1;
     private final int graphID;
@@ -31,6 +32,18 @@ public class PowerGraph{
 
     public int getID(){
         return graphID;
+    }
+
+    public float getLastScaledPowerIn(){
+        return lastScaledPowerIn;
+    }
+
+    public float getLastScaledPowerOut(){
+        return lastScaledPowerOut;
+    }
+
+    public float getLastCapacity(){
+        return lastCapacity;
     }
 
     public float getPowerBalance(){
@@ -200,6 +213,11 @@ public class PowerGraph{
 
         lastPowerNeeded = powerNeeded;
         lastPowerProduced = powerProduced;
+
+        lastScaledPowerIn = powerProduced / Time.delta;
+        lastScaledPowerOut = powerNeeded / Time.delta;
+        lastCapacity = getTotalBatteryCapacity();
+
         lastPowerStored = getBatteryStored();
 
         powerBalance.add((lastPowerProduced - lastPowerNeeded) / Time.delta);
