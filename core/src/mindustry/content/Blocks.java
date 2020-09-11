@@ -34,7 +34,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, ice, snow, darksandTaintedWater,
+    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, quicksand, darksand, dirt, mud, ice, snow, darksandTaintedWater,
     dacite, stoneWall, dirtWall, sporeWall, iceWall, daciteWall, cliffs, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, boulder, snowBoulder, saltWall,
@@ -251,6 +251,17 @@ public class Blocks implements ContentList{
             playerUnmineable = true;
             attributes.set(Attribute.oil, 0.7f);
         }};
+		
+		quicksand = new Floor("quicksand"){{
+			itemDrop = Items.sand;
+            speedMultiplier = 0.4f;
+			variants = 3;
+			status = StatusEffects.sandy;
+            statusDuration = 30f;
+            isLiquid = false;
+            albedo = 0.1f;
+			attributes.set(Attribute.water, 2f);
+        }};
 
         darksand = new Floor("darksand"){{
             itemDrop = Items.sand;
@@ -259,6 +270,16 @@ public class Blocks implements ContentList{
         }};
 
         dirt = new Floor("dirt");
+		
+		mud = new Floor("mud"){{
+            speedMultiplier = 0.6f;
+			variants = 3;
+			status = StatusEffects.muddy;
+            statusDuration = 30f;
+            isLiquid = false;
+            albedo = 0.1f;
+			attributes.set(Attribute.water, 2f);
+        }};
 
         ((ShallowLiquid)darksandTaintedWater).set(Blocks.taintedWater, Blocks.darksand);
         ((ShallowLiquid)sandWater).set(Blocks.water, Blocks.sand);
