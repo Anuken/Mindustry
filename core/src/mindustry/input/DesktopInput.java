@@ -116,7 +116,7 @@ public class DesktopInput extends InputHandler{
         //draw request being moved
         if(sreq != null){
             boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
-            if(sreq.block.rotate && sreq.block.rotateArrow){
+            if(sreq.block.rotate){
                 drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
             }
 
@@ -146,13 +146,13 @@ public class DesktopInput extends InputHandler{
             if(mode == placing && block != null){
                 for(int i = 0; i < lineRequests.size; i++){
                     BuildPlan req = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && req.block.rotate && req.block.rotateArrow){
+                    if(i == lineRequests.size - 1 && req.block.rotate){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
                     drawRequest(lineRequests.get(i));
                 }
             }else if(isPlacing()){
-                if(block.rotate && block.rotateArrow){
+                if(block.rotate){
                     drawArrow(block, cursorX, cursorY, rotation);
                 }
                 Draw.color();
