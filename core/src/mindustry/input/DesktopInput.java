@@ -116,7 +116,7 @@ public class DesktopInput extends InputHandler{
         //draw request being moved
         if(sreq != null){
             boolean valid = validPlace(sreq.x, sreq.y, sreq.block, sreq.rotation, sreq);
-            if(sreq.block.rotate){
+            if(sreq.block.rotate && sreq.block.rotateArrow){
                 drawArrow(sreq.block, sreq.x, sreq.y, sreq.rotation, valid);
             }
 
@@ -146,13 +146,13 @@ public class DesktopInput extends InputHandler{
             if(mode == placing && block != null){
                 for(int i = 0; i < lineRequests.size; i++){
                     BuildPlan req = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && req.block.rotate){
+                    if(i == lineRequests.size - 1 && req.block.rotate && req.block.rotateArrow){
                         drawArrow(block, req.x, req.y, req.rotation);
                     }
                     drawRequest(lineRequests.get(i));
                 }
             }else if(isPlacing()){
-                if(block.rotate){
+                if(block.rotate && block.rotateArrow){
                     drawArrow(block, cursorX, cursorY, rotation);
                 }
                 Draw.color();
@@ -306,7 +306,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.unloadCursor;
             }
 
-            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate && cursor.block().quickRotate){
                 Call.rotateBlock(player, cursor.build, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
