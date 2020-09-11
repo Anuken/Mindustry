@@ -304,7 +304,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //draw placing
                 for(int i = 0; i < lineRequests.size; i++){
                     BuildPlan request = lineRequests.get(i);
-                    if(i == lineRequests.size - 1 && request.block.rotate){
+                    if(i == lineRequests.size - 1 && request.block.rotate && request.block.rotateArrow){
                         drawArrow(block, request.x, request.y, request.rotation);
                     }
                     request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation) && getRequest(request.x, request.y, request.block.size, null) == null);
@@ -346,7 +346,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             if(!request.breaking && request == lastPlaced && request.block != null){
                 Draw.mixcol();
-                if(request.block.rotate) drawArrow(request.block, tile.x, tile.y, request.rotation);
+                if(request.block.rotate && request.block.rotateArrow) drawArrow(request.block, tile.x, tile.y, request.rotation);
             }
 
             Draw.reset();
