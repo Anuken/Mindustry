@@ -254,7 +254,7 @@ public class Blocks implements ContentList{
 		
 		quicksand = new Floor("quicksand"){{
 			itemDrop = Items.sand;
-            speedMultiplier = 0.4f;
+            speedMultiplier = 0.3f;
 			variants = 3;
 			status = StatusEffects.sandy;
             statusDuration = 30f;
