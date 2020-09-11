@@ -262,14 +262,10 @@ public class JoinDialog extends BaseDialog{
         cont.clear();
         cont.table(t -> {
             t.add("@name").padRight(10);
-            if(!steam){
-                t.field(Core.settings.getString("name"), text -> {
-                    player.name(text);
-                    Core.settings.put("name", text);
-                }).grow().pad(8).addInputDialog(maxNameLength);
-            }else{
-                t.add(player.name).update(l -> l.setColor(player.color())).grow().pad(8);
-            }
+            t.field(Core.settings.getString("name"), text -> {
+                player.name(text);
+                Core.settings.put("name", text);
+            }).grow().pad(8).addInputDialog(maxNameLength);
 
             ImageButton button = t.button(Tex.whiteui, Styles.clearFulli, 40, () -> {
                 new PaletteDialog().show(color -> {

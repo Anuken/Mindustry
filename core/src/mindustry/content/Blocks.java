@@ -1766,11 +1766,11 @@ public class Blocks implements ContentList{
         }};
 
         multiplicativeReconstructor = new Reconstructor("multiplicative-reconstructor"){{
-            requirements(Category.units, with(Items.lead, 650, Items.silicon, 350, Items.titanium, 350, Items.thorium, 650));
+            requirements(Category.units, with(Items.lead, 650, Items.silicon, 450, Items.titanium, 350, Items.thorium, 650));
 
             size = 5;
             consumes.power(6f);
-            consumes.items(with(Items.silicon, 130, Items.titanium, 80, Items.metaglass, 30));
+            consumes.items(with(Items.silicon, 130, Items.titanium, 80, Items.metaglass, 40));
 
             constructTime = 60f * 30f;
 
@@ -1785,11 +1785,11 @@ public class Blocks implements ContentList{
         }};
 
         exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
-            requirements(Category.units, with(Items.lead, 2000, Items.silicon, 750, Items.titanium, 950, Items.thorium, 450, Items.plastanium, 350, Items.phasefabric, 450));
+            requirements(Category.units, with(Items.lead, 2000, Items.silicon, 1000, Items.titanium, 2000, Items.thorium, 750, Items.plastanium, 450, Items.phasefabric, 600));
 
             size = 7;
             consumes.power(13f);
-            consumes.items(with(Items.silicon, 450, Items.titanium, 550, Items.plastanium, 550));
+            consumes.items(with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650));
             consumes.liquid(Liquids.cryofluid, 1f);
 
             constructTime = 60f * 60f * 1.5f;
@@ -1803,11 +1803,11 @@ public class Blocks implements ContentList{
         }};
 
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
-            requirements(Category.units, with(Items.lead, 4000, Items.silicon, 1500, Items.thorium, 500, Items.plastanium, 450, Items.phasefabric, 600, Items.surgealloy, 500));
+            requirements(Category.units, with(Items.lead, 4000, Items.silicon, 3000, Items.thorium, 1000, Items.plastanium, 600, Items.phasefabric, 600, Items.surgealloy, 800));
 
             size = 9;
             consumes.power(25f);
-            consumes.items(with(Items.silicon, 350, Items.plastanium, 550, Items.surgealloy, 350, Items.phasefabric, 150));
+            consumes.items(with(Items.silicon, 1000, Items.plastanium, 600, Items.surgealloy, 500, Items.phasefabric, 350));
             consumes.liquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;
@@ -1927,7 +1927,7 @@ public class Blocks implements ContentList{
         logicProcessor = new LogicBlock("logic-processor"){{
             requirements(Category.logic, with(Items.lead, 320, Items.silicon, 100, Items.graphite, 60, Items.thorium, 50));
 
-            instructionsPerTick = 5;
+            instructionsPerTick = 8;
 
             range = 8 * 22;
 

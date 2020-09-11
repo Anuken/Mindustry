@@ -151,7 +151,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 3f;
                 shotDelay = 4f;
 
-                bullet = new BasicBulletType(7f, 40){{
+                bullet = new BasicBulletType(7f, 45){{
                     width = 11f;
                     height = 20f;
                     lifetime = 25f;
@@ -160,7 +160,7 @@ public class UnitTypes implements ContentList{
                     lightningLength = 6;
                     lightningColor = Pal.surge;
                     //standard bullet damage is far too much for lightning
-                    lightningDamage = 17;
+                    lightningDamage = 25;
                 }};
             }},
 
@@ -208,7 +208,7 @@ public class UnitTypes implements ContentList{
                 bullet = new BasicBulletType(13f, 55){{
                     pierce = true;
                     width = 14f;
-                    height = 32f;
+                    height = 33f;
                     lifetime = 15f;
                     shootEffect = Fx.shootBig;
                     fragVelocityMin = 0.4f;
@@ -1036,6 +1036,7 @@ public class UnitTypes implements ContentList{
             hitsize = 15f;
             engineSize = 3f;
             payloadCapacity = 4 * (8 * 8);
+            buildSpeed = 2.5f;
 
             weapons.add(
             new Weapon("heal-weapon-mount"){{
