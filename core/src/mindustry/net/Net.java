@@ -152,7 +152,9 @@ public class Net{
     }
 
     public void disconnect(){
-        Log.info("Disconnecting.");
+        if(active && !server){
+            Log.info("Disconnecting.");
+        }
         provider.disconnectClient();
         server = false;
         active = false;

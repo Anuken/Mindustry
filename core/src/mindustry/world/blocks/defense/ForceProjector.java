@@ -83,8 +83,8 @@ public class ForceProjector extends Block{
         public ForceDraw drawer;
 
         @Override
-        public void add(){
-            super.add();
+        public void created(){
+            super.created();
             drawer = ForceDraw.create();
             drawer.build = this;
             drawer.set(x, y);
@@ -92,8 +92,8 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public void remove(){
-            super.remove();
+        public void onRemoved(){
+            super.onRemoved();
             drawer.remove();
         }
 
@@ -156,7 +156,9 @@ public class ForceProjector extends Block{
         public void draw(){
             super.draw();
 
-            drawer.set(x, y);
+            if(drawer != null){
+                drawer.set(x, y);
+            }
 
             if(buildup > 0f){
                 Draw.alpha(buildup / breakage * 0.75f);
