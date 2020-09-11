@@ -197,6 +197,8 @@ public class Block extends UnlockableContent{
     public boolean instantTransfer = false;
     /** Whether you can rotate this block with Keybind rotateplaced + Scroll Wheel. */
     public boolean quickRotate = true;
+    /** Whether to guide the placement of this block with an arrow icon; rotate needs to be true to work. */
+    public boolean rotateArrow = true;
 
     protected Prov<Building> entityType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
