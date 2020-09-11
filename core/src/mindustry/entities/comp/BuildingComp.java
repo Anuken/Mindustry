@@ -812,7 +812,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called after the block is placed by this client. */
     @CallSuper
-    public void playerPlaced(){
+    public void playerPlaced(Object config){
 
     }
 

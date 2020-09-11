@@ -75,7 +75,7 @@ public class ConstructBlock extends Block{
 
         //last builder was this local client player, call placed()
         if(tile.build != null && !headless && builder == player.unit()){
-            tile.build.playerPlaced();
+            tile.build.playerPlaced(config);
         }
 
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);

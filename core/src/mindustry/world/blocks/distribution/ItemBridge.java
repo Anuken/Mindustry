@@ -133,8 +133,10 @@ public class ItemBridge extends Block{
         public float cycleSpeed = 1f;
 
         @Override
-        public void playerPlaced(){
-            super.playerPlaced();
+        public void playerPlaced(Object config){
+            super.playerPlaced(config);
+
+            if(config != null) return;
 
             Tile link = findLink(tile.x, tile.y);
             if(linkValid(tile, link)){
@@ -265,7 +267,7 @@ public class ItemBridge extends Block{
                 Item item = items.take();
                 if(item != null && other.acceptItem(this, item)){
                     other.handleItem(this, item);
-                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
+                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f); //TODO this is kinda broken, because lerping only happens on a timer
                 }else{
                     cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
                     if(item != null) items.add(item, 1);
