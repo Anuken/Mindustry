@@ -260,6 +260,7 @@ public class Blocks implements ContentList{
 			status = StatusEffects.sandy;
             statusDuration = 30f;
             isAmphibious = true;
+			solid = false;
             albedo = 0.1f;
 			attributes.set(Attribute.water, 2f);
         }};
@@ -279,6 +280,7 @@ public class Blocks implements ContentList{
 			status = StatusEffects.muddy;
             statusDuration = 30f;
             isAmphibious = true;
+			solid = false;
             albedo = 0.1f;
 			attributes.set(Attribute.water, 2f);
         }};
