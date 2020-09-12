@@ -4,6 +4,7 @@ import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
+import arc.util.pooling.Pools;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -28,7 +29,6 @@ public class LExecutor{
 
     public static final int
         maxGraphicsBuffer = 256,
-        maxDisplayBuffer = 512,
         maxTextBuffer = 256;
 
     public LInstruction[] instructions = {};
@@ -484,11 +484,12 @@ public class LExecutor{
             Building build = exec.building(target);
             if(build instanceof LogicDisplayBuild){
                 LogicDisplayBuild d = (LogicDisplayBuild)build;
-                if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
-                    for(int i = 0; i < exec.graphicsBuffer.size; i++){
-                        d.commands.addLast(exec.graphicsBuffer.items[i]);
-                    }
-                }
+
+                //adds a copy of the graphics buffer, since the it can be changed before it gets drawn
+                LongSeq flush = Pools.obtain(LongSeq.class,LongSeq::new);
+                flush.addAll(exec.graphicsBuffer);
+                d.flushes.addLast(flush);
+
                 exec.graphicsBuffer.clear();
             }
         }

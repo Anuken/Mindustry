@@ -6,10 +6,10 @@ import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.pooling.Pools;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.*;
 import mindustry.world.*;
 
 public class LogicDisplay extends Block{
@@ -38,7 +38,7 @@ public class LogicDisplay extends Block{
         public FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
-        public LongQueue commands = new LongQueue(LExecutor.maxDisplayBuffer);
+        public Queue<LongSeq> flushes = new Queue<>();
 
         @Override
         public void draw(){
@@ -53,7 +53,7 @@ public class LogicDisplay extends Block{
                 }
             });
 
-            if(!commands.isEmpty()){
+            if(!flushes.isEmpty()){
                 Draw.draw(Draw.z(), () -> {
                     Tmp.m1.set(Draw.proj());
                     Draw.proj(0, 0, displaySize, displaySize);
@@ -62,23 +62,30 @@ public class LogicDisplay extends Block{
                     Lines.stroke(stroke);
                     Lines.precise(true);
 
-                    while(!commands.isEmpty()){
-                        long c = commands.removeFirst();
-                        byte type = DisplayCmd.type(c);
-                        int x = DisplayCmd.x(c), y = DisplayCmd.y(c),
-                        p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c), p4 = DisplayCmd.p4(c);
+                    while(!flushes.isEmpty()){
+                        LongSeq commands = flushes.removeFirst();
 
-                        switch(type){
-                            case commandClear: Core.graphics.clear(x/255f, y/255f, p1/255f, 1f); break;
-                            case commandLine: Lines.line(x, y, p1, p2); break;
-                            case commandRect: Fill.crect(x, y, p1, p2); break;
-                            case commandLineRect: Lines.rect(x, y, p1, p2); break;
-                            case commandPoly: Fill.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
-                            case commandLinePoly: Lines.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
-                            case commandTriangle: Fill.tri(x, y, p1, p2, p3, p4); break;
-                            case commandColor: this.color = Color.toFloatBits(x, y, p1, p2); Draw.color(this.color); break;
-                            case commandStroke: this.stroke = x; Lines.stroke(x); break;
+                        for(int i = 0; i < commands.size; i++){
+                            long c = commands.get(i);
+                            byte type = DisplayCmd.type(c);
+                            int x = DisplayCmd.x(c), y = DisplayCmd.y(c),
+                            p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c), p4 = DisplayCmd.p4(c);
+
+                            switch(type){
+                                case commandClear: Core.graphics.clear(x/255f, y/255f, p1/255f, 1f); break;
+                                case commandLine: Lines.line(x, y, p1, p2); break;
+                                case commandRect: Fill.crect(x, y, p1, p2); break;
+                                case commandLineRect: Lines.rect(x, y, p1, p2); break;
+                                case commandPoly: Fill.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
+                                case commandLinePoly: Lines.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
+                                case commandTriangle: Fill.tri(x, y, p1, p2, p3, p4); break;
+                                case commandColor: this.color = Color.toFloatBits(x, y, p1, p2); Draw.color(this.color); break;
+                                case commandStroke: this.stroke = x; Lines.stroke(x); break;
+                            }
                         }
+                        //the flushes come from a pool so they need to be freed
+                        commands.clear();
+                        Pools.free(commands);
                     }
 
                     Lines.precise(false);
