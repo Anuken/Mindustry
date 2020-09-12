@@ -174,7 +174,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            boolean preventDuplicates = headless && netServer.admins.getStrict();
+            boolean preventDuplicates = headless && netServer.admins.isStrict();
 
             if(preventDuplicates){
                 if(Groups.player.contains(p -> p.name.trim().equalsIgnoreCase(packet.name.trim()))){
@@ -485,7 +485,7 @@ public class NetServer implements ApplicationListener{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         player.con.sendStream(data);
 
-        Log.debug("Packed @ compressed bytes of world data.", stream.size());
+        Log.debug("Packed @ bytes of world data.", stream.size());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -539,6 +539,7 @@ public class NetServer implements ApplicationListener{
     public static void clientSnapshot(
         Player player,
         int snapshotID,
+        int unitID,
         boolean dead,
         float x, float y,
         float pointerX, float pointerY,
@@ -562,7 +563,7 @@ public class NetServer implements ApplicationListener{
         if(invalid(rotation)) rotation = 0f;
         if(invalid(baseRotation)) baseRotation = 0f;
 
-        boolean verifyPosition = !player.dead() && netServer.admins.getStrict() && headless;
+        boolean verifyPosition = netServer.admins.isStrict() && headless;
 
         if(con.lastReceivedClientTime == 0) con.lastReceivedClientTime = Time.millis() - 16;
 
@@ -580,7 +581,6 @@ public class NetServer implements ApplicationListener{
             boosting = false;
         }
 
-        //TODO these need to be assigned elsewhere
         player.mouseX = pointerX;
         player.mouseY = pointerY;
         player.typing = chatting;
@@ -635,41 +635,37 @@ public class NetServer implements ApplicationListener{
             if(unit.isGrounded()){
                 maxSpeed *= unit.floorSpeedMultiplier();
             }
-            unit.vel.set(xVelocity, yVelocity).limit(maxSpeed);
+
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
-            if(con.lastUnit != unit){
-                con.lastUnit = unit;
-                con.lastPosition.set(unit);
-            }
-
-            //if the player think they're dead their position should be ignored
-            if(dead){
-                x = unit.x;
-                y = unit.y;
-            }
-
-            vector.set(x, y).sub(con.lastPosition);
-            vector.limit(maxMove);
-
-            float prevx = unit.x, prevy = unit.y;
-            unit.set(con.lastPosition);
-            if(!unit.isFlying()){
-                unit.move(vector.x, vector.y);
-            }else{
-                unit.trns(vector.x, vector.y);
-            }
-
-            //set last position after movement
-            con.lastPosition.set(unit);
+            //ignore the position if the player thinks they're dead, or the unit is wrong
+            boolean ignorePosition = dead || unit.id != unitID;
             float newx = unit.x, newy = unit.y;
 
-            if(!verifyPosition){
-                unit.set(prevx, prevy);
-                newx = x;
-                newy = y;
-            }else if(!Mathf.within(x, y, newx, newy, correctDist) && !dead){
-                Call.setPosition(player.con, newx, newy); //teleport and correct position when necessary
+            if(!ignorePosition){
+                unit.vel.set(xVelocity, yVelocity).limit(maxSpeed);
+
+                vector.set(x, y).sub(unit);
+                vector.limit(maxMove);
+
+                float prevx = unit.x, prevy = unit.y;
+                //unit.set(con.lastPosition);
+                if(!unit.isFlying()){
+                    unit.move(vector.x, vector.y);
+                }else{
+                    unit.trns(vector.x, vector.y);
+                }
+
+                newx = unit.x;
+                newy = unit.y;
+
+                if(!verifyPosition){
+                    unit.set(prevx, prevy);
+                    newx = x;
+                    newy = y;
+                }else if(!Mathf.within(x, y, newx, newy, correctDist)){
+                    Call.setPosition(player.con, newx, newy); //teleport and correct position when necessary
+                }
             }
 
             //write sync data to the buffer
@@ -813,7 +809,7 @@ public class NetServer implements ApplicationListener{
 
         short sent = 0;
         for(Building entity : Groups.build){
-            if(!entity.block().sync) continue;
+            if(!entity.block.sync) continue;
             sent ++;
 
             dataStream.writeInt(entity.pos());
@@ -842,7 +838,7 @@ public class NetServer implements ApplicationListener{
         dataStream.writeByte(cores.size);
 
         for(CoreBuild entity : cores){
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.tile.pos());
             entity.items.write(Writes.get(dataStream));
         }
 

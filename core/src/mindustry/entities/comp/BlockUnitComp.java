@@ -18,9 +18,9 @@ abstract class BlockUnitComp implements Unitc{
         this.tile = tile;
 
         //sets up block stats
-        maxHealth(tile.block().health);
+        maxHealth(tile.block.health);
         health(tile.health());
-        hitSize(tile.block().size * tilesize * 0.7f);
+        hitSize(tile.block.size * tilesize * 0.7f);
         set(tile);
     }
 

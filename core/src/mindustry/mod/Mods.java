@@ -425,6 +425,7 @@ public class Mods implements Loadable{
     /** This must be run on the main thread! */
     public void loadScripts(){
         Time.mark();
+        boolean[] any = {false};
 
         try{
             eachEnabled(mod -> {
@@ -438,6 +439,7 @@ public class Mods implements Loadable{
                             if(scripts == null){
                                 scripts = platform.createScripts();
                             }
+                            any[0] = true;
                             scripts.run(mod, main);
                         }catch(Throwable e){
                             Core.app.post(() -> {
@@ -454,7 +456,9 @@ public class Mods implements Loadable{
             content.setCurrentMod(null);
         }
 
-        Log.info("Time to initialize modded scripts: @", Time.elapsed());
+        if(any[0]){
+            Log.info("Time to initialize modded scripts: @", Time.elapsed());
+        }
     }
 
     /** Creates all the content found in mod files. */
@@ -703,14 +707,49 @@ public class Mods implements Loadable{
 
         /** @return whether this mod is supported by the game verison */
         public boolean isSupported(){
-            if(Version.build <= 0 || meta.minGameVersion == null) return true;
-            if(meta.minGameVersion.contains(".")){
-                String[] split = meta.minGameVersion.split("\\.");
+            if(isOutdated()) return false;
+
+            int major = getMinMajor(), minor = getMinMinor();
+
+            if(Version.build <= 0) return true;
+
+            return Version.build >= major && Version.revision >= minor;
+        }
+
+        /** @return whether this mod is outdated, e.g. not compatible with v6. */
+        public boolean isOutdated(){
+            //must be at least 105 to indicate v6 compat
+            return getMinMajor() < 105;
+        }
+
+        public int getMinMajor(){
+            int major = 0;
+
+            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
+
+            if(ver.contains(".")){
+                String[] split = ver.split("\\.");
                 if(split.length == 2){
-                    return Version.build >= Strings.parseInt(split[0], 0) && Version.revision >= Strings.parseInt(split[1], 0);
+                    major = Strings.parseInt(split[0], 0);
+                }
+            }else{
+                major = Strings.parseInt(ver, 0);
+            }
+
+            return major;
+        }
+
+        public int getMinMinor(){
+            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
+
+            if(ver.contains(".")){
+                String[] split = ver.split("\\.");
+                if(split.length == 2){
+                    return Strings.parseInt(split[1], 0);
                 }
             }
-            return Version.build >= Strings.parseInt(meta.minGameVersion, 0);
+
+            return 0;
         }
 
         @Override
@@ -788,7 +827,7 @@ public class Mods implements Loadable{
 
     /** Mod metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, version, main, minGameVersion;
+        public String name, displayName, author, description, version, main, minGameVersion = "0";
         public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;

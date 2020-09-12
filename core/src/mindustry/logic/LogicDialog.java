@@ -7,7 +7,6 @@ import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
-import mindustry.world.blocks.logic.*;
 
 import static mindustry.Vars.*;
 
@@ -21,6 +20,7 @@ public class LogicDialog extends BaseDialog{
         clearChildren();
 
         canvas = new LCanvas();
+        shouldPause = true;
         addCloseButton();
 
         buttons.getCells().first().width(170f);
@@ -75,7 +75,7 @@ public class LogicDialog extends BaseDialog{
             });
             dialog.addCloseButton();
             dialog.show();
-        }).width(170f).disabled(t -> canvas.statements.getChildren().size >= LogicBlock.maxInstructions);
+        }).width(170f).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
 
         add(canvas).grow();
 

@@ -126,7 +126,7 @@ public class Generators{
             Image colors = new Image(content.blocks().size, 1);
 
             for(Block block : content.blocks()){
-                if(block.isAir() || block instanceof BuildBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
+                if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
 
                 block.load();
 

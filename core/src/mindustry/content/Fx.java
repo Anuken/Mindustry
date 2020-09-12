@@ -52,10 +52,11 @@ public class Fx{
         if(!(e.data instanceof Unit)) return;
 
         Unit select = e.data();
+        boolean block = select instanceof BlockUnitc;
 
         mixcol(Pal.accent, 1f);
         alpha(e.fout());
-        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
+        rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type().icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
         Lines.stroke(e.fslope() * 1f);
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);
@@ -900,7 +901,7 @@ public class Fx{
 
     }),
 
-    shootSmallFlame = new Effect(32f, e -> {
+    shootSmallFlame = new Effect(32f, 80f, e -> {
         color(Pal.lightFlame, Pal.darkFlame, Color.gray, e.fin());
 
         randLenVectors(e.id, 8, e.finpow() * 60f, e.rotation, 10f, (x, y) -> {
@@ -909,7 +910,7 @@ public class Fx{
 
     }),
 
-    shootPyraFlame = new Effect(33f, e -> {
+    shootPyraFlame = new Effect(33f, 80f, e -> {
         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
         randLenVectors(e.id, 10, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
@@ -918,7 +919,7 @@ public class Fx{
 
     }),
 
-    shootLiquid = new Effect(40f, e -> {
+    shootLiquid = new Effect(40f, 80f, e -> {
         color(e.color, Color.white, e.fout() / 6f + Mathf.randomSeedRange(e.id, 0.1f));
 
         randLenVectors(e.id, 6, e.finpow() * 60f, e.rotation, 11f, (x, y) -> {

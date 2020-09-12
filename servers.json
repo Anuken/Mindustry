@@ -1,8 +1,5 @@
 [
   {
-    "address": "mindustry.us.to"
-  },
-  {
     "address": "mindustry.indielm.com:1101"
   },
   {
@@ -43,6 +40,9 @@
   },
   {
     "address": "aamindustry.play.ai"
+  },
+  {
+    "address": "aamindustry.play.ai:6568"
   },
   {
     "address": "mindustry.atannergaming.com"

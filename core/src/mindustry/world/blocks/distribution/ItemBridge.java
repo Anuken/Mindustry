@@ -41,7 +41,6 @@ public class ItemBridge extends Block{
         hasItems = true;
         unloadable = false;
         group = BlockGroup.transportation;
-        canOverdrive = false;
         noUpdateDisabled = true;
 
         //point2 config is relative
@@ -134,8 +133,10 @@ public class ItemBridge extends Block{
         public float cycleSpeed = 1f;
 
         @Override
-        public void playerPlaced(){
-            super.playerPlaced();
+        public void playerPlaced(Object config){
+            super.playerPlaced(config);
+
+            if(config != null) return;
 
             Tile link = findLink(tile.x, tile.y);
             if(linkValid(tile, link)){
@@ -215,7 +216,7 @@ public class ItemBridge extends Block{
                 return true;
             }
 
-            if(linkValid(tile, other.tile())){
+            if(linkValid(tile, other.tile)){
                 if(link == other.pos()){
                     configure(-1);
                 }else{
@@ -266,7 +267,7 @@ public class ItemBridge extends Block{
                 Item item = items.take();
                 if(item != null && other.acceptItem(this, item)){
                     other.handleItem(this, item);
-                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
+                    cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f); //TODO this is kinda broken, because lerping only happens on a timer
                 }else{
                     cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
                     if(item != null) items.add(item, 1);
@@ -359,7 +360,7 @@ public class ItemBridge extends Block{
         }
 
         protected boolean linked(Building source){
-            return source instanceof ItemBridgeBuild && linkValid(source.tile(), tile) && ((ItemBridgeBuild)source).link == pos();
+            return source instanceof ItemBridgeBuild && linkValid(source.tile, tile) && ((ItemBridgeBuild)source).link == pos();
         }
 
         @Override
@@ -370,7 +371,7 @@ public class ItemBridge extends Block{
         protected boolean checkDump(Building to){
             Tile other = world.tile(link);
             if(!linkValid(tile, other)){
-                Tile edge = Edges.getFacingEdge(to.tile(), tile);
+                Tile edge = Edges.getFacingEdge(to.tile, tile);
                 int i = relativeTo(edge.x, edge.y);
 
                 IntSetIterator it = incoming.iterator();

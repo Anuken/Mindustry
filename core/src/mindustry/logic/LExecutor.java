@@ -3,6 +3,7 @@ package mindustry.logic;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -15,6 +16,11 @@ import mindustry.world.blocks.logic.MessageBlock.*;
 import static mindustry.Vars.*;
 
 public class LExecutor{
+    public static final int maxInstructions = 1000;
+
+    //for noise operations
+    public static final Simplex noise = new Simplex();
+
     //special variables
     public static final int
         varCounter = 0,
@@ -42,7 +48,8 @@ public class LExecutor{
         vars[varTime].numval = Time.millis();
 
         //reset to start
-        if(vars[varCounter].numval >= instructions.length) vars[varCounter].numval = 0;
+        if(vars[varCounter].numval >= instructions.length
+            || vars[varCounter].numval < 0) vars[varCounter].numval = 0;
 
         if(vars[varCounter].numval < instructions.length){
             instructions[(int)(vars[varCounter].numval++)].run(this);
@@ -252,18 +259,24 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
-            double output = 0;
-
             if(target instanceof Senseable){
+                Senseable se = (Senseable)target;
                 if(sense instanceof Content){
-                    output = ((Senseable)target).sense(((Content)sense));
+                    exec.setnum(to, se.sense(((Content)sense)));
                 }else if(sense instanceof LAccess){
-                    output = ((Senseable)target).sense(((LAccess)sense));
+                    Object objOut = se.senseObject((LAccess)sense);
+
+                    if(objOut == Senseable.noSensed){
+                        //numeric output
+                        exec.setnum(to, se.sense((LAccess)sense));
+                    }else{
+                        //object output
+                        exec.setobj(to, objOut);
+                    }
                 }
+            }else{
+                exec.setnum(to, 0);
             }
-
-            exec.setnum(to, output);
-
         }
     }
 
@@ -396,7 +409,17 @@ public class LExecutor{
             if(op.unary){
                 exec.setnum(dest, op.function1.get(exec.num(a)));
             }else{
-                exec.setnum(dest, op.function2.get(exec.num(a), exec.num(b)));
+                Var va = exec.vars[a];
+                Var vb = exec.vars[b];
+
+                if(op.objFunction2 != null && (va.isobj || vb.isobj)){
+                    //use object function if provided, and one of the variables is an object
+                    exec.setnum(dest, op.objFunction2.get(exec.obj(a), exec.obj(b)));
+                }else{
+                    //otherwise use the numeric function
+                    exec.setnum(dest, op.function2.get(exec.num(a), exec.num(b)));
+                }
+
             }
         }
     }
@@ -490,7 +513,9 @@ public class LExecutor{
             //this should avoid any garbage allocation
             Var v = exec.vars[value];
             if(v.isobj && value != 0){
-                String strValue = v.objval instanceof String ? (String)v.objval : v.objval == null ? "null" :
+                String strValue =
+                    v.objval == null ? "null" :
+                    v.objval instanceof String ? (String)v.objval :
                     v.objval instanceof Content ? "[content]" :
                     v.objval instanceof Building ? "[building]" :
                     v.objval instanceof Unit ? "[unit]" :
@@ -549,8 +574,21 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(address != -1 && op.function.get(exec.num(value), exec.num(compare))){
-                exec.vars[varCounter].numval = address;
+            if(address != -1){
+                Var va = exec.vars[value];
+                Var vb = exec.vars[compare];
+                boolean cmp = false;
+
+                if(op.objFunction != null && (va.isobj || vb.isobj)){
+                    //use object function if provided, and one of the variables is an object
+                    cmp = op.objFunction.get(exec.obj(value), exec.obj(compare));
+                }else{
+                    cmp = op.function.get(exec.num(value), exec.num(compare));
+                }
+
+                if(cmp){
+                    exec.vars[varCounter].numval = address;
+                }
             }
         }
     }

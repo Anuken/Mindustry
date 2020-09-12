@@ -468,6 +468,17 @@ public class EntityProcess extends BaseProcessor{
                                 mbuilder.addStatement("$L = $L", field.name(), field.name() + EntityIO.targetSuf);
                             }
                         }
+
+                        //SPECIAL CASE: method to snap to current position so interpolation doesn't go wild
+                        if(first.name().equals("snapInterpolation")){
+                            mbuilder.addStatement("updateSpacing = 16");
+                            mbuilder.addStatement("lastUpdated = $T.millis()", Time.class);
+                            for(Svar field : syncedFields){
+                                //reset last+current state to target position
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.lastSuf, field.name());
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.targetSuf, field.name());
+                            }
+                        }
                     }
 
                     for(Smethod elem : entry.value){
@@ -631,10 +642,10 @@ public class EntityProcess extends BaseProcessor{
 
             //build mapping class for sync IDs
             TypeSpec.Builder idBuilder = TypeSpec.classBuilder("EntityMapping").addModifiers(Modifier.PUBLIC)
-            .addField(FieldSpec.builder(TypeName.get(Prov[].class), "idMap", Modifier.PRIVATE, Modifier.STATIC).initializer("new Prov[256]").build())
+            .addField(FieldSpec.builder(TypeName.get(Prov[].class), "idMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new Prov[256]").build())
             .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(ObjectMap.class),
                 tname(String.class), tname(Prov.class)),
-                "nameMap", Modifier.PRIVATE, Modifier.STATIC).initializer("new ObjectMap<>()").build())
+                "nameMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new ObjectMap<>()").build())
             .addMethod(MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.get(Prov.class)).addParameter(int.class, "id").addStatement("return idMap[id]").build())
             .addMethod(MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)

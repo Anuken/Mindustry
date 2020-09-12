@@ -134,7 +134,9 @@ public class ResearchDialog extends BaseDialog{
             }
         });
 
-        view.addListener(new ElementGestureListener(){
+        touchable = Touchable.enabled;
+
+        addCaptureListener(new ElementGestureListener(){
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
                 if(view.lastZoom < 0){

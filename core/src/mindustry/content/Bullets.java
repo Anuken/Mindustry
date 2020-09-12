@@ -199,7 +199,7 @@ public class Bullets implements ContentList{
             hitEffect = Fx.flakExplosion;
             splashDamage = 18f;
             splashDamageRadius = 16f;
-            fragBullet = flakGlassFrag;
+            fragBullet = fragGlassFrag;
             fragBullets = 3;
             explodeRange = 20f;
             collidesGround = true;
@@ -275,7 +275,7 @@ public class Bullets implements ContentList{
             shrinkY = 0f;
             drag = -0.01f;
             splashDamageRadius = 28f;
-            splashDamage = 40f;
+            splashDamage = 35f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             lightning = 2;

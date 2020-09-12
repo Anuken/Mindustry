@@ -10,7 +10,7 @@ import mindustry.world.*;
 
 import static mindustry.Vars.world;
 
-public class StaticWall extends Rock{
+public class StaticWall extends Boulder{
     public @Load("@-large") TextureRegion large;
     public TextureRegion[][] split;
 

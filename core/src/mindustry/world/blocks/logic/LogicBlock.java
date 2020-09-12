@@ -16,7 +16,7 @@ import mindustry.logic.LAssembler.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
@@ -25,8 +25,6 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
-    public static final int maxInstructions = 1500;
-
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
@@ -36,6 +34,7 @@ public class LogicBlock extends Block{
         update = true;
         solid = true;
         configurable = true;
+        sync = true;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
@@ -270,7 +269,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str, maxInstructions);
+                    LAssembler asm = LAssembler.assemble(str, LExecutor.maxInstructions);
 
                     //store connections
                     for(LogicLink link : links){
@@ -315,7 +314,7 @@ public class LogicBlock extends Block{
                     e.printStackTrace();
 
                     //handle malformed code and replace it with nothing
-                    executor.load("", maxInstructions);
+                    executor.load("", LExecutor.maxInstructions);
                 }
             }
         }
@@ -414,7 +413,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof BuildEntity);
+            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
         }
 
 

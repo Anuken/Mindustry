@@ -76,6 +76,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public Building init(Tile tile, Team team, boolean shouldAdd, int rotation){
         if(!initialized){
             create(tile.block(), team);
+        }else{
+            if(block.hasPower){
+                //reinit power graph
+                power.graph = new PowerGraph();
+                power.graph.add(base());
+            }
         }
         this.rotation = rotation;
         this.tile = tile;
@@ -697,6 +703,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 other.build.power.links.removeValue(pos());
             }
         }
+        power.links.clear();
     }
 
     public Seq<Building> getPowerConnections(Seq<Building> out){
@@ -812,10 +819,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Called after the block is placed by this client. */
     @CallSuper
-    public void playerPlaced(){
-        if(block.saveConfig && block.lastConfig != null){
-            configure(block.lastConfig);
-        }
+    public void playerPlaced(Object config){
+
     }
 
     /** Called after the block is placed by anyone. */
@@ -831,7 +836,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, base()) && !PowerNode.insulated(other, base())
                     && !other.proximity().contains(this.<Building>base()) &&
                 !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
-                    tempTiles.add(other.tile());
+                    tempTiles.add(other.tile);
                 }
             });
             tempTiles.sort(Structs.comparingFloat(t -> t.dst2(tile)));
@@ -856,7 +861,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** Called when arbitrary configuration is applied to a tile. */
-    public void configured(@Nullable Player player, @Nullable Object value){
+    public void configured(@Nullable Unit builder, @Nullable Object value){
         //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 
@@ -967,7 +972,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             table.row();
             table.table(this::displayConsumption).growX();
 
-            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow");
+            boolean displayFlow = (block.category == Category.distribution || block.category == Category.liquid) && Core.settings.getBool("flow") && block.displayFlow;
 
             if(displayFlow){
                 String ps = " " + StatUnit.perSecond.localized();
@@ -1005,9 +1010,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 if(liquids != null){
                     table.row();
                     table.table(l -> {
-                        l.left();
-                        l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
-                        l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                        boolean[] had = {false};
+
+                        Runnable rebuild = () -> {
+                            l.clearChildren();
+                            l.left();
+                            l.image(() -> liquids.current().icon(Cicon.small)).padRight(3f);
+                            l.label(() -> liquids.getFlowRate() < 0 ? "..." : Strings.fixed(liquids.getFlowRate(), 2) + ps).color(Color.lightGray);
+                        };
+
+                        l.update(() -> {
+                           if(!had[0] && liquids.hadFlow()){
+                               had[0] = true;
+                               rebuild.run();
+                           }
+                        });
                     }).left();
                 }
             }
@@ -1200,6 +1217,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(sensor == LAccess.y) return y;
         if(sensor == LAccess.team) return team.id;
         if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.maxHealth) return maxHealth();
         if(sensor == LAccess.efficiency) return efficiency();
         if(sensor == LAccess.rotation) return rotation;
         if(sensor == LAccess.totalItems && items != null) return items.total();
@@ -1208,11 +1226,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(sensor == LAccess.itemCapacity) return block.itemCapacity;
         if(sensor == LAccess.liquidCapacity) return block.liquidCapacity;
         if(sensor == LAccess.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
-        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getPowerProduced();
-        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getPowerNeeded();
+        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getLastScaledPowerIn() * 60;
+        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getLastScaledPowerOut() * 60;
         if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
-        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getBatteryCapacity();
+        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getLastCapacity();
         return 0;
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.type) return block;
+
+        return noSensed;
     }
 
     @Override

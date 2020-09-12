@@ -56,7 +56,7 @@ public class BlockUnloader extends BlockLoader{
 
         @Override
         public float fraction(){
-            return payload == null ? 0f : 1f - payload.entity.items.total() / (float)payload.entity.block().itemCapacity;
+            return payload == null ? 0f : 1f - payload.entity.items.total() / (float)payload.entity.block.itemCapacity;
         }
 
         @Override

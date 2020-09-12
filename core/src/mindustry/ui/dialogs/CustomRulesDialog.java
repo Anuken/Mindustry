@@ -143,6 +143,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         main.button("@configure",
             () -> loadoutDialog.show(Blocks.coreShard.itemCapacity, rules.loadout,
+                i -> true,
                 () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
                 () -> {}, () -> {}
         )).left().width(300f);
@@ -162,7 +163,8 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("@rules.title.environment");
-        number("@rules.solarpowermultiplier", f -> rules.solarPowerMultiplier = f, () -> rules.solarPowerMultiplier);
+        check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
+        check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
         main.button(b -> {

@@ -75,6 +75,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(sensor == LAccess.totalItems) return stack().amount;
         if(sensor == LAccess.rotation) return rotation;
         if(sensor == LAccess.health) return health;
+        if(sensor == LAccess.maxHealth) return maxHealth;
         if(sensor == LAccess.x) return x;
         if(sensor == LAccess.y) return y;
         if(sensor == LAccess.team) return team.id;
@@ -85,9 +86,22 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.type) return type;
+
+        return noSensed;
+    }
+
+    @Override
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
         return 0;
+    }
+
+    @Override
+    @Replace
+    public boolean canDrown(){
+        return isGrounded() && !hovering && type.canDrown && !(this instanceof WaterMovec);
     }
 
     @Override
@@ -233,7 +247,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //simulate falling down
-        if(dead){
+        if(dead || health <= 0){
             //less drag when dead
             drag = 0.01f;
 

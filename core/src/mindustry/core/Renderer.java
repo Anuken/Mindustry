@@ -271,7 +271,7 @@ public class Renderer implements ApplicationListener{
             float fract = landTime / Fx.coreLand.lifetime;
             Building entity = player.closestCore();
 
-            TextureRegion reg = entity.block().icon(Cicon.full);
+            TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;
             float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
 

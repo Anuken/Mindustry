@@ -37,7 +37,7 @@ public class Vars implements Loadable{
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
     /** Maximum extra padding around deployment schematics. */
-    public static final int maxLoadoutSchematicPad = 4;
+    public static final int maxLoadoutSchematicPad = 5;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
@@ -78,6 +78,8 @@ public class Vars implements Loadable{
     public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
+    /** range for moving items */
+    public static final float itemTransferRange = 220f;
     /** duration of time between turns in ticks */
     public static final float turnDuration = 20 * Time.toMinutes;
     /** turns needed to destroy a sector completely */
@@ -199,8 +201,7 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
 
-    public static
-    Player player;
+    public static Player player;
 
     @Override
     public void loadAsync(){

@@ -30,6 +30,7 @@ public class PayloadConveyor extends Block{
         update = true;
         outputsPayload = true;
         noUpdateDisabled = true;
+        sync = true;
     }
 
     @Override
@@ -43,8 +44,8 @@ public class PayloadConveyor extends Block{
 
         for(int i = 0; i < 4; i++){
             Building other = world.build(x + Geometry.d4x[i] * size, y + Geometry.d4y[i] * size);
-            if(other != null && other.block().outputsPayload && other.block().size == size){
-                Drawf.selected(other.tileX(), other.tileY(), other.block(), Pal.accent);
+            if(other != null && other.block.outputsPayload && other.block.size == size){
+                Drawf.selected(other.tileX(), other.tileY(), other.block, Pal.accent);
             }
         }
     }
@@ -71,13 +72,13 @@ public class PayloadConveyor extends Block{
             //next block must be aligned and of the same size
             if(accept != null && (
                 //same size
-                (accept.block().size == size && tileX() + Geometry.d4(rotation).x * size == accept.tileX() && tileY() + Geometry.d4(rotation).y * size == accept.tileY()) ||
+                (accept.block.size == size && tileX() + Geometry.d4(rotation).x * size == accept.tileX() && tileY() + Geometry.d4(rotation).y * size == accept.tileY()) ||
 
                 //differing sizes
-                (accept.block().size > size &&
+                (accept.block.size > size &&
                     (rotation % 2 == 0 ? //check orientation
-                    Math.abs(accept.y - y) <= (accept.block().size * tilesize - size * tilesize)/2f : //check Y alignment
-                    Math.abs(accept.x - x) <= (accept.block().size * tilesize - size * tilesize)/2f   //check X alignment
+                    Math.abs(accept.y - y) <= (accept.block.size * tilesize - size * tilesize)/2f : //check Y alignment
+                    Math.abs(accept.x - x) <= (accept.block.size * tilesize - size * tilesize)/2f   //check X alignment
                 )))){
                 next = accept;
             }else{
@@ -193,15 +194,18 @@ public class PayloadConveyor extends Block{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
+            if(source == this){
+                return this.item == null && payload.fits();
+            }
             //accepting payloads from units isn't supported
-            return this.item == null && progress <= 5f && source != this && payload.fits();
+            return this.item == null && progress <= 5f && payload.fits();
         }
 
         @Override
         public void handlePayload(Building source, Payload payload){
             this.item = payload;
             this.stepAccepted = curStep();
-            this.itemRotation = source.angleTo(this);
+            this.itemRotation = source == this ? rotdeg() : source.angleTo(this);
             this.animation = 0;
 
             updatePayload();
@@ -220,7 +224,7 @@ public class PayloadConveyor extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            progress = read.f();
+            read.f(); //why is progress written?
             itemRotation = read.f();
             item = Payload.read(read);
         }

@@ -8,24 +8,25 @@ public enum LogicOp{
     mul("*", (a, b) -> a * b),
     div("/", (a, b) -> a / b),
     mod("%", (a, b) -> a % b),
-    equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0),
-    notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1),
+    equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> a == b ? 1 : 0),
+    notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> a != b ? 1 : 0),
     lessThan("<", (a, b) -> a < b ? 1 : 0),
     lessThanEq("<=", (a, b) -> a <= b ? 1 : 0),
     greaterThan(">", (a, b) -> a > b ? 1 : 0),
     greaterThanEq(">=", (a, b) -> a >= b ? 1 : 0),
     pow("^", Math::pow),
-    shl(">>", (a, b) -> (int)a >> (int)b),
-    shr("<<", (a, b) -> (int)a << (int)b),
-    or("or", (a, b) -> (int)a | (int)b),
-    and("and", (a, b) -> (int)a & (int)b),
-    xor("xor", (a, b) -> (int)a ^ (int)b),
+    shl(">>", (a, b) -> (long)a >> (long)b),
+    shr("<<", (a, b) -> (long)a << (long)b),
+    or("or", (a, b) -> (long)a | (long)b),
+    and("and", (a, b) -> (long)a & (long)b),
+    xor("xor", (a, b) -> (long)a ^ (long)b),
     max("max", Math::max),
     min("min", Math::min),
     atan2("atan2", (x, y) -> Mathf.atan2((float)x, (float)y) * Mathf.radDeg),
     dst("dst", (x, y) -> Mathf.dst((float)x, (float)y)),
+    noise("noise", LExecutor.noise::rawNoise2D),
 
-    not("not", a -> ~(int)(a)),
+    not("not", a -> ~(long)(a)),
     abs("abs", a -> Math.abs(a)),
     log("log", Math::log),
     log10("log10", Math::log10),
@@ -41,16 +42,22 @@ public enum LogicOp{
 
     public static final LogicOp[] all = values();
 
+    public final OpObjLambda2 objFunction2;
     public final OpLambda2 function2;
     public final OpLambda1 function1;
     public final boolean unary;
     public final String symbol;
 
     LogicOp(String symbol, OpLambda2 function){
+        this(symbol, function, null);
+    }
+
+    LogicOp(String symbol, OpLambda2 function, OpObjLambda2 objFunction){
         this.symbol = symbol;
         this.function2 = function;
         this.function1 = null;
         this.unary = false;
+        this.objFunction2 = objFunction;
     }
 
     LogicOp(String symbol, OpLambda1 function){
@@ -58,11 +65,16 @@ public enum LogicOp{
         this.function1 = function;
         this.function2 = null;
         this.unary = true;
+        this.objFunction2 = null;
     }
 
     @Override
     public String toString(){
         return symbol;
+    }
+
+    interface OpObjLambda2{
+        double get(Object a, Object b);
     }
 
     interface OpLambda2{

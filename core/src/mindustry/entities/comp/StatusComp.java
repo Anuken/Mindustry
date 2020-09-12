@@ -22,6 +22,8 @@ abstract class StatusComp implements Posc, Flyingc{
 
     @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, armorMultiplier = 1, reloadMultiplier = 1;
 
+    @Import UnitType type;
+
     /** @return damage taken based on status armor multipliers */
     float getShieldDamage(float amount){
         return amount * Mathf.clamp(1f - armorMultiplier / 100f);
@@ -102,7 +104,7 @@ abstract class StatusComp implements Posc, Flyingc{
     @Override
     public void update(){
         Floor floor = floorOn();
-        if(isGrounded()){
+        if(isGrounded() && !type.hovering){
             //apply effect
             apply(floor.status, floor.statusDuration);
         }

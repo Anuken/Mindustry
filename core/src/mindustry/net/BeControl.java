@@ -44,6 +44,17 @@ public class BeControl{
                 }
             }, updateInterval, updateInterval);
         }
+
+        if(System.getProperties().contains("becopy")){
+            try{
+                Fi dest = Fi.get(System.getProperty("becopy"));
+                Fi self = Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+
+                self.copyTo(dest);
+            }catch(Throwable e){
+                e.printStackTrace();
+            }
+        }
     }
 
     /** asynchronously checks for updates. */
@@ -68,13 +79,7 @@ public class BeControl{
             }else{
                 Core.app.post(() -> done.get(false));
             }
-        }, error -> Core.app.post(() -> {
-            if(!headless){
-                ui.showException(error);
-            }else{
-                error.printStackTrace();
-            }
-        }));
+        }, error -> {}); //ignore errors
     }
 
     /** @return whether a new update is available */
@@ -93,14 +98,17 @@ public class BeControl{
                     boolean[] cancel = {false};
                     float[] progress = {0};
                     int[] length = {0};
-                    Fi file = Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+                    Fi file = bebuildDirectory.child("client-be-" + updateBuild + ".jar");
+                    Fi fileDest = System.getProperties().contains("becopy") ?
+                        Fi.get(System.getProperty("becopy")) :
+                        Fi.get(BeControl.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 
                     BaseDialog dialog = new BaseDialog("@be.updating");
                     download(updateUrl, file, i -> length[0] = i, v -> progress[0] = v, () -> cancel[0], () -> {
                         try{
                             Runtime.getRuntime().exec(OS.isMac ?
-                                new String[]{"java", "-XstartOnFirstThread", "-DlastBuild=" + Version.build, "-Dberestart", "-jar", file.absolutePath()} :
-                                new String[]{"java", "-DlastBuild=" + Version.build, "-Dberestart", "-jar", file.absolutePath()}
+                                new String[]{"java", "-XstartOnFirstThread", "-DlastBuild=" + Version.build, "-Dberestart", "-Dbecopy=" + fileDest.absolutePath(), "-jar", file.absolutePath()} :
+                                new String[]{"java", "-DlastBuild=" + Version.build, "-Dberestart", "-Dbecopy=" + fileDest.absolutePath(), "-jar", file.absolutePath()}
                             );
                             System.exit(0);
                         }catch(IOException e){

@@ -56,7 +56,7 @@ public class BlockLoader extends PayloadAcceptor{
         public boolean acceptPayload(Building source, Payload payload){
             return super.acceptPayload(source, payload) &&
                 (payload instanceof BlockPayload) &&
-                ((((BlockPayload)payload).entity.block().hasItems && ((BlockPayload)payload).block().unloadable && ((BlockPayload)payload).block().itemCapacity >= 10)/* ||
+                ((((BlockPayload)payload).entity.block.hasItems && ((BlockPayload)payload).block().unloadable && ((BlockPayload)payload).block().itemCapacity >= 10)/* ||
                 ((BlockPayload)payload).entity.block().hasLiquids && ((BlockPayload)payload).block().liquidCapacity >= 10f)*/);
         }
 
@@ -127,7 +127,7 @@ public class BlockLoader extends PayloadAcceptor{
         }
 
         public float fraction(){
-            return payload == null ? 0f : payload.entity.items.total() / (float)payload.entity.block().itemCapacity;
+            return payload == null ? 0f : payload.entity.items.total() / (float)payload.entity.block.itemCapacity;
         }
 
         public boolean shouldExport(){

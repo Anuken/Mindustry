@@ -182,7 +182,7 @@ public class Control implements ApplicationListener, Loadable{
 
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
+            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effect.shake(5f, 5f, core);
@@ -428,19 +428,12 @@ public class Control implements ApplicationListener, Loadable{
         //just a regular reminder
         if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
             app.post(() -> app.post(() -> {
-                ui.showStartupInfo("[accent]v6[] is currently in [accent]pre-alpha[].\n" +
-                "[lightgray]This means:[]\n" +
-                "- Content is missing\n" +
-                "- [scarlet]Mobile[] is not supported.\n" +
-                "- Most [scarlet]Unit AI[] does not work\n" +
-                "- Many units are [scarlet]missing[] or unfinished\n" +
-                "- The campaign is completely unfinished\n" +
-                "- Everything you see is subject to change or removal." +
-                "\n\nReport bugs or crashes on [accent]Github[].");
+                ui.showStartupInfo("@indevpopup");
             }));
         }
 
-        //play tutorial on stop
+        //play tutorial on start
+        //TODO no tutorial right now
         if(!settings.getBool("playedtutorial", false)){
             //Core.app.post(() -> Core.app.post(this::playTutorial));
         }

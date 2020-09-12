@@ -65,7 +65,7 @@ public class SStats implements SteamUserStatsCallback{
             }
 
             for(Building entity : player.team().cores()){
-                if(!content.items().contains(i -> entity.items.get(i) < entity.block().itemCapacity)){
+                if(!content.items().contains(i -> entity.items.get(i) < entity.block.itemCapacity)){
                     fillCoreAllCampaign.complete();
                     break;
                 }
@@ -109,7 +109,7 @@ public class SStats implements SteamUserStatsCallback{
             if(campaign() && e.unit != null && e.unit.isLocal() && !e.breaking){
                 SStat.blocksBuilt.add();
 
-                if(e.tile.block() == Blocks.router && e.tile.build.proximity().contains(t -> t.block() == Blocks.router)){
+                if(e.tile.block() == Blocks.router && e.tile.build.proximity().contains(t -> t.block == Blocks.router)){
                     chainRouters.complete();
                 }
 
