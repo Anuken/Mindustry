@@ -76,6 +76,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public Building init(Tile tile, Team team, boolean shouldAdd, int rotation){
         if(!initialized){
             create(tile.block(), team);
+        }else{
+            if(block.hasPower){
+                //reinit power graph
+                power.graph = new PowerGraph();
+                power.graph.add(base());
+            }
         }
         this.rotation = rotation;
         this.tile = tile;
@@ -697,6 +703,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 other.build.power.links.removeValue(pos());
             }
         }
+        power.links.clear();
     }
 
     public Seq<Building> getPowerConnections(Seq<Building> out){
