@@ -64,7 +64,7 @@ public class UnitType extends UnlockableContent{
     public boolean flipBackLegs = true;
     public float mechLegMoveScl = 1f;
 
-    public int itemCapacity = 30;
+    public int itemCapacity = -1;
     public int ammoCapacity = 220;
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
@@ -184,6 +184,10 @@ public class UnitType extends UnlockableContent{
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
 
         singleTarget = weapons.size <= 1;
+
+        if(itemCapacity < 0){
+            itemCapacity = Math.max(Mathf.round(hitsize * 7, 20), 20);
+        }
 
         //set up default range
         if(range < 0){

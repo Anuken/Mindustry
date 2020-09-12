@@ -366,7 +366,11 @@ public class TechTree implements ContentList{
                 node(dagger, () -> {
                     node(mace, () -> {
                         node(fortress, () -> {
+                            node(scepter, () -> {
+                                node(reign, () -> {
 
+                                });
+                            });
                         });
                     });
 
@@ -381,7 +385,11 @@ public class TechTree implements ContentList{
                     node(crawler, () -> {
                         node(atrax, () -> {
                             node(spiroct, () -> {
+                                node(arkyid, () -> {
+                                    node(toxopid, () -> {
 
+                                    });
+                                });
                             });
                         });
                     });

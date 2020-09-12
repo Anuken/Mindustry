@@ -1,12 +1,13 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.input.*;
-import arc.struct.*;
 import arc.graphics.*;
+import arc.input.*;
+import arc.math.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ctype.*;
@@ -14,7 +15,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 public class DatabaseDialog extends BaseDialog{
 
@@ -49,8 +50,7 @@ public class DatabaseDialog extends BaseDialog{
             table.table(list -> {
                 list.left();
 
-                int maxWidth = Core.graphics.isPortrait() ? 7 : 13;
-
+                int cols = Mathf.clamp((Core.graphics.getWidth() - 30) / (32 + 10), 1, 18);
                 int count = 0;
 
                 for(int i = 0; i < array.size; i++){
@@ -77,7 +77,7 @@ public class DatabaseDialog extends BaseDialog{
                         image.addListener(new Tooltip(t -> t.background(Tex.button).add(unlock.localizedName)));
                     }
 
-                    if((++count) % maxWidth == 0){
+                    if((++count) % cols == 0){
                         list.row();
                     }
                 }

@@ -419,7 +419,6 @@ public class UnitTypes implements ContentList{
         }};
 
         spiroct = new UnitType("spiroct"){{
-            itemCapacity = 200;
             speed = 0.4f;
             drag = 0.4f;
             hitsize = 12f;
@@ -647,7 +646,7 @@ public class UnitTypes implements ContentList{
                 x = 0f;
                 shootY = 22f;
                 mirror = false;
-                reload = 180;
+                reload = 210;
                 shake = 10f;
                 recoil = 10f;
                 rotateSpeed = 1f;
@@ -656,7 +655,7 @@ public class UnitTypes implements ContentList{
                 rotate = true;
                 occlusion = 30f;
 
-                bullet = new ArtilleryBulletType(3f, 70){{
+                bullet = new ArtilleryBulletType(3f, 50){{
                     hitEffect = Fx.sapExplosion;
                     knockback = 0.8f;
                     lifetime = 80f;
@@ -684,7 +683,7 @@ public class UnitTypes implements ContentList{
                         lifetime = 90f;
                         width = height = 20f;
                         collidesTiles = false;
-                        splashDamageRadius = 90f;
+                        splashDamageRadius = 80f;
                         splashDamage = 45f;
                         backColor = Pal.sapBulletBack;
                         frontColor = lightningColor = Pal.sapBullet;
