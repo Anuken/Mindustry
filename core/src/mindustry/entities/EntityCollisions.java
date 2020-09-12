@@ -137,7 +137,7 @@ public class EntityCollisions{
 
     public static boolean solid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || (tile.solid() && !tile.floor().isAmphibious);
+        return tile == null || tile.solid();
     }
 
     private void checkCollide(Hitboxc a, Hitboxc b){
