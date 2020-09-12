@@ -255,6 +255,7 @@ public class Blocks implements ContentList{
 		quicksand = new Floor("quicksand"){{
 			itemDrop = Items.sand;
             speedMultiplier = 0.3f;
+			navalSpeedMultiplier = 0.6f;
 			variants = 3;
 			status = StatusEffects.sandy;
             statusDuration = 30f;
@@ -273,6 +274,7 @@ public class Blocks implements ContentList{
 		
 		mud = new Floor("mud"){{
             speedMultiplier = 0.6f;
+			navalSpeedMultiplier = 0.7f;
 			variants = 3;
 			status = StatusEffects.muddy;
             statusDuration = 30f;

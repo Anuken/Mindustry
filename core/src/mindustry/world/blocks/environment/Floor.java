@@ -26,6 +26,8 @@ public class Floor extends Block{
     public String edge = "stone";
     /** Multiplies unit velocity by this when walked on. */
     public float speedMultiplier = 1f;
+	/** Multiplies naval unit velocity by this when moving on block. */
+    public float navalSpeedMultiplier = 1f;
     /** Multiplies unit drag by this when walked on. */
     public float dragMultiplier = 1f;
     /** Damage taken per tick on this tile. */
