@@ -197,6 +197,7 @@ public class Block extends UnlockableContent{
     public boolean instantTransfer = false;
 
     protected Prov<Building> entityType = null; //initialized later
+    public Class<T> entityClass = Building.class;
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     protected TextureRegion[] generatedIcons;
@@ -598,6 +599,7 @@ public class Block extends UnlockableContent{
                             throw new RuntimeException(e);
                         }
                     };
+                    entityClass = type;
                 }
 
                 //scan through every superclass looking for it
