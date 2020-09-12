@@ -195,6 +195,8 @@ public class Block extends UnlockableContent{
     public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
+    /** Whether you can rotate this block with Keybind rotateplaced + Scroll Wheel. */
+    public boolean quickRotate = true;
 
     protected Prov<Building> entityType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();

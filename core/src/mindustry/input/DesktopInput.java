@@ -306,7 +306,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.unloadCursor;
             }
 
-            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate && cursor.block().quickRotate){
                 Call.rotateBlock(player, cursor.build, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
