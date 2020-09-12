@@ -103,9 +103,8 @@ public class Floor extends Block{
         super.init();
 
         if(wall == Blocks.air){
-            wall = content.block(name + "Rocks");
-            if(wall == null) wall = content.block(name + "rocks");
-            if(wall == null) wall = content.block(name.replace("darksand", "dune") + "rocks");
+            wall = content.block(name + "-wall");
+            if(wall == null) wall = content.block(name.replace("darksand", "dune") + "-wall");
         }
 
         //keep default value if not found...

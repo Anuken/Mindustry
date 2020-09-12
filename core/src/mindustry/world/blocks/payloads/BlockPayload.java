@@ -14,7 +14,7 @@ public class BlockPayload implements Payload{
     public Building entity;
 
     public BlockPayload(Block block, Team team){
-        this.entity = block.newEntity().create(block, team);
+        this.entity = block.newBuilding().create(block, team);
     }
 
     public BlockPayload(Building entity){

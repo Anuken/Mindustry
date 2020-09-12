@@ -43,6 +43,7 @@ public class PhysicsProcess implements AsyncProcess{
         //find entities without bodies and assign them
         for(Physicsc entity : group){
             boolean grounded = entity.isGrounded();
+            int bits = grounded ? flying.maskBits : ground.maskBits;
 
             if(entity.physref() == null){
                 //add bodies to entities that have none
@@ -66,12 +67,9 @@ public class PhysicsProcess implements AsyncProcess{
             //save last position
             PhysicRef ref = entity.physref();
 
-            if(ref.wasGround != grounded){
-                if(ref.body.getFixtureList().isEmpty()) continue;
-
+            if(ref.body.getFixtureList().any() && ref.body.getFixtureList().first().getFilterData().categoryBits != bits){
                 //set correct filter
                 ref.body.getFixtureList().first().setFilterData(grounded ? ground : flying);
-                ref.wasGround = grounded;
             }
 
             ref.velocity.set(entity.deltaX(), entity.deltaY());
@@ -143,10 +141,9 @@ public class PhysicsProcess implements AsyncProcess{
     }
 
     public static class PhysicRef{
-        Physicsc entity;
-        Body body;
-        boolean wasGround = true;
-        Vec2 lastPosition = new Vec2(), delta = new Vec2(), velocity = new Vec2(), lastVelocity = new Vec2(), position = new Vec2();
+        public Physicsc entity;
+        public Body body;
+        public Vec2 lastPosition = new Vec2(), delta = new Vec2(), velocity = new Vec2(), lastVelocity = new Vec2(), position = new Vec2();
 
         public PhysicRef(Physicsc entity, Body body){
             this.entity = entity;

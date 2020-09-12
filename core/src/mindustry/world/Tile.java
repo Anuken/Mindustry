@@ -45,7 +45,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.block = wall;
 
         //update entity and create it if needed
-        changeEntity(Team.derelict, wall::newEntity, 0);
+        changeEntity(Team.derelict, wall::newBuilding, 0);
         changed();
     }
 
@@ -174,7 +174,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public void setBlock(@NonNull Block type, Team team, int rotation){
-        setBlock(type, team, rotation, type::newEntity);
+        setBlock(type, team, rotation, type::newBuilding);
     }
 
     public void setBlock(@NonNull Block type, Team team, int rotation, Prov<Building> entityprov){

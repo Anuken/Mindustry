@@ -377,7 +377,7 @@ public class ApplicationTests{
         world.tile(length + 1, 0).setBlock(new Block("___"){{
             hasItems = true;
             destructible = true;
-            entityType = () -> new Building(){
+            buildType = () -> new Building(){
                 @Override
                 public void handleItem(Building source, Item item){
                     itemsa[0] ++;

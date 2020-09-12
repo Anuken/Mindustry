@@ -112,6 +112,17 @@ public class UnitType extends UnlockableContent{
         return unit;
     }
 
+    public Unit spawn(Team team, float x, float y){
+        Unit out = create(team);
+        out.set(x, y);
+        out.add();
+        return out;
+    }
+
+    public Unit spawn(float x, float y){
+        return spawn(state.rules.defaultTeam, x, y);
+    }
+
     public boolean hasWeapons(){
         return weapons.size > 0;
     }

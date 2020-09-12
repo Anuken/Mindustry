@@ -196,7 +196,7 @@ public class Block extends UnlockableContent{
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
 
-    protected Prov<Building> entityType = null; //initialized later
+    public Prov<Building> buildType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     protected TextureRegion[] generatedIcons;
@@ -217,7 +217,7 @@ public class Block extends UnlockableContent{
 
     public Block(String name){
         super(name);
-        initEntity();
+        initBuilding();
     }
 
     public void drawBase(Tile tile){
@@ -499,8 +499,8 @@ public class Block extends UnlockableContent{
         return destructible || update;
     }
 
-    public final Building newEntity(){
-        return entityType.get();
+    public final Building newBuilding(){
+        return buildType.get();
     }
 
     public Rect bounds(int x, int y, Rect rect){
@@ -576,7 +576,7 @@ public class Block extends UnlockableContent{
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
-    protected void initEntity(){
+    protected void initBuilding(){
         //attempt to find the first declared class and use it as the entity type
         try{
             Class<?> current = getClass();
@@ -585,13 +585,13 @@ public class Block extends UnlockableContent{
                 current = current.getSuperclass();
             }
 
-            while(entityType == null && Block.class.isAssignableFrom(current)){
+            while(buildType == null && Block.class.isAssignableFrom(current)){
                 //first class that is subclass of Building
                 Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Building.class.isAssignableFrom(t) && !t.isInterface());
                 if(type != null){
                     //these are inner classes, so they have an implicit parameter generated
                     Constructor<? extends Building> cons = (Constructor<? extends Building>)type.getDeclaredConstructor(type.getDeclaringClass());
-                    entityType = () -> {
+                    buildType = () -> {
                         try{
                             return cons.newInstance(this);
                         }catch(Exception e){
@@ -607,9 +607,9 @@ public class Block extends UnlockableContent{
         }catch(Throwable ignored){
         }
 
-        if(entityType == null){
+        if(buildType == null){
             //assign default value
-            entityType = Building::create;
+            buildType = Building::create;
         }
     }
 
