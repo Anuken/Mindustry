@@ -48,6 +48,8 @@ public class Floor extends Block{
     public @Nullable Item itemDrop = null;
     /** whether this block can be drowned in */
     public boolean isLiquid;
+	/** whether this land block permits naval traversal */
+    public boolean isAmphibious;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
     /** Group of blocks that this block does not draw edges on. */

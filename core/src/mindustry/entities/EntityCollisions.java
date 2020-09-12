@@ -132,12 +132,12 @@ public class EntityCollisions{
 
     public static boolean waterSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || (tile.solid() || !tile.floor().isLiquid);
+        return tile == null || ((tile.solid() && !tile.floor().isAmphibious) || (!tile.floor().isLiquid && !tile.floor().isAmphibious));
     }
 
     public static boolean solid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || tile.solid();
+        return tile == null || (tile.solid() && !tile.floor().isAmphibious);
     }
 
     private void checkCollide(Hitboxc a, Hitboxc b){

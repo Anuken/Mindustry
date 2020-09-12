@@ -91,7 +91,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
     public boolean onLiquid(){
         Tile tile = tileOn();
-        return tile != null && tile.floor().isLiquid;
+        return tile != null && (tile.floor().isLiquid || tile.floor().isAmphibious);
     }
 }
 
