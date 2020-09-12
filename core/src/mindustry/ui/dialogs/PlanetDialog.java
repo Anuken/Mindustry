@@ -94,6 +94,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     public void show(Sector sector, CoreBuild launcher){
+        if(launcher == null) return;
+
         this.launcher = launcher;
         selected = null;
         hovered = null;

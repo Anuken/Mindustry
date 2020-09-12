@@ -187,7 +187,7 @@ public class Logic implements ApplicationListener{
         //campaign maps do not have a 'win' state!
         if(state.isCampaign()){
             //gameover only when cores are dead
-            if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
+            if(state.teams.playerCores().size == 0 && !state.gameOver){
                 state.gameOver = true;
                 Events.fire(new GameOverEvent(state.rules.waveTeam));
             }

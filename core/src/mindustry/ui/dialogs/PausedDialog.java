@@ -88,7 +88,7 @@ public class PausedDialog extends BaseDialog{
                 cont.buttonRow("@launchcore", Icon.up, () -> {
                     hide();
                     ui.planet.show(state.getSector(), player.team().core());
-                });
+                }).disabled(b -> player.team().core() == null);
 
                 cont.row();
 

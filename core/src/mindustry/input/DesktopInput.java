@@ -354,7 +354,7 @@ public class DesktopInput extends InputHandler{
 
         table.button(Icon.up, Styles.clearPartiali, () -> {
             ui.planet.show(state.getSector(), player.team().core());
-        }).visible(() -> state.isCampaign()).tooltip("@launchcore");
+        }).visible(() -> state.isCampaign()).tooltip("@launchcore").disabled(b -> player.team().core() == null);
     }
 
     void pollInput(){
