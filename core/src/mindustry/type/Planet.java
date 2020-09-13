@@ -23,6 +23,8 @@ import mindustry.type.Sector.*;
 import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
+    /** Whether or not this planet is listed in the planet access ui**/
+    public boolean accessible = true;
     /** Default spacing between planet orbits in world units. */
     private static final float orbitSpacing = 6f;
     /** intersect() temp var. */
