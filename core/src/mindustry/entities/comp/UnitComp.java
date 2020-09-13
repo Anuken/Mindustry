@@ -67,7 +67,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Replace
     public float clipSize(){
-        return type.region.getWidth() * 2f;
+        return type.region.width * 2f;
     }
 
     @Override

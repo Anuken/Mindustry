@@ -1826,6 +1826,8 @@ public class Blocks implements ContentList{
 
             size = 2;
             range = 80f;
+            itemCapacity = 20;
+            ammoAmount = 5;
 
             consumes.item(Items.copper, 1);
         }};

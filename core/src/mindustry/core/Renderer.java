@@ -28,6 +28,8 @@ public class Renderer implements ApplicationListener{
     public PlanetRenderer planets;
 
     public FrameBuffer effectBuffer = new FrameBuffer();
+    public float laserOpacity = 1f;
+
     private Bloom bloom;
     private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
@@ -61,6 +63,7 @@ public class Renderer implements ApplicationListener{
         Color.white.set(1f, 1f, 1f, 1f);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
+        laserOpacity = Core.settings.getInt("lasersopacity") / 100f;
 
         if(landTime > 0){
             landTime -= Time.delta;
@@ -273,7 +276,7 @@ public class Renderer implements ApplicationListener{
 
             TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;
-            float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
+            float s = reg.width * Draw.scl * scl * 4f * fract;
 
             Draw.color(Pal.lightTrail);
             Draw.rect("circle-shadow", entity.getX(), entity.getY(), s, s);
@@ -285,7 +288,7 @@ public class Renderer implements ApplicationListener{
 
             Draw.color();
             Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.getX(), entity.getY(), reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
+            Draw.rect(reg, entity.getX(), entity.getY(), reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
 
             Draw.reset();
         }

@@ -152,8 +152,8 @@ public class Drawf{
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
         Tmp.v1.trns(rotation, 8f * scale * Draw.scl);
 
-        Draw.rect(edge, x, y, edge.getWidth() * scale * Draw.scl, edge.getHeight() * scale * Draw.scl, rotation + 180);
-        Draw.rect(edge, x2, y2, edge.getWidth() * scale * Draw.scl, edge.getHeight() * scale * Draw.scl, rotation);
+        Draw.rect(edge, x, y, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation + 180);
+        Draw.rect(edge, x2, y2, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation);
 
         Lines.stroke(12f * scale);
         Lines.precise(true);

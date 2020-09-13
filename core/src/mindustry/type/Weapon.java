@@ -59,6 +59,8 @@ public class Weapon{
     public int otherSide = -1;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
+    /** sound played when there is nothing to shoot */
+    public Sound noAmmoSound = Sounds.click;
     /** displayed region (autoloaded) */
     public TextureRegion region;
 

@@ -431,7 +431,7 @@ public class UnitType extends UnlockableContent{
     public void drawOcclusion(Unit unit){
         Draw.color(0, 0, 0, 0.4f);
         float rad = 1.6f;
-        float size = Math.max(region.getWidth(), region.getHeight()) * Draw.scl;
+        float size = Math.max(region.width, region.height) * Draw.scl;
         Draw.rect(occlusionRegion, unit, size * rad, size * rad);
         Draw.color();
     }
@@ -503,7 +503,7 @@ public class UnitType extends UnlockableContent{
 
             float rotation = unit.rotation - 90;
             float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-            float width = weapon.region.getWidth();
+            float width = weapon.region.width;
             float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
             float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
                 wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
@@ -514,7 +514,7 @@ public class UnitType extends UnlockableContent{
 
             Draw.rect(weapon.region, wx, wy,
             width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-            weapon.region.getHeight() * Draw.scl,
+            weapon.region.height * Draw.scl,
             weaponRotation);
         }
 
@@ -552,7 +552,7 @@ public class UnitType extends UnlockableContent{
 
         Leg[] legs = unit.legs();
 
-        float ssize = footRegion.getWidth() * Draw.scl * 1.5f;
+        float ssize = footRegion.width * Draw.scl * 1.5f;
         float rotation = unit.baseRotation();
 
         for(Leg leg : legs){
@@ -586,10 +586,10 @@ public class UnitType extends UnlockableContent{
 
             Draw.rect(footRegion, leg.base.x, leg.base.y, position.angleTo(leg.base));
 
-            Lines.stroke(legRegion.getHeight() * Draw.scl * flips);
+            Lines.stroke(legRegion.height * Draw.scl * flips);
             Lines.line(legRegion, position.x, position.y, leg.joint.x, leg.joint.y, false, 0);
 
-            Lines.stroke(legBaseRegion.getHeight() * Draw.scl * flips);
+            Lines.stroke(legBaseRegion.height * Draw.scl * flips);
             Lines.line(legBaseRegion, leg.joint.x + Tmp.v1.x, leg.joint.y + Tmp.v1.y, leg.base.x, leg.base.y, false, 0);
 
             if(jointRegion.found()){
@@ -627,8 +627,8 @@ public class UnitType extends UnlockableContent{
             Draw.rect(legRegion,
             unit.x + Angles.trnsx(mech.baseRotation(), extension * i - boostTrns, -boostTrns*i),
             unit.y + Angles.trnsy(mech.baseRotation(), extension * i - boostTrns, -boostTrns*i),
-            legRegion.getWidth() * i * Draw.scl,
-            legRegion.getHeight() * Draw.scl - Math.max(-sin * i, 0) * legRegion.getHeight() * 0.5f * Draw.scl,
+            legRegion.width * i * Draw.scl,
+            legRegion.height * Draw.scl - Math.max(-sin * i, 0) * legRegion.height * 0.5f * Draw.scl,
             mech.baseRotation() - 90 + 35f*i*e);
         }
 

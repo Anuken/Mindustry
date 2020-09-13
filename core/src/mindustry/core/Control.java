@@ -193,7 +193,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void loadAsync(){
-        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
+        Draw.scl = 1f / Core.atlas.find("scale_marker").width;
 
         Core.input.setCatch(KeyCode.back, true);
 

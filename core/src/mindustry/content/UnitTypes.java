@@ -1030,6 +1030,7 @@ public class UnitTypes implements ContentList{
 
         mega = new UnitType("mega"){{
 
+            mineTier = 2;
             health = 500;
             speed = 1.8f;
             accel = 0.06f;

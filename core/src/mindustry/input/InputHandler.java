@@ -59,7 +59,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
-    public boolean isBuilding = true, buildWasAutoPaused = false;
+    public boolean isBuilding = true, buildWasAutoPaused = false, wasShooting = false;
     public @Nullable UnitType controlledType;
 
     public @Nullable Schematic lastSchematic;
@@ -352,6 +352,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player.isBuilder()){
             player.builder().updateBuilding(isBuilding);
         }
+
+        if(player.shooting && !wasShooting && player.unit().hasWeapons()){
+            player.unit().type().weapons.first().noAmmoSound.at(player.unit());
+        }
+
+        wasShooting = player.shooting;
 
         if(!player.dead()){
             controlledType = player.unit().type();
@@ -1068,15 +1074,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset + dx*trns,
         y * tilesize + block.offset - 1 + dy*trns,
-        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-        Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+        Core.atlas.find("place-arrow").width * Draw.scl,
+        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset + dx*trns,
         y * tilesize + block.offset + dy*trns,
-        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-        Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+        Core.atlas.find("place-arrow").width * Draw.scl,
+        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){

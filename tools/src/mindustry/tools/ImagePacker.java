@@ -42,28 +42,12 @@ public class ImagePacker{
                 BufferedImage image = ImageIO.read(path.file());
 
                 if(image == null) throw new IOException("image " + path.absolutePath() + " is null for terrible reasons");
-                GenRegion region = new GenRegion(fname, path){
-
-                    @Override
-                    public int getX(){
-                        return 0;
-                    }
-
-                    @Override
-                    public int getY(){
-                        return 0;
-                    }
-
-                    @Override
-                    public int getWidth(){
-                        return image.getWidth();
-                    }
-
-                    @Override
-                    public int getHeight(){
-                        return image.getHeight();
-                    }
-                };
+                GenRegion region = new GenRegion(fname, path){{
+                    width = image.getWidth();
+                    height = image.getHeight();
+                    u2 = v2 = 1f;
+                    u = v = 0f;
+                }};
 
                 regionCache.put(fname, region);
                 imageCache.put(fname, image);
@@ -105,7 +89,7 @@ public class ImagePacker{
             }
         };
 
-        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
+        Draw.scl = 1f / Core.atlas.find("scale_marker").width;
 
         Time.mark();
         Generators.generate();

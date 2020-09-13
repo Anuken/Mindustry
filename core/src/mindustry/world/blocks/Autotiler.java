@@ -31,14 +31,14 @@ public interface Autotiler{
     default TextureRegion topHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
-        region.setWidth(region.getWidth() / 2);
+        region.setWidth(region.width / 2);
         return region;
     }
 
     default TextureRegion botHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
-        int width = region.getWidth();
+        int width = region.width;
         region.setWidth(width / 2);
         region.setX(region.getX() + width);
         return region;

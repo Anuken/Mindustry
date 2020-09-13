@@ -243,7 +243,7 @@ public class MenuRenderer implements Disposable{
 
         TextureRegion icon = flyerType.icon(Cicon.full);
 
-        float size = Math.max(icon.getWidth(), icon.getHeight()) * Draw.scl * 1.6f;
+        float size = Math.max(icon.width, icon.height) * Draw.scl * 1.6f;
 
         flyers((x, y) -> {
             Draw.rect(flyerType.region, x - 12f, y - 13f, flyerRot - 90);

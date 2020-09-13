@@ -98,10 +98,10 @@ public class Fonts{
                 glyph.srcY = 0;
                 glyph.width = size;
                 glyph.height = size;
-                glyph.u = region.getU();
-                glyph.v = region.getV2();
-                glyph.u2 = region.getU2();
-                glyph.v2 = region.getV();
+                glyph.u = region.u;
+                glyph.v = region.v2;
+                glyph.u2 = region.u2;
+                glyph.v2 = region.v;
                 glyph.xoffset = 0;
                 glyph.yoffset = -size;
                 glyph.xadvance = size;

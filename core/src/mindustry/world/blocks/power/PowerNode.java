@@ -146,9 +146,6 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void drawLaser(Team team, float x1, float y1, float x2, float y2, float satisfaction, int size1, int size2){
-        float opacity = Core.settings.getInt("lasersopacity") / 100f;
-        if(Mathf.zero(opacity)) return;
-
         float angle1 = Angles.angle(x1, y1, x2, y2);
         t1.trns(angle1, size1 * tilesize / 2f - 1.5f);
         t2.trns(angle1 + 180f, size2 * tilesize / 2f - 1.5f);
@@ -161,7 +158,7 @@ public class PowerNode extends PowerBlock{
         float fract = 1f - satisfaction;
 
         Draw.color(laserColor1, laserColor2, fract * 0.86f + Mathf.absin(3f, 0.1f));
-        Draw.alpha(opacity);
+        Draw.alpha(renderer.laserOpacity);
         Drawf.laser(team, laser, laserEnd, x1, y1, x2, y2, 0.25f);
         Draw.color();
     }
@@ -386,7 +383,7 @@ public class PowerNode extends PowerBlock{
         public void draw(){
             super.draw();
 
-            if(Core.settings.getInt("lasersopacity") == 0) return;
+            if(Mathf.zero(renderer.laserOpacity)) return;
 
             Draw.z(Layer.power);
 

@@ -110,7 +110,7 @@ public class MapRenderer implements Disposable{
         if(wall != Blocks.air && wall.synthetic()){
             region = !Core.atlas.isFound(wall.editorIcon()) || !center ? Core.atlas.find("clear-editor") : wall.editorIcon();
 
-            float width = region.getWidth() * Draw.scl, height = region.getHeight() * Draw.scl;
+            float width = region.width * Draw.scl, height = region.height * Draw.scl;
 
             mesh.draw(idxWall, region,
             wx * tilesize + wall.offset + (tilesize - width) / 2f,
@@ -130,15 +130,15 @@ public class MapRenderer implements Disposable{
             region = Core.atlas.find("block-border-editor");
         }else if(!wall.synthetic() && wall != Blocks.air && center){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
-            offsetX = tilesize / 2f - region.getWidth() / 2f * Draw.scl;
-            offsetY = tilesize / 2f - region.getHeight() / 2f * Draw.scl;
+            offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
+            offsetY = tilesize / 2f - region.height / 2f * Draw.scl;
         }else if(wall == Blocks.air && !tile.overlay().isAir()){
             region = tile.overlay().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().editorVariantRegions().length - 1)];
         }else{
             region = Core.atlas.find("clear-editor");
         }
 
-        float width = region.getWidth() * Draw.scl, height = region.getHeight() * Draw.scl;
+        float width = region.width * Draw.scl, height = region.height * Draw.scl;
         if(!wall.synthetic() && wall != Blocks.air && !wall.isMultiblock()){
             offsetX = 0;
             offsetY = 0;
