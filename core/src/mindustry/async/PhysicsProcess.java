@@ -43,7 +43,7 @@ public class PhysicsProcess implements AsyncProcess{
         //find entities without bodies and assign them
         for(Physicsc entity : group){
             boolean grounded = entity.isGrounded();
-            int bits = grounded ? flying.maskBits : ground.maskBits;
+            int bits = grounded ? ground.maskBits : flying.maskBits;
 
             if(entity.physref() == null){
                 //add bodies to entities that have none
