@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.Core;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -29,6 +30,7 @@ public class LExecutor{
 
     public static final int
         maxGraphicsBuffer = 256,
+        maxOffscreenFlushes = 16,
         maxTextBuffer = 256;
 
     public LInstruction[] instructions = {};
@@ -485,11 +487,12 @@ public class LExecutor{
             if(build instanceof LogicDisplayBuild){
                 LogicDisplayBuild d = (LogicDisplayBuild)build;
 
-                //adds a copy of the graphics buffer, since the it can be changed before it gets drawn
-                LongSeq flush = Pools.obtain(LongSeq.class,LongSeq::new);
-                flush.addAll(exec.graphicsBuffer);
-                d.flushes.addLast(flush);
-
+                if(Core.graphics.getFrameId() - d.lastFrameUpdated < 10 || d.flushes.size < maxOffscreenFlushes) {
+                    //adds a copy of the graphics buffer, since the it can be changed before it gets drawn
+                    LongSeq flush = Pools.obtain(LongSeq.class,LongSeq::new);
+                    flush.addAll(exec.graphicsBuffer);
+                    d.flushes.addLast(flush);
+                }
                 exec.graphicsBuffer.clear();
             }
         }

@@ -39,6 +39,7 @@ public class LogicDisplay extends Block{
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
         public Queue<LongSeq> flushes = new Queue<>();
+        public long lastFrameUpdated = 0;
 
         @Override
         public void draw(){
@@ -95,6 +96,8 @@ public class LogicDisplay extends Block{
                     Draw.reset();
                 });
             }
+
+            lastFrameUpdated = Core.graphics.getFrameId();
 
             Draw.draw(Draw.z(), () -> {
                 if(buffer != null){
