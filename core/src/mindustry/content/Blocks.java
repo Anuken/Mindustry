@@ -292,11 +292,6 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.water, 0.3f);
         }};
 
-        cliffs = new StaticWall("cliffs"){{
-            variants = 1;
-            fillsTile = false;
-        }};
-
         stoneWall = new StaticWall("stone-wall"){{
             variants = 2;
         }};
@@ -1493,7 +1488,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 4f;
+            powerUse = 4.5f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;

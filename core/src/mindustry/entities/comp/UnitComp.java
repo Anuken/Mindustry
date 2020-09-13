@@ -327,8 +327,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** Actually destroys the unit, removing it and creating explosions. **/
     public void destroy(){
-        float explosiveness = 2f + item().explosiveness * stack().amount;
-        float flammability = item().flammability * stack().amount;
+        float explosiveness = 2f + item().explosiveness * stack().amount / 2f;
+        float flammability = item().flammability * stack().amount / 2f;
         Damage.dynamicExplosion(x, y, flammability, explosiveness, 0f, bounds() / 2f, Pal.darkFlame, state.rules.damageExplosions);
 
         float shake = hitSize / 3f;
