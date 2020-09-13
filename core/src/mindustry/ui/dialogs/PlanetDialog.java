@@ -41,6 +41,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private CoreBuild launcher;
     Mode mode = look;
     private boolean launching;
+    private int accessiblePlanets;
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -244,20 +245,26 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }),
         new Table(t -> {
             t.left();
-            t.pane(Styles.smallPane, pt -> {
-                pt.left();
-                t.add("Planets:");
-                t.row();
-                for(int i = 0; i < content.planets().size; i++){
-                    Planet planet = content.planets().get(i);
-                    if(planet.accessible){
-                        pt.button(planet.localizedName, () -> {
-                            renderer.planets.planet = planet;
-                        }).width(280).growX();
-                        pt.row();
+            for(int i = 0; i < content.planets().size; i++){
+                accessiblePlanets = i;
+            }
+            if(accessiblePlanets > 1) {
+                t.pane(Styles.smallPane, pt -> {
+                    pt.left();
+                    t.add("Planets:");
+                    t.row();
+
+                    for (int i = 0; i < content.planets().size; i++) {
+                        Planet planet = content.planets().get(i);
+                        if (planet.accessible) {
+                            pt.button(planet.localizedName, () -> {
+                                renderer.planets.planet = planet;
+                            }).width(280).growX();
+                            pt.row();
+                        }
                     }
-                }
-            });
+                });
+            }
         })).grow();
     }
 
