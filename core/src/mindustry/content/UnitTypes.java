@@ -103,6 +103,7 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             health = 790;
             armor = 9f;
+            mechFrontSway = 0.55f;
 
             weapons.add(new Weapon("artillery"){{
                 y = 1f;
@@ -131,11 +132,13 @@ public class UnitTypes implements ContentList{
             speed = 0.35f;
             hitsize = 20f;
             rotateSpeed = 2.1f;
-            targetAir = false;
             health = 9000;
             armor = 11f;
-            mechLegMoveScl = 1.3f;
             canDrown = false;
+            mechFrontSway = 1f;
+
+            mechStepParticles = true;
+            mechStepShake = 0.15f;
 
             weapons.add(
             new Weapon("scepter-weapon"){{
@@ -188,11 +191,13 @@ public class UnitTypes implements ContentList{
             speed = 0.35f;
             hitsize = 26f;
             rotateSpeed = 1.65f;
-            targetAir = false;
             health = 24000;
             armor = 14f;
-            mechLegMoveScl = 1.75f;
+            mechStepParticles = true;
+            mechStepShake = 0.75f;
             canDrown = false;
+            mechFrontSway = 1.9f;
+            mechSideSway = 0.6f;
 
             weapons.add(
             new Weapon("reign-weapon"){{
@@ -201,7 +206,7 @@ public class UnitTypes implements ContentList{
                 shootY = 11f;
                 reload = 9f;
                 recoil = 5f;
-                shake = 4f;
+                shake = 2f;
                 ejectEffect = Fx.shellEjectBig;
                 shootSound = Sounds.artillery;
 
@@ -319,6 +324,7 @@ public class UnitTypes implements ContentList{
             landShake = 2f;
 
             commandLimit = 24;
+            mechFrontSway = 0.55f;
 
             speed = 0.4f;
             hitsize = 10f;
@@ -357,7 +363,7 @@ public class UnitTypes implements ContentList{
             speed = 0.85f;
             hitsize = 8f;
             health = 170;
-            sway = 0.25f;
+            mechSideSway = 0.25f;
             range = 40f;
 
             weapons.add(new Weapon(){{

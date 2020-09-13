@@ -48,7 +48,6 @@ public class UnitType extends UnlockableContent{
     public boolean canBoost = false;
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
-    public float sway = 1f;
     public float payloadCapacity = 8;
     public int commandLimit = 24;
     public float visualElevation = -1f;
@@ -62,7 +61,12 @@ public class UnitType extends UnlockableContent{
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
-    public float mechLegMoveScl = 1f;
+
+    public float mechSideSway = 0.54f, mechFrontSway = 0.1f;
+    public float mechStride = -1f;
+    public float mechStepShake = -1f;
+    public boolean mechStepParticles = false;
+    public Color mechLegColor = Pal.darkMetal;
 
     public int itemCapacity = -1;
     public int ammoCapacity = 220;
@@ -133,6 +137,42 @@ public class UnitType extends UnlockableContent{
                 a.update(unit);
             }
         }
+
+        if(unit instanceof Mechc){
+            updateMechEffects(unit);
+        }
+    }
+
+    public void updateMechEffects(Unit unit){
+        Mechc mech = (Mechc)unit;
+
+        float extend = walkExtend((Mechc)unit, false);
+        float base = walkExtend((Mechc)unit, true);
+        float extendScl = base % 1f;
+
+        float lastExtend = mech.walkExtension();
+
+        if(extendScl < lastExtend && base % 2f > 1f){
+            int side = -Mathf.sign(extend);
+            float width = hitsize / 2f * side, length = mechStride * 1.35f;
+
+            float cx = unit.x + Angles.trnsx(mech.baseRotation(), length, width),
+            cy = unit.y + Angles.trnsy(mech.baseRotation(), length, width);
+
+            if(mechStepShake > 0){
+                Effect.shake(mechStepShake, mechStepShake, cx, cy);
+            }
+
+            if(mechStepParticles){
+                Tile tile = world.tileWorld(cx, cy);
+                if(tile != null){
+                    Color color = tile.floor().mapColor;
+                    Fx.unitLand.at(cx, cy, hitsize/8f, color);
+                }
+            }
+        }
+
+        mech.walkExtension(extendScl);
     }
 
     public void landed(Unit unit){}
@@ -206,6 +246,15 @@ public class UnitType extends UnlockableContent{
             for(Weapon weapon : weapons){
                 range = Math.min(range, weapon.bullet.range() + hitsize/2f);
             }
+        }
+
+        if(mechStride < 0){
+            mechStride = 4f + (hitsize-8f)/2.1f;
+        }
+
+        if(mechStepShake < 0){
+            mechStepShake = Mathf.round((hitsize - 11f) / 9f);
+            mechStepParticles = hitsize > 15f;
         }
 
         canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
@@ -286,10 +335,14 @@ public class UnitType extends UnlockableContent{
         Draw.z(z - 0.02f);
 
         if(mech != null){
-            drawMech((Unit & Mechc)mech);
+            drawMech(mech);
 
-            float ft = Mathf.sin(mech.walkTime(), 3f * mechLegMoveScl, 3f);
-            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(ft * 0.18f * sway, 0f, unit.elevation));
+            //side
+            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(walkExtend(mech, true), 2f/Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+
+            //front
+            legOffset.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(walkExtend(mech, true), 1f/Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+
             unit.trns(legOffset.x, legOffset.y);
         }
 
@@ -551,14 +604,15 @@ public class UnitType extends UnlockableContent{
         Draw.reset();
     }
 
-    public <T extends Unit & Mechc> void drawMech(T unit){
+    public void drawMech(Mechc mech){
+        Unit unit = (Unit)mech;
+
         Draw.reset();
 
-        Draw.mixcol(Color.white, unit.hitTime);
-
         float e = unit.elevation;
-        float sin = Mathf.lerp(Mathf.sin(unit.walkTime(), 3f * mechLegMoveScl, 1f), 0f, e);
-        float ft = sin*(2.5f + (unit.hitSize-8f)/2f);
+
+        float sin = Mathf.lerp(Mathf.sin(walkExtend(mech, true), 2f / Mathf.PI, 1f), 0f, e);
+        float extension = walkExtend(mech, false);
         float boostTrns = e * 2f;
 
         Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
@@ -568,13 +622,17 @@ public class UnitType extends UnlockableContent{
         }
 
         for(int i : Mathf.signs){
+            Draw.mixcol(Tmp.c1.set(mechLegColor).lerp(Color.white, Mathf.clamp(unit.hitTime)), Math.max(Math.max(0, i * extension / mechStride), unit.hitTime));
+
             Draw.rect(legRegion,
-            unit.x + Angles.trnsx(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
-            unit.y + Angles.trnsy(unit.baseRotation(), ft * i - boostTrns, -boostTrns*i),
+            unit.x + Angles.trnsx(mech.baseRotation(), extension * i - boostTrns, -boostTrns*i),
+            unit.y + Angles.trnsy(mech.baseRotation(), extension * i - boostTrns, -boostTrns*i),
             legRegion.getWidth() * i * Draw.scl,
             legRegion.getHeight() * Draw.scl - Math.max(-sin * i, 0) * legRegion.getHeight() * 0.5f * Draw.scl,
-            unit.baseRotation() - 90 + 35f*i*e);
+            mech.baseRotation() - 90 + 35f*i*e);
         }
+
+        Draw.mixcol(Color.white, unit.hitTime);
 
         if(floor.isLiquid){
             Draw.color(Color.white, floor.mapColor, unit.drownTime() * 0.4f);
@@ -582,9 +640,23 @@ public class UnitType extends UnlockableContent{
             Draw.color(Color.white);
         }
 
-        Draw.rect(baseRegion, unit, unit.baseRotation() - 90);
+        Draw.rect(baseRegion, unit, mech.baseRotation() - 90);
 
         Draw.mixcol();
+    }
+
+    public float walkExtend(Mechc mech, boolean scaled){
+
+        //now ranges from -maxExtension to maxExtension*3
+        float raw = mech.walkTime() % (mechStride * 4);
+
+        if(scaled) return raw / mechStride;
+
+        if(raw > mechStride*3) raw = raw - mechStride * 4;
+        else if(raw > mechStride*2) raw = mechStride * 2 - raw;
+        else if(raw > mechStride) raw = mechStride * 2 - raw;
+
+        return raw;
     }
 
     public void applyColor(Unit unit){

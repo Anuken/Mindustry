@@ -433,6 +433,7 @@ public class Bullets implements ContentList{
             hitSize = 7f;
             lifetime = 18f;
             pierce = true;
+            collidesAir = false;
             statusDuration = 60f * 4;
             shootEffect = Fx.shootSmallFlame;
             hitEffect = Fx.hitFlameSmall;
@@ -447,6 +448,7 @@ public class Bullets implements ContentList{
             hitSize = 7f;
             lifetime = 18f;
             pierce = true;
+            collidesAir = false;
             statusDuration = 60f * 6;
             shootEffect = Fx.shootPyraFlame;
             hitEffect = Fx.hitFlameSmall;
