@@ -612,7 +612,7 @@ public class UnitType extends UnlockableContent{
         float e = unit.elevation;
 
         float sin = Mathf.lerp(Mathf.sin(walkExtend(mech, true), 2f / Mathf.PI, 1f), 0f, e);
-        float extension = walkExtend(mech, false);
+        float extension = Mathf.lerp(walkExtend(mech, false), 0, e);
         float boostTrns = e * 2f;
 
         Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();

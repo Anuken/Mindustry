@@ -1565,6 +1565,7 @@ public class Blocks implements ContentList{
         segment = new PointDefenseTurret("segment"){{
             requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 40));
 
+            health = 250 * size * size;
             range = 140f;
             hasPower = true;
             consumes.power(3f);
@@ -1572,7 +1573,6 @@ public class Blocks implements ContentList{
             shootLength = 5f;
             bulletDamage = 25f;
             reloadTime = 10f;
-            health = 190 * size * size;
         }};
 
         fuse = new ItemTurret("fuse"){{
