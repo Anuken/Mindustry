@@ -13,6 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import mindustry.Vars;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -240,8 +241,24 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             //TODO localize
             t.top();
             t.label(() -> mode == launch ? "Select Launch Sector" : "Turn " + universe.turn()).style(Styles.outlineLabel).color(Pal.accent);
+        }),
+        new Table(t -> {
+            t.left();
+            t.pane(Styles.smallPane, pt -> {
+                pt.left();
+                t.add("Planets:");
+                t.row();
+                for(int i = 0; i < content.planets().size; i++){
+                    Planet planet = content.planets().get(i);
+                    if(planet.accessible){
+                        pt.button(planet.localizedName, () -> {
+                            renderer.planets.planet = planet;
+                        }).width(280).growX();
+                        pt.row();
+                    }
+                }
+            });
         })).grow();
-
     }
 
     @Override
