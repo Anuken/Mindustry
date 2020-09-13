@@ -488,12 +488,12 @@ public class LExecutor{
                 LogicDisplayBuild d = (LogicDisplayBuild)build;
 
                 if(Core.graphics.getFrameId() - d.lastFrameUpdated < 10 || d.flushes.size < maxOffscreenFlushes) {
-                    //adds a copy of the graphics buffer, since the it can be changed before it gets drawn
-                    LongSeq flush = Pools.obtain(LongSeq.class,LongSeq::new);
-                    flush.addAll(exec.graphicsBuffer);
-                    d.flushes.addLast(flush);
+                    //sends the graphics buffer and gets a blank one
+                    d.flushes.add(exec.graphicsBuffer);
+                    exec.graphicsBuffer = Pools.obtain(LongSeq.class,LongSeq::new);
+                }else{
+                    exec.graphicsBuffer.clear();
                 }
-                exec.graphicsBuffer.clear();
             }
         }
     }
