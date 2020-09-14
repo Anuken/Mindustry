@@ -723,14 +723,16 @@ public class HudFragment extends Fragment{
         },
         new Table(t -> {
             float bw = 40f;
-            float pad = -30;
+            float pad = -20;
             t.margin(0);
 
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
-            t.image(() -> player.icon()).scaling(Scaling.bounded).grow();
+            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(58f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? Pal.ammo : Pal.health);
             });
+
+            t.getChildren().get(1).toFront();
         })).size(120f, 80).padRight(4);
 
         table.labelWrap(() -> {
