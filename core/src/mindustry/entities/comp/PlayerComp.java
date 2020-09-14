@@ -71,6 +71,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit.icon();
     }
 
+    public boolean displayAmmo(){
+        return unit instanceof BlockUnitc || state.rules.unitAmmo;
+    }
+
     public void reset(){
         team = state.rules.defaultTeam;
         admin = typing = false;

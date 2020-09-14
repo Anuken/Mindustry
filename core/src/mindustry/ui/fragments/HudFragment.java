@@ -714,8 +714,8 @@ public class HudFragment extends Fragment{
 
             t.add(new Bar(() -> player.unit().healthf(), true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow();
-            t.add(new Bar(() -> player.dead() ? 0f : state.rules.unitAmmo ? player.unit().ammof() : player.unit().healthf(), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(state.rules.unitAmmo ? Pal.ammo : Pal.health);
+            t.add(new Bar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), false)).width(bw).growY().padLeft(pad).update(b -> {
+                b.color.set(player.displayAmmo() ? Pal.ammo : Pal.health);
             });
         })).size(120f, 80).padRight(4);
 
