@@ -35,6 +35,10 @@ public class HudFragment extends Fragment{
 
     public final PlacementFragment blockfrag = new PlacementFragment();
 
+    //TODO localize
+    public String sectorText = "Out of sector time.";
+    public Seq<Sector> attackedSectors = new Seq<>();
+
     private ImageButton flip;
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
@@ -280,20 +284,27 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.top().visible(() -> state.isOutOfTime());
             t.table(Styles.black5, top -> {
-                //TODO localize when done
-                top.add("Out of sector time.").style(Styles.outlineLabel).color(Pal.accent).update(l -> l.color.a = Mathf.absin(Time.globalTime(), 7f, 1f)).colspan(2);
+                //TODO localize
+                top.add(sectorText).style(Styles.outlineLabel).color(Pal.accent).update(l -> {
+                    l.color.a = Mathf.absin(Time.globalTime(), 7f, 1f);
+                    l.setText(sectorText);
+                }).colspan(2);
                 top.row();
 
                 top.defaults().pad(2).size(150f, 54f);
-                top.button("Next Turn", () -> {
+                //TODO localize
+                top.button("Ignore", () -> {
                     universe.runTurn();
                     state.set(State.playing);
                 });
 
-                top.button("Back to Planet", () -> {
+                //TODO localize
+                top.button("Switch Sectors", () -> {
                     ui.paused.runExitSave();
-                    ui.planet.show();
-                });
+
+
+                    control.playSector(attackedSectors.first());
+                }).disabled(b -> attackedSectors.isEmpty());
             }).margin(8).growX();
         });
 
@@ -339,6 +350,7 @@ public class HudFragment extends Fragment{
         });
 
         //TODO DEBUG: rate table
+        if(false)
         parent.fill(t -> {
             t.bottom().left();
             t.table(Styles.black6, c -> {
