@@ -254,14 +254,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 "height", editor.height()
             ));
             world.endMapLoad();
-            //add entities so they update. is this really needed?
-            for(Tile tile : world.tiles){
-                if(tile.build != null){
-                    tile.build.add();
-                }
-            }
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
             player.clearUnit();
+            Groups.unit.clear();
             logic.play();
         });
     }

@@ -638,28 +638,42 @@ public class HudFragment extends Fragment{
 
         table.marginTop(0).marginBottom(4).marginLeft(4);
 
-        class Bar extends Element{
+        class SideBar extends Element{
             public final Floatp amount;
             public final boolean flip;
+            public final Boolp flash;
 
-            public Bar(Floatp amount, boolean flip){
+            float last, blink, value;
+
+            public SideBar(Floatp amount, Boolp flash, boolean flip){
                 this.amount = amount;
                 this.flip = flip;
+                this.flash = flash;
 
                 setColor(Pal.health);
             }
 
             @Override
             public void draw(){
+                float next = amount.get();
+
+                if(next < last && flash.get()){
+                    blink = 1f;
+                }
+
+                blink = Mathf.lerpDelta(blink, 0f, 0.2f);
+                value = Mathf.lerpDelta(value, next, 0.15f);
+                last = next;
+
                 drawInner(Pal.darkishGray);
 
                 Draw.beginStencil();
 
-                Fill.crect(x, y, width, height * amount.get());
+                Fill.crect(x, y, width, height * value);
 
                 Draw.beginStenciled();
 
-                drawInner(color);
+                drawInner(Tmp.c1.set(color).lerp(Color.white, blink));
 
                 Draw.endStencil();
             }
@@ -712,9 +726,9 @@ public class HudFragment extends Fragment{
             float pad = -30;
             t.margin(0);
 
-            t.add(new Bar(() -> player.unit().healthf(), true)).width(bw).growY().padRight(pad);
+            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow();
-            t.add(new Bar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), false)).width(bw).growY().padLeft(pad).update(b -> {
+            t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? Pal.ammo : Pal.health);
             });
         })).size(120f, 80).padRight(4);
