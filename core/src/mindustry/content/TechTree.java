@@ -208,7 +208,9 @@ public class TechTree implements ContentList{
                                         node(switchBlock, () -> {
                                             node(message, () -> {
                                                 node(logicDisplay, () -> {
+                                                    node(largeLogicDisplay, () -> {
 
+                                                    });
                                                 });
 
                                                 node(memoryCell, () -> {

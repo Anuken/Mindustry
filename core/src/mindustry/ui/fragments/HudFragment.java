@@ -70,10 +70,6 @@ public class HudFragment extends Fragment{
             coreItems.clear();
         });
 
-        Events.on(TurnEvent.class, e -> {
-            ui.announce("[accent][[ Turn " + universe.turn() + " ]");
-        });
-
         //paused table
         parent.fill(t -> {
             t.top().visible(() -> state.isPaused() && !state.isOutOfTime()).touchable = Touchable.disabled;
@@ -293,16 +289,19 @@ public class HudFragment extends Fragment{
 
                 top.defaults().pad(2).size(150f, 54f);
                 //TODO localize
-                top.button("Ignore", () -> {
+                top.button("Skip", () -> {
                     universe.runTurn();
                     state.set(State.playing);
+
+                    //announce turn info only when something is skipped.
+                    ui.announce("[accent][[ Turn " + universe.turn() + " ]\n[scarlet]" + attackedSectors.size + "[lightgray] sector(s) attacked.");
                 });
 
                 //TODO localize
                 top.button("Switch Sectors", () -> {
                     ui.paused.runExitSave();
 
-
+                    //switch to first attacked sector
                     control.playSector(attackedSectors.first());
                 }).disabled(b -> attackedSectors.isEmpty());
             }).margin(8).growX();

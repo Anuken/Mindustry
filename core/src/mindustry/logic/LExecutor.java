@@ -28,7 +28,7 @@ public class LExecutor{
 
     public static final int
         maxGraphicsBuffer = 256,
-        maxDisplayBuffer = 512,
+        maxDisplayBuffer = 1024,
         maxTextBuffer = 256;
 
     public LInstruction[] instructions = {};

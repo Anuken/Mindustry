@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     repairPoint, resupplyPoint,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, logicDisplay, memoryCell,
+    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell,
 
     //campaign
     launchPad, launchPadLarge,
@@ -1136,7 +1136,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
             itemDuration = 90f;
-            consumes.liquid(Liquids.water, 0.05f);
+            consumes.liquid(Liquids.water, 0.06f);
             hasLiquids = true;
             size = 2;
         }};
@@ -1943,18 +1943,26 @@ public class Blocks implements ContentList{
             size = 3;
         }};
 
+        memoryCell = new MemoryBlock("memory-cell"){{
+            requirements(Category.logic, with(Items.graphite, 40, Items.silicon, 40));
+
+            memoryCapacity = 64;
+        }};
+
         logicDisplay = new LogicDisplay("logic-display"){{
-            requirements(Category.logic, with(Items.copper, 200, Items.lead, 120, Items.silicon, 100, Items.metaglass, 50));
+            requirements(Category.logic, with(Items.lead, 100, Items.silicon, 50, Items.metaglass, 50));
 
             displaySize = 80;
 
             size = 3;
         }};
 
-        memoryCell = new MemoryBlock("memory-cell"){{
-            requirements(Category.logic, with(Items.graphite, 40, Items.silicon, 40));
+        largeLogicDisplay = new LogicDisplay("large-logic-display"){{
+            requirements(Category.logic, with(Items.lead, 200, Items.silicon, 150, Items.metaglass, 100, Items.phasefabric, 75));
 
-            memoryCapacity = 64;
+            displaySize = 176;
+
+            size = 6;
         }};
 
         //endregion

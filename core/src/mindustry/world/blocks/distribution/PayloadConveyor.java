@@ -108,6 +108,7 @@ public class PayloadConveyor extends Block{
             if(curStep > step){
                 boolean valid = step != -1;
                 step = curStep;
+                boolean had = item != null;
 
                 if(valid && stepAccepted != curStep && item != null){
                     if(next != null){
@@ -129,7 +130,15 @@ public class PayloadConveyor extends Block{
                         }
                     }
                 }
+
+                if(had && item != null){
+                    moveFailed();
+                }
             }
+        }
+
+        public void moveFailed(){
+
         }
 
         public void moved(){

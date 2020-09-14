@@ -5,7 +5,9 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.blocks.payloads.*;
 
 public class PayloadRouter extends PayloadConveyor{
     public @Load("@-over") TextureRegion overRegion;
@@ -33,13 +35,25 @@ public class PayloadRouter extends PayloadConveyor{
             smoothRot = rotdeg();
         }
 
+        public void pickNext(){
+            if(item != null){
+                int rotations = 0;
+                do{
+                    rotation = (rotation + 1) % 4;
+                    onProximityUpdate();
+                }while((blocked || next == null || !next.acceptPayload(next, item)) && ++rotations < 4);
+            }
+        }
+
         @Override
-        public void moved(){
-            int rotations = 0;
-            do{
-                rotation = (rotation + 1) % 4;
-                onProximityUpdate();
-            }while((blocked || next == null) && ++rotations < 4);
+        public void handlePayload(Building source, Payload payload){
+            super.handlePayload(source, payload);
+            pickNext();
+        }
+
+        @Override
+        public void moveFailed(){
+            pickNext();
         }
 
         @Override

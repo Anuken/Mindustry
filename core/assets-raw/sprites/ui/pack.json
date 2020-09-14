@@ -4,5 +4,6 @@
   flattenPaths: true,
   maxWidth: 4096,
   maxHeight: 4096,
+  minHeight: 2048,
   fast: true
 }
