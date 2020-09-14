@@ -73,6 +73,13 @@ public class LiquidTurret extends Turret{
         }
 
         @Override
+        public void updateTile(){
+            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
+
+            super.updateTile();
+        }
+
+        @Override
         protected void findTarget(){
             if(liquids.current().canExtinguish()){
                 int tr = (int)(range / tilesize);

@@ -1,7 +1,9 @@
 package mindustry.ui.fragments;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.*;
@@ -29,7 +31,7 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
-    private static final float dsize = 47f;
+    private static final float dsize = 65f;
 
     public final PlacementFragment blockfrag = new PlacementFragment();
 
@@ -147,48 +149,54 @@ public class HudFragment extends Fragment{
 
             cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight());
 
-            {
-                wavesMain.visible(() -> shown && !state.isEditor());
-                wavesMain.top().left();
-                Stack stack = new Stack();
-                Button waves = new Button(Styles.waveb);
-                Table btable = new Table().margin(0);
+            wavesMain.visible(() -> shown && !state.isEditor());
+            wavesMain.top().left();
 
-                stack.add(waves);
-                stack.add(btable);
+            wavesMain.table(s -> {
+                //wave info button with text
+                s.add(makeStatusTable()).grow();
 
-                addWaveTable(waves);
-                addPlayButton(btable);
-                wavesMain.add(stack).width(dsize * 5 + 4f);
-                wavesMain.row();
-                wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
-                .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
-                wavesMain.row();
-            }
+                //table with button to skip wave
+                s.button(Icon.play, Styles.righti, 30f, () -> {
+                    if(net.client() && player.admin){
+                        Call.adminRequest(player, AdminAction.wave);
+                    }else if(inLaunchWave()){
+                        ui.showConfirm("@confirm", "@launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
+                    }else{
+                        logic.skipWave();
+                    }
+                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave());
+            }).width(dsize * 5 + 4f);
 
-            {
-                editorMain.table(Tex.buttonEdge4, t -> {
-                    //t.margin(0f);
-                    t.add("@editor.teams").growX().left();
-                    t.row();
-                    t.table(teams -> {
-                        teams.left();
-                        int i = 0;
-                        for(Team team : Team.baseTeams){
-                            ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
-                                .size(50f).margin(6f).get();
-                            button.getImageCell().grow();
-                            button.getStyle().imageUpColor = team.color;
-                            button.update(() -> button.setChecked(player.team() == team));
+            wavesMain.row();
 
-                            if(++i % 3 == 0){
-                                teams.row();
-                            }
+            wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
+            .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
+
+            wavesMain.row();
+
+            editorMain.table(Tex.buttonEdge4, t -> {
+                //t.margin(0f);
+                t.add("@editor.teams").growX().left();
+                t.row();
+                t.table(teams -> {
+                    teams.left();
+                    int i = 0;
+                    for(Team team : Team.baseTeams){
+                        ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
+                            .size(50f).margin(6f).get();
+                        button.getImageCell().grow();
+                        button.getStyle().imageUpColor = team.color;
+                        button.update(() -> button.setChecked(player.team() == team));
+
+                        if(++i % 3 == 0){
+                            teams.row();
                         }
-                    }).left();
-                }).width(dsize * 5 + 4f);
-                editorMain.visible(() -> shown && state.isEditor());
-            }
+                    }
+                }).left();
+            }).width(dsize * 5 + 4f);
+            editorMain.visible(() -> shown && state.isEditor());
+
 
             //fps display
             cont.table(info -> {
@@ -598,7 +606,9 @@ public class HudFragment extends Fragment{
         shown = !shown;
     }
 
-    private void addWaveTable(Button table){
+    private Table makeStatusTable(){
+        Button table = new Button(Styles.waveb);
+
         StringBuilder ibuild = new StringBuilder();
 
         IntFormat wavef = new IntFormat("wave");
@@ -625,6 +635,90 @@ public class HudFragment extends Fragment{
         StringBuilder builder = new StringBuilder();
 
         table.name = "waves";
+
+        table.marginTop(0).marginBottom(4).marginLeft(4);
+
+        class Bar extends Element{
+            public final Floatp amount;
+            public final boolean flip;
+
+            public Bar(Floatp amount, boolean flip){
+                this.amount = amount;
+                this.flip = flip;
+
+                setColor(Pal.health);
+            }
+
+            @Override
+            public void draw(){
+                drawInner(Pal.darkishGray);
+
+                Draw.beginStencil();
+
+                Fill.crect(x, y, width, height * amount.get());
+
+                Draw.beginStenciled();
+
+                drawInner(color);
+
+                Draw.endStencil();
+            }
+
+            void drawInner(Color color){
+                if(flip){
+                    x += width;
+                    width = -width;
+                }
+
+                float stroke = width * 0.35f;
+                float bh = height/2f;
+                Draw.color(color);
+
+                Fill.quad(
+                x, y,
+                x + stroke, y,
+                x + width, y + bh,
+                x + width - stroke, y + bh
+                );
+
+                Fill.quad(
+                x + width, y + bh,
+                x + width - stroke, y + bh,
+                x, y + height,
+                x + stroke, y + height
+                );
+
+                Draw.reset();
+
+                if(flip){
+                    width = -width;
+                    x -= width;
+                }
+            }
+        }
+
+        table.stack(
+        new Element(){
+            @Override
+            public void draw(){
+                Draw.color(Pal.darkerGray);
+                Fill.poly(x + width/2f, y + height/2f, 6, height / Mathf.sqrt3);
+                Draw.reset();
+                Drawf.shadow(x + width/2f, y + height/2f, height * 1.1f);
+            }
+        },
+        new Table(t -> {
+            float bw = 40f;
+            float pad = -30;
+            t.margin(0);
+
+            t.add(new Bar(() -> player.unit().healthf(), true)).width(bw).growY().padRight(pad);
+            t.image(() -> player.icon()).scaling(Scaling.bounded).grow();
+            t.add(new Bar(() -> player.dead() ? 0f : state.rules.unitAmmo ? player.unit().ammof() : player.unit().healthf(), false)).width(bw).growY().padLeft(pad).update(b -> {
+                b.color.set(state.rules.unitAmmo ? Pal.ammo : Pal.health);
+            });
+        })).size(120f, 80).padRight(4);
+
         table.labelWrap(() -> {
             builder.setLength(0);
             builder.append(wavef.get(state.wave));
@@ -671,22 +765,12 @@ public class HudFragment extends Fragment{
                 showLaunchConfirm();
             }
         });
+
+        return table;
     }
 
     private boolean canSkipWave(){
         return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
-    private void addPlayButton(Table table){
-        table.right().button(Icon.play, Styles.righti, 30f, () -> {
-            if(net.client() && player.admin){
-                Call.adminRequest(player, AdminAction.wave);
-            }else if(inLaunchWave()){
-                ui.showConfirm("@confirm", "@launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
-            }else{
-                logic.skipWave();
-            }
-        }).growY().fillX().right().width(40f)
-        .visible(this::canSkipWave);
-    }
 }

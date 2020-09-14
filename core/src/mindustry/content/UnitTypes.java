@@ -362,7 +362,7 @@ public class UnitTypes implements ContentList{
 
             speed = 0.85f;
             hitsize = 8f;
-            health = 170;
+            health = 180;
             mechSideSway = 0.25f;
             range = 40f;
 
@@ -377,7 +377,7 @@ public class UnitTypes implements ContentList{
                     speed = 1f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
-                    splashDamage = 45f;
+                    splashDamage = 55f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;

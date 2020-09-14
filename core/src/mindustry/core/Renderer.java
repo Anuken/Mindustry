@@ -61,6 +61,7 @@ public class Renderer implements ApplicationListener{
     @Override
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
+        Gl.clear(Gl.stencilBufferBit);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
         laserOpacity = Core.settings.getInt("lasersopacity") / 100f;

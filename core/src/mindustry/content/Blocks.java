@@ -1481,14 +1481,14 @@ public class Blocks implements ContentList{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, with(Items.copper, 35, Items.lead, 50));
             shootType = new LightningBulletType(){{
-                damage = 21;
+                damage = 20;
                 lightningLength = 25;
                 collidesAir = false;
             }};
             reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 4.5f;
+            powerUse = 4f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1563,7 +1563,7 @@ public class Blocks implements ContentList{
             health = 250 * size * size;
             range = 140f;
             hasPower = true;
-            consumes.power(3f);
+            consumes.power(8f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 25f;

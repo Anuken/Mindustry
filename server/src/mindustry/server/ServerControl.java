@@ -967,7 +967,9 @@ public class ServerControl implements ApplicationListener{
             for(Player p : players){
                 if(p.con == null) continue;
 
+                boolean wasAdmin = p.admin;
                 p.reset();
+                p.admin = wasAdmin;
                 if(state.rules.pvp){
                     p.team(netServer.assignTeam(p, new SeqIterable<>(players)));
                 }
