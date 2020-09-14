@@ -718,7 +718,7 @@ public class HudFragment extends Fragment{
                 Draw.color(Pal.darkerGray);
                 Fill.poly(x + width/2f, y + height/2f, 6, height / Mathf.sqrt3);
                 Draw.reset();
-                Drawf.shadow(x + width/2f, y + height/2f, height * 1.1f);
+                Drawf.shadow(x + width/2f, y + height/2f, height * 1.13f);
             }
         },
         new Table(t -> {
