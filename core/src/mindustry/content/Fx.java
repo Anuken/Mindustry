@@ -686,6 +686,13 @@ public class Fx{
 
         Fill.circle(e.x, e.y, e.fout() * 1f);
     }),
+	
+	muddy = new Effect(80f, e -> {
+        color(Color.valueOf("432722"));
+        alpha(Mathf.clamp(e.fin() * 2f));
+
+        Fill.circle(e.x, e.y, e.fout() * 1f);
+    }),
 
     sapped = new Effect(40f, e -> {
         color(Pal.sap);
