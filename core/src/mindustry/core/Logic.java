@@ -245,7 +245,8 @@ public class Logic implements ApplicationListener{
             if(entry.cooldown < 0 && !entry.weather.isActive()){
                 float duration = Mathf.random(entry.minDuration, entry.maxDuration);
                 entry.cooldown = duration + Mathf.random(entry.minFrequency, entry.maxFrequency);
-                Call.createWeather(entry.weather, entry.intensity, duration);
+                Tmp.v1.setToRandomDirection();
+                Call.createWeather(entry.weather, entry.intensity, duration, Tmp.v1.x, Tmp.v1.y);
             }
         }
     }

@@ -106,8 +106,8 @@ public abstract class Weather extends UnlockableContent{
     }
 
     @Remote(called = Loc.server)
-    public static void createWeather(Weather weather, float intensity, float duration){
-        weather.create(intensity, duration);
+    public static void createWeather(Weather weather, float intensity, float duration, float windX, float windY){
+        weather.create(intensity, duration).windVector.set(windX, windY);
     }
 
     public static class WeatherEntry{
@@ -148,7 +148,7 @@ public abstract class Weather extends UnlockableContent{
 
         Weather weather;
         float intensity = 1f, opacity = 0f, life, effectTimer;
-        Vec2 windVector = new Vec2();
+        Vec2 windVector = new Vec2().setToRandomDirection();
 
         void init(Weather weather){
             this.weather = weather;
