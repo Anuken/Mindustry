@@ -41,7 +41,8 @@ Server builds are bundled with each released build (in Releases). If you'd rathe
 1. Install the Android SDK [here.](https://developer.android.com/studio#downloads) Make sure you're downloading the "Command line tools only", as Android Studio is not required.
 2. Set the `ANDROID_HOME` environment variable to point to your unzipped Android SDK directory.
 3. Run `gradlew android:assembleDebug` (or `./gradlew` if on linux/mac). This will create an unsigned APK in `android/build/outputs/apk`.
-4. (Optional) To debug the application on a connected phone, do `gradlew android:installDebug android:run`. It is **highly recommended** to use IntelliJ for this instead.
+
+To debug the application on a connected phone, run `gradlew android:installDebug android:run`.
 
 ##### Troubleshooting
 

@@ -23,6 +23,6 @@ public abstract class ConsumeLiquidBase extends Consume{
     }
 
     protected float use(Building entity){
-        return Math.min(amount * entity.delta(), entity.block().liquidCapacity);
+        return Math.min(amount * entity.delta(), entity.block.liquidCapacity);
     }
 }

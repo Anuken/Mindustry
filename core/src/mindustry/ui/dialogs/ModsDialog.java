@@ -162,11 +162,17 @@ public class ModsDialog extends BaseDialog{
                             }}).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
 
                             title.table(text -> {
-                                text.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+                                boolean hideDisabled = !mod.isSupported() || mod.hasUnmetDependencies() || mod.hasContentErrors();
+
+                                text.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
                                     .wrap().top().width(300f).growX().left();
 
                                 text.row();
-                                if(!mod.isSupported()){
+
+                                if(mod.isOutdated()){
+                                    text.labelWrap("@mod.outdated").growX();
+                                    text.row();
+                                }else if(!mod.isSupported()){
                                     text.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
                                     text.row();
                                 }else if(mod.hasUnmetDependencies()){

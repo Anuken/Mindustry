@@ -485,7 +485,7 @@ public class NetServer implements ApplicationListener{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         player.con.sendStream(data);
 
-        Log.debug("Packed @ invalid world data.", stream.size());
+        Log.debug("Packed @ bytes of world data.", stream.size());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -809,7 +809,7 @@ public class NetServer implements ApplicationListener{
 
         short sent = 0;
         for(Building entity : Groups.build){
-            if(!entity.block().sync) continue;
+            if(!entity.block.sync) continue;
             sent ++;
 
             dataStream.writeInt(entity.pos());
@@ -838,7 +838,7 @@ public class NetServer implements ApplicationListener{
         dataStream.writeByte(cores.size);
 
         for(CoreBuild entity : cores){
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.tile.pos());
             entity.items.write(Writes.get(dataStream));
         }
 

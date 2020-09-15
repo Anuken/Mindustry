@@ -16,16 +16,6 @@ public class UnitPayload implements Payload{
     }
 
     @Override
-    public boolean fits(){
-        return unit.hitSize <= 16f;
-    }
-
-    @Override
-    public boolean canBeTaken(Payloadc picker){
-        return unit.hitSize < picker.hitSize();
-    }
-
-    @Override
     public void write(Writes write){
         write.b(payloadUnit);
         write.b(unit.classId());
@@ -36,6 +26,11 @@ public class UnitPayload implements Payload{
     public void set(float x, float y, float rotation){
         unit.set(x, y);
         unit.rotation(rotation);
+    }
+
+    @Override
+    public float size(){
+        return unit.hitSize;
     }
 
     @Override

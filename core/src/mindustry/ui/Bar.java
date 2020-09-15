@@ -80,11 +80,11 @@ public class Bar extends Element{
         Drawable top = Tex.barTop;
         float topWidth = width * value;
 
-        if(topWidth > Core.atlas.find("bar-top").getWidth()){
+        if(topWidth > Core.atlas.find("bar-top").width){
             top.draw(x, y, topWidth, height);
         }else{
             if(ScissorStack.push(scissor.set(x, y, topWidth, height))){
-                top.draw(x, y, Core.atlas.find("bar-top").getWidth(), height);
+                top.draw(x, y, Core.atlas.find("bar-top").width, height);
                 ScissorStack.pop();
             }
         }

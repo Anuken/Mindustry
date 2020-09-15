@@ -51,7 +51,7 @@ public class Edges{
     }
 
     public static Tile getFacingEdge(Building tile, Building other){
-        return getFacingEdge(tile.block(), tile.tileX(), tile.tileY(), other.tile());
+        return getFacingEdge(tile.block, tile.tileX(), tile.tileY(), other.tile());
     }
 
     public static Tile getFacingEdge(Tile tile, Tile other){

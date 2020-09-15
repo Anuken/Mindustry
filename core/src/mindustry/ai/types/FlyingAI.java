@@ -12,14 +12,6 @@ public class FlyingAI extends AIController{
 
     @Override
     public void updateMovement(){
-        if(unit.moving()){
-            unit.lookAt(unit.vel.angle());
-        }
-
-        if(unit.isFlying()){
-            unit.wobble();
-        }
-
         if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
             if(unit.type().weapons.first().rotate){
                 moveTo(target, unit.range() * 0.8f);

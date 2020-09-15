@@ -38,7 +38,8 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient @Nullable NetConnection con;
 
     @ReadOnly Team team = Team.sharded;
-    @SyncLocal boolean admin, typing, shooting, boosting;
+    @SyncLocal boolean typing, shooting, boosting;
+    boolean admin;
     @SyncLocal float mouseX, mouseY;
     String name = "noname";
     Color color = new Color();
@@ -68,6 +69,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         if(dead()) return core() == null ? UnitTypes.alpha.icon(Cicon.full) : ((CoreBlock)core().block).unitType.icon(Cicon.full);
 
         return unit.icon();
+    }
+
+    public boolean displayAmmo(){
+        return unit instanceof BlockUnitc || state.rules.unitAmmo;
     }
 
     public void reset(){

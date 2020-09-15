@@ -31,7 +31,7 @@ import mindustry.type.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -59,7 +59,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
-    public boolean isBuilding = true, buildWasAutoPaused = false;
+    public boolean isBuilding = true, buildWasAutoPaused = false, wasShooting = false;
     public @Nullable UnitType controlledType;
 
     public @Nullable Schematic lastSchematic;
@@ -105,58 +105,107 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.builder().removeBuild(x, y, breaking);
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void pickupUnitPayload(Player player, Unit target){
+    @Remote(targets = Loc.both, called = Loc.server)
+    public static void requestUnitPayload(Player player, Unit target){
         if(player == null) return;
 
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
-        if(target.isAI() && target.isGrounded() && pay.payloads().size < unit.type().payloadCapacity
-            && target.mass() < unit.mass()
-            && target.within(unit, unit.type().hitsize * 1.5f + target.type().hitsize)){
-            pay.pickup(target);
+        if(target.isAI() && target.isGrounded() && pay.canPickup(target)
+        && target.within(unit, unit.type().hitsize * 2f + target.type().hitsize * 2f)){
+            Call.pickedUnitPayload(player, target);
         }
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void pickupBlockPayload(Player player, Building tile){
+    @Remote(targets = Loc.both, called = Loc.server)
+    public static void requestBlockPayload(Player player, Building tile){
         if(player == null) return;
 
         Unit unit = player.unit();
         Payloadc pay = (Payloadc)unit;
 
-        if(tile != null && tile.team == unit.team && pay.payloads().size < unit.type().payloadCapacity
-            && unit.within(tile, tilesize * tile.block.size * 1.2f)){
+        if(tile != null && tile.team == unit.team
+        && unit.within(tile, tilesize * tile.block.size * 1.2f + tilesize * 5f)){
             //pick up block directly
-            if(tile.block().buildVisibility != BuildVisibility.hidden && tile.block().size <= 2 && tile.canPickup()){
-                pay.pickup(tile);
+            if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
+                Call.pickedBlockPayload(player, tile, true);
             }else{ //pick up block payload
                 Payload current = tile.getPayload();
-                if(current != null && current.canBeTaken(pay)){
-                    Payload taken = tile.takePayload();
-                    if(taken != null){
-                        pay.addPayload(taken);
-                        Fx.unitPickup.at(tile);
-                    }
+                if(current != null && pay.canPickupPayload(current)){
+                    Call.pickedBlockPayload(player, tile, false);
                 }
             }
         }
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
-    public static void dropPayload(Player player, float x, float y){
+    @Remote(targets = Loc.server, called = Loc.server)
+    public static void pickedUnitPayload(Player player, Unit target){
+        if(player == null || target == null || !(player.unit() instanceof Payloadc)){
+            if(target != null){
+                target.remove();
+            }
+            return;
+        }
+
+        ((Payloadc)player.unit()).pickup(target);
+    }
+
+    @Remote(targets = Loc.server, called = Loc.server)
+    public static void pickedBlockPayload(Player player, Building tile, boolean onGround){
+        if(player == null || tile == null || !(player.unit() instanceof Payloadc)){
+            if(tile != null && onGround){
+                Fx.unitPickup.at(tile);
+                tile.tile.remove();
+            }
+            return;
+        }
+
+        Unit unit = player.unit();
+        Payloadc pay = (Payloadc)unit;
+
+        if(onGround){
+            if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
+                pay.pickup(tile);
+            }else{
+                Fx.unitPickup.at(tile);
+                tile.tile.remove();
+            }
+        }else{
+            Payload current = tile.getPayload();
+            if(current != null && pay.canPickupPayload(current)){
+                Payload taken = tile.takePayload();
+                if(taken != null){
+                    pay.addPayload(taken);
+                    Fx.unitPickup.at(tile);
+                }
+            }
+        }
+    }
+
+    @Remote(targets = Loc.both, called = Loc.server)
+    public static void requestDropPayload(Player player, float x, float y){
+        if(player == null || net.client()) return;
+
+        Payloadc pay = (Payloadc)player.unit();
+
+        //apply margin of error
+        Tmp.v1.set(x, y).sub(pay).limit(tilesize * 4f).add(pay);
+        float cx = Tmp.v1.x, cy = Tmp.v1.y;
+
+        Call.payloadDropped(player, cx, cy);
+    }
+
+    @Remote(called = Loc.server, targets = Loc.server)
+    public static void payloadDropped(Player player, float x, float y){
         if(player == null) return;
 
         Payloadc pay = (Payloadc)player.unit();
 
-        //allow a slight margin of error
-        if(pay.within(x, y, tilesize * 2f)){
-            float prevx = pay.x(), prevy = pay.y();
-            pay.set(x, y);
-            pay.dropLastPayload();
-            pay.set(prevx, prevy);
-        }
+        float prevx = pay.x(), prevy = pay.y();
+        pay.set(x, y);
+        pay.dropLastPayload();
+        pay.set(prevx, prevy);
     }
 
     @Remote(targets = Loc.client, called = Loc.server)
@@ -173,6 +222,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
     public static void rotateBlock(Player player, Building tile, boolean direction){
+        if(tile == null) return;
+
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.rotate, tile.tile(), action -> action.rotation = Mathf.mod(tile.rotation + Mathf.sign(direction), 4)))){
             throw new ValidateException(player, "Player cannot rotate a block.");
@@ -185,10 +236,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building tile){
-        if(player == null || tile == null) return;
+        if(player == null || tile == null || !player.within(tile, buildingRange)) return;
 
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile(), action -> {
+            !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile, action -> {
                 action.itemAmount = player.unit().stack.amount;
                 action.item = player.unit().item();
             }))){
@@ -215,11 +266,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
-    public static void tileConfig(Player player, Building tile, @Nullable Object value){
+    public static void tileConfig(@Nullable Player player, Building tile, @Nullable Object value){
         if(tile == null) return;
         if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.configure, tile.tile(), action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
-        tile.configured(player, value);
+            !netServer.admins.allowAction(player, ActionType.configure, tile.tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
+        tile.configured(player == null || player.dead() ? null : player.unit(), value);
         Core.app.post(() -> Events.fire(new ConfigEvent(tile, player, value)));
     }
 
@@ -302,6 +353,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.builder().updateBuilding(isBuilding);
         }
 
+        if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && player.unit().ammo <= 0){
+            player.unit().type().weapons.first().noAmmoSound.at(player.unit());
+        }
+
+        wasShooting = player.shooting;
+
         if(!player.dead()){
             controlledType = player.unit().type();
         }
@@ -337,16 +394,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(!(unit instanceof Payloadc)) return;
         Payloadc pay = (Payloadc)unit;
 
-        if(pay.payloads().size >= unit.type().payloadCapacity) return;
-
-        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && u.mass() < unit.mass() && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
         if(target != null){
-            Call.pickupUnitPayload(player, target);
-        }else if(!pay.hasPayload()){
+            Call.requestUnitPayload(player, target);
+        }else{
             Building tile = world.buildWorld(pay.x(), pay.y());
 
             if(tile != null && tile.team == unit.team){
-                Call.pickupBlockPayload(player, tile);
+                Call.requestBlockPayload(player, tile);
             }
         }
     }
@@ -354,10 +409,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void tryDropPayload(){
         Unit unit = player.unit();
         if(!(unit instanceof Payloadc)) return;
-        Payloadc pay = (Payloadc)unit;
 
-        Call.dropPayload(player, player.x, player.y);
-        pay.dropLastPayload();
+        Call.requestDropPayload(player, player.x, player.y);
     }
 
     public float getMouseX(){
@@ -408,7 +461,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public boolean requestMatches(BuildPlan request){
         Tile tile = world.tile(request.x, request.y);
-        return tile != null && tile.block() instanceof BuildBlock && tile.<BuildEntity>bc().cblock == request.block;
+        return tile != null && tile.block() instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == request.block;
     }
 
     public void drawBreaking(int x, int y){
@@ -552,7 +605,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return selectRequests.find(test);
     }
 
-    protected void drawBreakSelection(int x1, int y1, int x2, int y2){
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2, int maxLength){
         NormalizeDrawResult result = Placement.normalizeDrawArea(Blocks.air, x1, y1, x2, y2, false, maxLength, 1f);
         NormalizeResult dresult = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
 
@@ -597,6 +650,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Lines.rect(result.x, result.y - 1, result.x2 - result.x, result.y2 - result.y);
         Draw.color(Pal.remove);
         Lines.rect(result.x, result.y, result.x2 - result.x, result.y2 - result.y);
+    }
+
+    protected void drawBreakSelection(int x1, int y1, int x2, int y2){
+        drawBreakSelection(x1, y1, x2, y2, maxLength);
     }
 
     protected void drawSelection(int x1, int y1, int x2, int y2, int maxLength){
@@ -645,13 +702,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     protected void drawRequest(BuildPlan request){
         request.block.drawRequest(request, allRequests(), validPlace(request.x, request.y, request.block, request.rotation));
-
-        if(request.block.saveConfig && request.block.lastConfig != null && !request.hasConfig){
-            Object conf = request.config;
-            request.config = request.block.lastConfig;
-            request.block.drawRequestConfig(request, allRequests());
-            request.config = conf;
-        }
     }
 
     /** Draws a placement icon for a specific block. */
@@ -667,7 +717,17 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     /** Remove everything from the queue in a selection. */
+    protected void removeSelection(int x1, int y1, int x2, int y2, int maxLength){
+        removeSelection(x1, y1, x2, y2, false, maxLength);
+    }
+
+    /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
+        removeSelection(x1, y1, x2, y2, false, maxLength);
+    }
+
+    /** Remove everything from the queue in a selection. */
+    protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush, int maxLength){
         NormalizeResult result = Placement.normalizeArea(x1, y1, x2, y2, rotation, false, maxLength);
         for(int x = 0; x <= Math.abs(result.x2 - result.x); x++){
             for(int y = 0; y <= Math.abs(result.y2 - result.y); y++){
@@ -720,7 +780,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lineRequests.clear();
         iterateLine(x1, y1, x2, y2, l -> {
             rotation = l.rotation;
-            BuildPlan req = new BuildPlan(l.x, l.y, l.rotation, block);
+            BuildPlan req = new BuildPlan(l.x, l.y, l.rotation, block, block.nextConfig());
             req.animScale = 1f;
             lineRequests.add(req);
         });
@@ -749,7 +809,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         boolean consumed = false, showedInventory = false;
 
         //check if tapped block is configurable
-        if(tile.block().configurable && tile.interactable(player.team())){
+        if(tile.block.configurable && tile.interactable(player.team())){
             consumed = true;
             if(((!frag.config.isShown() && tile.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
@@ -776,10 +836,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //consume tap event if necessary
-        if(tile.interactable(player.team()) && tile.block().consumesTap){
+        if(tile.interactable(player.team()) && tile.block.consumesTap){
             consumed = true;
-        }else if(tile.interactable(player.team()) && tile.block().synthetic() && !consumed){
-            if(tile.block().hasItems && tile.items.total() > 0){
+        }else if(tile.interactable(player.team()) && tile.block.synthetic() && !consumed){
+            if(tile.block.hasItems && tile.items.total() > 0){
                 frag.inv.showFor(tile);
                 consumed = true;
                 showedInventory = true;
@@ -949,7 +1009,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         ItemStack stack = player.unit().stack;
 
-        if(tile != null && tile.acceptStack(stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block().hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
+        if(tile != null && tile.acceptStack(stack.item, stack.amount, player.unit()) > 0 && tile.interactable(player.team()) && tile.block.hasItems && player.unit().stack().amount > 0 && tile.interactable(player.team())){
             Call.transferInventory(player, tile);
         }else{
             Call.dropItem(player.angleTo(x, y));
@@ -993,13 +1053,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(req != null){
             player.builder().plans().remove(req);
         }
-        player.builder().addBuild(new BuildPlan(x, y, rotation, block));
+        player.builder().addBuild(new BuildPlan(x, y, rotation, block, block.nextConfig()));
     }
 
     public void breakBlock(int x, int y){
         Tile tile = world.tile(x, y);
-        //TODO hacky
-        if(tile != null && tile.build != null) tile = tile.build.tile();
+        if(tile != null && tile.build != null) tile = tile.build.tile;
         player.builder().addBuild(new BuildPlan(tile.x, tile.y));
     }
 
@@ -1015,15 +1074,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset + dx*trns,
         y * tilesize + block.offset - 1 + dy*trns,
-        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-        Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+        Core.atlas.find("place-arrow").width * Draw.scl,
+        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset + dx*trns,
         y * tilesize + block.offset + dy*trns,
-        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-        Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+        Core.atlas.find("place-arrow").width * Draw.scl,
+        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){

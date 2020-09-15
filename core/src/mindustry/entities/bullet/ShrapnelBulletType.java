@@ -25,6 +25,7 @@ public class ShrapnelBulletType extends BulletType{
         despawnEffect = Fx.none;
         pierce = true;
         keepVelocity = false;
+        hittable = false;
     }
 
     @Override

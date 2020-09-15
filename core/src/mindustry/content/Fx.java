@@ -36,7 +36,7 @@ public class Fx{
         TextureRegion region = unit.icon(Cicon.full);
 
         rect(region, e.x, e.y,
-            region.getWidth() * Draw.scl * scl, region.getHeight() * Draw.scl * scl, 180f);
+            region.width * Draw.scl * scl, region.height * Draw.scl * scl, 180f);
 
     }),
 

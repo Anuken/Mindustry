@@ -61,7 +61,7 @@ abstract class HitboxComp implements Posc, QuadTreeObject{
     }
 
     public void hitboxTile(Rect rect){
-        float scale = 0.66f;
-        rect.setCentered(x, y, hitSize * scale, hitSize * scale);
+        float size = hitSize * 0.66f;
+        rect.setCentered(x, y, size, size);
     }
 }

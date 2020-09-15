@@ -181,6 +181,12 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public boolean canPickup(){
+            //cores can never be picked up
+            return false;
+        }
+
+        @Override
         public void drawLight(){
             Drawf.light(team, x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
         }
@@ -204,7 +210,7 @@ public class CoreBlock extends StorageBlock{
             }
             state.teams.registerCore(this);
 
-            storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) && owns(e) ? e.block().itemCapacity : 0);
+            storageCapacity = itemCapacity + proximity().sum(e -> isContainer(e) && owns(e) ? e.block.itemCapacity : 0);
             proximity.each(e -> isContainer(e) && owns(e), t -> {
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
@@ -212,7 +218,7 @@ public class CoreBlock extends StorageBlock{
 
             for(Building other : state.teams.cores(team)){
                 if(other.tile() == tile) continue;
-                storageCapacity += other.block().itemCapacity + other.proximity().sum(e -> isContainer(e) && owns(other, e) ? e.block().itemCapacity : 0);
+                storageCapacity += other.block.itemCapacity + other.proximity().sum(e -> isContainer(e) && owns(other, e) ? e.block.itemCapacity : 0);
             }
 
             if(!world.isGenerating()){
@@ -232,7 +238,7 @@ public class CoreBlock extends StorageBlock{
             Cons<Building> outline = t -> {
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];
-                    float offset = -Math.max(t.block().size - 1, 0) / 2f * tilesize;
+                    float offset = -Math.max(t.block.size - 1, 0) / 2f * tilesize;
                     Draw.rect("block-select", t.x + offset * p.x, t.y + offset * p.y, i * 90);
                 }
             };

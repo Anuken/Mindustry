@@ -55,9 +55,22 @@ public class Universe{
 
     public void displayTimeEnd(){
         if(!headless){
-            state.set(State.paused);
+            //check if any sectors are under attack to display this
+            Seq<Sector> attacked = state.getSector().planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed());
 
-            ui.announce("Next turn incoming.");
+            if(attacked.any()){
+                state.set(State.paused);
+
+                //TODO localize
+                String text = attacked.size > 1 ? attacked.size + " sectors attacked." : "Sector " + attacked.first().id + " under attack.";
+
+                ui.hudfrag.sectorText = text;
+                ui.hudfrag.attackedSectors = attacked;
+                ui.announce(text);
+            }else{
+                //autorun next turn
+                universe.runTurn();
+            }
         }
     }
 

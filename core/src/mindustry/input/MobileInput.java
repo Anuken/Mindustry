@@ -558,7 +558,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
-        Tile linked = cursor.build == null ? cursor : cursor.build.tile();
+        Tile linked = cursor.build == null ? cursor : cursor.build.tile;
 
         if(!player.dead()){
             checkTargets(worldx, worldy);
@@ -569,7 +569,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             removeRequest(getRequest(cursor));
         }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
             //add to selection queue if it's a valid place position
-            selectRequests.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block));
+            selectRequests.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block, block.nextConfig()));
         }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasRequest(linked)){
             //add to selection queue if it's a valid BREAK position
             selectRequests.add(new BuildPlan(linked.x, linked.y));

@@ -8,6 +8,7 @@ import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
@@ -36,6 +37,12 @@ public class LAssembler{
 
         for(Liquid liquid : Vars.content.liquids()){
             putConst("@" + liquid.name, liquid);
+        }
+
+        for(Block block : Vars.content.blocks()){
+            if(block.synthetic()){
+                putConst("@" + block.name, block);
+            }
         }
 
         //store sensor constants
@@ -81,6 +88,8 @@ public class LAssembler{
 
             if(index++ > max) break;
 
+            line = line.replace("\t", "").trim();
+            
             try{
                 String[] arr;
 

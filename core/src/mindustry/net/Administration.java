@@ -27,20 +27,9 @@ public class Administration{
 
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    private IntIntMap lastPlaced = new IntIntMap();
 
     public Administration(){
         load();
-
-        Events.on(ResetEvent.class, e -> lastPlaced = new IntIntMap());
-
-        //keep track of who placed what on the server
-        Events.on(BlockBuildEndEvent.class, e -> {
-            //players should be able to configure their own tiles
-            if(net.server() && e.unit != null && e.unit.isPlayer()){
-                lastPlaced.put(e.tile.pos(), e.unit.getPlayer().id());
-            }
-        });
 
         //anti-spam
         addChatFilter((player, message) -> {
@@ -79,12 +68,6 @@ public class Administration{
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
                 Config.antiSpam.bool()){
-
-                //make sure players can configure their own stuff, e.g. in schematics - but only once.
-                if(lastPlaced.get(action.tile.pos(), -1) == action.player.id()){
-                    lastPlaced.remove(action.tile.pos());
-                    return true;
-                }
 
                 Ratekeeper rate = action.player.getInfo().rate;
                 if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){

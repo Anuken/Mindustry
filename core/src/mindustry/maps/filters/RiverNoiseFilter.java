@@ -11,7 +11,7 @@ import static mindustry.maps.filters.FilterOption.wallsOnly;
 
 public class RiverNoiseFilter extends GenerateFilter{
     float scl = 40, threshold = 0f, threshold2 = 0.1f;
-    Block floor = Blocks.water, floor2 = Blocks.deepwater, block = Blocks.sandRocks;
+    Block floor = Blocks.water, floor2 = Blocks.deepwater, block = Blocks.sandWall;
 
     @Override
     public FilterOption[] options(){

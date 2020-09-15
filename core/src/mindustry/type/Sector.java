@@ -32,6 +32,7 @@ public class Sector{
     public @Nullable SaveSlot save;
     public @Nullable SectorPreset preset;
 
+    /** Number 0-1 indicating the difficulty based on nearby bases. */
     public float baseCoverage;
 
     //TODO implement a dynamic launch period
@@ -390,6 +391,8 @@ public class Sector{
         /** Has an enemy base. */
         base,
         /** Has spore weather. */
-        spores
+        spores,
+        /** Path from core to spawns requires traversing water. */
+        navalPath
     }
 }

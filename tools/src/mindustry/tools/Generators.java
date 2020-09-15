@@ -126,7 +126,7 @@ public class Generators{
             Image colors = new Image(content.blocks().size, 1);
 
             for(Block block : content.blocks()){
-                if(block.isAir() || block instanceof BuildBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
+                if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
 
                 block.load();
 
@@ -172,7 +172,7 @@ public class Generators{
                         int radius = 4;
                         GenRegion region = (GenRegion)regions[regions.length - 1];
                         Image base = ImagePacker.get(region);
-                        Image out = last = new Image(region.getWidth(), region.getHeight());
+                        Image out = last = new Image(region.width, region.height);
                         for(int x = 0; x < out.width; x++){
                             for(int y = 0; y < out.height; y++){
 
@@ -330,7 +330,7 @@ public class Generators{
                     image.save(type.name + "-cell");
                 }
 
-                Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
+                Image cell = new Image(type.cellRegion.width, type.cellRegion.height);
                 cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
 
                 image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
@@ -339,8 +339,8 @@ public class Generators{
                     weapon.load();
 
                     image.draw(weapon.region,
-                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.getWidth() / 2f),
-                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
+                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
                     weapon.flipSprite, false);
                 }
 

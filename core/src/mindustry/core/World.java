@@ -105,7 +105,9 @@ public class World{
     public Tile tileBuilding(int x, int y){
         Tile tile = tiles.get(x, y);
         if(tile == null) return null;
-        if(tile.build != null) return tile.build.tile();
+        if(tile.build != null){
+            return tile.build.tile();
+        }
         return tile;
     }
 
@@ -185,16 +187,12 @@ public class World{
                 continue;
             }
 
-            tile.updateOcclusion();
-
             if(tile.build != null){
                 tile.build.updateProximity();
             }
         }
 
-        if(!headless){
-            addDarkness(tiles);
-        }
+        addDarkness(tiles);
 
         Groups.resize(-finalWorldBounds, -finalWorldBounds, tiles.width * tilesize + finalWorldBounds * 2, tiles.height * tilesize + finalWorldBounds * 2);
 

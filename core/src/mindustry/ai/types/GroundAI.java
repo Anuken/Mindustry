@@ -51,6 +51,7 @@ public class GroundAI extends AIController{
 
         if(!Units.invalidateTarget(target, unit, unit.range())){
             if(unit.type().hasWeapons()){
+                //TODO certain units should not look at the target, e.g. ships
                 unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
             }
         }else if(unit.moving()){

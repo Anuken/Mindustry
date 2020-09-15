@@ -1,7 +1,6 @@
 package mindustry.entities.comp;
 
 import arc.graphics.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
@@ -22,10 +21,7 @@ abstract class StatusComp implements Posc, Flyingc{
 
     @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, armorMultiplier = 1, reloadMultiplier = 1;
 
-    /** @return damage taken based on status armor multipliers */
-    float getShieldDamage(float amount){
-        return amount * Mathf.clamp(1f - armorMultiplier / 100f);
-    }
+    @Import UnitType type;
 
     /** Apply a status effect for 1 tick (for permanent effects) **/
     void apply(StatusEffect effect){
@@ -102,7 +98,7 @@ abstract class StatusComp implements Posc, Flyingc{
     @Override
     public void update(){
         Floor floor = floorOn();
-        if(isGrounded()){
+        if(isGrounded() && !type.hovering){
             //apply effect
             apply(floor.status, floor.statusDuration);
         }

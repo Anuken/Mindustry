@@ -31,6 +31,7 @@ public class TractorBeamTurret extends Block{
     public float scaledForce = 0f;
     public float damage = 0f;
     public boolean targetAir = true, targetGround = false;
+    public Color laserColor = Color.white;
 
     public TractorBeamTurret(String name){
         super(name);
@@ -60,7 +61,7 @@ public class TractorBeamTurret extends Block{
         stats.add(BlockStat.damage, damage * 60f, StatUnit.perSecond);
     }
 
-    public class TractorBeamEntity extends Building{
+    public class TractorBeamBuild extends Building{
         public float rotation = 90;
         public @Nullable Unit target;
         public float lastX, lastY, strength;
@@ -113,7 +114,7 @@ public class TractorBeamTurret extends Block{
                 float ang = angleTo(lastX, lastY);
                 float len = 5f;
 
-                Draw.mixcol(Color.white, Mathf.absin(4f, 0.6f));
+                Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
 
                 Drawf.laser(team, laser, laserEnd,
                 x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),

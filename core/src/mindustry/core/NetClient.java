@@ -338,6 +338,8 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
         state.rules = rules;
+        //campaign is not valid in multiplayer
+        state.rules.sector = null;
     }
 
     @Remote(variants = Variant.both)

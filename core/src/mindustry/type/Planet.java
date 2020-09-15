@@ -205,7 +205,7 @@ public class Planet extends UnlockableContent{
                 sum += 2f;
             }
 
-            sector.baseCoverage = sum;
+            sector.baseCoverage = Mathf.clamp(sum / 5f);
         }
     }
 

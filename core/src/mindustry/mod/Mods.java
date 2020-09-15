@@ -192,10 +192,10 @@ public class Mods implements Loadable{
 
     private PageType getPage(AtlasRegion region){
         return
-            region.getTexture() == Core.atlas.find("white").getTexture() ? PageType.main :
-            region.getTexture() == Core.atlas.find("stone1").getTexture() ? PageType.environment :
-            region.getTexture() == Core.atlas.find("clear-editor").getTexture() ? PageType.editor :
-            region.getTexture() == Core.atlas.find("whiteui").getTexture() ? PageType.ui :
+            region.texture == Core.atlas.find("white").texture ? PageType.main :
+            region.texture == Core.atlas.find("stone1").texture ? PageType.environment :
+            region.texture == Core.atlas.find("clear-editor").texture ? PageType.editor :
+            region.texture == Core.atlas.find("whiteui").texture ? PageType.ui :
             PageType.main;
     }
 
@@ -707,14 +707,49 @@ public class Mods implements Loadable{
 
         /** @return whether this mod is supported by the game verison */
         public boolean isSupported(){
-            if(Version.build <= 0 || meta.minGameVersion == null) return true;
-            if(meta.minGameVersion.contains(".")){
-                String[] split = meta.minGameVersion.split("\\.");
+            if(isOutdated()) return false;
+
+            int major = getMinMajor(), minor = getMinMinor();
+
+            if(Version.build <= 0) return true;
+
+            return Version.build >= major && Version.revision >= minor;
+        }
+
+        /** @return whether this mod is outdated, e.g. not compatible with v6. */
+        public boolean isOutdated(){
+            //must be at least 105 to indicate v6 compat
+            return getMinMajor() < 105;
+        }
+
+        public int getMinMajor(){
+            int major = 0;
+
+            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
+
+            if(ver.contains(".")){
+                String[] split = ver.split("\\.");
                 if(split.length == 2){
-                    return Version.build >= Strings.parseInt(split[0], 0) && Version.revision >= Strings.parseInt(split[1], 0);
+                    major = Strings.parseInt(split[0], 0);
+                }
+            }else{
+                major = Strings.parseInt(ver, 0);
+            }
+
+            return major;
+        }
+
+        public int getMinMinor(){
+            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
+
+            if(ver.contains(".")){
+                String[] split = ver.split("\\.");
+                if(split.length == 2){
+                    return Strings.parseInt(split[1], 0);
                 }
             }
-            return Version.build >= Strings.parseInt(meta.minGameVersion, 0);
+
+            return 0;
         }
 
         @Override
@@ -792,7 +827,7 @@ public class Mods implements Loadable{
 
     /** Mod metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, version, main, minGameVersion;
+        public String name, displayName, author, description, version, main, minGameVersion = "0";
         public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;

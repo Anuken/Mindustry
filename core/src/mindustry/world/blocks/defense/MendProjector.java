@@ -77,7 +77,7 @@ public class MendProjector extends Block{
 
                 indexer.eachBlock(this, realRange, other -> other.damaged(), other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
-                    Fx.healBlockFull.at(other.x, other.y, other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
                 });
             }
         }

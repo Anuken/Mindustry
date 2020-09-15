@@ -16,6 +16,8 @@ import static mindustry.Vars.*;
 public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
     protected static final int timerTarget = 0;
+    protected static final int timerTarget2 = 1;
+    protected static final int timerTarget3 = 2;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
@@ -27,10 +29,12 @@ public class AIController implements UnitController{
 
     {
         timer.reset(0, Mathf.random(40f));
+        timer.reset(1, Mathf.random(60f));
     }
 
     @Override
     public void updateUnit(){
+        updateVisuals();
         updateTargeting();
         updateMovement();
     }
@@ -39,13 +43,23 @@ public class AIController implements UnitController{
         return unit.team.data().command;
     }
 
+    protected void updateVisuals(){
+
+        if(unit.isFlying()){
+            unit.wobble();
+
+            if(unit.moving()){
+                unit.lookAt(unit.vel.angle());
+            }
+        }
+    }
+
     protected void updateMovement(){
 
     }
 
     protected void updateTargeting(){
         if(unit.hasWeapons()){
-
             updateWeapons();
         }
     }

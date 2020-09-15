@@ -15,14 +15,6 @@ public class MinerAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(unit.moving()){
-            unit.lookAt(unit.vel.angle());
-        }
-
-        if(unit.isFlying()){
-            unit.wobble();
-        }
-
         Building core = unit.closestCore();
 
         if(!(unit instanceof Minerc) || core == null) return;
@@ -39,6 +31,7 @@ public class MinerAI extends AIController{
             //core full of the target item, do nothing
             if(targetItem != null && core.acceptStack(targetItem, 1, unit) == 0){
                 unit.clearItem();
+                miner.mineTile(null);
                 return;
             }
 
@@ -63,6 +56,8 @@ public class MinerAI extends AIController{
                 }
             }
         }else{
+            miner.mineTile(null);
+
             if(unit.stack.amount == 0){
                 mining = true;
                 return;

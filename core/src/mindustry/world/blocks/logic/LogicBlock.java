@@ -16,7 +16,7 @@ import mindustry.logic.LAssembler.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
@@ -34,7 +34,6 @@ public class LogicBlock extends Block{
         update = true;
         solid = true;
         configurable = true;
-        sync = true;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
@@ -69,7 +68,7 @@ public class LogicBlock extends Block{
         if(name.contains("-")){
             String[] split = name.split("-");
             //filter out 'large' at the end of block names
-            if(split.length >= 2 && split[split.length - 1].equals("large")){
+            if(split.length >= 2 && (split[split.length - 1].equals("large") || Strings.canParseFloat(split[split.length - 1]))){
                 name = split[split.length - 2];
             }else{
                 name = split[split.length - 1];
@@ -413,7 +412,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof BuildEntity);
+            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
         }
 
 

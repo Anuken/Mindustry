@@ -81,12 +81,12 @@ class Image{
 
     /** Draws a region at the center. */
     void drawCenter(TextureRegion region){
-        draw(region, (width - region.getWidth()) / 2, (height - region.getHeight()) / 2, false, false);
+        draw(region, (width - region.width) / 2, (height - region.height) / 2, false, false);
     }
 
     /** Draws a region at the center. */
     void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
-        draw(region, (width - region.getWidth()) / 2, (height - region.getHeight()) / 2, flipx, flipy);
+        draw(region, (width - region.width) / 2, (height - region.height) / 2, flipx, flipy);
     }
 
     void drawScaled(Image image){
@@ -114,12 +114,12 @@ class Image{
 
         graphics.drawImage(ImagePacker.get(region).image,
         x, y,
-        x + region.getWidth(),
-        y + region.getHeight(),
-        (flipx ? region.getWidth() : 0) + ofx,
-        (flipy ? region.getHeight() : 0) + ofy,
-        (flipx ? 0 : region.getWidth()) + ofx,
-        (flipy ? 0 : region.getHeight()) + ofy,
+        x + region.width,
+        y + region.height,
+        (flipx ? region.width : 0) + ofx,
+        (flipy ? region.height : 0) + ofy,
+        (flipx ? 0 : region.width) + ofx,
+        (flipy ? 0 : region.height) + ofy,
         null);
     }
 

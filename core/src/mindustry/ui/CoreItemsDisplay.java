@@ -39,7 +39,8 @@ public class CoreItemsDisplay extends Table{
         for(Item item : content.items()){
             if(usedItems.contains(item)){
                 image(item.icon(Cicon.small)).padRight(3);
-                label(() -> core == null ? "0" : UI.formatAmount(core.items.get(item))).padRight(3);
+                //TODO leaks garbage
+                label(() -> core == null ? "0" : UI.formatAmount(core.items.get(item))).padRight(3).left();
 
                 if(++i % 4 == 0){
                     row();
