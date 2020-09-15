@@ -274,7 +274,7 @@ public class PayloadConveyor extends Block{
             boolean overlaps = Intersector.intersectRectangles(bounds, sprite, over);
 
             TextureRegion out = Tmp.tr1;
-            out.set(region.getTexture());
+            out.set(region.texture);
 
             if(overlaps){
                 float w = region.u2 - region.u;

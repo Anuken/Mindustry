@@ -192,10 +192,10 @@ public class Mods implements Loadable{
 
     private PageType getPage(AtlasRegion region){
         return
-            region.getTexture() == Core.atlas.find("white").getTexture() ? PageType.main :
-            region.getTexture() == Core.atlas.find("stone1").getTexture() ? PageType.environment :
-            region.getTexture() == Core.atlas.find("clear-editor").getTexture() ? PageType.editor :
-            region.getTexture() == Core.atlas.find("whiteui").getTexture() ? PageType.ui :
+            region.texture == Core.atlas.find("white").texture ? PageType.main :
+            region.texture == Core.atlas.find("stone1").texture ? PageType.environment :
+            region.texture == Core.atlas.find("clear-editor").texture ? PageType.editor :
+            region.texture == Core.atlas.find("whiteui").texture ? PageType.ui :
             PageType.main;
     }
 

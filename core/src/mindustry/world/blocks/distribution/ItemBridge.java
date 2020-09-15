@@ -61,11 +61,17 @@ public class ItemBridge extends Block{
         if(otherReq == null) return;
 
         Lines.stroke(8f);
-        Lines.line(bridgeRegion,
-        req.drawx(),
-        req.drawy(),
-        otherReq.drawx(),
-        otherReq.drawy(), false, -tilesize / 2f);
+
+        Tmp.v1.set(otherReq.drawx(), otherReq.drawx()).sub(req.drawx(), req.drawy()).setLength(-tilesize/2f);
+
+        Lines.line(
+        bridgeRegion,
+        req.drawx() + Tmp.v1.x,
+        req.drawy() + Tmp.v1.y,
+        otherReq.drawx() - Tmp.v1.x,
+        otherReq.drawy() - Tmp.v1.y, false
+        );
+
         Draw.rect(arrowRegion, (req.drawx() + otherReq.drawx()) / 2f, (req.drawy() + otherReq.drawy()) / 2f,
             Angles.angle(req.drawx(), req.drawy(), otherReq.drawx(), otherReq.drawy()));
     }
@@ -296,11 +302,14 @@ public class ItemBridge extends Block{
             Draw.rect(endRegion, other.drawx(), other.drawy(), i * 90 + 270);
 
             Lines.stroke(8f);
+
+            Tmp.v1.set(x, y).sub(other.worldx(), other.worldy()).setLength(-tilesize/2f);
+
             Lines.line(bridgeRegion,
-            x,
-            y,
-            other.worldx(),
-            other.worldy(), false, -tilesize / 2f);
+            x + Tmp.v1.x,
+            y + Tmp.v1.y,
+            other.worldx() - Tmp.v1.x,
+            other.worldy() - Tmp.v1.y, false);
 
             int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
 

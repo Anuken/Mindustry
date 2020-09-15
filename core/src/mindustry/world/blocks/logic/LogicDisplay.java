@@ -67,7 +67,6 @@ public class LogicDisplay extends Block{
                     buffer.begin();
                     Draw.color(color);
                     Lines.stroke(stroke);
-                    Lines.precise(true);
 
                     while(!commands.isEmpty()){
                         long c = commands.removeFirst();
@@ -87,8 +86,6 @@ public class LogicDisplay extends Block{
                             case commandStroke: this.stroke = x; Lines.stroke(x); break;
                         }
                     }
-
-                    Lines.precise(false);
 
                     buffer.end();
                     Draw.proj(Tmp.m1);

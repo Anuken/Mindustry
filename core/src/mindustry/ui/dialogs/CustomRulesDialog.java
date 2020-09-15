@@ -160,6 +160,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
+        check("@rules.buildai", b -> rules.waveTeam.rules().ai = b, () -> rules.waveTeam.rules().ai);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("@rules.title.environment");

@@ -24,7 +24,7 @@ public class MapRenderer implements Disposable{
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;
-        this.texture = Core.atlas.find("clear-editor").getTexture();
+        this.texture = Core.atlas.find("clear-editor").texture;
     }
 
     public void resize(int width, int height){

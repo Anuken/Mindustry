@@ -206,7 +206,7 @@ public class Weathers implements ContentList{
 
                 float scale = 1f / 2000f;
                 float scroll = Time.time() * scale;
-                Tmp.tr1.setTexture(noise);
+                Tmp.tr1.texture = noise;
                 Core.camera.bounds(Tmp.r1);
                 Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
                 Tmp.tr1.scroll(-xspeed * scroll, -yspeed * scroll);
@@ -287,7 +287,7 @@ public class Weathers implements ContentList{
 
                 float scale = 1f / 2000f;
                 float scroll = Time.time() * scale;
-                Tmp.tr1.setTexture(noise);
+                Tmp.tr1.texture = noise;
                 Core.camera.bounds(Tmp.r1);
                 Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
                 Tmp.tr1.scroll(-xspeed * scroll, -yspeed * scroll);

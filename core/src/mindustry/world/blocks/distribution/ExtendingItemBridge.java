@@ -45,7 +45,7 @@ public class ExtendingItemBridge extends ItemBridge{
             x + Geometry.d4[i].x * tilesize / 2f,
             y + Geometry.d4[i].y * tilesize / 2f,
             x + ex,
-            y + ey, false, 0f);
+            y + ey, false);
 
             Draw.rect(endRegion, x, y, i * 90 + 90);
             Draw.rect(endRegion,

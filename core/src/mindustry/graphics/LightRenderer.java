@@ -98,7 +98,7 @@ public class LightRenderer{
             vertices[22] = v;
             vertices[23] = 0;
 
-            Draw.vert(ledge.getTexture(), vertices, 0, vertices.length);
+            Draw.vert(ledge.texture, vertices, 0, vertices.length);
 
 
             Vec2 v3 = Tmp.v2.trnsExact(rot, stroke);
@@ -136,7 +136,7 @@ public class LightRenderer{
             vertices[22] = v;
             vertices[23] = 0;
 
-            Draw.vert(ledge.getTexture(), vertices, 0, vertices.length);
+            Draw.vert(ledge.texture, vertices, 0, vertices.length);
 
             vertices[0] = lx2;
             vertices[1] = ly2;
@@ -166,7 +166,7 @@ public class LightRenderer{
             vertices[22] = v;
             vertices[23] = 0;
 
-            Draw.vert(ledge.getTexture(), vertices, 0, vertices.length);
+            Draw.vert(ledge.texture, vertices, 0, vertices.length);
         });
     }
 
