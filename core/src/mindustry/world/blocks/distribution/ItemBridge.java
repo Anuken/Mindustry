@@ -99,7 +99,7 @@ public class ItemBridge extends Block{
             float h = (link.y == y ? tilesize : Math.abs(link.y - y) * tilesize - tilesize);
             Lines.rect((x + link.x) / 2f * tilesize - w / 2f, (y + link.y) / 2f * tilesize - h / 2f, w, h);
 
-            Draw.rect("bridge-arrow", link.x * tilesize + Geometry.d4[rot].x * tilesize, link.y * tilesize + Geometry.d4[rot].y * tilesize, link.absoluteRelativeTo(x, y) * 90);
+            Draw.rect("bridge-arrow", link.x * tilesize + Geometry.d4(rot).x * tilesize, link.y * tilesize + Geometry.d4(rot).y * tilesize, link.absoluteRelativeTo(x, y) * 90);
         }
         Draw.reset();
     }
@@ -321,8 +321,8 @@ public class ItemBridge extends Block{
             for(int a = 0; a < arrows; a++){
                 Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * opacity);
                 Draw.rect(arrowRegion,
-                x + Geometry.d4[i].x * (tilesize / 2f + a * 4f + time % 4f),
-                y + Geometry.d4[i].y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
+                x + Geometry.d4(i).x * (tilesize / 2f + a * 4f + time % 4f),
+                y + Geometry.d4(i).y * (tilesize / 2f + a * 4f + time % 4f), i * 90f);
             }
             Draw.reset();
         }

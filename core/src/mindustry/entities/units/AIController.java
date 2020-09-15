@@ -17,6 +17,7 @@ public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
     protected static final int timerTarget = 0;
     protected static final int timerTarget2 = 1;
+    protected static final int timerTarget3 = 2;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
