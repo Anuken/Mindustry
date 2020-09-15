@@ -255,8 +255,8 @@ public class Weathers implements ContentList{
             Texture noise;
 
             {
-                attrs.set(Attribute.spores, 0.5f);
-                attrs.set(Attribute.light, -0.1f);
+                attrs.set(Attribute.spores, 1f);
+                attrs.set(Attribute.light, -0.15f);
                 status = StatusEffects.sporeSlowed;
                 statusGround = false;
             }

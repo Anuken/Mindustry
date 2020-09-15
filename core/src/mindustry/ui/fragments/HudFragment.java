@@ -76,6 +76,19 @@ public class HudFragment extends Fragment{
             t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
+        //minimap + position
+        parent.fill(t -> {
+            t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
+            //minimap
+            t.add(new Minimap());
+            t.row();
+            //position
+            t.label(() -> player.tileX() + "," + player.tileY())
+            .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
+            .touchable(Touchable.disabled);
+            t.top().right();
+        });
+
         //TODO tear this all down
         //menu at top left
         parent.fill(cont -> {
@@ -210,18 +223,6 @@ public class HudFragment extends Fragment{
                 info.row();
                 info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
             }).top().left();
-        });
-
-        parent.fill(t -> {
-            t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
-            //minimap
-            t.add(new Minimap());
-            t.row();
-            //position
-            t.label(() -> player.tileX() + "," + player.tileY())
-                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
-                .touchable(Touchable.disabled);
-            t.top().right();
         });
 
         //core items
