@@ -1029,6 +1029,7 @@ public class UnitTypes implements ContentList{
         }};
 
         mega = new UnitType("mega"){{
+            defaultController = RepairAI::new;
 
             mineTier = 2;
             health = 500;

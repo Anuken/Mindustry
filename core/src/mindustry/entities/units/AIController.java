@@ -33,6 +33,7 @@ public class AIController implements UnitController{
 
     @Override
     public void updateUnit(){
+        updateVisuals();
         updateTargeting();
         updateMovement();
     }
@@ -41,13 +42,23 @@ public class AIController implements UnitController{
         return unit.team.data().command;
     }
 
+    protected void updateVisuals(){
+
+        if(unit.isFlying()){
+            unit.wobble();
+
+            if(unit.moving()){
+                unit.lookAt(unit.vel.angle());
+            }
+        }
+    }
+
     protected void updateMovement(){
 
     }
 
     protected void updateTargeting(){
         if(unit.hasWeapons()){
-
             updateWeapons();
         }
     }

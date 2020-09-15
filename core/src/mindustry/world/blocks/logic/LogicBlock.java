@@ -34,7 +34,6 @@ public class LogicBlock extends Block{
         update = true;
         solid = true;
         configurable = true;
-        sync = true;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 

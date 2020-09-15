@@ -214,8 +214,7 @@ public class Vars implements Loadable{
 
         if(loadLocales){
             //load locales
-            String[]
-            stra = Core.files.internal("locales").readString().split("\n");
+            String[] stra = Core.files.internal("locales").readString().split("\n");
             locales = new Locale[stra.length];
             for(int i = 0; i < locales.length; i++){
                 String code = stra[i];

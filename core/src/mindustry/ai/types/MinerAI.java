@@ -15,14 +15,6 @@ public class MinerAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(unit.moving()){
-            unit.lookAt(unit.vel.angle());
-        }
-
-        if(unit.isFlying()){
-            unit.wobble();
-        }
-
         Building core = unit.closestCore();
 
         if(!(unit instanceof Minerc) || core == null) return;
