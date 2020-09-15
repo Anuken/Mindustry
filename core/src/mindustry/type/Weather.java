@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -14,7 +15,7 @@ import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
-public abstract class Weather extends MappableContent{
+public abstract class Weather extends UnlockableContent{
     /** Default duration of this weather event in ticks. */
     public float duration = 9f * Time.toMinutes;
     public Attributes attrs = new Attributes();
@@ -90,6 +91,16 @@ public abstract class Weather extends MappableContent{
     }
 
     @Override
+    public void displayInfo(Table table){
+        //do not
+    }
+
+    @Override
+    public boolean isHidden(){
+        return true;
+    }
+
+    @Override
     public ContentType getContentType(){
         return ContentType.weather;
     }
@@ -104,7 +115,7 @@ public abstract class Weather extends MappableContent{
         public Weather weather;
         /** Minimum and maximum spacing between weather events. Does not include the time of the event itself. */
         public float minFrequency, maxFrequency, minDuration, maxDuration;
-        /** Cooldown time before the next weather event takes place. */
+        /** Cooldown time before the next weather event takes place This is *state*, not configuration. */
         public float cooldown;
         /** Intensity of the weather produced. */
         public float intensity = 1f;
@@ -146,7 +157,7 @@ public abstract class Weather extends MappableContent{
         @Override
         public void update(){
             if(life < fadeTime){
-                opacity = life / fadeTime;
+                opacity = Math.min(life / fadeTime, opacity);
             }else{
                 opacity = Mathf.lerpDelta(opacity, 1f, 0.004f);
             }

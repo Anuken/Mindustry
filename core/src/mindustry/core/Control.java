@@ -329,6 +329,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playTutorial(){
+        ui.showInfo("There is no tutorial yet.");
         //TODO implement
         //ui.showInfo("death");
         /*
