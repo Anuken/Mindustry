@@ -322,7 +322,17 @@ public class CustomRulesDialog extends BaseDialog{
         }).width(170f);
 
         //reset cooldown to random number
-        dialog.hidden(() -> rules.weather.each(w -> w.cooldown = Mathf.random(w.minFrequency, w.maxFrequency)));
+        dialog.hidden(() -> {
+            float sum = 0;
+            Seq<WeatherEntry> sh = rules.weather.copy();
+            sh.shuffle();
+
+            for(WeatherEntry w : sh){
+                //add the previous cooldowns to the sum so weather events are staggered and don't happen all at once.
+                w.cooldown = sum + Mathf.random(w.minFrequency, w.maxFrequency);
+                sum += w.cooldown;
+            }
+        });
 
         dialog.show();
     }
