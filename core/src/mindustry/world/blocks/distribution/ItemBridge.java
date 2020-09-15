@@ -62,7 +62,7 @@ public class ItemBridge extends Block{
 
         Lines.stroke(8f);
 
-        Tmp.v1.set(otherReq.drawx(), otherReq.drawx()).sub(req.drawx(), req.drawy()).setLength(-tilesize/2f);
+        Tmp.v1.set(otherReq.drawx(), otherReq.drawy()).sub(req.drawx(), req.drawy()).setLength(tilesize/2f);
 
         Lines.line(
         bridgeRegion,
