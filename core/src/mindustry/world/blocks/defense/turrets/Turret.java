@@ -56,6 +56,9 @@ public abstract class Turret extends Block{
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
+    public float xShift = 0f;
+    public float yRand = 0f;
+    public float yShift = 0f;
     /** Currently used for artillery only. */
     public float minRange = 0f;
     public float burstSpacing = 0;
@@ -364,7 +367,7 @@ public abstract class Turret extends Block{
 
                         recoil = recoilAmount;
 
-                        tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+                        tr.trns(rotation, (size * tilesize / 2f) + Mathf.range(yRand) + yShift, Mathf.range(xRand) + xShift);
                         bullet(type, rotation + Mathf.range(inaccuracy));
                         effects();
                         useAmmo();
@@ -377,10 +380,10 @@ public abstract class Turret extends Block{
                 if(alternate){
                     float i = (shotCounter % shots) - shots/2f + (((shots+1)%2) / 2f);
 
-                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2f);
+                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand) + xShift, (size * tilesize / 2f) + Mathf.range(yRand) + yShift);
                     bullet(type, rotation + Mathf.range(inaccuracy));
                 }else{
-                    tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+                    tr.trns(rotation, (size * tilesize / 2f) + Mathf.range(yRand) + yShift, Mathf.range(xRand) + xShift);
 
                     for(int i = 0; i < shots; i++){
                         bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
