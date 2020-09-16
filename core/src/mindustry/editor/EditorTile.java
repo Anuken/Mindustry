@@ -2,6 +2,7 @@ package mindustry.editor;
 
 import arc.func.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
 import mindustry.game.*;
@@ -20,7 +21,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setFloor(@NonNull Floor type){
-        if(state.isGame()){
+        if(skip()){
             super.setFloor(type);
             return;
         }
@@ -41,12 +42,10 @@ public class EditorTile extends Tile{
 
     @Override
     public void setBlock(Block type, Team team, int rotation){
-        if(state.isGame()){
+        if(skip()){
             super.setBlock(type, team, rotation);
             return;
         }
-
-        if(this.block == type && (build == null || build.rotation == rotation)) return;
 
         if(rotation != 0) op(OpType.rotation, (byte)rotation);
         if(team() != Team.derelict) op(OpType.team, (byte)team().id);
@@ -56,7 +55,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setTeam(Team team){
-        if(state.isGame()){
+        if(skip()){
             super.setTeam(team);
             return;
         }
@@ -68,7 +67,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setOverlay(Block overlay){
-        if(state.isGame()){
+        if(skip()){
             super.setOverlay(overlay);
             return;
         }
@@ -81,7 +80,7 @@ public class EditorTile extends Tile{
 
     @Override
     protected void fireChanged(){
-        if(state.isGame()){
+        if(skip()){
             super.fireChanged();
         }else{
             ui.editor.editor.renderer().updatePoint(x, y);
@@ -90,14 +89,14 @@ public class EditorTile extends Tile{
 
     @Override
     public void recache(){
-        if(state.isGame()){
+        if(skip()){
             super.recache();
         }
     }
     
     @Override
     protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
-        if(state.isGame()){
+        if(skip()){
             super.changeEntity(team, entityprov, rotation);
             return;
         }
@@ -116,6 +115,10 @@ public class EditorTile extends Tile{
             if(block.hasLiquids) build.liquids(new LiquidModule());
             if(block.hasPower) build.power(new PowerModule());
         }
+    }
+
+    private boolean skip(){
+        return state.isGame() || ui.editor.editor.isLoading();
     }
 
     private void op(OpType type, short value){

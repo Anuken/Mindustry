@@ -1011,7 +1011,7 @@ public class Blocks implements ContentList{
 
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, with(Items.copper, 15, Items.metaglass, 10));
-            pumpAmount = 0.1f;
+            pumpAmount = 0.11f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -1136,7 +1136,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
             itemDuration = 90f;
-            consumes.liquid(Liquids.water, 0.06f);
+            consumes.liquid(Liquids.water, 0.07f);
             hasLiquids = true;
             size = 2;
         }};
@@ -1269,7 +1269,7 @@ public class Blocks implements ContentList{
             hasItems = true;
 
             consumes.power(0.80f);
-            consumes.liquid(Liquids.water, 0.18f);
+            consumes.liquid(Liquids.water, 0.2f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{

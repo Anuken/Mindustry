@@ -31,6 +31,10 @@ public class MapEditor{
     public Block drawBlock = Blocks.stone;
     public Team drawTeam = Team.sharded;
 
+    public boolean isLoading(){
+        return loading;
+    }
+
     public StringMap getTags(){
         return tags;
     }
@@ -52,7 +56,7 @@ public class MapEditor{
         if(map.file.parent().parent().name().equals("1127400") && steam){
             tags.put("steamid",  map.file.parent().name());
         }
-        MapIO.loadMap(map, context);
+        load(() -> MapIO.loadMap(map, context));
         renderer.resize(width(), height());
         loading = false;
     }

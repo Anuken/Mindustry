@@ -116,7 +116,7 @@ public class MapRenderer implements Disposable{
             wx * tilesize + wall.offset + (tilesize - width) / 2f,
             wy * tilesize + wall.offset + (tilesize - height) / 2f,
             width, height,
-            tile.build == null || !wall.rotate ? 0 : tile.build.rotdeg() - 90);
+            tile.build == null || !wall.rotate ? 0 : tile.build.rotdeg());
         }else{
             region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length - 1)];
 
