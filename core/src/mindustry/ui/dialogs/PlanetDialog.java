@@ -245,6 +245,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }),
                 new Table(t -> {
                     t.right();
+                    accessiblePlanets = 0;
                     for(int i = 0; i < content.planets().size; i++){
                         if(content.planets().get(i).accessible) {
                             accessiblePlanets++;
