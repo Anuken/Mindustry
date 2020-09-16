@@ -54,7 +54,7 @@ public class LaserTurret extends PowerTurret{
             super.updateTile();
 
             if(bulletLife > 0 && bullet != null){
-                tr.trns(rotation, size * tilesize / 2f, 0f);
+                tr.trns(rotation, (size * tilesize / 2f) + yShift, xShift);
                 bullet.rotation(rotation);
                 bullet.set(x + tr.x, y + tr.y);
                 bullet.time(0f);
