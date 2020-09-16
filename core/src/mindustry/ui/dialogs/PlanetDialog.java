@@ -122,8 +122,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     boolean canLaunch(Sector sector){
         return mode == launch &&
-                (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
-                        || (sector.preset != null && sector.preset.unlocked())); //is an unlocked preset
+        (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
+        || (sector.preset != null && sector.preset.unlocked())); //is an unlocked preset
     }
 
     @Override
@@ -140,9 +140,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                     Color color =
                             sec.hasBase() ? Team.sharded.color :
-                                    sec.preset != null ? Team.derelict.color :
-                                            sec.hasEnemyBase() ? Team.crux.color :
-                                                    null;
+                            sec.preset != null ? Team.derelict.color :
+                            sec.hasEnemyBase() ? Team.crux.color :
+                            null;
 
                     if(color != null){
                         planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
