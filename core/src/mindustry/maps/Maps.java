@@ -59,6 +59,7 @@ public class Maps{
 
     /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
     public @Nullable Map getNextMap(Gamemode mode, @Nullable Map previous){
+        if(shuffler != null) return shuffler.next(mode, previous);
         return shuffleMode.next(mode, previous);
     }
 

@@ -33,9 +33,15 @@ public class World{
     public @NonNull Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
+    private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
 
+    }
+
+    /** Adds a custom handler function for loading a custom map - usually a generated one. */
+    public void addMapLoader(Map map, Runnable loader){
+        customMapLoaders.put(map, loader);
     }
 
     public boolean isInvalidMap(){
@@ -270,6 +276,12 @@ public class World{
     }
 
     public void loadMap(Map map, Rules checkRules){
+        //load using custom loader if possible
+        if(customMapLoaders.containsKey(map)){
+            customMapLoaders.get(map).run();
+            return;
+        }
+
         try{
             SaveIO.load(map.file, new FilterContext(map));
         }catch(Throwable e){

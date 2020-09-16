@@ -2,7 +2,6 @@ package mindustry.editor;
 
 import arc.func.*;
 import arc.util.ArcAnnotate.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
 import mindustry.game.*;
@@ -46,6 +45,11 @@ public class EditorTile extends Tile{
             super.setBlock(type, team, rotation);
             return;
         }
+
+        //if(this.block == type && (build == null || build.rotation == rotation)){
+        //    ui.editor.editor.renderer().updatePoint(x, y);
+        //    return;
+        //}
 
         if(rotation != 0) op(OpType.rotation, (byte)rotation);
         if(team() != Team.derelict) op(OpType.team, (byte)team().id);
