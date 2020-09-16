@@ -261,7 +261,6 @@ project(":core"){
         doLast{
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
-            def buildVersion = props["build"]
             def loglines = file("../changelog").text.split("\n")
             def maxLength = 460
 
@@ -273,7 +272,6 @@ project(":core"){
                 }
             }
             def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
-            new File(changelogs, buildVersion + ".txt").text = (result)
             new File(changelogs, androidVersion + ".txt").text = (result)
         }
     }
