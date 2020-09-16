@@ -1,6 +1,5 @@
 package mindustry.net;
 
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -12,15 +11,14 @@ import mindustry.net.Packets.*;
 
 import java.io.*;
 
-import static mindustry.Vars.netServer;
+import static mindustry.Vars.*;
 
 public abstract class NetConnection{
     public final String address;
     public String uuid = "AAAAAAAA", usid = uuid;
     public boolean mobile, modclient;
     public @Nullable Player player;
-    public @Nullable Unitc lastUnit;
-    public Vec2 lastPosition = new Vec2();
+    public boolean kicked = false;
 
     /** ID of last received client snapshot. */
     public int lastReceivedClientSnapshot = -1;
@@ -38,6 +36,8 @@ public abstract class NetConnection{
 
     /** Kick with a special, localized reason. Use this if possible. */
     public void kick(KickReason reason){
+        if(kicked) return;
+
         Log.info("Kicking connection @; Reason: @", address, reason.name());
 
         if((reason == KickReason.kick || reason == KickReason.banned || reason == KickReason.vote)){
@@ -51,6 +51,7 @@ public abstract class NetConnection{
         Time.runTask(2f, this::close);
 
         netServer.admins.save();
+        kicked = true;
     }
 
     /** Kick with an arbitrary reason. */
@@ -60,6 +61,8 @@ public abstract class NetConnection{
 
     /** Kick with an arbitrary reason, and a kick duration in milliseconds. */
     public void kick(String reason, int kickDuration){
+        if(kicked) return;
+
         Log.info("Kicking connection @; Reason: @", address, reason.replace("\n", " "));
 
         PlayerInfo info = netServer.admins.getInfo(uuid);
@@ -71,6 +74,7 @@ public abstract class NetConnection{
         Time.runTask(2f, this::close);
 
         netServer.admins.save();
+        kicked = true;
     }
 
     public boolean isConnected(){

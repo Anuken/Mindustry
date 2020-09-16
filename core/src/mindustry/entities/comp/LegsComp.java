@@ -31,29 +31,41 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     }
 
     @Override
-    public void update(){
-        if(Mathf.dst(deltaX(), deltaY()) > 0.001f){
-            baseRotation = Mathf.slerpDelta(baseRotation, Mathf.angle(deltaX(), deltaY()), 0.1f);
-        }
+    public void add(){
+        resetLegs();
+    }
 
+    public void resetLegs(){
         float rot = baseRotation;
         int count = type.legCount;
         float legLength = type.legLength;
 
+        this.legs = new Leg[count];
+
+        float spacing = 360f / count;
+
+        for(int i = 0; i < legs.length; i++){
+            Leg l = new Leg();
+
+            l.joint.trns(i * spacing + rot, legLength/2f + type.legBaseOffset).add(x, y);
+            l.base.trns(i * spacing + rot, legLength + type.legBaseOffset).add(x, y);
+
+            legs[i] = l;
+        }
+    }
+
+    @Override
+    public void update(){
+        if(Mathf.dst(deltaX(), deltaY()) > 0.001f){
+            baseRotation = Angles.moveToward(baseRotation, Mathf.angle(deltaX(), deltaY()), type.rotateSpeed);
+        }
+
+        float rot = baseRotation;
+        float legLength = type.legLength;
+
         //set up initial leg positions
         if(legs.length != type.legCount){
-            this.legs = new Leg[count];
-
-            float spacing = 360f / count;
-
-            for(int i = 0; i < legs.length; i++){
-                Leg l = new Leg();
-
-                l.joint.trns(i * spacing + rot, legLength/2f + type.legBaseOffset).add(x, y);
-                l.base.trns(i * spacing + rot, legLength + type.legBaseOffset).add(x, y);
-
-                legs[i] = l;
-            }
+            resetLegs();
         }
 
         float moveSpeed = type.legSpeed;

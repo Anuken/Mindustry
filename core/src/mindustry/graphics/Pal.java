@@ -9,6 +9,8 @@ public class Pal{
     command = Color.valueOf("eab678"),
 
     sap = Color.valueOf("665c9f"),
+    sapBullet = Color.valueOf("bf92f9"),
+    sapBulletBack = Color.valueOf("6d56bf"),
 
     spore = Color.valueOf("7457ce"),
 
@@ -44,6 +46,7 @@ public class Pal{
     lightishGray = Color.valueOf("a2a2a2"),
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
     darkerGray = new Color(0.2f, 0.2f, 0.2f, 1f),
+    darkestGray = new Color(0.1f, 0.1f, 0.1f, 1f),
     ammo = Color.valueOf("ff8947"),
     rubble = Color.valueOf("1c1817"),
 

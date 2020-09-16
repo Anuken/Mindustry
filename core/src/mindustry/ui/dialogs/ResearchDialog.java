@@ -134,7 +134,9 @@ public class ResearchDialog extends BaseDialog{
             }
         });
 
-        addListener(new ElementGestureListener(){
+        touchable = Touchable.enabled;
+
+        addCaptureListener(new ElementGestureListener(){
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
                 if(view.lastZoom < 0){
@@ -233,7 +235,7 @@ public class ResearchDialog extends BaseDialog{
     }
 
     boolean selectable(TechNode node){
-        return !node.objectives.contains(i -> !i.complete());
+        return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());
     }
 
     void showToast(String info){

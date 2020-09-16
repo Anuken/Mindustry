@@ -6,7 +6,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class LiquidExtendingBridge extends ExtendingItemBridge{
 
@@ -42,7 +42,7 @@ public class LiquidExtendingBridge extends ExtendingItemBridge{
                     if(moveLiquid(other, liquids.current()) > 0.1f){
                         cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f);
                     }else{
-                        cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
+                        cycleSpeed = Mathf.lerpDelta(cycleSpeed, 0f, 0.01f);
                     }
                 }
             }

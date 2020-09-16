@@ -241,8 +241,8 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
-                if(block.size > BuildBlock.maxSize){
-                    throw new IllegalArgumentException("Blocks cannot be larger than " + BuildBlock.maxSize);
+                if(block.size > ConstructBlock.maxSize){
+                    throw new IllegalArgumentException("Blocks cannot be larger than " + ConstructBlock.maxSize);
                 }
 
                 //add research tech node

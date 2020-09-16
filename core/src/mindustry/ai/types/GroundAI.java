@@ -1,11 +1,14 @@
 package mindustry.ai.types;
 
-import mindustry.ai.Pathfinder.*;
+import arc.math.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -18,18 +21,37 @@ public class GroundAI extends AIController{
 
         Building core = unit.closestEnemyCore();
 
-        if(core != null){
-            if(unit.within(core,unit.range() / 1.1f)){
-                target = core;
+        if(core != null && unit.within(core, unit.range() / 1.1f + core.block.size * tilesize / 2f)){
+            target = core;
+            Arrays.fill(targets, core);
+        }
+
+        if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
+            boolean move = true;
+
+            if(state.rules.waves && unit.team == state.rules.defaultTeam){
+                Tile spawner = getClosestSpawner();
+                if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
             }
 
-            if(!unit.within(core, unit.range() * 0.5f)){
-                moveToCore(FlagTarget.enemyCores);
+            if(move) moveTo(Pathfinder.fieldCore);
+        }
+
+        if(command() == UnitCommand.rally){
+            Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
+
+            if(target != null && !unit.within(target, 70f)){
+                moveTo(Pathfinder.fieldRally);
             }
+        }
+
+        if(unit.type().canBoost && !unit.onSolid()){
+            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
         if(!Units.invalidateTarget(target, unit, unit.range())){
             if(unit.type().hasWeapons()){
+                //TODO certain units should not look at the target, e.g. ships
                 unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
@@ -52,40 +74,17 @@ public class GroundAI extends AIController{
         }*/
     }
 
-    protected void moveToCore(FlagTarget path){
-        Tile tile = unit.tileOn();
-        if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, unit.team(), path);
-
-        if(tile == targetTile) return;
-
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
-    }
-
-    protected void moveAwayFromCore(){
-        Team enemy = null;
-        for(Team team : unit.team().enemies()){
-            if(team.active()){
-                enemy = team;
-                break;
-            }
-        }
-
-        if(enemy == null){
-            for(Team team : unit.team().enemies()){
-                enemy = team;
-                break;
-            }
-        }
-
-        if(enemy == null) return;
+    protected void moveTo(int pathType){
+        int costType =
+            unit instanceof Legsc ? Pathfinder.costLegs :
+            unit instanceof WaterMovec ? Pathfinder.costWater :
+            Pathfinder.costGround;
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, enemy, FlagTarget.enemyCores);
-        Building core = unit.closestCore();
+        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathType));
 
-        if(tile == targetTile || core == null || unit.within(core, 120f)) return;
+        if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
 
         unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }

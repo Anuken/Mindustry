@@ -40,13 +40,6 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void updateOcclusion(){
-        super.updateOcclusion();
-
-        ui.editor.editor.renderer().updatePoint(x, y);
-    }
-
-    @Override
     public void setBlock(Block type, Team team, int rotation){
         if(state.isGame()){
             super.setBlock(type, team, rotation);
@@ -85,8 +78,12 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    protected void preChanged(){
-        super.preChanged();
+    protected void fireChanged(){
+        if(state.isGame()){
+            super.fireChanged();
+        }else{
+            ui.editor.editor.renderer().updatePoint(x, y);
+        }
     }
 
     @Override
@@ -112,7 +109,7 @@ public class EditorTile extends Tile{
 
         if(block.hasEntity()){
             build = entityprov.get().init(this, team, false, rotation);
-            build.cons(new ConsumeModule(build));
+            build.cons = new ConsumeModule(build);
             if(block.hasItems) build.items = new ItemModule();
             if(block.hasLiquids) build.liquids(new LiquidModule());
             if(block.hasPower) build.power(new PowerModule());

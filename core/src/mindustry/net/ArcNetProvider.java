@@ -1,10 +1,10 @@
 package mindustry.net;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.net.*;
 import arc.net.FrameworkMessage.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.pooling.*;
@@ -28,7 +28,9 @@ public class ArcNetProvider implements NetProvider{
     Thread serverThread;
 
     public ArcNetProvider(){
-        client = new Client(8192, 4096, new PacketSerializer());
+        ArcNet.errorHandler = e -> Log.debug(Strings.getStackTrace(e));
+
+        client = new Client(8192, 8192, new PacketSerializer());
         client.setDiscoveryPacket(packetSupplier);
         client.addListener(new NetListener(){
             @Override
@@ -66,7 +68,7 @@ public class ArcNetProvider implements NetProvider{
             }
         });
 
-        server = new Server(4096 * 2, 4096, new PacketSerializer());
+        server = new Server(8192, 8192, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();

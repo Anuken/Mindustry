@@ -49,8 +49,8 @@ public class AttributeSmelter extends GenericSmelter{
         }
 
         @Override
-        public void placed(){
-            super.placed();
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
 
             attrsum = sumAttribute(attribute, tile.x, tile.y);
         }

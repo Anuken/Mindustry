@@ -62,6 +62,7 @@ public class ItemTurret extends Turret{
     }
 
     public class ItemTurretBuild extends TurretBuild{
+
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();
@@ -70,6 +71,13 @@ public class ItemTurret extends Turret{
             if(cheating() && ammo.size > 0){
                 handleItem(this, ammoTypes.entries().next().key);
             }
+        }
+
+        @Override
+        public void updateTile(){
+            unit.ammo((float)unit.type().ammoCapacity * totalAmmo / maxAmmo);
+
+            super.updateTile();
         }
 
         @Override
@@ -139,12 +147,17 @@ public class ItemTurret extends Turret{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.b(ammo.size);
             for(AmmoEntry entry : ammo){
                 ItemEntry i = (ItemEntry)entry;
-                write.b(i.item.id);
+                write.s(i.item.id);
                 write.s(i.amount);
             }
         }
@@ -152,12 +165,16 @@ public class ItemTurret extends Turret{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte amount = read.b();
+            int amount = read.ub();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(read.b());
+                Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
                 short a = read.s();
                 totalAmmo += a;
-                ammo.add(new ItemEntry(item, a));
+
+                //only add ammo if this is a valid ammo type
+                if(ammoTypes.containsKey(item)){
+                    ammo.add(new ItemEntry(item, a));
+                }
             }
         }
     }

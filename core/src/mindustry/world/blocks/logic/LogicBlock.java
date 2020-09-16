@@ -16,7 +16,8 @@ import mindustry.logic.LAssembler.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -24,8 +25,6 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
-    public static final int maxInstructions = 2000;
-
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
@@ -69,7 +68,7 @@ public class LogicBlock extends Block{
         if(name.contains("-")){
             String[] split = name.split("-");
             //filter out 'large' at the end of block names
-            if(split.length >= 2 && split[split.length - 1].equals("large")){
+            if(split.length >= 2 && (split[split.length - 1].equals("large") || Strings.canParseFloat(split[split.length - 1]))){
                 name = split[split.length - 2];
             }else{
                 name = split[split.length - 1];
@@ -111,6 +110,14 @@ public class LogicBlock extends Block{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.linkRange, range / 8, StatUnit.blocks);
+        stats.add(BlockStat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
     }
 
     @Override
@@ -198,7 +205,6 @@ public class LogicBlock extends Block{
                         stream.readInt();
                     }
                 }else{
-
                     for(int i = 0; i < total; i++){
                         String name = stream.readUTF();
                         short x = stream.readShort(), y = stream.readShort();
@@ -262,7 +268,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str, maxInstructions);
+                    LAssembler asm = LAssembler.assemble(str, LExecutor.maxInstructions);
 
                     //store connections
                     for(LogicLink link : links){
@@ -281,6 +287,7 @@ public class LogicBlock extends Block{
                     }
 
                     asm.putConst("@links", executor.links.length);
+                    asm.putConst("@ipt", instructionsPerTick);
 
                     //store any older variables
                     for(Var var : executor.vars){
@@ -298,13 +305,15 @@ public class LogicBlock extends Block{
                     }
 
                     asm.putConst("@this", this);
+                    asm.putConst("@thisx", x);
+                    asm.putConst("@thisy", y);
 
                     executor.load(asm);
                 }catch(Exception e){
                     e.printStackTrace();
 
                     //handle malformed code and replace it with nothing
-                    executor.load("", maxInstructions);
+                    executor.load("", LExecutor.maxInstructions);
                 }
             }
         }
@@ -320,7 +329,9 @@ public class LogicBlock extends Block{
             //check for previously invalid links to add after configuration
             boolean changed = false;
 
-            for(LogicLink l : links){
+            for(int i = 0; i < links.size; i++){
+                LogicLink l = links.get(i);
+
                 if(!l.active) continue;
 
                 boolean valid = validLink(world.build(l.x, l.y));
@@ -328,10 +339,18 @@ public class LogicBlock extends Block{
                     changed = true;
                     l.valid = valid;
                     if(valid){
+                        Building lbuild = world.build(l.x, l.y);
+
                         //this prevents conflicts
                         l.name = "";
                         //finds a new matching name after toggling
-                        l.name = findLinkName(world.build(l.x, l.y).block);
+                        l.name = findLinkName(lbuild.block);
+
+                        //remove redundant links
+                        links.removeAll(o -> world.build(o.x, o.y) == lbuild && o != l);
+
+                        //break to prevent concurrent modification
+                        break;
                     }
                 }
             }
@@ -340,15 +359,17 @@ public class LogicBlock extends Block{
                 updateCode();
             }
 
-            accumulator += edelta() * instructionsPerTick;
+            if(enabled){
+                accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
 
-            if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
+                if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
 
-            for(int i = 0; i < (int)accumulator; i++){
-                if(executor.initialized()){
-                    executor.runOnce();
+                for(int i = 0; i < (int)accumulator; i++){
+                    if(executor.initialized()){
+                        executor.runOnce();
+                    }
+                    accumulator --;
                 }
-                accumulator --;
             }
         }
 
@@ -391,7 +412,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof BuildEntity);
+            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
         }
 
 

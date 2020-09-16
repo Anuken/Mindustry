@@ -31,14 +31,14 @@ public interface Autotiler{
     default TextureRegion topHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
-        region.setWidth(region.getWidth() / 2);
+        region.setWidth(region.width / 2);
         return region;
     }
 
     default TextureRegion botHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
-        int width = region.getWidth();
+        int width = region.width;
         region.setWidth(width / 2);
         region.setX(region.getX() + width);
         return region;
@@ -104,7 +104,7 @@ public interface Autotiler{
 
         for(int i = 0; i < 4; i++){
             int realDir = Mathf.mod(rotation - i, 4);
-            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.getNearbyEntity(realDir) != null && !tile.getNearbyEntity(realDir).block().squareSprite)){
+            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.getNearbyEntity(realDir) != null && !tile.getNearbyEntity(realDir).block.squareSprite)){
                 blendresult[4] |= (1 << i);
             }
         }
@@ -147,7 +147,7 @@ public interface Autotiler{
 
     default boolean blends(Tile tile, int rotation, int direction){
         Building other = tile.getNearbyEntity(Mathf.mod(rotation - direction, 4));
-        return other != null && other.team() == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation, other.block());
+        return other != null && other.team == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation, other.block);
     }
 
     default boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){

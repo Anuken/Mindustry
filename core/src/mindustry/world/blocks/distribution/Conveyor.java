@@ -63,7 +63,7 @@ public class Conveyor extends Block implements Autotiler{
         if(bits == null) return;
 
         TextureRegion region = regions[bits[0]][0];
-        Draw.rect(region, req.drawx(), req.drawy(), region.getWidth() * bits[1] * Draw.scl, region.getHeight() * bits[2] * Draw.scl, req.rotation * 90);
+        Draw.rect(region, req.drawx(), req.drawy(), region.width * bits[1] * Draw.scl, region.height * bits[2] * Draw.scl, req.rotation * 90);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class Conveyor extends Block implements Autotiler{
 
             if(front() != null && front() != null){
                 next = front();
-                nextc = next instanceof ConveyorBuild && next.team() == team ? (ConveyorBuild)next : null;
+                nextc = next instanceof ConveyorBuild && next.team == team ? (ConveyorBuild)next : null;
                 aligned = nextc != null && rotation == next.rotation;
             }
         }
@@ -178,7 +178,7 @@ public class Conveyor extends Block implements Autotiler{
             float mspeed = speed * tilesize * 55f;
             float centerSpeed = 0.1f;
             float centerDstScl = 3f;
-            float tx = Geometry.d4x[rotation], ty = Geometry.d4y[rotation];
+            float tx = Geometry.d4x(rotation), ty = Geometry.d4y(rotation);
 
             float centerx = 0f, centery = 0f;
 
@@ -289,9 +289,9 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Building source, Item item){
             if(len >= capacity) return false;
-            Tile facing = Edges.getFacingEdge(source.tile(), tile);
+            Tile facing = Edges.getFacingEdge(source.tile, tile);
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
-            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block().rotate && (source.rotation + 2) % 4 == rotation);
+            return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && (source.rotation + 2) % 4 == rotation);
         }
 
         @Override
@@ -299,7 +299,7 @@ public class Conveyor extends Block implements Autotiler{
             if(len >= capacity) return;
 
             int r = rotation;
-            Tile facing = Edges.getFacingEdge(source.tile(), tile);
+            Tile facing = Edges.getFacingEdge(source.tile, tile);
             int ang = ((facing.relativeTo(tile.x, tile.y) - r));
             float x = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 

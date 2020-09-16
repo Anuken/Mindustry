@@ -74,7 +74,7 @@ public abstract class BulletType extends Content{
 
     public float fragCone = 360f;
     public int fragBullets = 9;
-    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
+    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
@@ -92,6 +92,7 @@ public abstract class BulletType extends Content{
     public float homingPower = 0f;
     public float homingRange = 50f;
 
+    public Color lightningColor = Pal.surge;
     public int lightning;
     public int lightningLength = 5;
     /** Use a negative value to use default bullet damage. */
@@ -148,7 +149,7 @@ public abstract class BulletType extends Content{
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragCone/2);
-                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
+                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
 
@@ -172,7 +173,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b, Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
         }
     }
 
@@ -244,6 +245,10 @@ public abstract class BulletType extends Content{
 
     public Bullet create(Bullet parent, float x, float y, float angle){
         return create(parent.owner(), parent.team, x, y, angle);
+    }
+
+    public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
+        return create(parent.owner(), parent.team, x, y, angle, velocityScl, lifeScale);
     }
 
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){

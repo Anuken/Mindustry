@@ -102,7 +102,7 @@ public class Teams{
     }
 
     public void registerCore(CoreBuild core){
-        TeamData data = get(core.team());
+        TeamData data = get(core.team);
         //add core if not present
         if(!data.cores.contains(core)){
             data.cores.add(core);
@@ -117,7 +117,7 @@ public class Teams{
     }
 
     public void unregisterCore(CoreBuild entity){
-        TeamData data = get(entity.team());
+        TeamData data = get(entity.team);
         //remove core
         data.cores.remove(entity);
         //unregister in active list
@@ -181,7 +181,7 @@ public class Teams{
 
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
-            return state.rules.attackMode && team.rules().ai;
+            return team.rules().ai;
         }
 
         @Override

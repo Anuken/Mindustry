@@ -8,6 +8,7 @@ import java.util.Locale;
 public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
+    displaySize(StatCategory.general),
     buildTime(StatCategory.general),
     buildCost(StatCategory.general),
 
@@ -32,6 +33,8 @@ public enum BlockStat{
     drillTier(StatCategory.crafting),
     drillSpeed(StatCategory.crafting),
     maxUnits(StatCategory.crafting),
+    linkRange(StatCategory.crafting),
+    instructions(StatCategory.crafting),
 
     speedIncrease(StatCategory.shooting),
     repairTime(StatCategory.shooting),

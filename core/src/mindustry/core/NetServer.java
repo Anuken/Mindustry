@@ -34,7 +34,8 @@ import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
-    private static final int maxSnapshotSize = 430, timerBlockSync = 0;
+    /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
+    private static final int maxSnapshotSize = 800, timerBlockSync = 0;
     private static final float serverSyncTime = 12, blockSyncTime = 60 * 6;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Vec2 vector = new Vec2();
@@ -173,7 +174,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            boolean preventDuplicates = headless && netServer.admins.getStrict();
+            boolean preventDuplicates = headless && netServer.admins.isStrict();
 
             if(preventDuplicates){
                 if(Groups.player.contains(p -> p.name.trim().equalsIgnoreCase(packet.name.trim()))){
@@ -370,6 +371,11 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
+            if(currentlyKicking[0] != null){
+                player.sendMessage("[scarlet]A vote is already in progress.");
+                return;
+            }
+
             if(args.length == 0){
                 StringBuilder builder = new StringBuilder();
                 builder.append("[orange]Players to kick: \n");
@@ -384,9 +390,7 @@ public class NetServer implements ApplicationListener{
                     int id = Strings.parseInt(args[0].substring(1));
                     found = Groups.player.find(p -> p.id() == id);
                 }else{
-                    found = Groups.player.find(p -> {
-                        return p.name.equalsIgnoreCase(args[0]);
-                    });
+                    found = Groups.player.find(p -> p.name.equalsIgnoreCase(args[0]));
                 }
 
                 if(found != null){
@@ -481,7 +485,7 @@ public class NetServer implements ApplicationListener{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         player.con.sendStream(data);
 
-        Log.debug("Packed @ compressed bytes of world data.", stream.size());
+        Log.debug("Packed @ bytes of world data.", stream.size());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -526,11 +530,16 @@ public class NetServer implements ApplicationListener{
     public static void serverPacketUnreliable(Player player, String type, String contents){
         serverPacketReliable(player, type, contents);
     }
+    
+    private static boolean invalid(float f){
+        return Float.isInfinite(f) || Float.isNaN(f);
+    }
 
     @Remote(targets = Loc.client, unreliable = true)
     public static void clientSnapshot(
         Player player,
         int snapshotID,
+        int unitID,
         boolean dead,
         float x, float y,
         float pointerX, float pointerY,
@@ -544,7 +553,17 @@ public class NetServer implements ApplicationListener{
         NetConnection con = player.con;
         if(con == null || snapshotID < con.lastReceivedClientSnapshot) return;
 
-        boolean verifyPosition = !player.dead() && netServer.admins.getStrict() && headless;
+        //validate coordinates just in case
+        if(invalid(x)) x = 0f;
+        if(invalid(y)) y = 0f;
+        if(invalid(xVelocity)) xVelocity = 0f;
+        if(invalid(yVelocity)) yVelocity = 0f;
+        if(invalid(pointerX)) pointerX = 0f;
+        if(invalid(pointerY)) pointerY = 0f;
+        if(invalid(rotation)) rotation = 0f;
+        if(invalid(baseRotation)) baseRotation = 0f;
+
+        boolean verifyPosition = netServer.admins.isStrict() && headless;
 
         if(con.lastReceivedClientTime == 0) con.lastReceivedClientTime = Time.millis() - 16;
 
@@ -562,7 +581,6 @@ public class NetServer implements ApplicationListener{
             boosting = false;
         }
 
-        //TODO these need to be assigned elsewhere
         player.mouseX = pointerX;
         player.mouseY = pointerY;
         player.typing = chatting;
@@ -613,45 +631,41 @@ public class NetServer implements ApplicationListener{
             Unit unit = player.unit();
 
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
-            float maxSpeed = (boosting ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
+            float maxSpeed = ((player.unit().type().canBoost && player.unit().isFlying()) ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
             if(unit.isGrounded()){
                 maxSpeed *= unit.floorSpeedMultiplier();
             }
-            unit.vel.set(xVelocity, yVelocity).limit(maxSpeed);
+
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
-            if(con.lastUnit != unit){
-                con.lastUnit = unit;
-                con.lastPosition.set(unit);
-            }
-
-            //if the player think they're dead their position should be ignored
-            if(dead){
-                x = unit.x;
-                y = unit.y;
-            }
-
-            vector.set(x, y).sub(con.lastPosition);
-            vector.limit(maxMove);
-
-            float prevx = unit.x, prevy = unit.y;
-            unit.set(con.lastPosition);
-            if(!unit.isFlying()){
-                unit.move(vector.x, vector.y);
-            }else{
-                unit.trns(vector.x, vector.y);
-            }
-
-            //set last position after movement
-            con.lastPosition.set(unit);
+            //ignore the position if the player thinks they're dead, or the unit is wrong
+            boolean ignorePosition = dead || unit.id != unitID;
             float newx = unit.x, newy = unit.y;
 
-            if(!verifyPosition){
-                unit.set(prevx, prevy);
-                newx = x;
-                newy = y;
-            }else if(!Mathf.within(x, y, newx, newy, correctDist) && !dead){
-                Call.setPosition(player.con, newx, newy); //teleport and correct position when necessary
+            if(!ignorePosition){
+                unit.vel.set(xVelocity, yVelocity).limit(maxSpeed);
+
+                vector.set(x, y).sub(unit);
+                vector.limit(maxMove);
+
+                float prevx = unit.x, prevy = unit.y;
+                //unit.set(con.lastPosition);
+                if(!unit.isFlying()){
+                    unit.move(vector.x, vector.y);
+                }else{
+                    unit.trns(vector.x, vector.y);
+                }
+
+                newx = unit.x;
+                newy = unit.y;
+
+                if(!verifyPosition){
+                    unit.set(prevx, prevy);
+                    newx = x;
+                    newy = y;
+                }else if(!Mathf.within(x, y, newx, newy, correctDist)){
+                    Call.setPosition(player.con, newx, newy); //teleport and correct position when necessary
+                }
             }
 
             //write sync data to the buffer
@@ -681,8 +695,8 @@ public class NetServer implements ApplicationListener{
     public static void adminRequest(Player player, Player other, AdminAction action){
 
         if(!player.admin){
-            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action without proper security access.",
-            player.name, player.con.address);
+            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
+            player.name, player.con.address, action.name(), other == null ? null : other.name);
             return;
         }
 
@@ -735,7 +749,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public boolean isWaitingForPlayers(){
-        if(state.rules.pvp){
+        if(state.rules.pvp && !state.gameOver){
             int used = 0;
             for(TeamData t : state.teams.getActive()){
                 if(Groups.player.count(p -> p.team() == t.team) > 0){
@@ -761,6 +775,10 @@ public class NetServer implements ApplicationListener{
         }
 
         if(state.isGame() && net.server()){
+            if(state.rules.pvp){
+                state.serverPaused = isWaitingForPlayers();
+            }
+
             sync();
         }
     }
@@ -791,10 +809,10 @@ public class NetServer implements ApplicationListener{
 
         short sent = 0;
         for(Building entity : Groups.build){
-            if(!entity.block().sync) continue;
+            if(!entity.block.sync) continue;
             sent ++;
 
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.pos());
             entity.writeAll(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
@@ -820,7 +838,7 @@ public class NetServer implements ApplicationListener{
         dataStream.writeByte(cores.size);
 
         for(CoreBuild entity : cores){
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.tile.pos());
             entity.items.write(Writes.get(dataStream));
         }
 
@@ -828,7 +846,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 

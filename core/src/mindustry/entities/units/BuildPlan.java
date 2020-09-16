@@ -16,8 +16,6 @@ public class BuildPlan{
     public @Nullable Block block;
     /** Whether this is a break request.*/
     public boolean breaking;
-    /** Whether this request comes with a config int. If yes, any blocks placed with this request will not call playerPlaced.*/
-    public boolean hasConfig;
     /** Config int. Not used unless hasConfig is true.*/
     public Object config;
     /** Original position, only used in schematics.*/
@@ -38,6 +36,16 @@ public class BuildPlan{
         this.rotation = rotation;
         this.block = block;
         this.breaking = false;
+    }
+
+    /** This creates a build request with a config. */
+    public BuildPlan(int x, int y, int rotation, Block block, Object config){
+        this.x = x;
+        this.y = y;
+        this.rotation = rotation;
+        this.block = block;
+        this.breaking = false;
+        this.config = config;
     }
 
     /** This creates a remove request. */
@@ -84,7 +92,6 @@ public class BuildPlan{
         copy.rotation = rotation;
         copy.block = block;
         copy.breaking = breaking;
-        copy.hasConfig = hasConfig;
         copy.config = config;
         copy.originalX = originalX;
         copy.originalY = originalY;
@@ -125,12 +132,6 @@ public class BuildPlan{
 
     public float drawy(){
         return y*tilesize + block.offset;
-    }
-
-    public BuildPlan configure(Object config){
-        this.config = config;
-        this.hasConfig = true;
-        return this;
     }
 
     public @Nullable Tile tile(){

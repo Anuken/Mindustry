@@ -56,6 +56,8 @@ public class Block extends UnlockableContent{
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
+    /** whether to display flow rate */
+    public boolean displayFlow = true;
     /** whether this block is visible in the editor */
     public boolean inEditor = true;
     /** the last configuration value applied to this block. */
@@ -193,8 +195,10 @@ public class Block extends UnlockableContent{
     public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
+    /** Whether you can rotate this block with Keybind rotateplaced + Scroll Wheel. */
+    public boolean quickRotate = true;
 
-    protected Prov<Building> entityType = null; //initialized later
+    public Prov<Building> buildType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     protected TextureRegion[] generatedIcons;
@@ -215,7 +219,7 @@ public class Block extends UnlockableContent{
 
     public Block(String name){
         super(name);
-        initEntity();
+        initBuilding();
     }
 
     public void drawBase(Tile tile){
@@ -372,6 +376,13 @@ public class Block extends UnlockableContent{
         return this;
     }
 
+    public Object nextConfig(){
+        if(saveConfig && lastConfig != null){
+            return lastConfig;
+        }
+        return null;
+    }
+
     public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
         Draw.reset();
         Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime(), 6f, 0.28f));
@@ -387,7 +398,7 @@ public class Block extends UnlockableContent{
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
-        if(req.hasConfig){
+        if(req.config != null){
             drawRequestConfig(req, list);
         }
     }
@@ -490,8 +501,8 @@ public class Block extends UnlockableContent{
         return destructible || update;
     }
 
-    public final Building newEntity(){
-        return entityType.get();
+    public final Building newBuilding(){
+        return buildType.get();
     }
 
     public Rect bounds(int x, int y, Rect rect){
@@ -567,7 +578,7 @@ public class Block extends UnlockableContent{
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
-    protected void initEntity(){
+    protected void initBuilding(){
         //attempt to find the first declared class and use it as the entity type
         try{
             Class<?> current = getClass();
@@ -576,13 +587,13 @@ public class Block extends UnlockableContent{
                 current = current.getSuperclass();
             }
 
-            while(entityType == null && Block.class.isAssignableFrom(current)){
+            while(buildType == null && Block.class.isAssignableFrom(current)){
                 //first class that is subclass of Building
                 Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Building.class.isAssignableFrom(t) && !t.isInterface());
                 if(type != null){
                     //these are inner classes, so they have an implicit parameter generated
                     Constructor<? extends Building> cons = (Constructor<? extends Building>)type.getDeclaredConstructor(type.getDeclaringClass());
-                    entityType = () -> {
+                    buildType = () -> {
                         try{
                             return cons.newInstance(this);
                         }catch(Exception e){
@@ -598,9 +609,9 @@ public class Block extends UnlockableContent{
         }catch(Throwable ignored){
         }
 
-        if(entityType == null){
+        if(buildType == null){
             //assign default value
-            entityType = Building::create;
+            buildType = Building::create;
         }
     }
 
@@ -662,7 +673,7 @@ public class Block extends UnlockableContent{
     public void load(){
         region = Core.atlas.find(name);
 
-        if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
+        if(cracks == null || (cracks[0][0].texture != null && cracks[0][0].texture.isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];
             for(int size = 1; size <= maxCrackSize; size++){
                 for(int i = 0; i < crackRegions; i++){

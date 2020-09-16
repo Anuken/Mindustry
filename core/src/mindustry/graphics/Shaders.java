@@ -152,9 +152,9 @@ public class Shaders{
             setUniformf("u_time", time);
             setUniformf("u_color", color);
             setUniformf("u_progress", progress);
-            setUniformf("u_uv", region.getU(), region.getV());
-            setUniformf("u_uv2", region.getU2(), region.getV2());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_uv", region.u, region.v);
+            setUniformf("u_uv2", region.u2, region.v2);
+            setUniformf("u_texsize", region.texture.getWidth(), region.texture.height);
         }
     }
 
@@ -171,10 +171,10 @@ public class Shaders{
         public void apply(){
             setUniformf("u_progress", progress);
             setUniformf("u_color", color);
-            setUniformf("u_uv", region.getU(), region.getV());
-            setUniformf("u_uv2", region.getU2(), region.getV2());
+            setUniformf("u_uv", region.u, region.v);
+            setUniformf("u_uv2", region.u2, region.v2);
             setUniformf("u_time", Time.time());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_texsize", region.texture.getWidth(), region.texture.height);
         }
     }
 

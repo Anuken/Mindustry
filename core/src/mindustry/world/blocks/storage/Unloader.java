@@ -51,7 +51,7 @@ public class Unloader extends Block{
         public void updateTile(){
             if(timer(timerUnload, speed / timeScale())){
                 for(Building other : proximity){
-                    if(other.interactable(team) && other.block().unloadable && other.block().hasItems
+                    if(other.interactable(team) && other.block.unloadable && other.block.hasItems
                         && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
                         //make sure the item can't be dumped back into this block
                         dumpingTo = other;
@@ -99,7 +99,7 @@ public class Unloader extends Block{
 
         @Override
         public boolean canDump(Building to, Item item){
-            return !(to.block() instanceof StorageBlock) && to != dumpingTo;
+            return !(to.block instanceof StorageBlock) && to != dumpingTo;
         }
 
         @Override
@@ -108,15 +108,20 @@ public class Unloader extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
-            write.b(sortItem == null ? -1 : sortItem.id);
+            write.s(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte id = read.b();
+            int id = revision == 1 ? read.s() : read.b();
             sortItem = id == -1 ? null : content.items().get(id);
         }
     }

@@ -68,10 +68,10 @@ public class IndexedRenderer implements Disposable{
     public void draw(int index, TextureRegion region, float x, float y, float w, float h){
         float fx2 = x + w;
         float fy2 = y + h;
-        float u = region.getU();
-        float v = region.getV2();
-        float u2 = region.getU2();
-        float v2 = region.getV();
+        float u = region.u;
+        float v = region.v2;
+        float u2 = region.u2;
+        float v2 = region.v;
 
         float[] vertices = tmpVerts;
         float color = this.color;
@@ -118,10 +118,10 @@ public class IndexedRenderer implements Disposable{
     }
 
     public void draw(int index, TextureRegion region, float x, float y, float w, float h, float rotation){
-        float u = region.getU();
-        float v = region.getV2();
-        float u2 = region.getU2();
-        float v2 = region.getV();
+        float u = region.u;
+        float v = region.v2;
+        float u2 = region.u2;
+        float v2 = region.v;
 
         float originX = w / 2, originY = h / 2;
 

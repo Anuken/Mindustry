@@ -82,7 +82,7 @@ public class BlockRenderer implements Disposable{
             dark.end();
         });
 
-        Events.on(BuildinghangeEvent.class, event -> {
+        Events.on(TileChangeEvent.class, event -> {
             shadowEvents.add(event.tile);
 
             int avgx = (int)(camera.position.x / tilesize);
@@ -192,7 +192,9 @@ public class BlockRenderer implements Disposable{
                 Tile tile = world.rawTile(x, y);
                 Block block = tile.block();
                 //link to center
-                if(tile.build != null) tile = tile.build.tile();
+                if(tile.build != null){
+                    tile = tile.build.tile;
+                }
 
                 if(block != Blocks.air && block.cacheLayer == CacheLayer.normal && (tile.build == null || !processedEntities.contains(tile.build.id()))){
                     if(block.expanded || !expanded){
@@ -207,8 +209,8 @@ public class BlockRenderer implements Disposable{
 
                     if(tile.build != null && tile.build.power != null && tile.build.power.links.size > 0){
                         for(Building other : tile.build.getPowerConnections(outArray2)){
-                            if(other.block() instanceof PowerNode){ //TODO need a generic way to render connections!
-                                tileview.add(other.tile());
+                            if(other.block instanceof PowerNode){ //TODO need a generic way to render connections!
+                                tileview.add(other.tile);
                             }
                         }
                     }
@@ -249,7 +251,7 @@ public class BlockRenderer implements Disposable{
                         Draw.z(Layer.block);
                     }
 
-                    if(entity.team() != player.team()){
+                    if(entity.team != player.team()){
                         entity.drawTeam();
                         Draw.z(Layer.block);
                     }

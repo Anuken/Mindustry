@@ -8,7 +8,7 @@ import mindustry.gen.*;
 @Component
 abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, ElevationMovec{
     @SyncField(false) @SyncLocal float baseRotation;
-    transient float walkTime;
+    transient float walkTime, walkExtension;
 
     @Override
     public void update(){

@@ -7,8 +7,9 @@ const log = function(context, obj){
 }
 
 const readString = path => Vars.mods.getScripts().readString(path)
-
 const readBytes = path => Vars.mods.getScripts().readBytes(path)
+const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
+const loadSound = path => Vars.mods.getScripts().loadSound(path)
 
 var scriptName = "base.js"
 var modName = "none"
@@ -40,6 +41,7 @@ importPackage(Packages.arc)
 importPackage(Packages.arc.func)
 importPackage(Packages.arc.graphics)
 importPackage(Packages.arc.graphics.g2d)
+importPackage(Packages.arc.graphics.gl)
 importPackage(Packages.arc.math)
 importPackage(Packages.arc.math.geom)
 importPackage(Packages.arc.scene)
@@ -77,6 +79,7 @@ importPackage(Packages.mindustry.maps)
 importPackage(Packages.mindustry.maps.filters)
 importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
+importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.type)
 importPackage(Packages.mindustry.ui)
 importPackage(Packages.mindustry.ui.dialogs)
@@ -122,7 +125,7 @@ const BlockBuildBeginEvent = Packages.mindustry.game.EventType.BlockBuildBeginEv
 const ResearchEvent = Packages.mindustry.game.EventType.ResearchEvent
 const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
-const BuildinghangeEvent = Packages.mindustry.game.EventType.BuildinghangeEvent
+const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
 const ConfigEvent = Packages.mindustry.game.EventType.ConfigEvent
 const DepositEvent = Packages.mindustry.game.EventType.DepositEvent

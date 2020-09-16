@@ -38,7 +38,6 @@ public class TechTree implements ContentList{
                         node(distributor);
                         node(sorter, () -> {
                             node(invertedSorter);
-                            node(message);
                             node(overflowGate, () -> {
                                 node(underflowGate);
                             });
@@ -204,6 +203,28 @@ public class TechTree implements ContentList{
                                             });
                                         });
                                     });
+
+                                    node(microProcessor, () -> {
+                                        node(switchBlock, () -> {
+                                            node(message, () -> {
+                                                node(logicDisplay, () -> {
+                                                    node(largeLogicDisplay, () -> {
+
+                                                    });
+                                                });
+
+                                                node(memoryCell, () -> {
+
+                                                });
+                                            });
+
+                                            node(logicProcessor, () -> {
+                                                node(hyperProcessor, () -> {
+
+                                                });
+                                            });
+                                        });
+                                    });
                                 });
                             });
                         });
@@ -242,7 +263,7 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(turbineGenerator, () -> {
+                            node(steamGenerator, () -> {
                                 node(thermalGenerator, () -> {
                                     node(differentialGenerator, () -> {
                                         node(thoriumReactor, () -> {
@@ -340,10 +361,18 @@ public class TechTree implements ContentList{
             });
 
             node(groundFactory, () -> {
+                node(commandCenter, () -> {
+
+                });
+
                 node(dagger, () -> {
                     node(mace, () -> {
                         node(fortress, () -> {
+                            node(scepter, () -> {
+                                node(reign, () -> {
 
+                                });
+                            });
                         });
                     });
 
@@ -358,7 +387,11 @@ public class TechTree implements ContentList{
                     node(crawler, () -> {
                         node(atrax, () -> {
                             node(spiroct, () -> {
+                                node(arkyid, () -> {
+                                    node(toxopid, () -> {
 
+                                    });
+                                });
                             });
                         });
                     });
@@ -405,8 +438,6 @@ public class TechTree implements ContentList{
                     });
                 });
             });
-
-            //TODO research sectors
 
             node(groundZero, () -> {
                 node(frozenForest, Seq.with(
@@ -469,7 +500,7 @@ public class TechTree implements ContentList{
                         new SectorComplete(frozenForest),
                         new Research(pneumaticDrill),
                         new Research(powerNode),
-                        new Research(turbineGenerator)
+                        new Research(steamGenerator)
                     ), () -> {
                         node(fungalPass, Seq.with(
                             new SectorComplete(stainedMountains),
@@ -556,25 +587,20 @@ public class TechTree implements ContentList{
         public ItemStack[] requirements;
         /** Requirements that have been fulfilled. Always the same length as the requirement array. */
         public final ItemStack[] finishedRequirements;
-        /** Extra objectives needed to research this. TODO implement */
+        /** Extra objectives needed to research this. */
         public Seq<Objective> objectives = new Seq<>();
         /** Time required to research this content, in seconds. */
         public float time;
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
-        /** Research progress, in seconds. */
-        public float progress;
 
         TechNode(@Nullable TechNode ccontext, UnlockableContent content, ItemStack[] requirements, Runnable children){
-            if(ccontext != null){
-                ccontext.children.add(this);
-            }
+            if(ccontext != null) ccontext.children.add(this);
 
             this.parent = ccontext;
             this.content = content;
             this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
-            this.progress = Core.settings == null ? 0 : Core.settings.getFloat("research-" + content.name, 0f);
             this.time = Seq.with(requirements).mapFloat(i -> i.item.cost * i.amount).sum() * 10;
             this.finishedRequirements = new ItemStack[requirements.length];
 
@@ -599,7 +625,6 @@ public class TechTree implements ContentList{
 
         /** Flushes research progress to settings. */
         public void save(){
-            Core.settings.put("research-" + content.name, progress);
 
             //save finished requirements by item type
             for(ItemStack stack : finishedRequirements){

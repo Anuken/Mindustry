@@ -2,7 +2,9 @@ package mindustry.entities.units;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -14,6 +16,8 @@ import static mindustry.Vars.*;
 public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
     protected static final int timerTarget = 0;
+    protected static final int timerTarget2 = 1;
+    protected static final int timerTarget3 = 2;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
@@ -25,12 +29,29 @@ public class AIController implements UnitController{
 
     {
         timer.reset(0, Mathf.random(40f));
+        timer.reset(1, Mathf.random(60f));
     }
 
     @Override
     public void updateUnit(){
+        updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    protected UnitCommand command(){
+        return unit.team.data().command;
+    }
+
+    protected void updateVisuals(){
+
+        if(unit.isFlying()){
+            unit.wobble();
+
+            if(unit.moving()){
+                unit.lookAt(unit.vel.angle());
+            }
+        }
     }
 
     protected void updateMovement(){
@@ -39,7 +60,6 @@ public class AIController implements UnitController{
 
     protected void updateTargeting(){
         if(unit.hasWeapons()){
-
             updateWeapons();
         }
     }
@@ -113,6 +133,10 @@ public class AIController implements UnitController{
 
     protected void init(){
 
+    }
+
+    protected @Nullable Tile getClosestSpawner(){
+        return Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
     }
 
     protected void circle(Position target, float circleLength){

@@ -275,6 +275,8 @@ public class MapGenerateDialog extends BaseDialog{
                     }
                 }).grow().left().pad(6).top();
             }).width(280f).pad(3).top().left().fillY();
+
+
             if(++i % cols == 0){
                 filterTable.row();
             }
@@ -348,6 +350,7 @@ public class MapGenerateDialog extends BaseDialog{
 
         result = executor.submit(() -> {
             try{
+                world.setGenerating(true);
                 generating = true;
 
                 if(!filters.isEmpty()){
@@ -400,7 +403,7 @@ public class MapGenerateDialog extends BaseDialog{
                 generating = false;
                 e.printStackTrace();
             }
-            return null;
+            world.setGenerating(false);
         });
     }
 

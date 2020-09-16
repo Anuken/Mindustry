@@ -51,7 +51,7 @@ public class Sorter extends Block{
         public @Nullable Item sortItem;
 
         @Override
-        public void configured(Player player, Object value){
+        public void configured(Unit player, Object value){
             super.configured(player, value);
 
             if(!headless){
@@ -76,7 +76,7 @@ public class Sorter extends Block{
         public boolean acceptItem(Building source, Item item){
             Building to = getTileTarget(item, source, false);
 
-            return to != null && to.acceptItem(this, item) && to.team() == team;
+            return to != null && to.acceptItem(this, item) && to.team == team;
         }
 
         @Override
@@ -88,7 +88,7 @@ public class Sorter extends Block{
 
         public boolean isSame(Building other){
             // comment code below to allow sorter/gate chaining
-            return other != null && other.block().instantTransfer;
+            return other != null && other.block.instantTransfer;
         }
 
         public Building getTileTarget(Item item, Building source, boolean flip){
@@ -105,9 +105,9 @@ public class Sorter extends Block{
             }else{
                 Building a = nearby(Mathf.mod(dir - 1, 4));
                 Building b = nearby(Mathf.mod(dir + 1, 4));
-                boolean ac = a != null && !(a.block().instantTransfer && source.block().instantTransfer) &&
+                boolean ac = a != null && !(a.block.instantTransfer && source.block.instantTransfer) &&
                 a.acceptItem(this, item);
-                boolean bc = b != null && !(b.block().instantTransfer && source.block().instantTransfer) &&
+                boolean bc = b != null && !(b.block.instantTransfer && source.block.instantTransfer) &&
                 b.acceptItem(this, item);
 
                 if(ac && !bc){

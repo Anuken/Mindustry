@@ -30,7 +30,12 @@ public class EventType{
         openWiki,
         teamCoreDamage,
         socketConfigChanged,
-        update
+        update,
+        draw,
+        preDraw,
+        postDraw,
+        uiDrawBegin,
+        uiDrawEnd
     }
 
     public static class WinEvent{}
@@ -76,7 +81,6 @@ public class EventType{
             this.stack = stack;
         }
     }
-
 
     public static class CommandIssueEvent{
         public final Building tile;
@@ -166,11 +170,10 @@ public class EventType{
         }
     }
 
-    /** Called from the logic thread. Do not access graphics here! */
-    public static class BuildinghangeEvent{
+    public static class TileChangeEvent{
         public final Tile tile;
 
-        public BuildinghangeEvent(Tile tile){
+        public TileChangeEvent(Tile tile){
             this.tile = tile;
         }
     }
@@ -221,12 +224,14 @@ public class EventType{
         public final Team team;
         public final @Nullable Unit unit;
         public final boolean breaking;
+        public final @Nullable Object config;
 
-        public BlockBuildEndEvent(Tile tile, @Nullable Unit unit, Team team, boolean breaking){
+        public BlockBuildEndEvent(Tile tile, @Nullable Unit unit, Team team, boolean breaking, @Nullable Object config){
             this.tile = tile;
             this.team = team;
             this.unit = unit;
             this.breaking = breaking;
+            this.config = config;
         }
     }
 

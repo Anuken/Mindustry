@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     @Import float x, y, rotation, reloadMultiplier;
     @Import Vec2 vel;
+    @Import UnitType type;
 
     /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
     static final float minAimDst = 18f;
@@ -28,6 +29,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
     float ammo;
+
+    float ammof(){
+        return ammo / type.ammoCapacity;
+    }
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
