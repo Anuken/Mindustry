@@ -96,23 +96,23 @@ public class IndexedRenderer implements Disposable{
         vertices[idx++] = v2;
 
         //tri2
-        vertices[idx++] = x;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v;
-
-        vertices[idx++] = fx2;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v;
-
         vertices[idx++] = fx2;
         vertices[idx++] = fy2;
         vertices[idx++] = color;
         vertices[idx++] = u2;
         vertices[idx++] = v2;
+
+        vertices[idx++] = fx2;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
 
         mesh.updateVertices(index * vsize * 6, vertices);
     }
@@ -155,6 +155,19 @@ public class IndexedRenderer implements Disposable{
         vertices[idx++] = u;
         vertices[idx++] = v;
 
+        vertices[idx++] = x2;
+        vertices[idx++] = y2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+
+        vertices[idx++] = x3;
+        vertices[idx++] = y3;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+
+        //tri2
         vertices[idx++] = x3;
         vertices[idx++] = y3;
         vertices[idx++] = color;
@@ -164,27 +177,14 @@ public class IndexedRenderer implements Disposable{
         vertices[idx++] = x4;
         vertices[idx++] = y4;
         vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v2;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
 
-        //tri2
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;
         vertices[idx++] = u;
         vertices[idx++] = v;
-
-        vertices[idx++] = x2;
-        vertices[idx++] = y2;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v;
-
-        vertices[idx++] = x3;
-        vertices[idx++] = y3;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v2;
 
         mesh.updateVertices(index * vsize * 6, vertices);
     }

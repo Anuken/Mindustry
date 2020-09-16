@@ -46,9 +46,9 @@ public class EditorTile extends Tile{
             return;
         }
 
-        op(OpType.block, block.id);
         if(rotation != 0) op(OpType.rotation, (byte)rotation);
         if(team() != Team.derelict) op(OpType.team, (byte)team().id);
+        op(OpType.block, block.id);
         super.setBlock(type, team, rotation);
     }
 
