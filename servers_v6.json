@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "address": "mindustry.pl:6000"
+  },
+  {
+    "address": "mindustry.pl:6666"
+  }
+]
