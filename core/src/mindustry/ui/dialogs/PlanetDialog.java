@@ -9,11 +9,11 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
+import arc.scene.style.Drawable;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.Vars;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -41,7 +41,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     private CoreBuild launcher;
     Mode mode = look;
     private boolean launching;
-    private int accessiblePlanets;
+    private int accessiblePlanets = 0;
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -122,8 +122,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     boolean canLaunch(Sector sector){
         return mode == launch &&
-            (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
-            || (sector.preset != null && sector.preset.unlocked())); //is an unlocked preset
+                (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
+                        || (sector.preset != null && sector.preset.unlocked())); //is an unlocked preset
     }
 
     @Override
@@ -139,10 +139,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
 
                     Color color =
-                    sec.hasBase() ? Team.sharded.color :
-                    sec.preset != null ? Team.derelict.color :
-                    sec.hasEnemyBase() ? Team.crux.color :
-                    null;
+                            sec.hasBase() ? Team.sharded.color :
+                                    sec.preset != null ? Team.derelict.color :
+                                            sec.hasEnemyBase() ? Team.crux.color :
+                                                    null;
 
                     if(color != null){
                         planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
@@ -215,57 +215,59 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
 
         cont.stack(
-        new Element(){
-            {
-                //add listener to the background rect, so it doesn't get unnecessary touch input
-                addListener(new ElementGestureListener(){
+                new Element(){
+                    {
+                        //add listener to the background rect, so it doesn't get unnecessary touch input
+                        addListener(new ElementGestureListener(){
+                            @Override
+                            public void tap(InputEvent event, float x, float y, int count, KeyCode button){
+                                if(hovered != null && (mode == launch ? canLaunch(hovered) && hovered != launchSector : hovered.unlocked())){
+                                    selected = hovered;
+                                }
+
+                                if(selected != null){
+                                    updateSelected();
+                                }
+                            }
+                        });
+                    }
+
                     @Override
-                    public void tap(InputEvent event, float x, float y, int count, KeyCode button){
-                        if(hovered != null && (mode == launch ? canLaunch(hovered) && hovered != launchSector : hovered.unlocked())){
-                            selected = hovered;
-                        }
-
-                        if(selected != null){
-                            updateSelected();
+                    public void draw(){
+                        planets.render(PlanetDialog.this);
+                        Core.scene.setScrollFocus(PlanetDialog.this);
+                    }
+                },
+                new Table(t -> {
+                    //TODO localize
+                    t.top();
+                    t.label(() -> mode == launch ? "Select Launch Sector" : "Turn " + universe.turn()).style(Styles.outlineLabel).color(Pal.accent);
+                }),
+                new Table(t -> {
+                    t.right();
+                    for(int i = 0; i < content.planets().size; i++){
+                        if(content.planets().get(i).accessible) {
+                            accessiblePlanets++;
                         }
                     }
-                });
-            }
-
-            @Override
-            public void draw(){
-                planets.render(PlanetDialog.this);
-                Core.scene.setScrollFocus(PlanetDialog.this);
-            }
-        },
-        new Table(t -> {
-            //TODO localize
-            t.top();
-            t.label(() -> mode == launch ? "Select Launch Sector" : "Turn " + universe.turn()).style(Styles.outlineLabel).color(Pal.accent);
-        }),
-        new Table(t -> {
-            t.left();
-            for(int i = 0; i < content.planets().size; i++){
-                accessiblePlanets = i;
-            }
-            if(accessiblePlanets > 1) {
-                t.pane(Styles.smallPane, pt -> {
-                    pt.left();
-                    t.add("Planets:");
-                    t.row();
-
-                    for (int i = 0; i < content.planets().size; i++) {
-                        Planet planet = content.planets().get(i);
-                        if (planet.accessible) {
-                            pt.button(planet.localizedName, () -> {
-                                renderer.planets.planet = planet;
-                            }).width(280).growX();
+                    if(accessiblePlanets > 1) {
+                        t.table(Styles.black6, pt -> {
+                            pt.add("[accent]Planets[]");
                             pt.row();
-                        }
+                            pt.image().growX().height(4f).pad(6f).color(Pal.accent);
+                            pt.row();
+                            for (int i = 0; i < content.planets().size; i++) {
+                                Planet planet = content.planets().get(i);
+                                if (planet.accessible) {
+                                    pt.button(planet.localizedName, Styles.transt, () -> {
+                                        renderer.planets.planet = planet;
+                                    }).width(200).height(30).growX();
+                                    pt.row();
+                                }
+                            }
+                        });
                     }
-                });
-            }
-        })).grow();
+                })).grow();
     }
 
     @Override
