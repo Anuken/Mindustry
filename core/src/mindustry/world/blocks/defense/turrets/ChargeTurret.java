@@ -26,13 +26,13 @@ public class ChargeTurret extends PowerTurret{
         public void shoot(BulletType ammo){
             useAmmo();
 
-            tr.trns(rotation, size * tilesize / 2f);
+            tr.trns(rotation, (size * tilesize / 2f) + yShift, xShift);
             chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
 
             for(int i = 0; i < chargeEffects; i++){
                 Time.run(Mathf.random(chargeMaxDelay), () -> {
                     if(!isValid()) return;
-                    tr.trns(rotation, size * tilesize / 2f);
+                    tr.trns(rotation, (size * tilesize / 2f) + yShift, xShift);
                     chargeEffect.at(x + tr.x, y + tr.y, rotation);
                 });
             }
@@ -41,7 +41,7 @@ public class ChargeTurret extends PowerTurret{
 
             Time.run(chargeTime, () -> {
                 if(!isValid()) return;
-                tr.trns(rotation, size * tilesize / 2f);
+                tr.trns(rotation, (size * tilesize / 2f) + yShift, xShift);
                 recoil = recoilAmount;
                 heat = 1f;
                 bullet(ammo, rotation + Mathf.range(inaccuracy));
