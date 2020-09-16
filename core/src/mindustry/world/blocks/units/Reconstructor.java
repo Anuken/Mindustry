@@ -140,7 +140,7 @@ public class Reconstructor extends UnitBlock{
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
-                            progress += edelta();
+                            progress += edelta() * state.rules.unitBuildSpeedMultiplier;
                         }
 
                         //upgrade the unit

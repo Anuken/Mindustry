@@ -46,6 +46,8 @@ public class EditorTile extends Tile{
             return;
         }
 
+        if(this.block == type && (build == null || build.rotation == rotation)) return;
+
         if(rotation != 0) op(OpType.rotation, (byte)rotation);
         if(team() != Team.derelict) op(OpType.team, (byte)team().id);
         op(OpType.block, block.id);
