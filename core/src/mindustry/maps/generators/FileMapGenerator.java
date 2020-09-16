@@ -3,7 +3,6 @@ package mindustry.maps.generators;
 import arc.math.*;
 import arc.math.geom.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.*;
@@ -29,12 +28,13 @@ public class FileMapGenerator implements WorldGenerator{
         world.setGenerating(true);
 
         tiles = world.tiles;
+        Item[] items = {Items.blastCompound, Items.pyratite, Items.copper, Items.thorium, Items.copper, Items.lead};
 
         for(Tile tile : tiles){
             if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock) && state.hasSector()){
-                for(Content content : state.getSector().data.resources){
-                    if(content instanceof Item && Mathf.chance(0.3)){
-                        tile.build.items.add((Item)content, Math.min(Mathf.random(500), tile.block().itemCapacity));
+                for(Item content : items){
+                    if(Mathf.chance(0.2)){
+                        tile.build.items.add(content, Math.min(Mathf.random(500), tile.block().itemCapacity));
                     }
                 }
             }

@@ -100,6 +100,20 @@ public class JsonIO{
             }
         });
 
+        json.setSerializer(Liquid.class, new Serializer<Liquid>(){
+            @Override
+            public void write(Json json, Liquid object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public Liquid read(Json json, JsonValue jsonData, Class type){
+                if(jsonData.asString() == null) return Liquids.water;
+                Liquid i =  Vars.content.getByName(ContentType.liquid, jsonData.asString());
+                return i == null ? Liquids.water : i;
+            }
+        });
+
         json.setSerializer(Item.class, new Serializer<Item>(){
             @Override
             public void write(Json json, Item object, Class knownType){
@@ -163,6 +177,21 @@ public class JsonIO{
             @Override
             public ItemStack read(Json json, JsonValue jsonData, Class type){
                 return new ItemStack(json.getSerializer(Item.class).read(json, jsonData.get("item"), Item.class), jsonData.getInt("amount"));
+            }
+        });
+
+        json.setSerializer(UnlockableContent.class, new Serializer<UnlockableContent>(){
+            @Override
+            public void write(Json json, UnlockableContent object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public UnlockableContent read(Json json, JsonValue jsonData, Class type){
+                String str = jsonData.asString();
+                Item item = Vars.content.getByName(ContentType.item, str);
+                Liquid liquid = Vars.content.getByName(ContentType.liquid, str);
+                return item != null ? item : liquid;
             }
         });
     }
