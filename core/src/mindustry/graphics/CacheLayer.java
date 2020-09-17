@@ -18,6 +18,17 @@ public enum CacheLayer{
             endShader(Shaders.water);
         }
     },
+	mud{
+        @Override
+        public void begin(){
+            beginShader();
+        }
+
+        @Override
+        public void end(){
+            endShader(Shaders.mud);
+        }
+    },
     tar{
         @Override
         public void begin(){

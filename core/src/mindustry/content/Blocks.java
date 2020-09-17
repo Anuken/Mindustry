@@ -266,6 +266,8 @@ public class Blocks implements ContentList{
 			status = StatusEffects.muddy;
             statusDuration = 30f;
 			attributes.set(Attribute.water, 2f);
+			cacheLayer = CacheLayer.mud;
+			albedo = 0.35f;
         }};
 
         ((ShallowLiquid)darksandTaintedWater).set(Blocks.taintedWater, Blocks.darksand);
