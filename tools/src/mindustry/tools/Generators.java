@@ -232,18 +232,22 @@ public class Generators{
 
                     boolean hasEmpty = false;
                     Color average = new Color();
+                    float asum = 0f;
                     for(int x = 0; x < image.width; x++){
                         for(int y = 0; y < image.height; y++){
                             Color color = image.getColor(x, y);
-                            average.r += color.r;
-                            average.g += color.g;
-                            average.b += color.b;
+                            average.r += color.r*color.a;
+                            average.g += color.g*color.a;
+                            average.b += color.b*color.a;
+                            asum += color.a;
                             if(color.a < 0.9f){
                                 hasEmpty = true;
                             }
                         }
                     }
-                    average.mul(1f / (image.width * image.height));
+
+                    average.mul(1f / asum);
+
                     if(block instanceof Floor){
                         average.mul(0.8f);
                     }else{

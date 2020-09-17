@@ -70,10 +70,10 @@ public class ForceProjector extends Block{
 
         Draw.color(Pal.gray);
         Lines.stroke(3f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color(player.team().color);
         Lines.stroke(1f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color();
     }
 

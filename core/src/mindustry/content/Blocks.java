@@ -327,7 +327,7 @@ public class Blocks implements ContentList{
 
         duneWall = new StaticWall("dune-wall"){{
             variants = 2;
-            basalt.asFloor().wall = this;
+            basalt.asFloor().wall = darksandWater.asFloor().wall = darksandTaintedWater.asFloor().wall = this;
         }};
 
         sandWall = new StaticWall("sand-wall"){{
@@ -1011,7 +1011,7 @@ public class Blocks implements ContentList{
 
         mechanicalPump = new Pump("mechanical-pump"){{
             requirements(Category.liquid, with(Items.copper, 15, Items.metaglass, 10));
-            pumpAmount = 0.1f;
+            pumpAmount = 0.11f;
         }};
 
         rotaryPump = new Pump("rotary-pump"){{
@@ -1136,7 +1136,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
             itemDuration = 90f;
-            consumes.liquid(Liquids.water, 0.06f);
+            consumes.liquid(Liquids.water, 0.07f);
             hasLiquids = true;
             size = 2;
         }};
@@ -1269,7 +1269,7 @@ public class Blocks implements ContentList{
             hasItems = true;
 
             consumes.power(0.80f);
-            consumes.liquid(Liquids.water, 0.18f);
+            consumes.liquid(Liquids.water, 0.2f);
         }};
 
         oilExtractor = new Fracker("oil-extractor"){{
@@ -1645,7 +1645,7 @@ public class Blocks implements ContentList{
         }};
 
         spectre = new ItemTurret("spectre"){{
-            requirements(Category.turret, with(Items.copper, 350, Items.graphite, 300, Items.surgealloy, 250, Items.plastanium, 175, Items.thorium, 250));
+            requirements(Category.turret, with(Items.copper, 900, Items.graphite, 300, Items.surgealloy, 250, Items.plastanium, 175, Items.thorium, 250));
             ammo(
             Items.graphite, Bullets.standardDenseBig,
             Items.pyratite, Bullets.standardIncendiaryBig,
@@ -1671,7 +1671,7 @@ public class Blocks implements ContentList{
         }};
 
         meltdown = new LaserTurret("meltdown"){{
-            requirements(Category.turret, with(Items.copper, 250, Items.lead, 350, Items.graphite, 300, Items.surgealloy, 325, Items.silicon, 325));
+            requirements(Category.turret, with(Items.copper, 1200, Items.lead, 350, Items.graphite, 300, Items.surgealloy, 325, Items.silicon, 325));
             shootEffect = Fx.shootBigSmoke2;
             shootCone = 40f;
             recoilAmount = 4f;

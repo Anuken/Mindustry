@@ -41,7 +41,7 @@ public enum CacheLayer{
         }
     },
     normal(5),
-    walls;
+    walls(3);
 
     public static final CacheLayer[] all = values();
     /** Capacity multiplier. */

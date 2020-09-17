@@ -427,7 +427,7 @@ public class JoinDialog extends BaseDialog{
         }
 
         //get servers
-        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonURL, result -> {
+        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonV6URL, result -> {
             try{
                 Jval val = Jval.read(result.getResultAsString());
                 Core.app.post(() -> {

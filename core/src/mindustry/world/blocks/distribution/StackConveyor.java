@@ -117,7 +117,7 @@ public class StackConveyor extends Block implements Autotiler{
 
             Tile from = world.tile(link);
 
-            if(link == -1 || from == null) return;
+            if(link == -1 || from == null || lastItem == null) return;
 
             int fromRot = from.build == null ? rotation : from.build.rotation;
 
@@ -138,7 +138,7 @@ public class StackConveyor extends Block implements Autotiler{
             //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
             Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
-            Draw.rect(items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
+            Draw.rect(lastItem.icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
         @Override

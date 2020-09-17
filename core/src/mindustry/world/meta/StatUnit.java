@@ -16,6 +16,7 @@ public enum StatUnit{
     powerUnits,
     degrees,
     seconds,
+    minutes,
     perSecond,
     perMinute,
     timesSpeed(false),

@@ -409,16 +409,6 @@ task genSprites(dependsOn: classes, type: JavaExec){
     workingDir = genFolder
 }
 
-task genSectorData(dependsOn: classes, type: JavaExec){
-    main = "mindustry.tools.SectorDataGenerator"
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = "../core/assets/"
-}
-
-task updateCache(dependsOn: [genSectorData]){
-}
-
 task updateBundles(dependsOn: classes, type: JavaExec){
     file(genFolder).mkdirs()
 

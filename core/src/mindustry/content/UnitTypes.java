@@ -41,7 +41,7 @@ public class UnitTypes implements ContentList{
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
-    //water
+    //water + commander
     public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risso, minke, bryde;
 
     //special block unit type

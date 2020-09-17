@@ -77,6 +77,7 @@ public class SaveIO{
         try{
             return getMeta(getStream(file));
         }catch(Exception e){
+            e.printStackTrace();
             return getMeta(getBackupStream(file));
         }
     }

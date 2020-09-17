@@ -275,6 +275,8 @@ public class MapGenerateDialog extends BaseDialog{
                     }
                 }).grow().left().pad(6).top();
             }).width(280f).pad(3).top().left().fillY();
+
+
             if(++i % cols == 0){
                 filterTable.row();
             }
