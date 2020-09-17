@@ -7,6 +7,7 @@ public enum LogicOp{
     sub("-", (a, b) -> a - b),
     mul("*", (a, b) -> a * b),
     div("/", (a, b) -> a / b),
+    idiv("//", (a, b) -> Math.floor(a / b)),
     mod("%", (a, b) -> a % b),
     equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> a == b ? 1 : 0),
     notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> a != b ? 1 : 0),
