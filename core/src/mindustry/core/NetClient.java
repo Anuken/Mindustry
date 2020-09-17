@@ -549,6 +549,10 @@ public class NetClient implements ApplicationListener{
         quiet = true;
     }
 
+    public void clearRemovedEntity(int id){
+        removed.remove(id);
+    }
+
     public void addRemovedEntity(int id){
         removed.add(id);
     }

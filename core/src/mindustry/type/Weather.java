@@ -143,7 +143,7 @@ public abstract class Weather extends UnlockableContent{
 
     @EntityDef(value = {WeatherStatec.class}, pooled = true, isFinal = false)
     @Component(base = true)
-    abstract static class WeatherStateComp implements Drawc{
+    abstract static class WeatherStateComp implements Drawc, Syncc{
         private static final float fadeTime = 60 * 4;
 
         Weather weather;
