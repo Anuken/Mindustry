@@ -260,9 +260,9 @@ public class Blocks implements ContentList{
 
         dirt = new Floor("dirt");
 		
-		mud = new Floor("mud"){{
-	    	speedMultiplier = 0.6f;
-	    	variants = 3;
+        mud = new Floor("mud"){{
+            speedMultiplier = 0.6f;
+            variants = 3;
 	    	status = StatusEffects.muddy;
             statusDuration = 30f;
 	    	attributes.set(Attribute.water, 2f);
