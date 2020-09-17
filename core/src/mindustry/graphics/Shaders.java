@@ -42,7 +42,7 @@ public class Shaders{
         darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
-	mud = new SurfaceShader("mud");
+	    mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
         planet = new PlanetShader();
