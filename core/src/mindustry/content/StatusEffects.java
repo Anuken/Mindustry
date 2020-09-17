@@ -63,7 +63,7 @@ public class StatusEffects implements ContentList{
             });
         }};
 		
-		muddy = new StatusEffect("muddy"){{
+	muddy = new StatusEffect("muddy"){{
             color = Color.valueOf("46382a");
             speedMultiplier = 0.94f;
             effect = Fx.muddy;

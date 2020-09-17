@@ -22,10 +22,10 @@ void main(){
     if(noise > 0.54 && noise < 0.68){
         color.rgb *= 1.4;
     }else if(noise > 0.40 && noise < 0.54){
-		color.rgb *= 1;
-	}else{
-		color.rgb *= 1.2;
-	}
+	color.rgb *= 1;
+    }else{
+	color.rgb *= 1.2;
+    }
 
     gl_FragColor = color;
 }
