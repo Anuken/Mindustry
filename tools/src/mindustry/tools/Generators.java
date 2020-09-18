@@ -306,9 +306,21 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 
+            ObjectSet<String> outlined = new ObjectSet<>();
+
             try{
                 type.load();
                 type.init();
+
+                //TODO decide whether to keep weapon outlines or not
+                if(true)
+                for(Weapon weapon : type.weapons){
+                    if(weapon.rotate && outlined.add(weapon.name) && ImagePacker.has(weapon.name)){
+                        ImagePacker.get(weapon.name).outline(4, Pal.darkerMetal).save(weapon.name);
+
+                        ((GenRegion)Core.atlas.find(weapon.name)).path.delete();
+                    }
+                }
 
                 Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
                 for(int i = 1; i < type.parts; i++){

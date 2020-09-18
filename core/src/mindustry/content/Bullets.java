@@ -269,13 +269,13 @@ public class Bullets implements ContentList{
             status = StatusEffects.burning;
         }};
 
-        missileSurge = new MissileBulletType(3.7f, 20){{
+        missileSurge = new MissileBulletType(3.7f, 18){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
             drag = -0.01f;
-            splashDamageRadius = 28f;
-            splashDamage = 35f;
+            splashDamageRadius = 25f;
+            splashDamage = 25f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             lightning = 2;

@@ -43,7 +43,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
     //water + commander
-    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risso, minke, bryde, omura;
+    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risso, minke, bryde, sei, omura;
 
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
@@ -275,7 +275,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.48f;
+            speed = 0.62f;
             hitsize = 10f;
             health = 320f;
             buildSpeed = 0.9f;
@@ -1254,18 +1254,104 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        sei = new UnitType("sei"){{
+            health = 10000;
+            armor = 12f;
+
+            speed = 0.73f;
+            drag = 0.17f;
+            hitsize = 39f;
+            accel = 0.2f;
+            rotateSpeed = 1.3f;
+            immunities = ObjectSet.with(StatusEffects.wet);
+            rotateShooting = false;
+
+            trailLength = 50;
+            trailX = 18f;
+            trailY = -21f;
+            trailScl = 3f;
+
+            weapons.add(new Weapon("sei-launcher"){{
+
+                x = 0f;
+                y = 0f;
+                rotate = true;
+                rotateSpeed = 4f;
+                mirror = false;
+
+                occlusion = 30f;
+
+                shootY = 2f;
+                recoil = 4f;
+                reload = 45f;
+                shots = 6;
+                spacing = 10f;
+                velocityRnd = 0.4f;
+                inaccuracy = 7f;
+                ejectEffect = Fx.none;
+                shake = 3f;
+                shootSound = Sounds.shootBig;
+                xRand = 8f;
+                shotDelay = 1f;
+
+                bullet = new MissileBulletType(4.2f, 25){{
+                    homingPower = 0.12f;
+                    width = 8f;
+                    height = 8f;
+                    shrinkX = shrinkY = 0f;
+                    drag = -0.003f;
+                    homingRange = 80f;
+                    keepVelocity = false;
+                    splashDamageRadius = 25f;
+                    splashDamage = 25f;
+                    lifetime = 56f;
+                    trailColor = Pal.bulletYellowBack;
+                    backColor = Pal.bulletYellowBack;
+                    frontColor = Pal.bulletYellow;
+                    hitEffect = Fx.blastExplosion;
+                    despawnEffect = Fx.blastExplosion;
+                    weaveScale = 8f;
+                    weaveMag = 2f;
+                }};
+            }});
+
+            weapons.add(new Weapon("large-bullet-mount"){{
+                reload = 80f;
+                cooldownTime = 90f;
+                x = 70f/4f;
+                y = -66f/4f;
+                rotateSpeed = 4f;
+                rotate = true;
+                shootY = 7f;
+                shake = 2f;
+                recoil = 3f;
+                occlusion = 12f;
+                ejectEffect = Fx.shellEjectBig;
+
+                shots = 3;
+                shotDelay = 4f;
+                inaccuracy = 1f;
+                bullet = new BasicBulletType(7f, 50){{
+                    width = 13f;
+                    height = 19f;
+                    shootEffect = Fx.shootBig;
+                    lifetime = 30f;
+                }};
+            }});
+        }};
+
         omura = new UnitType("omura"){{
-            health = 20000;
+            health = 22000;
             speed = 0.62f;
             drag = 0.18f;
             hitsize = 50f;
-            armor = 15f;
+            armor = 16f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
             immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
-            float spawnTime = 0.75f * Time.toMinutes;
+            float spawnTime = 0.5f * Time.toMinutes;
 
             abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
 
@@ -1285,20 +1371,20 @@ public class UnitTypes implements ContentList{
                 shootY = 23f;
                 shake = 6f;
                 recoil = 10.5f;
-                occlusion = 42f;
+                occlusion = 50f;
 
                 shots = 1;
                 ejectEffect = Fx.none;
 
                 bullet = new RailBulletType(){{
                     shootEffect = Fx.railShoot;
-                    speed = 65f;
+                    speed = 67f;
                     lifetime = 8f;
                     pierceEffect = Fx.railHit;
                     updateEffect = Fx.railTrail;
                     hitEffect = Fx.massiveExplosion;
                     smokeEffect = Fx.shootBig2;
-                    damage = 1200;
+                    damage = 1250;
                     pierceDamageFactor = 0.5f;
                 }};
             }});

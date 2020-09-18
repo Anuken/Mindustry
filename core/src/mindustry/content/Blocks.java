@@ -1803,6 +1803,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.zenith, UnitTypes.antumbra},
                 {UnitTypes.spiroct, UnitTypes.arkyid},
                 {UnitTypes.fortress, UnitTypes.scepter},
+                {UnitTypes.bryde, UnitTypes.sei},
             };
         }};
 
@@ -1821,6 +1822,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.antumbra, UnitTypes.eclipse},
                 {UnitTypes.arkyid, UnitTypes.toxopid},
                 {UnitTypes.scepter, UnitTypes.reign},
+                {UnitTypes.sei, UnitTypes.omura}
             };
         }};
 

@@ -3,6 +3,7 @@ package mindustry.tools;
 import arc.func.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.tools.ImagePacker.*;
@@ -58,6 +59,33 @@ class Image{
         int i = image.getRGB(x, y);
         color.argb8888(i);
         return color;
+    }
+
+    Image outline(int radius, Color outlineColor){
+        Image out = copy();
+        for(int x = 0; x < out.width; x++){
+            for(int y = 0; y < out.height; y++){
+
+                Color color = getColor(x, y);
+                out.draw(x, y, color);
+                if(color.a < 1f){
+                    boolean found = false;
+                    outer:
+                    for(int rx = -radius; rx <= radius; rx++){
+                        for(int ry = -radius; ry <= radius; ry++){
+                            if(Mathf.dst(rx, ry) <= radius && getColor(rx + x, ry + y).a > 0.01f){
+                                found = true;
+                                break outer;
+                            }
+                        }
+                    }
+                    if(found){
+                        out.draw(x, y, outlineColor);
+                    }
+                }
+            }
+        }
+        return out;
     }
 
     void each(Intc2 cons){
