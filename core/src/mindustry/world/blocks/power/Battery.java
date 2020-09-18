@@ -1,8 +1,10 @@
 package mindustry.world.blocks.power;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.graphics.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.tilesize;
@@ -27,6 +29,10 @@ public class Battery extends PowerDistributor{
             Draw.color();
 
             Draw.rect(topRegion, x, y);
+
+            Draw.color(team.color);
+            if(teamRegion != null && teamRegion != Core.atlas.find("error")) Draw.rect(teamRegion, x, y);
+            Draw.color();
         }
     }
 }

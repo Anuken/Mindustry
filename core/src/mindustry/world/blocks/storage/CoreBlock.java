@@ -234,7 +234,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawSelect(){
-            Lines.stroke(1f, Pal.accent);
+            Lines.stroke(1f, team.color);
             Cons<Building> outline = t -> {
                 for(int i = 0; i < 4; i++){
                     Point2 p = Geometry.d8edge[i];

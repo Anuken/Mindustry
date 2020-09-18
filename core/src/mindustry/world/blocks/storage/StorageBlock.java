@@ -1,9 +1,13 @@
 package mindustry.world.blocks.storage;
 
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.graphics.*;
 
 public abstract class StorageBlock extends Block{
 
@@ -38,6 +42,13 @@ public abstract class StorageBlock extends Block{
             if(linkedCore != null){
                 linkedCore.drawSelect();
             }
+        }
+
+        @Override
+        public void draw(){
+            super.draw();
+
+            if(teamRegions[1] != null && teamRegions[1] != Core.atlas.find("error")) Drawf.team(teamRegions, team, x, y);
         }
 
         @Override

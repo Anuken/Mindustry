@@ -1,10 +1,12 @@
 package mindustry.world.blocks.storage;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.graphics.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -43,6 +45,11 @@ public class Unloader extends Block{
         bars.remove("items");
     }
 
+    @Override
+    public TextureRegion[] icons(){
+        return teamRegions[1].found() ? new TextureRegion[]{region, teamRegions[1]} : super.icons();
+    }
+
     public class UnloaderBuild extends Building{
         public Item sortItem = null;
         public Building dumpingTo;
@@ -75,6 +82,8 @@ public class Unloader extends Block{
         @Override
         public void draw(){
             super.draw();
+
+            if(teamRegions[1] != null && teamRegions[1] != Core.atlas.find("error")) Drawf.team(teamRegions, team, x, y);
 
             Draw.color(sortItem == null ? Color.clear : sortItem.color);
             Draw.rect("unloader-center", x, y);

@@ -190,4 +190,16 @@ public class Drawf{
 
         Draw.reset();
     }
+
+    public static void team(TextureRegion[] regions, Team team, float x, float y){
+        if(team.id != 1 || team.id != 2) Draw.color(team.color);
+        Draw.rect(regions[team.id], x, y);
+        Draw.color();
+    }
+
+    public static void team(TextureRegion[] regions, Team team, float x, float y, float rotation){
+        if(team.id != 1 || team.id != 2) Draw.color(team.color);
+        Draw.rect(regions[team.id], x, y, rotation);
+        Draw.color();
+    }
 }
