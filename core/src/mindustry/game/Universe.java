@@ -56,7 +56,7 @@ public class Universe{
     public void displayTimeEnd(){
         if(!headless){
             //check if any sectors are under attack to display this
-            Seq<Sector> attacked = state.getSector().planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed());
+            Seq<Sector> attacked = state.getSector().planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed() && s.getSecondsPassed() > 1);
 
             if(attacked.any()){
                 state.set(State.paused);

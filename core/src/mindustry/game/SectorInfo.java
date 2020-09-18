@@ -89,11 +89,6 @@ public class SectorInfo{
     public void update(){
         internalTimeSpent += Time.delta;
 
-        //time spent exceeds turn duration!
-        if(internalTimeSpent >= turnDuration && internalTimeSpent - Time.delta < turnDuration){
-            universe.displayTimeEnd();
-        }
-
         //create last stored core items
         if(lastCoreItems == null){
             lastCoreItems = new int[content.items().size];

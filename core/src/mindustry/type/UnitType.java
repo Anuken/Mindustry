@@ -132,11 +132,6 @@ public class UnitType extends UnlockableContent{
     }
 
     public void update(Unit unit){
-        if(abilities.size > 0){
-            for(Ability a : abilities){
-                a.update(unit);
-            }
-        }
 
         if(unit instanceof Mechc){
             updateMechEffects(unit);
@@ -378,8 +373,8 @@ public class UnitType extends UnlockableContent{
             drawDeactive(unit);
         }
 
-        if(abilities.size > 0){
-            for(Ability a : abilities){
+        if(unit.abilities.size > 0){
+            for(Ability a : unit.abilities){
                 Draw.reset();
                 a.draw(unit);
             }
@@ -512,10 +507,23 @@ public class UnitType extends UnlockableContent{
                 Drawf.shadow(wx, wy, weapon.occlusion);
             }
 
-            Draw.rect(weapon.region, wx, wy,
+            Draw.rect(weapon.region,
+            wx, wy,
             width * Draw.scl * -Mathf.sign(weapon.flipSprite),
             weapon.region.height * Draw.scl,
             weaponRotation);
+
+            if(weapon.heatRegion.found() && mount.heat > 0){
+                Draw.color(weapon.heatColor, mount.heat);
+                Draw.blend(Blending.additive);
+                Draw.rect(weapon.heatRegion,
+                wx, wy,
+                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.region.height * Draw.scl,
+                weaponRotation);
+                Draw.blend();
+                Draw.color();
+            }
         }
 
         Draw.reset();

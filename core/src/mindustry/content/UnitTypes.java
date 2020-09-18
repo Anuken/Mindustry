@@ -2,6 +2,7 @@ package mindustry.content;
 
 import arc.graphics.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
@@ -42,7 +43,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
     //water + commander
-    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risso, minke, bryde;
+    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risso, minke, bryde, omura;
 
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
@@ -668,8 +669,8 @@ public class UnitTypes implements ContentList{
                     width = height = 25f;
                     collidesTiles = collides = true;
                     ammoMultiplier = 4f;
-                    splashDamageRadius = 95f;
-                    splashDamage = 90f;
+                    splashDamageRadius = 90f;
+                    splashDamage = 75f;
                     backColor = Pal.sapBulletBack;
                     frontColor = lightningColor = Pal.sapBullet;
                     lightning = 5;
@@ -690,7 +691,7 @@ public class UnitTypes implements ContentList{
                         width = height = 20f;
                         collidesTiles = false;
                         splashDamageRadius = 80f;
-                        splashDamage = 45f;
+                        splashDamage = 40f;
                         backColor = Pal.sapBulletBack;
                         frontColor = lightningColor = Pal.sapBullet;
                         lightning = 2;
@@ -1164,7 +1165,7 @@ public class UnitTypes implements ContentList{
             accel = 0.2f;
             rotateSpeed = 1.8f;
             drag = 0.17f;
-            hitsize = 14f;
+            hitsize = 16f;
             armor = 6f;
             immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
@@ -1248,6 +1249,55 @@ public class UnitTypes implements ContentList{
                     despawnEffect = Fx.blastExplosion;
                     weaveScale = 8f;
                     weaveMag = 1f;
+                }};
+            }});
+        }};
+
+        omura = new UnitType("omura"){{
+            health = 20000;
+            speed = 0.62f;
+            drag = 0.18f;
+            hitsize = 50f;
+            armor = 15f;
+            accel = 0.19f;
+            rotateSpeed = 0.9f;
+            immunities = ObjectSet.with(StatusEffects.wet);
+
+            float spawnTime = 0.75f * Time.toMinutes;
+
+            abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
+
+            trailLength = 70;
+            trailX = 23f;
+            trailY = -32f;
+            trailScl = 3.5f;
+
+            weapons.add(new Weapon("omura-cannon"){{
+                reload = 110f;
+                cooldownTime = 90f;
+                mirror = false;
+                x = 0f;
+                y = -3.5f;
+                rotateSpeed = 1.4f;
+                rotate = true;
+                shootY = 23f;
+                shake = 6f;
+                recoil = 10.5f;
+                occlusion = 42f;
+
+                shots = 1;
+                ejectEffect = Fx.none;
+
+                bullet = new RailBulletType(){{
+                    shootEffect = Fx.railShoot;
+                    speed = 65f;
+                    lifetime = 8f;
+                    pierceEffect = Fx.railHit;
+                    updateEffect = Fx.railTrail;
+                    hitEffect = Fx.massiveExplosion;
+                    smokeEffect = Fx.shootBig2;
+                    damage = 1200;
+                    pierceDamageFactor = 0.5f;
                 }};
             }});
         }};

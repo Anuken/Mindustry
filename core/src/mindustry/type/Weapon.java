@@ -2,12 +2,14 @@ package mindustry.type;
 
 import arc.*;
 import arc.audio.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.io.*;
 
 public class Weapon{
@@ -51,6 +53,8 @@ public class Weapon{
     public float shotDelay = 0;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
+    /** ticks to cool down the heat region */
+    public float cooldownTime = 20f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
     /** min velocity required for this weapon to shoot */
@@ -63,6 +67,10 @@ public class Weapon{
     public Sound noAmmoSound = Sounds.click;
     /** displayed region (autoloaded) */
     public TextureRegion region;
+    /** heat region, must be same size as region (optional) */
+    public TextureRegion heatRegion;
+    /** heat region tint */
+    public Color heatColor = Pal.turretHeat;
 
     public Weapon(String name){
         this.name = name;
@@ -80,6 +88,7 @@ public class Weapon{
 
     public void load(){
         region = Core.atlas.find(name, Core.atlas.find("clear"));
+        heatRegion = Core.atlas.find(name + "-heat");
     }
 
 }

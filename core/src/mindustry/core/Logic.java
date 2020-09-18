@@ -337,7 +337,14 @@ public class Logic implements ApplicationListener{
 
             //force pausing when the player is out of sector time
             if(state.isOutOfTime()){
-                state.set(State.paused);
+                if(!state.wasTimeout){
+                    universe.displayTimeEnd();
+                    state.wasTimeout = true;
+                }
+                //if no turn was run.
+                if(state.isOutOfTime()){
+                    state.set(State.paused);
+                }
             }
 
             if(!state.isPaused()){

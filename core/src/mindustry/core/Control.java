@@ -191,6 +191,10 @@ public class Control implements ApplicationListener, Loadable{
 
     }
 
+    void resetCamera(){
+
+    }
+
     @Override
     public void loadAsync(){
         Draw.scl = 1f / Core.atlas.find("scale_marker").width;
@@ -280,6 +284,7 @@ public class Control implements ApplicationListener, Loadable{
                 try{
                     net.reset();
                     slot.load();
+                    slot.setAutosave(true);
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position

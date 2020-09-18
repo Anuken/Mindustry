@@ -93,6 +93,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
+            mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
 
             //flip weapon shoot side for alternating weapons at half reload
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&
@@ -138,6 +139,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
                 shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
 
                 mount.reload = weapon.reload;
+                mount.heat = 1f;
 
                 ammo--;
                 if(ammo < 0) ammo = 0;

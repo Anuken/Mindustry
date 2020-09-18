@@ -5,12 +5,13 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-public class ShieldFieldAbility implements Ability{
+public class ShieldFieldAbility extends Ability{
     public float amount = 1, max = 100f, reload = 100, range = 60;
     public Effect applyEffect = Fx.shieldApply;
     public Effect activeEffect = Fx.shieldWave;
 
-    private boolean applied = false;
+    protected float timer;
+    protected boolean applied = false;
 
     ShieldFieldAbility(){}
 
@@ -23,9 +24,9 @@ public class ShieldFieldAbility implements Ability{
 
     @Override
     public void update(Unit unit){
-        unit.timer1 += Time.delta;
+        timer += Time.delta;
 
-        if(unit.timer1 >= reload){
+        if(timer >= reload){
             applied = false;
 
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
@@ -41,7 +42,7 @@ public class ShieldFieldAbility implements Ability{
                 activeEffect.at(unit);
             }
 
-            unit.timer1 = 0f;
+            timer = 0f;
         }
     }
 }

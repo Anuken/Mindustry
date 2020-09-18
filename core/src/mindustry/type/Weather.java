@@ -164,8 +164,8 @@ public abstract class Weather extends UnlockableContent{
 
             life -= Time.delta;
 
-            weather.update(base());
-            weather.updateEffect(base());
+            weather.update(self());
+            weather.updateEffect(self());
 
             if(life < 0){
                 remove();
@@ -178,14 +178,14 @@ public abstract class Weather extends UnlockableContent{
                 Draw.draw(Layer.weather, () -> {
                     weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity);
-                    weather.drawOver(base());
+                    weather.drawOver(self());
                     Draw.reset();
                 });
 
                 Draw.draw(Layer.debris, () -> {
                     weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity);
-                    weather.drawUnder(base());
+                    weather.drawUnder(self());
                     Draw.reset();
                 });
             }
