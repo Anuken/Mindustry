@@ -1,12 +1,10 @@
 package mindustry.world.blocks.storage;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.graphics.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -82,8 +80,6 @@ public class Unloader extends Block{
         @Override
         public void draw(){
             super.draw();
-
-            if(teamRegions[1] != null && teamRegions[1] != Core.atlas.find("error")) Drawf.team(teamRegions, team, x, y);
 
             Draw.color(sortItem == null ? Color.clear : sortItem.color);
             Draw.rect("unloader-center", x, y);

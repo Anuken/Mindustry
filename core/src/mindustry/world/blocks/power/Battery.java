@@ -21,6 +21,11 @@ public class Battery extends PowerDistributor{
         consumesPower = true;
     }
 
+    @Override
+    public TextureRegion[] icons(){
+        return new TextureRegion[]{region};
+    }
+
     public class BatteryBuild extends Building{
         @Override
         public void draw(){

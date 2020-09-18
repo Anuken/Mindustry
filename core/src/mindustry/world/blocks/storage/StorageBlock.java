@@ -24,6 +24,11 @@ public abstract class StorageBlock extends Block{
         return false;
     }
 
+    @Override
+    public TextureRegion[] icons(){
+        return teamRegions[1].found() ? new TextureRegion[]{region, teamRegions[1]} : super.icons();
+    }
+
     public class StorageBuild extends Building{
         protected @Nullable Building linkedCore;
 
