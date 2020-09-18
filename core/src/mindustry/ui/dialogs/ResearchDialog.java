@@ -377,8 +377,18 @@ public class ResearchDialog extends BaseDialog{
         }
 
         boolean canSpend(TechNode node){
-            //can spend when there's at least 1 item that can be spent
-            return selectable(node) && (node.requirements.length == 0 || Structs.contains(node.requirements, i -> items.has(i.item)));
+            if(!selectable(node)) return false;
+
+            if(node.requirements.length == 0) return true;
+
+            //can spend when there's at least 1 item that can be spent (non complete)
+            for(int i = 0; i < node.requirements.length; i++){
+                if(node.finishedRequirements[i].amount < node.requirements[i].amount && items.has(node.requirements[i].item)){
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         void spend(TechNode node){

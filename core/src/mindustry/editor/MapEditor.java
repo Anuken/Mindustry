@@ -231,8 +231,14 @@ public class MapEditor{
                 int px = offsetX + x, py = offsetY + y;
                 if(previous.in(px, py)){
                     tiles.set(x, y, previous.getn(px, py));
-                    tiles.getn(x, y).x = (short)x;
-                    tiles.getn(x, y).y = (short)y;
+                    Tile tile = tiles.getn(x, y);
+                    tile.x = (short)x;
+                    tile.y = (short)y;
+
+                    if(tile.build != null && tile.isCenter()){
+                        tile.build.x = x * tilesize + tile.block().offset;
+                        tile.build.y = y * tilesize + tile.block().offset;
+                    }
                 }else{
                     tiles.set(x, y, new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0));
                 }

@@ -48,6 +48,9 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         unit.remove();
         payloads.add(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
+        if(Vars.net.client()){
+            Vars.netClient.clearRemovedEntity(unit.id);
+        }
     }
 
     void pickup(Building tile){
