@@ -1,10 +1,8 @@
 package mindustry.world.blocks.power;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.graphics.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.tilesize;
@@ -21,11 +19,6 @@ public class Battery extends PowerDistributor{
         consumesPower = true;
     }
 
-    @Override
-    public TextureRegion[] icons(){
-        return new TextureRegion[]{region};
-    }
-
     public class BatteryBuild extends Building{
         @Override
         public void draw(){
@@ -34,10 +27,6 @@ public class Battery extends PowerDistributor{
             Draw.color();
 
             Draw.rect(topRegion, x, y);
-
-            Draw.color(team.color);
-            if(teamRegion != null && teamRegion != Core.atlas.find("error")) Draw.rect(teamRegion, x, y);
-            Draw.color();
         }
     }
 }
