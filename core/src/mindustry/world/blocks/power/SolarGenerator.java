@@ -25,6 +25,11 @@ public class SolarGenerator extends PowerGenerator{
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
+    @Override
+    public TextureRegion[] icons(){
+        return teamRegion.found() ? new TextureRegion[]{region, teamRegion} : super.icons();
+    }
+
     public class SolarGeneratorBuild extends GeneratorBuild{
         @Override
         public void updateTile(){

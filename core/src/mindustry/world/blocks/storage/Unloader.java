@@ -43,11 +43,6 @@ public class Unloader extends Block{
         bars.remove("items");
     }
 
-    @Override
-    public TextureRegion[] icons(){
-        return teamRegions[1].found() ? new TextureRegion[]{region, teamRegions[1]} : super.icons();
-    }
-
     public class UnloaderBuild extends Building{
         public Item sortItem = null;
         public Building dumpingTo;
