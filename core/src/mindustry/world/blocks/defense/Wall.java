@@ -100,7 +100,7 @@ public class Wall extends Block{
             //deflect bullets if necessary
             if(deflect){
                 //slow bullets are not deflected
-                if(bullet.vel().len() <= 0.2f || !bullet.type.reflectable) return true;
+                if(bullet.vel().len() <= 0.1f || !bullet.type.reflectable) return true;
 
                 //bullet reflection chance depends on bullet damage
                 if(!Mathf.chance(chanceDeflect / bullet.damage())) return true;

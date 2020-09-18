@@ -70,7 +70,7 @@ public abstract class BulletType extends Content{
     /** Whether this bullet can be hit by point defense. */
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
-    public boolean reflectable = false;
+    public boolean reflectable = true;
 
     //additional effects
 

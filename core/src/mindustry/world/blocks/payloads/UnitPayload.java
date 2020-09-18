@@ -2,8 +2,10 @@ package mindustry.world.blocks.payloads;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -35,6 +37,18 @@ public class UnitPayload implements Payload{
 
     @Override
     public boolean dump(){
+        //naval units need water.
+        if(unit instanceof WaterMovec){
+            int tx = unit.tileX(), ty = unit.tileY();
+            boolean nearEmpty = !EntityCollisions.waterSolid(tx, ty);
+            for(Point2 p : Geometry.d4){
+                nearEmpty |= !EntityCollisions.waterSolid(tx + p.x, ty + p.y);
+            }
+
+            //cannot dump on dry land
+            if(!nearEmpty) return false;
+        }
+
         //no client dumping
         if(Vars.net.client()) return true;
 

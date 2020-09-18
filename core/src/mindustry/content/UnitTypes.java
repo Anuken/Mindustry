@@ -1126,6 +1126,7 @@ public class UnitTypes implements ContentList{
             accel = 0.3f;
             rotateSpeed = 2.6f;
             immunities = ObjectSet.with(StatusEffects.wet);
+            rotateShooting = false;
 
             trailLength = 20;
             trailX = 5.5f;
@@ -1262,6 +1263,7 @@ public class UnitTypes implements ContentList{
             accel = 0.19f;
             rotateSpeed = 0.9f;
             immunities = ObjectSet.with(StatusEffects.wet);
+            rotateShooting = false;
 
             float spawnTime = 0.75f * Time.toMinutes;
 
