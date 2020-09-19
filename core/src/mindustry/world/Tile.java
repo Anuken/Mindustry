@@ -8,6 +8,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -91,6 +92,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                 if(y >= cy + 1) return 3;
             }
         }else{ //need offsets here
+            Log.info("");
             if(Math.abs(x - cx + 0.5f) > Math.abs(y - cy + 0.5f)){
                 if(x+0.5f <= cx - 1) return 0;
                 if(x+0.5f >= cx + 1) return 2;
