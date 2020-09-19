@@ -161,11 +161,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            //do not consume when cap reached
-            if(constructing()){
-                return Units.canCreate(team, upgrade(payload.unit.type()));
-            }
-            return false;
+            return constructing();
         }
 
         public UnitType unit(){

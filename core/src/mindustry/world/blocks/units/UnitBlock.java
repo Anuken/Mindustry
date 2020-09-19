@@ -55,7 +55,9 @@ public class UnitBlock extends PayloadAcceptor{
 
         @Override
         public void dumpPayload(){
-            Call.unitBlockSpawn(tile);
+            if(payload.dump()){
+                Call.unitBlockSpawn(tile);
+            }
         }
     }
 }

@@ -1422,6 +1422,7 @@ public class UnitTypes implements ContentList{
                 reload = 17f;
                 x = 2.75f;
                 y = 1f;
+                top = false;
 
                 bullet = new BasicBulletType(2.5f, 9){{
                     width = 7f;
