@@ -5,6 +5,7 @@ import mindustry.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.blocks.payloads.*;
 
 import java.util.*;
 
@@ -48,6 +49,19 @@ public class TeamIndexProcess implements AsyncProcess{
         activeCounts[team.id][type.id] += amount;
     }
 
+    private void count(Unit unit){
+        updateCount(unit.team, unit.type(), 1);
+        if(!unit.deactivated) updateActiveCount(unit.team, unit.type(), 1);
+
+        if(unit instanceof Payloadc){
+            ((Payloadc)unit).payloads().each(p -> {
+                if(p instanceof UnitPayload){
+                    count(((UnitPayload)p).unit);
+                }
+            });
+        }
+    }
+
     @Override
     public void reset(){
         counts = new int[Team.all.length];
@@ -71,8 +85,7 @@ public class TeamIndexProcess implements AsyncProcess{
         for(Unit unit : Groups.unit){
             tree(unit.team).insert(unit);
 
-            updateCount(unit.team, unit.type(), 1);
-            if(!unit.deactivated) updateActiveCount(unit.team, unit.type(), 1);
+            count(unit);
         }
     }
 
