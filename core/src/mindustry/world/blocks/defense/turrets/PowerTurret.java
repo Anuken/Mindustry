@@ -29,6 +29,13 @@ public class PowerTurret extends Turret{
     public class PowerTurretBuild extends TurretBuild{
 
         @Override
+        public void updateTile(){
+            unit.ammo(power.status * unit.type().ammoCapacity);
+
+            super.updateTile();
+        }
+
+        @Override
         public BulletType useAmmo(){
             //nothing used directly
             return shootType;

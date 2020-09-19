@@ -61,7 +61,6 @@ public class LaserBulletType extends BulletType{
         float compound = 1f;
 
         Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
-        Lines.precise(true);
         for(Color color : colors){
             Draw.color(color);
             Lines.stroke((cwidth *= lengthFalloff) * b.fout());
@@ -76,7 +75,6 @@ public class LaserBulletType extends BulletType{
 
             compound *= lengthFalloff;
         }
-        Lines.precise(false);
         Draw.reset();
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);

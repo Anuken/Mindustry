@@ -224,12 +224,14 @@ public class EventType{
         public final Team team;
         public final @Nullable Unit unit;
         public final boolean breaking;
+        public final @Nullable Object config;
 
-        public BlockBuildEndEvent(Tile tile, @Nullable Unit unit, Team team, boolean breaking){
+        public BlockBuildEndEvent(Tile tile, @Nullable Unit unit, Team team, boolean breaking, @Nullable Object config){
             this.tile = tile;
             this.team = team;
             this.unit = unit;
             this.breaking = breaking;
+            this.config = config;
         }
     }
 

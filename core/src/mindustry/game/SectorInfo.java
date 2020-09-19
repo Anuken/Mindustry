@@ -2,9 +2,10 @@ package mindustry.game;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -32,6 +33,8 @@ public class SectorInfo{
     public boolean hasCore = true;
     /** Sector that was launched from. */
     public @Nullable Sector origin;
+    /** Resources known to occur at this sector. */
+    public Seq<UnlockableContent> resources = new Seq<>();
     /** Time spent at this sector. Do not use unless you know what you're doing. */
     public transient float internalTimeSpent;
 
@@ -85,11 +88,6 @@ public class SectorInfo{
      * Called every frame. */
     public void update(){
         internalTimeSpent += Time.delta;
-
-        //time spent exceeds turn duration!
-        if(internalTimeSpent >= turnDuration && internalTimeSpent - Time.delta < turnDuration){
-            universe.displayTimeEnd();
-        }
 
         //create last stored core items
         if(lastCoreItems == null){

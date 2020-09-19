@@ -49,9 +49,10 @@ public class GroundAI extends AIController{
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
-        if(!Units.invalidateTarget(target, unit, unit.range())){
+        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type().rotateShooting){
             if(unit.type().hasWeapons()){
-                unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
+                //TODO certain units should not look at the target, e.g. ships
+                unit.lookAt(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
             unit.lookAt(unit.vel().angle());

@@ -228,7 +228,7 @@ public class FloorRenderer implements Disposable{
         int chunksx = Mathf.ceil((float)(world.width()) / chunksize),
         chunksy = Mathf.ceil((float)(world.height()) / chunksize);
         cache = new Chunk[chunksx][chunksy];
-        cbatch = new MultiCacheBatch(chunksize * chunksize * 5);
+        cbatch = new MultiCacheBatch(chunksize * chunksize * 7);
 
         Time.mark();
 

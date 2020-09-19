@@ -3,19 +3,24 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.type.Weather.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import static arc.util.Time.*;
 import static mindustry.Vars.*;
 
 public class CustomRulesDialog extends BaseDialog{
@@ -160,9 +165,12 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
+        check("@rules.buildai", b -> rules.waveTeam.rules().ai = b, () -> rules.waveTeam.rules().ai);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("@rules.title.environment");
+        check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
+        check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
 
         main.button(b -> {
@@ -173,8 +181,9 @@ public class CustomRulesDialog extends BaseDialog{
                 }}).grow();
             }).margin(4).size(50f).padRight(10);
             b.add("@rules.ambientlight");
-        }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
-        main.row();
+        }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
+
+        main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
 
         //TODO add weather patterns
     }
@@ -210,5 +219,121 @@ public class CustomRulesDialog extends BaseDialog{
         main.row();
         main.image().color(Pal.accent).height(3f).padRight(100f).padBottom(20);
         main.row();
+    }
+
+    Cell<TextField> field(Table table, float value, Floatc setter){
+        return table.field(Strings.autoFixed(value, 2), v -> setter.get(Strings.parseFloat(v)))
+            .valid(Strings::canParsePositiveFloat)
+            .size(90f, 40f).pad(2f).addInputDialog();
+    }
+
+    void weatherDialog(){
+        BaseDialog dialog = new BaseDialog("@rules.weather");
+        Runnable[] rebuild = {null};
+
+        dialog.cont.pane(base -> {
+
+            rebuild[0] = () -> {
+                base.clearChildren();
+                int cols = Math.max(1, Core.graphics.getWidth() / 460);
+                int idx = 0;
+
+                for(WeatherEntry entry : rules.weather){
+                    base.top();
+                    //main container
+                    base.table(Tex.pane, c -> {
+                        c.margin(0);
+
+                        //icons to perform actions
+                        c.table(Tex.whiteui, t -> {
+                            t.setColor(Pal.gray);
+
+                            t.top().left();
+                            t.add(entry.weather.localizedName).left().padLeft(6);
+
+                            t.add().growX();
+
+                            ImageButtonStyle style = Styles.geni;
+                            t.defaults().size(42f);
+
+                            t.button(Icon.cancel, style, () -> {
+                                rules.weather.remove(entry);
+                                rebuild[0].run();
+                            });
+                        }).growX();
+
+                        c.row();
+
+                        //all the options
+                        c.table(f -> {
+                            f.marginLeft(4);
+                            f.left().top();
+
+                            f.defaults().padRight(4).left();
+
+                            f.add("@rules.weather.duration");
+                            field(f, entry.minDuration / toMinutes, v -> entry.minDuration = v * toMinutes);
+                            f.add("@waves.to");
+                            field(f, entry.maxDuration / toMinutes, v -> entry.maxDuration = v * toMinutes);
+                            f.add("@unit.minutes");
+
+                            f.row();
+
+                            f.add("@rules.weather.frequency");
+                            field(f, entry.minFrequency / toMinutes, v -> entry.minFrequency = v * toMinutes);
+                            f.add("@waves.to");
+                            field(f, entry.maxFrequency / toMinutes, v -> entry.maxFrequency = v * toMinutes);
+                            f.add("@unit.minutes");
+
+                            //intensity can't currently be customized
+
+                        }).grow().left().pad(6).top();
+                    }).width(410f).pad(3).top().left().fillY();
+
+                    if(++idx % cols == 0){
+                        base.row();
+                    }
+                }
+            };
+
+            rebuild[0].run();
+        }).grow();
+
+        dialog.addCloseButton();
+
+        dialog.buttons.button("@add", Icon.add, () -> {
+            BaseDialog addd = new BaseDialog("@add");
+            addd.cont.pane(t -> {
+                t.background(Tex.button);
+                int i = 0;
+                for(Weather weather : content.<Weather>getBy(ContentType.weather)){
+
+                    t.button(weather.localizedName, Styles.cleart, () -> {
+                        rules.weather.add(new WeatherEntry(weather));
+                        rebuild[0].run();
+
+                        addd.hide();
+                    }).size(140f, 50f);
+                    if(++i % 2 == 0) t.row();
+                }
+            });
+            addd.addCloseButton();
+            addd.show();
+        }).width(170f);
+
+        //reset cooldown to random number
+        dialog.hidden(() -> {
+            float sum = 0;
+            Seq<WeatherEntry> sh = rules.weather.copy();
+            sh.shuffle();
+
+            for(WeatherEntry w : sh){
+                //add the previous cooldowns to the sum so weather events are staggered and don't happen all at once.
+                w.cooldown = sum + Mathf.random(w.minFrequency, w.maxFrequency);
+                sum += w.cooldown;
+            }
+        });
+
+        dialog.show();
     }
 }

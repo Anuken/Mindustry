@@ -338,6 +338,8 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
         state.rules = rules;
+        //campaign is not valid in multiplayer
+        state.rules.sector = null;
     }
 
     @Remote(variants = Variant.both)
@@ -545,6 +547,10 @@ public class NetClient implements ApplicationListener{
     /** When set, any disconnects will be ignored and no dialogs will be shown. */
     public void setQuiet(){
         quiet = true;
+    }
+
+    public void clearRemovedEntity(int id){
+        removed.remove(id);
     }
 
     public void addRemovedEntity(int id){

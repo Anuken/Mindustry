@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -27,6 +28,8 @@ public class StackConveyor extends Block implements Autotiler{
     public float speed = 0f;
     public boolean splitOut = true;
     public float recharge = 2f;
+    public Effect loadEffect = Fx.plasticburn;
+    public Effect unloadEffect = Fx.plasticburn;
 
     public StackConveyor(String name){
         super(name);
@@ -112,20 +115,22 @@ public class StackConveyor extends Block implements Autotiler{
 
             Draw.z(Layer.blockOver);
 
-            Building from = world.build(link);
+            Tile from = world.tile(link);
 
-            if(link == -1 || from == null) return;
+            if(link == -1 || from == null || lastItem == null) return;
+
+            int fromRot = from.build == null ? rotation : from.build.rotation;
 
             //offset
-            Tmp.v1.set(from);
-            Tmp.v2.set(tile);
+            Tmp.v1.set(from.worldx(), from.worldy());
+            Tmp.v2.set(x, y);
             Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interp.linear);
 
             //rotation
-            float a = (from.rotation%4) * 90;
+            float a = (fromRot%4) * 90;
             float b = (rotation%4) * 90;
-            if((from.rotation%4) == 3 && (rotation%4) == 0) a = -1 * 90;
-            if((from.rotation%4) == 0 && (rotation%4) == 3) a =  4 * 90;
+            if((fromRot%4) == 3 && (rotation%4) == 0) a = -1 * 90;
+            if((fromRot%4) == 0 && (rotation%4) == 3) a =  4 * 90;
 
             //stack
             Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
@@ -133,7 +138,7 @@ public class StackConveyor extends Block implements Autotiler{
             //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
             Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
-            Draw.rect(items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
+            Draw.rect(lastItem.icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
         @Override
@@ -221,11 +226,11 @@ public class StackConveyor extends Block implements Autotiler{
 
         protected void poofIn(){
             link = tile.pos();
-            Fx.plasticburn.at(this);
+            loadEffect.at(this);
         }
 
         protected void poofOut(){
-            Fx.plasticburn.at(this);
+            unloadEffect.at(this);
             link = -1;
         }
 

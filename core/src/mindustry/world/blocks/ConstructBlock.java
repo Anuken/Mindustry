@@ -23,51 +23,61 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class BuildBlock extends Block{
+/** A block in the process of construction. */
+public class ConstructBlock extends Block{
     public static final int maxSize = 16;
-    private static final BuildBlock[] buildBlocks = new BuildBlock[maxSize];
+    private static final ConstructBlock[] consBlocks = new ConstructBlock[maxSize];
 
     private static long lastTime = 0;
     private static int pitchSeq = 0;
     private static long lastPlayed;
 
-    public BuildBlock(int size){
+    public ConstructBlock(int size){
         super("build" + size);
         this.size = size;
         update = true;
         health = 20;
         consumesTap = true;
         solidifes = true;
-        buildBlocks[size - 1] = this;
+        consBlocks[size - 1] = this;
     }
 
     /** Returns a BuildBlock by size. */
-    public static BuildBlock get(int size){
-        if(size > maxSize) throw new IllegalArgumentException("No. Don't place BuildBlocks of size greater than " + maxSize);
-        return buildBlocks[size - 1];
+    public static ConstructBlock get(int size){
+        if(size > maxSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxSize);
+        return consBlocks[size - 1];
     }
 
     @Remote(called = Loc.server)
-    public static void deconstructFinish(Tile tile, Block block, int builderID){
+    public static void deconstructFinish(Tile tile, Block block, Unit builder){
         Team team = tile.team();
         Fx.breakBlock.at(tile.drawx(), tile.drawy(), block.size);
-        Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, true));
+        Events.fire(new BlockBuildEndEvent(tile, builder, team, true, null));
         tile.remove();
         if(shouldPlay()) Sounds.breaks.at(tile, calcPitch(false));
     }
 
     @Remote(called = Loc.server)
-    public static void constructFinish(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
+    public static void constructFinish(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
         if(tile == null) return;
+
         float healthf = tile.build == null ? 1f : tile.build.healthf();
+
         tile.setBlock(block, team, rotation);
-        if(tile.build != null) tile.build.health = block.health * healthf;
-        //last builder was this local client player, call placed()
-        if(tile.build != null && !headless && builderID == player.unit().id()){
-            if(!skipConfig){
-                tile.build.playerPlaced();
+
+        if(tile.build != null){
+            tile.build.health = block.health * healthf;
+
+            if(config != null){
+                tile.build.configured(builder, config);
             }
         }
+
+        //last builder was this local client player, call placed()
+        if(tile.build != null && !headless && builder == player.unit()){
+            tile.build.playerPlaced(config);
+        }
+
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
     }
 
@@ -95,11 +105,11 @@ public class BuildBlock extends Block{
         }
     }
 
-    public static void constructed(Tile tile, Block block, int builderID, byte rotation, Team team, boolean skipConfig){
-        Call.constructFinish(tile, block, builderID, rotation, team, skipConfig);
+    public static void constructed(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
+        Call.constructFinish(tile, block, builder, rotation, team, config);
         tile.build.placed();
 
-        Events.fire(new BlockBuildEndEvent(tile, Groups.unit.getByID(builderID), team, false));
+        Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
@@ -108,7 +118,7 @@ public class BuildBlock extends Block{
         return true;
     }
 
-    public class BuildEntity extends Building{
+    public class ConstructBuild extends Building{
         /**
          * The recipe of the block that is being constructed.
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
@@ -122,7 +132,7 @@ public class BuildBlock extends Block{
          * If a non-recipe block is being deconstructed, this is the block that is being deconstructed.
          */
         public Block previous;
-        public int builderID = -1;
+        public Object lastConfig;
 
         private float[] accumulator;
         private float[] totalAccumulator;
@@ -154,7 +164,7 @@ public class BuildBlock extends Block{
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.builder().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock), false);
+                player.builder().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
             }
         }
 
@@ -190,11 +200,13 @@ public class BuildBlock extends Block{
             });
         }
 
-        public boolean construct(Unit builder, @Nullable Building core, float amount, boolean configured){
+        public void construct(Unit builder, @Nullable Building core, float amount, Object config){
             if(cblock == null){
                 kill();
-                return false;
+                return;
             }
+
+            lastConfig = config;
 
             if(cblock.requirements.length != accumulator.length || totalAccumulator.length != cblock.requirements.length){
                 setConstruct(previous, cblock);
@@ -211,16 +223,13 @@ public class BuildBlock extends Block{
             maxProgress = core == null || team.rules().infiniteResources ? maxProgress : checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-            builderID = builder.id;
 
             if(progress >= 1f || state.rules.infiniteResources){
-                constructed(tile, cblock, builderID, (byte)rotation, builder.team, configured);
-                return true;
+                constructed(tile, cblock, builder, (byte)rotation, builder.team, config);
             }
-            return false;
         }
 
-        public void deconstruct(Unitc builder, @Nullable Building core, float amount){
+        public void deconstruct(Unit builder, @Nullable Building core, float amount){
             float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
 
             if(cblock != null){
@@ -253,10 +262,8 @@ public class BuildBlock extends Block{
 
             progress = Mathf.clamp(progress - amount);
 
-            builderID = builder.id();
-
             if(progress <= 0 || state.rules.infiniteResources){
-                Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, builderID);
+                Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, builder);
             }
         }
 

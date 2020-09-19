@@ -128,6 +128,7 @@ public class Saves{
             sector.save.setName(sector.save.file.nameWithoutExtension());
             saves.add(sector.save);
         }
+        sector.save.setAutosave(true);
         sector.save.save();
         lastSectorSave = sector.save;
         Core.settings.put("last-sector-save", sector.save.getName());

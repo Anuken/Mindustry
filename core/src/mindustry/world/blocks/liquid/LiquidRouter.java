@@ -11,7 +11,7 @@ public class LiquidRouter extends LiquidBlock{
         noUpdateDisabled = true;
     }
 
-    public class LiquidRouterEntity extends LiquidBuild{
+    public class LiquidRouterBuild extends LiquidBuild{
         @Override
         public void updateTile(){
             if(liquids.total() > 0.01f){

@@ -33,7 +33,7 @@ public class BlockIndexer{
     /** Maps each team ID to a quarant. A quadrant is a grid of bits, where each bit is set if and only if there is a block of that team in that quadrant. */
     private GridBits[] structQuadrants;
     /** Stores all damaged tile entities by team. */
-    private BuildingArray[] damagedTiles = new BuildingArray[Team.all.length];
+    private ObjectSet<Building>[] damagedTiles = new ObjectSet[Team.all.length];
     /** All ores available on this map. */
     private ObjectSet<Item> allOres = new ObjectSet<>();
     /** Stores teams that are present here as tiles. */
@@ -70,7 +70,7 @@ public class BlockIndexer{
         Events.on(WorldLoadEvent.class, event -> {
             scanOres.clear();
             scanOres.addAll(Item.getAllOres());
-            damagedTiles = new BuildingArray[Team.all.length];
+            damagedTiles = new ObjectSet[Team.all.length];
             flagMap = new TileArray[Team.all.length][BlockFlag.all.length];
             unitCaps = new int[Team.all.length];
             activeTeams = new Seq<>(Team.class);
@@ -139,16 +139,16 @@ public class BlockIndexer{
     }
 
     /** Returns all damaged tiles by team. */
-    public BuildingArray getDamaged(Team team){
-        returnArray.clear();
+    public ObjectSet<Building> getDamaged(Team team){
+        breturnArray.clear();
 
         if(damagedTiles[team.id] == null){
-            damagedTiles[team.id] = new BuildingArray();
+            damagedTiles[team.id] = new ObjectSet<>();
         }
 
-        BuildingArray set = damagedTiles[team.id];
+        ObjectSet<Building> set = damagedTiles[team.id];
         for(Building build : set){
-            if((!build.isValid() || build.team != team || !build.damaged()) || build.block instanceof BuildBlock){
+            if((!build.isValid() || build.team != team || !build.damaged()) || build.block instanceof ConstructBlock){
                 breturnArray.add(build);
             }
         }
@@ -214,7 +214,7 @@ public class BlockIndexer{
 
     public void notifyTileDamaged(Building entity){
         if(damagedTiles[entity.team.id] == null){
-            damagedTiles[entity.team.id] = new BuildingArray();
+            damagedTiles[entity.team.id] = new ObjectSet<Building>();
         }
 
         damagedTiles[entity.team.id].add(entity);
@@ -255,15 +255,15 @@ public class BlockIndexer{
 
                         if(e == null) continue;
 
-                        if(e.team != team || !pred.get(e) || !e.block().targetable)
+                        if(e.team != team || !pred.get(e) || !e.block.targetable)
                             continue;
 
                         float ndst = e.dst2(x, y);
                         if(ndst < range2 && (closest == null ||
                         //this one is closer, and it is at least of equal priority
-                        (ndst < dst && (!usePriority || closest.block().priority.ordinal() <= e.block().priority.ordinal())) ||
+                        (ndst < dst && (!usePriority || closest.block.priority.ordinal() <= e.block.priority.ordinal())) ||
                         //priority is used, and new block has higher priority regardless of range
-                        (usePriority && closest.block().priority.ordinal() < e.block().priority.ordinal()))){
+                        (usePriority && closest.block.priority.ordinal() < e.block.priority.ordinal()))){
                             dst = ndst;
                             closest = e;
                         }
@@ -473,37 +473,6 @@ public class BlockIndexer{
 
         @Override
         public Iterator<Tile> iterator(){
-            return tiles.iterator();
-        }
-    }
-
-    //TODO copy-pasted code, generics would be nice here
-    public static class BuildingArray implements Iterable<Building>{
-        private Seq<Building> tiles = new Seq<>(false, 16);
-        private IntSet contained = new IntSet();
-
-        public void add(Building tile){
-            if(contained.add(tile.pos())){
-                tiles.add(tile);
-            }
-        }
-
-        public void remove(Building tile){
-            if(contained.remove(tile.pos())){
-                tiles.remove(tile);
-            }
-        }
-
-        public int size(){
-            return tiles.size;
-        }
-
-        public Building first(){
-            return tiles.first();
-        }
-
-        @Override
-        public Iterator<Building> iterator(){
             return tiles.iterator();
         }
     }

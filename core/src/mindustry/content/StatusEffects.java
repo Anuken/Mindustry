@@ -9,7 +9,7 @@ import mindustry.type.StatusEffect;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed;
+    public static StatusEffect none, burning, freezing, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed;
 
     @Override
     public void load(){
@@ -53,7 +53,7 @@ public class StatusEffects implements ContentList{
 
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
-                    unit.damagePierce(20f);
+                    unit.damagePierce(14f);
                     if(unit.team() == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
@@ -61,6 +61,13 @@ public class StatusEffects implements ContentList{
                 }));
                 opposite(burning);
             });
+        }};
+		
+        muddy = new StatusEffect("muddy"){{
+            color = Color.valueOf("46382a");
+            speedMultiplier = 0.94f;
+            effect = Fx.muddy;
+            effectChance = 0.09f;
         }};
 
         melting = new StatusEffect("melting"){{

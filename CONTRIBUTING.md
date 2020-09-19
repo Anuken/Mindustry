@@ -68,3 +68,6 @@ If something needs to be encapsulated in the future, IntelliJ can handle it with
 
 #### Do not create methods unless necessary.
 Unless a block of code is very large or used in more than 1-2 places, don't split it up into a separate method. Making unnecessary methods only creates confusion, and may slightly decrease performance.  
+
+## Other Notes
+If you would like your name to appear in the game's credits, add it to the [list of contributors](https://github.com/Anuken/Mindustry/blob/master/core/assets/contributors) as part of your PR.

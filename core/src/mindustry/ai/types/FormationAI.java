@@ -58,6 +58,7 @@ public class FormationAI extends AIController implements FormationMember{
     public void removed(Unit unit){
         if(formation != null){
             formation.removeMember(this);
+            unit.resetController();
         }
     }
 

@@ -35,7 +35,7 @@ public class Router extends Block{
                 time += 1f / speed * delta();
                 Building target = getTileTarget(lastItem, lastInput, false);
 
-                if(target != null && (time >= 1f || !(target.block() instanceof Router || target.block().instantTransfer))){
+                if(target != null && (time >= 1f || !(target.block instanceof Router || target.block.instantTransfer))){
                     getTileTarget(lastItem, lastInput, true);
                     target.handleItem(this, lastItem);
                     items.remove(lastItem, 1);

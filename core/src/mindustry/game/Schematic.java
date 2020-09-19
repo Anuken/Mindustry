@@ -12,7 +12,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -43,8 +42,6 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         IntIntMap amounts = new IntIntMap();
 
         tiles.each(t -> {
-            if(t.block.buildVisibility == BuildVisibility.hidden) return;
-
             for(ItemStack stack : t.block.requirements){
                 amounts.increment(stack.item.id, stack.amount);
             }

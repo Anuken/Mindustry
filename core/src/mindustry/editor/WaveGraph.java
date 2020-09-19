@@ -32,7 +32,6 @@ public class WaveGraph extends Table{
 
         rect((x, y, width, height) -> {
             Lines.stroke(Scl.scl(3f));
-            Lines.precise(true);
 
             GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
             Font font = Fonts.outline;
@@ -122,7 +121,6 @@ public class WaveGraph extends Table{
 
             Pools.free(lay);
 
-            Lines.precise(false);
             Draw.reset();
         }).pad(4).padBottom(10).grow();
 

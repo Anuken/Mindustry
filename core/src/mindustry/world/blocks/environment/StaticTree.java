@@ -16,7 +16,7 @@ public class StaticTree extends StaticWall{
     public void drawBase(Tile tile){
         TextureRegion r = Tmp.tr1;
         r.set(region);
-        int crop = (region.getWidth() - tilesize*4) / 2;
+        int crop = (region.width - tilesize*4) / 2;
         float ox = 0;
         float oy = 0;
 
@@ -24,7 +24,7 @@ public class StaticTree extends StaticWall{
             if(tile.getNearby(i) != null && tile.getNearby(i).block() instanceof StaticWall){
 
                 if(i == 0){
-                    r.setWidth(r.getWidth() - crop);
+                    r.setWidth(r.width - crop);
                     ox -= crop /2f;
                 }else if(i == 1){
                     r.setY(r.getY() + crop);
@@ -33,7 +33,7 @@ public class StaticTree extends StaticWall{
                     r.setX(r.getX() + crop);
                     ox += crop /2f;
                 }else{
-                    r.setHeight(r.getHeight() - crop);
+                    r.setHeight(r.height - crop);
                     oy += crop /2f;
                 }
             }

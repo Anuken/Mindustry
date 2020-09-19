@@ -10,8 +10,8 @@ public class LegacyIO{
     /** Maps old unit names to new ones. */
     public static final StringMap unitMap = StringMap.of(
     "titan", "mace",
-    "chaos-array", "vestige",
-    "eradicator", "cataclyst",
+    "chaos-array", "scepter",
+    "eradicator", "reign",
     "eruptor", "atrax",
     "wraith", "flare",
     "ghoul", "horizon",

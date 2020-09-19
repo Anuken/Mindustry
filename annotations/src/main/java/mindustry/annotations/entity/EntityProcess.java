@@ -77,7 +77,11 @@ public class EntityProcess extends BaseProcessor{
                 for(Smethod elem : component.methods()){
                     if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
                     //get all statements in the method, store them
-                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString());
+                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString()
+                        //replace all self() invocations with this
+                        .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                        .replaceAll("self\\(\\)", "this")
+                    );
                 }
             }
 
@@ -642,10 +646,10 @@ public class EntityProcess extends BaseProcessor{
 
             //build mapping class for sync IDs
             TypeSpec.Builder idBuilder = TypeSpec.classBuilder("EntityMapping").addModifiers(Modifier.PUBLIC)
-            .addField(FieldSpec.builder(TypeName.get(Prov[].class), "idMap", Modifier.PRIVATE, Modifier.STATIC).initializer("new Prov[256]").build())
+            .addField(FieldSpec.builder(TypeName.get(Prov[].class), "idMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new Prov[256]").build())
             .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(ObjectMap.class),
                 tname(String.class), tname(Prov.class)),
-                "nameMap", Modifier.PRIVATE, Modifier.STATIC).initializer("new ObjectMap<>()").build())
+                "nameMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new ObjectMap<>()").build())
             .addMethod(MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.get(Prov.class)).addParameter(int.class, "id").addStatement("return idMap[id]").build())
             .addMethod(MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)

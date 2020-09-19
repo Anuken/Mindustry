@@ -7,10 +7,10 @@ import arc.math.Mathf;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 
-public class Rock extends Block{
+public class Boulder extends Block{
     protected int variants;
 
-    public Rock(String name){
+    public Boulder(String name){
         super(name);
         breakable = true;
         alwaysReplace = true;

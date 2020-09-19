@@ -485,7 +485,7 @@ public class NetServer implements ApplicationListener{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         player.con.sendStream(data);
 
-        Log.debug("Packed @ invalid world data.", stream.size());
+        Log.debug("Packed @ bytes of world data.", stream.size());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -593,36 +593,36 @@ public class NetServer implements ApplicationListener{
         if(player.isBuilder()){
             player.builder().clearBuilding();
             player.builder().updateBuilding(building);
+
+            if(requests != null){
+                for(BuildPlan req : requests){
+                    if(req == null) continue;
+                    Tile tile = world.tile(req.x, req.y);
+                    if(tile == null || (!req.breaking && req.block == null)) continue;
+                    //auto-skip done requests
+                    if(req.breaking && tile.block() == Blocks.air){
+                        continue;
+                    }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || (tile.build != null && tile.build.rotation == req.rotation))){
+                        continue;
+                    }else if(con.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
+                        continue;
+                    }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
+                        action.block = req.block;
+                        action.rotation = req.rotation;
+                        action.config = req.config;
+                    })){
+                        //force the player to remove this request if that's not the case
+                        Call.removeQueueBlock(player.con, req.x, req.y, req.breaking);
+                        con.rejectedRequests.add(req);
+                        continue;
+                    }
+                    player.builder().plans().addLast(req);
+                }
+            }
         }
 
         if(player.isMiner()){
             player.miner().mineTile(mining);
-        }
-
-        if(requests != null){
-            for(BuildPlan req : requests){
-                if(req == null) continue;
-                Tile tile = world.tile(req.x, req.y);
-                if(tile == null || (!req.breaking && req.block == null)) continue;
-                //auto-skip done requests
-                if(req.breaking && tile.block() == Blocks.air){
-                    continue;
-                }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || (tile.build != null && tile.build.rotation == req.rotation))){
-                    continue;
-                }else if(con.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
-                    continue;
-                }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
-                    action.block = req.block;
-                    action.rotation = req.rotation;
-                    action.config = req.config;
-                })){
-                    //force the player to remove this request if that's not the case
-                    Call.removeQueueBlock(player.con, req.x, req.y, req.breaking);
-                    con.rejectedRequests.add(req);
-                    continue;
-                }
-                player.builder().plans().addLast(req);
-            }
         }
 
         con.rejectedRequests.clear();
@@ -809,7 +809,7 @@ public class NetServer implements ApplicationListener{
 
         short sent = 0;
         for(Building entity : Groups.build){
-            if(!entity.block().sync) continue;
+            if(!entity.block.sync) continue;
             sent ++;
 
             dataStream.writeInt(entity.pos());
@@ -838,7 +838,7 @@ public class NetServer implements ApplicationListener{
         dataStream.writeByte(cores.size);
 
         for(CoreBuild entity : cores){
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.tile.pos());
             entity.items.write(Writes.get(dataStream));
         }
 

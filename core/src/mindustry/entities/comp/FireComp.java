@@ -97,11 +97,11 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
 
     @Override
     public void afterRead(){
-        Fires.register(base());
+        Fires.register(self());
     }
 
     @Override
     public void afterSync(){
-        Fires.register(base());
+        Fires.register(self());
     }
 }
