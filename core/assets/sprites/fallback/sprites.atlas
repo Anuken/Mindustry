@@ -1039,6 +1039,13 @@ toxopid-cannon-outline
   orig: 206, 220
   offset: 0, 0
   index: -1
+toxopid-leg
+  rotate: false
+  xy: 1, 1
+  size: 150, 72
+  orig: 150, 72
+  offset: 0, 0
+  index: -1
 toxopid-outline
   rotate: false
   xy: 648, 895
@@ -1233,13 +1240,6 @@ toxopid-cell
   xy: 964, 668
   size: 152, 124
   orig: 152, 124
-  offset: 0, 0
-  index: -1
-toxopid-leg
-  rotate: false
-  xy: 1, 1
-  size: 150, 72
-  orig: 150, 72
   offset: 0, 0
   index: -1
 omura-cannon
@@ -3768,6 +3768,13 @@ arkyid-joint-base
   orig: 70, 70
   offset: 0, 0
   index: -1
+arkyid-leg
+  rotate: false
+  xy: 621, 605
+  size: 56, 56
+  orig: 56, 56
+  offset: 0, 0
+  index: -1
 arkyid-leg-base
   rotate: false
   xy: 473, 1982
@@ -3801,6 +3808,13 @@ atrax-joint
   xy: 1725, 1523
   size: 26, 26
   orig: 26, 26
+  offset: 0, 0
+  index: -1
+atrax-leg
+  rotate: false
+  xy: 553, 10
+  size: 36, 26
+  orig: 36, 26
   offset: 0, 0
   index: -1
 atrax-leg-base
@@ -6120,6 +6134,13 @@ spiroct-joint
   orig: 32, 32
   offset: 0, 0
   index: -1
+spiroct-leg
+  rotate: false
+  xy: 507, 1848
+  size: 48, 34
+  orig: 48, 34
+  offset: 0, 0
+  index: -1
 spiroct-leg-base
   rotate: false
   xy: 1941, 1650
@@ -6624,13 +6645,6 @@ alpha-cell
   orig: 48, 48
   offset: 0, 0
   index: -1
-arkyid-leg
-  rotate: false
-  xy: 621, 605
-  size: 56, 56
-  orig: 56, 56
-  offset: 0, 0
-  index: -1
 atrax
   rotate: false
   xy: 1, 9
@@ -6650,13 +6664,6 @@ atrax-cell
   xy: 1581, 1786
   size: 88, 64
   orig: 88, 64
-  offset: 0, 0
-  index: -1
-atrax-leg
-  rotate: false
-  xy: 553, 10
-  size: 36, 26
-  orig: 36, 26
   offset: 0, 0
   index: -1
 beta
@@ -6930,13 +6937,6 @@ spiroct-cell
   xy: 1389, 1775
   size: 94, 75
   orig: 94, 75
-  offset: 0, 0
-  index: -1
-spiroct-leg
-  rotate: false
-  xy: 507, 1848
-  size: 48, 34
-  orig: 48, 34
   offset: 0, 0
   index: -1
 vanguard

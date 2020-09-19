@@ -29,7 +29,7 @@ public class MapInfoDialog extends BaseDialog{
     private void setup(){
         cont.clear();
 
-        ObjectMap<String, String> tags = editor.getTags();
+        ObjectMap<String, String> tags = editor.tags;
         
         cont.pane(t -> {
             t.add("@editor.mapname").padRight(8).left();
@@ -73,8 +73,8 @@ public class MapInfoDialog extends BaseDialog{
             t.row();
             t.add("@editor.generation").padRight(8).left();
             t.button("@edit", () -> {
-                generate.show(Vars.maps.readFilters(editor.getTags().get("genfilters", "")),
-                filters -> editor.getTags().put("genfilters", JsonIO.write(filters)));
+                generate.show(Vars.maps.readFilters(editor.tags.get("genfilters", "")),
+                filters -> editor.tags.put("genfilters", JsonIO.write(filters)));
                 hide();
             }).left().width(200f);
 

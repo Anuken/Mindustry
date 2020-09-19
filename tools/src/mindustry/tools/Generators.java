@@ -338,6 +338,7 @@ public class Generators{
                 outliner.get(type.footRegion);
                 outliner.get(type.legBaseRegion);
                 outliner.get(type.baseJointRegion);
+                if(type.constructor.get() instanceof Legsc) outliner.get(type.legRegion);
 
                 Image image = ImagePacker.get(type.region);
 

@@ -1010,6 +1010,7 @@ public class UnitTypes implements ContentList{
             abilities.add(new HealFieldAbility(5f, 60f * 5, 50f));
 
             weapons.add(new Weapon("heal-weapon-mount"){{
+                top = false;
                 y = -2.5f;
                 x = 3.5f;
                 reload = 30f;

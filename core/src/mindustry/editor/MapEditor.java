@@ -18,10 +18,10 @@ import static mindustry.Vars.*;
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
 
-    private final Context context = new Context();
-    private StringMap tags = new StringMap();
-    private MapRenderer renderer = new MapRenderer(this);
+    public StringMap tags = new StringMap();
+    public MapRenderer renderer = new MapRenderer(this);
 
+    private final Context context = new Context();
     private OperationStack stack = new OperationStack();
     private DrawOperation currentOp;
     private boolean loading;
@@ -33,10 +33,6 @@ public class MapEditor{
 
     public boolean isLoading(){
         return loading;
-    }
-
-    public StringMap getTags(){
-        return tags;
     }
 
     public void beginEdit(int width, int height){
@@ -212,10 +208,6 @@ public class MapEditor{
                 drawer.get(tile(wx, wy));
             }
         }
-    }
-
-    public MapRenderer renderer(){
-        return renderer;
     }
 
     public void resize(int width, int height){

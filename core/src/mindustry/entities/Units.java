@@ -1,5 +1,6 @@
 package mindustry.entities;
 
+import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
@@ -17,6 +18,15 @@ public class Units{
     private static Unit result;
     private static float cdist;
     private static boolean boolResult;
+
+    @Remote(called = Loc.server)
+    public static void unitCapDeath(Unit unit){
+        if(unit != null){
+            unit.dead = true;
+            Fx.unitCapKill.at(unit);
+            Core.app.post(() -> Call.unitDeath(unit.id));
+        }
+    }
 
     @Remote(called = Loc.server)
     public static void unitDeath(int uid){

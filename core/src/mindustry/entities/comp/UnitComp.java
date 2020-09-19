@@ -209,6 +209,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //check if over unit cap
         if(count() > cap() && !spawnedByCore){
             deactivated = true;
+
+            if(!dead){
+                Call.unitCapDeath(self());
+            }
         }else{
             teamIndex.updateActiveCount(team, type, 1);
         }
@@ -245,6 +249,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     a.update(self());
                 }
             }
+        }else if(!dead){
+            Call.unitCapDeath(self());
         }
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
