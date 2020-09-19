@@ -522,13 +522,13 @@ public class TechTree implements ContentList{
         });
     }
 
-    private static void setup(){
+    public static void setup(){
         TechNode.context = null;
         map = new ObjectMap<>();
         all = new Seq<>();
     }
 
-    private static TechNode node(UnlockableContent content, Runnable children){
+    public static TechNode node(UnlockableContent content, Runnable children){
         ItemStack[] requirements;
 
         if(content instanceof Block){
@@ -547,17 +547,17 @@ public class TechTree implements ContentList{
         return node(content, requirements, children);
     }
 
-    private static TechNode node(UnlockableContent content, ItemStack[] requirements, Runnable children){
+    public static TechNode node(UnlockableContent content, ItemStack[] requirements, Runnable children){
         return new TechNode(content, requirements, children);
     }
 
-    private static TechNode node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
+    public static TechNode node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
         TechNode node = new TechNode(content, empty, children);
         node.objectives = objectives;
         return node;
     }
 
-    private static TechNode node(UnlockableContent block){
+    public static TechNode node(UnlockableContent block){
         return node(block, () -> {});
     }
 
