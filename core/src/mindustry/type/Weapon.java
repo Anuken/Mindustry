@@ -27,6 +27,8 @@ public class Weapon{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
+    /** whether to draw the outline on top. */
+    public boolean top = true;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
     public float rotateSpeed = 20f;
     /** weapon reload in frames */
@@ -71,6 +73,8 @@ public class Weapon{
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */
     public TextureRegion heatRegion;
+    /** outline region to display if top is false */
+    public TextureRegion outlineRegion;
     /** heat region tint */
     public Color heatColor = Pal.turretHeat;
 
@@ -91,6 +95,7 @@ public class Weapon{
     public void load(){
         region = Core.atlas.find(name, Core.atlas.find("clear"));
         heatRegion = Core.atlas.find(name + "-heat");
+        outlineRegion = Core.atlas.find(name + "-outline");
     }
 
 }

@@ -32,7 +32,7 @@ import mindustry.world.blocks.units.*;
 import static mindustry.Vars.*;
 
 public class UnitType extends UnlockableContent{
-    public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
+    public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f), outlineSpace = 0.01f;
     private static final Vec2 legOffset = new Vec2();
 
     /** If true, the unit is always at elevation 1. */
@@ -81,7 +81,6 @@ public class UnitType extends UnlockableContent{
     public float lightRadius = 60f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
     public boolean drawCell = true, drawItems = true, drawShields = true;
-    public int parts = 0;
     public int trailLength = 3;
     public float trailX = 4f, trailY = -3f, trailScl = 1f;
     /** Whether the unit can heal blocks. Initialized in init() */
@@ -93,8 +92,8 @@ public class UnitType extends UnlockableContent{
 
     public Seq<Weapon> weapons = new Seq<>();
     public TextureRegion baseRegion, legRegion, region, shadowRegion, cellRegion,
-        occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion;
-    public TextureRegion[] partRegions, partCellRegions, wreckRegions;
+        occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
+    public TextureRegion[] wreckRegions;
 
     public UnitType(String name){
         super(name);
@@ -291,15 +290,8 @@ public class UnitType extends UnlockableContent{
         baseRegion = Core.atlas.find(name + "-base");
         cellRegion = Core.atlas.find(name + "-cell", Core.atlas.find("power-cell"));
         occlusionRegion = Core.atlas.find("circle-shadow");
+        outlineRegion = Core.atlas.find(name + "-outline");
         shadowRegion = icon(Cicon.full);
-
-        partRegions = new TextureRegion[parts];
-        partCellRegions = new TextureRegion[parts];
-
-        for(int i = 0; i < parts; i++){
-            partRegions[i] = Core.atlas.find(name + "-part" + i);
-            partCellRegions[i] = Core.atlas.find(name + "-cell" + i);
-        }
 
         wreckRegions = new TextureRegion[3];
         for(int i = 0; i < wreckRegions.length; i++){
@@ -351,7 +343,12 @@ public class UnitType extends UnlockableContent{
             drawPayload((Unit & Payloadc)unit);
         }
 
+        //TODO
         drawOcclusion(unit);
+
+        Draw.z(z - outlineSpace);
+
+        drawOutline(unit);
 
         Draw.z(z);
         if(engineSize > 0) drawEngine(unit);
@@ -507,6 +504,20 @@ public class UnitType extends UnlockableContent{
                 Drawf.shadow(wx, wy, weapon.occlusion);
             }
 
+            if(weapon.outlineRegion.found()){
+                float z = Draw.z();
+                if(!weapon.top) Draw.z(z - outlineSpace);
+
+                Draw.rect(weapon.outlineRegion,
+                wx, wy,
+                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.region.height * Draw.scl,
+                weaponRotation);
+
+
+                Draw.z(z);
+            }
+
             Draw.rect(weapon.region,
             wx, wy,
             width * Draw.scl * -Mathf.sign(weapon.flipSprite),
@@ -529,10 +540,16 @@ public class UnitType extends UnlockableContent{
         Draw.reset();
     }
 
+    public void drawOutline(Unit unit){
+        if(Core.atlas.isFound(outlineRegion)){
+            Draw.rect(outlineRegion, unit.x, unit.y, unit.rotation - 90);
+        }
+    }
+
     public void drawBody(Unit unit){
         applyColor(unit);
 
-        Draw.rect(region, unit, unit.rotation - 90);
+        Draw.rect(region, unit.x, unit.y, unit.rotation - 90);
 
         Draw.reset();
     }
@@ -541,7 +558,7 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         Draw.color(cellColor(unit));
-        Draw.rect(cellRegion, unit, unit.rotation - 90);
+        Draw.rect(cellRegion, unit.x, unit.y, unit.rotation - 90);
         Draw.reset();
     }
 
@@ -551,7 +568,7 @@ public class UnitType extends UnlockableContent{
 
     public void drawLight(Unit unit){
         if(lightRadius > 0){
-            Drawf.light(unit.team, unit, lightRadius, lightColor, lightOpacity);
+            Drawf.light(unit.team, unit.x, unit.y, lightRadius, lightColor, lightOpacity);
         }
     }
 

@@ -2,7 +2,6 @@ package mindustry.content;
 
 import arc.graphics.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
@@ -62,6 +61,7 @@ public class UnitTypes implements ContentList{
                 reload = 14f;
                 x = 4f;
                 y = 2f;
+                top = false;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
             }});
@@ -76,6 +76,7 @@ public class UnitTypes implements ContentList{
             immunities.add(StatusEffects.burning);
 
             weapons.add(new Weapon("flamethrower"){{
+                top = false;
                 shootSound = Sounds.flame;
                 shootY = 2f;
                 reload = 14f;
@@ -107,6 +108,7 @@ public class UnitTypes implements ContentList{
             mechFrontSway = 0.55f;
 
             weapons.add(new Weapon("artillery"){{
+                top = false;
                 y = 1f;
                 x = 9f;
                 reload = 60f;
@@ -143,6 +145,7 @@ public class UnitTypes implements ContentList{
 
             weapons.add(
             new Weapon("scepter-weapon"){{
+                top = false;
                 y = 1f;
                 x = 16f;
                 shootY = 8f;
@@ -202,6 +205,7 @@ public class UnitTypes implements ContentList{
 
             weapons.add(
             new Weapon("reign-weapon"){{
+                top = false;
                 y = 1f;
                 x = 21.5f;
                 shootY = 11f;
@@ -260,6 +264,7 @@ public class UnitTypes implements ContentList{
             abilities.add(new HealFieldAbility(10f, 60f * 4, 60f));
 
             weapons.add(new Weapon("heal-weapon"){{
+                top = false;
                 shootY = 2f;
                 reload = 24f;
                 x = 4.5f;
@@ -288,6 +293,7 @@ public class UnitTypes implements ContentList{
             abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 5, 60f));
 
             weapons.add(new Weapon("heal-shotgun-weapon"){{
+                top = false;
                 x = 5f;
                 shake = 2.2f;
                 y = 0.5f;
@@ -337,6 +343,7 @@ public class UnitTypes implements ContentList{
             abilities.add(new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6));
 
             weapons.add(new Weapon("beam-weapon"){{
+                top = false;
                 shake = 2f;
                 shootY = 4f;
                 x = 6.5f;
@@ -407,6 +414,7 @@ public class UnitTypes implements ContentList{
             groundLayer = Layer.legUnit - 1f;
 
             weapons.add(new Weapon("eruption"){{
+                top = false;
                 shootY = 3f;
                 reload = 10f;
                 ejectEffect = Fx.none;
@@ -1188,7 +1196,7 @@ public class UnitTypes implements ContentList{
                 shootY = 7f;
                 shake = 5f;
                 recoil = 4f;
-                occlusion = 17f;
+                occlusion = 12f;
 
                 shots = 1;
                 inaccuracy = 3f;
@@ -1279,7 +1287,7 @@ public class UnitTypes implements ContentList{
                 rotateSpeed = 4f;
                 mirror = false;
 
-                occlusion = 30f;
+                occlusion = 20f;
 
                 shootY = 2f;
                 recoil = 4f;
@@ -1351,7 +1359,7 @@ public class UnitTypes implements ContentList{
             immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
-            float spawnTime = 0.5f * Time.toMinutes;
+            float spawnTime = 60f * 25f;
 
             abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
 
@@ -1446,6 +1454,7 @@ public class UnitTypes implements ContentList{
             lowAltitude = true;
 
             weapons.add(new Weapon("small-mount-weapon"){{
+                top = false;
                 reload = 20f;
                 x = 3f;
                 y = 0.5f;
@@ -1483,6 +1492,7 @@ public class UnitTypes implements ContentList{
             hitsize = 10f;
 
             weapons.add(new Weapon("small-mount-weapon"){{
+                top = false;
                 reload = 15f;
                 x = 1f;
                 y = 2f;

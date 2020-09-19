@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.tools.ImagePacker.*;
@@ -85,6 +86,49 @@ class Image{
                 }
             }
         }
+        return out;
+    }
+
+    Image shadow(float alpha, int rad){
+        Image out = silhouette(new Color(0f, 0f, 0f, alpha)).blur(rad);
+        out.draw(this);
+        return out;
+    }
+
+    Image silhouette(Color color){
+        Image out = copy();
+
+        each((x, y) -> out.draw(x, y, getColor(x, y).set(color.r, color.g, color.b, this.color.a * color.a)));
+
+        return out;
+    }
+
+    Image blur(int radius){
+        Image out = copy();
+        Color c = new Color();
+        int[] sum = {0};
+
+        for(int x = 0; x < out.width; x++){
+            for(int y = 0; y < out.height; y++){
+                sum[0] = 0;
+
+                Geometry.circle(x, y, radius, (cx, cy) -> {
+                    int rx = Mathf.clamp(cx, 0, out.width - 1), ry = Mathf.clamp(cy, 0, out.height - 1);
+
+                    Color other = getColor(rx, ry);
+                    c.r += other.r;
+                    c.g += other.g;
+                    c.b += other.b;
+                    c.a += other.a;
+                    sum[0] ++;
+                });
+
+                c.mula(1f / sum[0]);
+
+                out.draw(x, y, c);
+            }
+        }
+
         return out;
     }
 
