@@ -27,7 +27,7 @@ public class CrashSender{
     public static String createReport(String error){
         return "Oh no, Mindustry crashed!\n"
             + "Please report this at https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md\n\n"
-            + "Version:" + Version.combined() + "\n"
+            + "Version: " + Version.combined() + "\n"
             + mods.list().size + " Mods: " + mods.list().toString(", ", mod -> mod.name)
             + "\n\n" + error;
     }
