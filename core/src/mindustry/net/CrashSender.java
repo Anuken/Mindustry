@@ -25,9 +25,11 @@ import static mindustry.Vars.net;
 public class CrashSender{
 
     public static String createReport(String error){
-        return "Oh no, Mindustry crashed!\n"
-            + "Please report this at https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md\n\n"
-            + "Version: " + Version.combined() + "\n"
+        String report = "Oh no, Mindustry crashed!\n";
+        if(mods.list().size == 0){
+            report += "Please report this at https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md\n\n";
+        }
+        return report + "Version: " + Version.combined() + "\n"
             + mods.list().size + " Mods: " + mods.list().toString(", ", mod -> mod.name)
             + "\n\n" + error;
     }
