@@ -342,6 +342,7 @@ public class Blocks implements ContentList{
 
         sandWall = new StaticWall("sand-wall"){{
             variants = 2;
+            sandWater.asFloor().wall = this;
         }};
 
         saltWall = new StaticWall("salt-wall");

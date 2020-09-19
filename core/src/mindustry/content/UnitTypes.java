@@ -38,6 +38,9 @@ public class UnitTypes implements ContentList{
     //air + building + mining + payload
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
 
+    //air + building + payload TODO implement
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType quad, oct;
+
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
