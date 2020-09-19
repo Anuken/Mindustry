@@ -15,6 +15,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -613,6 +614,18 @@ public class Block extends UnlockableContent{
             //assign default value
             buildType = Building::create;
         }
+    }
+
+    @Override
+    public ItemStack[] researchRequirements(){
+        ItemStack[] out = new ItemStack[requirements.length];
+        for(int i = 0; i < out.length; i++){
+            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20, 10);
+
+            out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
+        }
+
+        return out;
     }
 
     @Override

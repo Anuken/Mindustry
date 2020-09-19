@@ -1,18 +1,15 @@
 package mindustry.content;
 
 import arc.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
-import mindustry.world.*;
 
 import static mindustry.content.Blocks.*;
-import static mindustry.content.SectorPresets.*;
 import static mindustry.content.SectorPresets.craters;
+import static mindustry.content.SectorPresets.*;
 import static mindustry.content.UnitTypes.*;
 import static mindustry.type.ItemStack.*;
 
@@ -422,7 +419,11 @@ public class TechTree implements ContentList{
                         node(risso, () -> {
                             node(minke, () -> {
                                 node(bryde, () -> {
+                                    node(sei, () -> {
+                                        node(omura, () -> {
 
+                                        });
+                                    });
                                 });
                             });
                         });
@@ -529,22 +530,7 @@ public class TechTree implements ContentList{
     }
 
     public static TechNode node(UnlockableContent content, Runnable children){
-        ItemStack[] requirements;
-
-        if(content instanceof Block){
-            Block block = (Block)content;
-
-            requirements = new ItemStack[block.requirements.length];
-            for(int i = 0; i < requirements.length; i++){
-                int quantity = 40 + Mathf.round(Mathf.pow(block.requirements[i].amount, 1.25f) * 20, 10);
-
-                requirements[i] = new ItemStack(block.requirements[i].item, UI.roundAmount(quantity));
-            }
-        }else{
-            requirements = ItemStack.empty;
-        }
-
-        return node(content, requirements, children);
+        return node(content, content.researchRequirements(), children);
     }
 
     public static TechNode node(UnlockableContent content, ItemStack[] requirements, Runnable children){

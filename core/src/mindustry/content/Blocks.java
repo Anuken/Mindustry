@@ -801,7 +801,7 @@ public class Blocks implements ContentList{
         }};
 
         door = new Door("door"){{
-            requirements(Category.defense, with(Items.graphite, 6, Items.silicon, 4));
+            requirements(Category.defense, with(Items.titanium, 6, Items.silicon, 4));
             health = 100 * wallHealthMultiplier;
         }};
 
