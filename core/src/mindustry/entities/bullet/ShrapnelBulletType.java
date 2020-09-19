@@ -25,11 +25,17 @@ public class ShrapnelBulletType extends BulletType{
         despawnEffect = Fx.none;
         pierce = true;
         keepVelocity = false;
+        hittable = false;
     }
 
     @Override
     public void init(Bullet b){
         Damage.collideLaser(b, length);
+    }
+
+    @Override
+    public float range(){
+        return length;
     }
 
     @Override

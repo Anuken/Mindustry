@@ -68,9 +68,9 @@ public class CallSuperProcess extends AbstractProcessor{
     }
 
     static class CodeAnalyzerTreeScanner extends TreePathScanner<Object, Trees>{
-        private String methodName;
-        private MethodTree method;
-        private boolean callSuperUsed;
+        String methodName;
+        MethodTree method;
+        boolean callSuperUsed;
 
         @Override
         public Object visitClass(ClassTree classTree, Trees trees){
@@ -83,6 +83,9 @@ public class CallSuperProcess extends AbstractProcessor{
 
             if(extendTree instanceof JCIdent){
                 JCIdent tree = (JCIdent)extendTree;
+
+                if(tree == null || tree.sym == null)  return super.visitClass(classTree, trees);
+
                 com.sun.tools.javac.code.Scope members = tree.sym.members();
 
                 if(checkScope(members))

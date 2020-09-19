@@ -18,6 +18,17 @@ public enum CacheLayer{
             endShader(Shaders.water);
         }
     },
+    mud{
+        @Override
+        public void begin(){
+            beginShader();
+        }
+
+        @Override
+        public void end(){
+            endShader(Shaders.mud);
+        }
+    },
     tar{
         @Override
         public void begin(){
@@ -41,7 +52,7 @@ public enum CacheLayer{
         }
     },
     normal(5),
-    walls;
+    walls(3);
 
     public static final CacheLayer[] all = values();
     /** Capacity multiplier. */

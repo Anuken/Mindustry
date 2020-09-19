@@ -10,8 +10,12 @@ public class ItemImage extends Stack{
     public ItemImage(TextureRegion region, int amount){
         Table t = new Table().left().bottom();
         t.add(amount + "").name("item-label");
+        t.pack();
 
-        add(new Image(region));
+        add(new Table(o -> {
+            o.left();
+            o.add(new Image(region)).size(32f);
+        }));
         add(t);
     }
 

@@ -13,6 +13,7 @@ abstract class SyncComp implements Entityc{
 
     //all these method bodies are internally generated
     void snapSync(){}
+    void snapInterpolation(){}
     void readSync(Reads read){}
     void writeSync(Writes write){}
     void readSyncManual(FloatBuffer buffer){}

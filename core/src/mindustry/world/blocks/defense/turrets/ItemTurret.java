@@ -62,6 +62,7 @@ public class ItemTurret extends Turret{
     }
 
     public class ItemTurretBuild extends TurretBuild{
+
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();
@@ -70,6 +71,13 @@ public class ItemTurret extends Turret{
             if(cheating() && ammo.size > 0){
                 handleItem(this, ammoTypes.entries().next().key);
             }
+        }
+
+        @Override
+        public void updateTile(){
+            unit.ammo((float)unit.type().ammoCapacity * totalAmmo / maxAmmo);
+
+            super.updateTile();
         }
 
         @Override

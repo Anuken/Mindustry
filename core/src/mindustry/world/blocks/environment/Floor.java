@@ -103,16 +103,15 @@ public class Floor extends Block{
         super.init();
 
         if(wall == Blocks.air){
-            wall = content.block(name + "Rocks");
-            if(wall == null) wall = content.block(name + "rocks");
-            if(wall == null) wall = content.block(name.replace("darksand", "dune") + "rocks");
+            wall = content.block(name + "-wall");
+            if(wall == null) wall = content.block(name.replace("darksand", "dune") + "-wall");
         }
 
         //keep default value if not found...
         if(wall == null) wall = Blocks.air;
 
         if(decoration == Blocks.air){
-            decoration = content.blocks().min(b -> b instanceof Rock && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
+            decoration = content.blocks().min(b -> b instanceof Boulder && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
         }
     }
 

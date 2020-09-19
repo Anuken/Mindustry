@@ -99,7 +99,7 @@ public class Units{
 
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
-            if(unit.isGrounded() == ground){
+            if((unit.isGrounded() && !unit.type().hovering) == ground){
                 unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){
@@ -251,9 +251,20 @@ public class Units{
 
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        for(Team enemy : state.teams.enemiesOf(team)){
-            nearby(enemy, x, y, width, height, cons);
+        if(team.active()){
+            for(Team enemy : state.teams.enemiesOf(team)){
+                nearby(enemy, x, y, width, height, cons);
+            }
+        }else{
+            //inactive teams have no cache, check everything
+            //TODO cache all teams with units OR blocks
+            for(Team other : Team.all){
+                if(other != team && teamIndex.count(other) > 0){
+                    nearby(other, x, y, width, height, cons);
+                }
+            }
         }
+
     }
 
     /** Iterates over all units that are enemies of this team. */

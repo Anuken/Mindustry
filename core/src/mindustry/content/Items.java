@@ -84,7 +84,7 @@ public class Items implements ContentList{
         }};
 
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
-            flammability = 1.5f;
+            flammability = 1.4f;
             explosiveness = 0.4f;
         }};
     }

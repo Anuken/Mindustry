@@ -7,12 +7,9 @@ import arc.struct.ObjectIntMap.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.game.Saves.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
-import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -27,23 +24,22 @@ public class Sector{
     public final Ptile tile;
     public final int id;
 
-    public final SectorData data;
-
     public @Nullable SaveSlot save;
     public @Nullable SectorPreset preset;
 
+    /** Number 0-1 indicating the difficulty based on nearby bases. */
     public float baseCoverage;
+    public boolean generateEnemyBase;
 
     //TODO implement a dynamic launch period
     public int launchPeriod = 10;
 
-    public Sector(Planet planet, Ptile tile, SectorData data){
+    public Sector(Planet planet, Ptile tile){
         this.planet = planet;
         this.tile = tile;
         this.plane = new Plane();
         this.rect = makeRect();
         this.id = tile.id;
-        this.data = data;
     }
 
     public Seq<Sector> inRange(int range){
@@ -99,7 +95,7 @@ public class Sector{
 
     /** @return whether the enemy has a generated base here. */
     public boolean hasEnemyBase(){
-        return is(SectorAttribute.base) && (save == null || save.meta.rules.waves);
+        return generateEnemyBase && (save == null || save.meta.rules.waves);
     }
 
     public boolean isBeingPlayed(){
@@ -310,10 +306,6 @@ public class Sector{
         return new SectorRect(radius, center, planeTop, planeRight, angle);
     }
 
-    public boolean is(SectorAttribute attribute){
-        return (data.attributes & (1 << attribute.ordinal())) != 0;
-    }
-
     public static class SectorRect{
         public final Vec3 center, top, right;
         public final Vec3 result = new Vec3();
@@ -333,63 +325,5 @@ public class Sector{
             float nx = (x - 0.5f) * 2f, ny = (y - 0.5f) * 2f;
             return result.set(center).add(right, nx).add(top, ny);
         }
-    }
-
-    /** Cached data about a sector. */
-    public static class SectorData{
-        public UnlockableContent[] resources = {};
-        public int spawnX, spawnY;
-
-        public Block[] floors = {};
-        public int[] floorCounts = {};
-        public int attributes;
-
-        public void write(Writes write){
-            write.s(resources.length);
-            for(Content resource : resources){
-                write.b(resource.getContentType().ordinal());
-                write.s(resource.id);
-            }
-            write.s(spawnX);
-            write.s(spawnY);
-            write.s(floors.length);
-            for(int i = 0; i < floors.length; i++){
-                write.s(floors[i].id);
-                write.i(floorCounts[i]);
-            }
-
-            write.i(attributes);
-        }
-
-        public void read(Reads read){
-            resources = new UnlockableContent[read.s()];
-            for(int i = 0; i < resources.length; i++){
-                resources[i] = Vars.content.getByID(ContentType.all[read.b()], read.s());
-            }
-            spawnX = read.s();
-            spawnY = read.s();
-            floors = new Block[read.s()];
-            floorCounts = new int[floors.length];
-            for(int i = 0; i < floors.length; i++){
-                floors[i] = Vars.content.block(read.s());
-                floorCounts[i] = read.i();
-            }
-            attributes = read.i();
-        }
-    }
-
-    public enum SectorAttribute{
-        /** Requires naval technology to land on, e.g. mostly water */
-        naval,
-        /** Has rain. */
-        rainy,
-        /** Has snow. */
-        snowy,
-        /** Has sandstorms. */
-        desert,
-        /** Has an enemy base. */
-        base,
-        /** Has spore weather. */
-        spores
     }
 }

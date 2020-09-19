@@ -77,6 +77,7 @@ public abstract class Turret extends Block{
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
     public Cons<TurretBuild> heatDrawer = tile -> {
         if(tile.heat <= 0.00001f) return;
+
         Draw.color(heatColor, tile.heat);
         Draw.blend(Blending.additive);
         Draw.rect(heatRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);

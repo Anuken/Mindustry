@@ -26,10 +26,10 @@ public class SolarGenerator extends PowerGenerator{
         public void updateTile(){
             productionEfficiency = enabled ?
                 Mathf.maxZero(Attribute.light.env() +
-                (state.rules.solarPowerMultiplier < 0 ?
-                    (state.rules.lighting ? 1f - state.rules.ambientLight.a : 1f) :
-                    state.rules.solarPowerMultiplier
-                )) : 0f;
+                    (state.rules.lighting ?
+                        1f - state.rules.ambientLight.a :
+                        1f
+                    )) : 0f;
         }
     }
 }

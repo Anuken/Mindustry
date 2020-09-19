@@ -41,6 +41,11 @@ public class AndroidRhinoContext{
                 public Object getDynamicSecurityDomain(Object o){
                     return null;
                 }
+
+                @Override
+                public Object callWithDomain(Object o, Context context, Callable callable, Scriptable scriptable, Scriptable scriptable1, Object[] objects){
+                    return null;
+                }
             });
 
         AndroidContextFactory factory;

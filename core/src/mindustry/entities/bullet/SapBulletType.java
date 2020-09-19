@@ -39,8 +39,13 @@ public class SapBulletType extends BulletType{
 
             Draw.reset();
 
-            Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 15f * b.fout(), lightColor, 0.6f);
+            Drawf.light(b.team, b.x, b.y, Tmp.v1.x, Tmp.v1.y, 15f * b.fout(), lightColor, 0.6f);
         }
+    }
+
+    @Override
+    public void drawLight(Bullet b){
+
     }
 
     @Override

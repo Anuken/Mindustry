@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.type.*;
-import mindustry.world.blocks.logic.*;
+import mindustry.world.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
@@ -39,6 +39,12 @@ public class LAssembler{
             putConst("@" + liquid.name, liquid);
         }
 
+        for(Block block : Vars.content.blocks()){
+            if(block.synthetic()){
+                putConst("@" + block.name, block);
+            }
+        }
+
         //store sensor constants
 
         for(LAccess sensor : LAccess.all){
@@ -66,7 +72,7 @@ public class LAssembler{
     }
 
     public static Seq<LStatement> read(String data){
-        return read(data, LogicBlock.maxInstructions);
+        return read(data, LExecutor.maxInstructions);
     }
 
     public static Seq<LStatement> read(String data, int max){
@@ -82,6 +88,8 @@ public class LAssembler{
 
             if(index++ > max) break;
 
+            line = line.replace("\t", "").trim();
+            
             try{
                 String[] arr;
 

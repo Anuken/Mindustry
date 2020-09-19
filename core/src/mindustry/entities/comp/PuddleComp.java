@@ -128,6 +128,6 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Override
     public void afterRead(){
-        Puddles.register(base());
+        Puddles.register(self());
     }
 }

@@ -79,6 +79,7 @@ importPackage(Packages.mindustry.maps)
 importPackage(Packages.mindustry.maps.filters)
 importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
+importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.type)
 importPackage(Packages.mindustry.ui)
 importPackage(Packages.mindustry.ui.dialogs)
@@ -124,7 +125,7 @@ const BlockBuildBeginEvent = Packages.mindustry.game.EventType.BlockBuildBeginEv
 const ResearchEvent = Packages.mindustry.game.EventType.ResearchEvent
 const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
-const BuildinghangeEvent = Packages.mindustry.game.EventType.BuildinghangeEvent
+const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
 const ConfigEvent = Packages.mindustry.game.EventType.ConfigEvent
 const DepositEvent = Packages.mindustry.game.EventType.DepositEvent

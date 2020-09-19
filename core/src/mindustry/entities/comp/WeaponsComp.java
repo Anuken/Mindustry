@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     @Import float x, y, rotation, reloadMultiplier;
     @Import Vec2 vel;
+    @Import UnitType type;
 
     /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
     static final float minAimDst = 18f;
@@ -28,6 +29,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
     float ammo;
+
+    float ammof(){
+        return ammo / type.ammoCapacity;
+    }
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
@@ -88,6 +93,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
+            mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
 
             //flip weapon shoot side for alternating weapons at half reload
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&
@@ -122,7 +128,6 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
                 float rotation = this.rotation - 90;
                 float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
 
-                //m a t h
 
                 float mountX = this.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                     mountY = this.y + Angles.trnsy(rotation, weapon.x, weapon.y);
@@ -133,6 +138,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
                 shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
 
                 mount.reload = weapon.reload;
+                mount.heat = 1f;
 
                 ammo--;
                 if(ammo < 0) ammo = 0;
@@ -159,9 +165,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
         }
 
-        if(this instanceof Velc){
-            ((Velc)this).vel().add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
-        }
+        vel().add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
+
         boolean parentize = ammo.keepVelocity;
 
         Effect.shake(weapon.shake, weapon.shake, x, y);
@@ -171,6 +176,11 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     }
 
     private void bullet(Weapon weapon, float x, float y, float angle, float lifescl){
-        weapon.bullet.create(this, team(), x, y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
+        float xr = Mathf.range(weapon.xRand);
+
+        weapon.bullet.create(this, team(),
+        x + Angles.trnsx(angle, 0, xr),
+        y + Angles.trnsy(angle, 0, xr),
+        angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
     }
 }

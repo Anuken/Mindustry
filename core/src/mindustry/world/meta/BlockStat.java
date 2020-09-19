@@ -8,6 +8,7 @@ import java.util.Locale;
 public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
+    displaySize(StatCategory.general),
     buildTime(StatCategory.general),
     buildCost(StatCategory.general),
 

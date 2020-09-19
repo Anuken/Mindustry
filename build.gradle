@@ -32,11 +32,11 @@ allprojects{
 
     ext{
         versionNumber = '6'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'pre-alpha'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'alpha'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
-        rhinoVersion = 'eeb327d141146663ff3924bd20d2a5da8a6439cc'
+        rhinoVersion = '8437435dab9993769d72739608580d40c5343285'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -261,7 +261,6 @@ project(":core"){
         doLast{
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
-            def buildVersion = props["build"]
             def loglines = file("../changelog").text.split("\n")
             def maxLength = 460
 
@@ -273,7 +272,6 @@ project(":core"){
                 }
             }
             def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
-            new File(changelogs, buildVersion + ".txt").text = (result)
             new File(changelogs, androidVersion + ".txt").text = (result)
         }
     }
