@@ -2,6 +2,7 @@ package mindustry.tools;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -232,18 +233,22 @@ public class Generators{
 
                     boolean hasEmpty = false;
                     Color average = new Color();
+                    float asum = 0f;
                     for(int x = 0; x < image.width; x++){
                         for(int y = 0; y < image.height; y++){
                             Color color = image.getColor(x, y);
-                            average.r += color.r;
-                            average.g += color.g;
-                            average.b += color.b;
+                            average.r += color.r*color.a;
+                            average.g += color.g*color.a;
+                            average.b += color.b*color.a;
+                            asum += color.a;
                             if(color.a < 0.9f){
                                 hasEmpty = true;
                             }
                         }
                     }
-                    average.mul(1f / (image.width * image.height));
+
+                    average.mul(1f / asum);
+
                     if(block instanceof Floor){
                         average.mul(0.8f);
                     }else{
@@ -302,17 +307,42 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 
+            ObjectSet<String> outlined = new ObjectSet<>();
+
             try{
                 type.load();
                 type.init();
 
-                Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
-                for(int i = 1; i < type.parts; i++){
-                    image.draw(ImagePacker.get(type.partRegions[i]));
+                Color outc = Pal.darkerMetal;
+                //Func<Image, Image> outlineS = i -> i.shadow(0.8f, 9);
+                Func<Image, Image> outline = i -> i.outline(4, outc);
+                Cons<TextureRegion> outliner = t -> {
+                    if(t != null && t.found()){
+                        ImagePacker.replace(t, outline.get(ImagePacker.get(t)));
+                    }
+                };
+
+                for(Weapon weapon : type.weapons){
+                    if(outlined.add(weapon.name) && ImagePacker.has(weapon.name)){
+                        outline.get(ImagePacker.get(weapon.name)).save(weapon.name + "-outline");
+
+                        //old outline
+                        //ImagePacker.get(weapon.name).outline(4, Pal.darkerMetal).save(weapon.name);
+                    }
                 }
-                if(type.parts > 0){
-                    image.save(type.name);
-                }
+
+                //baseRegion, legRegion, region, shadowRegion, cellRegion,
+                //        occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
+
+                outliner.get(type.jointRegion);
+                outliner.get(type.footRegion);
+                outliner.get(type.legBaseRegion);
+                outliner.get(type.baseJointRegion);
+
+                Image image = ImagePacker.get(type.region);
+
+                outline.get(image).save(type.name + "-outline");
+                //ImagePacker.replace(type.region, outline.get(image));
 
                 if(type.constructor.get() instanceof Mechc){
                     image.drawCenter(type.baseRegion);
@@ -321,15 +351,7 @@ public class Generators{
                     image.draw(type.region);
                 }
 
-                Image baseCell = ImagePacker.get(type.parts > 0 ? type.partCellRegions[0] : type.cellRegion);
-                for(int i = 1; i < type.parts; i++){
-                    baseCell.draw(ImagePacker.get(type.partCellRegions[i]));
-                }
-
-                if(type.parts > 0){
-                    image.save(type.name + "-cell");
-                }
-
+                Image baseCell = ImagePacker.get(type.cellRegion);
                 Image cell = new Image(type.cellRegion.width, type.cellRegion.height);
                 cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
 

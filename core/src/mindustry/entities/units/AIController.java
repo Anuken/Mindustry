@@ -152,7 +152,7 @@ public class AIController implements UnitController{
             vec.rotate((circleLength - vec.len()) / circleLength * 180f);
         }
 
-        vec.setLength(speed * Time.delta);
+        vec.setLength(speed);
 
         unit.moveAt(vec);
     }
@@ -164,7 +164,7 @@ public class AIController implements UnitController{
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
 
-        vec.setLength(unit.type().speed * Time.delta * length);
+        vec.setLength(unit.type().speed * length);
         if(length < -0.5f){
             vec.rotate(180f);
         }else if(length < 0){

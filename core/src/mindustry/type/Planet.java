@@ -1,7 +1,6 @@
 package mindustry.type;
 
 import arc.*;
-import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
@@ -10,15 +9,12 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
-import arc.util.io.*;
 import arc.util.noise.*;
-import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
-import mindustry.type.Sector.*;
 
 import static mindustry.Vars.*;
 
@@ -83,25 +79,10 @@ public class Planet extends UnlockableContent{
 
             sectors = new Seq<>(grid.tiles.length);
             for(int i = 0; i < grid.tiles.length; i++){
-                sectors.add(new Sector(this, grid.tiles[i], new SectorData()));
+                sectors.add(new Sector(this, grid.tiles[i]));
             }
 
             sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
-
-            //read data for sectors
-            Fi data = Vars.tree.get("planets/" + name + ".dat");
-            if(data.exists()){
-                try{
-                    try(Reads read = data.reads()){
-                        short dsize = read.s();
-                        for(int i = 0; i < dsize; i++){
-                            sectors.get(i).data.read(read);
-                        }
-                    }
-                }catch(Throwable t){
-                    t.printStackTrace();
-                }
-            }
         }else{
             sectors = new Seq<>();
         }
@@ -196,7 +177,7 @@ public class Planet extends UnlockableContent{
         for(Sector sector : sectors){
             float sum = 1f;
             for(Sector other : sector.inRange(2)){
-                if(other.is(SectorAttribute.base)){
+                if(other.generateEnemyBase){
                     sum += 1f;
                 }
             }

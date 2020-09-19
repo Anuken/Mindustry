@@ -318,6 +318,12 @@ public class LogicBlock extends Block{
             }
         }
 
+        //logic blocks cause write problems when picked up
+        @Override
+        public boolean canPickup(){
+            return false;
+        }
+
         @Override
         public float range(){
             return range;

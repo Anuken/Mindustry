@@ -7,11 +7,13 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-public class StatusFieldAbility implements Ability{
+public class StatusFieldAbility extends Ability{
     public @NonNull StatusEffect effect;
     public float duration = 60, reload = 100, range = 20;
     public Effect applyEffect = Fx.heal;
     public Effect activeEffect = Fx.overdriveWave;
+
+    protected float timer;
 
     StatusFieldAbility(){}
 
@@ -24,9 +26,9 @@ public class StatusFieldAbility implements Ability{
 
     @Override
     public void update(Unit unit){
-        unit.timer2 += Time.delta;
+        timer += Time.delta;
 
-        if(unit.timer2 >= reload){
+        if(timer >= reload){
 
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
                 other.apply(effect, duration);
@@ -34,7 +36,7 @@ public class StatusFieldAbility implements Ability{
 
             activeEffect.at(unit);
 
-            unit.timer2 = 0f;
+            timer = 0f;
         }
     }
 }

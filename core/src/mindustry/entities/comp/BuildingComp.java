@@ -80,7 +80,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(block.hasPower){
                 //reinit power graph
                 power.graph = new PowerGraph();
-                power.graph.add(base());
+                power.graph.add(self());
             }
         }
         this.rotation = rotation;
@@ -94,7 +94,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         created();
 
-        return base();
+        return self();
     }
 
     /** Sets up all the necessary variables, but does not add this entity anywhere. */
@@ -111,17 +111,17 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         maxHealth(block.health);
         timer(new Interval(block.timers));
 
-        cons = new ConsumeModule(base());
+        cons = new ConsumeModule(self());
         if(block.hasItems) items = new ItemModule();
         if(block.hasLiquids) liquids = new LiquidModule();
         if(block.hasPower){
             power = new PowerModule();
-            power.graph.add(base());
+            power.graph.add(self());
         }
 
         initialized = true;
 
-        return base();
+        return self();
     }
 
     @Override
@@ -195,17 +195,17 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void configure(Object value){
         //save last used config
         block.lastConfig = value;
-        Call.tileConfig(player, base(), value);
+        Call.tileConfig(player, self(), value);
     }
 
     /** Configure from a server. */
     public void configureAny(Object value){
-        Call.tileConfig(null, base(), value);
+        Call.tileConfig(null, self(), value);
     }
 
     /** Deselect this tile from configuration. */
     public void deselect(){
-        if(!headless && control.input.frag.config.getSelectedTile() == base()){
+        if(!headless && control.input.frag.config.getSelectedTile() == self()){
             control.input.frag.config.hideConfig();
         }
     }
@@ -372,7 +372,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Returns the amount of items this block can accept. */
     public int acceptStack(Item item, int amount, Teamc source){
-        if(acceptItem(base(), item) && block.hasItems && (source == null || source.team() == team)){
+        if(acceptItem(self(), item) && block.hasItems && (source == null || source.team() == team)){
             return Math.min(getMaximumAccepted(item) - items.get(item), amount);
         }else{
             return 0;
@@ -425,8 +425,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         int trns = block.size/2 + 1;
         Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
-        if(next != null && next.build != null && next.build.team == team && next.build.acceptPayload(base(), todump)){
-            next.build.handlePayload(base(), todump);
+        if(next != null && next.build != null && next.build.team == team && next.build.acceptPayload(self(), todump)){
+            next.build.handlePayload(self(), todump);
             return true;
         }
 
@@ -446,8 +446,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             Building other = proximity.get((i + dump) % proximity.size);
 
-            if(other.team == team && other.acceptPayload(base(), todump)){
-                other.handlePayload(base(), todump);
+            if(other.team == team && other.acceptPayload(self(), todump)){
+                other.handlePayload(self(), todump);
                 incrementDump(proximity.size);
                 return true;
             }
@@ -480,7 +480,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
-            other = other.getLiquidDestination(base(), liquid);
+            other = other.getLiquidDestination(self(), liquid);
 
             if(other != null && other.team == team && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null){
                 float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
@@ -499,8 +499,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void transferLiquid(Building next, float amount, Liquid liquid){
         float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f, amount);
 
-        if(next.acceptLiquid(base(), liquid, flow)){
-            next.handleLiquid(base(), liquid, flow);
+        if(next.acceptLiquid(self(), liquid, flow)){
+            next.handleLiquid(self(), liquid, flow);
             liquids.remove(liquid, flow);
         }
     }
@@ -523,7 +523,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public float moveLiquid(Building next, Liquid liquid){
         if(next == null) return 0;
 
-        next = next.getLiquidDestination(base(), liquid);
+        next = next.getLiquidDestination(self(), liquid);
 
         if(next.team == team && next.block.hasLiquids && liquids.get(liquid) > 0f){
             float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
@@ -531,8 +531,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
             flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f);
 
-            if(flow > 0f && ofract <= fract && next.acceptLiquid(base(), liquid, flow)){
-                next.handleLiquid(base(), liquid, flow);
+            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid, flow)){
+                next.handleLiquid(self(), liquid, flow);
                 liquids.remove(liquid, flow);
                 return flow;
             }else if(next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
@@ -558,7 +558,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public Building getLiquidDestination(Building from, Liquid liquid){
-        return base();
+        return self();
     }
 
     public @Nullable Payload getPayload(){
@@ -580,13 +580,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
-            if(other.team == team && other.acceptItem(base(), item) && canDump(other, item)){
-                other.handleItem(base(), item);
+            if(other.team == team && other.acceptItem(self(), item) && canDump(other, item)){
+                other.handleItem(self(), item);
                 return;
             }
         }
 
-        handleItem(base(), item);
+        handleItem(self(), item);
     }
 
     /**
@@ -598,8 +598,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
-            if(other.team == team && other.acceptItem(base(), item) && canDump(other, item)){
-                other.handleItem(base(), item);
+            if(other.team == team && other.acceptItem(self(), item) && canDump(other, item)){
+                other.handleItem(self(), item);
                 return true;
             }
         }
@@ -631,16 +631,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 for(int ii = 0; ii < content.items().size; ii++){
                     Item item = content.item(ii);
 
-                    if(other.team == team && items.has(item) && other.acceptItem(base(), item) && canDump(other, item)){
-                        other.handleItem(base(), item);
+                    if(other.team == team && items.has(item) && other.acceptItem(self(), item) && canDump(other, item)){
+                        other.handleItem(self(), item);
                         items.remove(item, 1);
                         incrementDump(proximity.size);
                         return true;
                     }
                 }
             }else{
-                if(other.team == team && other.acceptItem(base(), todump) && canDump(other, todump)){
-                    other.handleItem(base(), todump);
+                if(other.team == team && other.acceptItem(self(), todump) && canDump(other, todump)){
+                    other.handleItem(self(), todump);
                     items.remove(todump, 1);
                     incrementDump(proximity.size);
                     return true;
@@ -665,8 +665,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Try offloading an item to a nearby container in its facing direction. Returns true if success. */
     public boolean moveForward(Item item){
         Building other = front();
-        if(other != null && other.team == team && other.acceptItem(base(), item)){
-            other.handleItem(base(), item);
+        if(other != null && other.team == team && other.acceptItem(self(), item)){
+            other.handleItem(self(), item);
             return true;
         }
         return false;
@@ -696,7 +696,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return;
         }
 
-        power.graph.remove(base());
+        power.graph.remove(self());
         for(int i = 0; i < power.links.size; i++){
             Tile other = world.tile(power.links.get(i));
             if(other != null && other.build != null && other.build.power != null){
@@ -833,8 +833,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             tempTiles.clear();
             Geometry.circle(tileX(), tileY(), range, (x, y) -> {
                 Building other = world.build(x, y);
-                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, base()) && !PowerNode.insulated(other, base())
-                    && !other.proximity().contains(this.<Building>base()) &&
+                if(other != null && other.block instanceof PowerNode && ((PowerNode)other.block).linkValid(other, self()) && !PowerNode.insulated(other, self())
+                    && !other.proximity().contains(this.<Building>self()) &&
                 !(block.outputsPower && proximity.contains(p -> p.power != null && p.power.graph == other.power.graph))){
                     tempTiles.add(other.tile);
                 }
@@ -1037,13 +1037,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         table.left();
         for(Consume cons : block.consumes.all()){
             if(cons.isOptional() && cons.isBoost()) continue;
-            cons.build(base(), table);
+            cons.build(self(), table);
         }
     }
 
     public void displayBars(Table table){
         for(Func<Building, Bar> bar : block.bars.list()){
-            table.add(bar.get(base())).growX();
+            table.add(bar.get(self())).growX();
             table.row();
         }
     }
@@ -1069,7 +1069,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @return whether or not this block should be deselected.
      */
     public boolean onConfigureTileTapped(Building other){
-        return base() != other;
+        return self() != other;
     }
 
     /** Returns whether this config menu should show when the specified player taps it. */
@@ -1128,7 +1128,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         for(Building other : tmpTiles){
-            other.proximity.remove(base(), true);
+            other.proximity.remove(self(), true);
             other.onProximityUpdate();
         }
     }
@@ -1144,8 +1144,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             if(other == null || !(other.tile.interactable(team))) continue;
 
             //add this tile to proximity of nearby tiles
-            if(!other.proximity.contains(base(), true)){
-                other.proximity.add(base());
+            if(!other.proximity.contains(self(), true)){
+                other.proximity.add(self());
             }
 
             tmpTiles.add(other);
@@ -1184,13 +1184,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Replace
     @Override
     public boolean isValid(){
-        return tile.build == base() && !dead();
+        return tile.build == self() && !dead();
     }
 
     @Replace
     @Override
     public void kill(){
-        Call.tileDestroyed(base());
+        Call.tileDestroyed(self());
     }
 
     @Replace
@@ -1204,10 +1204,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             damage /= state.rules.blockHealthMultiplier;
         }
 
-        Call.tileDamage(base(), health - handleDamage(damage));
+        Call.tileDamage(self(), health - handleDamage(damage));
 
         if(health <= 0){
-            Call.tileDestroyed(base());
+            Call.tileDestroyed(self());
         }
     }
 
@@ -1292,7 +1292,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if(block.idleSound != Sounds.none && shouldIdleSound()){
-            loops.play(block.idleSound, base(), block.idleSoundVolume);
+            loops.play(block.idleSound, self(), block.idleSoundVolume);
         }
 
         if(enabled || !block.noUpdateDisabled){

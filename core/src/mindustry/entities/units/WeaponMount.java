@@ -11,6 +11,8 @@ public class WeaponMount{
     public float rotation;
     /** destination rotation; do not modify! */
     public float targetRotation;
+    /** current heat, 0 to 1*/
+    public float heat;
     /** aiming position in world coordinates */
     public float aimX, aimY;
     /** whether to shoot right now */

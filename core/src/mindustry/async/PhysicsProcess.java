@@ -35,6 +35,7 @@ public class PhysicsProcess implements AsyncProcess{
         refs.removeAll(ref -> {
             if(!ref.entity.isAdded()){
                 physics.destroyBody(ref.body);
+                ref.entity.physref(null);
                 return true;
             }
             return false;

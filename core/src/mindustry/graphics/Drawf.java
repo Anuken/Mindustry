@@ -172,6 +172,20 @@ public class Drawf{
         construct(t, content.icon(Cicon.full), rotation, progress, speed, time);
     }
 
+    public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float speed, float time){
+        Shaders.build.region = region;
+        Shaders.build.progress = progress;
+        Shaders.build.color.set(Pal.accent);
+        Shaders.build.color.a = speed;
+        Shaders.build.time = -time / 20f;
+
+        Draw.shader(Shaders.build);
+        Draw.rect(region, x, y, rotation);
+        Draw.shader();
+
+        Draw.reset();
+    }
+
     public static void construct(Building t, TextureRegion region, float rotation, float progress, float speed, float time){
         Shaders.build.region = region;
         Shaders.build.progress = progress;

@@ -42,7 +42,7 @@ abstract class StatusComp implements Posc, Flyingc{
                     return;
                 }else if(entry.effect.reactsWith(effect)){ //find opposite
                     StatusEntry.tmp.effect = entry.effect;
-                    entry.effect.getTransition(base(), effect, entry.time, duration, StatusEntry.tmp);
+                    entry.effect.getTransition(self(), effect, entry.time, duration, StatusEntry.tmp);
                     entry.time = StatusEntry.tmp.time;
 
                     if(StatusEntry.tmp.effect != entry.effect){
@@ -125,14 +125,14 @@ abstract class StatusComp implements Posc, Flyingc{
                 armorMultiplier *= entry.effect.armorMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
                 reloadMultiplier *= entry.effect.reloadMultiplier;
-                entry.effect.update(base(), entry.time);
+                entry.effect.update(self(), entry.time);
             }
         }
     }
 
     public void draw(){
         for(StatusEntry e : statuses){
-            e.effect.draw(base());
+            e.effect.draw(self());
         }
     }
 

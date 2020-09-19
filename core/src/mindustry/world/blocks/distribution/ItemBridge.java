@@ -303,7 +303,7 @@ public class ItemBridge extends Block{
 
             Lines.stroke(8f);
 
-            Tmp.v1.set(x, y).sub(other.worldx(), other.worldy()).setLength(-tilesize/2f);
+            Tmp.v1.set(x, y).sub(other.worldx(), other.worldy()).setLength(tilesize/2f).scl(-1f);
 
             Lines.line(bridgeRegion,
             x + Tmp.v1.x,

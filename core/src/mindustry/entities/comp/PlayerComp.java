@@ -134,7 +134,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             deathTimer += Time.delta;
             if(deathTimer >= deathDelay){
                 //request spawn - this happens serverside only
-                core.requestSpawn(base());
+                core.requestSpawn(self());
                 deathTimer = 0;
             }
         }
@@ -191,7 +191,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             }
         }
 
-        Events.fire(new UnitChangeEvent(base(), unit));
+        Events.fire(new UnitChangeEvent(self(), unit));
     }
 
     boolean dead(){
