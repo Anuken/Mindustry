@@ -8,6 +8,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -41,6 +42,11 @@ public abstract class UnlockableContent extends MappableContent{
     @CallSuper
     public void createIcons(MultiPacker packer){
 
+    }
+
+    /** @return items needed to research this content */
+    public ItemStack[] researchRequirements(){
+        return ItemStack.empty;
     }
 
     public String emoji(){

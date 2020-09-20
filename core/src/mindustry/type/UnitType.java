@@ -15,6 +15,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
@@ -28,6 +29,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.*;
+import mindustry.world.consumers.*;
 
 import static mindustry.Vars.*;
 
@@ -297,6 +299,34 @@ public class UnitType extends UnlockableContent{
         for(int i = 0; i < wreckRegions.length; i++){
             wreckRegions[i] = Core.atlas.find(name + "-wreck" + i);
         }
+    }
+
+    @Override
+    public ItemStack[] researchRequirements(){
+        ItemStack[] stacks = null;
+
+        //calculate costs based on reconstructors or factories found
+        Block rec = content.blocks().find(b -> b instanceof Reconstructor && Structs.contains(((Reconstructor)b).upgrades, u -> u[1] == this));
+
+        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems){
+            stacks = ((ConsumeItems)rec.consumes.get(ConsumeType.item)).items;
+        }else{
+            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && Structs.contains(((UnitFactory)u).plans, p -> p.unit == this));
+            if(factory != null){
+                stacks = Structs.find(factory.plans, p -> p.unit == this).requirements;
+            }
+        }
+
+        if(stacks != null){
+            ItemStack[] out = new ItemStack[stacks.length];
+            for(int i = 0; i < out.length; i++){
+                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * 50)));
+            }
+
+            return out;
+        }
+
+        return super.researchRequirements();
     }
 
     @Override

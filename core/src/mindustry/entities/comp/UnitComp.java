@@ -37,7 +37,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     private UnitController controller;
     private UnitType type;
-    boolean spawnedByCore, deactivated;
+    boolean spawnedByCore, deactivated; //TODO remove deactivation boolean
 
     transient Seq<Ability> abilities = new Seq<>(0);
 
@@ -204,13 +204,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void add(){
-        teamIndex.updateCount(team, type, 1);
 
         //check if over unit cap
         if(count() > cap() && !spawnedByCore){
             deactivated = true;
-        }else{
-            teamIndex.updateActiveCount(team, type, 1);
+
+            if(!dead){
+                Call.unitCapDeath(self());
+            }
         }
     }
 
@@ -245,6 +246,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     a.update(self());
                 }
             }
+        }else if(!dead){
+            Call.unitCapDeath(self());
         }
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
