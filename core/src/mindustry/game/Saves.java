@@ -61,6 +61,9 @@ public class Saves{
         //automatically assign sector save slots
         for(SaveSlot slot : saves){
             if(slot.getSector() != null){
+                if(slot.getSector().save != null){
+                    Log.warn("Sector @ has two corresponding saves: @ and @", slot.getSector(), slot.getSector().save.file, slot.file);
+                }
                 slot.getSector().save = slot;
             }
         }

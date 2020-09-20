@@ -413,7 +413,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
 
                 if(shouldHide) hide();
-            }).growX().padTop(2f).height(50f).minWidth(170f);
+            }).growX().padTop(2f).height(50f).minWidth(170f).disabled(b -> state.rules.sector == sector && !state.isMenu());
         }
 
         stable.pack();
