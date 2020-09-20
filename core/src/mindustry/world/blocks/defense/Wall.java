@@ -55,7 +55,7 @@ public class Wall extends Block{
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) && health > other.health && size == other.size;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && health > other.health && size >= other.size;
     }
 
     public class WallBuild extends Building{
