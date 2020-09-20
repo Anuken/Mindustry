@@ -79,15 +79,6 @@ public class ForceProjector extends Block{
         Lines.stroke(1f);
         Lines.poly(x * tilesize, y * tilesize, 6, radius);
         Draw.color();
-
-        float phaseBoostedRadius = radius + phaseRadiusBoost;
-        Draw.color(Pal.gray);
-        Lines.stroke(3f);
-        Lines.poly(x * tilesize, y * tilesize, 6, phaseBoostedRadius);
-        Draw.color(player.team().color);
-        Lines.stroke(1f);
-        Lines.poly(x * tilesize, y * tilesize, 6, phaseBoostedRadius);
-        Draw.color();
     }
 
     public class ForceProjectorEntity extends Building{
