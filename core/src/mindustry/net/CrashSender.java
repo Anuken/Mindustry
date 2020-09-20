@@ -29,7 +29,10 @@ public class CrashSender{
         if(mods.list().size == 0){
             report += "Please report this at https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md\n\n";
         }
-        return report + "Version: " + Version.combined() + "\n"
+        return report + "Version: " + Version.combined() + (net.headless ? " (Server)" : "") + "\n"
+            + "OS: " + System.getProperty("os.name") + "x" + (OS.is64Bit ? "64" : "32") + "\n"
+            + "Java Version: " + System.getProperty("java.version") + "\n"
+            + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
             + mods.list().size + " Mods: " + mods.list().toString(", ", mod -> mod.name)
             + "\n\n" + error;
     }
@@ -141,7 +144,7 @@ public class CrashSender{
             boolean[] sent = {false};
 
             Log.info("Sending crash report.");
-            //post to crash report URL, exit code indicates success
+            //post to crash report URL, exit code indicates send success
             httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
                 sent[0] = true;
