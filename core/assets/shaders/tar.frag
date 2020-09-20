@@ -20,7 +20,7 @@ void main(){
     vec4 color = texture2D(u_texture, c);
 
     if(!(noise > 0.54 && noise < 0.58)){
-        color.rgb *= 0.6;
+        color.rgb *= vec3(0.6, 0.6, 0.7);
     }
 
     gl_FragColor = color;

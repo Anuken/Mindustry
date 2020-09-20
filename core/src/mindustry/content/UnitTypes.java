@@ -38,6 +38,9 @@ public class UnitTypes implements ContentList{
     //air + building + mining + payload
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
 
+    //air + building + payload TODO implement
+    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType quad, oct;
+
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
@@ -744,6 +747,7 @@ public class UnitTypes implements ContentList{
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
+            hitsize = 9f;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;
@@ -1010,6 +1014,7 @@ public class UnitTypes implements ContentList{
             abilities.add(new HealFieldAbility(5f, 60f * 5, 50f));
 
             weapons.add(new Weapon("heal-weapon-mount"){{
+                top = false;
                 y = -2.5f;
                 x = 3.5f;
                 reload = 30f;

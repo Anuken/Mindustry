@@ -248,7 +248,7 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(2f);
         Lines.rect(centerx - sclwidth / 2 - 1, centery - sclheight / 2 - 1, sclwidth + 2, sclheight + 2);
-        editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
+        editor.renderer.draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
         Draw.reset();
 
         if(grid){
