@@ -168,14 +168,14 @@ public class Drawf{
         Draw.rect(Core.atlas.find("shape-3"), x, y - oy + length / 2f, width, length, width / 2f, oy, rotation - 90);
     }
 
-    public static void construct(Building t, UnlockableContent content, float rotation, float progress, float speed, float time){
-        construct(t, content.icon(Cicon.full), rotation, progress, speed, time);
+    public static void construct(Building t, UnlockableContent content, float rotation, float progress, float speed, float time, Color color){
+        construct(t, content.icon(Cicon.full), rotation, progress, speed, time, color);
     }
 
-    public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float speed, float time){
+    public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float speed, float time, Color color){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
-        Shaders.build.color.set(Pal.accent);
+        Shaders.build.color.set(color);
         Shaders.build.color.a = speed;
         Shaders.build.time = -time / 20f;
 
@@ -186,10 +186,10 @@ public class Drawf{
         Draw.reset();
     }
 
-    public static void construct(Building t, TextureRegion region, float rotation, float progress, float speed, float time){
+    public static void construct(Building t, TextureRegion region, float rotation, float progress, float speed, float time, Color color){
         Shaders.build.region = region;
         Shaders.build.progress = progress;
-        Shaders.build.color.set(Pal.accent);
+        Shaders.build.color.set(color);
         Shaders.build.color.a = speed;
         Shaders.build.time = -time / 20f;
 
@@ -197,7 +197,7 @@ public class Drawf{
         Draw.rect(region, t.x, t.y, rotation);
         Draw.shader();
 
-        Draw.color(Pal.accent);
+        Draw.color(color);
         Draw.alpha(speed);
 
         Lines.lineAngleCenter(t.x + Mathf.sin(time, 20f, Vars.tilesize / 2f * t.block.size - 2f), t.y, 90, t.block.size * Vars.tilesize - 4f);

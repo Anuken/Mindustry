@@ -114,7 +114,7 @@ public class BlockForge extends PayloadAcceptor{
             Draw.rect(outRegion, x, y, rotdeg());
 
             if(recipe != null){
-                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, recipe, 0, progress / recipe.buildCost, heat, time));
+                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, recipe, 0, progress / recipe.buildCost, heat, time, team.color));
             }
 
             drawPayload();

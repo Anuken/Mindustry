@@ -31,13 +31,14 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(teamRegions[1], req.drawx(), req.drawy());
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region, outRegion, topRegion};
+        return teamRegions[1].found() ? new TextureRegion[]{region, teamRegions[1], outRegion, topRegion} : new TextureRegion[]{region, outRegion, topRegion};
     }
 
     @Override
@@ -100,6 +101,11 @@ public class Reconstructor extends UnitBlock{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
+            if(teamRegions[1].found() && teamRegions[1] != Core.atlas.find("error")){
+                if(team.id != 1 && team.id != 2) Draw.color(team.color);
+                Draw.rect(regions[team.id], x, y, rotation);
+                Draw.color();
+            }
 
             //draw input
             for(int i = 0; i < 4; i++){
@@ -115,7 +121,7 @@ public class Reconstructor extends UnitBlock{
                     Draw.alpha(1f - progress/ constructTime);
                     Draw.rect(payload.unit.type().icon(Cicon.full), x, y, rotdeg() - 90);
                     Draw.reset();
-                    Drawf.construct(this, upgrade(payload.unit.type()), rotdeg() - 90f, progress / constructTime, speedScl, time);
+                    Drawf.construct(this, upgrade(payload.unit.type()), rotdeg() - 90f, progress / constructTime, speedScl, time, team.color);
                 });
             }else{
                 Draw.z(Layer.blockOver);

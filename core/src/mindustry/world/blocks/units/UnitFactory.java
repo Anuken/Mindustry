@@ -171,7 +171,7 @@ public class UnitFactory extends UnitBlock{
 
             if(currentPlan != -1){
                 UnitPlan plan = plans[currentPlan];
-                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, plan.unit, rotdeg() - 90f, progress / plan.time, speedScl, time));
+                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, plan.unit, rotdeg() - 90f, progress / plan.time, speedScl, time, team.color));
             }
 
             Draw.z(Layer.blockOver);

@@ -53,7 +53,7 @@ public class UnitSpawnAbility extends Ability{
         if(Units.canCreate(unit.team, type)){
             Draw.draw(Draw.z(), () -> {
                 float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
-                Drawf.construct(x, y, type.icon(Cicon.full), unit.rotation - 90, timer / spawnTime, 1f, timer);
+                Drawf.construct(x, y, type.icon(Cicon.full), unit.rotation - 90, timer / spawnTime, 1f, timer, unit.team().color);
             });
         }
     }
