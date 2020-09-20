@@ -334,7 +334,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playTutorial(){
-        ui.showInfo("There is no tutorial yet.");
+        ui.showInfo("@indev.notready");
         //TODO implement
         //ui.showInfo("death");
         /*
