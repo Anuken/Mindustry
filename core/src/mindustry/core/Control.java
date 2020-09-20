@@ -434,7 +434,7 @@ public class Control implements ApplicationListener, Loadable{
         //just a regular reminder
         if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
             app.post(() -> app.post(() -> {
-                ui.showStartupInfo("@indevpopup");
+                ui.showStartupInfo("@indev.popup");
             }));
         }
 
