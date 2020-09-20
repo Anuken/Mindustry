@@ -48,6 +48,8 @@ public enum BlockStat{
     targetsGround(StatCategory.shooting),
     damage(StatCategory.shooting),
     ammo(StatCategory.shooting),
+    shieldHealth(StatCategory.shooting),
+    cooldownTime(StatCategory.shooting),
 
     booster(StatCategory.optional),
     boostEffect(StatCategory.optional),
