@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.math.*;
+import arc.util.*;
 
 public enum LogicOp{
     add("+", (a, b) -> a + b),
@@ -39,10 +40,24 @@ public enum LogicOp{
     sqrt("sqrt", Math::sqrt),
     rand("rand", d -> Mathf.rand.nextDouble() * d),
 
+    // Get char
+    charAt("char", (a,b) -> 0, (a,b) -> 0, (a,b)->{
+        if(a instanceof String){
+            try{
+
+                return Character.toString(((String)a).charAt((int)b));
+            }catch(StringIndexOutOfBoundsException e){
+                return "";
+            }
+        }else{
+            return "";
+        }
+    })
     ;
 
     public static final LogicOp[] all = values();
 
+    public final OpObjNumLambda2 objNumFunction2;
     public final OpObjLambda2 objFunction2;
     public final OpLambda2 function2;
     public final OpLambda1 function1;
@@ -54,11 +69,16 @@ public enum LogicOp{
     }
 
     LogicOp(String symbol, OpLambda2 function, OpObjLambda2 objFunction){
+        this(symbol, function, objFunction, null);
+    }
+
+    LogicOp(String symbol, OpLambda2 function, OpObjLambda2 objFunction, OpObjNumLambda2 objNumFunction){
         this.symbol = symbol;
         this.function2 = function;
         this.function1 = null;
         this.unary = false;
         this.objFunction2 = objFunction;
+        this.objNumFunction2 = objNumFunction;
     }
 
     LogicOp(String symbol, OpLambda1 function){
@@ -67,11 +87,16 @@ public enum LogicOp{
         this.function2 = null;
         this.unary = true;
         this.objFunction2 = null;
+        this.objNumFunction2 = null;
     }
 
     @Override
     public String toString(){
         return symbol;
+    }
+
+    interface OpObjNumLambda2{
+        Object get(Object a, double b);
     }
 
     interface OpObjLambda2{
