@@ -39,7 +39,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
 
     //air + building + payload TODO implement
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType quad, oct;
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad, oct;
 
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
@@ -1047,6 +1047,8 @@ public class UnitTypes implements ContentList{
 
             mineTier = 2;
             health = 500;
+            armor = 2f;
+            armor = 5f;
             speed = 1.8f;
             accel = 0.06f;
             drag = 0.017f;
@@ -1073,6 +1075,65 @@ public class UnitTypes implements ContentList{
                 y = 5f;
                 rotate = true;
                 bullet = Bullets.healBullet;
+            }});
+        }};
+
+        quad = new UnitType("quad"){{
+            mineTier = 2;
+            armor = 4f;
+            health = 7000;
+            speed = 1.2f;
+            rotateSpeed = 2f;
+            accel = 0.05f;
+            drag = 0.017f;
+            lowAltitude = false;
+            flying = true;
+            engineOffset = 12f;
+            engineSize = 6f;
+            rotateShooting = false;
+            hitsize = 32f;
+            payloadCapacity = (3 * 3) * (8 * 8);
+            buildSpeed = 2.5f;
+            range = 140f;
+
+            weapons.add(
+            new Weapon(){{
+                x = y = 0f;
+                mirror = false;
+                reload = 60f;
+                minShootVelocity = 0.01f;
+
+                bullet = new BasicBulletType(){{
+                    sprite = "large-bomb";
+                    width = height = 120/4f;
+
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                    mixColorTo = Color.white;
+
+                    shootCone = 180f;
+                    ejectEffect = Fx.none;
+                    ignoreRotation = true;
+                    shootSound = Sounds.none;
+                    despawnShake = 4f;
+
+                    collidesAir = false;
+
+                    lifetime = 70f;
+
+                    despawnEffect = Fx.healBomb;
+                    hitEffect = Fx.massiveExplosion;
+                    keepVelocity = false;
+                    spin = 2f;
+
+                    shrinkX = shrinkY = 0.7f;
+
+                    speed = 0.001f;
+                    collides = false;
+
+                    splashDamage = 230f;
+                    splashDamageRadius = 90f;
+                }};
             }});
         }};
 

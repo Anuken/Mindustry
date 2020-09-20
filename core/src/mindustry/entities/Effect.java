@@ -40,7 +40,7 @@ public class Effect{
     }
 
     public Effect(float life, Cons<EffectContainer> renderer){
-        this(life, 32f, renderer);
+        this(life,50f, renderer);
     }
 
     public Effect ground(){

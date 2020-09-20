@@ -290,6 +290,22 @@ public class Fx{
         Lines.spikes(e.x, e.y, 1f + e.fin() * 6f, e.fout() * 4f, 6);
     }),
 
+    healBomb = new Effect(40f, 100f, e -> {
+        color(Pal.heal);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * 65f);
+
+        color(Pal.heal);
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 6f, 100f * e.fout(), i*90);
+        }
+
+        color();
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 3f, 35f * e.fout(), i*90);
+        }
+    }),
+
     healWave = new Effect(22, e -> {
         color(Pal.heal);
         stroke(e.fout() * 2f);

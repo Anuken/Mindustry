@@ -102,7 +102,7 @@ public abstract class BulletType extends Content{
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
-    public float hitShake = 0f;
+    public float hitShake = 0f, despawnShake = 0f;
 
     public int puddles;
     public float puddleRange;
@@ -186,6 +186,8 @@ public abstract class BulletType extends Content{
     public void despawned(Bullet b){
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         hitSound.at(b);
+
+        Effect.shake(despawnShake, despawnShake, b);
 
         if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
             hit(b);
