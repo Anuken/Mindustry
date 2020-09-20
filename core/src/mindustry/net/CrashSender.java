@@ -29,7 +29,7 @@ public class CrashSender{
         if(mods.list().size == 0){
             report += "Please report this at https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md\n\n";
         }
-        return report + "Version: " + Version.combined() + (net.headless ? " (Server)" : "") + "\n"
+        return report + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
             + "OS: " + System.getProperty("os.name") + "x" + (OS.is64Bit ? "64" : "32") + "\n"
             + "Java Version: " + System.getProperty("java.version") + "\n"
             + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
