@@ -87,6 +87,9 @@ public class SectorInfo{
     /** Update averages of various stats, updates some special sector logic.
      * Called every frame. */
     public void update(){
+        //updating in multiplayer as a client doesn't make sense
+        if(net.client()) return;
+
         internalTimeSpent += Time.delta;
 
         //create last stored core items

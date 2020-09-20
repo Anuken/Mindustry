@@ -747,6 +747,7 @@ public class UnitTypes implements ContentList{
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
+            hitsize = 9f;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;

@@ -27,7 +27,7 @@ abstract class CommanderComp implements Unitc{
     @Override
     public void update(){
         if(formation != null){
-            formation.anchor.set(x, y, rotation);
+            formation.anchor.set(x, y, /*rotation*/ 0); //TODO rotation set to 0 because rotating is pointless
             formation.updateSlots();
         }
     }
@@ -73,7 +73,7 @@ abstract class CommanderComp implements Unitc{
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
-        float spacing = hitSize() * 1.7f;
+        float spacing = hitSize() * 1f;
         minFormationSpeed = type().speed;
 
         controlling.addAll(units);

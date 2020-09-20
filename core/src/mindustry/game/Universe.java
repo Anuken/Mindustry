@@ -14,7 +14,8 @@ import static mindustry.Vars.*;
 
 /** Updates and handles state of the campaign universe. Has no relevance to other gamemodes. */
 public class Universe{
-    private long seconds;
+    private int seconds;
+    private int netSeconds;
     private float secondCounter;
     private int turn;
 
@@ -76,15 +77,19 @@ public class Universe{
 
     /** Update planet rotations, global time and relevant state. */
     public void update(){
-        secondCounter += Time.delta / 60f;
 
-        if(secondCounter >= 1){
-            seconds += (int)secondCounter;
-            secondCounter %= 1f;
+        //only update time when not in multiplayer
+        if(!net.client()){
+            secondCounter += Time.delta / 60f;
 
-            //save every few seconds
-            if(seconds % 10 == 1){
-                save();
+            if(secondCounter >= 1){
+                seconds += (int)secondCounter;
+                secondCounter %= 1f;
+
+                //save every few seconds
+                if(seconds % 10 == 1){
+                    save();
+                }
             }
         }
 
@@ -191,25 +196,30 @@ public class Universe{
         return count;
     }
 
-    public float secondsMod(float mod, float scale){
-        return (seconds / scale) % mod;
+    public void updateNetSeconds(int value){
+        netSeconds = value;
     }
 
-    public long seconds(){
-        return seconds;
+    public float secondsMod(float mod, float scale){
+        return (seconds() / scale) % mod;
+    }
+
+    public int seconds(){
+        //use networked seconds when playing as client
+        return net.client() ? netSeconds : seconds;
     }
 
     public float secondsf(){
-        return seconds + secondCounter;
+        return seconds() + secondCounter;
     }
 
     private void save(){
-        Core.settings.put("utime", seconds);
+        Core.settings.put("utimei", seconds);
         Core.settings.put("turn", turn);
     }
 
     private void load(){
-        seconds = Core.settings.getLong("utime");
+        seconds = Core.settings.getInt("utimei");
         turn = Core.settings.getInt("turn");
     }
 

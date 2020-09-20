@@ -519,7 +519,7 @@ public class World{
             dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
         }
 
-        if(state.hasSector()){
+        if(state.hasSector() && state.getSector().preset == null){
             int circleBlend = 14;
             //quantized angle
             float offset = state.getSector().rect.rotation + 90;
