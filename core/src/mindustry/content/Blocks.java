@@ -1367,12 +1367,11 @@ public class Blocks implements ContentList{
             Items.silicon, Bullets.standardHoming
             );
 
+            spread = 4f;
             shots = 2;
             barrels = 2;
-            barrelPos = new float[][]{
-                {-1f, 0f, 0f},
-                {1f, 0f, 0f}
-            };
+            barrelXs = {-2f, 2f};
+            barrelYs = {0f, 0f};
             reloadTime = 20f;
             restitution = 0.03f;
             range = 100;
@@ -1539,11 +1538,8 @@ public class Blocks implements ContentList{
             shots = 4;
             burstSpacing = 5;
             barrels = 3;
-            barrelPos = new float[][]{
-                {-4f,0f, 0f},
-                {0f, 0f, 0f},
-                {4f, 0f, 0f}
-            };
+            barrelXs = {-8f, 0f, 8f};
+            barrelYs = {0f, 0f, 0f};
             inaccuracy = 10f;
             range = 190f;
             xRand = 6f;
@@ -1598,15 +1594,10 @@ public class Blocks implements ContentList{
             range = 90f;
             recoilAmount = 5f;
             shots = 3;
+            spread = 20f;
             restitution = 0.1f;
             shootCone = 30;
             size = 3;
-            barrels = 3;
-            barrelPos = new float[][]{
-                {0f, 0f, -20f},
-                {0f, 0f, 0f},
-                {0f, 0f, 20f},
-            };
 
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
@@ -1684,10 +1675,8 @@ public class Blocks implements ContentList{
             inaccuracy = 3f;
             recoilAmount = 3f;
             barrels = 2;
-            barrelPos = new float[][]{
-                {-6f, 0f, 0f},
-                {6f, 0f, 0f}
-            };
+            barrelXs = {-8f, 8f};
+            barrelYs = {0f, 0f};
             shootShake = 2f;
             shots = 2;
             size = 4;

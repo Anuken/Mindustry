@@ -56,7 +56,8 @@ public abstract class Turret extends Block{
     public float shootShake = 0f;
     /** Positioning stuff*/
     public int barrels = 1; //Don't make this 0 or negtive. No idea what will happen, but probably crash.
-    public float[][] barrelPos = {}; //Defaults to 0, 0 if no input is given. Done in the shoot code so that you can add input in Blocks.java like the Reconstructors.
+    public float[] barrelXs = {0f};
+    public float[] barrelYs = {0f};
     public boolean barrelBurst = false; //Think of a better name for this.
     public float xRand = 0f;
     public float yRand = 0f;
@@ -356,7 +357,7 @@ public abstract class Turret extends Block{
             }
         }
 
-        protected void shoot(BulletType type){ /*Way too much copied code, will have to clean up sometime.*/
+        protected void shoot(BulletType type){
             recoil = recoilAmount;
             heat = 1f;
 
@@ -369,39 +370,54 @@ public abstract class Turret extends Block{
                         recoil = recoilAmount;
 
                         if(barrelBurst){
-                            tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
+                            xOffset = barrelXs[shotCounter % barrels] + Mathf.range(xRand);
+                            yOffset = barrelYs[shotCounter % barrels] + Mathf.range(yRand);
                             
-                            bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
-                        }else{
-                            tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
+                            tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
                             
-                            bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
+                            for(int i = 0; i < shots; i++){
+                                bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
+                            }
 
                             shotCounter++;
+                        }else{
+                            for(int i = 0; i < shots; i++){
+                                xOffset = barrelXs[shotCounter % barrels] + Mathf.range(xRand);
+                                yOffset = barrelYs[shotCounter % barrels] + Mathf.range(yRand);
+                                
+                                tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
+                                
+                                bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
+
+                                shotCounter++;
+                            }
                         }
                         effects();
                         useAmmo();
                     });
                 }
-                if(barrelBurst){
-                    shotCounter++;
-                }
 
             }else{
                 //otherwise, use the normal shot pattern(s)
                 if(barrelBurst){
-                    tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
+                    xOffset = barrelXs[shotCounter % barrels] + Mathf.range(xRand);
+                    yOffset = barrelYs[shotCounter % barrels] + Mathf.range(yRand);
+                    
+                    tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
                     
                     for(int i = 0; i < shots; i++){
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
                     }
 
                     shotCounter++;
                 }else{
                     for(int i = 0; i < shots; i++){
-                        tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
+                        xOffset = barrelXs[shotCounter % barrels] + Mathf.range(xRand);
+                        yOffset = barrelYs[shotCounter % barrels] + Mathf.range(yRand);
                         
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
+                        tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
+                        
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
 
                         shotCounter++;
                     }
