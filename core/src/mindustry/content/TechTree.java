@@ -409,7 +409,11 @@ public class TechTree implements ContentList{
                         node(mono, () -> {
                             node(poly, () -> {
                                 node(mega, () -> {
+                                    node(quad, () -> {
+                                        node(oct, () -> {
 
+                                        });
+                                    });
                                 });
                             });
                         });

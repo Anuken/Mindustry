@@ -1145,11 +1145,11 @@ public class UnitTypes implements ContentList{
             accel = 0.04f;
             drag = 0.018f;
             flying = true;
-            engineOffset = 24f;
-            engineSize = 9f;
+            engineOffset = 46f;
+            engineSize = 7.8f;
             rotateShooting = false;
             hitsize = 60f;
-            payloadCapacity = (4 * 4) * (8 * 8);
+            payloadCapacity = (4.5f * 4.5f) * (8 * 8);
             buildSpeed = 3.5f;
 
             abilities.add(new ForceFieldAbility(140f, 4f, 6000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
