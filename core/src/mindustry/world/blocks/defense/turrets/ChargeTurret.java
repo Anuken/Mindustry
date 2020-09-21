@@ -21,31 +21,52 @@ public class ChargeTurret extends PowerTurret{
 
     public class ChargeTurretBuild extends PowerTurretBuild{
         public boolean shooting;
+        public int chargeCounter;
 
         @Override
         public void shoot(BulletType ammo){
             useAmmo();
-
-            tr.trns(rotation, size * tilesize / 2f);
-            chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
-
-            for(int i = 0; i < chargeEffects; i++){
-                Time.run(Mathf.random(chargeMaxDelay), () -> {
-                    if(!isValid()) return;
-                    tr.trns(rotation, size * tilesize / 2f);
-                    chargeEffect.at(x + tr.x, y + tr.y, rotation);
+            
+            for(int i = 0; i < shots; i++){
+                Time.run(burstSpacing * i, () -> {
+                    tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][1] : 0f), (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][0] : 0f));
+                    chargeBeginEffect.at(x + tr.x, y + tr.y, rotation + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][2] : 0f));
+                    
+                    for(int j = 0; j < chargeEffects; j++){
+                        Time.run(Mathf.random(chargeMaxDelay), () -> {
+                            if(!isValid()) return;
+                            tr.trns(rotation, size * tilesize / 2f);
+                            chargeEffect.at(x + tr.x, y + tr.y, rotation + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][2] : 0f));
+                        });
+                    }
+                    if(!barrelBurst){
+                        chargeCounter++;
+                    }
                 });
+            }
+            if(barrelBurst){
+                chargeCounter++;
             }
 
             shooting = true;
 
             Time.run(chargeTime, () -> {
-                if(!isValid()) return;
-                tr.trns(rotation, size * tilesize / 2f);
-                recoil = recoilAmount;
-                heat = 1f;
-                bullet(ammo, rotation + Mathf.range(inaccuracy));
-                effects();
+                for(int i = 0; i < shots; i++){
+                    Time.run(burstSpacing * i, () -> {
+                        if(!isValid()) return;
+                        tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f));
+                        recoil = recoilAmount;
+                        heat = 1f;
+                        bullet(ammo, rotation + Mathf.range(inaccuracy + ammo.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
+                        effects();
+                        if(!barrelBurst){
+                            shotCounter++;
+                        }
+                    });
+                }
+                if(barrelBurst){
+                    shotCounter++;
+                }
                 shooting = false;
             });
         }
