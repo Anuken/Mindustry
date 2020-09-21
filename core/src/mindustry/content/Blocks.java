@@ -1540,7 +1540,7 @@ public class Blocks implements ContentList{
             burstSpacing = 5;
             barrels = 3;
             barrelPos = new float[][]{
-                {-4f,0f, 0f},
+                {-4f, 0f, 0f},
                 {0f, 0f, 0f},
                 {4f, 0f, 0f}
             };
