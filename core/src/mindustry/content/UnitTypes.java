@@ -1131,8 +1131,8 @@ public class UnitTypes implements ContentList{
                     speed = 0.001f;
                     collides = false;
 
-                    splashDamage = 230f;
-                    splashDamageRadius = 110f;
+                    splashDamage = 240f;
+                    splashDamageRadius = 115f;
                 }};
             }});
         }};
