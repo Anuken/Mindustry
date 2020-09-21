@@ -48,21 +48,18 @@ public abstract class Turret extends Block{
     public float inaccuracy = 0f;
     public float velocityInaccuracy = 0f;
     public int shots = 1;
+    public float spread = 4f;
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
     public float rotatespeed = 5f; //in degrees per tick
     public float shootCone = 8f;
     public float shootShake = 0f;
-    /** Positioning stuff*/
-    public int barrels = 1; //Don't make this 0 or negtive. No idea what will happen, but probably crash.
-    public float[][] barrelPos = [[0f,0f]];
-    public boolean barrelBurst = false; //Think of a better name for this.
     public float xRand = 0f;
-    public float yRand = 0f;
     /** Currently used for artillery only. */
     public float minRange = 0f;
     public float burstSpacing = 0;
+    public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
     public boolean acceptCoolant = true;
@@ -368,29 +365,8 @@ public abstract class Turret extends Block{
 
                         recoil = recoilAmount;
 
-                        if(barrelBurst){
-                            xOffset = barrelPos[shotCounter % barrels][0] + Mathf.range(xRand);
-                            yOffset = barrelPos[shotCounter % barrels][1] + Mathf.range(yRand);
-                            
-                            tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
-                            
-                            for(int i = 0; i < shots; i++){
-                                bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
-                            }
-
-                            shotCounter++;
-                        }else{
-                            for(int i = 0; i < shots; i++){
-                                xOffset = barrelPos[shotCounter % barrels][0] + Mathf.range(xRand);
-                                yOffset = barrelPos[shotCounter % barrels][1] + Mathf.range(yRand);
-                                
-                                tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
-                                
-                                bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
-
-                                shotCounter++;
-                            }
-                        }
+                        tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+                        bullet(type, rotation + Mathf.range(inaccuracy));
                         effects();
                         useAmmo();
                     });
@@ -398,29 +374,21 @@ public abstract class Turret extends Block{
 
             }else{
                 //otherwise, use the normal shot pattern(s)
-                if(barrelBurst){
-                    xOffset = barrelPos[shotCounter % barrels][0] + Mathf.range(xRand);
-                    yOffset = barrelPos[shotCounter % barrels][1] + Mathf.range(yRand);
-                    
-                    tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
-                    
-                    for(int i = 0; i < shots; i++){
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
-                    }
 
-                    shotCounter++;
+                if(alternate){
+                    float i = (shotCounter % shots) - shots/2f + (((shots+1)%2) / 2f);
+
+                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2f);
+                    bullet(type, rotation + Mathf.range(inaccuracy));
                 }else{
-                    for(int i = 0; i < shots; i++){
-                        xOffset = barrelPos[shotCounter % barrels][0] + Mathf.range(xRand);
-                        yOffset = barrelPos[shotCounter % barrels][1] + Mathf.range(yRand);
-                        
-                        tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
-                        
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy));
+                    tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
 
-                        shotCounter++;
+                    for(int i = 0; i < shots; i++){
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
                     }
                 }
+
+                shotCounter++;
 
                 effects();
                 useAmmo();
