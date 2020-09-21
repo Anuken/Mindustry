@@ -103,7 +103,7 @@ public class Reconstructor extends UnitBlock{
             Draw.rect(region, x, y);
             if(teamRegions[1].found() && teamRegions[1] != Core.atlas.find("error")){
                 if(team.id != 1 && team.id != 2) Draw.color(team.color);
-                Draw.rect(regions[team.id], x, y, rotation);
+                Draw.rect(teamRegions[team.id], x, y, rotation);
                 Draw.color();
             }
 
