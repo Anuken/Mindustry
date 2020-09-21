@@ -361,22 +361,17 @@ public abstract class Turret extends Block{
             heat = 1f;
 
             //when burst spacing is enabled, use the burst pattern
-            if(burstSpacing > 0.0001f){
+            /*if(burstSpacing > 0.0001f){*/
                 for(int i = 0; i < shots; i++){
                     Time.run(burstSpacing * i, () -> {
                         if(!isValid() || !hasAmmo()) return;
 
                         recoil = recoilAmount;
 
-                        if(barrelBurst){
-                            tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
+                        tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
                             
-                            bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
-                        }else{
-                            tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
-                            
-                            bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
-
+                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
+                        if(!barrelBurst){
                             shotCounter++;
                         }
                         effects();
@@ -387,7 +382,7 @@ public abstract class Turret extends Block{
                     shotCounter++;
                 }
 
-            }else{
+            /*}else{
                 //otherwise, use the normal shot pattern(s)
                 if(barrelBurst){
                     tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
@@ -409,7 +404,7 @@ public abstract class Turret extends Block{
 
                 effects();
                 useAmmo();
-            }
+            }*/
         }
 
         protected void bullet(BulletType type, float angle){
