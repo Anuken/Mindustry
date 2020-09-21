@@ -56,8 +56,7 @@ public abstract class Turret extends Block{
     public float shootShake = 0f;
     /** Positioning stuff*/
     public int barrels = 1; //Don't make this 0 or negtive. No idea what will happen, but probably crash.
-    public float[] barrelXs = {0f};
-    public float[] barrelYs = {0f};
+    public float[][] barrelPos = [[0f,0f]];
     public boolean barrelBurst = false; //Think of a better name for this.
     public float xRand = 0f;
     public float yRand = 0f;
@@ -370,8 +369,8 @@ public abstract class Turret extends Block{
                         recoil = recoilAmount;
 
                         if(barrelBurst){
-                            xOffset = barrelXs[shotCounter % barrels] + Mathf.range(xRand);
-                            yOffset = barrelYs[shotCounter % barrels] + Mathf.range(yRand);
+                            xOffset = barrelPos[shotCounter % barrels][0] + Mathf.range(xRand);
+                            yOffset = barrelPos[shotCounter % barrels][1] + Mathf.range(yRand);
                             
                             tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
                             
@@ -382,8 +381,8 @@ public abstract class Turret extends Block{
                             shotCounter++;
                         }else{
                             for(int i = 0; i < shots; i++){
-                                xOffset = barrelXs[shotCounter % barrels] + Mathf.range(xRand);
-                                yOffset = barrelYs[shotCounter % barrels] + Mathf.range(yRand);
+                                xOffset = barrelPos[shotCounter % barrels][0] + Mathf.range(xRand);
+                                yOffset = barrelPos[shotCounter % barrels][1] + Mathf.range(yRand);
                                 
                                 tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
                                 
@@ -400,8 +399,8 @@ public abstract class Turret extends Block{
             }else{
                 //otherwise, use the normal shot pattern(s)
                 if(barrelBurst){
-                    xOffset = barrelXs[shotCounter % barrels] + Mathf.range(xRand);
-                    yOffset = barrelYs[shotCounter % barrels] + Mathf.range(yRand);
+                    xOffset = barrelPos[shotCounter % barrels][0] + Mathf.range(xRand);
+                    yOffset = barrelPos[shotCounter % barrels][1] + Mathf.range(yRand);
                     
                     tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
                     
@@ -412,8 +411,8 @@ public abstract class Turret extends Block{
                     shotCounter++;
                 }else{
                     for(int i = 0; i < shots; i++){
-                        xOffset = barrelXs[shotCounter % barrels] + Mathf.range(xRand);
-                        yOffset = barrelYs[shotCounter % barrels] + Mathf.range(yRand);
+                        xOffset = barrelPos[shotCounter % barrels][0] + Mathf.range(xRand);
+                        yOffset = barrelPos[shotCounter % barrels][1] + Mathf.range(yRand);
                         
                         tr.trns(rotation, size * tilesize / 2f + yOffset, xOffset);
                         

@@ -1369,9 +1369,7 @@ public class Blocks implements ContentList{
 
             spread = 4f;
             shots = 2;
-            barrels = 2;
-            barrelXs = {-2f, 2f};
-            barrelYs = {0f, 0f};
+            alternate = true;
             reloadTime = 20f;
             restitution = 0.03f;
             range = 100;
@@ -1537,9 +1535,6 @@ public class Blocks implements ContentList{
             reloadTime = 30f;
             shots = 4;
             burstSpacing = 5;
-            barrels = 3;
-            barrelXs = {-8f, 0f, 8f};
-            barrelYs = {0f, 0f, 0f};
             inaccuracy = 10f;
             range = 190f;
             xRand = 6f;
@@ -1674,9 +1669,8 @@ public class Blocks implements ContentList{
             range = 200f;
             inaccuracy = 3f;
             recoilAmount = 3f;
-            barrels = 2;
-            barrelXs = {-8f, 8f};
-            barrelYs = {0f, 0f};
+            spread = 8f;
+            alternate = true;
             shootShake = 2f;
             shots = 2;
             size = 4;
