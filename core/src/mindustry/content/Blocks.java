@@ -1367,13 +1367,13 @@ public class Blocks implements ContentList{
             Items.silicon, Bullets.standardHoming
             );
 
-            shots = 2;
+            shots = 1;
             barrels = 2;
             barrelPos = new float[][]{
                 {-1f, 0f, 0f},
                 {1f, 0f, 0f}
             };
-            reloadTime = 20f;
+            reloadTime = 10f;
             restitution = 0.03f;
             range = 100;
             shootCone = 15f;
@@ -1546,7 +1546,6 @@ public class Blocks implements ContentList{
             };
             inaccuracy = 10f;
             range = 190f;
-            xRand = 6f;
             size = 2;
             health = 300 * size * size;
             shootSound = Sounds.missile;
@@ -1676,7 +1675,7 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.standardIncendiaryBig,
             Items.thorium, Bullets.standardThoriumBig
             );
-            reloadTime = 6f;
+            reloadTime = 3f;
             coolantMultiplier = 0.5f;
             restitution = 0.1f;
             ammoUseEffect = Fx.shellEjectBig;
@@ -1685,11 +1684,11 @@ public class Blocks implements ContentList{
             recoilAmount = 3f;
             barrels = 2;
             barrelPos = new float[][]{
-                {-6f, 0f, 0f},
-                {6f, 0f, 0f}
+                {-5f, 0f, 0f},
+                {5f, 0f, 0f}
             };
             shootShake = 2f;
-            shots = 2;
+            shots = 1;
             size = 4;
             shootCone = 24f;
             shootSound = Sounds.shootBig;

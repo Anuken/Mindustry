@@ -361,50 +361,25 @@ public abstract class Turret extends Block{
             heat = 1f;
 
             //when burst spacing is enabled, use the burst pattern
-            /*if(burstSpacing > 0.0001f){*/
-                for(int i = 0; i < shots; i++){
-                    Time.run(burstSpacing * i, () -> {
-                        if(!isValid() || !hasAmmo()) return;
+            for(int i = 0; i < shots; i++){
+                Time.run(burstSpacing * i, () -> {
+                    if(!isValid() || !hasAmmo()) return;
 
-                        recoil = recoilAmount;
+                    recoil = recoilAmount;
 
-                        tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
-                            
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
-                        if(!barrelBurst){
-                            shotCounter++;
-                        }
-                        effects();
-                        useAmmo();
-                    });
-                }
-                if(barrelBurst){
-                    shotCounter++;
-                }
-
-            /*}else{
-                //otherwise, use the normal shot pattern(s)
-                if(barrelBurst){
                     tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
-                    
-                    for(int i = 0; i < shots; i++){
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
-                    }
-
-                    shotCounter++;
-                }else{
-                    for(int i = 0; i < shots; i++){
-                        tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
                         
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
-
+                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
+                    if(!barrelBurst){
                         shotCounter++;
                     }
-                }
-
-                effects();
-                useAmmo();
-            }*/
+                    effects();
+                    useAmmo();
+                });
+            }
+            if(barrelBurst){
+                shotCounter++;
+            }
         }
 
         protected void bullet(BulletType type, float angle){
