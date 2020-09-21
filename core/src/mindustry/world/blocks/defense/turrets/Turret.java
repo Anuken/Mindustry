@@ -56,7 +56,7 @@ public abstract class Turret extends Block{
     public float shootShake = 0f;
     /** Positioning stuff*/
     public int barrels = 1; //Don't make this 0 or negtive. No idea what will happen, but probably crash.
-    public float[][] barrelPos = {}; //Defaults to 0, 0 if no input is given. Done in the shoot code so that you can add input in Blocks.java like the Reconstructors.
+    public float[][] barrelPos = {}; //Defaults to 0, 0, 0 if no input is given. Input {X, Y, Deg}
     public boolean barrelBurst = false; //Think of a better name for this.
     public float xRand = 0f;
     public float yRand = 0f;
@@ -360,16 +360,18 @@ public abstract class Turret extends Block{
             recoil = recoilAmount;
             heat = 1f;
 
-            //when burst spacing is enabled, use the burst pattern
             for(int i = 0; i < shots; i++){
-                Time.run(burstSpacing * i, () -> {
+                Time.run(burstSpacing * i, () -> { //Code works perfectly fine if burstSpacing is 0, eliminates repeated code.
                     if(!isValid() || !hasAmmo()) return;
 
                     recoil = recoilAmount;
-
+                    
+                    //Ternary operator determines if array is empty. If empty, set value as 0.
                     tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
                         
                     bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f));
+                    
+                    //BarrelBurst means should all the bullets in a burst attack come form one barrel or spread across multiple. Probably should've included that in my demonstration.
                     if(!barrelBurst){
                         shotCounter++;
                     }
