@@ -27,7 +27,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
 
     //air (no special traits)
-    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
+    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra, ghost, echo;
 
     //air + mining
     public static @EntityDef({Unitc.class, Minerc.class}) UnitType mono;
@@ -719,6 +719,61 @@ public class UnitTypes implements ContentList{
 
         //endregion
         //region air attack
+        
+        ghost = new UnitType("ghost"){{
+            health = 150;
+            speed = 2f;
+            accel = 0.08f;
+            drag = 0.016f;
+            flying = true;
+            targetAir = false;
+            engineOffset = 5.2f;
+            range = 140f;
+            faceTarget = false;
+            armor = 4f;
+
+            weapons.add(new Weapon(){{
+                minShootVelocity = 0.75f;
+                x = 3f;
+                shootY = 0f;
+                reload = 13f;
+                shootCone = 180f;
+                ejectEffect = Fx.none;
+                inaccuracy = 15f;
+                ignoreRotation = true;
+                shootSound = Sounds.none;
+                bullet = new BombBulletType(18f, 20f){{
+                    width = 8f;
+                    height = 10f;
+                    hitEffect = Fx.flakExplosion;
+                    shootEffect = Fx.none;
+                    smokeEffect = Fx.none;
+
+                    status = StatusEffects.blasted;
+                    statusDuration = 40f;
+                }};
+            }});
+        }};
+        
+        echo = new UnitType("echo"){{
+            speed = 4f;
+            accel = 0.08f;
+            drag = 0.01f;
+            flying = true;
+            health = 100;
+            faceTarget = false;
+            engineOffset = 5.5f;
+            range = 140f;
+
+            weapons.add(new Weapon(){{
+                y = 0f;
+                x = 2f;
+                reload = 10f;
+                ejectEffect = Fx.shellEjectSmall;
+                bullet = Bullets.fragGlass;
+                shootSound = Sounds.shoot;
+            }});
+        }};
 
         flare = new UnitType("flare"){{
             speed = 3f;
