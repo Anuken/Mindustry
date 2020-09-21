@@ -10,6 +10,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.Vars;
 
 public class UnitTypes implements ContentList{
     //region definitions
@@ -1057,7 +1058,7 @@ public class UnitTypes implements ContentList{
             rotateShooting = false;
             hitsize = 15f;
             engineSize = 3f;
-            payloadCapacity = 4 * (8 * 8);
+            payloadCapacity = 4 * (Vars.tilesize * Vars.tilesize);
             buildSpeed = 2.5f;
 
             weapons.add(
@@ -1090,7 +1091,7 @@ public class UnitTypes implements ContentList{
             engineSize = 6f;
             rotateShooting = false;
             hitsize = 32f;
-            payloadCapacity = (3 * 3) * (8 * 8);
+            payloadCapacity = (3 * 3) * (Vars.tilesize * Vars.tilesize);
             buildSpeed = 2.5f;
             range = 140f;
 
@@ -1149,7 +1150,7 @@ public class UnitTypes implements ContentList{
             engineSize = 7.8f;
             rotateShooting = false;
             hitsize = 60f;
-            payloadCapacity = (4.5f * 4.5f) * (8 * 8);
+            payloadCapacity = (4.5f * 4.5f) * (Vars.tilesize * Vars.tilesize);
             buildSpeed = 3.5f;
 
             abilities.add(new ForceFieldAbility(140f, 4f, 6000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
