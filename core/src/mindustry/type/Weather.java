@@ -143,7 +143,7 @@ public abstract class Weather extends UnlockableContent{
 
     @EntityDef(value = {WeatherStatec.class}, pooled = true, isFinal = false)
     @Component(base = true)
-    abstract static class WeatherStateComp implements Drawc{
+    abstract static class WeatherStateComp implements Drawc, Syncc{
         private static final float fadeTime = 60 * 4;
 
         Weather weather;
@@ -164,8 +164,8 @@ public abstract class Weather extends UnlockableContent{
 
             life -= Time.delta;
 
-            weather.update(base());
-            weather.updateEffect(base());
+            weather.update(self());
+            weather.updateEffect(self());
 
             if(life < 0){
                 remove();
@@ -178,14 +178,14 @@ public abstract class Weather extends UnlockableContent{
                 Draw.draw(Layer.weather, () -> {
                     weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity);
-                    weather.drawOver(base());
+                    weather.drawOver(self());
                     Draw.reset();
                 });
 
                 Draw.draw(Layer.debris, () -> {
                     weather.rand.setSeed(0);
                     Draw.alpha(renderer.weatherAlpha() * opacity);
-                    weather.drawUnder(base());
+                    weather.drawUnder(self());
                     Draw.reset();
                 });
             }

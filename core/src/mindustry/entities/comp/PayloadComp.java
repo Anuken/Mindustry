@@ -48,6 +48,9 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         unit.remove();
         payloads.add(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
+        if(Vars.net.client()){
+            Vars.netClient.clearRemovedEntity(unit.id);
+        }
     }
 
     void pickup(Building tile){
@@ -70,6 +73,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
     boolean tryDropPayload(Payload payload){
         Tile on = tileOn();
+
+        //clear removed state of unit so it can be synced
+        if(Vars.net.client() && payload instanceof UnitPayload){
+            Vars.netClient.clearRemovedEntity(((UnitPayload)payload).unit.id);
+        }
 
         //drop off payload on an acceptor if possible
         if(on != null && on.build != null && on.build.acceptPayload(on.build, payload)){

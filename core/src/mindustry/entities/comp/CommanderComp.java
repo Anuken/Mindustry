@@ -27,7 +27,7 @@ abstract class CommanderComp implements Unitc{
     @Override
     public void update(){
         if(formation != null){
-            formation.anchor.set(x, y, rotation);
+            formation.anchor.set(x, y, /*rotation*/ 0); //TODO rotation set to 0 because rotating is pointless
             formation.updateSlots();
         }
     }
@@ -59,7 +59,7 @@ abstract class CommanderComp implements Unitc{
         units.clear();
 
         Units.nearby(team(), x, y, 200f, u -> {
-            if(u.isAI() && include.get(u) && u != base()){
+            if(u.isAI() && include.get(u) && u != self()){
                 units.add(u);
             }
         });
@@ -73,13 +73,13 @@ abstract class CommanderComp implements Unitc{
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
-        float spacing = hitSize() * 1.7f;
+        float spacing = hitSize() * 1f;
         minFormationSpeed = type().speed;
 
         controlling.addAll(units);
         for(Unit unit : units){
             FormationAI ai;
-            unit.controller(ai = new FormationAI(base(), formation));
+            unit.controller(ai = new FormationAI(self(), formation));
             spacing = Math.max(spacing, ai.formationSize());
             minFormationSpeed = Math.min(minFormationSpeed, unit.type().speed);
         }
@@ -104,7 +104,7 @@ abstract class CommanderComp implements Unitc{
     void clearCommand(){
         //reset controlled units
         for(Unit unit : controlling){
-            if(unit.controller().isBeingControlled(base())){
+            if(unit.controller().isBeingControlled(self())){
                 unit.controller(unit.type().createController());
             }
         }

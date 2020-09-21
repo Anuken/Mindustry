@@ -1,7 +1,6 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
@@ -59,7 +58,7 @@ public class FlyingAI extends AIController{
             vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.6f));
         }
 
-        vec.setLength(unit.type().speed * Time.delta);
+        vec.setLength(unit.type().speed);
 
         unit.moveAt(vec);
     }

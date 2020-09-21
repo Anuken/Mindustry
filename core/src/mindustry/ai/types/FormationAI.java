@@ -2,10 +2,10 @@ package mindustry.ai.types;
 
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.*;
 import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
 public class FormationAI extends AIController implements FormationMember{
     public Unit leader;
@@ -25,39 +25,40 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public void updateUnit(){
+        UnitType type = unit.type();
+
         if(leader.dead){
             unit.resetController();
             return;
         }
 
-        unit.controlWeapons(leader.isRotate(), leader.isShooting);
+        unit.controlWeapons(true, leader.isShooting);
         // unit.moveAt(Tmp.v1.set(deltaX, deltaY).limit(unit.type().speed));
-        if(leader.isShooting){
-            unit.aimLook(leader.aimX(), leader.aimY());
-        }else{
-            if(!leader.moving() || !unit.type().rotateShooting){
-                if(unit.moving()){
-                    unit.lookAt(unit.vel.angle());
-                }
-            }else{
-                unit.lookAt(leader.rotation);
-            }
+
+        unit.aim(leader.aimX(), leader.aimY());
+
+        if(unit.type().rotateShooting){
+            unit.lookAt(leader.aimX(), leader.aimY());
+        }else if(unit.moving()){
+            unit.lookAt(unit.vel.angle());
         }
 
         Vec2 realtarget = vec.set(target);
 
-        if(unit.isGrounded() && Vars.world.raycast(unit.tileX(), unit.tileY(), leader.tileX(), leader.tileY(), Vars.world::solid)){
-            //TODO pathfind
-            //realtarget.set(Vars.pathfinder.getTargetTile(unit.tileOn(), unit.team, leader));
-        }
+        float margin = 3f;
 
-        unit.moveAt(realtarget.sub(unit).limit(unit.type().speed));
+        if(unit.dst(realtarget) <= margin){
+            unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
+        }else{
+            unit.moveAt(realtarget.sub(unit).limit(type.speed));
+        }
     }
 
     @Override
     public void removed(Unit unit){
         if(formation != null){
             formation.removeMember(this);
+            unit.resetController();
         }
     }
 
@@ -67,7 +68,7 @@ public class FormationAI extends AIController implements FormationMember{
             //TODO return formation size
             //eturn ((Commanderc)unit).formation().
         }
-        return unit.hitSize * 1.7f;
+        return unit.hitSize * 1f;
     }
 
     @Override

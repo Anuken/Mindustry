@@ -321,16 +321,25 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
         }
 
-        stable.add("@sectors.resources").row();
-        stable.table(t -> {
-            t.left();
-            int idx = 0;
-            int max = 5;
-            for(UnlockableContent c : sector.data.resources){
-                t.image(c.icon(Cicon.small)).padRight(3);
-                if(++idx % max == 0) t.row();
-            }
-        }).fillX().row();
+        if(sector.save != null){
+            stable.add("@sectors.resources").row();
+            stable.table(t -> {
+
+                if(sector.save != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.resources.any()){
+                    t.left();
+                    int idx = 0;
+                    int max = 5;
+                    for(UnlockableContent c : sector.save.meta.secinfo.resources){
+                        t.image(c.icon(Cicon.small)).padRight(3);
+                        if(++idx % max == 0) t.row();
+                    }
+                }else{
+                    t.add("@unknown").color(Color.lightGray);
+                }
+
+
+            }).fillX().row();
+        }
 
         //production
         if(sector.hasBase() && sector.save.meta.hasProduction){
@@ -404,7 +413,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
 
                 if(shouldHide) hide();
-            }).growX().padTop(2f).height(50f).minWidth(170f);
+            }).growX().padTop(2f).height(50f).minWidth(170f).disabled(b -> state.rules.sector == sector && !state.isMenu());
         }
 
         stable.pack();

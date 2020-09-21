@@ -5,12 +5,14 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -35,9 +37,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     private UnitController controller;
     private UnitType type;
-    boolean spawnedByCore, deactivated;
+    boolean spawnedByCore, deactivated; //TODO remove deactivation boolean
 
-    transient float timer1, timer2;
+    transient Seq<Ability> abilities = new Seq<>(0);
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -117,7 +119,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void controller(UnitController next){
         this.controller = next;
-        if(controller.unit() != base()) controller.unit(base());
+        if(controller.unit() != self()) controller.unit(self());
     }
 
     @Override
@@ -171,7 +173,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return Units.getCap(team);
     }
 
-    private void setStats(UnitType type){
+    public void setStats(UnitType type){
         this.type = type;
         this.maxHealth = type.health;
         this.drag = type.drag;
@@ -181,13 +183,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         if(controller == null) controller(type.createController());
         if(mounts().length != type.weapons.size) setupWeapons(type);
+        if(abilities.size != type.abilities.size){
+            abilities = type.abilities.map(Ability::copy);
+        }
     }
 
     @Override
     public void afterSync(){
         //set up type info after reading
         setStats(this.type);
-        controller.unit(base());
+        controller.unit(self());
     }
 
     @Override
@@ -199,20 +204,21 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void add(){
-        teamIndex.updateCount(team, type, 1);
 
         //check if over unit cap
         if(count() > cap() && !spawnedByCore){
             deactivated = true;
-        }else{
-            teamIndex.updateActiveCount(team, type, 1);
+
+            if(!dead){
+                Call.unitCapDeath(self());
+            }
         }
     }
 
     @Override
     public void remove(){
         teamIndex.updateCount(team, type, -1);
-        controller.removed(base());
+        controller.removed(self());
     }
 
     @Override
@@ -221,7 +227,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             Effect.shake(type.landShake, type.landShake, this);
         }
 
-        type.landed(base());
+        type.landed(self());
     }
 
     @Override
@@ -232,7 +238,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             deactivated = false;
         }
 
-        if(!deactivated) type.update(base());
+        if(!deactivated){
+            type.update(self());
+
+            if(abilities.size > 0){
+                for(Ability a : abilities){
+                    a.update(self());
+                }
+            }
+        }else if(!dead){
+            Call.unitCapDeath(self());
+        }
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
 
@@ -282,7 +298,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(tile != null && isGrounded() && !type.hovering){
             //unit block update
             if(tile.build != null){
-                tile.build.unitOn(base());
+                tile.build.unitOn(self());
             }
 
             //apply damage
@@ -316,7 +332,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //remove units spawned by the core
         if(spawnedByCore && !isPlayer()){
-            Call.unitDespawn(base());
+            Call.unitDespawn(self());
         }
     }
 
@@ -338,7 +354,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         Effect.shake(shake, shake, this);
         type.deathSound.at(this);
 
-        Events.fire(new UnitDestroyEvent(base()));
+        Events.fire(new UnitDestroyEvent(self()));
 
         if(explosiveness > 7f && isLocal()){
             Events.fire(Trigger.suicideBomb);
@@ -364,7 +380,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void display(Table table){
-        type.display(base(), table);
+        type.display(self(), table);
     }
 
     @Override
@@ -374,7 +390,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void draw(){
-        type.draw(base());
+        type.draw(self());
     }
 
     @Override

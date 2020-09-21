@@ -12,8 +12,8 @@ public class RepairAI extends AIController{
         boolean shoot = false;
 
         if(target != null){
-            if(!target.within(unit, unit.type().range)){
-                moveTo(target, unit.type().range * 0.9f);
+            if(!target.within(unit, unit.type().range * 0.8f)){
+                moveTo(target, unit.type().range * 0.8f);
             }else{
                 unit.aim(target);
                 shoot = true;

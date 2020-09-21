@@ -163,6 +163,15 @@ public class ImagePacker{
         return new Image(imageCache.get(((AtlasRegion)region).name));
     }
 
+    static void replace(String name, Image image){
+        image.save(name);
+        ((GenRegion)Core.atlas.find(name)).path.delete();
+    }
+
+    static void replace(TextureRegion region, Image image){
+        replace(((GenRegion)region).name, image);
+    }
+
     static void err(String message, Object... args){
         throw new IllegalArgumentException(Strings.format(message, args));
     }

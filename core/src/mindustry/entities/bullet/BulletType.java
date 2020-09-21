@@ -24,7 +24,7 @@ public abstract class BulletType extends Content{
     public float hitSize = 4;
     public float drawSize = 40f;
     public float drag = 0f;
-    public boolean pierce;
+    public boolean pierce, pierceBuilding;
     public Effect hitEffect, despawnEffect;
 
     /** Effect created when shooting. */
@@ -69,6 +69,8 @@ public abstract class BulletType extends Content{
     public boolean scaleVelocity;
     /** Whether this bullet can be hit by point defense. */
     public boolean hittable = true;
+    /** Whether this bullet can be reflected. */
+    public boolean reflectable = true;
 
     //additional effects
 
@@ -100,7 +102,7 @@ public abstract class BulletType extends Content{
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
-    public float hitShake = 0f;
+    public float hitShake = 0f, despawnShake = 0f;
 
     public int puddles;
     public float puddleRange;
@@ -131,8 +133,12 @@ public abstract class BulletType extends Content{
         return true;
     }
 
-    public void hitTile(Bullet b, Building tile){
+    public void hitTile(Bullet b, Building tile, float initialHealth){
         hit(b);
+    }
+
+    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+
     }
 
     public void hit(Bullet b){
@@ -180,6 +186,8 @@ public abstract class BulletType extends Content{
     public void despawned(Bullet b){
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         hitSound.at(b);
+
+        Effect.shake(despawnShake, despawnShake, b);
 
         if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
             hit(b);

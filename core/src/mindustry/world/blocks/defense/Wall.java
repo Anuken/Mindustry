@@ -55,7 +55,7 @@ public class Wall extends Block{
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) && health > other.health && size == other.size;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && health > other.health && size >= other.size;
     }
 
     public class WallBuild extends Building{
@@ -100,7 +100,7 @@ public class Wall extends Block{
             //deflect bullets if necessary
             if(deflect){
                 //slow bullets are not deflected
-                if(bullet.vel().len() <= 0.2f) return true;
+                if(bullet.vel().len() <= 0.1f || !bullet.type.reflectable) return true;
 
                 //bullet reflection chance depends on bullet damage
                 if(!Mathf.chance(chanceDeflect / bullet.damage())) return true;

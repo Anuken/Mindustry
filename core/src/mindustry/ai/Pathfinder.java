@@ -59,7 +59,7 @@ public class Pathfinder implements Runnable{
     Flowfield[][][] cache;
 
     /** tile data, see PathTileStruct */
-    int[][] tiles;
+    int[][] tiles = new int[0][0];
     /** unordered array of path data for iteration only. DO NOT iterate or access this in the main thread. */
     Seq<Flowfield> threadList = new Seq<>(), mainList = new Seq<>();
     /** handles task scheduling on the update thread. */

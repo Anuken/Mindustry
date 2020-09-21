@@ -191,6 +191,10 @@ public class Control implements ApplicationListener, Loadable{
 
     }
 
+    void resetCamera(){
+
+    }
+
     @Override
     public void loadAsync(){
         Draw.scl = 1f / Core.atlas.find("scale_marker").width;
@@ -280,6 +284,7 @@ public class Control implements ApplicationListener, Loadable{
                 try{
                     net.reset();
                     slot.load();
+                    slot.setAutosave(true);
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
@@ -329,7 +334,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playTutorial(){
-        ui.showInfo("There is no tutorial yet.");
+        ui.showInfo("@indev.notready");
         //TODO implement
         //ui.showInfo("death");
         /*
@@ -429,7 +434,7 @@ public class Control implements ApplicationListener, Loadable{
         //just a regular reminder
         if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
             app.post(() -> app.post(() -> {
-                ui.showStartupInfo("@indevpopup");
+                ui.showStartupInfo("@indev.popup");
             }));
         }
 
