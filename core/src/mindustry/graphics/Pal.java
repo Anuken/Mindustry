@@ -3,7 +3,7 @@ package mindustry.graphics;
 import arc.graphics.Color;
 
 public class Pal{
-    public static final Color
+    public static Color
 
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
