@@ -10,7 +10,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.Vars;
+import static mindustry.Vars;
 
 public class UnitTypes implements ContentList{
     //region definitions
