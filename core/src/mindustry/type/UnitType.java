@@ -44,7 +44,7 @@ public class UnitType extends UnlockableContent{
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, armor = 0f;
-    public float crashDamageMultiplier = 3f;
+    public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
@@ -75,6 +75,7 @@ public class UnitType extends UnlockableContent{
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
+    public float clipSize = -1;
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
@@ -571,6 +572,8 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawOutline(Unit unit){
+        Draw.reset();
+
         if(Core.atlas.isFound(outlineRegion)){
             Draw.rect(outlineRegion, unit.x, unit.y, unit.rotation - 90);
         }

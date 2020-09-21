@@ -69,7 +69,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Replace
     public float clipSize(){
-        return type.region.width * 2f;
+        return Math.max(type.region.width * 2f, type.clipSize);
     }
 
     @Override
@@ -362,7 +362,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying){
-            Damage.damage(team,x, y, hitSize * 1.1f, hitSize * type.crashDamageMultiplier, true, false, true);
+            Damage.damage(team,x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
 
         if(!headless){

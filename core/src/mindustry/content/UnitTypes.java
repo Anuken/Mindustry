@@ -729,7 +729,6 @@ public class UnitTypes implements ContentList{
             faceTarget = false;
             engineOffset = 5.5f;
             range = 140f;
-            crashDamageMultiplier = 4f;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -1079,9 +1078,8 @@ public class UnitTypes implements ContentList{
         }};
 
         quad = new UnitType("quad"){{
-            mineTier = 2;
             armor = 4f;
-            health = 7000;
+            health = 6000;
             speed = 1.2f;
             rotateSpeed = 2f;
             accel = 0.05f;
@@ -1106,6 +1104,8 @@ public class UnitTypes implements ContentList{
                 bullet = new BasicBulletType(){{
                     sprite = "large-bomb";
                     width = height = 120/4f;
+
+                    range = 20f;
 
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -1132,9 +1132,27 @@ public class UnitTypes implements ContentList{
                     collides = false;
 
                     splashDamage = 230f;
-                    splashDamageRadius = 90f;
+                    splashDamageRadius = 110f;
                 }};
             }});
+        }};
+
+        oct = new UnitType("oct"){{
+            armor = 16f;
+            health = 23000;
+            speed = 0.6f;
+            rotateSpeed = 1f;
+            accel = 0.04f;
+            drag = 0.018f;
+            flying = true;
+            engineOffset = 24f;
+            engineSize = 9f;
+            rotateShooting = false;
+            hitsize = 60f;
+            payloadCapacity = (4 * 4) * (8 * 8);
+            buildSpeed = 3.5f;
+
+            abilities.add(new ForceFieldAbility(140f, 4f, 6000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
         }};
 
         //endregion
@@ -1241,7 +1259,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 1.8f;
             drag = 0.17f;
             hitsize = 16f;
-            armor = 6f;
+            armor = 7f;
             immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
@@ -1250,7 +1268,7 @@ public class UnitTypes implements ContentList{
             trailY = -9f;
             trailScl = 1.5f;
 
-            abilities.add(new HealFieldAbility(22f, 60f * 4, 70f), new ShieldFieldAbility(20f, 40f, 60f * 4, 60f));
+            abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 4, 60f));
 
             weapons.add(new Weapon("large-artillery"){{
                 reload = 65f;

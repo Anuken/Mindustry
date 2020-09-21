@@ -306,6 +306,12 @@ public class Fx{
         }
     }),
 
+    healWaveDynamic = new Effect(22, e -> {
+        color(Pal.heal);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation);
+    }),
+
     healWave = new Effect(22, e -> {
         color(Pal.heal);
         stroke(e.fout() * 2f);

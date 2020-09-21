@@ -1320,7 +1320,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.copper, 3000, Items.lead, 3000, Items.silicon, 2000));
 
             unitType = UnitTypes.beta;
-            health = 2000;
+            health = 3500;
             itemCapacity = 9000;
             size = 4;
 
@@ -1331,7 +1331,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.copper, 8000, Items.lead, 8000, Items.silicon, 5000, Items.thorium, 4000));
 
             unitType = UnitTypes.gamma;
-            health = 4000;
+            health = 6000;
             itemCapacity = 13000;
             size = 5;
 
@@ -1805,6 +1805,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.spiroct, UnitTypes.arkyid},
                 {UnitTypes.fortress, UnitTypes.scepter},
                 {UnitTypes.bryde, UnitTypes.sei},
+                {UnitTypes.mega, UnitTypes.quad},
             };
         }};
 
@@ -1823,7 +1824,8 @@ public class Blocks implements ContentList{
                 {UnitTypes.antumbra, UnitTypes.eclipse},
                 {UnitTypes.arkyid, UnitTypes.toxopid},
                 {UnitTypes.scepter, UnitTypes.reign},
-                {UnitTypes.sei, UnitTypes.omura}
+                {UnitTypes.sei, UnitTypes.omura},
+                {UnitTypes.quad, UnitTypes.oct}
             };
         }};
 
