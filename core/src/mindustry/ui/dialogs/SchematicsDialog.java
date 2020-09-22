@@ -79,7 +79,7 @@ public class SchematicsDialog extends BaseDialog{
 
                 t.clear();
                 int i = 0;
-                String regex = "[`~!@#$%^&*()-_=+[{]}|;:'\",<.>/?]";
+                String regex = "[`~!@#$%^&*()-_=+{}|;:'\",<.>/?]";
                 String searchString = search.toLowerCase().replaceAll(regex, " ");
 
                 firstSchematic = null;

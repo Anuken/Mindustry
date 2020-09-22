@@ -223,7 +223,7 @@ public class UnitFactory extends UnitBlock{
             if(currentPlan != -1 && !Units.canCreate(team, plans[currentPlan].unit)){
                 return false;
             }
-            return super.shouldConsume();
+            return enabled;
         }
 
         @Override

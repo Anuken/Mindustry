@@ -1,10 +1,13 @@
 package mindustry.entities.comp;
 
+import arc.func.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.ai.formations.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 
@@ -12,6 +15,7 @@ import mindustry.gen.*;
 @Component
 abstract class CommanderComp implements Unitc{
     private static final Seq<FormationMember> members = new Seq<>();
+    private static final Seq<Unit> units = new Seq<>();
 
     @Import float x, y, rotation;
 
@@ -42,6 +46,28 @@ abstract class CommanderComp implements Unitc{
     @Override
     public void controller(UnitController next){
         clearCommand();
+    }
+
+    void commandNearby(FormationPattern pattern){
+        commandNearby(pattern, u -> true);
+    }
+
+    void commandNearby(FormationPattern pattern, Boolf<Unit> include){
+        Formation formation = new Formation(new Vec3(x, y, rotation), pattern);
+        formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
+
+        units.clear();
+
+        Units.nearby(team(), x, y, 200f, u -> {
+            if(u.isAI() && include.get(u) && u != base()){
+                units.add(u);
+            }
+        });
+
+        units.sort(u -> u.dst2(this));
+        units.truncate(type().commandLimit);
+
+        command(formation, units);
     }
 
     void command(Formation formation, Seq<Unit> units){

@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 
 public class LogicDisplay extends Block{
@@ -37,7 +38,7 @@ public class LogicDisplay extends Block{
         public FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
-        public LongQueue commands = new LongQueue();
+        public LongQueue commands = new LongQueue(LExecutor.maxDisplayBuffer);
 
         @Override
         public void draw(){

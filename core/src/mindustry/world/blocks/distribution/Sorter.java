@@ -76,7 +76,7 @@ public class Sorter extends Block{
         public boolean acceptItem(Building source, Item item){
             Building to = getTileTarget(item, source, false);
 
-            return to != null && to.acceptItem(this, item) && to.team() == team;
+            return to != null && to.acceptItem(this, item) && to.team == team;
         }
 
         @Override
@@ -132,7 +132,7 @@ public class Sorter extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> sortItem, item -> configure(item));
+            ItemSelection.buildTable(table, content.items(), () -> sortItem, this::configure);
         }
 
         @Override

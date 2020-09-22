@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.ui.*;
@@ -233,6 +234,10 @@ public class JoinDialog extends BaseDialog{
             t.add("[lightgray]" + (Core.bundle.format("players" + (host.players == 1 && host.playerLimit <= 0 ? ".single" : ""), (host.players == 0 ? "[lightgray]" : "[accent]") + host.players + (host.playerLimit > 0 ? "[lightgray]/[accent]" + host.playerLimit : "")+ "[lightgray]"))).left();
             t.row();
             t.add("[lightgray]" + Core.bundle.format("save.map", host.mapname) + "[lightgray] / " + (host.modeName == null ? host.mode.toString() : host.modeName)).width(targetWidth() - 10f).left().get().setEllipsis(true);
+            if(host.ping > 0){
+                t.row();
+                t.add(Iconc.chartBar + " " + host.ping + "ms").color(Color.gray).left();
+            }
         }).expand().left().bottom().padLeft(12f).padBottom(8);
     }
 
@@ -434,9 +439,13 @@ public class JoinDialog extends BaseDialog{
                         defaultServers.clear();
                         val.asArray().each(child -> defaultServers.add(child.getString("address", "<invalid>")));
                         Log.info("Fetched @ global servers.", defaultServers.size);
-                    }catch(Throwable ignored){}
+                    }catch(Throwable ignored){
+                        Log.err("Failed to parse community servers.");
+                    }
                 });
-            }catch(Throwable ignored){}
+            }catch(Throwable e){
+                Log.err("Failed to fetch community servers.");
+            }
         }, t -> {});
     }
 

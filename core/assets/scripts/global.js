@@ -7,8 +7,9 @@ const log = function(context, obj){
 }
 
 const readString = path => Vars.mods.getScripts().readString(path)
-
 const readBytes = path => Vars.mods.getScripts().readBytes(path)
+const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
+const loadSound = path => Vars.mods.getScripts().loadSound(path)
 
 var scriptName = "base.js"
 var modName = "none"
@@ -40,6 +41,7 @@ importPackage(Packages.arc)
 importPackage(Packages.arc.func)
 importPackage(Packages.arc.graphics)
 importPackage(Packages.arc.graphics.g2d)
+importPackage(Packages.arc.graphics.gl)
 importPackage(Packages.arc.math)
 importPackage(Packages.arc.math.geom)
 importPackage(Packages.arc.scene)
@@ -128,8 +130,6 @@ const ConfigEvent = Packages.mindustry.game.EventType.ConfigEvent
 const DepositEvent = Packages.mindustry.game.EventType.DepositEvent
 const WithdrawEvent = Packages.mindustry.game.EventType.WithdrawEvent
 const SectorCaptureEvent = Packages.mindustry.game.EventType.SectorCaptureEvent
-const ZoneConfigureCompleteEvent = Packages.mindustry.game.EventType.ZoneConfigureCompleteEvent
-const ZoneRequireCompleteEvent = Packages.mindustry.game.EventType.ZoneRequireCompleteEvent
 const PlayerChatEvent = Packages.mindustry.game.EventType.PlayerChatEvent
 const ClientPreConnectEvent = Packages.mindustry.game.EventType.ClientPreConnectEvent
 const CommandIssueEvent = Packages.mindustry.game.EventType.CommandIssueEvent

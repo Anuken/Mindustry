@@ -155,12 +155,6 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(ZoneRequireCompleteEvent.class, e -> {
-            if(e.objective.display() != null){
-                ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", e.zoneForMet.localizedName, e.objective.display()));
-            }
-        });
-
         //delete save on campaign game over
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){

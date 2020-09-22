@@ -16,7 +16,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class RepairPoint extends Block{
-    private static final Rect rect = new Rect();
+    static final Rect rect = new Rect();
 
     public int timerTarget = timers++;
 
@@ -115,7 +115,7 @@ public class RepairPoint extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return target != null;
+            return target != null && enabled;
         }
     }
 }

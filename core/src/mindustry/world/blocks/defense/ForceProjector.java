@@ -31,8 +31,8 @@ public class ForceProjector extends Block{
     public float basePowerDraw = 0.2f;
     public @Load("@-top") TextureRegion topRegion;
 
-    private static ForceProjectorEntity paramEntity;
-    private static final Cons<Shielderc> shieldConsumer = trait -> {
+    static ForceProjectorEntity paramEntity;
+    static final Cons<Shielderc> shieldConsumer = trait -> {
         if(trait.team() != paramEntity.team && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);
@@ -48,6 +48,7 @@ public class ForceProjector extends Block{
         hasPower = true;
         hasLiquids = true;
         hasItems = true;
+        //TODO this isn't good enough, shields are still clipped
         expanded = true;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
     }

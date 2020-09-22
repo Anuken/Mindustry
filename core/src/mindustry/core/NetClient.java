@@ -366,6 +366,9 @@ public class NetClient implements ApplicationListener{
 
     @Remote
     public static void playerDisconnect(int playerid){
+        if(netClient != null){
+            netClient.addRemovedEntity(playerid);
+        }
         Groups.player.removeByID(playerid);
     }
 
@@ -437,13 +440,14 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, short coreDataLen, byte[] coreData){
+    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, short coreDataLen, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
                 Events.fire(new WaveEvent());
             }
 
+            state.gameOver = gameOver;
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;
@@ -557,6 +561,22 @@ public class NetClient implements ApplicationListener{
             if(player.isBuilder()){
                 //limit to 10 to prevent buffer overflows
                 int usedRequests = Math.min(player.builder().plans().size, 10);
+
+                int totalLength = 0;
+
+                //prevent buffer overflow by checking config length
+                for(int i = 0; i < usedRequests; i++){
+                    BuildPlan plan = player.builder().plans().get(i);
+                    if(plan.config instanceof byte[]){
+                        int length = ((byte[])plan.config).length;
+                        totalLength += length;
+                    }
+
+                    if(totalLength > 2048){
+                        usedRequests = i + 1;
+                        break;
+                    }
+                }
 
                 requests = new BuildPlan[usedRequests];
                 for(int i = 0; i < usedRequests; i++){

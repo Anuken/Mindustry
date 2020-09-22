@@ -187,6 +187,10 @@ configure(subprojects - project(":annotations")){
             options.compilerArgs.addAll(['--release', '8'])
         }
     }
+
+    tasks.withType(Javadoc){
+       options.addStringOption('Xdoclint:none', '-quiet')
+    }
 }
 
 project(":desktop"){

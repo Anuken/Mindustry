@@ -48,7 +48,7 @@ public class ServerControl implements ApplicationListener{
     private Fi currentLogFile;
     private boolean inExtraRound;
     private Task lastTask;
-    private Gamemode lastMode = Gamemode.survival;
+    private Gamemode lastMode;
     private @Nullable Map nextMapOverride;
     private Interval autosaveCount = new Interval();
 
@@ -63,6 +63,15 @@ public class ServerControl implements ApplicationListener{
             "shufflemode", "custom",
             "globalrules", "{reactorExplosions: false}" //schematicAllowed: true} //is not working
         );
+
+        //update log level
+        Config.debug.set(Config.debug.bool());
+
+        try{
+            lastMode = Gamemode.valueOf(Core.settings.getString("lastServerMode", "survival"));
+        }catch(Exception e){ //handle enum parse exception
+            lastMode = Gamemode.survival;
+        }
 
         Log.setLogger((level, text) -> {
             String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr");
@@ -158,6 +167,9 @@ public class ServerControl implements ApplicationListener{
                 + "\nNext selected map:[accent] " + map.name() + "[]"
                 + (map.tags.containsKey("author") && !map.tags.get("author").trim().isEmpty() ? " by[accent] " + map.author() + "[white]" : "") + "." +
                 "\nNew game begins in " + roundExtraTime + " seconds.");
+
+                state.gameOver = true;
+                Call.updateGameOver(event.winner);
 
                 info("Selected next map to be @.", map.name());
 
@@ -298,6 +310,7 @@ public class ServerControl implements ApplicationListener{
 
             logic.reset();
             lastMode = preset;
+            Core.settings.put("lastServerMode", lastMode.name());
             try{
                 world.loadMap(result, result.applyRules(lastMode));
                 state.rules = result.applyRules(preset);

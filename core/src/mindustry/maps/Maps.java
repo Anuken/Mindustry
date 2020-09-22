@@ -32,7 +32,7 @@ public class Maps{
     /** List of all built-in maps. Filenames only. */
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
     /** Maps tagged as PvP */
-    private static final String[] pvpMaps = {"veins", "glacier"};
+    static final String[] pvpMaps = {"veins", "glacier"};
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
     /** Serializer for meta. */

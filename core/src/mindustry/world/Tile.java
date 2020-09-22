@@ -150,7 +150,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Team team(){
-        return build == null ? Team.derelict : build.team();
+        return build == null ? Team.derelict : build.team;
     }
 
     public void setTeam(Team team){
@@ -181,6 +181,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public void setBlock(@NonNull Block type, Team team, int rotation, Prov<Building> entityprov){
         changing = true;
+
+        if(type.isStatic() || this.block.isStatic()){
+            recache();
+        }
 
         this.block = type;
         preChanged();
@@ -286,6 +290,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     /** remove()-s this tile, except it's synced across the network */
     public void removeNet(){
         Call.removeTile(this);
+    }
+
+    /** set()-s this tile, except it's synced across the network */
+    public void setNet(Block block){
+        Call.setTile(this, block, Team.derelict, 0);
     }
 
     /** set()-s this tile, except it's synced across the network */

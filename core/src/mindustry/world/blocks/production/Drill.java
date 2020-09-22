@@ -217,7 +217,7 @@ public class Drill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity;
+            return items.total() < itemCapacity && enabled;
         }
 
         @Override

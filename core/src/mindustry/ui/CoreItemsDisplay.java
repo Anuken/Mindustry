@@ -28,11 +28,8 @@ public class CoreItemsDisplay extends Table{
         update(() -> {
             CoreBuild core = Vars.player.team().core();
 
-            for(Item item : content.items()){
-                if(core != null && core.items.get(item) > 0 && usedItems.add(item)){
-                    rebuild();
-                    break;
-                }
+            if(content.items().contains(item -> core != null && core.items.get(item) > 0 && usedItems.add(item))){
+                rebuild();
             }
         });
 

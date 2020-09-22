@@ -42,7 +42,7 @@ public class UnitType extends UnlockableContent{
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, armor = 0f;
-    public float crashDamageMultiplier = 4f;
+    public float crashDamageMultiplier = 3f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
@@ -127,7 +127,7 @@ public class UnitType extends UnlockableContent{
     public void display(Unit unit, Table table){
         table.table(t -> {
             t.left();
-            t.add(new Image(icon(Cicon.medium))).size(8 * 4);
+            t.add(new Image(icon(Cicon.medium))).size(8 * 4).scaling(Scaling.fit);
             t.labelWrap(localizedName).left().width(190f).padLeft(5);
         }).growX().left();
         table.row();

@@ -42,7 +42,7 @@ public abstract class StorageBlock extends Block{
 
         @Override
         public boolean canPickup(){
-            return linkedCore != null;
+            return linkedCore == null;
         }
     }
 }

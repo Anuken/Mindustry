@@ -17,7 +17,7 @@ import mindustry.world.blocks.production.*;
 import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
-    public float moveTime = 70f;
+    public float moveTime = 60f;
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
@@ -29,6 +29,7 @@ public class PayloadConveyor extends Block{
         rotate = true;
         update = true;
         outputsPayload = true;
+        noUpdateDisabled = true;
     }
 
     @Override
@@ -85,7 +86,7 @@ public class PayloadConveyor extends Block{
 
             int ntrns = 1 + size/2;
             Tile next = tile.getNearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
-            blocked = (next != null && next.solid()) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
+            blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
         }
 
         @Override
@@ -95,7 +96,9 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void updateTile(){
-            progress = Time.time() % moveTime;
+            if(!enabled) return;
+
+            progress = time() % moveTime;
 
             updatePayload();
 
@@ -182,6 +185,10 @@ public class PayloadConveyor extends Block{
             if(item != null){
                 item.draw();
             }
+        }
+
+        public float time(){
+            return Time.time();
         }
 
         @Override
@@ -273,7 +280,7 @@ public class PayloadConveyor extends Block{
         }
 
         public int curStep(){
-            return (int)((Time.time()) / moveTime);
+            return (int)((time()) / moveTime);
         }
 
         public float fract(){

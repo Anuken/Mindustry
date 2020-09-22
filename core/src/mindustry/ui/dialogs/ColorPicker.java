@@ -8,7 +8,7 @@ import mindustry.graphics.*;
 
 public class ColorPicker extends BaseDialog{
     private Cons<Color> cons = c -> {};
-    private Color current = new Color();
+    Color current = new Color();
 
     public ColorPicker(){
         super("@pickcolor");

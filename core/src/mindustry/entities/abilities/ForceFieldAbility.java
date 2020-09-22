@@ -31,6 +31,7 @@ public class ForceFieldAbility implements Ability{
             //break shield
             if(paramUnit.shield <= trait.damage()){
                 paramUnit.shield -= cooldown * regen;
+
                 Fx.shieldBreak.at(paramUnit.x, paramUnit.y, radius, paramUnit.team.color);
             }
 

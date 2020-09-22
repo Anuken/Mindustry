@@ -19,7 +19,6 @@ import mindustry.world.blocks.experimental.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.logic.MessageBlock;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -78,12 +77,13 @@ public class Blocks implements ContentList{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
 
     //units
+    commandCenter,
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
     repairPoint, resupplyPoint,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, logicDisplay, memoryCell,
+    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, logicDisplay, memoryCell,
 
     //campaign
     launchPad, launchPadLarge,
@@ -270,7 +270,7 @@ public class Blocks implements ContentList{
         }};
 
         grass = new Floor("grass"){{
-
+            attributes.set(Attribute.water, 0.1f);
         }};
 
         salt = new Floor("salt"){{
@@ -908,6 +908,7 @@ public class Blocks implements ContentList{
             health = 45;
             speed = 0.03f;
             displayedSpeed = 4.2f;
+            buildCostMultiplier = 2f;
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
@@ -995,12 +996,14 @@ public class Blocks implements ContentList{
             consumes.power(1.75f);
         }};
 
-        payloadConveyor = new PayloadConveyor("mass-conveyor"){{
-            requirements(Category.distribution, with(Items.copper, 1));
+        payloadConveyor = new PayloadConveyor("payload-conveyor"){{
+            requirements(Category.distribution, with(Items.graphite, 10, Items.copper, 20));
+            canOverdrive = false;
         }};
 
         payloadRouter = new PayloadRouter("payload-router"){{
-            requirements(Category.distribution, with(Items.copper, 1));
+            requirements(Category.distribution, with(Items.graphite, 15, Items.copper, 20));
+            canOverdrive = false;
         }};
 
         //endregion
@@ -1338,7 +1341,7 @@ public class Blocks implements ContentList{
 
         unloader = new Unloader("unloader"){{
             requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
-            speed = 7f;
+            speed = 6f;
         }};
 
         //endregion
@@ -1485,7 +1488,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotatespeed = 8f;
-            powerUse = 5f;
+            powerUse = 4f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1501,8 +1504,8 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 2.5f;
-            scaledForce = 5f;
+            force = 3f;
+            scaledForce = 5.5f;
             range = 170f;
             damage = 0.08f;
             health = 160 * size * size;
@@ -1555,14 +1558,14 @@ public class Blocks implements ContentList{
         }};
 
         segment = new PointDefenseTurret("segment"){{
-            requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 50));
+            requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 25));
 
             hasPower = true;
             consumes.power(3f);
             size = 2;
             shootLength = 5f;
             bulletDamage = 12f;
-            reloadTime = 25f;
+            reloadTime = 20f;
             health = 190 * size * size;
         }};
 
@@ -1698,11 +1701,17 @@ public class Blocks implements ContentList{
         //endregion
         //region units
 
+        commandCenter = new CommandCenter("command-center"){{
+            requirements(Category.units, ItemStack.with(Items.copper, 200, Items.lead, 250, Items.silicon, 250, Items.graphite, 100));
+            size = 2;
+            health = size * size * 55;
+        }};
+
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
             plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.dagger, 60f * 20, with(Items.silicon, 10, Items.lead, 10)),
-                new UnitPlan(UnitTypes.crawler, 60f * 15, with(Items.silicon, 10, Items.coal, 20)),
+                new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 10, Items.lead, 10)),
+                new UnitPlan(UnitTypes.crawler, 60f * 12, with(Items.silicon, 10, Items.coal, 20)),
                 new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
             };
             size = 3;
@@ -1710,7 +1719,7 @@ public class Blocks implements ContentList{
         }};
 
         airFactory = new UnitFactory("air-factory"){{
-            requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
+            requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
                 new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15)),
@@ -1720,7 +1729,7 @@ public class Blocks implements ContentList{
         }};
 
         navalFactory = new UnitFactory("naval-factory"){{
-            requirements(Category.units, with(Items.copper, 30, Items.lead, 70));
+            requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
             plans = new UnitPlan[]{
                 new UnitPlan(UnitTypes.risso, 60f * 30f, with(Items.silicon, 20, Items.metaglass, 25)),
             };
@@ -1768,11 +1777,11 @@ public class Blocks implements ContentList{
         }};
 
         exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
-            requirements(Category.units, with(Items.lead, 2000, Items.silicon, 750, Items.titanium, 950, Items.thorium, 450, Items.plastanium, 350, Items.phasefabric, 250));
+            requirements(Category.units, with(Items.lead, 2000, Items.silicon, 750, Items.titanium, 950, Items.thorium, 450, Items.plastanium, 350, Items.phasefabric, 450));
 
             size = 7;
-            consumes.power(12f);
-            consumes.items(with(Items.silicon, 250, Items.titanium, 500, Items.plastanium, 400));
+            consumes.power(13f);
+            consumes.items(with(Items.silicon, 450, Items.titanium, 550, Items.plastanium, 550));
             consumes.liquid(Liquids.cryofluid, 1f);
 
             constructTime = 60f * 60f * 1.5f;
@@ -1780,15 +1789,16 @@ public class Blocks implements ContentList{
 
             upgrades = new UnitType[][]{
                 {UnitTypes.zenith, UnitTypes.antumbra},
+                {UnitTypes.spiroct, UnitTypes.arkyid},
             };
         }};
 
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
-            requirements(Category.units, with(Items.lead, 4000, Items.silicon, 1500, Items.thorium, 500, Items.plastanium, 50, Items.phasefabric, 600, Items.surgealloy, 500));
+            requirements(Category.units, with(Items.lead, 4000, Items.silicon, 1500, Items.thorium, 500, Items.plastanium, 450, Items.phasefabric, 600, Items.surgealloy, 500));
 
             size = 9;
             consumes.power(25f);
-            consumes.items(with(Items.silicon, 350, Items.plastanium, 450, Items.surgealloy, 400, Items.phasefabric, 150));
+            consumes.items(with(Items.silicon, 350, Items.plastanium, 550, Items.surgealloy, 350, Items.phasefabric, 150));
             consumes.liquid(Liquids.cryofluid, 3f);
 
             constructTime = 60f * 60f * 4;
@@ -1861,7 +1871,6 @@ public class Blocks implements ContentList{
         //looked up by name, no ref needed
         new LegacyMechPad("legacy-mech-pad");
         new LegacyUnitFactory("legacy-unit-factory");
-        new LegacyCommandCenter("legacy-command-center");
 
         //endregion
         //region campaign
@@ -1897,7 +1906,7 @@ public class Blocks implements ContentList{
         }};
 
         microProcessor = new LogicBlock("micro-processor"){{
-            requirements(Category.logic, with(Items.copper, 80, Items.lead, 50, Items.silicon, 60));
+            requirements(Category.logic, with(Items.copper, 80, Items.lead, 50, Items.silicon, 50));
 
             instructionsPerTick = 2;
 
@@ -1905,13 +1914,26 @@ public class Blocks implements ContentList{
         }};
 
         logicProcessor = new LogicBlock("logic-processor"){{
-            requirements(Category.logic, with(Items.lead, 320, Items.silicon, 140, Items.graphite, 80, Items.thorium, 70));
+            requirements(Category.logic, with(Items.lead, 320, Items.silicon, 100, Items.graphite, 60, Items.thorium, 50));
 
             instructionsPerTick = 5;
 
-            range = 16 * 10;
+            range = 8 * 20;
 
             size = 2;
+        }};
+
+        hyperProcessor = new LogicBlock("hyper-processor"){{
+            requirements(Category.logic, with(Items.lead, 450, Items.silicon, 150, Items.thorium, 75, Items.surgealloy, 50));
+
+            consumes.liquid(Liquids.cryofluid, 0.08f);
+            hasLiquids = true;
+
+            instructionsPerTick = 25;
+
+            range = 8 * 40;
+
+            size = 3;
         }};
 
         logicDisplay = new LogicDisplay("logic-display"){{

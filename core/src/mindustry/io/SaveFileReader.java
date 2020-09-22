@@ -34,7 +34,7 @@ public abstract class SaveFileReader{
     "titan-factory", "legacy-unit-factory",
     "fortress-factory", "legacy-unit-factory",
 
-    "command-center", "legacy-command-center"
+    "mass-conveyor", "payload-conveyor"
     );
 
     protected int lastRegionLength;

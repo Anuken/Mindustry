@@ -24,6 +24,7 @@ public class LiquidSource extends Block{
         configurable = true;
         outputsLiquid = true;
         saveConfig = true;
+        noUpdateDisabled = true;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
         configClear((LiquidSourceBuild tile) -> tile.source = null);
@@ -67,7 +68,7 @@ public class LiquidSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> configure(liquid));
+            ItemSelection.buildTable(table, content.liquids(), () -> source, this::configure);
         }
 
         @Override
@@ -87,15 +88,20 @@ public class LiquidSource extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
-            write.b(source == null ? -1 : source.id);
+            write.s(source == null ? -1 : source.id);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte id = read.b();
+            int id = revision == 1 ? read.s() : read.b();
             source = id == -1 ? null : content.liquid(id);
         }
     }

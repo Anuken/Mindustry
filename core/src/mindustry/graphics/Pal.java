@@ -9,6 +9,8 @@ public class Pal{
     command = Color.valueOf("eab678"),
 
     sap = Color.valueOf("665c9f"),
+    sapBullet = Color.valueOf("bf92f9"),
+    sapBulletBack = Color.valueOf("6d56bf"),
 
     spore = Color.valueOf("7457ce"),
 

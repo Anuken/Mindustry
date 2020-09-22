@@ -34,8 +34,9 @@ import static arc.util.Log.*;
 import static mindustry.Vars.*;
 
 public class NetServer implements ApplicationListener{
-    private static final int maxSnapshotSize = 430, timerBlockSync = 0;
-    private static final float serverSyncTime = 12, blockSyncTime = 60 * 8;
+    /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
+    private static final int maxSnapshotSize = 800, timerBlockSync = 0;
+    private static final float serverSyncTime = 12, blockSyncTime = 60 * 6;
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
     private static final Vec2 vector = new Vec2();
     private static final Rect viewport = new Rect();
@@ -370,6 +371,11 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
+            if(currentlyKicking[0] != null){
+                player.sendMessage("[scarlet]A vote is already in progress.");
+                return;
+            }
+
             if(args.length == 0){
                 StringBuilder builder = new StringBuilder();
                 builder.append("[orange]Players to kick: \n");
@@ -384,9 +390,7 @@ public class NetServer implements ApplicationListener{
                     int id = Strings.parseInt(args[0].substring(1));
                     found = Groups.player.find(p -> p.id() == id);
                 }else{
-                    found = Groups.player.find(p -> {
-                        return p.name.equalsIgnoreCase(args[0]);
-                    });
+                    found = Groups.player.find(p -> p.name.equalsIgnoreCase(args[0]));
                 }
 
                 if(found != null){
@@ -526,6 +530,10 @@ public class NetServer implements ApplicationListener{
     public static void serverPacketUnreliable(Player player, String type, String contents){
         serverPacketReliable(player, type, contents);
     }
+    
+    private static boolean invalid(float f){
+        return Float.isInfinite(f) || Float.isNaN(f);
+    }
 
     @Remote(targets = Loc.client, unreliable = true)
     public static void clientSnapshot(
@@ -543,6 +551,16 @@ public class NetServer implements ApplicationListener{
     ){
         NetConnection con = player.con;
         if(con == null || snapshotID < con.lastReceivedClientSnapshot) return;
+
+        //validate coordinates just in case
+        if(invalid(x)) x = 0f;
+        if(invalid(y)) y = 0f;
+        if(invalid(xVelocity)) xVelocity = 0f;
+        if(invalid(yVelocity)) yVelocity = 0f;
+        if(invalid(pointerX)) pointerX = 0f;
+        if(invalid(pointerY)) pointerY = 0f;
+        if(invalid(rotation)) rotation = 0f;
+        if(invalid(baseRotation)) baseRotation = 0f;
 
         boolean verifyPosition = !player.dead() && netServer.admins.getStrict() && headless;
 
@@ -612,12 +630,12 @@ public class NetServer implements ApplicationListener{
         if(!player.dead()){
             Unit unit = player.unit();
 
-            unit.vel.set(xVelocity, yVelocity).limit(unit.type().speed);
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
-            float maxSpeed = (boosting ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
+            float maxSpeed = ((player.unit().type().canBoost && player.unit().isFlying()) ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
             if(unit.isGrounded()){
                 maxSpeed *= unit.floorSpeedMultiplier();
             }
+            unit.vel.set(xVelocity, yVelocity).limit(maxSpeed);
             float maxMove = elapsed / 1000f * 60f * maxSpeed * 1.1f;
 
             if(con.lastUnit != unit){
@@ -681,8 +699,8 @@ public class NetServer implements ApplicationListener{
     public static void adminRequest(Player player, Player other, AdminAction action){
 
         if(!player.admin){
-            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action without proper security access.",
-            player.name, player.con.address);
+            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
+            player.name, player.con.address, action.name(), other == null ? null : other.name);
             return;
         }
 
@@ -735,7 +753,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public boolean isWaitingForPlayers(){
-        if(state.rules.pvp){
+        if(state.rules.pvp && !state.gameOver){
             int used = 0;
             for(TeamData t : state.teams.getActive()){
                 if(Groups.player.count(p -> p.team() == t.team) > 0){
@@ -761,6 +779,10 @@ public class NetServer implements ApplicationListener{
         }
 
         if(state.isGame() && net.server()){
+            if(state.rules.pvp){
+                state.serverPaused = isWaitingForPlayers();
+            }
+
             sync();
         }
     }
@@ -794,7 +816,7 @@ public class NetServer implements ApplicationListener{
             if(!entity.block().sync) continue;
             sent ++;
 
-            dataStream.writeInt(entity.tile().pos());
+            dataStream.writeInt(entity.pos());
             entity.writeAll(Writes.get(dataStream));
 
             if(syncStream.size() > maxSnapshotSize){
@@ -828,7 +850,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 

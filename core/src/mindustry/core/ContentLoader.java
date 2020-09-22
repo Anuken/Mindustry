@@ -243,11 +243,11 @@ public class ContentLoader{
     }
 
     public Block block(int id){
-        return (Block)getByID(ContentType.block, id);
+        return getByID(ContentType.block, id);
     }
 
     public Block block(String name){
-        return (Block)getByName(ContentType.block, name);
+        return getByName(ContentType.block, name);
     }
 
     public Seq<Item> items(){
@@ -255,7 +255,7 @@ public class ContentLoader{
     }
 
     public Item item(int id){
-        return (Item)getByID(ContentType.item, id);
+        return getByID(ContentType.item, id);
     }
 
     public Seq<Liquid> liquids(){
@@ -263,7 +263,7 @@ public class ContentLoader{
     }
 
     public Liquid liquid(int id){
-        return (Liquid)getByID(ContentType.liquid, id);
+        return getByID(ContentType.liquid, id);
     }
 
     public Seq<BulletType> bullets(){
@@ -271,7 +271,7 @@ public class ContentLoader{
     }
 
     public BulletType bullet(int id){
-        return (BulletType)getByID(ContentType.bullet, id);
+        return getByID(ContentType.bullet, id);
     }
 
     public Seq<SectorPreset> sectors(){
