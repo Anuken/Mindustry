@@ -148,11 +148,11 @@ public class CrashSender{
             httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
                 sent[0] = true;
-                System.exit(0);
+                System.exit(1);
             }, t -> {
                 t.printStackTrace();
                 sent[0] = true;
-                System.exit(1);
+                System.exit(-1);
             });
 
             //sleep until report is sent
