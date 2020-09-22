@@ -416,7 +416,7 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard()){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
-            if (selectRequests.isEmpty()) {
+            if(selectRequests.isEmpty()){
                 lastSchematic = null;
             }
         }
