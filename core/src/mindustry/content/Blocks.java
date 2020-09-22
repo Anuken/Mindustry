@@ -1806,6 +1806,7 @@ public class Blocks implements ContentList{
                 {UnitTypes.fortress, UnitTypes.scepter},
                 {UnitTypes.bryde, UnitTypes.sei},
                 {UnitTypes.mega, UnitTypes.quad},
+                {UnitTypes.quasar, UnitTypes.vela},
             };
         }};
 
@@ -1825,7 +1826,8 @@ public class Blocks implements ContentList{
                 {UnitTypes.arkyid, UnitTypes.toxopid},
                 {UnitTypes.scepter, UnitTypes.reign},
                 {UnitTypes.sei, UnitTypes.omura},
-                {UnitTypes.quad, UnitTypes.oct}
+                {UnitTypes.quad, UnitTypes.oct},
+                {UnitTypes.vela, UnitTypes.corvus}
             };
         }};
 

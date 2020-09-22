@@ -135,7 +135,7 @@ public class UnitType extends UnlockableContent{
 
     public void update(Unit unit){
 
-        if(unit instanceof Mechc){
+        if(unit instanceof Mechc && !unit.isFlying()){
             updateMechEffects(unit);
         }
     }
@@ -526,7 +526,6 @@ public class UnitType extends UnlockableContent{
 
             float rotation = unit.rotation - 90;
             float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-            float width = weapon.region.width;
             float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
             float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
                 wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
@@ -541,17 +540,16 @@ public class UnitType extends UnlockableContent{
 
                 Draw.rect(weapon.outlineRegion,
                 wx, wy,
-                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.outlineRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
                 weapon.region.height * Draw.scl,
                 weaponRotation);
-
 
                 Draw.z(z);
             }
 
             Draw.rect(weapon.region,
             wx, wy,
-            width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+            weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
             weapon.region.height * Draw.scl,
             weaponRotation);
 
@@ -560,8 +558,8 @@ public class UnitType extends UnlockableContent{
                 Draw.blend(Blending.additive);
                 Draw.rect(weapon.heatRegion,
                 wx, wy,
-                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.region.height * Draw.scl,
+                weapon.heatRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.heatRegion.height * Draw.scl,
                 weaponRotation);
                 Draw.blend();
                 Draw.color();

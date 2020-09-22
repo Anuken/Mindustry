@@ -77,8 +77,7 @@ public class Damage{
         }
     }
 
-    /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
-    public static float collideLaser(Bullet b, float length){
+    public static float findLaserLength(Bullet b, float length){
         Tmp.v1.trns(b.rotation(), length);
 
         furthest = null;
@@ -86,9 +85,15 @@ public class Damage{
         world.raycast(b.tileX(), b.tileY(), world.toTile(b.x + Tmp.v1.x), world.toTile(b.y + Tmp.v1.y),
         (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
 
-        float resultLength = furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+        return furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+    }
 
-        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength);
+    /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
+    public static float collideLaser(Bullet b, float length, boolean large){
+        float resultLength = findLaserLength(b, length);
+
+        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large);
+
         b.fdata = furthest != null ? resultLength : length;
 
         return resultLength;
@@ -103,6 +108,8 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
+        length = findLaserLength(hitter, length);
+
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {

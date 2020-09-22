@@ -14,11 +14,17 @@ import mindustry.type.*;
 public class UnitTypes implements ContentList{
     //region definitions
 
-    //ground
+    //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
-    //ground + builder + miner + commander
+    //mech + builder + miner + commander
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType nova, pulsar, quasar;
+
+    //mech + commander
+    public static @EntityDef({Unitc.class, Mechc.class, Commanderc.class}) UnitType vela;
+
+    //legs + commander
+    public static @EntityDef({Unitc.class, Legsc.class, Commanderc.class}) UnitType corvus;
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
@@ -365,6 +371,134 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        vela = new UnitType("vela"){{
+            hitsize = 23f;
+
+            rotateSpeed = 1.6f;
+            canDrown = false;
+            mechFrontSway = 1f;
+
+            mechStepParticles = true;
+            mechStepShake = 0.15f;
+
+            speed = 0.35f;
+            boostMultiplier = 1.5f;
+            engineOffset = 12f;
+            engineSize = 6f;
+
+            health = 6000f;
+            armor = 7f;
+            canBoost = true;
+            landShake = 4f;
+
+            commandLimit = 32;
+
+            weapons.add(new Weapon("vela-weapon"){{
+                mirror = false;
+                top = false;
+                shake = 4f;
+                shootY = 13f;
+                x = y = 0f;
+
+                firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
+
+                reload = 320f;
+                recoil = 0f;
+                shootSound = Sounds.laser;
+                continuous = true;
+                cooldownTime = 200f;
+
+                bullet = new ContinuousLaserBulletType(16){{
+                    length = 150f;
+                    hitEffect = Fx.hitMeltHeal;
+                    drawSize = 420f;
+                    lifetime = 160f;
+                    shake = 1f;
+                    despawnEffect = Fx.smokeCloud;
+                    smokeEffect = Fx.none;
+
+                    shootEffect = Fx.greenLaserChargeSmall;
+
+                    incendChance = 0.02f;
+                    incendSpread = 5f;
+                    incendAmount = 1;
+
+                    colors = new Color[]{Pal.heal.cpy().a(.2f), Pal.heal.cpy().a(.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                }};
+
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = bullet.lifetime + firstShotDelay;
+            }});
+        }};
+
+        corvus = new UnitType("corvus"){{
+            mineTier = 1;
+            hitsize = 29f;
+            itemCapacity = 80;
+            health = 19000f;
+            buildSpeed = 1.7f;
+            armor = 9f;
+            landShake = 1.5f;
+
+            commandLimit = 24;
+
+            legCount = 4;
+            legLength = 14f;
+            legBaseOffset = 10f;
+            legMoveSpace = 1.5f;
+            legTrns = 0.58f;
+            hovering = true;
+            visualElevation = 0.2f;
+            allowLegStep = true;
+
+            speed = 0.3f;
+
+            mineTier = 2;
+            mineSpeed = 7f;
+            drawShields = false;
+
+            weapons.add(new Weapon("corvus-weapon"){{
+                top = false;
+                mirror = false;
+                shake = 14f;
+                shootY = 5f;
+                x = y = 0;
+                reload = 350f;
+                recoil = 0f;
+                shootSound = Sounds.laser;
+
+                cooldownTime = 350f;
+
+                shootStatusDuration = 60f * 2f;
+                shootStatus = StatusEffects.unmoving;
+                firstShotDelay = Fx.greenLaserCharge.lifetime;
+
+                bullet = new LaserBulletType(){{
+                    length = 500f;
+                    damage = 520f;
+                    width = 75f;
+
+                    lifetime = 65f;
+
+                    lightningSpacing = 35f;
+                    lightningLength = 5;
+                    lightningDelay = 1.1f;
+                    lightningLengthRand = 15;
+                    lightningDamage = 50;
+                    lightningAngleRand = 40f;
+                    largeHit = true;
+                    lightColor = lightningColor = Pal.heal;
+
+                    shootEffect = Fx.greenLaserCharge;
+
+                    sideAngle = 15f;
+                    sideWidth = 0f;
+                    sideLength = 0f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
+            }});
+        }};
+
         //endregion
         //region ground legs
 
@@ -405,6 +539,7 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+
             legCount = 4;
             legLength = 9f;
             legTrns = 0.6f;
@@ -603,8 +738,8 @@ public class UnitTypes implements ContentList{
             drag = 0.1f;
             speed = 0.5f;
             hitsize = 21f;
-            health = 23000;
-            armor = 14f;
+            health = 22000;
+            armor = 13f;
 
             rotateSpeed = 1.9f;
 
@@ -1121,7 +1256,7 @@ public class UnitTypes implements ContentList{
 
                     lifetime = 70f;
 
-                    despawnEffect = Fx.healBomb;
+                    despawnEffect = Fx.greenBomb;
                     hitEffect = Fx.massiveExplosion;
                     keepVelocity = false;
                     spin = 2f;
@@ -1139,7 +1274,7 @@ public class UnitTypes implements ContentList{
 
         oct = new UnitType("oct"){{
             armor = 16f;
-            health = 23000;
+            health = 24000;
             speed = 0.6f;
             rotateSpeed = 1f;
             accel = 0.04f;
@@ -1149,10 +1284,11 @@ public class UnitTypes implements ContentList{
             engineSize = 7.8f;
             rotateShooting = false;
             hitsize = 60f;
-            payloadCapacity = (4.5f * 4.5f) * (8 * 8);
-            buildSpeed = 3.5f;
+            payloadCapacity = (5.2f * 5.2f) * (8 * 8);
+            buildSpeed = 4f;
+            drawShields = false;
 
-            abilities.add(new ForceFieldAbility(140f, 4f, 6000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
+            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
         }};
 
         //endregion
