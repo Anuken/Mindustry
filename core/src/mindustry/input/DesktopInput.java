@@ -596,7 +596,7 @@ public class DesktopInput extends InputHandler{
     }
 
     protected void updateMovement(Unit unit){
-        boolean omni = !(unit instanceof WaterMovec);
+        boolean omni = unit.type().omniMovement;
         boolean ground = unit.isGrounded();
 
         float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);

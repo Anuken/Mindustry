@@ -8,6 +8,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -37,7 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     private UnitController controller;
     private UnitType type;
-    boolean spawnedByCore, deactivated; //TODO remove deactivation boolean
+    boolean spawnedByCore;
 
     transient Seq<Ability> abilities = new Seq<>(0);
 
@@ -103,7 +104,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     @Replace
     public boolean canDrown(){
-        return isGrounded() && !hovering && type.canDrown && !(this instanceof WaterMovec);
+        return isGrounded() && !hovering && type.canDrown;
     }
 
     @Override
@@ -147,6 +148,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public UnitType type(){
         return type;
+    }
+
+    /** @return pathfinder path type for calculating costs */
+    public int pathType(){
+        return Pathfinder.costGround;
     }
 
     public void lookAt(float angle){
@@ -206,12 +212,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void add(){
 
         //check if over unit cap
-        if(count() > cap() && !spawnedByCore){
-            deactivated = true;
-
-            if(!dead){
-                Call.unitCapDeath(self());
-            }
+        if(count() > cap() && !spawnedByCore && !dead){
+            Call.unitCapDeath(self());
+            teamIndex.updateCount(team, type, -1);
         }
     }
 
@@ -232,22 +235,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void update(){
-        //activate the unit when possible
-        if(!net.client() && deactivated && teamIndex.countActive(team, type) < Units.getCap(team)){
-            teamIndex.updateActiveCount(team, type, 1);
-            deactivated = false;
-        }
 
-        if(!deactivated){
-            type.update(self());
+        type.update(self());
 
-            if(abilities.size > 0){
-                for(Ability a : abilities){
-                    a.update(self());
-                }
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.update(self());
             }
-        }else if(!dead){
-            Call.unitCapDeath(self());
         }
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
@@ -305,29 +299,26 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             if(floor.damageTaken > 0f){
                 damageContinuous(floor.damageTaken);
             }
+        }
 
-            if(tile.solid()){
-                if(type.canBoost){
-                    elevation = 1f;
-                }else if(!net.client()){
-                    kill();
-                }
+        //kill entities on tiles that are solid to them
+        if(tile != null && !canPassOn()){
+            //boost if possible
+            if(type.canBoost){
+                elevation = 1f;
+            }else if(!net.client()){
+                kill();
             }
         }
 
         //AI only updates on the server
-        if(!net.client() && !dead && !deactivated){
+        if(!net.client() && !dead){
             controller.updateUnit();
         }
 
         //clear controller when it becomes invalid
         if(!controller.isValidController()){
             resetController();
-        }
-
-        //do not control anything when deactivated
-        if(deactivated){
-            controlWeapons(false, false);
         }
 
         //remove units spawned by the core

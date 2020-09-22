@@ -804,7 +804,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(type == null) return;
 
         boolean flying = type.flying;
-        boolean omni = !(unit instanceof WaterMovec);
+        boolean omni = unit.type().omniMovement;
         boolean legs = unit.isGrounded();
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&

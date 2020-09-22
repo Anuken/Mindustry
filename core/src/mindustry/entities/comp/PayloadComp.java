@@ -98,11 +98,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Unit u = payload.unit;
 
         //can't drop ground units
-        //TODO bad code, solidity should not be handled this way
-        if(
-            ((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f && !u.type().allowLegStep) ||
-            (!floorOn().isLiquid && u instanceof WaterMovec) ||
-            (u.type().allowLegStep && EntityCollisions.legsSolid(u.tileX(), u.tileY()))){
+        if(!u.canPassOn()){
             return false;
         }
 

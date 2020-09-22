@@ -1306,7 +1306,6 @@ public class UnitTypes implements ContentList{
             health = 280;
             accel = 0.4f;
             rotateSpeed = 3.3f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             trailLength = 20;
             rotateShooting = false;
 
@@ -1358,7 +1357,6 @@ public class UnitTypes implements ContentList{
             armor = 4f;
             accel = 0.3f;
             rotateSpeed = 2.6f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
             trailLength = 20;
@@ -1400,7 +1398,6 @@ public class UnitTypes implements ContentList{
             drag = 0.17f;
             hitsize = 16f;
             armor = 7f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
             trailLength = 22;
@@ -1495,7 +1492,6 @@ public class UnitTypes implements ContentList{
             hitsize = 39f;
             accel = 0.2f;
             rotateSpeed = 1.3f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
             trailLength = 50;
@@ -1580,10 +1576,9 @@ public class UnitTypes implements ContentList{
             armor = 16f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
-            float spawnTime = 60f * 25f;
+            float spawnTime = 60f * 15f;
 
             abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
 

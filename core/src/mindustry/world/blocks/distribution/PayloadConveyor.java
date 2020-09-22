@@ -17,7 +17,7 @@ import mindustry.world.blocks.production.*;
 import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
-    public float moveTime = 50f;
+    public float moveTime = 40f, moveForce = 201f;
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
@@ -53,6 +53,7 @@ public class PayloadConveyor extends Block{
     public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
+        public float curInterp, lastInterp;
         public @Nullable Building next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
@@ -99,6 +100,10 @@ public class PayloadConveyor extends Block{
         public void updateTile(){
             if(!enabled) return;
 
+            lastInterp = curInterp;
+            curInterp = fract();
+            //rollover skip
+            if(lastInterp > curInterp) lastInterp = 0f;
             progress = time() % moveTime;
 
             updatePayload();
@@ -199,6 +204,14 @@ public class PayloadConveyor extends Block{
 
         public float time(){
             return Time.time();
+        }
+
+        @Override
+        public void unitOn(Unit unit){
+            //calculate derivative of units moved last frame
+            float delta = (curInterp - lastInterp) * size * tilesize;
+            Tmp.v1.trns(rotdeg(), delta * moveForce).scl(1f / Math.max(unit.mass(), 201f));
+            unit.move(Tmp.v1.x, Tmp.v1.y);
         }
 
         @Override

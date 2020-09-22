@@ -55,6 +55,7 @@ public class UnitType extends UnlockableContent{
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
     public boolean hovering = false;
+    public boolean omniMovement = true;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Seq<Ability> abilities = new Seq<>();
@@ -195,13 +196,6 @@ public class UnitType extends UnlockableContent{
         }).growX();
         
         table.row();
-        if(unit.deactivated){
-            table.table(d -> {
-                d.left();
-                d.label(() -> Core.bundle.format("bar.limitreached", unit.count(), unit.cap(), Fonts.getUnicodeStr(name)));
-            }).left().visible(() -> unit.deactivated);
-        }
-        
     }
 
     @Override
@@ -230,6 +224,15 @@ public class UnitType extends UnlockableContent{
     @Override
     public void init(){
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
+
+        Unit example = constructor.get();
+
+        //water preset
+        if(example instanceof WaterMovec){
+            canDrown = false;
+            omniMovement = false;
+            immunities.add(StatusEffects.wet);
+        }
 
         singleTarget = weapons.size <= 1;
 
@@ -397,10 +400,6 @@ public class UnitType extends UnlockableContent{
             unit.trns(-legOffset.x, -legOffset.y);
         }
 
-        if(unit.deactivated){
-            drawDeactive(unit);
-        }
-
         if(unit.abilities.size > 0){
             for(Ability a : unit.abilities){
                 Draw.reset();
@@ -409,16 +408,6 @@ public class UnitType extends UnlockableContent{
 
             Draw.reset();
         }
-    }
-
-    public void drawDeactive(Unit unit){
-        Draw.color(Color.scarlet);
-        Draw.alpha(0.8f);
-
-        float size = 8f;
-        Draw.rect(Icon.warning.getRegion(), unit.x, unit.y, size, size);
-
-        Draw.reset();
     }
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
