@@ -362,6 +362,7 @@ public abstract class Turret extends Block{
             heat = 1f;
 
             for(int i = 0; i < shots; i++){
+                final int index = i;
                 Time.run(burstSpacing * i, () -> { //Code works perfectly fine if burstSpacing is 0, eliminates repeated code.
                     if(!isValid() || !hasAmmo()) return;
 
@@ -369,8 +370,8 @@ public abstract class Turret extends Block{
                     
                     //Ternary operator determines if array is empty. If empty, set value as 0.
                     tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
-                        
-                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f) + (barrelBurst ? (i - (int)(shots / 2f)) * spread : 0));
+                    
+                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f) + (barrelBurst ? (index - (int)(shots / 2f)) * spread : 0));
                     
                     //BarrelBurst means should all the bullets in a burst attack come form one barrel or spread across multiple. Probably should've included that in my demonstration.
                     if(!barrelBurst){
