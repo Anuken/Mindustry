@@ -66,12 +66,14 @@ public class LaserBulletType extends BulletType{
                 int f = idx++;
 
                 for(int s : Mathf.signs){
-                    Time.run(f * lightningDelay, () ->
-                        Lightning.create(b, lightningColor,
-                            lightningDamage < 0 ? damage : lightningDamage,
-                            cx, cy, rot + 90*s + Mathf.range(lightningAngleRand),
-                            lightningLength + Mathf.random(lightningLengthRand))
-                    );
+                    Time.run(f * lightningDelay, () -> {
+                        if(b.isAdded() && b.type == this){
+                            Lightning.create(b, lightningColor,
+                                lightningDamage < 0 ? damage : lightningDamage,
+                                cx, cy, rot + 90*s + Mathf.range(lightningAngleRand),
+                                lightningLength + Mathf.random(lightningLengthRand));
+                        }
+                    });
                 }
             }
         }

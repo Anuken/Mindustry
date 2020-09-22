@@ -615,11 +615,6 @@ public class UnitType extends UnlockableContent{
             Drawf.shadow(leg.base.x, leg.base.y, ssize);
         }
 
-        //TODO should be below/above legs
-        if(baseRegion.found()){
-            Draw.rect(baseRegion, unit.x, unit.y, rotation);
-        }
-
         //legs are drawn front first
         for(int j = legs.length - 1; j >= 0; j--){
             int i = (j % 2 == 0 ? j/2 : legs.length - 1 - j/2);
@@ -655,6 +650,11 @@ public class UnitType extends UnlockableContent{
             if(baseJointRegion.found()){
                 Draw.rect(baseJointRegion, position.x, position.y, rotation);
             }
+        }
+
+        //TODO should be below/above legs
+        if(baseRegion.found()){
+            Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
         }
 
         Draw.reset();

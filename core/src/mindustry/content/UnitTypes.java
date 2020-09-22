@@ -382,9 +382,10 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
 
             speed = 0.35f;
-            boostMultiplier = 1.5f;
+            boostMultiplier = 2.1f;
             engineOffset = 12f;
             engineSize = 6f;
+            lowAltitude = true;
 
             health = 6000f;
             armor = 7f;
@@ -444,7 +445,7 @@ public class UnitTypes implements ContentList{
 
             legCount = 4;
             legLength = 14f;
-            legBaseOffset = 10f;
+            legBaseOffset = 11f;
             legMoveSpace = 1.5f;
             legTrns = 0.58f;
             hovering = true;
