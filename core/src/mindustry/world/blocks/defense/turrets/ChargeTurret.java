@@ -30,13 +30,13 @@ public class ChargeTurret extends PowerTurret{
             for(int i = 0; i < shots; i++){
                 Time.run(burstSpacing * i, () -> {
                     tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][1] : 0f), (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][0] : 0f));
-                    chargeBeginEffect.at(x + tr.x, y + tr.y, rotation + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][2] : 0f) + (barrelBurst ? (i - (int)(shots / 2f)) * spread) : 0));
+                    chargeBeginEffect.at(x + tr.x, y + tr.y, rotation + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][2] : 0f) + (barrelBurst ? (i - (int)(shots / 2f)) * spread : 0));
                     
                     for(int j = 0; j < chargeEffects; j++){
                         Time.run(Mathf.random(chargeMaxDelay), () -> {
                             if(!isValid()) return;
                             tr.trns(rotation, size * tilesize / 2f);
-                            chargeEffect.at(x + tr.x, y + tr.y, rotation + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][2] : 0f) + (barrelBurst ? (i - (int)(shots / 2f)) * spread) : 0));
+                            chargeEffect.at(x + tr.x, y + tr.y, rotation + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][2] : 0f) + (barrelBurst ? (i - (int)(shots / 2f)) * spread : 0));
                         });
                     }
                     if(!barrelBurst){
@@ -57,7 +57,7 @@ public class ChargeTurret extends PowerTurret{
                         tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f));
                         recoil = recoilAmount;
                         heat = 1f;
-                        bullet(ammo, rotation + Mathf.range(inaccuracy + ammo.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f) + (barrelBurst ? (i - (int)(shots / 2f)) * spread) : 0));
+                        bullet(ammo, rotation + Mathf.range(inaccuracy + ammo.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f) + (barrelBurst ? (i - (int)(shots / 2f)) * spread : 0));
                         effects();
                         if(!barrelBurst){
                             shotCounter++;
