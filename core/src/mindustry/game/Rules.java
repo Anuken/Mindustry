@@ -40,8 +40,6 @@ public class Rules{
     public boolean reactorExplosions = true;
     /** Whether schematics are allowed */
     public boolean schematicAllowed = true;
-    /** Whether copying is allowed */
-    public boolean copyAllowed = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
     /** How fast unit pads build units. */
