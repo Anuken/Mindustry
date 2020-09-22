@@ -11,6 +11,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
+import static mindustry.Vars.*;
+
 public class UnitTypes implements ContentList{
     //region definitions
 
@@ -1194,7 +1196,7 @@ public class UnitTypes implements ContentList{
             rotateShooting = false;
             hitsize = 15f;
             engineSize = 3f;
-            payloadCapacity = 4 * (8 * 8);
+            payloadCapacity = (2 * 2) * tilePayload;
             buildSpeed = 2.5f;
 
             weapons.add(
@@ -1227,7 +1229,7 @@ public class UnitTypes implements ContentList{
             engineSize = 6f;
             rotateShooting = false;
             hitsize = 32f;
-            payloadCapacity = (3 * 3) * (8 * 8);
+            payloadCapacity = (3 * 3) * tilePayload;
             buildSpeed = 2.5f;
             range = 140f;
             targetAir = false;
@@ -1287,7 +1289,7 @@ public class UnitTypes implements ContentList{
             engineSize = 7.8f;
             rotateShooting = false;
             hitsize = 60f;
-            payloadCapacity = (5.2f * 5.2f) * (8 * 8);
+            payloadCapacity = (5.3f * 5.3f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
 
