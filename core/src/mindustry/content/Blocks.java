@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, takedown, segment, parallax,
 
     //units
     commandCenter,
@@ -1709,6 +1709,26 @@ public class Blocks implements ContentList{
 
             health = 200 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
+        }};
+
+        takedown = new PowerItemTurret("takedown"){{
+            requirements(Category.turret, with(Items.lead, 1200, Items.silicon, 325, Items.graphite, 300, Items.plastanium, 350, Items.surgealloy, 325));
+            ammo(
+            Items.titanium, Bullets.railgunTitanium, 
+            Items.thorium, Bullets.railgunThorium, 
+            Items.surgealloy, Bullets.railgunSurge
+            );
+            reloadTime = 240f;
+            range = 275f;
+            size = 4;
+            recoilAmount = 3f;
+            rotatespeed = 3f;
+            inaccuracy = 0f;
+            shootCone = 10f;
+            shootSound = Sounds.bigshot;
+            health = 200 * size * size;
+            powerUse = 7.5f;
+            ammoPerShot = 2;
         }};
 
         //endregion

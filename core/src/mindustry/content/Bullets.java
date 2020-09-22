@@ -29,6 +29,9 @@ public class Bullets implements ContentList{
     //missiles
     missileExplosive, missileIncendiary, missileSurge,
 
+    //railgun
+    railgunTitanium, railgunThorium, railgunSurge, 
+
     //standard
     standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
     standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
@@ -280,6 +283,45 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.blastExplosion;
             lightning = 2;
             lightningLength = 10;
+        }};
+
+        railgunTitanium = new RailBulletType(){{
+            shootEffect = Fx.railShoot;
+            speed = 65f;
+            lifetime = 5f;
+            pierceEffect = Fx.railHit;
+            updateEffect = Fx.railTrail;
+            hitEffect = Fx.massiveExplosion;
+            smokeEffect = Fx.shootBig2;
+            damage = 1000;
+            pierceDamageFactor = 0.5f;
+        }};
+
+        railgunThorium = new RailBulletType(){{
+            shootEffect = Fx.railShoot;
+            speed = 65f;
+            lifetime = 5f;
+            pierceEffect = Fx.railHit;
+            updateEffect = Fx.railTrail;
+            hitEffect = Fx.massiveExplosion;
+            smokeEffect = Fx.shootBig2;
+            damage = 1250;
+            pierceDamageFactor = 0.5f;
+        }};
+
+        railgunSurge = new RailBulletType(){{
+            shootEffect = Fx.railShoot;
+            speed = 65f;
+            lifetime = 5f;
+            pierceEffect = Fx.railHit;
+            updateEffect = Fx.railTrail;
+            hitEffect = Fx.massiveExplosion;
+            smokeEffect = Fx.shootBig2;
+            damage = 1150;
+            lightning = 5;
+            lightningLength = 5;
+            lightningDamage = 100;
+            pierceDamageFactor = 0.5f;
         }};
 
         standardCopper = new BasicBulletType(2.5f, 9){{
