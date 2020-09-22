@@ -277,9 +277,8 @@ public abstract class BulletType extends Content{
         bullet.damage = damage < 0 ? this.damage : damage;
         bullet.add();
 
-        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
+        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
         return bullet;
-
     }
 
     public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
