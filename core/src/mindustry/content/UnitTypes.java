@@ -1365,7 +1365,6 @@ public class UnitTypes implements ContentList{
             trailX = 5.5f;
             trailY = -4f;
             trailScl = 1.9f;
-            rotateShooting = false;
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 

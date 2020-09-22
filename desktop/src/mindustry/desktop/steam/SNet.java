@@ -79,10 +79,14 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                                 Log.err(e);
                             }
                         }else if(currentServer != null && fromID == currentServer.getAccountID()){
-                            net.handleClientReceived(output);
+                            try{
+                                net.handleClientReceived(output);
+                            }catch(Throwable t){
+                                net.handleException(t);
+                            }
                         }
                     }catch(SteamException e){
-                        e.printStackTrace();
+                        Log.err(e);
                     }
                 }
             }
