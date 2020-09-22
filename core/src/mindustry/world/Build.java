@@ -105,7 +105,7 @@ public class Build{
                             int wx = dx + offsetx + x, wy = dy + offsety + y;
 
                             Tile check = world.tile(wx, wy);
-                            if(check == null || (!check.block.alwaysReplace && check.block != tile.block && !(check.block.size == 1 && type.canReplace(check.block)))) return false;
+                            if(check == null || !check.interactable(team) || (!check.block.alwaysReplace && check.block != tile.block && !(check.block.size == 1 && type.canReplace(check.block)))) return false;
                         }
                     }
                 }
