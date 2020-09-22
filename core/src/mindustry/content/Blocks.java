@@ -1600,12 +1600,8 @@ public class Blocks implements ContentList{
             restitution = 0.1f;
             shootCone = 30;
             size = 3;
-            barrels = 3;
-            barrelPos = new float[][]{
-                {0f, 0f, -20f},
-                {0f, 0f, 0f},
-                {0f, 0f, 20f},
-            };
+            barrelBurst = true;
+            spread = 20;
 
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
