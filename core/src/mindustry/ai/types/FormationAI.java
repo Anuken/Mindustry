@@ -1,5 +1,6 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.ai.formations.*;
@@ -30,6 +31,10 @@ public class FormationAI extends AIController implements FormationMember{
         if(leader.dead){
             unit.resetController();
             return;
+        }
+
+        if(unit.type().canBoost && unit.canPassOn()){
+            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
         unit.controlWeapons(true, leader.isShooting);

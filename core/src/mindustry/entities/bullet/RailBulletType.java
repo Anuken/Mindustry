@@ -43,7 +43,7 @@ public class RailBulletType extends BulletType{
 
     @Override
     public void update(Bullet b){
-        if(b.timer(1, 1f)){
+        if(b.timer(1, 0.9f)){
             updateEffect.at(b.x, b.y, b.rotation());
         }
     }

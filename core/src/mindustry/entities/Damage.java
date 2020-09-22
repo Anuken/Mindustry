@@ -157,13 +157,8 @@ public class Damage{
             if(!e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
 
             e.hitbox(hitrect);
-            Rect other = hitrect;
-            other.y -= expand;
-            other.x -= expand;
-            other.width += expand * 2;
-            other.height += expand * 2;
 
-            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
+            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
 
             if(vec != null){
                 effect.at(vec.x, vec.y);

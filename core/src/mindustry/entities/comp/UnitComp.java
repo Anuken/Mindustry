@@ -108,6 +108,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
+    @Replace
+    public boolean canShoot(){
+        //cannot shoot while boosting
+        return !(type.canBoost && isFlying());
+    }
+
+    @Override
     public int itemCapacity(){
         return type.itemCapacity;
     }
