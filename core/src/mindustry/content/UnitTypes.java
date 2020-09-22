@@ -440,6 +440,7 @@ public class UnitTypes implements ContentList{
             buildSpeed = 1.7f;
             armor = 9f;
             landShake = 1.5f;
+            rotateSpeed = 1.5f;
 
             commandLimit = 24;
 
@@ -1229,6 +1230,7 @@ public class UnitTypes implements ContentList{
             payloadCapacity = (3 * 3) * (8 * 8);
             buildSpeed = 2.5f;
             range = 140f;
+            targetAir = false;
 
             weapons.add(
             new Weapon(){{
@@ -1241,7 +1243,8 @@ public class UnitTypes implements ContentList{
                     sprite = "large-bomb";
                     width = height = 120/4f;
 
-                    range = 20f;
+                    range = 30f;
+                    ignoreRotation = true;
 
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -1249,7 +1252,6 @@ public class UnitTypes implements ContentList{
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
-                    ignoreRotation = true;
                     shootSound = Sounds.none;
                     despawnShake = 4f;
 

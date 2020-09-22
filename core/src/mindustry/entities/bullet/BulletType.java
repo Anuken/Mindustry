@@ -71,6 +71,8 @@ public abstract class BulletType extends Content{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
+    /** Bullet range override. */
+    public float range = -1f;
 
     //additional effects
 
@@ -126,7 +128,7 @@ public abstract class BulletType extends Content{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return speed * lifetime * (1f - drag);
+        return Math.max(speed * lifetime * (1f - drag), range);
     }
 
     public boolean collides(Bullet bullet, Building tile){

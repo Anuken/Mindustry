@@ -406,7 +406,7 @@ public class JoinDialog extends BaseDialog{
     void safeConnect(String ip, int port, int version){
         if(version != Version.build && Version.build != -1 && version != -1){
             ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
-            Core.bundle.format("server.versions", Version.build, version));
+                Core.bundle.format("server.versions", Version.build, version));
         }else{
             connect(ip, port);
         }
