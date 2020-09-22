@@ -344,7 +344,7 @@ public class DesktopInput extends InputHandler{
 
         table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
-        }).tooltip("Schematics");
+        }).tooltip("@schematics");
 
         table.button(Icon.tree, Styles.clearPartiali, () -> {
             ui.research.show();
