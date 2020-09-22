@@ -61,7 +61,7 @@ public class ServerControl implements ApplicationListener{
             "bans", "",
             "admins", "",
             "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false}" //schematicAllowed: true} //is not working
+            "globalrules", "{reactorExplosions: false}"
         );
 
         //update log level
