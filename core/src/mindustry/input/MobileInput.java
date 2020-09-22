@@ -488,7 +488,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             selectRequests.clear();
             lastSchematic = schematics.create(lineStartX, lineStartY, lastLineX, lastLineY);
             useSchematic(lastSchematic);
-            if (selectRequests.isEmpty()) {
+            if(selectRequests.isEmpty()){
                 lastSchematic = null;
             }
             schematicMode = false;
