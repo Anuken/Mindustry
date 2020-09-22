@@ -67,7 +67,7 @@ public class SchematicsDialog extends BaseDialog{
                 if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
                     if(!Vars.state.rules.schematicAllowed){
                         ui.showInfo("@schematic.disabled");
-                    }else {
+                    }else{
                         control.input.useSchematic(firstSchematic);
                         hide();
                     }
