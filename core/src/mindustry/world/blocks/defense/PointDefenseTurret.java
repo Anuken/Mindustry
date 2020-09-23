@@ -112,7 +112,7 @@ public class PointDefenseTurret extends Block{
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.color(Color.toFloatBits(0, 0, 0, 0.22f));
-            Draw.rect(region, x - (size / 2f), y - (size / 2f), rotation - 90)
+            Draw.rect(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.color();
             Draw.rect(region, x, y, rotation - 90);
         }
