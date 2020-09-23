@@ -120,7 +120,7 @@ public class LaunchPad extends Block{
                 Sector dest = state.secinfo.getRealDestination();
 
                 return Core.bundle.format("launch.destination",
-                    dest == null ? Core.bundle.get("sectors.sundest") :
+                    dest == null ? Core.bundle.get("sectors.nonelaunch") :
                     dest.preset == null ?
                         "[accent]Sector " + dest.id :
                         "[accent]" + dest.preset.localizedName);
