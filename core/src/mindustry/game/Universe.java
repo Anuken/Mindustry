@@ -165,7 +165,20 @@ public class Universe{
                             //if so, just delete the save for now. it's lost.
                             //TODO don't delete it later maybe
                             sector.save.delete();
+                            //clear recieved
+                            sector.setExtraItems(new ItemSeq());
                             sector.save = null;
+                        }
+                    }
+
+                    //export to another sector
+                    if(sector.save.meta.secinfo.destination != null){
+                        Sector to = sector.save.meta.secinfo.destination;
+                        if(to.save != null){
+                            ItemSeq items = to.getExtraItems();
+                            //calculated exported items to this sector
+                            sector.save.meta.secinfo.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed)));
+                            to.setExtraItems(items);
                         }
                     }
 

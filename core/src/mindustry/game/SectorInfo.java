@@ -33,6 +33,8 @@ public class SectorInfo{
     public boolean hasCore = true;
     /** Sector that was launched from. */
     public @Nullable Sector origin;
+    /** Launch destination. */
+    public @Nullable Sector destination;
     /** Resources known to occur at this sector. */
     public Seq<UnlockableContent> resources = new Seq<>();
     /** Time spent at this sector. Do not use unless you know what you're doing. */
@@ -42,6 +44,12 @@ public class SectorInfo{
     private transient Interval time = new Interval();
     /** Core item storage to prevent spoofing. */
     private transient int[] lastCoreItems;
+
+    /** @return the real location items go when launched on this sector */
+    public Sector getRealDestination(){
+        //on multiplayer the destination is, by default, the first captured sector (basically random)
+        return !net.client() || destination != null ? destination : state.rules.sector.planet.sectors.find(Sector::hasBase);
+    }
 
     /** Updates export statistics. */
     public void handleItemExport(ItemStack stack){

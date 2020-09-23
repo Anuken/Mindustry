@@ -425,20 +425,12 @@ public class LogicBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            Table cont = new Table();
-            cont.defaults().size(40);
 
-            cont.button(Icon.pencil, Styles.clearTransi, () -> {
+            table.button(Icon.pencil, Styles.clearTransi, () -> {
                 Vars.ui.logic.show(code, code -> {
                     configure(compress(code, relativeConnections()));
                 });
-            });
-
-            //cont.button(Icon.refreshSmall, Styles.clearTransi, () -> {
-
-            //});
-
-            table.add(cont);
+            }).size(40);
         }
 
         @Override
