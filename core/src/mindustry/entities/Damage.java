@@ -94,7 +94,7 @@ public class Damage{
 
         collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large);
 
-        b.fdata = furthest != null ? resultLength : length;
+        b.fdata = resultLength;
 
         return resultLength;
     }
