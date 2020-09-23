@@ -263,7 +263,7 @@ public class TechTree implements ContentList{
                             node(steamGenerator, () -> {
                                 node(thermalGenerator, () -> {
                                     node(differentialGenerator, () -> {
-                                        node(thoriumReactor, () -> {
+                                        node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
                                             node(impactReactor, () -> {
 
                                             });
@@ -409,7 +409,11 @@ public class TechTree implements ContentList{
                         node(mono, () -> {
                             node(poly, () -> {
                                 node(mega, () -> {
+                                    node(quad, () -> {
+                                        node(oct, () -> {
 
+                                        });
+                                    });
                                 });
                             });
                         });
@@ -538,7 +542,7 @@ public class TechTree implements ContentList{
     }
 
     public static TechNode node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
-        TechNode node = new TechNode(content, empty, children);
+        TechNode node = new TechNode(content, content.researchRequirements(), children);
         node.objectives = objectives;
         return node;
     }

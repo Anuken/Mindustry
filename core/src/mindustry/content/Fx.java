@@ -145,7 +145,7 @@ public class Fx{
 
         int i = 0;
         for(Vec2 p : lines){
-            Fill.square(p.x, p.y, (5f - (float)i++ / lines.size * 2f) * e.fout(), 45);
+            Fill.circle(p.x, p.y, Lines.getStroke() / 2f);
         }
     }),
 
@@ -290,6 +290,50 @@ public class Fx{
         Lines.spikes(e.x, e.y, 1f + e.fin() * 6f, e.fout() * 4f, 6);
     }),
 
+    greenBomb = new Effect(40f, 100f, e -> {
+        color(Pal.heal);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * 65f);
+
+        color(Pal.heal);
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 6f, 100f * e.fout(), i*90);
+        }
+
+        color();
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 3f, 35f * e.fout(), i*90);
+        }
+    }),
+
+    greenLaserCharge = new Effect(80f, 100f, e -> {
+        color(Pal.heal);
+        stroke(e.fin() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.fout() * 100f);
+
+        Fill.circle(e.x, e.y, e.fin() * 20);
+
+        randLenVectors(e.id, 20, 40f * e.fout(), (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, e.fin() * 5f);
+        });
+
+        color();
+
+        Fill.circle(e.x, e.y, e.fin() * 10);
+    }),
+
+    greenLaserChargeSmall = new Effect(40f, 100f, e -> {
+        color(Pal.heal);
+        stroke(e.fin() * 2f);
+        Lines.circle(e.x, e.y, e.fout() * 50f);
+    }),
+
+    healWaveDynamic = new Effect(22, e -> {
+        color(Pal.heal);
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation);
+    }),
+
     healWave = new Effect(22, e -> {
         color(Pal.heal);
         stroke(e.fout() * 2f);
@@ -391,6 +435,17 @@ public class Fx{
 
     hitMeltdown = new Effect(12, e -> {
         color(Pal.meltdownHit);
+        stroke(e.fout() * 2f);
+
+        randLenVectors(e.id, 6, e.finpow() * 18f, e.rotation, 360f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+        });
+
+    }),
+
+    hitMeltHeal = new Effect(12, e -> {
+        color(Pal.heal);
         stroke(e.fout() * 2f);
 
         randLenVectors(e.id, 6, e.finpow() * 18f, e.rotation, 360f, (x, y) -> {
@@ -1227,6 +1282,14 @@ public class Fx{
         randLenVectors(e.id, 8, 4f + e.fin() * 18f, (x, y) -> {
             color(Color.white, Pal.accent, e.fin());
             Fill.square(e.x + x, e.y + y, 1f + e.fout() * 3f, 45);
+        });
+    }),
+
+    smokeCloud = new Effect(70, e -> {
+        randLenVectors(e.id, e.fin(), 30, 30f, (x, y, fin, fout) -> {
+            color(Color.gray);
+            alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
+            Fill.circle(e.x + x, e.y + y, 0.5f + fout * 4f);
         });
     }),
     

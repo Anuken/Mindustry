@@ -72,6 +72,8 @@ public class Vars implements Loadable{
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
+    /** shadow color for turrets */
+    public static final float turretShadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
     /** units outside of this bound will die instantly */
@@ -87,15 +89,17 @@ public class Vars implements Loadable{
     /** turns needed to destroy a sector completely */
     public static final float sectorDestructionTurns = 3f;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
-    public static final float minArmorDamage = 0.05f;
+    public static final float minArmorDamage = 0.1f;
     /** launch animation duration */
     public static final float launchDuration = 140f;
+    /** size of tiles in units */
+    public static final int tilesize = 8;
+    /** size of one tile payload (^2) */
+    public static final float tilePayload = tilesize * tilesize;
     /** tile used in certain situations, instead of null */
     public static Tile emptyTile;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
-    /** size of tiles in units */
-    public static final int tilesize = 8;
     /** all choosable player colors in join/host dialog */
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),

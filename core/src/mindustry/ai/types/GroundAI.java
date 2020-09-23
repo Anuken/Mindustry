@@ -45,7 +45,7 @@ public class GroundAI extends AIController{
             }
         }
 
-        if(unit.type().canBoost && !unit.onSolid()){
+        if(unit.type().canBoost && unit.canPassOn()){
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
@@ -74,15 +74,12 @@ public class GroundAI extends AIController{
         }*/
     }
 
-    protected void moveTo(int pathType){
-        int costType =
-            unit instanceof Legsc ? Pathfinder.costLegs :
-            unit instanceof WaterMovec ? Pathfinder.costWater :
-            Pathfinder.costGround;
+    protected void moveTo(int pathTarget){
+        int costType = unit.pathType();
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathType));
+        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
 
         if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
 

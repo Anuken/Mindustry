@@ -12,7 +12,7 @@ import mindustry.world.blocks.ConstructBlock.*;
 import static mindustry.Vars.*;
 
 public class BuilderAI extends AIController{
-    float buildRadius = 700;
+    float buildRadius = 1500;
     boolean found = false;
     @Nullable Builderc following;
 

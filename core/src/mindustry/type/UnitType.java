@@ -44,7 +44,7 @@ public class UnitType extends UnlockableContent{
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, armor = 0f;
-    public float crashDamageMultiplier = 3f;
+    public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
     public boolean canBoost = false;
@@ -55,6 +55,7 @@ public class UnitType extends UnlockableContent{
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
     public boolean hovering = false;
+    public boolean omniMovement = true;
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Seq<Ability> abilities = new Seq<>();
@@ -75,6 +76,7 @@ public class UnitType extends UnlockableContent{
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
+    public float clipSize = -1;
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
@@ -134,7 +136,7 @@ public class UnitType extends UnlockableContent{
 
     public void update(Unit unit){
 
-        if(unit instanceof Mechc){
+        if(unit instanceof Mechc && !unit.isFlying()){
             updateMechEffects(unit);
         }
     }
@@ -194,13 +196,6 @@ public class UnitType extends UnlockableContent{
         }).growX();
         
         table.row();
-        if(unit.deactivated){
-            table.table(d -> {
-                d.left();
-                d.label(() -> Core.bundle.format("bar.limitreached", unit.count(), unit.cap(), Fonts.getUnicodeStr(name)));
-            }).left().visible(() -> unit.deactivated);
-        }
-        
     }
 
     @Override
@@ -229,6 +224,15 @@ public class UnitType extends UnlockableContent{
     @Override
     public void init(){
         if(constructor == null) throw new IllegalArgumentException("no constructor set up for unit '" + name + "'");
+
+        Unit example = constructor.get();
+
+        //water preset
+        if(example instanceof WaterMovec){
+            canDrown = false;
+            omniMovement = false;
+            immunities.add(StatusEffects.wet);
+        }
 
         singleTarget = weapons.size <= 1;
 
@@ -396,10 +400,6 @@ public class UnitType extends UnlockableContent{
             unit.trns(-legOffset.x, -legOffset.y);
         }
 
-        if(unit.deactivated){
-            drawDeactive(unit);
-        }
-
         if(unit.abilities.size > 0){
             for(Ability a : unit.abilities){
                 Draw.reset();
@@ -408,16 +408,6 @@ public class UnitType extends UnlockableContent{
 
             Draw.reset();
         }
-    }
-
-    public void drawDeactive(Unit unit){
-        Draw.color(Color.scarlet);
-        Draw.alpha(0.8f);
-
-        float size = 8f;
-        Draw.rect(Icon.warning.getRegion(), unit.x, unit.y, size, size);
-
-        Draw.reset();
     }
 
     public <T extends Unit & Payloadc> void drawPayload(T unit){
@@ -525,7 +515,6 @@ public class UnitType extends UnlockableContent{
 
             float rotation = unit.rotation - 90;
             float weaponRotation  = rotation + (weapon.rotate ? mount.rotation : 0);
-            float width = weapon.region.width;
             float recoil = -((mount.reload) / weapon.reload * weapon.recoil);
             float wx = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y) + Angles.trnsx(weaponRotation, 0, recoil),
                 wy = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y) + Angles.trnsy(weaponRotation, 0, recoil);
@@ -540,17 +529,16 @@ public class UnitType extends UnlockableContent{
 
                 Draw.rect(weapon.outlineRegion,
                 wx, wy,
-                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.outlineRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
                 weapon.region.height * Draw.scl,
                 weaponRotation);
-
 
                 Draw.z(z);
             }
 
             Draw.rect(weapon.region,
             wx, wy,
-            width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+            weapon.region.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
             weapon.region.height * Draw.scl,
             weaponRotation);
 
@@ -559,8 +547,8 @@ public class UnitType extends UnlockableContent{
                 Draw.blend(Blending.additive);
                 Draw.rect(weapon.heatRegion,
                 wx, wy,
-                width * Draw.scl * -Mathf.sign(weapon.flipSprite),
-                weapon.region.height * Draw.scl,
+                weapon.heatRegion.width * Draw.scl * -Mathf.sign(weapon.flipSprite),
+                weapon.heatRegion.height * Draw.scl,
                 weaponRotation);
                 Draw.blend();
                 Draw.color();
@@ -571,6 +559,8 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawOutline(Unit unit){
+        Draw.reset();
+
         if(Core.atlas.isFound(outlineRegion)){
             Draw.rect(outlineRegion, unit.x, unit.y, unit.rotation - 90);
         }
@@ -614,11 +604,6 @@ public class UnitType extends UnlockableContent{
             Drawf.shadow(leg.base.x, leg.base.y, ssize);
         }
 
-        //TODO should be below/above legs
-        if(baseRegion.found()){
-            Draw.rect(baseRegion, unit.x, unit.y, rotation);
-        }
-
         //legs are drawn front first
         for(int j = legs.length - 1; j >= 0; j--){
             int i = (j % 2 == 0 ? j/2 : legs.length - 1 - j/2);
@@ -654,6 +639,11 @@ public class UnitType extends UnlockableContent{
             if(baseJointRegion.found()){
                 Draw.rect(baseJointRegion, position.x, position.y, rotation);
             }
+        }
+
+        //TODO should be below/above legs
+        if(baseRegion.found()){
+            Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
         }
 
         Draw.reset();

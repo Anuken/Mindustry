@@ -61,7 +61,7 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         net.handleClientReceived(object);
                     }catch(Throwable e){
-                        handleException(e);
+                        net.handleException(e);
                     }
                 });
 
@@ -144,14 +144,14 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         client.run();
                     }catch(Exception e){
-                        if(!(e instanceof ClosedSelectorException)) handleException(e);
+                        if(!(e instanceof ClosedSelectorException)) net.handleException(e);
                     }
                 });
 
                 client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
-                handleException(e);
+                net.handleException(e);
             }
         });
     }
@@ -267,16 +267,6 @@ public class ArcNetProvider implements NetProvider{
         }
 
         return null;
-    }
-
-    void handleException(Throwable e){
-        if(e instanceof ArcNetException){
-            Core.app.post(() -> net.showError(new IOException("mismatch")));
-        }else if(e instanceof ClosedChannelException){
-            Core.app.post(() -> net.showError(new IOException("alreadyconnected")));
-        }else{
-            Core.app.post(() -> net.showError(e));
-        }
     }
 
     class ArcConnection extends NetConnection{

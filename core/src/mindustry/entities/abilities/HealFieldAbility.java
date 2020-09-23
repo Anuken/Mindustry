@@ -8,7 +8,7 @@ import mindustry.gen.*;
 public class HealFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal;
-    public Effect activeEffect = Fx.healWave;
+    public Effect activeEffect = Fx.healWaveDynamic;
 
     protected float timer;
     protected boolean wasHealed = false;
@@ -37,7 +37,7 @@ public class HealFieldAbility extends Ability{
             });
 
             if(wasHealed){
-                activeEffect.at(unit);
+                activeEffect.at(unit, range);
             }
 
             timer = 0f;

@@ -1267,7 +1267,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
 
-            consumes.power(1f);
+            consumes.power(1.25f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
@@ -1320,7 +1320,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.copper, 3000, Items.lead, 3000, Items.silicon, 2000));
 
             unitType = UnitTypes.beta;
-            health = 2000;
+            health = 3500;
             itemCapacity = 9000;
             size = 4;
 
@@ -1331,7 +1331,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.copper, 8000, Items.lead, 8000, Items.silicon, 5000, Items.thorium, 4000));
 
             unitType = UnitTypes.gamma;
-            health = 4000;
+            health = 6000;
             itemCapacity = 13000;
             size = 5;
 
@@ -1377,7 +1377,7 @@ public class Blocks implements ContentList{
             ammoUseEffect = Fx.shellEjectSmall;
             health = 250;
             inaccuracy = 2f;
-            rotatespeed = 10f;
+            rotateSpeed = 10f;
         }};
 
         scatter = new ItemTurret("scatter"){{
@@ -1395,7 +1395,7 @@ public class Blocks implements ContentList{
             targetGround = false;
 
             recoilAmount = 2f;
-            rotatespeed = 15f;
+            rotateSpeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
 
@@ -1498,7 +1498,7 @@ public class Blocks implements ContentList{
             }};
             reloadTime = 35f;
             shootCone = 40f;
-            rotatespeed = 8f;
+            rotateSpeed = 8f;
             powerUse = 4f;
             targetAir = false;
             range = 90f;
@@ -1597,8 +1597,10 @@ public class Blocks implements ContentList{
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
 
+            float brange = range + 10f;
+
             ammo(Items.thorium, new ShrapnelBulletType(){{
-                length = range + 10f;
+                length = brange;
                 damage = 105f;
                 ammoMultiplier = 6f;
             }});
@@ -1647,7 +1649,7 @@ public class Blocks implements ContentList{
             range = 200f;
             size = 3;
             recoilAmount = 3f;
-            rotatespeed = 10f;
+            rotateSpeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
@@ -1805,6 +1807,8 @@ public class Blocks implements ContentList{
                 {UnitTypes.spiroct, UnitTypes.arkyid},
                 {UnitTypes.fortress, UnitTypes.scepter},
                 {UnitTypes.bryde, UnitTypes.sei},
+                {UnitTypes.mega, UnitTypes.quad},
+                {UnitTypes.quasar, UnitTypes.vela},
             };
         }};
 
@@ -1823,7 +1827,9 @@ public class Blocks implements ContentList{
                 {UnitTypes.antumbra, UnitTypes.eclipse},
                 {UnitTypes.arkyid, UnitTypes.toxopid},
                 {UnitTypes.scepter, UnitTypes.reign},
-                {UnitTypes.sei, UnitTypes.omura}
+                {UnitTypes.sei, UnitTypes.omura},
+                {UnitTypes.quad, UnitTypes.oct},
+                {UnitTypes.vela, UnitTypes.corvus}
             };
         }};
 
