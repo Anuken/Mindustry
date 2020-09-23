@@ -87,7 +87,7 @@ public class Vars implements Loadable{
     /** turns needed to destroy a sector completely */
     public static final float sectorDestructionTurns = 3f;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
-    public static final float minArmorDamage = 0.05f;
+    public static final float minArmorDamage = 0.1f;
     /** launch animation duration */
     public static final float launchDuration = 140f;
     /** size of tiles in units */
