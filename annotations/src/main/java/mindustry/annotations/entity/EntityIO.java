@@ -61,11 +61,14 @@ public class EntityIO{
         //keep track of fields present in the entity
         presentFields.addAll(fields.map(f -> f.name));
 
+        Revision previous = revisions.isEmpty() ? null : revisions.peek();
+
         //add new revision if it doesn't match or there are no revisions
         if(revisions.isEmpty() || !revisions.peek().equal(fields)){
             revisions.add(new Revision(nextRevision,
                 fields.map(f -> new RevisionField(f.name, f.type.toString(),
                 f.type.isPrimitive() ? BaseProcessor.typeSize(f.type.toString()) : -1))));
+            Log.warn("Adding new revision @ for @.\nPrevious = @\nNew = @\n", nextRevision, name, previous == null ? null : previous.fields.toString(", ", f -> f.name), fields.toString(", ", f -> f.name));
             //write revision
             directory.child(nextRevision + ".json").writeString(json.toJson(revisions.peek()));
         }
