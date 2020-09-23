@@ -56,7 +56,9 @@ public abstract class Turret extends Block{
     public float shootShake = 0f;
     /** Positioning stuff*/
     public int barrels = 1; //Don't make this 0 or negtive. No idea what will happen, but probably crash.
-    public float[][] barrelPos = {}; //Defaults to 0, 0, 0 if no input is given. Input {X, Y, Deg}
+    public float[][] barrelPos = {}; /*Defaults to {0f, 0f, 0f} if no input is given.
+    Input: {x offest, y offset, angle degree}, where 0x, 0y is the middle front and 0d is normal straight forwards.
+    Arrays inside arrays should work for json/hjson modding since modding reconstructors work as well.*/
     public boolean barrelBurst = false; //Should all the shots come from one barrel?
     public float xRand = 0f;
     public float yRand = 0f;
@@ -357,7 +359,7 @@ public abstract class Turret extends Block{
             }
         }
 
-        protected void shoot(BulletType type){ /*Way too much copied code, will have to clean up sometime.*/
+        protected void shoot(BulletType type){
             recoil = recoilAmount;
             heat = 1f;
 
@@ -368,12 +370,13 @@ public abstract class Turret extends Block{
 
                     recoil = recoilAmount;
                     
-                    //Ternary operator determines if array is empty. If empty, set value as 0.
+                    //Ternary operator determines if array is empty (length of 0). If empty, set value as 0.
                     tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][1] : 0f) + Mathf.range(yRand), (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][0] : 0f) + Mathf.range(xRand));
                     
                     bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (barrelPos.length != 0f ? barrelPos[shotCounter % barrels][2] : 0f) + (barrelBurst ? (index - (int)(shots / 2f)) * spread : 0));
                     
                     //BarrelBurst means should all the bullets in a burst attack come form one barrel or spread across multiple. Probably should've included that in my demonstration.
+                    //Used in Fuse
                     if(!barrelBurst){
                         shotCounter++;
                     }
