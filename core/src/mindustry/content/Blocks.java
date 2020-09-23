@@ -1267,7 +1267,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
 
-            consumes.power(1f);
+            consumes.power(1.25f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
