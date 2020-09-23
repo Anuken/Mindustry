@@ -180,18 +180,26 @@ public class LaunchPad extends Block{
             Sector destsec = !net.client() ? state.secinfo.origin : state.rules.sector.planet.sectors.find(Sector::hasBase);
 
             //actually launch the items upon removal
-            if(team() == state.rules.defaultTeam && destsec != null){
-                ItemSeq dest = destsec.getExtraItems();
+            if(team() == state.rules.defaultTeam){
+                if(destsec != null && (destsec != state.rules.sector || net.client())){
+                    ItemSeq dest = destsec.getExtraItems();
 
-                for(ItemStack stack : stacks){
-                    dest.add(stack);
+                    for(ItemStack stack : stacks){
+                        dest.add(stack);
 
-                    //update export
-                    state.secinfo.handleItemExport(stack);
-                    Events.fire(new LaunchItemEvent(stack));
+                        //update export
+                        state.secinfo.handleItemExport(stack);
+                        Events.fire(new LaunchItemEvent(stack));
+                    }
+
+                    destsec.setExtraItems(dest);
+                }else if(team().core() != null){
+                    //dump launched stuff into the core
+                    for(ItemStack stack : stacks){
+                        int min = Math.min(team().core().block.itemCapacity - team().core().items.get(stack.item), stack.amount);
+                        team().core().items.add(stack.item, min);
+                    }
                 }
-
-                destsec.setExtraItems(dest);
             }
         }
     }

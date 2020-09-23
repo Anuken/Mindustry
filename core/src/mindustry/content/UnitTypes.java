@@ -265,7 +265,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.52f;
+            speed = 0.55f;
             hitsize = 8f;
             health = 110f;
             buildSpeed = 0.8f;
@@ -291,7 +291,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.62f;
+            speed = 0.65f;
             hitsize = 10f;
             health = 320f;
             buildSpeed = 0.9f;

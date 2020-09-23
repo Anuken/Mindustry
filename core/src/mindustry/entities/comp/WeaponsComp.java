@@ -106,7 +106,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime){
                     mount.bullet = null;
                 }else{
-                    mount.bullet.rotation(shootAngle);
+                    mount.bullet.rotation(weaponRotation + 90);
                     mount.bullet.set(shootX, shootY);
                     vel.add(Tmp.v1.trns(rotation + 180f, mount.bullet.type.recoil));
                 }

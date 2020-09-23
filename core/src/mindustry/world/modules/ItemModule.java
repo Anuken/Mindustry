@@ -135,6 +135,15 @@ public class ItemModule extends BlockModule{
         return true;
     }
 
+    public boolean has(ItemSeq items){
+        for(Item item : content.items()){
+            if(!has(item, items.get(item))){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean has(Iterable<ItemStack> stacks){
         for(ItemStack stack : stacks){
             if(!has(stack.item, stack.amount)) return false;
@@ -259,6 +268,10 @@ public class ItemModule extends BlockModule{
 
     public void remove(ItemStack[] stacks){
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
+    }
+
+    public void remove(ItemSeq stacks){
+        stacks.each(this::remove);
     }
 
     public void remove(Iterable<ItemStack> stacks){
