@@ -85,6 +85,16 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         return true;
     }
 
+    @Override
+    public void remove(){
+        for(WeaponMount mount : mounts){
+            if(mount.bullet != null){
+                mount.bullet.time = mount.bullet.lifetime - 10f;
+                mount.bullet = null;
+            }
+        }
+    }
+
     /** Update shooting and rotation for this unit. */
     @Override
     public void update(){
@@ -167,7 +177,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         sequenceNum = 0;
         if(weapon.shotDelay + weapon.firstShotDelay > 0.01f){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, () -> mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl));
+                Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, () -> {
+                    if(!isAdded()) return;
+                    mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
+                });
                 sequenceNum++;
             });
         }else{
@@ -178,6 +191,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
         if(weapon.firstShotDelay > 0){
             Time.run(weapon.firstShotDelay, () -> {
+                if(!isAdded()) return;
+
                 vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
                 Effect.shake(weapon.shake, weapon.shake, x, y);
                 mount.heat = 1f;
