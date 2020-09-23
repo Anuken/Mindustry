@@ -1597,8 +1597,10 @@ public class Blocks implements ContentList{
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
 
+            float brange = range + 10f;
+
             ammo(Items.thorium, new ShrapnelBulletType(){{
-                length = range + 10f;
+                length = brange;
                 damage = 105f;
                 ammoMultiplier = 6f;
             }});
