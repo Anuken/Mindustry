@@ -542,7 +542,7 @@ public class TechTree implements ContentList{
     }
 
     public static TechNode node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
-        TechNode node = new TechNode(content, empty, children);
+        TechNode node = new TechNode(content, content.researchRequirements(), children);
         node.objectives = objectives;
         return node;
     }
