@@ -202,6 +202,9 @@ public abstract class Turret extends Block{
 
             tr2.trns(rotation, -recoil);
 
+            Draw.color(Color.toFloatBits(0, 0, 0, 0.22f));
+            Draw.rect(region, x + tr2.x - (size / 2f), y + tr2.y - (size / 2f), rotation - 90);
+            Draw.color();
             drawer.get(this);
 
             if(heatRegion != Core.atlas.find("error")){
