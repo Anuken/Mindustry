@@ -15,10 +15,17 @@ public class FileTree implements FileHandleResolver{
 
     /** Gets an asset file.*/
     public Fi get(String path){
+        return get(path, false);
+    }
+
+    /** Gets an asset file.*/
+    public Fi get(String path, boolean safe){
         if(files.containsKey(path)){
             return files.get(path);
         }else if(files.containsKey("/" + path)){
             return files.get("/" + path);
+        }else if(Core.files == null && !safe){ //headless
+            return Fi.get(path);
         }else{
             return Core.files.internal(path);
         }

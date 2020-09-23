@@ -1,0 +1,5 @@
+- Adicionado nova forma de ver mapas. Com panorâmica e rolagem
+- Foi adicionada regra de integridade do bloco
+- Adicionado mais equipes internas para modos de jogo alternativos
+- Adicionado recursos para melhorar a modificação do servidor
+-Grande mudança interna: o pacote agora é "mindustry" em vez de "io.anuke.mindustry" (irá quebrar os plugins)

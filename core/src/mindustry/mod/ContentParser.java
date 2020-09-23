@@ -3,12 +3,11 @@ package mindustry.mod;
 import arc.*;
 import arc.assets.*;
 import arc.audio.*;
-import arc.audio.mock.*;
-import arc.struct.Array;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.mock.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.serialization.*;
@@ -18,16 +17,17 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
-import mindustry.entities.Effects.*;
+import mindustry.entities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
+import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
@@ -35,21 +35,9 @@ import java.lang.reflect.*;
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
-    private ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
-    private StringMap legacyUnitMap = StringMap.of(
-    "Dagger", "GroundUnit",
-    "Eruptor", "GroundUnit",
-    "Titan", "GroundUnit",
-    "Fortress", "GroundUnit",
-    "Crawler", "GroundUnit",
-    "Revenant", "HoverUnit",
-    "Draug", "MinerDrone",
-    "Phantom", "BuilderDrone",
-    "Spirit", "RepairDrone",
-    "Wraith", "FlyingUnit",
-    "Ghoul", "FlyingUnit"
-    );
-    private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
+    ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
+
+    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
@@ -57,7 +45,7 @@ public class ContentParser{
                 return result;
             }else{
                 String str = data.asString();
-                if(str.startsWith(Schematics.base64Header)){
+                if(str.startsWith(Vars.schematicBaseStart)){
                     return Schematics.readBase64(str);
                 }else{
                     return Schematics.read(Vars.tree.get("schematics/" + str + "." + Vars.schematicExtension));
@@ -90,16 +78,18 @@ public class ContentParser{
 
             String name = "sounds/" + data.asString();
             String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+
+            if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
             ModLoadingSound sound = new ModLoadingSound();
             AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
             desc.loaded = result -> sound.sound = (Sound)result;
             desc.errored = Throwable::printStackTrace;
             return sound;
         });
-        put(Objective.class, (type, data) -> {
-            Class<? extends Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : ZoneWave.class;
+        put(Objectives.Objective.class, (type, data) -> {
+            Class<? extends Objectives.Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : SectorComplete.class;
             data.remove("type");
-            Objective obj = make(oc);
+            Objectives.Objective obj = make(oc);
             readFields(obj, data);
             return obj;
         });
@@ -112,10 +102,10 @@ public class ContentParser{
     }};
     /** Stores things that need to be parsed fully, e.g. reading fields of content.
      * This is done to accomodate binding of content names first.*/
-    private Array<Runnable> reads = new Array<>();
-    private Array<Runnable> postreads = new Array<>();
+    private Seq<Runnable> reads = new Seq<>();
+    private Seq<Runnable> postreads = new Seq<>();
     private ObjectSet<Object> toBeParsed = new ObjectSet<>();
-    private LoadedMod currentMod;
+    LoadedMod currentMod;
     private Content currentContent;
 
     private Json parser = new Json(){
@@ -153,6 +143,11 @@ public class ContentParser{
                     }
                 }
 
+                //try to load DrawBlock by instantiating it
+                if(type == DrawBlock.class && jsonData.isString()){
+                    return Reflect.make("mindustry.world.draw." + Strings.capitalize(jsonData.asString()));
+                }
+
                 if(Content.class.isAssignableFrom(type)){
                     ContentType ctype = contentTypes.getThrow(type, () -> new IllegalArgumentException("No content type for class: " + type.getSimpleName()));
                     String prefix = currentMod != null ? currentMod.name + "-" : "";
@@ -174,9 +169,11 @@ public class ContentParser{
             readBundle(ContentType.block, name, value);
 
             Block block;
+            boolean exists;
 
             if(locate(ContentType.block, name) != null){
                 block = locate(ContentType.block, name);
+                exists = true;
 
                 if(value.has("type")){
                     throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
@@ -184,6 +181,7 @@ public class ContentParser{
             }else{
                 //TODO generate dynamically instead of doing.. this
                 Class<? extends Block> type;
+                exists = false;
 
                 try{
                     type = resolve(getType(value),
@@ -243,28 +241,35 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
-                if(block.size > 8){
-                    throw new IllegalArgumentException("Blocks cannot be larger than 8x8.");
+                if(block.size > ConstructBlock.maxSize){
+                    throw new IllegalArgumentException("Blocks cannot be larger than " + ConstructBlock.maxSize);
                 }
 
                 //add research tech node
                 if(research[0] != null){
+                    //TODO only works with blocks
                     Block parent = find(ContentType.block, research[0]);
-                    TechNode baseNode = TechTree.create(parent, block);
+                    TechNode baseNode = exists && TechTree.all.contains(t -> t.content == block) ? TechTree.all.find(t -> t.content == block) : TechTree.create(parent, block);
                     LoadedMod cur = currentMod;
 
                     postreads.add(() -> {
                         currentContent = block;
                         currentMod = cur;
 
-                        TechNode parnode = TechTree.all.find(t -> t.block == parent);
+                        if(baseNode.parent != null){
+                            baseNode.parent.children.remove(baseNode);
+                        }
+
+                        TechNode parnode = TechTree.all.find(t -> t.content == parent);
                         if(parnode == null){
                             throw new IllegalArgumentException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.");
                         }
                         if(!parnode.children.contains(baseNode)){
                             parnode.children.add(baseNode);
                         }
+                        baseNode.parent = parnode;
                     });
+
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -280,8 +285,8 @@ public class ContentParser{
 
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
-                Class<BaseUnit> type = resolve(legacyUnitMap.get(Strings.capitalize(getType(value)), getType(value)), "mindustry.entities.type.base");
-                unit = new UnitType(mod + "-" + name, supply(type));
+                unit = new UnitType(mod + "-" + name);
+                unit.constructor = Reflect.cons(resolve(Strings.capitalize(getType(value)), "mindustry.gen"));
             }else{
                 unit = locate(ContentType.unit, name);
             }
@@ -292,9 +297,8 @@ public class ContentParser{
             return unit;
         },
         ContentType.item, parser(ContentType.item, Item::new),
-        ContentType.liquid, parser(ContentType.liquid, Liquid::new),
-        ContentType.mech, parser(ContentType.mech, Mech::new),
-        ContentType.zone, parser(ContentType.zone, Zone::new)
+        ContentType.liquid, parser(ContentType.liquid, Liquid::new)
+        //ContentType.sector, parser(ContentType.sector, SectorPreset::new)
     );
 
     private String getString(JsonValue value, String key){
@@ -333,22 +337,25 @@ public class ContentParser{
     }
 
     private void readBundle(ContentType type, String name, JsonValue value){
-        UnlockableContent cont = Vars.content.getByName(type, name) instanceof UnlockableContent ?
-                                Vars.content.getByName(type, name) : null;
+        UnlockableContent cont = locate(type, name) instanceof UnlockableContent ? locate(type, name) : null;
 
         String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
         I18NBundle bundle = Core.bundle;
         while(bundle.getParent() != null) bundle = bundle.getParent();
 
         if(value.has("name")){
-            bundle.getProperties().put(entryName + "name", value.getString("name"));
-            if(cont != null) cont.localizedName = value.getString("name");
+            if(!Core.bundle.has(entryName + "name")){
+                bundle.getProperties().put(entryName + "name", value.getString("name"));
+                if(cont != null) cont.localizedName = value.getString("name");
+            }
             value.remove("name");
         }
 
         if(value.has("description")){
-            bundle.getProperties().put(entryName + "description", value.getString("description"));
-            if(cont != null) cont.description = value.getString("description");
+            if(!Core.bundle.has(entryName + "description")){
+                bundle.getProperties().put(entryName + "description", value.getString("description"));
+                if(cont != null) cont.description = value.getString("description");
+            }
             value.remove("description");
         }
     }
@@ -366,7 +373,7 @@ public class ContentParser{
 
     private void init(){
         for(ContentType type : ContentType.all){
-            Array<Content> arr = Vars.content.getBy(type);
+            Seq<Content> arr = Vars.content.getBy(type);
             if(!arr.isEmpty()){
                 Class<?> c = arr.first().getClass();
                 //get base content class, skipping intermediates
@@ -454,8 +461,10 @@ public class ContentParser{
 
         if(t.getMessage() != null && t instanceof JsonParseException){
             builder.append("[accent][[JsonParse][] ").append(":\n").append(t.getMessage());
+        }else if(t instanceof NullPointerException){
+            builder.append(Strings.neatError(t));
         }else{
-            Array<Throwable> causes = Strings.getCauses(t);
+            Seq<Throwable> causes = Strings.getCauses(t);
             for(Throwable e : causes){
                 builder.append("[accent][[").append(e.getClass().getSimpleName().replace("Exception", ""))
                 .append("][] ")
@@ -471,7 +480,7 @@ public class ContentParser{
         return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
     }
 
-    private <T> T make(Class<T> type){
+    <T> T make(Class<T> type){
         try{
             Constructor<T> cons = type.getDeclaredConstructor();
             cons.setAccessible(true);
@@ -506,7 +515,7 @@ public class ContentParser{
         }
     }
 
-    private Object field(Class<?> type, JsonValue value){
+    Object field(Class<?> type, JsonValue value){
         return field(type, value.asString());
     }
 
@@ -521,7 +530,7 @@ public class ContentParser{
         }
     }
 
-    private Object fieldOpt(Class<?> type, JsonValue value){
+    Object fieldOpt(Class<?> type, JsonValue value){
         try{
             return type.getField(value.asString()).get(null);
         }catch(Exception e){
@@ -529,10 +538,10 @@ public class ContentParser{
         }
     }
 
-    private void checkNullFields(Object object){
+    void checkNullFields(Object object){
         if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
 
-        parser.getFields(object.getClass()).values().toArray().each(field -> {
+        parser.getFields(object.getClass()).values().toSeq().each(field -> {
             try{
                 if(field.field.getType().isPrimitive()) return;
 
@@ -550,7 +559,7 @@ public class ContentParser{
         readFields(object, jsonMap);
     }
 
-    private void readFields(Object object, JsonValue jsonMap){
+    void readFields(Object object, JsonValue jsonMap){
         toBeParsed.remove(object);
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
@@ -558,7 +567,7 @@ public class ContentParser{
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    Log.warn("{0}: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
+                    Log.warn("@: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
                     continue;
                 }else{
                     SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");
@@ -584,7 +593,7 @@ public class ContentParser{
     }
 
     /** Tries to resolve a class from a list of potential class names. */
-    private <T> Class<T> resolve(String base, String... potentials){
+    <T> Class<T> resolve(String base, String... potentials){
         if(!base.isEmpty() && Character.isLowerCase(base.charAt(0))) base = Strings.capitalize(base);
 
         for(String type : potentials){

@@ -1,25 +1,32 @@
 package mindustry.entities.bullet;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
-import mindustry.entities.type.Bullet;
-import mindustry.graphics.Pal;
+import arc.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.util.*;
+import mindustry.gen.*;
+import mindustry.graphics.*;
 
 /** An extended BulletType for most ammo-based bullets shot from turrets and units. */
 public class BasicBulletType extends BulletType{
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
-    public float bulletWidth = 5f, bulletHeight = 7f;
-    public float bulletShrink = 0.5f;
-    public String bulletSprite;
+    public Color mixColorFrom = new Color(1f, 1f, 1f, 0f), mixColorTo = new Color(1f, 1f, 1f, 0f);
+    public float width = 5f, height = 7f;
+    public float shrinkX = 0f, shrinkY = 0.5f;
+    public float spin = 0;
+    public String sprite;
 
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
 
     public BasicBulletType(float speed, float damage, String bulletSprite){
         super(speed, damage);
-        this.bulletSprite = bulletSprite;
+        this.sprite = bulletSprite;
+    }
+    
+    public BasicBulletType(float speed, float damage){
+        this(speed, damage, "bullet");
     }
 
     /** For mods. */
@@ -29,18 +36,25 @@ public class BasicBulletType extends BulletType{
 
     @Override
     public void load(){
-        backRegion = Core.atlas.find(bulletSprite + "-back");
-        frontRegion = Core.atlas.find(bulletSprite);
+        backRegion = Core.atlas.find(sprite + "-back");
+        frontRegion = Core.atlas.find(sprite);
     }
 
     @Override
     public void draw(Bullet b){
-        float height = bulletHeight * ((1f - bulletShrink) + bulletShrink * b.fout());
+        float height = this.height * ((1f - shrinkY) + shrinkY * b.fout());
+        float width = this.width * ((1f - shrinkX) + shrinkX * b.fout());
+        float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f);
+
+        Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
+
+        Draw.mixcol(mix, mix.a);
 
         Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, bulletWidth, height, b.rot() - 90);
+        Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
         Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, bulletWidth, height, b.rot() - 90);
-        Draw.color();
+        Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() + offset);
+
+        Draw.reset();
     }
 }

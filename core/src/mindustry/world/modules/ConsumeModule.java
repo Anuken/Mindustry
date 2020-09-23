@@ -1,21 +1,33 @@
 package mindustry.world.modules;
 
-import mindustry.entities.type.TileEntity;
-import mindustry.world.consumers.Consume;
-
-import java.io.*;
+import arc.util.io.*;
+import mindustry.gen.*;
+import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 public class ConsumeModule extends BlockModule{
     private boolean valid, optionalValid;
-    private final TileEntity entity;
+    private final Building entity;
 
-    public ConsumeModule(TileEntity entity){
+    public ConsumeModule(Building entity){
         this.entity = entity;
     }
 
+    public BlockStatus status(){
+        if(!entity.shouldConsume()){
+            return BlockStatus.noOutput;
+        }
+
+        if(!valid || !entity.productionValid()){
+            return BlockStatus.noInput;
+        }
+
+        return BlockStatus.active;
+    }
+
     public void update(){
-        //everything is valid here
-        if(entity.tile.isEnemyCheat()){
+        //everything is valid when cheating
+        if(entity.cheating()){
             valid = optionalValid = true;
             return;
         }
@@ -23,7 +35,7 @@ public class ConsumeModule extends BlockModule{
         boolean prevValid = valid();
         valid = true;
         optionalValid = true;
-        boolean docons = entity.block.shouldConsume(entity.tile) && entity.block.productionValid(entity.tile);
+        boolean docons = entity.shouldConsume() && entity.productionValid();
 
         for(Consume cons : entity.block.consumes.all()){
             if(cons.isOptional()) continue;
@@ -51,20 +63,20 @@ public class ConsumeModule extends BlockModule{
     }
 
     public boolean valid(){
-        return valid && entity.block.shouldConsume(entity.tile);
+        return valid && entity.shouldConsume() && entity.enabled;
     }
 
     public boolean optionalValid(){
-        return valid() && optionalValid;
+        return valid() && optionalValid && entity.enabled;
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException{
-        stream.writeBoolean(valid);
+    public void write(Writes write){
+        write.bool(valid);
     }
 
     @Override
-    public void read(DataInput stream) throws IOException{
-        valid = stream.readBoolean();
+    public void read(Reads read){
+        valid = read.bool();
     }
 }

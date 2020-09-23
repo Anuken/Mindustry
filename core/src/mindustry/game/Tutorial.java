@@ -10,7 +10,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.entities.type.*;
+import mindustry.gen.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -23,15 +23,15 @@ public class Tutorial{
     private static final int mineCopper = 18;
     private static final int blocksToBreak = 3, blockOffset = -6;
 
-    private ObjectSet<String> events = new ObjectSet<>();
-    private ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
-    private int sentence;
+    ObjectSet<String> events = new ObjectSet<>();
+    ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
+    int sentence;
     public TutorialStage stage = TutorialStage.values()[0];
 
     public Tutorial(){
         Events.on(BlockBuildEndEvent.class, event -> {
             if(!event.breaking){
-                blocksPlaced.getAndIncrement(event.tile.block(), 0, 1);
+                blocksPlaced.increment(event.tile.block(), 1);
             }
         });
 
@@ -105,7 +105,7 @@ public class Tutorial{
 
     public enum TutorialStage{
         intro(
-        line -> Strings.format(line, item(Items.copper), mineCopper),
+        line -> Core.bundle.format(line, item(Items.copper), mineCopper),
         () -> item(Items.copper) >= mineCopper
         ),
         drill(() -> placed(Blocks.mechanicalDrill, 1)){
@@ -186,7 +186,6 @@ public class Tutorial{
                 //end tutorial, never show it again
                 Events.fire(Trigger.tutorialComplete);
                 Core.settings.put("playedtutorial", true);
-                Core.settings.save();
             }
 
             void draw(){
@@ -196,7 +195,7 @@ public class Tutorial{
 
         protected String line = "";
         protected final Func<String, String> text;
-        protected Array<String> sentences;
+        protected Seq<String> sentences;
         protected final Boolp done;
 
         TutorialStage(Func<String, String> text, Boolp done){
@@ -219,7 +218,7 @@ public class Tutorial{
 
         void load(){
             this.line = Core.bundle.has("tutorial." + name() + ".mobile") && mobile ? "tutorial." + name() + ".mobile" : "tutorial." + name();
-            this.sentences = Array.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
+            this.sentences = Seq.select(Core.bundle.get(line).split("\n"), s -> !s.isEmpty());
         }
 
         /** called every frame when this stage is active.*/
@@ -240,15 +239,15 @@ public class Tutorial{
         //utility
 
         static void placeBlocks(){
-            TileEntity core = state.teams.playerCores().first();
+            Building core = state.teams.playerCores().first();
             for(int i = 0; i < blocksToBreak; i++){
-                world.ltile(core.tile.x + blockOffset, core.tile.y + i).remove();
-                world.tile(core.tile.x + blockOffset, core.tile.y + i).setBlock(Blocks.scrapWall, state.rules.defaultTeam);
+                world.tile(core.tile().x + blockOffset, core.tile().y + i).remove();
+                world.tile(core.tile().x + blockOffset, core.tile().y + i).setBlock(Blocks.scrapWall, state.rules.defaultTeam);
             }
         }
 
         static boolean blocksBroken(){
-            TileEntity core = state.teams.playerCores().first();
+            Building core = state.teams.playerCores().first();
 
             for(int i = 0; i < blocksToBreak; i++){
                 if(world.tile(core.tile.x + blockOffset, core.tile.y + i).block() == Blocks.scrapWall){

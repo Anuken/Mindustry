@@ -2,8 +2,7 @@ package mindustry.world.consumers;
 
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
-import mindustry.entities.type.TileEntity;
-import mindustry.world.Tile;
+import mindustry.gen.*;
 import mindustry.world.meta.*;
 
 /** Consumer class for blocks which consume power while being connected to a power graph. */
@@ -31,7 +30,7 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Building tile, Table table){
         //No tooltip for power, for now
     }
 
@@ -41,12 +40,12 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void update(TileEntity entity){
+    public void update(Building entity){
         // Nothing to do since PowerGraph directly updates entity.power.status
     }
 
     @Override
-    public boolean valid(TileEntity entity){
+    public boolean valid(Building entity){
         if(buffered){
             return true;
         }else{
@@ -68,13 +67,13 @@ public class ConsumePower extends Consume{
      * @param entity The entity which contains the power module.
      * @return The amount of power which is requested per tick.
      */
-    public float requestedPower(TileEntity entity){
-        if(entity.tile.entity == null) return 0f;
+    public float requestedPower(Building entity){
+        if(entity.tile().build == null) return 0f;
         if(buffered){
             return (1f-entity.power.status)*capacity;
         }else{
             try{
-                return usage * Mathf.num(entity.block.shouldConsume(entity.tile));
+                return usage * Mathf.num(entity.shouldConsume());
             }catch(Exception e){
                 //HACK an error will only happen with a bar that is checking its requested power, and the entity is null/a different class
                 return 0;

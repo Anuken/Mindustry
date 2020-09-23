@@ -5,7 +5,7 @@ Twórz skomplikowane linie transportowe przy użyciu przenośników by zaopatrzy
 [h2]Rozgrywka[/h2]
 
 [list]
-[*] Twórz wiertła oraz przenośniki by przenieść surowce do twojego Rdzenia. 
+[*] Stawiaj wiertła oraz przenośniki by przetransportować surowce do twojego Rdzenia.
 [*] Używaj bloków produkcyjnych do tworzenia zaawansowanych materiałów.
 [*] Buduj drony do automatycznego wydobycia surowców, pomocy przy budowie i obrony twojej bazy.
 [*] Rozprowadzaj płyny i walcz z nagłymi pożarami.
@@ -37,11 +37,11 @@ Twórz skomplikowane linie transportowe przy użyciu przenośników by zaopatrzy
 [h2]Gra Niestandardowa & Międzyplatformowa Gra Wieloosobowa[/h2]
 
 [list]
-[*] 12 wbudowanych map do gier niestandardowych, oprócz kampanii
+[*] 12 wbudowanych map do gier niestandardowych (nie licząc kampanii)
 [*] Graj w trybie Co-op, PvP lub sandbox
 [*] Dołącz do publicznych serwerów dedykowanych, lub zaproś przyjaciół do twoich własnych prywatnych rozgrywek
-[*] Konfigurowalne zasady gry: Zmień koszt budowy, statystyki wrogów, przedmioty początkowe, odstęp fal i więcej
-[*] Możliwość mieszania trybów gry: Połącz ze sobą tyby PvP oraz PvE
+[*] Konfigurowalne zasady gry: Zmień koszt budowy, statystyki wrogów, przedmioty początkowe, odstęp fal wrogów i wiele więcej
+[*] Możliwość mieszania trybów gry: Połącz ze sobą tryby PvP oraz PvE
 [/list]
 
 [h2]Edytor Map[/h2]
@@ -56,5 +56,5 @@ Twórz skomplikowane linie transportowe przy użyciu przenośników by zaopatrzy
 [*] Konfiguruj układ fal wroga
 [*] Publikuj eksportowane mapy na Warsztacie Steam
 [*] Dostosuj standardowy zasady mapy
-[*] Użyj 75+ róznych bloków terenu
+[*] Użyj 75+ różnych bloków terenu
 [/list]

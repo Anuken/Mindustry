@@ -13,7 +13,7 @@ import com.android.dx.dex.cf.*;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.merge.*;
 import dalvik.system.*;
-import org.mozilla.javascript.*;
+import rhino.*;
 
 import java.io.*;
 import java.nio.*;
@@ -39,6 +39,11 @@ public class AndroidRhinoContext{
 
                 @Override
                 public Object getDynamicSecurityDomain(Object o){
+                    return null;
+                }
+
+                @Override
+                public Object callWithDomain(Object o, Context context, Callable callable, Scriptable scriptable, Scriptable scriptable1, Object[] objects){
                     return null;
                 }
             });
@@ -121,7 +126,7 @@ public class AndroidRhinoContext{
                 }
                 return loadClass(dex, name);
             }catch(IOException | ClassNotFoundException e){
-                throw new FatalLoadingException(e);
+                throw new RuntimeException("Failed to define class", e);
             }
         }
 
@@ -148,14 +153,6 @@ public class AndroidRhinoContext{
                 }
             }
             return loadedClass;
-        }
-    }
-
-
-    /** Might be thrown in any Rhino method that loads bytecode if the loading failed. */
-    public static class FatalLoadingException extends RuntimeException{
-        FatalLoadingException(Throwable t){
-            super("Failed to define class", t);
         }
     }
 

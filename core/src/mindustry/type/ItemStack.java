@@ -1,11 +1,13 @@
 package mindustry.type;
 
-import arc.struct.Array;
+import arc.struct.Seq;
 import mindustry.content.Items;
 
 public class ItemStack implements Comparable<ItemStack>{
+    public static final ItemStack[] empty = {};
+
     public Item item;
-    public int amount = 1;
+    public int amount = 0;
 
     public ItemStack(Item item, int amount){
         if(item == null) item = Items.copper;
@@ -17,6 +19,12 @@ public class ItemStack implements Comparable<ItemStack>{
     public ItemStack(){
         //prevent nulls.
         item = Items.copper;
+    }
+
+    public ItemStack set(Item item, int amount){
+        this.item = item;
+        this.amount = amount;
+        return this;
     }
 
     public ItemStack copy(){
@@ -43,8 +51,8 @@ public class ItemStack implements Comparable<ItemStack>{
         return stacks;
     }
 
-    public static Array<ItemStack> list(Object... items){
-        Array<ItemStack> stacks = new Array<>(items.length / 2);
+    public static Seq<ItemStack> list(Object... items){
+        Seq<ItemStack> stacks = new Seq<>(items.length / 2);
         for(int i = 0; i < items.length; i += 2){
             stacks.add(new ItemStack((Item)items[i], ((Number)items[i + 1]).intValue()));
         }

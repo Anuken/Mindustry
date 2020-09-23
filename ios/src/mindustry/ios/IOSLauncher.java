@@ -1,7 +1,8 @@
 package mindustry.ios;
 
 import arc.*;
-import com.badlogic.gdx.backends.iosrobovm.*;
+import arc.Input.*;
+import arc.backend.robovm.*;
 import arc.files.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
@@ -40,13 +41,32 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
             @Override
             public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
+                if(!open){ //when exporting, just share it.
+                    //ask for export name
+                    Core.input.getTextInput(new TextInput(){{
+                        title = Core.bundle.get("filename");
+                        accepted = name -> {
+                            try{
+                                //write result
+                                Fi result = tmpDirectory.child(name + "." + extension);
+                                cons.get(result);
 
+                                //import the document
+                                shareFile(result);
+                            }catch(Throwable t){
+                                ui.showException(t);
+                            }
+                        };
+                    }});
+                    return;
+                }
+
+                UIDocumentBrowserViewController cont = new UIDocumentBrowserViewController((NSArray<NSString>)null);
 
                 NSArray<UIBarButtonItem> arr = new NSArray<>(new UIBarButtonItem(Core.bundle.get("cancel"), UIBarButtonItemStyle.Plain,
                     uiBarButtonItem -> cont.dismissViewController(true, () -> {})));
 
-                cont.setAllowsDocumentCreation(!open);
+                cont.setAllowsDocumentCreation(false);
                 cont.setAdditionalLeadingNavigationBarButtonItems(arr);
 
                 class ChooserDelegate extends NSObject implements UIDocumentBrowserViewControllerDelegate{
@@ -97,7 +117,6 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void failedToImportDocument(UIDocumentBrowserViewController controller, NSURL documentURL, NSError error){
-
                     }
 
                     @Override
@@ -135,7 +154,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         pop.setSourceRect(targetRect);
                         pop.setPermittedArrowDirections(UIPopoverArrowDirection.None);
                     }
-                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented {0}", to));
+                    rootVc.presentViewController(p, true, () -> Log.info("Success! Presented @", to));
                 }catch(Throwable t){
                     ui.showException(t);
                 }
@@ -153,7 +172,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
         }, new IOSApplicationConfiguration(){{
-           //errorHandler = ModCrashHandler::handle;
+
         }});
     }
 
@@ -217,10 +236,10 @@ public class IOSLauncher extends IOSApplication.Delegate{
                             ui.load.runLoadSave(slot);
                         }
                     }catch(IOException e){
-                        ui.showException("$save.import.fail", e);
+                        ui.showException("@save.import.fail", e);
                     }
                 }else{
-                    ui.showErrorMessage("$save.import.invalid");
+                    ui.showErrorMessage("@save.import.invalid");
                 }
 
             }

@@ -1,18 +1,19 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.Pixmap.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -21,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class MinimapRenderer implements Disposable{
     private static final float baseSize = 16f;
-    private final Array<Unit> units = new Array<>();
+    private final Seq<Unit> units = new Seq<>();
     private Pixmap pixmap;
     private Texture texture;
     private TextureRegion region;
@@ -35,14 +36,18 @@ public class MinimapRenderer implements Disposable{
         });
 
         //make sure to call on the graphics thread
-        Events.on(TileChangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
+        Events.on(TileChangeEvent.class, event -> {
+            if(!ui.editor.isShown()){
+                update(event.tile);
+            }
+        });
     }
 
     public Pixmap getPixmap(){
         return pixmap;
     }
 
-    public Texture getTexture(){
+    public @Nullable Texture getTexture(){
         return texture;
     }
 
@@ -65,13 +70,18 @@ public class MinimapRenderer implements Disposable{
             texture.dispose();
         }
         setZoom(4f);
-        pixmap = new Pixmap(world.width(), world.height(), Format.RGBA8888);
+        pixmap = new Pixmap(world.width(), world.height(), Format.rgba8888);
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h, boolean withLabels){
-        updateUnitArray();
+    public void drawEntities(float x, float y, float w, float h, float scaling, boolean withLabels){
+        if(!withLabels){
+            updateUnitArray();
+        }else{
+            units.clear();
+            Groups.unit.each(units::add);
+        }
 
         float sz = baseSize * zoom;
         float dx = (Core.camera.position.x / tilesize);
@@ -82,29 +92,29 @@ public class MinimapRenderer implements Disposable{
         rect.set((dx - sz) * tilesize, (dy - sz) * tilesize, sz * 2 * tilesize, sz * 2 * tilesize);
 
         for(Unit unit : units){
-            float rx = (unit.x - rect.x) / rect.width * w;
-            float ry = (unit.y - rect.y) / rect.width * h;
+            float rx = !withLabels ? (unit.x() - rect.x) / rect.width * w : unit.x() / (world.width() * tilesize) * w;
+            float ry = !withLabels ? (unit.y() - rect.y) / rect.width * h : unit.y() / (world.height() * tilesize) * h;
 
-            if(withLabels && unit instanceof Player){
-                Player pl = (Player) unit;
-                if(!pl.isLocal){
-                    // Only display names for other players.
-                    drawLabel(x + rx, y + ry, pl.name, unit.getTeam().color);
-                }
+            Draw.mixcol(unit.team().color, 1f);
+            float scale = Scl.scl(1f) / 2f * scaling * 32f;
+            Draw.rect(unit.type().icon(Cicon.full), x + rx, y + ry, scale, scale, unit.rotation() - 90);
+            Draw.reset();
+
+            //only disable player names in multiplayer
+            if(withLabels && unit.isPlayer() && net.active()){
+                Player pl = unit.getPlayer();
+                drawLabel(x + rx, y + ry, pl.name, unit.team().color);
             }
-
-            Draw.color(unit.getTeam().color);
-            Fill.rect(x + rx, y + ry, Scl.scl(baseSize / 2f), Scl.scl(baseSize / 2f));
         }
 
-        Draw.color();
+        Draw.reset();
     }
 
     public void drawEntities(float x, float y, float w, float h){
-        drawEntities(x, y, w, h, true);
+        drawEntities(x, y, w, h, 1f, true);
     }
 
-    public TextureRegion getRegion(){
+    public @Nullable TextureRegion getRegion(){
         if(texture == null) return null;
 
         float sz = Mathf.clamp(baseSize * zoom, baseSize, Math.min(world.width(), world.height()));
@@ -113,22 +123,22 @@ public class MinimapRenderer implements Disposable{
         dx = Mathf.clamp(dx, sz, world.width() - sz);
         dy = Mathf.clamp(dy, sz, world.height() - sz);
         float invTexWidth = 1f / texture.getWidth();
-        float invTexHeight = 1f / texture.getHeight();
+        float invTexHeight = 1f / texture.height;
         float x = dx - sz, y = world.height() - dy - sz, width = sz * 2, height = sz * 2;
         region.set(x * invTexWidth, y * invTexHeight, (x + width) * invTexWidth, (y + height) * invTexHeight);
         return region;
     }
 
     public void updateAll(){
-        for(int x = 0; x < world.width(); x++){
-            for(int y = 0; y < world.height(); y++){
-                pixmap.draw(x, pixmap.getHeight() - 1 - y, colorFor(world.tile(x, y)));
-            }
+        for(Tile tile : world.tiles){
+            pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, colorFor(tile));
         }
-        texture.draw(pixmap, 0, 0);
+        texture.draw(pixmap);
     }
 
     public void update(Tile tile){
+        if(world.isGenerating() || !state.isGame()) return;
+
         int color = colorFor(world.tile(tile.x, tile.y));
         pixmap.draw(tile.x, pixmap.getHeight() - 1 - tile.y, color);
 
@@ -148,12 +158,11 @@ public class MinimapRenderer implements Disposable{
 
     private int colorFor(Tile tile){
         if(tile == null) return 0;
-        tile = tile.link();
         int bc = tile.block().minimapColor(tile);
-        if(bc != 0){
-            return bc;
-        }
-        return Tmp.c1.set(MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.getTeam())).mul(tile.block().cacheLayer == CacheLayer.walls ? 1f - tile.rotation() / 4f : 1f).rgba();
+        Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team()) : bc);
+        color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
+
+        return color.rgba();
     }
 
     @Override
@@ -167,7 +176,7 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void drawLabel(float x, float y, String text, Color color){
-        BitmapFont font = Fonts.outline;
+        Font font = Fonts.outline;
         GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.getData().setScale(1 / 1.5f / Scl.scl(1f));

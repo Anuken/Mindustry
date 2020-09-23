@@ -1,14 +1,15 @@
 package mindustry.world.meta;
 
-import arc.struct.Array;
-import arc.struct.ObjectMap.Entry;
-import arc.struct.OrderedMap;
+import arc.struct.*;
+import arc.struct.ObjectMap.*;
+import mindustry.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.meta.values.*;
 
 /** Hold and organizes a list of block stats. */
 public class BlockStats{
-    private final OrderedMap<StatCategory, OrderedMap<BlockStat, Array<StatValue>>> map = new OrderedMap<>();
+    private final OrderedMap<StatCategory, OrderedMap<BlockStat, Seq<StatValue>>> map = new OrderedMap<>();
     private boolean dirty;
 
     /** Adds a single float value with this stat, formatted to 2 decimal places. */
@@ -36,6 +37,17 @@ public class BlockStats{
         add(stat, new LiquidValue(liquid, amount, perSecond));
     }
 
+    public void add(BlockStat stat, Attribute attr){
+        add(stat, attr, 1f);
+    }
+
+    public void add(BlockStat stat, Attribute attr, float scale){
+        for(Block block : Vars.content.blocks()){
+            if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0) continue;
+            add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr) * scale));
+        }
+    }
+
     /** Adds a single string value with this stat. */
     public void add(BlockStat stat, String format, Object... args){
         add(stat, new StringValue(format, args));
@@ -47,7 +59,7 @@ public class BlockStats{
             map.put(stat.category, new OrderedMap<>());
         }
 
-        map.get(stat.category).getOr(stat, Array::new).add(value);
+        map.get(stat.category).get(stat, Seq::new).add(value);
 
         dirty = true;
     }
@@ -63,11 +75,11 @@ public class BlockStats{
         dirty = true;
     }
 
-    public OrderedMap<StatCategory, OrderedMap<BlockStat, Array<StatValue>>> toMap(){
+    public OrderedMap<StatCategory, OrderedMap<BlockStat, Seq<StatValue>>> toMap(){
         //sort stats by index if they've been modified
         if(dirty){
             map.orderedKeys().sort();
-            for(Entry<StatCategory, OrderedMap<BlockStat, Array<StatValue>>> entry : map.entries()){
+            for(Entry<StatCategory, OrderedMap<BlockStat, Seq<StatValue>>> entry : map.entries()){
                 entry.value.orderedKeys().sort();
             }
 

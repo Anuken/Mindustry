@@ -1,19 +1,21 @@
 package mindustry.tools;
 
+import arc.func.*;
 import arc.graphics.Color;
-import arc.graphics.g2d.TextureRegion;
-import arc.util.Structs;
-import mindustry.tools.ImagePacker.GenRegion;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import arc.math.geom.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.tools.ImagePacker.*;
 
-import javax.imageio.ImageIO;
+import javax.imageio.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.awt.image.*;
+import java.io.*;
 
 class Image{
-    private static ArrayList<Image> toDispose = new ArrayList<>();
+    private static Seq<Image> toDispose = new Seq<>();
 
     private BufferedImage image;
     private Graphics2D graphics;
@@ -39,6 +41,12 @@ class Image{
         this(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
     }
 
+    Image copy(){
+        Image out =new Image(width, height);
+        out.draw(this);
+        return out;
+    }
+
     boolean isEmpty(int x, int y){
         if(!Structs.inBounds(x, y, width, height)){
             return true;
@@ -50,14 +58,93 @@ class Image{
     Color getColor(int x, int y){
         if(!Structs.inBounds(x, y, width, height)) return color.set(0, 0, 0, 0);
         int i = image.getRGB(x, y);
-        Color.argb8888ToColor(color, i);
+        color.argb8888(i);
         return color;
+    }
+
+    Image outline(int radius, Color outlineColor){
+        Image out = copy();
+        for(int x = 0; x < out.width; x++){
+            for(int y = 0; y < out.height; y++){
+
+                Color color = getColor(x, y);
+                out.draw(x, y, color);
+                if(color.a < 1f){
+                    boolean found = false;
+                    outer:
+                    for(int rx = -radius; rx <= radius; rx++){
+                        for(int ry = -radius; ry <= radius; ry++){
+                            if(Mathf.dst(rx, ry) <= radius && getColor(rx + x, ry + y).a > 0.01f){
+                                found = true;
+                                break outer;
+                            }
+                        }
+                    }
+                    if(found){
+                        out.draw(x, y, outlineColor);
+                    }
+                }
+            }
+        }
+        return out;
+    }
+
+    Image shadow(float alpha, int rad){
+        Image out = silhouette(new Color(0f, 0f, 0f, alpha)).blur(rad);
+        out.draw(this);
+        return out;
+    }
+
+    Image silhouette(Color color){
+        Image out = copy();
+
+        each((x, y) -> out.draw(x, y, getColor(x, y).set(color.r, color.g, color.b, this.color.a * color.a)));
+
+        return out;
+    }
+
+    Image blur(int radius){
+        Image out = copy();
+        Color c = new Color();
+        int[] sum = {0};
+
+        for(int x = 0; x < out.width; x++){
+            for(int y = 0; y < out.height; y++){
+                sum[0] = 0;
+
+                Geometry.circle(x, y, radius, (cx, cy) -> {
+                    int rx = Mathf.clamp(cx, 0, out.width - 1), ry = Mathf.clamp(cy, 0, out.height - 1);
+
+                    Color other = getColor(rx, ry);
+                    c.r += other.r;
+                    c.g += other.g;
+                    c.b += other.b;
+                    c.a += other.a;
+                    sum[0] ++;
+                });
+
+                c.mula(1f / sum[0]);
+
+                out.draw(x, y, c);
+            }
+        }
+
+        return out;
+    }
+
+    void each(Intc2 cons){
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                cons.get(x, y);
+            }
+        }
     }
 
     void draw(int x, int y, Color color){
         graphics.setColor(new java.awt.Color(color.r, color.g, color.b, color.a));
         graphics.fillRect(x, y, 1, 1);
     }
+
 
     /** Draws a region at the top left corner. */
     void draw(TextureRegion region){
@@ -66,12 +153,12 @@ class Image{
 
     /** Draws a region at the center. */
     void drawCenter(TextureRegion region){
-        draw(region, (width - region.getWidth()) / 2, (height - region.getHeight()) / 2, false, false);
+        draw(region, (width - region.width) / 2, (height - region.height) / 2, false, false);
     }
 
     /** Draws a region at the center. */
     void drawCenter(TextureRegion region, boolean flipx, boolean flipy){
-        draw(region, (width - region.getWidth()) / 2, (height - region.getHeight()) / 2, flipx, flipy);
+        draw(region, (width - region.width) / 2, (height - region.height) / 2, flipx, flipy);
     }
 
     void drawScaled(Image image){
@@ -99,12 +186,12 @@ class Image{
 
         graphics.drawImage(ImagePacker.get(region).image,
         x, y,
-        x + region.getWidth(),
-        y + region.getHeight(),
-        (flipx ? region.getWidth() : 0) + ofx,
-        (flipy ? region.getHeight() : 0) + ofy,
-        (flipx ? 0 : region.getWidth()) + ofx,
-        (flipy ? 0 : region.getHeight()) + ofy,
+        x + region.width,
+        y + region.height,
+        (flipx ? region.width : 0) + ofx,
+        (flipy ? region.height : 0) + ofy,
+        (flipx ? 0 : region.width) + ofx,
+        (flipy ? 0 : region.height) + ofy,
         null);
     }
 
@@ -125,7 +212,7 @@ class Image{
     }
 
     static int total(){
-        return toDispose.size();
+        return toDispose.size;
     }
 
     static void dispose(){

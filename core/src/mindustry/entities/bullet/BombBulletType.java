@@ -10,12 +10,16 @@ public class BombBulletType extends BasicBulletType{
         splashDamage = damage;
         collidesTiles = false;
         collides = false;
-        bulletShrink = 0.7f;
+        shrinkY = 0.7f;
         lifetime = 30f;
         drag = 0.05f;
         keepVelocity = false;
         collidesAir = false;
         hitSound = Sounds.explosion;
+    }
+
+    public BombBulletType(float damage, float radius){
+        this(damage, radius, "shell");
     }
 
     public BombBulletType(){

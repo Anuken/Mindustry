@@ -2,8 +2,7 @@ package mindustry.world.consumers;
 
 import arc.struct.*;
 import arc.scene.ui.layout.Table;
-import mindustry.entities.type.TileEntity;
-import mindustry.world.Tile;
+import mindustry.gen.*;
 import mindustry.world.meta.BlockStats;
 
 /** An abstract class that defines a type of resource that a block can consume. */
@@ -59,18 +58,16 @@ public abstract class Consume{
 
     public abstract ConsumeType type();
 
-    public abstract void build(Tile tile, Table table);
+    public abstract void build(Building tile, Table table);
 
     /** Called when a consumption is triggered manually. */
-    public void trigger(TileEntity entity){
-
-    }
+    public void trigger(Building entity){}
 
     public abstract String getIcon();
 
-    public abstract void update(TileEntity entity);
+    public abstract void update(Building entity);
 
-    public abstract boolean valid(TileEntity entity);
+    public abstract boolean valid(Building entity);
 
     public abstract void display(BlockStats stats);
 }

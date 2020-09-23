@@ -8,21 +8,22 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ui.Cicon;
+import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
 public abstract class FilterOption{
-    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full));
-    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full));
-    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full)));
-    public static final Boolf<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full)));
-    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full)));
+    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full));
+    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)) && b.inEditor;
+    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)));
+    public static final Boolf<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)));
+    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full))) && b.inEditor;
     public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full));
-    public static final Boolf<Block> anyOptional = b -> floorsOnly.get(b) || wallsOnly.get(b) || oresOnly.get(b) || b == Blocks.air;
+    public static final Boolf<Block> anyOptional = b -> (floorsOnly.get(b) || wallsOnly.get(b) || oresOnly.get(b) || b == Blocks.air) && b.inEditor;
 
     public abstract void build(Table table);
 
@@ -33,6 +34,8 @@ public abstract class FilterOption{
         final Floatp getter;
         final Floatc setter;
         final float min, max, step;
+
+        boolean display;
 
         SliderOption(String name, Floatp getter, Floatc setter, float min, float max){
             this(name, getter, setter, min, max, (max - min) / 200);
@@ -47,11 +50,20 @@ public abstract class FilterOption{
             this.step = step;
         }
 
+        public SliderOption display(){
+            display = true;
+            return this;
+        }
+
         @Override
         public void build(Table table){
-            table.add("$filter.option." + name);
+            if(!display){
+                table.add("@filter.option." + name);
+            }else{
+                table.label(() -> Core.bundle.get("filter.option." + name) + ": " + (int)getter.get());
+            }
             table.row();
-            Slider slider = table.addSlider(min, max, step, setter).growX().get();
+            Slider slider = table.slider(min, max, step, setter).growX().get();
             slider.setValue(getter.get());
             if(updateEditorOnChange){
                 slider.changed(changed);
@@ -76,15 +88,15 @@ public abstract class FilterOption{
 
         @Override
         public void build(Table table){
-            table.addButton(b -> b.addImage(supplier.get().icon(mindustry.ui.Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
-                .setRegion(supplier.get() == Blocks.air ? Core.atlas.find("icon-none") : supplier.get().icon(mindustry.ui.Cicon.small))).size(8 * 3), () -> {
-                FloatingDialog dialog = new FloatingDialog("");
+            table.button(b -> b.image(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
+                .setRegion(supplier.get() == Blocks.air ? Icon.block.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
+                BaseDialog dialog = new BaseDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){
                     if(!filter.get(block)) continue;
 
-                    dialog.cont.addImage(block == Blocks.air ? Core.atlas.find("icon-none-small") : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
+                    dialog.cont.image(block == Blocks.air ? Icon.block.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
                         consumer.get(block);
                         dialog.hide();
                         changed.run();
@@ -95,7 +107,7 @@ public abstract class FilterOption{
                 dialog.show();
             }).pad(4).margin(12f);
 
-            table.add("$filter.option." + name);
+            table.add("@filter.option." + name);
         }
     }
 }

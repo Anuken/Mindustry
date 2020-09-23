@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-if [[ $# -eq 0 ]] ; then
-    echo 'A build version must be supplied as the first argument.'
-    exit 1
-fi
-
-./gradlew server:dist -Pbuildversion=$1
-java -jar -XX:+HeapDumpOnOutOfMemoryError server/build/libs/server-release.jar

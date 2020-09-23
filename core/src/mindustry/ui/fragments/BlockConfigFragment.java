@@ -7,19 +7,17 @@ import arc.scene.actions.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
-import mindustry.world.*;
+import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
 public class BlockConfigFragment extends Fragment{
-    private Table table = new Table();
-    private Tile configTile;
-    private Block configBlock;
+    Table table = new Table();
+    Building configTile;
 
     @Override
     public void build(Group parent){
-        table.visible(false);
+        table.visible = false;
         parent.addChild(table);
 
         //hacky way to hide block config when in menu
@@ -28,8 +26,8 @@ public class BlockConfigFragment extends Fragment{
             @Override
             public void act(float delta){
                 super.act(delta);
-                if(state.is(State.menu)){
-                    table.visible(false);
+                if(state.isMenu()){
+                    table.visible = false;
                     configTile = null;
                 }
             }
@@ -37,38 +35,39 @@ public class BlockConfigFragment extends Fragment{
     }
 
     public boolean isShown(){
-        return table.isVisible() && configTile != null;
+        return table.visible && configTile != null;
     }
 
-    public Tile getSelectedTile(){
+    public Building getSelectedTile(){
         return configTile;
     }
 
-    public void showConfig(Tile tile){
-        configTile = tile;
-        configBlock = tile.block();
+    public void showConfig(Building tile){
+        if(tile.configTapped()){
+            configTile = tile;
 
-        table.visible(true);
-        table.clear();
-        tile.block().buildConfiguration(tile, table);
-        table.pack();
-        table.setTransform(true);
-        table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-        Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+            table.visible = true;
+            table.clear();
+            tile.buildConfiguration(table);
+            table.pack();
+            table.setTransform(true);
+            table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+            Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
 
-        table.update(() -> {
-            if(configTile != null && configTile.block().shouldHideConfigure(configTile, player)){
-                hideConfig();
-                return;
-            }
+            table.update(() -> {
+                if(configTile != null && configTile.shouldHideConfigure(player)){
+                    hideConfig();
+                    return;
+                }
 
-            table.setOrigin(Align.center);
-            if(configTile == null || configTile.block() == Blocks.air || configTile.block() != configBlock){
-                hideConfig();
-            }else{
-                configTile.block().updateTableAlign(tile, table);
-            }
-        });
+                table.setOrigin(Align.center);
+                if(configTile == null || configTile.block == Blocks.air || !configTile.isValid()){
+                    hideConfig();
+                }else{
+                    configTile.updateTableAlign(table);
+                }
+            });
+        }
     }
 
     public boolean hasConfigMouse(){
@@ -78,6 +77,6 @@ public class BlockConfigFragment extends Fragment{
 
     public void hideConfig(){
         configTile = null;
-        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.visible(false));
+        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
     }
 }

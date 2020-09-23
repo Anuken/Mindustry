@@ -2,14 +2,13 @@ package mindustry.ui.dialogs;
 
 import arc.Core;
 import arc.scene.ui.layout.Table;
-import mindustry.entities.type.Player;
 import mindustry.gen.*;
 import mindustry.net.Administration.TraceInfo;
 
-public class TraceDialog extends FloatingDialog{
+public class TraceDialog extends BaseDialog{
 
     public TraceDialog(){
-        super("$trace");
+        super("@trace");
 
         addCloseButton();
         setFillParent(false);

@@ -1,14 +1,11 @@
 package mindustry.tools;
 
-import arc.Core;
-import arc.files.Fi;
-import arc.graphics.Color;
-import arc.graphics.Pixmap;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.gl.FrameBuffer;
-import arc.util.ScreenUtils;
-import arc.util.Tmp;
+import arc.*;
+import arc.files.*;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
+import arc.util.*;
 
 public class SquareMarcher{
     final int resolution;

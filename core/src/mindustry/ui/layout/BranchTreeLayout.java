@@ -12,7 +12,7 @@ public class BranchTreeLayout implements TreeLayout{
     public float gapBetweenLevels = 10;
     public float gapBetweenNodes = 10f;
 
-    private final FloatArray sizeOfLevel = new FloatArray();
+    private final FloatSeq sizeOfLevel = new FloatSeq();
     private float boundsLeft = Float.MAX_VALUE;
     private float boundsRight = Float.MIN_VALUE;
     private float boundsTop = Float.MAX_VALUE;
@@ -148,8 +148,7 @@ public class BranchTreeLayout implements TreeLayout{
         wPlus.mode = wPlus.mode + shift;
     }
 
-    private TreeNode apportion(TreeNode v, TreeNode defaultAncestor,
-                               TreeNode leftSibling, TreeNode parentOfV){
+    private TreeNode apportion(TreeNode v, TreeNode defaultAncestor, TreeNode leftSibling, TreeNode parentOfV){
         if(leftSibling == null){
             return defaultAncestor;
         }
@@ -230,8 +229,7 @@ public class BranchTreeLayout implements TreeLayout{
             TreeNode previousChild = null;
             for(TreeNode w : v.children){
                 firstWalk(w, previousChild);
-                defaultAncestor = apportion(w, defaultAncestor, previousChild,
-                v);
+                defaultAncestor = apportion(w, defaultAncestor, previousChild, v);
                 previousChild = w;
             }
             executeShifts(v);
@@ -258,8 +256,7 @@ public class BranchTreeLayout implements TreeLayout{
         }else if(alignment == TreeAlignment.towardsRoot){
             y = levelStart + levelChangeSign * (getNodeThickness(v) / 2);
         }else{
-            y = levelStart + levelSize - levelChangeSign
-            * (getNodeThickness(v) / 2);
+            y = levelStart + levelSize - levelChangeSign * (getNodeThickness(v) / 2);
         }
 
         if(!levelChangeOnYAxis){

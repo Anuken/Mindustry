@@ -28,12 +28,12 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
         table.row();
         for(T t : map.keys()){
             BulletType type = map.get(t);
-            table.addImage(icon(t)).size(3 * 8).padRight(4).right().top();
+            table.image(icon(t)).size(3 * 8).padRight(4).right().top();
             table.add(t.localizedName).padRight(10).left().top();
             table.table(Tex.underline, bt -> {
                 bt.left().defaults().padRight(3).left();
 
-                if(type.damage > 0){
+                if(type.damage > 0 && type.collides){
                     bt.add(Core.bundle.format("bullet.damage", type.damage));
                 }
 
@@ -51,27 +51,27 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 }
 
                 if((type.status == StatusEffects.burning || type.status == StatusEffects.melting) || type.incendAmount > 0){
-                    sep(bt, "$bullet.incendiary");
+                    sep(bt, "@bullet.incendiary");
                 }
 
                 if(type.status == StatusEffects.freezing){
-                    sep(bt, "$bullet.freezing");
+                    sep(bt, "@bullet.freezing");
                 }
 
                 if(type.status == StatusEffects.tarred){
-                    sep(bt, "$bullet.tarred");
+                    sep(bt, "@bullet.tarred");
                 }
 
                 if(type.homingPower > 0.01f){
-                    sep(bt, "$bullet.homing");
+                    sep(bt, "@bullet.homing");
                 }
 
-                if(type.lightining > 0){
-                    sep(bt, "$bullet.shock");
+                if(type.lightning > 0){
+                    sep(bt, "@bullet.shock");
                 }
 
                 if(type.fragBullet != null){
-                    sep(bt, "$bullet.frag");
+                    sep(bt, "@bullet.frag");
                 }
             }).left().padTop(-9);
             table.row();

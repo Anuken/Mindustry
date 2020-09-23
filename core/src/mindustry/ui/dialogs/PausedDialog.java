@@ -2,24 +2,23 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.input.*;
-import mindustry.core.GameState.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
-public class PausedDialog extends FloatingDialog{
+public class PausedDialog extends BaseDialog{
     private SaveDialog save = new SaveDialog();
     private LoadDialog load = new LoadDialog();
     private boolean wasClient = false;
 
     public PausedDialog(){
-        super("$menu");
+        super("@menu");
         shouldPause = true;
 
         shown(this::rebuild);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 hide();
             }
         });
@@ -29,35 +28,35 @@ public class PausedDialog extends FloatingDialog{
         cont.clear();
 
         update(() -> {
-            if(state.is(State.menu) && isShown()){
+            if(state.isMenu() && isShown()){
                 hide();
             }
         });
 
         if(!mobile){
-            float dw = 210f;
-            cont.defaults().width(dw).height(50).pad(5f);
-
-            cont.addButton("$back", this::hide).colspan(2).width(dw * 2 + 20f);
-
+            //TODO localize
+            cont.label(() -> state.getSector() == null ? "" :
+            ("[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining() +
+                (state.rules.winWave > 0 && !state.getSector().isCaptured() ? "\n[lightgray]Reach wave[accent] " + state.rules.winWave + "[] to capture" : "")))
+            .visible(() -> state.getSector() != null).colspan(2);
             cont.row();
-            if(world.isZone()){
-                cont.addButton("$techtree", ui.tech::show);
-            }else{
-                cont.addButton("$database", ui.database::show);
-            }
-            cont.addButton("$settings", ui.settings::show);
+
+            float dw = 220f;
+            cont.defaults().width(dw).height(55).pad(5f);
+
+            cont.button("@back", Icon.left, this::hide);
+            cont.button("@settings", Icon.settings, ui.settings::show);
 
             if(!state.rules.tutorial){
-                if(!world.isZone() && !state.isEditor()){
+                if(!state.isCampaign() && !state.isEditor()){
                     cont.row();
-                    cont.addButton("$savegame", save::show);
-                    cont.addButton("$loadgame", load::show).disabled(b -> net.active());
+                    cont.button("@savegame", Icon.save, save::show);
+                    cont.button("@loadgame", Icon.upload, load::show).disabled(b -> net.active());
                 }
 
                 cont.row();
 
-                cont.addButton("$hostserver", () -> {
+                cont.button("@hostserver", Icon.host, () -> {
                     if(net.server() && steam){
                         platform.inviteFriends();
                     }else{
@@ -67,39 +66,53 @@ public class PausedDialog extends FloatingDialog{
                             ui.host.show();
                         }
                     }
-                }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.server() && steam ? "$invitefriends" : "$hostserver"));
+                }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
             }
 
             cont.row();
 
-            cont.addButton("$quit", this::showQuitConfirm).colspan(2).width(dw + 10f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
+            cont.button("@quit", Icon.exit, this::showQuitConfirm).colspan(2).width(dw + 20f).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit"));
 
         }else{
             cont.defaults().size(130f).pad(5);
-            cont.addRowImageTextButton("$back", Icon.play2, this::hide);
-            cont.addRowImageTextButton("$settings", Icon.tools, ui.settings::show);
+            cont.buttonRow("@back", Icon.play, this::hide);
+            cont.buttonRow("@settings", Icon.settings, ui.settings::show);
 
-            if(!world.isZone() && !state.isEditor()){
-                cont.addRowImageTextButton("$save", Icon.save, save::show);
+            if(!state.isCampaign() && !state.isEditor()){
+                cont.buttonRow("@save", Icon.save, save::show);
 
                 cont.row();
 
-                cont.addRowImageTextButton("$load", Icon.load, load::show).disabled(b -> net.active());
+                cont.buttonRow("@load", Icon.download, load::show).disabled(b -> net.active());
+            }else if(state.isCampaign()){
+                cont.buttonRow("@launchcore", Icon.up, () -> {
+                    hide();
+                    ui.planet.show(state.getSector(), player.team().core());
+                }).disabled(b -> player.team().core() == null);
+
+                cont.row();
+
+                cont.buttonRow("@planetmap", Icon.map, () -> {
+                    hide();
+                    ui.planet.show();
+                });
             }else{
                 cont.row();
             }
 
-            cont.addRowImageTextButton("$hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
+            cont.buttonRow("@hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
-            cont.addRowImageTextButton("$quit", Icon.quit, this::showQuitConfirm).update(s -> s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "$save.quit" : "$quit"));
+            cont.buttonRow("@quit", Icon.exit, this::showQuitConfirm).update(s -> {
+                s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit");
+                s.getLabelCell().growX().wrap();
+            });
         }
     }
 
     void showQuitConfirm(){
-        ui.showConfirm("$confirm", state.rules.tutorial ? "$quit.confirm.tutorial" : "$quit.confirm", () -> {
+        ui.showConfirm("@confirm", state.rules.tutorial ? "@quit.confirm.tutorial" : "@quit.confirm", () -> {
             if(state.rules.tutorial){
                 Core.settings.put("playedtutorial", true);
-                Core.settings.save();
             }
             wasClient = net.client();
             if(net.client()) netClient.disconnectQuietly();
@@ -115,19 +128,17 @@ public class PausedDialog extends FloatingDialog{
         }
 
         if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || state.rules.tutorial || wasClient){
-            state.set(State.menu);
             logic.reset();
             return;
         }
 
-        ui.loadAnd("$saveload", () -> {
+        ui.loadAnd("@saving", () -> {
             try{
                 control.saves.getCurrent().save();
             }catch(Throwable e){
                 e.printStackTrace();
                 ui.showException("[accent]" + Core.bundle.get("savefail"), e);
             }
-            state.set(State.menu);
             logic.reset();
         });
     }

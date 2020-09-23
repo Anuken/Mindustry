@@ -3,15 +3,25 @@ package mindustry.graphics;
 import arc.graphics.Color;
 
 public class Pal{
-    public static final Color
+    public static Color
 
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
-    bulletYellow = Color.valueOf("ffeec9"),
-    bulletYellowBack = Color.valueOf("f9c87a"),
+    sap = Color.valueOf("665c9f"),
+    sapBullet = Color.valueOf("bf92f9"),
+    sapBulletBack = Color.valueOf("6d56bf"),
+
+    spore = Color.valueOf("7457ce"),
+
+    shield = Color.valueOf("ffd37f").a(0.7f),
+    shieldIn = Color.black.cpy().a(0f),
+
+    bulletYellow = Color.valueOf("fff8e8"),
+    bulletYellowBack = Color.valueOf("f9c27a"),
 
     darkMetal = Color.valueOf("6e7080"),
+    darkerMetal = Color.valueOf("565666"),
 
     missileYellow = Color.valueOf("ffd2ae"),
     missileYellowBack = Color.valueOf("e58956"),
@@ -23,8 +33,6 @@ public class Pal{
 
     lightFlame = Color.valueOf("ffdd55"),
     darkFlame = Color.valueOf("db401c"),
-
-    power2 = Color.valueOf("ff9f6c"),
 
     lightPyraFlame = Color.valueOf("ffb855"),
     darkPyraFlame = Color.valueOf("db661c"),
@@ -38,6 +46,7 @@ public class Pal{
     lightishGray = Color.valueOf("a2a2a2"),
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
     darkerGray = new Color(0.2f, 0.2f, 0.2f, 1f),
+    darkestGray = new Color(0.1f, 0.1f, 0.1f, 1f),
     ammo = Color.valueOf("ff8947"),
     rubble = Color.valueOf("1c1817"),
 
@@ -55,6 +64,7 @@ public class Pal{
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),
     gray = Color.valueOf("454545"),
+    metalGrayDark = Color.valueOf("6e7080"),
     accentBack = Color.valueOf("d4816b"),
     place = Color.valueOf("6335f8"),
     remove = Color.valueOf("e55454"),

@@ -1,21 +1,17 @@
 package mindustry.world;
 
 import arc.util.*;
-import mindustry.type.Item;
-
-import java.io.*;
+import arc.util.io.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.content;
 
 public class ItemBuffer{
-    private final float speed;
-
     private long[] buffer;
     private int index;
 
-    public ItemBuffer(int capacity, float speed){
+    public ItemBuffer(int capacity){
         this.buffer = new long[capacity];
-        this.speed = speed;
     }
 
     public boolean accepts(){
@@ -24,14 +20,14 @@ public class ItemBuffer{
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index++] = Pack.longInt(Float.floatToIntBits(Time.time()), Pack.shortInt((short)item.id, data));
+        buffer[index++] = Pack.longInt(Float.floatToIntBits(Time.time()), Pack.shortInt(item.id, data));
     }
 
     public void accept(Item item){
         accept(item, (short)-1);
     }
 
-    public Item poll(){
+    public Item poll(float speed){
         if(index > 0){
             long l = buffer[0];
             float time = Float.intBitsToFloat(Pack.leftInt(l));
@@ -43,36 +39,24 @@ public class ItemBuffer{
         return null;
     }
 
-    public short pollData(){
-        if(index > 0){
-            long l = buffer[0];
-            float time = Float.intBitsToFloat(Pack.leftInt(l));
-
-            if(Time.time() >= time + speed || Time.time() < time){
-                return Pack.rightShort(Pack.rightInt(l));
-            }
-        }
-        return -1;
-    }
-
     public void remove(){
         System.arraycopy(buffer, 1, buffer, 0, index - 1);
         index--;
     }
 
-    public void write(DataOutput stream) throws IOException{
-        stream.writeByte((byte)index);
-        stream.writeByte((byte)buffer.length);
+    public void write(Writes write){
+        write.b((byte)index);
+        write.b((byte)buffer.length);
         for(long l : buffer){
-            stream.writeLong(l);
+            write.l(l);
         }
     }
 
-    public void read(DataInput stream) throws IOException{
-        index = stream.readByte();
-        byte length = stream.readByte();
+    public void read(Reads read){
+        index = read.b();
+        byte length = read.b();
         for(int i = 0; i < length; i++){
-            long l = stream.readLong();
+            long l = read.l();
             if(i < buffer.length){
                 buffer[i] = l;
             }

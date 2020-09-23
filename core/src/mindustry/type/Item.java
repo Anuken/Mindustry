@@ -4,17 +4,14 @@ import arc.struct.*;
 import arc.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.ctype.*;
-import mindustry.ctype.ContentType;
 import mindustry.ui.*;
-import mindustry.world.blocks.*;
+import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.content;
 
 public class Item extends UnlockableContent{
     public final Color color;
 
-    /** type of the item; used for tabs and core acceptance. default value is {@link ItemType#resource}. */
-    public ItemType type = ItemType.resource;
     /** how explosive this item is. */
     public float explosiveness = 0f;
     /** flammability above 0.3 makes this eleigible for item burners. */
@@ -28,8 +25,6 @@ public class Item extends UnlockableContent{
      * 1 cost = 1 tick added to build time
      */
     public float cost = 1f;
-    /** If true, item is always unlocked. */
-    public boolean alwaysUnlocked = false;
 
     public Item(String name, Color color){
         super(name);
@@ -38,11 +33,6 @@ public class Item extends UnlockableContent{
 
     public Item(String name){
         this(name, new Color(Color.black));
-    }
-
-    @Override
-    public boolean alwaysUnlocked(){
-        return alwaysUnlocked;
     }
 
     @Override
@@ -61,7 +51,7 @@ public class Item extends UnlockableContent{
     }
 
     /** Allocates a new array containing all items that generate ores. */
-    public static Array<Item> getAllOres(){
+    public static Seq<Item> getAllOres(){
         return content.blocks().select(b -> b instanceof OreBlock).map(b -> ((Floor)b).itemDrop);
     }
 }

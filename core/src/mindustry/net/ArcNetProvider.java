@@ -1,10 +1,10 @@
 package mindustry.net;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.net.*;
 import arc.net.FrameworkMessage.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.pooling.*;
@@ -21,14 +21,16 @@ import static mindustry.Vars.*;
 
 public class ArcNetProvider implements NetProvider{
     final Client client;
-    final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[256], 256);
+    final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
     Thread serverThread;
 
     public ArcNetProvider(){
-        client = new Client(8192, 4096, new PacketSerializer());
+        ArcNet.errorHandler = e -> Log.debug(Strings.getStackTrace(e));
+
+        client = new Client(8192, 8192, new PacketSerializer());
         client.setDiscoveryPacket(packetSupplier);
         client.addListener(new NetListener(){
             @Override
@@ -58,15 +60,15 @@ public class ArcNetProvider implements NetProvider{
                 Core.app.post(() -> {
                     try{
                         net.handleClientReceived(object);
-                    }catch(Exception e){
-                        handleException(e);
+                    }catch(Throwable e){
+                        net.handleException(e);
                     }
                 });
 
             }
         });
 
-        server = new Server(4096 * 2, 4096, new PacketSerializer());
+        server = new Server(8192, 8192, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
@@ -85,7 +87,7 @@ public class ArcNetProvider implements NetProvider{
                 Connect c = new Connect();
                 c.addressTCP = ip;
 
-                Log.debug("&bRecieved connection: {0}", c.addressTCP);
+                Log.debug("&bReceived connection: @", c.addressTCP);
 
                 connections.add(kn);
                 Core.app.post(() -> net.handleServerReceived(kn, c));
@@ -113,14 +115,7 @@ public class ArcNetProvider implements NetProvider{
                 Core.app.post(() -> {
                     try{
                         net.handleServerReceived(k, object);
-                    }catch(RuntimeException e){
-                        if(e.getCause() instanceof ValidateException){
-                            ValidateException v = (ValidateException)e.getCause();
-                            Log.err("Validation failed: {0} ({1})", v.player.name, v.getMessage());
-                        }else{
-                            e.printStackTrace();
-                        }
-                    }catch(Exception e){
+                    }catch(Throwable e){
                         e.printStackTrace();
                     }
                 });
@@ -149,14 +144,14 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         client.run();
                     }catch(Exception e){
-                        if(!(e instanceof ClosedSelectorException)) handleException(e);
+                        if(!(e instanceof ClosedSelectorException)) net.handleException(e);
                     }
                 });
 
                 client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
-                handleException(e);
+                net.handleException(e);
             }
         });
     }
@@ -187,6 +182,7 @@ public class ArcNetProvider implements NetProvider{
         Threads.daemon(() -> {
             try{
                 DatagramSocket socket = new DatagramSocket();
+                long time = Time.millis();
                 socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
                 socket.setSoTimeout(2000);
 
@@ -194,7 +190,7 @@ public class ArcNetProvider implements NetProvider{
                 socket.receive(packet);
 
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
+                Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
 
                 Core.app.post(() -> valid.get(host));
             }catch(Exception e){
@@ -205,7 +201,8 @@ public class ArcNetProvider implements NetProvider{
 
     @Override
     public void discoverServers(Cons<Host> callback, Runnable done){
-        Array<InetAddress> foundAddresses = new Array<>();
+        Seq<InetAddress> foundAddresses = new Seq<>();
+        long time = Time.millis();
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
             Core.app.post(() -> {
                 try{
@@ -213,7 +210,7 @@ public class ArcNetProvider implements NetProvider{
                         return;
                     }
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                    Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
+                    Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
                     callback.get(host);
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
@@ -270,16 +267,6 @@ public class ArcNetProvider implements NetProvider{
         }
 
         return null;
-    }
-
-    private void handleException(Exception e){
-        if(e instanceof ArcNetException){
-            Core.app.post(() -> net.showError(new IOException("mismatch")));
-        }else if(e instanceof ClosedChannelException){
-            Core.app.post(() -> net.showError(new IOException("alreadyconnected")));
-        }else{
-            Core.app.post(() -> net.showError(e));
-        }
     }
 
     class ArcConnection extends NetConnection{
@@ -346,7 +333,6 @@ public class ArcNetProvider implements NetProvider{
 
     @SuppressWarnings("unchecked")
     public static class PacketSerializer implements NetSerializer{
-        static Cons2<Packet, ByteBuffer> writer = Packet::write;
 
         @Override
         public Object read(ByteBuffer byteBuffer){
@@ -366,13 +352,11 @@ public class ArcNetProvider implements NetProvider{
                 byteBuffer.put((byte)-2); //code for framework message
                 writeFramework(byteBuffer, (FrameworkMessage)o);
             }else{
-                if(!(o instanceof Packet))
-                    throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
+                if(!(o instanceof Packet)) throw new RuntimeException("All sent objects must implement be Packets! Class: " + o.getClass());
                 byte id = Registrator.getID(o.getClass());
-                if(id == -1)
-                    throw new RuntimeException("Unregistered class: " + o.getClass());
+                if(id == -1) throw new RuntimeException("Unregistered class: " + o.getClass());
                 byteBuffer.put(id);
-                writer.get((Packet)o, byteBuffer);
+                ((Packet)o).write(byteBuffer);
             }
         }
 

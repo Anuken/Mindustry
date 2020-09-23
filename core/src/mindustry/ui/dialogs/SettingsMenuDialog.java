@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -12,7 +11,9 @@ import arc.scene.ui.*;
 import arc.scene.ui.SettingsDialog.SettingsTable.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
@@ -21,7 +22,11 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 
-import static arc.Core.bundle;
+import java.io.*;
+import java.util.zip.*;
+
+import static arc.Core.*;
+import static mindustry.Vars.net;
 import static mindustry.Vars.*;
 
 public class SettingsMenuDialog extends SettingsDialog{
@@ -31,13 +36,13 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     private Table prefs;
     private Table menu;
-    private FloatingDialog dataDialog;
+    private BaseDialog dataDialog;
     private boolean wasPaused;
 
     public SettingsMenuDialog(){
         hidden(() -> {
             Sounds.back.play();
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 if(!wasPaused || net.active())
                     state.set(State.playing);
             }
@@ -45,7 +50,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         shown(() -> {
             back();
-            if(!state.is(State.menu)){
+            if(state.isGame()){
                 wasPaused = state.is(State.paused);
                 state.set(State.paused);
             }
@@ -77,14 +82,14 @@ public class SettingsMenuDialog extends SettingsDialog{
         prefs.clearChildren();
         prefs.add(menu);
 
-        dataDialog = new FloatingDialog("$settings.data");
+        dataDialog = new BaseDialog("@settings.data");
         dataDialog.addCloseButton();
 
         dataDialog.cont.table(Tex.button, t -> {
-            t.defaults().size(240f, 60f).left();
+            t.defaults().size(280f, 60f).left();
             TextButtonStyle style = Styles.cleart;
 
-            t.addButton("$settings.cleardata", style, () -> ui.showConfirm("$confirm", "$settings.clearall.confirm", () -> {
+            t.button("@settings.cleardata", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
                 for(String value : Core.settings.keys()){
                     if(value.contains("usid") || value.contains("uuid")){
@@ -93,22 +98,29 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }
                 Core.settings.clear();
                 Core.settings.putAll(map);
-                Core.settings.save();
 
                 for(Fi file : dataDirectory.list()){
                     file.deleteDirectory();
                 }
 
                 Core.app.exit();
-            }));
+            })).marginLeft(4);
 
             t.row();
 
-            t.addButton("$data.export", style, () -> {
+            t.button("@settings.clearsaves", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> {
+                    control.saves.deleteAll();
+                });
+            }).marginLeft(4);
+
+            t.row();
+
+            t.button("@data.export", Icon.upload, style, () -> {
                 if(ios){
                     Fi file = Core.files.local("mindustry-data-export.zip");
                     try{
-                        data.exportData(file);
+                        exportData(file);
                     }catch(Exception e){
                         ui.showException(e);
                     }
@@ -116,33 +128,38 @@ public class SettingsMenuDialog extends SettingsDialog{
                 }else{
                     platform.showFileChooser(false, "zip", file -> {
                         try{
-                            data.exportData(file);
-                            ui.showInfo("$data.exported");
+                            exportData(file);
+                            ui.showInfo("@data.exported");
                         }catch(Exception e){
                             e.printStackTrace();
                             ui.showException(e);
                         }
                     });
                 }
-            });
+            }).marginLeft(4);
 
             t.row();
 
-            t.addButton("$data.import", style, () -> ui.showConfirm("$confirm", "$data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+            t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
                 try{
-                    data.importData(file);
+                    importData(file);
                     Core.app.exit();
                 }catch(IllegalArgumentException e){
-                    ui.showErrorMessage("$data.invalid");
+                    ui.showErrorMessage("@data.invalid");
                 }catch(Exception e){
                     e.printStackTrace();
                     if(e.getMessage() == null || !e.getMessage().contains("too short")){
                         ui.showException(e);
                     }else{
-                        ui.showErrorMessage("$data.invalid");
+                        ui.showErrorMessage("@data.invalid");
                     }
                 }
-            })));
+            }))).marginLeft(4);
+
+            if(!mobile){
+                t.row();
+                t.button("@data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath())).marginLeft(4);
+            }
         });
 
         ScrollPane pane = new ScrollPane(prefs);
@@ -180,20 +197,20 @@ public class SettingsMenuDialog extends SettingsDialog{
         TextButtonStyle style = Styles.cleart;
 
         menu.defaults().size(300f, 60f);
-        menu.addButton("$settings.game", style, () -> visible(0));
+        menu.button("@settings.game", style, () -> visible(0));
         menu.row();
-        menu.addButton("$settings.graphics", style, () -> visible(1));
+        menu.button("@settings.graphics", style, () -> visible(1));
         menu.row();
-        menu.addButton("$settings.sound", style, () -> visible(2));
+        menu.button("@settings.sound", style, () -> visible(2));
         menu.row();
-        menu.addButton("$settings.language", style, ui.language::show);
+        menu.button("@settings.language", style, ui.language::show);
         if(!mobile || Core.settings.getBool("keyboard")){
             menu.row();
-            menu.addButton("$settings.controls", style, ui.controls::show);
+            menu.button("@settings.controls", style, ui.controls::show);
         }
 
         menu.row();
-        menu.addButton("$settings.data", style, () -> dataDialog.show());
+        menu.button("@settings.data", style, () -> dataDialog.show());
     }
 
     void addSettings(){
@@ -233,17 +250,25 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             game.checkPref("buildautopause", false);
         }
+        game.checkPref("mapcenter", true);
 
-        if(steam && !Version.modifier.contains("beta")){
-            game.checkPref("publichost", false, i -> {
+        if(steam){
+            game.sliderPref("playerlimit", 16, 2, 32, i -> {
                 platform.updateLobby();
+                return i + "";
             });
+
+            if(!Version.modifier.contains("beta")){
+                game.checkPref("publichost", false, i -> {
+                    platform.updateLobby();
+                });
+            }
         }
 
         game.pref(new Setting(){
             @Override
             public void add(SettingsTable table){
-                table.addButton("$tutorial.retake", () -> {
+                table.button("@tutorial.retake", () -> {
                     hide();
                     control.playTutorial();
                 }).size(220f, 60f).pad(6).left();
@@ -267,6 +292,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
             return s + "%";
         });
+        graphics.sliderPref("bridgeopacity", 75, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
@@ -288,7 +314,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             if(Core.settings.getBool("borderlesswindow")){
                 Core.app.post(() -> Core.graphics.setUndecorated(true));
             }
-        }else{
+        }else if(!ios){
             graphics.checkPref("landscape", false, b -> {
                 if(b){
                     platform.beginForceLandscape();
@@ -303,20 +329,34 @@ public class SettingsMenuDialog extends SettingsDialog{
         }
 
         graphics.checkPref("effects", true);
+        graphics.checkPref("atmosphere", !mobile);
         graphics.checkPref("destroyedblocks", true);
+        graphics.checkPref("blockstatus", false);
         graphics.checkPref("playerchat", true);
+        if(!mobile){
+            graphics.checkPref("coreitems", false);
+        }
         graphics.checkPref("minimap", !mobile);
+        graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
         if(!mobile){
             graphics.checkPref("blockselectkeys", true);
         }
+        graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
-        graphics.checkPref("animatedwater", !mobile);
+        graphics.checkPref("animatedwater", true);
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
-        graphics.checkPref("bloom", !mobile, val -> renderer.toggleBloom(val));
+        if(!ios){
+            graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
+        }else{
+            Core.settings.put("bloom", false);
+        }
+
+
+
         graphics.checkPref("pixelate", false, val -> {
             if(val){
                 Events.fire(Trigger.enablePixelation);
@@ -325,14 +365,14 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         graphics.checkPref("linear", !mobile, b -> {
             for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = b ? TextureFilter.Linear : TextureFilter.Nearest;
+                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
                 tex.setFilter(filter, filter);
             }
         });
 
         if(Core.settings.getBool("linear")){
             for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = TextureFilter.Linear;
+                TextureFilter filter = TextureFilter.linear;
                 tex.setFilter(filter, filter);
             }
         }
@@ -340,6 +380,48 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
+
+        graphics.checkPref("flow", true);
+    }
+
+    public void exportData(Fi file) throws IOException{
+        Seq<Fi> files = new Seq<>();
+        files.add(Core.settings.getSettingsFile());
+        files.addAll(customMapDirectory.list());
+        files.addAll(saveDirectory.list());
+        files.addAll(screenshotDirectory.list());
+        files.addAll(modDirectory.list());
+        files.addAll(schematicDirectory.list());
+        String base = Core.settings.getDataDirectory().path();
+
+        try(OutputStream fos = file.write(false, 2048); ZipOutputStream zos = new ZipOutputStream(fos)){
+            for(Fi add : files){
+                if(add.isDirectory()) continue;
+                zos.putNextEntry(new ZipEntry(add.path().substring(base.length())));
+                Streams.copy(add.read(), zos);
+                zos.closeEntry();
+            }
+        }
+    }
+
+    public void importData(Fi file){
+        Fi dest = Core.files.local("zipdata.zip");
+        file.copyTo(dest);
+        Fi zipped = new ZipFi(dest);
+
+        Fi base = Core.settings.getDataDirectory();
+        if(!zipped.child("settings.bin").exists()){
+            throw new IllegalArgumentException("Not valid save data.");
+        }
+
+        //purge existing tmp data, keep everything else
+        tmpDirectory.deleteDirectory();
+
+        zipped.walk(f -> f.copyTo(base.child(f.path())));
+        dest.delete();
+
+        //load data so it's saved on exit
+        settings.load();
     }
 
     private void back(){
@@ -355,7 +437,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
     @Override
     public void addCloseButton(){
-        buttons.addImageTextButton("$back", Icon.arrowLeftSmaller, () -> {
+        buttons.button("@back", Icon.leftOpen, () -> {
             if(prefs.getChildren().first() != menu){
                 back();
             }else{
@@ -364,7 +446,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         }).size(230f, 64f);
 
         keyDown(key -> {
-            if(key == KeyCode.ESCAPE || key == KeyCode.BACK){
+            if(key == KeyCode.escape || key == KeyCode.back){
                 if(prefs.getChildren().first() != menu){
                     back();
                 }else{

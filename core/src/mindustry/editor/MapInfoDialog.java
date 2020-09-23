@@ -9,14 +9,14 @@ import mindustry.io.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
-public class MapInfoDialog extends FloatingDialog{
+public class MapInfoDialog extends BaseDialog{
     private final MapEditor editor;
     private final WaveInfoDialog waveInfo;
     private final MapGenerateDialog generate;
     private final CustomRulesDialog ruleInfo = new CustomRulesDialog();
 
     public MapInfoDialog(MapEditor editor){
-        super("$editor.mapinfo");
+        super("@editor.mapinfo");
         this.editor = editor;
         this.waveInfo = new WaveInfoDialog(editor);
         this.generate = new MapGenerateDialog(editor, false);
@@ -29,53 +29,52 @@ public class MapInfoDialog extends FloatingDialog{
     private void setup(){
         cont.clear();
 
-        ObjectMap<String, String> tags = editor.getTags();
+        ObjectMap<String, String> tags = editor.tags;
         
         cont.pane(t -> {
-            t.add("$editor.name").padRight(8).left();
+            t.add("@editor.mapname").padRight(8).left();
             t.defaults().padTop(15);
 
-            TextField name = t.addField(tags.get("name", ""), text -> {
+            TextField name = t.field(tags.get("name", ""), text -> {
                 tags.put("name", text);
-            }).size(400, 55f).get();
-            name.setMessageText("$unknown");
+            }).size(400, 55f).addInputDialog(50).get();
+            name.setMessageText("@unknown");
 
             t.row();
-            t.add("$editor.description").padRight(8).left();
+            t.add("@editor.description").padRight(8).left();
 
-            TextArea description = t.addArea(tags.get("description", ""), Styles.areaField, text -> {
+            TextArea description = t.area(tags.get("description", ""), Styles.areaField, text -> {
                 tags.put("description", text);
-            }).size(400f, 140f).get();
+            }).size(400f, 140f).addInputDialog(1000).get();
 
             t.row();
-            t.add("$editor.author").padRight(8).left();
+            t.add("@editor.author").padRight(8).left();
 
-            TextField author = t.addField(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
+            TextField author = t.field(tags.get("author", Core.settings.getString("mapAuthor", "")), text -> {
                 tags.put("author", text);
                 Core.settings.put("mapAuthor", text);
-                Core.settings.save();
-            }).size(400, 55f).get();
-            author.setMessageText("$unknown");
+            }).size(400, 55f).addInputDialog(50).get();
+            author.setMessageText("@unknown");
 
             t.row();
-            t.add("$editor.rules").padRight(8).left();
-            t.addButton("$edit", () -> {
+            t.add("@editor.rules").padRight(8).left();
+            t.button("@edit", () -> {
                 ruleInfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules());
                 hide();
             }).left().width(200f);
 
             t.row();
-            t.add("$editor.waves").padRight(8).left();
-            t.addButton("$edit", () -> {
+            t.add("@editor.waves").padRight(8).left();
+            t.button("@edit", () -> {
                 waveInfo.show();
                 hide();
             }).left().width(200f);
 
             t.row();
-            t.add("$editor.generation").padRight(8).left();
-            t.addButton("$edit", () -> {
-                generate.show(Vars.maps.readFilters(editor.getTags().get("genfilters", "")),
-                filters -> editor.getTags().put("genfilters", JsonIO.write(filters)));
+            t.add("@editor.generation").padRight(8).left();
+            t.button("@edit", () -> {
+                generate.show(Vars.maps.readFilters(editor.tags.get("genfilters", "")),
+                filters -> editor.tags.put("genfilters", JsonIO.write(filters)));
                 hide();
             }).left().width(200f);
 
@@ -83,9 +82,6 @@ public class MapInfoDialog extends FloatingDialog{
             description.change();
             author.change();
 
-            Vars.platform.addDialog(name, 50);
-            Vars.platform.addDialog(author, 50);
-            Vars.platform.addDialog(description, 1000);
             t.margin(16f);
         });
     }

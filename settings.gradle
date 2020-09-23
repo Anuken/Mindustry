@@ -1,41 +1,59 @@
 include 'desktop', 'core', 'server', 'ios', 'annotations', 'tools', 'tests'
 
-def use = { String name ->
-    include(name)
-    project(name).projectDir = new File(settingsDir, "../${name.substring(1).replace(":", "/")}")
+def use = { ... names ->
+    for(String name : names){
+        include(name)
+        project(name).projectDir = new File(settingsDir, "../${name.substring(1).replace(":", "/")}")
+    }
 }
 
-def properties = new Properties()
+def hasSdk = System.getenv("ANDROID_HOME") != null
 
-if(new File(settingsDir, 'local.properties').exists() && System.getenv("JITPACK") != "true"){
-    properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+if(new File(settingsDir, 'local.properties').exists()){
+	def properties = new Properties()
+	properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+	if(properties.containsKey("sdk.dir")) hasSdk = true
+}
 
-    if(properties.containsKey("sdk.dir")){
-        include 'android'
-    }else{
-        println("No android SDK dir found Not loading Android module.")
-    }
+if(System.getenv("JITPACK") == "true") hasSdk = false
+
+if(hasSdk){
+	include 'android'
 }else{
-    println("No local.properties found. Not loading Android module.")
+    println("No Android SDK found. Skipping Android module.")
 }
 
 if(!hasProperty("release")){
     if(new File(settingsDir, '../Arc').exists()){
-        use(':Arc')
-        use(':Arc:arc-core')
-        use(':Arc:extensions')
-        use(':Arc:extensions:freetype')
-        use(':Arc:extensions:recorder')
-        use(':Arc:extensions:arcnet')
-        use(':Arc:extensions:packer')
-        use(':Arc:backends')
-        use(':Arc:backends:backend-sdl')
-        use(':Arc:backends:backend-lwjgl3')
-        use(':Arc:backends:backend-android')
-        use(':Arc:backends:backend-robovm')
-        use(':Arc:backends:backend-headless')
+        use(
+        ':Arc',
+        ':Arc:arc-core',
+        ':Arc:extensions',
+        ':Arc:extensions:freetype',
+        ':Arc:extensions:recorder',
+        ':Arc:extensions:arcnet',
+        ':Arc:extensions:packer',
+        ':Arc:extensions:box2d',
+        ':Arc:extensions:g3d',
+        ':Arc:extensions:fx',
+        ':Arc:natives',
+        ':Arc:natives:natives-desktop',
+        ':Arc:natives:natives-android',
+        ':Arc:natives:natives-ios',
+        ':Arc:natives:natives-freetype-desktop',
+        ':Arc:natives:natives-freetype-android',
+        ':Arc:natives:natives-freetype-ios',
+        ':Arc:natives:natives-box2d-desktop',
+        ':Arc:natives:natives-box2d-android',
+        ':Arc:natives:natives-box2d-ios',
+        ':Arc:backends',
+        ':Arc:backends:backend-sdl',
+        ':Arc:backends:backend-android',
+        ':Arc:backends:backend-robovm',
+        ':Arc:backends:backend-headless'
+        )
     }
-    
+
     if(new File(settingsDir, '../Mindustry-Debug').exists()){
         include(":debug")
         project(":debug").projectDir = new File(settingsDir, "../Mindustry-Debug")

@@ -15,6 +15,11 @@ public class Mod{
 
     }
 
+    /** Called on clientside mods. Load content here. */
+    public void loadContent(){
+
+    }
+
     /** Register any commands to be used on the server side, e.g. from the console. */
     public void registerServerCommands(CommandHandler handler){
 

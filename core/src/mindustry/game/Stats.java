@@ -1,14 +1,13 @@
 package mindustry.game;
 
-import mindustry.annotations.Annotations.Serialize;
-import arc.struct.Array;
-import arc.struct.ObjectIntMap;
-import arc.math.Mathf;
+import arc.math.*;
+import arc.struct.*;
 import mindustry.type.*;
 
-@Serialize
+//TODO more stats:
+//- units constructed
 public class Stats{
-    /** Items delivered to global resoure counter. Zones only. */
+    /** Total items delivered to global resoure counter. Campaign only. */
     public ObjectIntMap<Item> itemsDelivered = new ObjectIntMap<>();
     /** Enemy (red team) units destroyed. */
     public int enemyUnitsDestroyed;
@@ -23,21 +22,24 @@ public class Stats{
     /** Friendly buildings destroyed. */
     public int buildingsDestroyed;
 
-    public RankResult calculateRank(Zone zone, boolean launched){
+    public RankResult calculateRank(Sector zone, boolean launched){
         float score = 0;
 
+        //TODO implement wave/attack mode based score
+        /*
         if(launched && zone.getRules().attackMode){
             score += 3f;
         }else if(wavesLasted >= zone.conditionWave){
             //each new launch period adds onto the rank 'points'
             score += (float)((wavesLasted - zone.conditionWave) / zone.launchPeriod + 1) * 1.2f;
-        }
+        }*/
 
-        int capacity = zone.loadout.findCore().itemCapacity;
+        //TODO implement
+        int capacity = 3000;//zone.loadout.findCore().itemCapacity;
 
         //weigh used fractions
         float frac = 0f;
-        Array<Item> obtainable = Array.with(zone.resources).select(i -> i.type == ItemType.material);
+        Seq<Item> obtainable = zone.save == null ? new Seq<>() : zone.save.meta.secinfo.resources.select(i -> i instanceof Item).as();
         for(Item item : obtainable){
             frac += Mathf.clamp((float)itemsDelivered.get(item, 0) / capacity) / (float)obtainable.size;
         }

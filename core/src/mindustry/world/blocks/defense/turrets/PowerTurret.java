@@ -1,12 +1,10 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.util.ArcAnnotate.*;
-import mindustry.entities.bullet.BulletType;
-import mindustry.world.Tile;
-import mindustry.world.meta.BlockStat;
-import mindustry.world.meta.StatUnit;
+import mindustry.entities.bullet.*;
+import mindustry.world.meta.*;
 
-public class PowerTurret extends CooledTurret{
+public class PowerTurret extends Turret{
     public @NonNull BulletType shootType;
     public float powerUse = 1f;
 
@@ -24,29 +22,34 @@ public class PowerTurret extends CooledTurret{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, entity -> ((TurretEntity)entity).target != null);
+        consumes.powerCond(powerUse, (TurretBuild entity) -> entity.target != null || (entity.logicControlled() && entity.logicShooting));
         super.init();
     }
 
-    @Override
-    public BulletType useAmmo(Tile tile){
-        //nothing used directly
-        return shootType;
-    }
+    public class PowerTurretBuild extends TurretBuild{
 
-    @Override
-    public boolean hasAmmo(Tile tile){
-        //you can always rotate, but never shoot if there's no power
-        return true;
-    }
+        @Override
+        public void updateTile(){
+            unit.ammo(power.status * unit.type().ammoCapacity);
 
-    @Override
-    public BulletType peekAmmo(Tile tile){
-        return shootType;
-    }
+            super.updateTile();
+        }
 
-    @Override
-    protected float baseReloadSpeed(Tile tile){
-        return tile.isEnemyCheat() ? 1f : tile.entity.power.status;
+        @Override
+        public BulletType useAmmo(){
+            //nothing used directly
+            return shootType;
+        }
+
+        @Override
+        public boolean hasAmmo(){
+            //you can always rotate, but never shoot if there's no power
+            return true;
+        }
+
+        @Override
+        public BulletType peekAmmo(){
+            return shootType;
+        }
     }
 }

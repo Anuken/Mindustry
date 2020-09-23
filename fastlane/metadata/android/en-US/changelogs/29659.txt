@@ -1,0 +1,10 @@
+This is the first alpha release of 6.0, a massive campaign and content update. 
+While this build has been tested in multiplayer, it still may have numerous issues. As usual, report problems on Github.
+
+There are too many changes to list here, but the important bits include:
+
+- A new unit production system, with incremental upgrades
+- Direct unit and turret control
+- Renamed and re-sprited units
+- New blocks and units
+- Naval and insect-like units

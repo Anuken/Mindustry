@@ -7,10 +7,10 @@ import mindustry.net.Administration.*;
 
 import static mindustry.Vars.*;
 
-public class BansDialog extends FloatingDialog{
+public class BansDialog extends BaseDialog{
 
     public BansDialog(){
-        super("$server.bans");
+        super("@server.bans");
 
         addCloseButton();
 
@@ -30,17 +30,17 @@ public class BansDialog extends FloatingDialog{
         pane.setFadeScrollBars(false);
 
         if(netServer.admins.getBanned().size == 0){
-            table.add("$server.bans.none");
+            table.add("@server.bans.none");
         }
 
         for(PlayerInfo info : netServer.admins.getBanned()){
             Table res = new Table(Tex.button);
             res.margin(14f);
 
-            res.labelWrap("IP: [LIGHT_GRAY]" + info.lastIP + "\n[]Name: [LIGHT_GRAY]" + info.lastName).width(w - h - 24f);
+            res.labelWrap("IP: [lightgray]" + info.lastIP + "\n[]Name: [lightgray]" + info.lastName).width(w - h - 24f);
             res.add().growX();
-            res.addImageButton(Icon.cancel, () -> {
-                ui.showConfirm("$confirm", "$confirmunban", () -> {
+            res.button(Icon.cancel, () -> {
+                ui.showConfirm("@confirm", "@confirmunban", () -> {
                     netServer.admins.unbanPlayerID(info.id);
                     setup();
                 });

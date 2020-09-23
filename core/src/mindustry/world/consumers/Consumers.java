@@ -4,7 +4,7 @@ import arc.struct.*;
 import arc.func.Boolf;
 import arc.util.Structs;
 import mindustry.Vars;
-import mindustry.entities.type.TileEntity;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.blocks.power.ConditionalConsumePower;
 import mindustry.world.meta.BlockStats;
@@ -15,6 +15,10 @@ public class Consumers{
 
     public final Bits itemFilters = new Bits(Vars.content.items().size);
     public final Bits liquidfilters = new Bits(Vars.content.liquids().size);
+
+    public boolean any(){
+        return results != null && results.length > 0;
+    }
 
     public void init(){
         results = Structs.filter(Consume.class, map, m -> m != null);
@@ -28,6 +32,10 @@ public class Consumers{
 
     public ConsumePower getPower(){
         return get(ConsumeType.power);
+    }
+
+    public ConsumeItems getItem(){
+        return get(ConsumeType.item);
     }
 
     public boolean hasPower(){
@@ -48,8 +56,8 @@ public class Consumers{
     }
 
     /** Creates a consumer which only consumes power when the condition is met. */
-    public ConsumePower powerCond(float usage, Boolf<TileEntity> cons){
-        return add(new ConditionalConsumePower(usage, cons));
+    public <T extends Building> ConsumePower powerCond(float usage, Boolf<T> cons){
+        return add(new ConditionalConsumePower(usage, (Boolf<Building>)cons));
     }
 
     /**

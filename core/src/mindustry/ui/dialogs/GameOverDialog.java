@@ -1,20 +1,19 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import mindustry.core.GameState.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Stats.*;
+import mindustry.game.*;
 import mindustry.type.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class GameOverDialog extends FloatingDialog{
+public class GameOverDialog extends BaseDialog{
     private Team winner;
 
     public GameOverDialog(){
-        super("$gameover");
+        super("@gameover");
         setFillParent(true);
         shown(this::rebuild);
     }
@@ -22,7 +21,7 @@ public class GameOverDialog extends FloatingDialog{
     public void show(Team winner){
         this.winner = winner;
         show();
-        if(winner == player.getTeam()){
+        if(winner == player.team()){
             Events.fire(new WinEvent());
         }else{
             Events.fire(new LoseEvent());
@@ -30,7 +29,7 @@ public class GameOverDialog extends FloatingDialog{
     }
 
     void rebuild(){
-        title.setText(state.launched ? "$launch.title" : "$gameover");
+        title.setText(state.launched ? "@launch.title" : "@gameover");
         buttons.clear();
         cont.clear();
 
@@ -38,14 +37,13 @@ public class GameOverDialog extends FloatingDialog{
 
         if(state.rules.pvp){
             cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
-            buttons.addButton("$menu", () -> {
+            buttons.button("@menu", () -> {
                 hide();
-                state.set(State.menu);
                 logic.reset();
             }).size(130f, 60f);
         }else{
             if(control.isHighScore()){
-                cont.add("$highscore").pad(6);
+                cont.add("@highscore").pad(6);
                 cont.row();
             }
 
@@ -62,38 +60,40 @@ public class GameOverDialog extends FloatingDialog{
                 t.row();
                 t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed));
                 t.row();
-                if(world.isZone() && !state.stats.itemsDelivered.isEmpty()){
-                    t.add("$stat.delivered");
+                if(control.saves.getCurrent() != null){
+                    t.add(Core.bundle.format("stat.playtime", control.saves.getCurrent().getPlayTime()));
+                    t.row();
+                }
+                if(state.isCampaign() && !state.stats.itemsDelivered.isEmpty()){
+                    t.add("@stat.delivered");
                     t.row();
                     for(Item item : content.items()){
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             t.table(items -> {
-                                items.add("    [LIGHT_GRAY]" + state.stats.itemsDelivered.get(item, 0));
-                                items.addImage(item.icon(Cicon.small)).size(8 * 3).pad(4);
+                                items.add("    [lightgray]" + state.stats.itemsDelivered.get(item, 0));
+                                items.image(item.icon(Cicon.small)).size(8 * 3).pad(4);
                             }).left();
                             t.row();
                         }
                     }
                 }
 
-                if(world.isZone()){
-                    RankResult result = state.stats.calculateRank(world.getZone(), state.launched);
+                if(state.hasSector()){
+                    RankResult result = state.stats.calculateRank(state.getSector(), state.launched);
                     t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
                     t.row();
                 }
             }).pad(12);
 
-            if(world.isZone()){
-                buttons.addButton("$continue", () -> {
+            if(state.isCampaign()){
+                buttons.button("@continue", () -> {
                     hide();
-                    state.set(State.menu);
                     logic.reset();
-                    ui.deploy.show();
+                    ui.planet.show();
                 }).size(130f, 60f);
             }else{
-                buttons.addButton("$menu", () -> {
+                buttons.button("@menu", () -> {
                     hide();
-                    state.set(State.menu);
                     logic.reset();
                 }).size(130f, 60f);
             }

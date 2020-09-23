@@ -1,4 +1,5 @@
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import org.junit.jupiter.api.*;
@@ -41,9 +42,9 @@ public class IOTests{
         rules.attackMode = true;
         rules.buildSpeedMultiplier = 99f;
 
-        TypeIO.writeRules(buffer, rules);
+        TypeIO.writeRules(new Writes(new ByteBufferOutput(buffer)), rules);
         buffer.position(0);
-        Rules res = TypeIO.readRules(buffer);
+        Rules res = TypeIO.readRules(new Reads(new ByteBufferInput(buffer)));
 
         assertEquals(rules.buildSpeedMultiplier, res.buildSpeedMultiplier);
         assertEquals(rules.attackMode, res.attackMode);

@@ -1,6 +1,6 @@
 package mindustry.net;
 
-import mindustry.entities.type.Player;
+import mindustry.gen.*;
 
 /**
  * Thrown when a client sends invalid information.

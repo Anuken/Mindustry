@@ -1,41 +1,75 @@
 package mindustry.world.modules;
 
 import arc.math.*;
-import mindustry.type.Liquid;
+import arc.util.*;
+import arc.util.ArcAnnotate.*;
+import arc.util.io.*;
+import mindustry.type.*;
 
-import java.io.*;
-import java.util.Arrays;
+import java.util.*;
 
 import static mindustry.Vars.content;
 
 public class LiquidModule extends BlockModule{
+    private static final int windowSize = 3, updateInterval = 60;
+    private static final Interval flowTimer = new Interval(2);
+    private static final float pollScl = 20f;
+
     private float[] liquids = new float[content.liquids().size];
     private float total;
     private Liquid current = content.liquid(0);
     private float smoothLiquid;
 
-    public void update(){
+    private boolean hadFlow;
+    private @Nullable WindowedMean flow;
+    private float lastAdded, currentFlowRate;
+
+    public void update(boolean showFlow){
         smoothLiquid = Mathf.lerpDelta(smoothLiquid, currentAmount(), 0.1f);
+        if(showFlow){
+            if(flowTimer.get(1, pollScl)){
+
+                if(flow == null) flow = new WindowedMean(windowSize);
+                if(lastAdded > 0.0001f) hadFlow = true;
+
+                flow.add(lastAdded);
+                lastAdded = 0;
+                if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
+                    currentFlowRate = flow.hasEnoughData() ? flow.mean() / pollScl : -1f;
+                }
+            }
+        }else{
+            currentFlowRate = -1f;
+            flow = null;
+            hadFlow = false;
+        }
+    }
+
+    /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
+    public float getFlowRate(){
+        return currentFlowRate * 60;
+    }
+
+    public boolean hadFlow(){
+        return hadFlow;
     }
 
     public float smoothAmount(){
         return smoothLiquid;
     }
 
-    /** Returns total amount of liquids. */
+    /** @return total amount of liquids. */
     public float total(){
         return total;
     }
 
-    /** Last recieved or loaded liquid. Only valid for liquid modules with 1 type of liquid. */
+    /** Last received or loaded liquid. Only valid for liquid modules with 1 type of liquid. */
     public Liquid current(){
         return current;
     }
 
     public void reset(Liquid liquid, float amount){
-        for(int i = 0; i < liquids.length; i++){
-            liquids[i] = 0f;
-        }
+        Arrays.fill(liquids, 0f);
         liquids[liquid.id] = amount;
         total = amount;
         current = liquid;
@@ -58,6 +92,10 @@ public class LiquidModule extends BlockModule{
         liquids[liquid.id] += amount;
         total += amount;
         current = liquid;
+
+        if(flow != null){
+            lastAdded += Math.max(amount, 0);
+        }
     }
 
     public void remove(Liquid liquid, float amount){
@@ -83,30 +121,31 @@ public class LiquidModule extends BlockModule{
     }
 
     @Override
-    public void write(DataOutput stream) throws IOException{
-        byte amount = 0;
+    public void write(Writes write){
+        int amount = 0;
         for(float liquid : liquids){
             if(liquid > 0) amount++;
         }
 
-        stream.writeByte(amount); //amount of liquids
+        write.s(amount); //amount of liquids
 
         for(int i = 0; i < liquids.length; i++){
             if(liquids[i] > 0){
-                stream.writeByte(i); //liquid ID
-                stream.writeFloat(liquids[i]); //item amount
+                write.s(i); //liquid ID
+                write.f(liquids[i]); //liquid amount
             }
         }
     }
 
     @Override
-    public void read(DataInput stream) throws IOException{
+    public void read(Reads read, boolean legacy){
         Arrays.fill(liquids, 0);
-        byte count = stream.readByte();
+        total = 0f;
+        int count = legacy ? read.ub() : read.s();
 
         for(int j = 0; j < count; j++){
-            int liquidid = stream.readByte();
-            float amount = stream.readFloat();
+            int liquidid = legacy ? read.ub() : read.s();
+            float amount = read.f();
             liquids[liquidid] = amount;
             if(amount > 0){
                 current = content.liquid(liquidid);

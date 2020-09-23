@@ -16,14 +16,14 @@ public class FadeInFragment extends Fragment{
         parent.addChild(new Element(){
             {
                 setFillParent(true);
-                touchable(Touchable.disabled);
+                this.touchable = Touchable.disabled;
             }
 
              @Override
              public void draw(){
-                Draw.color(0f, 0f, 0f, Mathf.clamp(1f - time));
-                Fill.crect(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
-                Draw.color();
+                 Draw.color(0f, 0f, 0f, Mathf.clamp(1f - time));
+                 Fill.crect(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
+                 Draw.color();
              }
 
             @Override

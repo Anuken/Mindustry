@@ -1,9 +1,9 @@
 import com.badlogicgames.packr.Packr
 import com.badlogicgames.packr.PackrConfig
 
-apply plugin: "java"
+import java.nio.ByteBuffer
+import java.security.MessageDigest
 
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "mindustry.desktop.DesktopLauncher"
@@ -11,7 +11,28 @@ project.ext.assetsDir = new File("../core/assets")
 
 def enableTemplates = true
 def JDK_DIR = "$System.env.JDK_DIR"
-def ICON_DIR = new File("core/assets/icons/icon.icns")
+def ICON_DIR = new File("$rootDir/core/assets/icons/icon.icns")
+def spriteHashFile = new File(project.rootDir, "build/spritehash")
+
+def hashDirectory = {
+    def root = new File(project.rootDir, "core/assets-raw/sprites/")
+    MessageDigest digest = MessageDigest.getInstance("MD5")
+    ByteBuffer buffer = ByteBuffer.allocate(16)
+    def files = []
+    root.eachFileRecurse{ file ->
+        if(!file.name.startsWith(".")) files += file
+    }
+
+    files.sort()
+
+    for(File file : files){
+        buffer.position(0)
+        buffer.putLong(file.lastModified())
+        digest.update(buffer.array())
+    }
+
+    return digest.digest().encodeHex()
+}
 
 task run(dependsOn: classes, type: JavaExec){
     main = project.mainClassName
@@ -23,6 +44,13 @@ task run(dependsOn: classes, type: JavaExec){
     if(System.getProperty("os.name").toLowerCase().contains("mac")){
         jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
     }
+
+    /*spriteHashFile.parentFile.mkdirs()
+    String spriteHash = hashDirectory()
+    if(spriteHashFile.exists() && spriteHashFile.text != spriteHash){
+        dependsOn ":tools:pack"
+    }
+    spriteHashFile.text = spriteHash*/
 
     if(project.hasProperty("args")){
         args Eval.me(project.getProperties()["args"])
@@ -38,10 +66,10 @@ task run(dependsOn: classes, type: JavaExec){
 }
 
 
-task dist(type: Jar, dependsOn: classes){
+task dist(type: Jar, dependsOn: configurations.runtimeClasspath){
     from files(sourceSets.main.output.classesDirs)
     from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
+    from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
     from files(project.assetsDir)
 
     archiveFileName = "${appName}.jar"
@@ -99,13 +127,13 @@ PackrConfig.Platform.values().each{ platform ->
                     verbose = true
                     bundleIdentifier = getPackage() + ".mac"
                     iconResource = ICON_DIR
-                    outDir = file("build/packr/output")
+                    outDir = file("$rootDir/desktop/build/packr/output")
                     mainClass = project.ext.mainClassName
-                    classpath = ["desktop/build/packr/desktop.jar"]
-                    removePlatformLibs = ["desktop/build/packr/desktop.jar"]
+                    classpath = ["$rootDir/desktop/build/packr/desktop.jar".toString()]
+                    removePlatformLibs = ["$rootDir/desktop/build/packr/desktop.jar".toString()]
 
-                    vmArgs = ["Djava.net.preferIPv4Stack=true"]
-                    minimizeJre = "desktop/packr_minimize.json"
+                    vmArgs = []
+                    minimizeJre = "$rootDir/desktop/packr_minimize.json".toString()
                     jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
 
                     if(platform == PackrConfig.Platform.MacOS){

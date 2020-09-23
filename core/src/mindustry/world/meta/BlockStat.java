@@ -8,12 +8,14 @@ import java.util.Locale;
 public enum BlockStat{
     health(StatCategory.general),
     size(StatCategory.general),
+    displaySize(StatCategory.general),
     buildTime(StatCategory.general),
     buildCost(StatCategory.general),
 
     itemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),
     launchTime(StatCategory.items),
+    maxConsecutive(StatCategory.items),
 
     liquidCapacity(StatCategory.liquids),
 
@@ -24,12 +26,15 @@ public enum BlockStat{
     powerConnections(StatCategory.power),
     basePowerGeneration(StatCategory.power),
 
+    tiles(StatCategory.crafting),
     input(StatCategory.crafting),
     output(StatCategory.crafting),
     productionTime(StatCategory.crafting),
     drillTier(StatCategory.crafting),
     drillSpeed(StatCategory.crafting),
     maxUnits(StatCategory.crafting),
+    linkRange(StatCategory.crafting),
+    instructions(StatCategory.crafting),
 
     speedIncrease(StatCategory.shooting),
     repairTime(StatCategory.shooting),
@@ -43,9 +48,12 @@ public enum BlockStat{
     targetsGround(StatCategory.shooting),
     damage(StatCategory.shooting),
     ammo(StatCategory.shooting),
+    shieldHealth(StatCategory.shooting),
+    cooldownTime(StatCategory.shooting),
 
     booster(StatCategory.optional),
-    boostEffect(StatCategory.optional);
+    boostEffect(StatCategory.optional),
+    affinities(StatCategory.optional);
 
     public final StatCategory category;
 

@@ -1,8 +1,6 @@
 package mindustry.ui.fragments;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
@@ -13,56 +11,75 @@ import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.Stack;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.core.GameState.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.net.Administration.*;
+import mindustry.net.*;
 import mindustry.type.*;
-import mindustry.ui.Cicon;
-import mindustry.world.*;
+import mindustry.ui.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class BlockInventoryFragment extends Fragment{
-    private final static float holdWithdraw = 20f;
+    private static final float holdWithdraw = 20f;
+    private static final float holdShrink = 120f;
 
-    private Table table = new Table();
-    private Tile tile;
-    private float holdTime = 0f;
-    private boolean holding;
-    private Item lastItem;
+    Table table = new Table();
+    Building tile;
+    float holdTime = 0f, emptyTime;
+    boolean holding;
+    float[] shrinkHoldTimes = new float[content.items().size];
+    Item lastItem;
+
+    {
+        Events.on(WorldLoadEvent.class, e -> hide());
+    }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void requestItem(Player player, Tile tile, Item item, int amount){
-        if(player == null || tile == null || !player.timer.get(Player.timerTransfer, 20) || !tile.interactable(player.getTeam())) return;
-        if(!Units.canInteract(player, tile)) return;
+    public static void requestItem(Player player, Building tile, Item item, int amount){
+        if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange)) return;
+        amount = Math.min(player.unit().maxAccepted(item), amount);
+        int fa = amount;
 
-        int removed = tile.block().removeStack(tile, item, amount);
+        if(amount == 0) return;
 
-        player.addItem(item, removed);
+        if(net.server() && (!Units.canInteract(player, tile) ||
+            !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
+                action.item = item;
+                action.itemAmount = fa;
+            }))) throw new ValidateException(player, "Player cannot request items.");
+
+        int removed = tile.removeStack(item, amount);
+
+        player.unit().addItem(item, removed);
         Events.fire(new WithdrawEvent(tile, player, item, amount));
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.drawx(), tile.drawy(), player));
+            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x, tile.y, player.unit()));
         }
     }
 
     @Override
     public void build(Group parent){
-        table.setName("inventory");
+        table.name = "inventory";
         table.setTransform(true);
         parent.setTransform(true);
         parent.addChild(table);
     }
 
-    public void showFor(Tile t){
+    public void showFor(Building t){
         if(this.tile == t){
             hide();
             return;
         }
         this.tile = t;
-        if(tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0)
+        if(tile == null || !tile.block.isAccessible() || tile.items.total() == 0)
             return;
         rebuild(true);
     }
@@ -70,33 +87,41 @@ public class BlockInventoryFragment extends Fragment{
     public void hide(){
         if(table == null) return;
 
-        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interpolation.pow3Out), Actions.run(() -> {
+        table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.run(() -> {
             table.clearChildren();
             table.clearListeners();
             table.update(null);
         }), Actions.visible(false));
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         tile = null;
     }
 
     private void rebuild(boolean actions){
-
         IntSet container = new IntSet();
+
+        Arrays.fill(shrinkHoldTimes, 0);
+        holdTime = emptyTime = 0f;
 
         table.clearChildren();
         table.clearActions();
         table.background(Tex.inventory);
-        table.touchable(Touchable.enabled);
+        table.touchable = Touchable.enabled;
         table.update(() -> {
 
-            if(state.is(State.menu) || tile == null || tile.entity == null || !tile.block().isAccessible() || tile.entity.items.total() == 0){
+            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block.isAccessible() || emptyTime >= holdShrink){
                 hide();
             }else{
+                if(tile.items.total() == 0){
+                    emptyTime += Time.delta;
+                }else{
+                    emptyTime = 0f;
+                }
+
                 if(holding && lastItem != null){
-                    holdTime += Time.delta();
+                    holdTime += Time.delta;
 
                     if(holdTime >= holdWithdraw){
-                        int amount = Math.min(tile.entity.items.get(lastItem), player.maxAccepted(lastItem));
+                        int amount = Math.min(tile.items.get(lastItem), player.unit().maxAccepted(lastItem));
                         Call.requestItem(player, tile, lastItem, amount);
                         holding = false;
                         holdTime = 0f;
@@ -106,13 +131,22 @@ public class BlockInventoryFragment extends Fragment{
                 }
 
                 updateTablePosition();
-                if(tile.block().hasItems){
+                if(tile.block.hasItems){
+                    boolean dirty = false;
+                    if(shrinkHoldTimes.length != content.items().size) shrinkHoldTimes = new float[content.items().size];
+
                     for(int i = 0; i < content.items().size; i++){
-                        boolean has = tile.entity.items.has(content.item(i));
-                        if(has != container.contains(i)){
-                            rebuild(false);
+                        boolean has = tile.items.has(content.item(i));
+                        boolean had = container.contains(i);
+                        if(has){
+                            shrinkHoldTimes[i] = 0f;
+                            dirty |= !had;
+                        }else if(had){
+                            shrinkHoldTimes[i] += Time.delta;
+                            dirty |= shrinkHoldTimes[i] >= holdShrink;
                         }
                     }
+                    if(dirty) rebuild(false);
                 }
             }
         });
@@ -123,32 +157,32 @@ public class BlockInventoryFragment extends Fragment{
         table.margin(4f);
         table.defaults().size(8 * 5).pad(4f);
 
-        if(tile.block().hasItems){
+        if(tile.block.hasItems){
 
             for(int i = 0; i < content.items().size; i++){
                 Item item = content.item(i);
-                if(!tile.entity.items.has(item)) continue;
+                if(!tile.items.has(item)) continue;
 
                 container.add(i);
 
-                Boolp canPick = () -> player.acceptsItem(item) && !state.isPaused();
+                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused() && player.within(tile, itemTransferRange);
 
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
 
                 Element image = itemImage(item.icon(Cicon.xlarge), () -> {
-                    if(tile == null || tile.entity == null){
+                    if(tile == null || !tile.isValid()){
                         return "";
                     }
-                    return round(tile.entity.items.get(item));
+                    return round(tile.items.get(item));
                 });
                 image.addListener(l);
 
                 image.addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                        if(!canPick.get() || tile == null || tile.entity == null || tile.entity.items == null || !tile.entity.items.has(item)) return false;
-                        int amount = Math.min(1, player.maxAccepted(item));
+                        if(!canPick.get() || tile == null || !tile.isValid() || tile.items == null || !tile.items.has(item)) return false;
+                        int amount = Math.min(1, player.unit().maxAccepted(item));
                         if(amount > 0){
                             Call.requestItem(player, tile, item, amount);
                             lastItem = item;
@@ -177,11 +211,11 @@ public class BlockInventoryFragment extends Fragment{
 
         updateTablePosition();
 
-        table.visible(true);
+        table.visible = true;
 
         if(actions){
             table.setScale(0f, 1f);
-            table.actions(Actions.scaleTo(1f, 1f, 0.07f, Interpolation.pow3Out));
+            table.actions(Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
         }else{
             table.setScale(1f, 1f);
         }
@@ -199,7 +233,7 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     private void updateTablePosition(){
-        Vec2 v = Core.input.mouseScreen(tile.drawx() + tile.block().size * tilesize / 2f, tile.drawy() + tile.block().size * tilesize / 2f);
+        Vec2 v = Core.input.mouseScreen(tile.x + tile.block.size * tilesize / 2f, tile.y + tile.block.size * tilesize / 2f);
         table.pack();
         table.setPosition(v.x, v.y, Align.topLeft);
     }

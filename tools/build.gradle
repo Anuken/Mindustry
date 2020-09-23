@@ -1,14 +1,9 @@
-apply plugin: "java"
-
-sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = ["src/"]
 
-
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.tools.texturepacker.TexturePacker
-import com.badlogic.gdx.utils.IntArray
-import com.badlogic.gdx.utils.IntIntMap
-import com.badlogic.gdx.utils.IntMap
+import arc.struct.*
+import arc.graphics.*
+import arc.packer.*
+import arc.util.Tmp
 
 import javax.imageio.ImageIO
 import java.awt.*
@@ -21,6 +16,9 @@ import java.util.concurrent.TimeUnit
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
 def colorMap = new IntMap<List<Color>>(), colorIndexMap = new IntIntMap()
+//on my machine, I have a native Nim AA implementation that is ~10x faster
+//it's not compiled for other platforms so they don't get it
+def useFastAA = System.getProperty("user.name") == "anuke"
 
 def transformColors = { List<List<String>> list ->
     list.each{ colors ->
@@ -30,17 +28,23 @@ def transformColors = { List<List<String>> list ->
         }
 
         newColors.each{ color ->
-            colorMap.put(Color.argb8888(color), newColors)
-            colorIndexMap.put(Color.argb8888(color), newColors.indexOf(color))
+            colorMap.put(color.argb8888(), newColors)
+            colorIndexMap.put(color.argb8888(), newColors.indexOf(color))
         }
     }
 }
 
 
-transformColors([["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"], ["dea158", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"]])
+//d4816b
+transformColors([["a387ea", "8a73c6", "5c5e9f"], ["6e7080", "989aa4", "b0bac0"], ["bc5452", "ea8878", "feb380"], ["de9458", "f8c266", "ffe18f"], ["feb380", "ea8878", "bc5452"], ["d4816b", "eab678", "ffd37f"]])
 
 def antialias = { File file ->
-    if(!doAntialias || file.lastModified() <= 1000) return
+    if(!doAntialias) return
+
+    if(useFastAA){
+        "antialias ${file.absolutePath}".execute().waitFor()
+        return
+    }
 
     def image = ImageIO.read(file)
     def out = ImageIO.read(file)
@@ -80,20 +84,21 @@ def antialias = { File file ->
             suma.set(0)
 
             for(int val : p){
-                Color.argb8888ToColor(color, val)
+                color.argb8888(val)
                 suma.r += color.r * color.a
                 suma.g += color.g * color.a
                 suma.b += color.b * color.a
                 suma.a += color.a
             }
 
-            suma.mul(suma.a <= 0.001f ? 0f : (float) (1f / suma.a))
+            float fm = suma.a <= 0.001f ? 0f : (float) (1f / suma.a)
+            suma.mul(fm, fm, fm, fm)
 
             float total = 0
             sum.set(0)
 
             for(int val : p){
-                Color.argb8888ToColor(color, val)
+                color.argb8888(val)
                 float a = color.a
                 color.lerp(suma, (float) (1f - a))
                 sum.r += color.r
@@ -103,9 +108,9 @@ def antialias = { File file ->
                 total += 1f
             }
 
-            sum.mul((float) (1f / total))
-            int result = Color.argb8888(sum)
-            out.setRGB(x, y, result)
+            fm = (float)(1f / total)
+            sum.mul(fm, fm, fm, fm)
+            out.setRGB(x, y, sum.argb8888())
             sum.set(0)
         }
     }
@@ -117,7 +122,7 @@ def medianBlur = { File file ->
     def image = ImageIO.read(file)
     def result = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_ARGB)
     def radius = 4
-    IntArray array = new IntArray()
+    IntSeq array = new IntSeq()
 
     def getRGB = { int ix, int iy ->
         return image.getRGB(Math.max(Math.min(ix, image.width - 1), 0), Math.max(Math.min(iy, image.height - 1), 0))
@@ -173,9 +178,9 @@ def scaleImage = { File file ->
                     M = getRGB(x, y - 2)
 
                 if(B == D && B != F && D != H && (E != A || E == C || E == G || A == J || A == K)) p1 = B
-                if(B == F & B != D & F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
-                if(D == H & B != D & F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
-                if(F == H & B != F & D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
+                if(B == F && B != D && F != H && (E != C || E == A || E == I || C == J || C == L)) p2 = F
+                if(D == H && B != D && F != H && (E != G || E == A || E == I || G == K || G == M)) p3 = D
+                if(F == H && B != F && D != H && (E != I || E == C || E == G || I == L || I == M)) p4 = H
 
                 scaled.setRGB(x * 2, y * 2 + 1, p1)
                 scaled.setRGB(x * 2 + 1, y * 2 + 1, p2)
@@ -191,6 +196,17 @@ def scaleImage = { File file ->
 
 def tileImage = { File file ->
     def image = ImageIO.read(file)
+
+    for(x in 0..image.width-1){
+        for(y in 0..image.height-1){
+            if(x > (image.height - 1 - y)){
+                def rx = image.height - 1 - y
+                def ry = x
+
+                image.setRGB(x, y, image.getRGB(rx, image.height - 1 - ry))
+            }
+        }
+    }
 
     def result = new BufferedImage(image.width * 2, image.height * 2, image.getType())
     Graphics2D graphics = result.createGraphics()
@@ -211,7 +227,7 @@ def tileImage = { File file ->
 
                 if(index != -1){
                     int resultIndex = (x == y ? 1 : index == 2 ? 0 : index == 0 ? 2 : 1);
-                    result.setRGB(x, y, Color.argb8888(list[resultIndex]))
+                    result.setRGB(x, y, list[resultIndex].argb8888())
                 }
             }
         }
@@ -226,30 +242,64 @@ task swapColors(){
             def carr = new File(getProperty("colors")).text.split("\n")
             def map = [:]
             def swaps = 0
-            carr.each{ str -> map[Color.argb8888(Color.valueOf(str.split("=")[0]))] = Color.argb8888(Color.valueOf(str.split("=")[1])) }
+            carr.each{ str -> map[Color.valueOf(str.split("=")[0]).argb8888()] = Color.valueOf(str.split("=")[1]).argb8888() }
             def tmpc = new Color()
 
             fileTree(dir: '../core/assets-raw/sprites', include: "**/*.png").visit{ file ->
                 if(file.isDirectory()) return
-                swaps++
+
+                boolean found = false
 
                 def img = ImageIO.read(file.file)
                 for(x in (0..img.getWidth() - 1)){
                     for(y in (0..img.getHeight() - 1)){
                         def c = img.getRGB(x, y)
-                        Color.argb8888ToColor(tmpc, c)
+                        tmpc.argb8888(c)
                         if(tmpc.a < 0.1f) continue
                         if(map.containsKey(c)){
                             img.setRGB(x, y, (int)map.get(c))
+                            found = true
                         }
                     }
                 }
-                ImageIO.write(img, "png", file.file)
+                if(found){
+                    swaps++
+                    ImageIO.write(img, "png", file.file)
+                }
             }
             println "Swapped $swaps images."
         }else{
             throw new InvalidUserDataException("No replacement colors specified. Use -Pcolors=\"<path to color file>\"")
         }
+    }
+}
+
+task genPalette(){
+    doLast{
+        def total = 0
+        def size = 32
+        def outImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
+        def colorsUsed = new IntSet()
+
+        fileTree(dir: '../core/assets-raw/sprites/blocks', include: "**/*.png").visit{ file ->
+            if(file.isDirectory()) return
+
+            def img = ImageIO.read(file.file)
+            for(x in (0..img.getWidth() - 1)){
+                for(y in (0..img.getHeight() - 1)){
+                    def c = img.getRGB(x, y)
+
+                    if(Tmp.c1.argb8888(c).a > 0.999f && colorsUsed.add(c)){
+                        outImage.setRGB((int)(total / size), total % size, c)
+                        total ++
+                    }
+                }
+            }
+        }
+
+        ImageIO.write(outImage, "png", new File("palette.png"))
+        println "Found $total colors."
+
     }
 }
 
@@ -299,21 +349,7 @@ task pack(dependsOn: classes){
         javaexec{
             main = "mindustry.tools.ImagePacker"
             classpath = sourceSets.main.runtimeClasspath
-            standardInput = System.in
             workingDir = genFolder
-        }
-
-        //upscale icon sprites using different method, which requires an OpenGL context
-        javaexec{
-            if(System.getProperty("os.name").toLowerCase().contains("mac")){
-                jvmArgs "-XstartOnFirstThread"
-            }
-
-            jvmArgs("-Djava.awt.headless=true")
-            main = "mindustry.tools.Upscaler"
-            classpath = sourceSets.main.runtimeClasspath
-            standardInput = System.in
-            workingDir = "../core/assets-raw/sprites_out/ui/icons"
         }
 
         copy{
@@ -326,25 +362,40 @@ task pack(dependsOn: classes){
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(16)
+        long ms = System.currentTimeMillis()
 
         //antialias everything except UI elements
         fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.png").visit{ file ->
-            if(file.isDirectory() || file.toString().replace("\\", "/").contains("zones/") || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-"))) return
+            if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png")) return
 
             executor.submit{
                 antialias(file.file)
             }
         }
 
-        executor.shutdown();
+        executor.shutdown()
         try{
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)
         }catch(InterruptedException e){
             e.printStackTrace()
         }
 
+        println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f}"
+
+        println("\n\nPacking normal 4096 sprites...\n\n")
+
         //pack normal sprites
         TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/", "sprites.atlas")
+
+        println("\n\nPacking fallback 2048 sprites...\n\n")
+
+        //replace config file contents
+        fileTree(dir: '../core/assets-raw/sprites_out/', include: "**/*.json").visit{ file ->
+            if(!file.isDirectory()) file.file.text = file.file.text.replace("4096", "2048")
+        }
+
+        //pack fallback 2048x2048 sprites
+        TexturePacker.process("core/assets-raw/sprites_out/", "core/assets/sprites/fallback/", "sprites.atlas")
     }
 }
 
@@ -365,4 +416,11 @@ task updateBundles(dependsOn: classes, type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../core/assets/bundles/"
+}
+
+task fontgen(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.FontGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../"
 }

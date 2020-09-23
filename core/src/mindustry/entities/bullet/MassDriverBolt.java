@@ -5,8 +5,7 @@ import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.Mathf;
 import mindustry.content.Fx;
-import mindustry.entities.Effects;
-import mindustry.entities.type.Bullet;
+import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.world.blocks.distribution.MassDriver.DriverBulletData;
 
@@ -15,41 +14,40 @@ import static mindustry.Vars.content;
 public class MassDriverBolt extends BulletType{
 
     public MassDriverBolt(){
-        super(5.3f, 50);
+        super(1f, 50);
         collidesTiles = false;
-        lifetime = 200f;
+        lifetime = 1f;
         despawnEffect = Fx.smeltsmoke;
         hitEffect = Fx.hitBulletBig;
-        drag = 0.005f;
     }
 
     @Override
-    public void draw(mindustry.entities.type.Bullet b){
+    public void draw(Bullet b){
         float w = 11f, h = 13f;
 
         Draw.color(Pal.bulletYellowBack);
-        Draw.rect("shell-back", b.x, b.y, w, h, b.rot() + 90);
+        Draw.rect("shell-back", b.x, b.y, w, h, b.rotation() + 90);
 
         Draw.color(Pal.bulletYellow);
-        Draw.rect("shell", b.x, b.y, w, h, b.rot() + 90);
+        Draw.rect("shell", b.x, b.y, w, h, b.rotation() + 90);
 
         Draw.reset();
     }
 
     @Override
-    public void update(mindustry.entities.type.Bullet b){
+    public void update(Bullet b){
         //data MUST be an instance of DriverBulletData
-        if(!(b.getData() instanceof DriverBulletData)){
+        if(!(b.data() instanceof DriverBulletData)){
             hit(b);
             return;
         }
 
         float hitDst = 7f;
 
-        DriverBulletData data = (DriverBulletData)b.getData();
+        DriverBulletData data = (DriverBulletData)b.data();
 
         //if the target is dead, just keep flying until the bullet explodes
-        if(data.to.isDead()){
+        if(data.to.dead()){
             return;
         }
 
@@ -75,7 +73,7 @@ public class MassDriverBolt extends BulletType{
         //if on course and it's in range of the target
         if(Math.abs(dst1 + dst2 - baseDst) < 4f && dst2 <= hitDst){
             intersect = true;
-        } //else, bullet has gone off course, does not get recieved.
+        } //else, bullet has gone off course, does not get received.
 
         if(intersect){
             data.to.handlePayload(b, data);
@@ -83,18 +81,18 @@ public class MassDriverBolt extends BulletType{
     }
 
     @Override
-    public void despawned(mindustry.entities.type.Bullet b){
+    public void despawned(Bullet b){
         super.despawned(b);
 
-        if(!(b.getData() instanceof DriverBulletData)) return;
+        if(!(b.data() instanceof DriverBulletData)) return;
 
-        DriverBulletData data = (DriverBulletData)b.getData();
+        DriverBulletData data = (DriverBulletData)b.data();
 
         for(int i = 0; i < data.items.length; i++){
             int amountDropped = Mathf.random(0, data.items[i]);
             if(amountDropped > 0){
-                float angle = b.rot() + Mathf.range(100f);
-                Effects.effect(Fx.dropItem, Color.white, b.x, b.y, angle, content.item(i));
+                float angle = b.rotation() + Mathf.range(100f);
+                Fx.dropItem.at(b.x, b.y, angle, Color.white, content.item(i));
             }
         }
     }

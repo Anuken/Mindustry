@@ -1,7 +1,8 @@
 package mindustry.world;
 
-import mindustry.entities.type.TileEntity;
-import mindustry.game.Team;
+import arc.func.*;
+import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.modules.*;
 
 /**
@@ -15,31 +16,25 @@ public class CachedTile extends Tile{
     }
 
     @Override
-    public Team getTeam(){
-        return Team.get(getTeamID());
-    }
-
-    @Override
     protected void preChanged(){
         //this basically overrides the old tile code and doesn't remove from proximity
-        team = 0;
     }
 
     @Override
-    protected void changed(){
-        entity = null;
+    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+        build = null;
 
         Block block = block();
 
         if(block.hasEntity()){
-            TileEntity n = block.newEntity();
-            n.cons = new ConsumeModule(entity);
-            n.tile = this;
-            n.block = block;
+            Building n = entityprov.get();
+            n.cons(new ConsumeModule(build));
+            n.tile(this);
+            n.block(block);
             if(block.hasItems) n.items = new ItemModule();
-            if(block.hasLiquids) n.liquids = new LiquidModule();
-            if(block.hasPower) n.power = new PowerModule();
-            entity = n;
+            if(block.hasLiquids) n.liquids(new LiquidModule());
+            if(block.hasPower) n.power(new PowerModule());
+            build = n;
         }
     }
 }
