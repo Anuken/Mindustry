@@ -421,8 +421,6 @@ public class LogicBlock extends Block{
             return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
         }
 
-
-
         @Override
         public void buildConfiguration(Table table){
 

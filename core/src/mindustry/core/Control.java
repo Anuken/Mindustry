@@ -326,6 +326,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.rules.sector = sector;
                 //assign origin when launching
                 state.secinfo.origin = origin;
+                state.secinfo.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);
