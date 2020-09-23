@@ -253,6 +253,12 @@ public class ItemModule extends BlockModule{
         }
     }
 
+    public void undoFlow(Item item){
+        if(flow != null){
+            cacheSums[item.id] -= 1;
+        }
+    }
+
     public void addAll(ItemModule items){
         for(int i = 0; i < items.items.length; i++){
             add(i, items.items[i]);

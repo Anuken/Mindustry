@@ -276,7 +276,10 @@ public class ItemBridge extends Block{
                     cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f); //TODO this is kinda broken, because lerping only happens on a timer
                 }else{
                     cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
-                    if(item != null) items.add(item, 1);
+                    if(item != null){
+                        items.add(item, 1);
+                        items.undoFlow(item);
+                    }
                 }
             }
         }
