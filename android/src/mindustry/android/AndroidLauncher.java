@@ -29,7 +29,6 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
     boolean doubleScaleTablets = true;
@@ -170,6 +169,16 @@ public class AndroidLauncher extends AndroidApplication{
                 t.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void onStop(Bundle savedInstanceState){
+        super.onStop(savedInstanceState);
+        if(state.rules.tutorial){
+            Core.settings.put("playedtutorial", true);
+        }
+        if(net.client()) netClient.disconnectQuietly();
+        if(ui && ui.paused) ui.paused.runExitSave();
     }
 
     @Override
