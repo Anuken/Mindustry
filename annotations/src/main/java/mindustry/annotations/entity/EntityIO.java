@@ -328,7 +328,7 @@ public class EntityIO{
             for(int i = 0; i < fields.size; i++){
                 RevisionField field = fields.get(i);
                 FieldSpec spec = specs.get(i);
-                if(!field.type.equals(spec.type.toString())){
+                if(!field.type.replace("mindustry.gen.", "").equals(spec.type.toString().replace("mindustry.gen.", ""))){
                     return false;
                 }
             }
