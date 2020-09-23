@@ -98,7 +98,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Unit u = payload.unit;
 
         //can't drop ground units
-        if(!u.canPassOn()){
+        if(!u.canPass(tileX(), tileY())){
             return false;
         }
 
