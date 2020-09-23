@@ -1377,7 +1377,7 @@ public class Blocks implements ContentList{
             ammoUseEffect = Fx.shellEjectSmall;
             health = 250;
             inaccuracy = 2f;
-            rotatespeed = 10f;
+            rotateSpeed = 10f;
         }};
 
         scatter = new ItemTurret("scatter"){{
@@ -1395,7 +1395,7 @@ public class Blocks implements ContentList{
             targetGround = false;
 
             recoilAmount = 2f;
-            rotatespeed = 15f;
+            rotateSpeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
 
@@ -1498,7 +1498,7 @@ public class Blocks implements ContentList{
             }};
             reloadTime = 35f;
             shootCone = 40f;
-            rotatespeed = 8f;
+            rotateSpeed = 8f;
             powerUse = 4f;
             targetAir = false;
             range = 90f;
@@ -1647,7 +1647,7 @@ public class Blocks implements ContentList{
             range = 200f;
             size = 3;
             recoilAmount = 3f;
-            rotatespeed = 10f;
+            rotateSpeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
