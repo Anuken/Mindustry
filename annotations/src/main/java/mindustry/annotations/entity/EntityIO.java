@@ -38,6 +38,8 @@ public class EntityIO{
         this.serializer = serializer;
         this.name = name;
 
+        json.setIgnoreUnknownFields(true);
+
         directory.mkdirs();
 
         //load old revisions
@@ -66,8 +68,7 @@ public class EntityIO{
         //add new revision if it doesn't match or there are no revisions
         if(revisions.isEmpty() || !revisions.peek().equal(fields)){
             revisions.add(new Revision(nextRevision,
-                fields.map(f -> new RevisionField(f.name, f.type.toString(),
-                f.type.isPrimitive() ? BaseProcessor.typeSize(f.type.toString()) : -1))));
+                fields.map(f -> new RevisionField(f.name, f.type.toString()))));
             Log.warn("Adding new revision @ for @.\nPrevious = @\nNew = @\n", nextRevision, name, previous == null ? null : previous.fields.toString(", ", f -> f.name), fields.toString(", ", f -> f.name));
             //write revision
             directory.child(nextRevision + ".json").writeString(json.toJson(revisions.peek()));
@@ -325,8 +326,7 @@ public class EntityIO{
             for(int i = 0; i < fields.size; i++){
                 RevisionField field = fields.get(i);
                 FieldSpec spec = specs.get(i);
-                //TODO when making fields, their primitive size may be overwritten by an annotation; check for that
-                if(!(field.type.equals(spec.type.toString()) && (!spec.type.isPrimitive() || BaseProcessor.typeSize(spec.type.toString()) == field.size))){
+                if(!field.type.equals(spec.type.toString())){
                     return false;
                 }
             }
@@ -336,11 +336,9 @@ public class EntityIO{
 
     public static class RevisionField{
         String name, type;
-        int size; //in bytes
 
-        RevisionField(String name, String type, int size){
+        RevisionField(String name, String type){
             this.name = name;
-            this.size = size;
             this.type = type;
         }
 
