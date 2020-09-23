@@ -71,7 +71,7 @@ public class EntityIO{
         if(revisions.isEmpty() || !revisions.peek().equal(fields)){
             revisions.add(new Revision(nextRevision,
                 fields.map(f -> new RevisionField(f.name, f.type.toString()))));
-            Log.warn("Adding new revision @ for @.\nPre = @\nNew = @\n", nextRevision, name, previous == null ? null : previous.fields.toString(", ", f -> f.name), fields.toString(", ", f -> f.name));
+            Log.warn("Adding new revision @ for @.\nPre = @\nNew = @\n", nextRevision, name, previous == null ? null : previous.fields.toString(", ", f -> f.name + ":" + f.type), fields.toString(", ", f -> f.name + ":" + f.type.toString()));
             //write revision
             directory.child(nextRevision + ".json").writeString(json.toJson(revisions.peek()));
         }
