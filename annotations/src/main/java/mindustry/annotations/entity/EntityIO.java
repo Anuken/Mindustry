@@ -47,6 +47,8 @@ public class EntityIO{
             revisions.add(json.fromJson(Revision.class, fi));
         }
 
+        revisions.sort(r -> r.version);
+
         //next revision to be used
         int nextRevision = revisions.isEmpty() ? 0 : revisions.max(r -> r.version).version + 1;
 
@@ -69,7 +71,7 @@ public class EntityIO{
         if(revisions.isEmpty() || !revisions.peek().equal(fields)){
             revisions.add(new Revision(nextRevision,
                 fields.map(f -> new RevisionField(f.name, f.type.toString()))));
-            Log.warn("Adding new revision @ for @.\nPrevious = @\nNew = @\n", nextRevision, name, previous == null ? null : previous.fields.toString(", ", f -> f.name), fields.toString(", ", f -> f.name));
+            Log.warn("Adding new revision @ for @.\nPre = @\nNew = @\n", nextRevision, name, previous == null ? null : previous.fields.toString(", ", f -> f.name), fields.toString(", ", f -> f.name));
             //write revision
             directory.child(nextRevision + ".json").writeString(json.toJson(revisions.peek()));
         }
