@@ -14,8 +14,10 @@ public class ItemDisplay extends Table{
     }
 
     public ItemDisplay(Item item, int amount, boolean showName){
-        add(new ItemImage(new ItemStack(item, amount))).size(8 * 4).padRight(amount > 99 ? 12 : 0);
-        if(showName) add(item.localizedName).padLeft(4 + amount > 99 ? 4 : 0);
+        int digits = (int) Math.log10(amount) - 1 >= 0 ? (int) Math.log10(amount) - 1 : 0;
+
+        add(new ItemImage(new ItemStack(item, amount))).size(8 * 4).padRight(2 + (12 * digits));
+        if(showName) add(item.localizedName).padLeft(4 + 4 * digits);
 
         this.item = item;
         this.amount = amount;
