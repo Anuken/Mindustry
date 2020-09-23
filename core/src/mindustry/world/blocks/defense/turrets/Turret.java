@@ -52,7 +52,7 @@ public abstract class Turret extends Block{
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
-    public float rotatespeed = 5f; //in degrees per tick
+    public float rotateSpeed = 5f; //in degrees per tick
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
@@ -312,7 +312,7 @@ public abstract class Turret extends Block{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotatespeed * delta() * baseReloadSpeed());
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed());
         }
 
         public boolean shouldTurn(){
