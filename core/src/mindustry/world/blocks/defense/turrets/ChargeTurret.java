@@ -36,7 +36,7 @@ public class ChargeTurret extends PowerTurret{
                     for(int j = 0; j < chargeEffects; j++){
                         Time.run(Mathf.random(chargeMaxDelay), () -> {
                             if(!isValid()) return;
-                            tr.trns(rotation, size * tilesize / 2f);
+                            tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][1] : 0f), (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][0] : 0f));
                             chargeEffect.at(x + tr.x, y + tr.y, rotation + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][2] : 0f) + (barrelBurst ? (indexC - (int)(shots / 2f)) * spread : 0));
                         });
                     }
