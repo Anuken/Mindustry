@@ -1,7 +1,6 @@
 package mindustry.world.consumers;
 
 import arc.func.*;
-import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -48,7 +47,7 @@ public class ConsumeItemDynamic extends Consume{
 
         for(ItemStack stack : items.get(tile)){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
-            () -> tile.items != null && tile.items.has(stack.item, stack.amount))).size(8 * 4).padRight(6 * Mathf.digits(stack.amount));
+            () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
         }
     }
 

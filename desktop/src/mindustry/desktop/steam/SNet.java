@@ -79,10 +79,14 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                                 Log.err(e);
                             }
                         }else if(currentServer != null && fromID == currentServer.getAccountID()){
-                            net.handleClientReceived(output);
+                            try{
+                                net.handleClientReceived(output);
+                            }catch(Throwable t){
+                                net.handleException(t);
+                            }
                         }
                     }catch(SteamException e){
-                        e.printStackTrace();
+                        Log.err(e);
                     }
                 }
             }
@@ -233,11 +237,22 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyEnter(SteamID steamIDLobby, int chatPermissions, boolean blocked, ChatRoomEnterResponse response){
-        Log.info("enter lobby @ @", steamIDLobby.getAccountID(), response);
+        Log.info("onLobbyEnter @ @", steamIDLobby.getAccountID(), response);
 
         if(response != ChatRoomEnterResponse.Success){
             ui.loadfrag.hide();
             ui.showErrorMessage(Core.bundle.format("cantconnect", response.toString()));
+            return;
+        }
+
+        int version = Strings.parseInt(smat.getLobbyData(steamIDLobby, "version"), -1);
+
+        //check version
+        if(version != Version.build){
+            ui.loadfrag.hide();
+            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
+                Core.bundle.format("server.versions", Version.build, version));
+            smat.leaveLobby(steamIDLobby);
             return;
         }
 

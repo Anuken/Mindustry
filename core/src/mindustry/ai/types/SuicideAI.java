@@ -1,10 +1,12 @@
 package mindustry.ai.types;
 
 import mindustry.*;
-import mindustry.ai.Pathfinder.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class SuicideAI extends GroundAI{
     static boolean blockedByBlock;
@@ -27,7 +29,7 @@ public class SuicideAI extends GroundAI{
         if(!Units.invalidateTarget(target, unit, unit.range())){
             rotate = true;
             shoot = unit.within(target, unit.type().weapons.first().bullet.range() +
-                (target instanceof Building ? ((Building)target).block().size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
+                (target instanceof Building ? ((Building)target).block.size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
 
             if(unit.type().hasWeapons()){
                 unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
@@ -58,8 +60,14 @@ public class SuicideAI extends GroundAI{
             }
 
         }else{
-            if(core != null){
-                moveToCore(FlagTarget.enemyCores);
+            if(command() == UnitCommand.rally){
+                Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
+
+                if(target != null && !unit.within(target, 70f)){
+                    moveTo(Pathfinder.fieldRally);
+                }
+            }else if(command() == UnitCommand.attack && core != null){
+                moveTo(Pathfinder.fieldCore);
             }
 
             if(unit.moving()) unit.lookAt(unit.vel().angle());

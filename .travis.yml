@@ -26,6 +26,7 @@ script:
 - cp -a Mindustry/core/build/docs/javadoc/. docs/
 - cd docs
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add .; git commit -m "Update ${TRAVIS_BUILD_NUMBER}"; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/MindustryGame/docs; fi
+- cd ../Mindustry
 deploy:
 - provider: releases
   skip_cleanup: true

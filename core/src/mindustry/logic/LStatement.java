@@ -93,7 +93,13 @@ public abstract class LStatement{
         Core.scene.add(t);
 
         t.update(() -> {
-            if(b.parent == null) return;
+            if(b.parent == null || !b.isDescendantOf(Core.scene.root)){
+                Core.app.post(() -> {
+                    hitter.remove();
+                    t.remove();
+                });
+                return;
+            }
 
             b.localToStageCoordinates(Tmp.v1.set(b.getWidth()/2f, b.getHeight()/2f));
             t.setPosition(Tmp.v1.x, Tmp.v1.y, Align.center);

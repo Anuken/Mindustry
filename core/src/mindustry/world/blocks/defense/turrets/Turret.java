@@ -52,7 +52,7 @@ public abstract class Turret extends Block{
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
-    public float rotatespeed = 5f; //in degrees per tick
+    public float rotateSpeed = 5f; //in degrees per tick
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
@@ -77,6 +77,7 @@ public abstract class Turret extends Block{
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
     public Cons<TurretBuild> heatDrawer = tile -> {
         if(tile.heat <= 0.00001f) return;
+
         Draw.color(heatColor, tile.heat);
         Draw.blend(Blending.additive);
         Draw.rect(heatRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
@@ -237,7 +238,7 @@ public abstract class Turret extends Block{
                         canShoot = unit.isShooting();
                     }else if(logicControlled()){ //logic behavior
                         canShoot = logicShooting;
-                    }else if(peekAmmo() != null){ //default AI behavior
+                    }else{ //default AI behavior
                         BulletType type = peekAmmo();
                         float speed = type.speed;
                         //slow bullets never intersect
@@ -311,7 +312,7 @@ public abstract class Turret extends Block{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotatespeed * delta() * baseReloadSpeed());
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed());
         }
 
         public boolean shouldTurn(){

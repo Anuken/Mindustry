@@ -94,6 +94,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     public void show(Sector sector, CoreBuild launcher){
+        if(launcher == null) return;
+
         this.launcher = launcher;
         selected = null;
         hovered = null;
@@ -127,10 +129,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //draw all sector stuff
         for(Sector sec : planet.sectors){
+
             if(selectAlpha > 0.01f){
                 if(canLaunch(sec) || sec.unlocked()){
                     if(sec.baseCoverage > 0){
-                        planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.1f * sec.baseCoverage * selectAlpha), -0.002f);
+                        planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.5f * sec.baseCoverage * selectAlpha), -0.002f);
                     }
 
                     Color color =
@@ -290,7 +293,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         selectAlpha = Mathf.lerpDelta(selectAlpha, Mathf.num(planets.zoom < 1.9f), 0.1f);
     }
 
-    //TODO localize
     void updateSelected(){
         Sector sector = selected;
 
@@ -305,29 +307,43 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.add("[accent]" + (sector.preset == null ? sector.id : sector.preset.localizedName)).row();
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
-        stable.add(sector.save != null ? sector.save.getPlayTime() : "[lightgray]Unexplored").row();
+        stable.add(sector.save != null ? sector.save.getPlayTime() : "@sectors.unexplored").row();
+        if(sector.hasWaves() || sector.hasEnemyBase()){
+            stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
+        }
 
         if(sector.hasBase() && sector.hasWaves()){
+            //TODO localize when finalized
+            //these mechanics are likely to change and as such are not added to the bundle
             stable.add("[scarlet]Under attack!");
             stable.row();
             stable.add("[accent]" + Mathf.ceil(sectorDestructionTurns - (sector.getSecondsPassed() * 60) / turnDuration) + " turn(s)\nuntil destruction");
             stable.row();
         }
 
-        stable.add("Resources:").row();
-        stable.table(t -> {
-            t.left();
-            int idx = 0;
-            int max = 5;
-            for(UnlockableContent c : sector.data.resources){
-                t.image(c.icon(Cicon.small)).padRight(3);
-                if(++idx % max == 0) t.row();
-            }
-        }).fillX().row();
+        if(sector.save != null){
+            stable.add("@sectors.resources").row();
+            stable.table(t -> {
+
+                if(sector.save != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.resources.any()){
+                    t.left();
+                    int idx = 0;
+                    int max = 5;
+                    for(UnlockableContent c : sector.save.meta.secinfo.resources){
+                        t.image(c.icon(Cicon.small)).padRight(3);
+                        if(++idx % max == 0) t.row();
+                    }
+                }else{
+                    t.add("@unknown").color(Color.lightGray);
+                }
+
+
+            }).fillX().row();
+        }
 
         //production
         if(sector.hasBase() && sector.save.meta.hasProduction){
-            stable.add("Production:").row();
+            stable.add("@sectors.production").row();
             stable.table(t -> {
                 t.left();
 
@@ -335,7 +351,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     int total = (int)(stat.mean * 60);
                     if(total > 1){
                         t.image(item.icon(Cicon.small)).padRight(3);
-                        t.add(UI.formatAmount(total) + " /min").color(Color.lightGray);
+                        t.add(UI.formatAmount(total) + " " + Core.bundle.get("unit.perminute")).color(Color.lightGray);
                         t.row();
                     }
                 });
@@ -344,7 +360,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         //stored resources
         if(sector.hasBase() && sector.save.meta.secinfo.coreItems.size > 0){
-            stable.add("Stored:").row();
+            stable.add("@sectors.stored").row();
             stable.table(t -> {
                 t.left();
 
@@ -367,7 +383,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.row();
 
         if((sector.hasBase() && mode == look) || canLaunch(sector) || (sector.preset != null && sector.preset.alwaysUnlocked)){
-            stable.button(sector.hasBase() ? "Resume" : "Launch", Styles.transt, () -> {
+            stable.button(sector.hasBase() ? "@sectors.resume" : "@sectors.launch", Styles.transt, () -> {
 
                 boolean shouldHide = true;
 
@@ -397,7 +413,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
 
                 if(shouldHide) hide();
-            }).growX().padTop(2f).height(50f).minWidth(170f);
+            }).growX().padTop(2f).height(50f).minWidth(170f).disabled(b -> state.rules.sector == sector && !state.isMenu());
         }
 
         stable.pack();

@@ -440,7 +440,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, short coreDataLen, byte[] coreData){
+    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, short coreDataLen, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
@@ -452,6 +452,8 @@ public class NetClient implements ApplicationListener{
             state.wave = wave;
             state.enemies = enemies;
             state.serverPaused = paused;
+
+            universe.updateNetSeconds(timeData);
 
             netClient.byteStream.setBytes(net.decompressSnapshot(coreData, coreDataLen));
             DataInputStream input = netClient.dataStream;
@@ -547,6 +549,10 @@ public class NetClient implements ApplicationListener{
         quiet = true;
     }
 
+    public void clearRemovedEntity(int id){
+        removed.remove(id);
+    }
+
     public void addRemovedEntity(int id){
         removed.add(id);
     }
@@ -585,8 +591,11 @@ public class NetClient implements ApplicationListener{
             }
 
             Unit unit = player.dead() ? Nulls.unit : player.unit();
+            int uid = player.dead() ? -1 : unit.id;
 
-            Call.clientSnapshot(lastSent++,
+            Call.clientSnapshot(
+            lastSent++,
+            uid,
             player.dead(),
             unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
@@ -597,7 +606,8 @@ public class NetClient implements ApplicationListener{
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
-            Core.camera.width * viewScale, Core.camera.height * viewScale);
+            Core.camera.width * viewScale, Core.camera.height * viewScale
+            );
         }
 
         if(timer.get(1, 60)){

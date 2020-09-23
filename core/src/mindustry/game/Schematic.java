@@ -2,9 +2,7 @@ package mindustry.game;
 
 import arc.files.*;
 import arc.struct.*;
-import arc.struct.IntIntMap.*;
 import arc.util.ArcAnnotate.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
@@ -12,7 +10,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -39,22 +36,16 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         return tiles.sumf(s -> s.block.consumes.has(ConsumeType.power) ? s.block.consumes.getPower().usage : 0f);
     }
 
-    public Seq<ItemStack> requirements(){
-        IntIntMap amounts = new IntIntMap();
+    public ItemSeq requirements(){
+        ItemSeq requirements = new ItemSeq();
 
         tiles.each(t -> {
-            if(t.block.buildVisibility == BuildVisibility.hidden) return;
-
             for(ItemStack stack : t.block.requirements){
-                amounts.increment(stack.item.id, stack.amount);
+                requirements.add(stack.item, stack.amount);
             }
         });
-        Seq<ItemStack> stacks = new Seq<>();
-        for(Entry ent : amounts.entries()){
-            stacks.add(new ItemStack(Vars.content.item(ent.key), ent.value));
-        }
-        stacks.sort();
-        return stacks;
+
+        return requirements;
     }
 
     public boolean hasCore(){

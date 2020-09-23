@@ -12,7 +12,7 @@ import static mindustry.maps.filters.FilterOption.wallsOnly;
 
 public class TerrainFilter extends GenerateFilter{
     float scl = 40, threshold = 0.9f, octaves = 3f, falloff = 0.5f, magnitude = 1f, circleScl = 2.1f;
-    Block floor = Blocks.stone, block = Blocks.rocks;
+    Block floor = Blocks.stone, block = Blocks.stoneWall;
 
     @Override
     public FilterOption[] options(){

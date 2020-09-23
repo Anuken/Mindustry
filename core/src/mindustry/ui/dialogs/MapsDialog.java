@@ -54,7 +54,7 @@ public class MapsDialog extends BaseDialog{
                 Runnable show = () -> ui.loadAnd(() -> {
                     hide();
                     ui.editor.show();
-                    ui.editor.editor.getTags().put("name", text);
+                    ui.editor.editor.tags.put("name", text);
                     Events.fire(new MapMakeEvent());
                 });
 

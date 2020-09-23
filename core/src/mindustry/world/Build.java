@@ -10,7 +10,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
@@ -32,10 +32,10 @@ public class Build{
 
         int rotation = tile.build != null ? tile.build.rotation : 0;
         Block previous = tile.block();
-        Block sub = BuildBlock.get(previous.size);
+        Block sub = ConstructBlock.get(previous.size);
 
         tile.setBlock(sub, team, rotation);
-        tile.<BuildEntity>bc().setDeconstruct(previous);
+        tile.<ConstructBuild>bc().setDeconstruct(previous);
         tile.build.health(tile.build.maxHealth() * prevPercent);
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
@@ -54,12 +54,12 @@ public class Build{
         if(tile == null) return;
 
         Block previous = tile.block();
-        Block sub = BuildBlock.get(result.size);
+        Block sub = ConstructBlock.get(result.size);
 
         result.beforePlaceBegan(tile, previous);
 
         tile.setBlock(sub, team, rotation);
-        tile.<BuildEntity>bc().setConstruct(previous, result);
+        tile.<ConstructBuild>bc().setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
 
         result.placeBegan(tile, previous);
 
@@ -91,7 +91,7 @@ public class Build{
         }
 
         if(type.isMultiblock()){
-            if((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type)) &&
+            if(((type.canReplace(tile.block()) || tile.block.alwaysReplace) || (tile.block instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == type)) &&
                 type.canPlaceOn(tile, team) && tile.interactable(team)){
 
                 //if the block can be replaced but the sizes differ, check all the spaces around the block to make sure it can fit
@@ -105,7 +105,7 @@ public class Build{
                             int wx = dx + offsetx + x, wy = dy + offsety + y;
 
                             Tile check = world.tile(wx, wy);
-                            if(check == null || (!check.block.alwaysReplace && check.block != tile.block)) return false;
+                            if(check == null || !check.interactable(team) || (!check.block.alwaysReplace && check.block != tile.block && !(check.block.size == 1 && type.canReplace(check.block)))) return false;
                         }
                     }
                 }
@@ -145,7 +145,7 @@ public class Build{
                 && (!tile.floor().isDeep() || type.floating || type.requiresWater || type.placeableLiquid)
                 && tile.floor().placeableOn
                 && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
-                && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type))
+                && (((type.canReplace(tile.block()) || (tile.block instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == type))
                 && !(type == tile.block() && (tile.build != null && rotation == tile.build.rotation) && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
                 && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile, team);
         }

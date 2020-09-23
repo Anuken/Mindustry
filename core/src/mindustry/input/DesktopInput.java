@@ -31,7 +31,7 @@ public class DesktopInput extends InputHandler{
     /** Current cursor type. */
     public Cursor cursorType = SystemCursor.arrow;
     /** Position where the player started dragging a line. */
-    public int selectX, selectY, schemX, schemY;
+    public int selectX = -1, selectY = -1, schemX = -1, schemY = -1;
     /** Last known line positions.*/
     public int lastLineX, lastLineY, schematicX, schematicY;
     /** Whether selecting mode is active. */
@@ -47,8 +47,9 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildUI(Group group){
+
         group.fill(t -> {
-            t.visible(() -> Core.settings.getBool("hints") && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
+            t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown() && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -75,13 +76,13 @@ public class DesktopInput extends InputHandler{
         });
 
         group.fill(t -> {
-            t.visible(() -> Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty());
+            t.visible(() -> lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
-                b.label( () -> Core.bundle.format("schematic.flip",
-                Core.keybinds.get(Binding.schematic_flip_x).key.toString(),
-                Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format("schematic.flip",
+                    Core.keybinds.get(Binding.schematic_flip_x).key.toString(),
+                    Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel).visible(() -> Core.settings.getBool("hints"));
                 b.row();
                 b.table(a -> {
                     a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
@@ -98,10 +99,10 @@ public class DesktopInput extends InputHandler{
 
         //draw break selection
         if(mode == breaking){
-            drawBreakSelection(selectX, selectY, cursorX, cursorY);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
         }
 
-        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard()){
+        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
             drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
@@ -181,7 +182,7 @@ public class DesktopInput extends InputHandler{
         }
 
         boolean panCam = false;
-        float camSpeed = !Core.input.keyDown(Binding.boost) ? panSpeed : panBoostSpeed;
+        float camSpeed = (!Core.input.keyDown(Binding.boost) ? panSpeed : panBoostSpeed) * Time.delta;
 
         if(input.keyDown(Binding.pan)){
             panCam = true;
@@ -199,7 +200,7 @@ public class DesktopInput extends InputHandler{
             }
             panning = false;
 
-            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
         }else if(!player.dead() && !panning){
             Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
         }
@@ -224,7 +225,7 @@ public class DesktopInput extends InputHandler{
         if(!player.dead() && !state.isPaused() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
             updateMovement(player.unit());
 
-            if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore()){
+            if(Core.input.keyDown(Binding.respawn) && !player.unit().spawnedByCore() && !scene.hasField()){
                 Call.unitClear(player);
                 controlledType = null;
             }
@@ -306,7 +307,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.unloadCursor;
             }
 
-            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate){
+            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate && cursor.block().quickRotate){
                 Call.rotateBlock(player, cursor.build, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
@@ -340,8 +341,6 @@ public class DesktopInput extends InputHandler{
         table.row();
         table.left().margin(0f).defaults().size(48f).left();
 
-        //TODO localize these
-
         table.button(Icon.paste, Styles.clearPartiali, () -> {
             ui.schematics.show();
         }).tooltip("@schematics");
@@ -356,8 +355,7 @@ public class DesktopInput extends InputHandler{
 
         table.button(Icon.up, Styles.clearPartiali, () -> {
             ui.planet.show(state.getSector(), player.team().core());
-        }).visible(() -> state.isCampaign())
-        .disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements)).tooltip("@launchcore");
+        }).visible(() -> state.isCampaign()).tooltip("@launchcore").disabled(b -> player.team().core() == null);
     }
 
     void pollInput(){
@@ -394,7 +392,7 @@ public class DesktopInput extends InputHandler{
             player.builder().clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard()){
+        if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
             schemX = rawCursorX;
             schemY = rawCursorY;
         }
@@ -413,12 +411,14 @@ public class DesktopInput extends InputHandler{
             selectRequests.clear();
         }
 
-        if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard()){
+        if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
             if(selectRequests.isEmpty()){
                 lastSchematic = null;
             }
+            schemX = -1;
+            schemY = -1;
         }
 
         if(!selectRequests.isEmpty()){
@@ -497,6 +497,8 @@ public class DesktopInput extends InputHandler{
             mode = breaking;
             selectX = tileX(Core.input.mouseX());
             selectY = tileY(Core.input.mouseY());
+            schemX = rawCursorX;
+            schemY = rawCursorY;
         }
 
         if(Core.input.keyDown(Binding.select) && mode == none && !isPlacing() && deleting){
@@ -517,6 +519,12 @@ public class DesktopInput extends InputHandler{
             overrideLineRotation = false;
         }
 
+        if(Core.input.keyRelease(Binding.break_block) && Core.input.keyDown(Binding.schematic_select) && mode == breaking){
+            lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
+            schemX = -1;
+            schemY = -1;
+        }
+
         if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
 
             if(mode == placing && block != null){ //touch up while placing, place everything in selection
@@ -524,8 +532,14 @@ public class DesktopInput extends InputHandler{
                 lineRequests.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
-                removeSelection(selectX, selectY, cursorX, cursorY);
+                removeSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
+                if(lastSchematic != null){
+                    useSchematic(lastSchematic);
+                    lastSchematic = null;
+                }
             }
+            selectX = -1;
+            selectY = -1;
 
             tryDropItems(selected == null ? null : selected.build, Core.input.mouseWorld().x, Core.input.mouseWorld().y);
 
@@ -582,7 +596,7 @@ public class DesktopInput extends InputHandler{
     }
 
     protected void updateMovement(Unit unit){
-        boolean omni = !(unit instanceof WaterMovec);
+        boolean omni = unit.type().omniMovement;
         boolean ground = unit.isGrounded();
 
         float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);

@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -30,6 +31,7 @@ public class MassDriver extends Block{
     public Effect shootEffect = Fx.shootBig2;
     public Effect smokeEffect = Fx.shootBigSmoke2;
     public Effect receiveEffect = Fx.mineBig;
+    public Sound shootSound = Sounds.shootBig;
     public float shake = 3f;
     public @Load("@-base") TextureRegion baseRegion;
 
@@ -60,7 +62,7 @@ public class MassDriver extends Block{
         //check if a mass driver is selected while placing this driver
         if(!control.input.frag.config.isShown()) return;
         Building selected = control.input.frag.config.getSelectedTile();
-        if(selected == null || !(selected.block() instanceof MassDriver) || !(selected.within(x * tilesize, y * tilesize, range))) return;
+        if(selected == null || !(selected.block instanceof MassDriver) || !(selected.within(x * tilesize, y * tilesize, range))) return;
 
         //if so, draw a dotted line towards it while it is in range
         float sin = Mathf.absin(Time.time(), 6f, 1f);
@@ -153,7 +155,7 @@ public class MassDriver extends Block{
 
                 if(
                 items.total() >= minDistribute && //must shoot minimum amount of items
-                link.block().itemCapacity - link.items.total() >= minDistribute //must have minimum amount of space
+                link.block.itemCapacity - link.items.total() >= minDistribute //must have minimum amount of space
                 ){
                     MassDriverBuild other = (MassDriverBuild)link;
                     other.waitingShooters.add(tile);
@@ -223,7 +225,7 @@ public class MassDriver extends Block{
             if(link == other.pos()){
                 configure(-1);
                 return false;
-            }else if(other.block() instanceof MassDriver && other.dst(tile) <= range && other.team == team){
+            }else if(other.block instanceof MassDriver && other.dst(tile) <= range && other.team == team){
                 configure(other.pos());
                 return false;
             }
@@ -265,6 +267,8 @@ public class MassDriver extends Block{
             y + Angles.trnsy(angle, translation), angle);
 
             Effect.shake(shake, shake, this);
+            
+            shootSound.at(tile, Mathf.random(0.9f, 1.1f));
         }
 
         public void handlePayload(Bullet bullet, DriverBulletData data){

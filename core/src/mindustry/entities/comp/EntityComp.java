@@ -40,7 +40,7 @@ abstract class EntityComp{
         return false;
     }
 
-    <T extends Entityc> T base(){
+    <T extends Entityc> T self(){
         return (T)this;
     }
 

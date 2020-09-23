@@ -199,7 +199,7 @@ public class Bullets implements ContentList{
             hitEffect = Fx.flakExplosion;
             splashDamage = 18f;
             splashDamageRadius = 16f;
-            fragBullet = flakGlassFrag;
+            fragBullet = fragGlassFrag;
             fragBullets = 3;
             explodeRange = 20f;
             collidesGround = true;
@@ -269,13 +269,13 @@ public class Bullets implements ContentList{
             status = StatusEffects.burning;
         }};
 
-        missileSurge = new MissileBulletType(3.7f, 20){{
+        missileSurge = new MissileBulletType(3.7f, 18){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
             drag = -0.01f;
-            splashDamageRadius = 28f;
-            splashDamage = 40f;
+            splashDamageRadius = 25f;
+            splashDamage = 25f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             lightning = 2;
@@ -433,6 +433,7 @@ public class Bullets implements ContentList{
             hitSize = 7f;
             lifetime = 18f;
             pierce = true;
+            collidesAir = false;
             statusDuration = 60f * 4;
             shootEffect = Fx.shootSmallFlame;
             hitEffect = Fx.hitFlameSmall;
@@ -447,6 +448,7 @@ public class Bullets implements ContentList{
             hitSize = 7f;
             lifetime = 18f;
             pierce = true;
+            collidesAir = false;
             statusDuration = 60f * 6;
             shootEffect = Fx.shootPyraFlame;
             hitEffect = Fx.hitFlameSmall;

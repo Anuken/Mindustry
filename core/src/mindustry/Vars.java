@@ -37,7 +37,7 @@ public class Vars implements Loadable{
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
     /** Maximum extra padding around deployment schematics. */
-    public static final int maxLoadoutSchematicPad = 4;
+    public static final int maxLoadoutSchematicPad = 5;
     /** Maximum schematic size.*/
     public static final int maxSchematicSize = 32;
     /** All schematic base64 starts with this string.*/
@@ -60,6 +60,8 @@ public class Vars implements Loadable{
     public static final String serverJsonURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers.json";
     /** URL to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String serverJsonBeURL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_be.json";
+    /** URL to the JSON file containing all the BE servers. Only queried in the V6 alpha (will be removed once it's out). */
+    public static final String serverJsonV6URL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
     /** list of built-in servers.*/
@@ -78,20 +80,24 @@ public class Vars implements Loadable{
     public static final float miningRange = 70f;
     /** range for building */
     public static final float buildingRange = 220f;
+    /** range for moving items */
+    public static final float itemTransferRange = 220f;
     /** duration of time between turns in ticks */
     public static final float turnDuration = 20 * Time.toMinutes;
     /** turns needed to destroy a sector completely */
     public static final float sectorDestructionTurns = 3f;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
-    public static final float minArmorDamage = 0.05f;
+    public static final float minArmorDamage = 0.1f;
     /** launch animation duration */
     public static final float launchDuration = 140f;
+    /** size of tiles in units */
+    public static final int tilesize = 8;
+    /** size of one tile payload (^2) */
+    public static final float tilePayload = tilesize * tilesize;
     /** tile used in certain situations, instead of null */
     public static Tile emptyTile;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
-    /** size of tiles in units */
-    public static final int tilesize = 8;
     /** all choosable player colors in join/host dialog */
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),
@@ -199,8 +205,7 @@ public class Vars implements Loadable{
     public static NetServer netServer;
     public static NetClient netClient;
 
-    public static
-    Player player;
+    public static Player player;
 
     @Override
     public void loadAsync(){

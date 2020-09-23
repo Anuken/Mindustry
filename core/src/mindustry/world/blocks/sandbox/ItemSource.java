@@ -52,11 +52,13 @@ public class ItemSource extends Block{
         public void draw(){
             super.draw();
 
-            if(outputItem == null) return;
-
-            Draw.color(outputItem.color);
-            Draw.rect("center", x, y);
-            Draw.color();
+            if(outputItem == null){
+                Draw.rect("cross", x, y);
+            }else{
+                Draw.color(outputItem.color);
+                Draw.rect("center", x, y);
+                Draw.color();
+            }
         }
 
         @Override

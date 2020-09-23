@@ -140,7 +140,7 @@ public class Reconstructor extends UnitBlock{
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
-                            progress += edelta();
+                            progress += edelta() * state.rules.unitBuildSpeedMultiplier;
                         }
 
                         //upgrade the unit
@@ -161,11 +161,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            //do not consume when cap reached
-            if(constructing()){
-                return Units.canCreate(team, upgrade(payload.unit.type()));
-            }
-            return false;
+            return constructing();
         }
 
         public UnitType unit(){

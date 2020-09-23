@@ -491,7 +491,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(Item item : content.items()){
-                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block().itemCapacity);
+                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block.itemCapacity);
             }
 
             info("Core filled.");
@@ -749,7 +749,7 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+            Player playert = Groups.player.find(p -> p.name.equalsIgnoreCase(arg[1]));
             if(playert != null){
                 target = playert.getInfo();
             }else{
@@ -763,7 +763,7 @@ public class ServerControl implements ApplicationListener{
                 }else{
                     netServer.admins.unAdminPlayer(target.id);
                 }
-                if(playert != null) playert.admin(add);
+                if(playert != null) playert.admin = add;
                 info("Changed admin status of player: &ly@", target.lastName);
             }else{
                 err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
@@ -967,7 +967,9 @@ public class ServerControl implements ApplicationListener{
             for(Player p : players){
                 if(p.con == null) continue;
 
+                boolean wasAdmin = p.admin;
                 p.reset();
+                p.admin = wasAdmin;
                 if(state.rules.pvp){
                     p.team(netServer.assignTeam(p, new SeqIterable<>(players)));
                 }

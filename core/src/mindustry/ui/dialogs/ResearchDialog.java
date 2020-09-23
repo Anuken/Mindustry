@@ -134,7 +134,9 @@ public class ResearchDialog extends BaseDialog{
             }
         });
 
-        view.addListener(new ElementGestureListener(){
+        touchable = Touchable.enabled;
+
+        addCaptureListener(new ElementGestureListener(){
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
                 if(view.lastZoom < 0){
@@ -338,7 +340,7 @@ public class ResearchDialog extends BaseDialog{
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : selectable(node.node) && !canSpend(node.node) ? Tex.buttonRed : Tex.button;
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || !canSpend(node.node) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
@@ -375,8 +377,18 @@ public class ResearchDialog extends BaseDialog{
         }
 
         boolean canSpend(TechNode node){
-            //can spend when there's at least 1 item that can be spent
-            return selectable(node) && (node.requirements.length == 0 || Structs.contains(node.requirements, i -> items.has(i.item)));
+            if(!selectable(node)) return false;
+
+            if(node.requirements.length == 0) return true;
+
+            //can spend when there's at least 1 item that can be spent (non complete)
+            for(int i = 0; i < node.requirements.length; i++){
+                if(node.finishedRequirements[i].amount < node.requirements[i].amount && items.has(node.requirements[i].item)){
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         void spend(TechNode node){

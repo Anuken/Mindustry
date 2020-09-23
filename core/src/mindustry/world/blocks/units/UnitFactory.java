@@ -219,11 +219,8 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            //do not consume when cap reached
-            if(currentPlan != -1 && !Units.canCreate(team, plans[currentPlan].unit)){
-                return false;
-            }
-            return enabled;
+            if(currentPlan == -1) return false;
+            return enabled && payload == null;
         }
 
         @Override

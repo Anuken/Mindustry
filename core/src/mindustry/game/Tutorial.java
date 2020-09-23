@@ -250,7 +250,7 @@ public class Tutorial{
             Building core = state.teams.playerCores().first();
 
             for(int i = 0; i < blocksToBreak; i++){
-                if(world.tile(core.tile().x + blockOffset, core.tile().y + i).block() == Blocks.scrapWall){
+                if(world.tile(core.tile.x + blockOffset, core.tile.y + i).block() == Blocks.scrapWall){
                     return false;
                 }
             }

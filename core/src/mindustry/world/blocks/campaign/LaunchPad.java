@@ -97,7 +97,7 @@ public class LaunchPad extends Block{
             //launch when full and base conditions are met
             if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
                 LaunchPayload entity = LaunchPayload.create();
-                items.each((item, amount) -> entity.stacks().add(new ItemStack(item, amount)));
+                items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
                 entity.lifetime(120f);
                 entity.team(team);
@@ -142,7 +142,7 @@ public class LaunchPad extends Block{
             Draw.z(Layer.weather - 1);
 
             TextureRegion region = Core.atlas.find("launchpod");
-            float rw = region.getWidth() * Draw.scl * scale, rh = region.getHeight() * Draw.scl * scale;
+            float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);
             Draw.rect(region, cx, cy, rw, rh, rotation);
@@ -174,19 +174,32 @@ public class LaunchPad extends Block{
 
         @Override
         public void remove(){
+            if(!state.isCampaign()) return;
+
+            //on multiplayer the destination is a the first captured sector (basically random)
+            Sector destsec = !net.client() ? state.secinfo.origin : state.rules.sector.planet.sectors.find(Sector::hasBase);
+
             //actually launch the items upon removal
-            if(team() == state.rules.defaultTeam && state.secinfo.origin != null){
-                ItemSeq dest = state.secinfo.origin.getExtraItems();
+            if(team() == state.rules.defaultTeam){
+                if(destsec != null && (destsec != state.rules.sector || net.client())){
+                    ItemSeq dest = destsec.getExtraItems();
 
-                for(ItemStack stack : stacks){
-                    dest.add(stack);
+                    for(ItemStack stack : stacks){
+                        dest.add(stack);
 
-                    //update export
-                    state.secinfo.handleItemExport(stack);
-                    Events.fire(new LaunchItemEvent(stack));
+                        //update export
+                        state.secinfo.handleItemExport(stack);
+                        Events.fire(new LaunchItemEvent(stack));
+                    }
+
+                    destsec.setExtraItems(dest);
+                }else if(team().core() != null){
+                    //dump launched stuff into the core
+                    for(ItemStack stack : stacks){
+                        int min = Math.min(team().core().block.itemCapacity - team().core().items.get(stack.item), stack.amount);
+                        team().core().items.add(stack.item, min);
+                    }
                 }
-
-                state.secinfo.origin.setExtraItems(dest);
             }
         }
     }

@@ -24,7 +24,7 @@ public class TreeBlock extends Block{
 
         float x = tile.worldx(), y = tile.worldy();
         float rot = Mathf.randomSeed(tile.pos(), 0, 4) * 90 + Mathf.sin(Time.time() + x, 50f, 0.5f) + Mathf.sin(Time.time() - y, 65f, 0.9f) + Mathf.sin(Time.time() + y - x, 85f, 0.9f);
-        float w = region.getWidth() * Draw.scl, h = region.getHeight() * Draw.scl;
+        float w = region.width * Draw.scl, h = region.height * Draw.scl;
         float scl = 30f, mag = 0.2f;
 
         if(shadow.found()){
