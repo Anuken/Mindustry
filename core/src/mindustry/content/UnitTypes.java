@@ -392,7 +392,7 @@ public class UnitTypes implements ContentList{
             engineSize = 6f;
             lowAltitude = true;
 
-            health = 6000f;
+            health = 6500f;
             armor = 7f;
             canBoost = true;
             landShake = 4f;
@@ -414,7 +414,7 @@ public class UnitTypes implements ContentList{
                 continuous = true;
                 cooldownTime = 200f;
 
-                bullet = new ContinuousLaserBulletType(16){{
+                bullet = new ContinuousLaserBulletType(17){{
                     length = 150f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
