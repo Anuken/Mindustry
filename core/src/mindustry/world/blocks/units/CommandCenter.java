@@ -63,11 +63,7 @@ public class CommandCenter extends Block{
 
             Draw.color(bottomColor);
             Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy() - 1, size, size);
-            if(topColor == null){
-                Draw.color(team.color);
-            }else{
-                Draw.color(topColor);
-            }
+            Draw.color(topColor == null ? team.color : topColor);
             Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy(), size, size);
             Draw.color();
         }
