@@ -168,6 +168,7 @@ public class ResearchDialog extends BaseDialog{
         Core.app.post(() -> {
             if(net.client()){
                 //TODO make this not display every time
+                //TODO rework this in the future
                 ui.showInfo("campaign.multiplayer");
             }
         });

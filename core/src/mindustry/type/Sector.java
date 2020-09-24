@@ -97,7 +97,7 @@ public class Sector{
 
     public boolean isBeingPlayed(){
         //after the launch dialog, a sector is no longer considered being played
-        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.launched && !Vars.state.gameOver;
+        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver;
     }
 
     public boolean isCaptured(){

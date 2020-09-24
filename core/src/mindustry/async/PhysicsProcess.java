@@ -10,10 +10,16 @@ import mindustry.async.PhysicsProcess.PhysicsWorld.*;
 import mindustry.gen.*;
 
 public class PhysicsProcess implements AsyncProcess{
+    private static final int
+        layers = 3,
+        layerGround = 0,
+        layerLegs = 1,
+        layerFlying = 2;
+
     private PhysicsWorld physics;
     private Seq<PhysicRef> refs = new Seq<>(false);
     //currently only enabled for units
-    private EntityGroup<? extends Physicsc> group = Groups.unit;
+    private EntityGroup<Unit> group = Groups.unit;
 
     @Override
     public void begin(){
@@ -29,9 +35,8 @@ public class PhysicsProcess implements AsyncProcess{
             return false;
         });
 
-        //find entities without bodies and assign them
-        for(Physicsc entity : group){
-            boolean grounded = entity.isGrounded();
+        //find Unit without bodies and assign them
+        for(Unit entity : group){
 
             if(entity.physref() == null){
                 PhysicsBody body = new PhysicsBody();
@@ -39,7 +44,6 @@ public class PhysicsProcess implements AsyncProcess{
                 body.y = entity.y();
                 body.mass = entity.mass();
                 body.radius = entity.hitSize() / 2f;
-                body.flag = grounded ? 1 : 0;
 
                 PhysicRef ref = new PhysicRef(entity, body);
                 refs.add(ref);
@@ -52,7 +56,9 @@ public class PhysicsProcess implements AsyncProcess{
             //save last position
             PhysicRef ref = entity.physref();
 
-            ref.body.flag = grounded ? 1 : 0;
+            ref.body.layer =
+                entity.type().allowLegStep ? layerLegs :
+                entity.isGrounded() ? layerGround : layerFlying;
             ref.x = entity.x();
             ref.y = entity.y();
         }
@@ -116,13 +122,16 @@ public class PhysicsProcess implements AsyncProcess{
         //how much to soften movement by
         private static final float scl = 1.25f;
 
-        private final QuadTree<PhysicsBody> tree;
+        private final QuadTree<PhysicsBody>[] trees = new QuadTree[layers];
         private final Seq<PhysicsBody> bodies = new Seq<>(false, 16, PhysicsBody.class);
+        private final Seq<PhysicsBody> seq = new Seq<>(PhysicsBody.class);
         private final Rect rect = new Rect();
         private final Vec2 vec = new Vec2();
 
         public PhysicsWorld(Rect bounds){
-            tree = new QuadTree<>(new Rect(bounds));
+            for(int i = 0; i < layers; i++){
+                trees[i] = new QuadTree<>(new Rect(bounds));
+            }
         }
 
         public void add(PhysicsBody body){
@@ -134,18 +143,27 @@ public class PhysicsProcess implements AsyncProcess{
         }
 
         public void update(){
-            tree.clear();
+            for(int i = 0; i < layers; i++){
+                trees[i].clear();
+            }
+
             for(int i = 0; i < bodies.size; i++){
                 PhysicsBody body = bodies.items[i];
                 body.collided = false;
-                tree.insert(body);
+                trees[body.layer].insert(body);
             }
 
             for(int i = 0; i < bodies.size; i++){
                 PhysicsBody body = bodies.items[i];
                 body.hitbox(rect);
-                tree.intersect(rect, other -> {
-                    if(other.flag != body.flag || other == body || other.collided) return;
+
+                seq.size = 0;
+                trees[body.layer].intersect(rect, seq);
+
+                for(int j = 0; j < seq.size; j++){
+                    PhysicsBody other = seq.items[j];
+
+                    if(other == body || other.collided) continue;
 
                     float rs = body.radius + other.radius;
                     float dst = Mathf.dst(body.x, body.y, other.x, other.y);
@@ -160,14 +178,14 @@ public class PhysicsProcess implements AsyncProcess{
                         other.x -= vec.x * m2 / scl;
                         other.y -= vec.y * m2 / scl;
                     }
-                });
+                }
                 body.collided = true;
             }
         }
 
         public static class PhysicsBody implements QuadTreeObject{
             public float x, y, radius, mass;
-            public int flag = 0;
+            public int layer = 0;
             public boolean collided = false;
 
             @Override

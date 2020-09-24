@@ -463,6 +463,7 @@ public class UnitTypes implements ContentList{
             visualElevation = 0.2f;
             allowLegStep = true;
             ammoType = AmmoTypes.powerHigh;
+            groundLayer = Layer.legUnit;
 
             speed = 0.3f;
 

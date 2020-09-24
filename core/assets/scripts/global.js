@@ -154,7 +154,6 @@ const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
 const MapPublishEvent = Packages.mindustry.game.EventType.MapPublishEvent
 const MapMakeEvent = Packages.mindustry.game.EventType.MapMakeEvent
 const ResizeEvent = Packages.mindustry.game.EventType.ResizeEvent
-const LaunchEvent = Packages.mindustry.game.EventType.LaunchEvent
 const LoseEvent = Packages.mindustry.game.EventType.LoseEvent
 const WinEvent = Packages.mindustry.game.EventType.WinEvent
 const Trigger = Packages.mindustry.game.EventType.Trigger

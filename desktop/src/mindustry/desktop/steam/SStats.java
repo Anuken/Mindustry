@@ -243,7 +243,7 @@ public class SStats implements SteamUserStatsCallback{
                     SStat.attacksWon.add();
                 }
 
-                RankResult result = state.stats.calculateRank(state.getSector(), state.launched);
+                RankResult result = state.stats.calculateRank(state.getSector(), true);
                 if(result.rank == Rank.S) earnSRank.complete();
                 if(result.rank == Rank.SS) earnSSRank.complete();
             }
