@@ -11,6 +11,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -63,8 +64,12 @@ public class SchematicsDialog extends BaseDialog{
 
             t.update(() -> {
                 if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
-                    control.input.useSchematic(firstSchematic);
-                    hide();
+                    if(!Vars.state.rules.schematicAllowed){
+                        ui.showInfo("@schematic.disabled");
+                    }else{
+                        control.input.useSchematic(firstSchematic);
+                        hide();
+                    }
                 }
             });
 
@@ -145,8 +150,12 @@ public class SchematicsDialog extends BaseDialog{
                         if(state.isMenu()){
                             showInfo(s);
                         }else{
-                            control.input.useSchematic(s);
-                            hide();
+                            if(!Vars.state.rules.schematicAllowed){
+                                ui.showInfo("@schematic.disabled");
+                            }else{
+                                control.input.useSchematic(s);
+                                hide();
+                            }
                         }
                     }).pad(4).style(Styles.cleari).get();
 
