@@ -378,7 +378,11 @@ public class TechTree implements ContentList{
                     node(nova, () -> {
                         node(pulsar, () -> {
                             node(quasar, () -> {
+                                node(vela, () -> {
+                                    node(corvus, () -> {
 
+                                    });
+                                });
                             });
                         });
                     });

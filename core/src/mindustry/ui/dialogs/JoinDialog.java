@@ -30,6 +30,7 @@ public class JoinDialog extends BaseDialog{
     Table global = new Table();
     Table hosts = new Table();
     int totalHosts;
+    int refreshes;
 
     public JoinDialog(){
         super("@joingame");
@@ -95,6 +96,8 @@ public class JoinDialog extends BaseDialog{
     }
 
     void refreshAll(){
+        refreshes ++;
+
         refreshLocal();
         refreshRemote();
         refreshGlobal();
@@ -327,12 +330,15 @@ public class JoinDialog extends BaseDialog{
     }
 
     void refreshGlobal(){
+        int cur = refreshes;
+
         global.clear();
         global.background(null);
         for(String host : defaultServers){
             String resaddress = host.contains(":") ? host.split(":")[0] : host;
             int resport = host.contains(":") ? Strings.parseInt(host.split(":")[1]) : port;
             net.pingHost(resaddress, resport, res -> {
+                if(refreshes != cur) return;
                 res.port = resport;
                 addGlobalHost(res);
             }, e -> {});

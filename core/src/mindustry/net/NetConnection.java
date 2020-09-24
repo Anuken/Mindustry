@@ -65,9 +65,7 @@ public abstract class NetConnection{
 
         Log.info("Kicking connection @; Reason: @", address, reason.replace("\n", " "));
 
-        PlayerInfo info = netServer.admins.getInfo(uuid);
-        info.timesKicked++;
-        info.lastKicked = Math.max(Time.millis() + kickDuration, info.lastKicked);
+        netServer.admins.handleKicked(uuid, address, kickDuration);
 
         Call.kick(this, reason);
 

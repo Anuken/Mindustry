@@ -69,7 +69,7 @@ public class UnitTypes implements ContentList{
 
         dagger = new UnitType("dagger"){{
             speed = 0.5f;
-            hitsize = 8f;
+            hitSize = 8f;
             health = 140;
             weapons.add(new Weapon("large-weapon"){{
                 reload = 14f;
@@ -83,7 +83,7 @@ public class UnitTypes implements ContentList{
 
         mace = new UnitType("mace"){{
             speed = 0.4f;
-            hitsize = 9f;
+            hitSize = 9f;
             health = 500;
             armor = 4f;
 
@@ -114,7 +114,7 @@ public class UnitTypes implements ContentList{
 
         fortress = new UnitType("fortress"){{
             speed = 0.38f;
-            hitsize = 13f;
+            hitSize = 13f;
             rotateSpeed = 3f;
             targetAir = false;
             health = 790;
@@ -147,7 +147,7 @@ public class UnitTypes implements ContentList{
 
         scepter = new UnitType("scepter"){{
             speed = 0.35f;
-            hitsize = 20f;
+            hitSize = 20f;
             rotateSpeed = 2.1f;
             health = 9000;
             armor = 11f;
@@ -207,7 +207,7 @@ public class UnitTypes implements ContentList{
 
         reign = new UnitType("reign"){{
             speed = 0.35f;
-            hitsize = 26f;
+            hitSize = 26f;
             rotateSpeed = 1.65f;
             health = 24000;
             armor = 14f;
@@ -269,13 +269,14 @@ public class UnitTypes implements ContentList{
             canBoost = true;
             boostMultiplier = 1.5f;
             speed = 0.55f;
-            hitsize = 8f;
+            hitSize = 8f;
             health = 110f;
             buildSpeed = 0.8f;
             armor = 1f;
             commandLimit = 8;
 
             abilities.add(new HealFieldAbility(10f, 60f * 4, 60f));
+            ammoType = AmmoTypes.power;
 
             weapons.add(new Weapon("heal-weapon"){{
                 top = false;
@@ -295,7 +296,7 @@ public class UnitTypes implements ContentList{
             canBoost = true;
             boostMultiplier = 1.5f;
             speed = 0.65f;
-            hitsize = 10f;
+            hitSize = 10f;
             health = 320f;
             buildSpeed = 0.9f;
             armor = 4f;
@@ -305,6 +306,7 @@ public class UnitTypes implements ContentList{
             commandLimit = 15;
 
             abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 5, 60f));
+            ammoType = AmmoTypes.power;
 
             weapons.add(new Weapon("heal-shotgun-weapon"){{
                 top = false;
@@ -335,7 +337,7 @@ public class UnitTypes implements ContentList{
 
         quasar = new UnitType("quasar"){{
             mineTier = 1;
-            hitsize = 12f;
+            hitSize = 12f;
             boostMultiplier = 2f;
             itemCapacity = 80;
             health = 650f;
@@ -346,9 +348,10 @@ public class UnitTypes implements ContentList{
 
             commandLimit = 18;
             mechFrontSway = 0.55f;
+            ammoType = AmmoTypes.power;
 
             speed = 0.4f;
-            hitsize = 10f;
+            hitSize = 10f;
 
             mineTier = 2;
             mineSpeed = 7f;
@@ -377,7 +380,7 @@ public class UnitTypes implements ContentList{
         }};
 
         vela = new UnitType("vela"){{
-            hitsize = 23f;
+            hitSize = 23f;
 
             rotateSpeed = 1.6f;
             canDrown = false;
@@ -385,6 +388,7 @@ public class UnitTypes implements ContentList{
 
             mechStepParticles = true;
             mechStepShake = 0.15f;
+            ammoType = AmmoTypes.powerHigh;
 
             speed = 0.35f;
             boostMultiplier = 2.1f;
@@ -439,7 +443,7 @@ public class UnitTypes implements ContentList{
 
         corvus = new UnitType("corvus"){{
             mineTier = 1;
-            hitsize = 29f;
+            hitSize = 29f;
             itemCapacity = 80;
             health = 19000f;
             buildSpeed = 1.7f;
@@ -457,6 +461,7 @@ public class UnitTypes implements ContentList{
             hovering = true;
             visualElevation = 0.2f;
             allowLegStep = true;
+            ammoType = AmmoTypes.powerHigh;
 
             speed = 0.3f;
 
@@ -513,7 +518,7 @@ public class UnitTypes implements ContentList{
             defaultController = SuicideAI::new;
 
             speed = 0.85f;
-            hitsize = 8f;
+            hitSize = 8f;
             health = 180;
             mechSideSway = 0.25f;
             range = 40f;
@@ -541,7 +546,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 80;
             speed = 0.5f;
             drag = 0.4f;
-            hitsize = 10f;
+            hitSize = 10f;
             rotateSpeed = 3f;
             targetAir = false;
             health = 600;
@@ -581,7 +586,7 @@ public class UnitTypes implements ContentList{
         spiroct = new UnitType("spiroct"){{
             speed = 0.4f;
             drag = 0.4f;
-            hitsize = 12f;
+            hitSize = 12f;
             rotateSpeed = 3f;
             health = 760;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
@@ -592,6 +597,7 @@ public class UnitTypes implements ContentList{
             legBaseOffset = 2f;
             hovering = true;
             armor = 5f;
+            ammoType = AmmoTypes.power;
 
             buildSpeed = 0.75f;
 
@@ -646,7 +652,7 @@ public class UnitTypes implements ContentList{
         arkyid = new UnitType("arkyid"){{
             drag = 0.1f;
             speed = 0.5f;
-            hitsize = 21f;
+            hitSize = 21f;
             health = 8000;
             armor = 6f;
 
@@ -663,6 +669,7 @@ public class UnitTypes implements ContentList{
             legLengthScl = 0.96f;
             rippleScale = 2f;
             legSpeed = 0.2f;
+            ammoType = AmmoTypes.power;
 
             legSplashDamage = 32;
             legSplashRange = 30;
@@ -744,7 +751,7 @@ public class UnitTypes implements ContentList{
         toxopid = new UnitType("toxopid"){{
             drag = 0.1f;
             speed = 0.5f;
-            hitsize = 21f;
+            hitSize = 21f;
             health = 22000;
             armor = 13f;
 
@@ -761,6 +768,7 @@ public class UnitTypes implements ContentList{
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
+            ammoType = AmmoTypes.powerHigh;
 
             legSplashDamage = 80;
             legSplashRange = 60;
@@ -888,7 +896,7 @@ public class UnitTypes implements ContentList{
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
-            hitsize = 9f;
+            hitSize = 9f;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;
@@ -925,7 +933,7 @@ public class UnitTypes implements ContentList{
             drag = 0.016f;
             flying = true;
             range = 140f;
-            hitsize = 18f;
+            hitSize = 18f;
             lowAltitude = true;
             armor = 5f;
 
@@ -973,7 +981,7 @@ public class UnitTypes implements ContentList{
             armor = 9f;
             engineOffset = 21;
             engineSize = 5.3f;
-            hitsize = 56f;
+            hitSize = 56f;
 
             BulletType missiles = new MissileBulletType(2.7f, 10){{
                 width = 8f;
@@ -1045,7 +1053,7 @@ public class UnitTypes implements ContentList{
             health = 20000;
             engineOffset = 38;
             engineSize = 7.3f;
-            hitsize = 58f;
+            hitSize = 58f;
             destructibleWreck = false;
             armor = 13f;
 
@@ -1128,6 +1136,8 @@ public class UnitTypes implements ContentList{
             range = 50f;
             isCounted = false;
 
+            ammoType = AmmoTypes.powerLow;
+
             mineTier = 1;
             mineSpeed = 2.5f;
         }};
@@ -1145,9 +1155,11 @@ public class UnitTypes implements ContentList{
             health = 400;
             buildSpeed = 0.5f;
             engineOffset = 6.5f;
-            hitsize = 8f;
+            hitSize = 8f;
             lowAltitude = true;
             isCounted = false;
+
+            ammoType = AmmoTypes.power;
 
             mineTier = 2;
             mineSpeed = 3.5f;
@@ -1197,10 +1209,12 @@ public class UnitTypes implements ContentList{
             flying = true;
             engineOffset = 10.5f;
             rotateShooting = false;
-            hitsize = 15f;
+            hitSize = 15f;
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
             buildSpeed = 2.5f;
+
+            ammoType = AmmoTypes.power;
 
             weapons.add(
             new Weapon("heal-weapon-mount"){{
@@ -1231,11 +1245,13 @@ public class UnitTypes implements ContentList{
             engineOffset = 12f;
             engineSize = 6f;
             rotateShooting = false;
-            hitsize = 32f;
+            hitSize = 32f;
             payloadCapacity = (3 * 3) * tilePayload;
             buildSpeed = 2.5f;
             range = 140f;
             targetAir = false;
+
+            ammoType = AmmoTypes.powerHigh;
 
             weapons.add(
             new Weapon(){{
@@ -1291,7 +1307,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 46f;
             engineSize = 7.8f;
             rotateShooting = false;
-            hitsize = 60f;
+            hitSize = 60f;
             payloadCapacity = (5.3f * 5.3f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
@@ -1306,7 +1322,7 @@ public class UnitTypes implements ContentList{
         risso = new UnitType("risso"){{
             speed = 1.1f;
             drag = 0.13f;
-            hitsize = 9f;
+            hitSize = 9f;
             health = 280;
             accel = 0.4f;
             rotateSpeed = 3.3f;
@@ -1357,7 +1373,7 @@ public class UnitTypes implements ContentList{
             health = 600;
             speed = 0.9f;
             drag = 0.15f;
-            hitsize = 11f;
+            hitSize = 11f;
             armor = 4f;
             accel = 0.3f;
             rotateSpeed = 2.6f;
@@ -1400,7 +1416,7 @@ public class UnitTypes implements ContentList{
             accel = 0.2f;
             rotateSpeed = 1.8f;
             drag = 0.17f;
-            hitsize = 16f;
+            hitSize = 16f;
             armor = 7f;
             rotateShooting = false;
 
@@ -1493,7 +1509,7 @@ public class UnitTypes implements ContentList{
 
             speed = 0.73f;
             drag = 0.17f;
-            hitsize = 39f;
+            hitSize = 39f;
             accel = 0.2f;
             rotateSpeed = 1.3f;
             rotateShooting = false;
@@ -1576,7 +1592,7 @@ public class UnitTypes implements ContentList{
             health = 22000;
             speed = 0.62f;
             drag = 0.18f;
-            hitsize = 50f;
+            hitSize = 50f;
             armor = 16f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
@@ -1639,7 +1655,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 30;
             health = 120f;
             engineOffset = 6f;
-            hitsize = 8f;
+            hitSize = 8f;
 
             weapons.add(new Weapon("small-basic-weapon"){{
                 reload = 17f;
@@ -1673,7 +1689,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 50;
             health = 150f;
             engineOffset = 6f;
-            hitsize = 9f;
+            hitSize = 9f;
             rotateShooting = false;
             lowAltitude = true;
 
@@ -1713,7 +1729,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 70;
             health = 190f;
             engineOffset = 6f;
-            hitsize = 10f;
+            hitSize = 10f;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
@@ -1743,7 +1759,7 @@ public class UnitTypes implements ContentList{
         block = new UnitType("block"){
             {
                 speed = 0f;
-                hitsize = 0f;
+                hitSize = 0f;
                 health = 1;
                 rotateSpeed = 360f;
                 itemCapacity = 0;

@@ -56,7 +56,7 @@ public class StatusEffect extends MappableContent{
         }
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
-            Tmp.v1.rnd(unit.type().hitsize/2f);
+            Tmp.v1.rnd(unit.type().hitSize /2f);
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y);
         }
     }

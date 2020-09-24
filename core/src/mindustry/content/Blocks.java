@@ -265,7 +265,7 @@ public class Blocks implements ContentList{
             variants = 3;
             status = StatusEffects.muddy;
             statusDuration = 30f;
-            attributes.set(Attribute.water, 2f);
+            attributes.set(Attribute.water, 1f);
             cacheLayer = CacheLayer.mud;
             albedo = 0.35f;
         }};
