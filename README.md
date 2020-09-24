@@ -22,9 +22,9 @@ First, make sure you have [JDK 14](https://adoptopenjdk.net/) installed. Open a 
 
 #### Windows
 
-_Running:_ `gradlew.bat desktop:run`  
-_Building:_ `gradlew.bat desktop:dist`  
-_Sprite Packing:_ `gradlew.bat tools:pack`
+_Running:_ `gradlew desktop:run`  
+_Building:_ `gradlew desktop:dist`  
+_Sprite Packing:_ `gradlew tools:pack`
 
 #### Linux/Mac OS
 
