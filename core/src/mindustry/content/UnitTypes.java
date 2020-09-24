@@ -304,7 +304,7 @@ public class UnitTypes implements ContentList{
 
             mineTier = 2;
             mineSpeed = 5f;
-            commandLimit = 15;
+            commandLimit = 8;
 
             abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = AmmoTypes.power;
@@ -347,7 +347,7 @@ public class UnitTypes implements ContentList{
             armor = 9f;
             landShake = 2f;
 
-            commandLimit = 18;
+            commandLimit = 10;
             mechFrontSway = 0.55f;
             ammoType = AmmoTypes.power;
 
@@ -402,7 +402,7 @@ public class UnitTypes implements ContentList{
             canBoost = true;
             landShake = 4f;
 
-            commandLimit = 20;
+            commandLimit = 8;
 
             weapons.add(new Weapon("vela-weapon"){{
                 mirror = false;
@@ -452,7 +452,7 @@ public class UnitTypes implements ContentList{
             landShake = 1.5f;
             rotateSpeed = 1.5f;
 
-            commandLimit = 20;
+            commandLimit = 8;
 
             legCount = 4;
             legLength = 14f;
@@ -1312,7 +1312,7 @@ public class UnitTypes implements ContentList{
             payloadCapacity = (5.3f * 5.3f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
-            commandLimit = 25;
+            commandLimit = 6;
 
             abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
         }};

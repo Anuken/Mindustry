@@ -200,7 +200,6 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
         implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
@@ -239,7 +238,6 @@ project(":ios"){
 
         implementation arcModule("natives:natives-ios")
         implementation arcModule("natives:natives-freetype-ios")
-        implementation arcModule("natives:natives-box2d-ios")
         implementation arcModule("backends:backend-robovm")
 
         compileOnly project(":annotations")
@@ -282,7 +280,6 @@ project(":core"){
         api "org.lz4:lz4-java:1.4.1"
         api arcModule("arc-core")
         api arcModule("extensions:freetype")
-        api arcModule("extensions:box2d")
         api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
@@ -299,7 +296,6 @@ project(":server"){
 
     dependencies{
         implementation project(":core")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
     }
 }
@@ -312,7 +308,6 @@ project(":tests"){
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
         testImplementation arcModule("backends:backend-headless")
-        testImplementation arcModule("natives:natives-box2d-desktop")
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
     }
 
@@ -334,7 +329,6 @@ project(":tools"){
 
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
     }
 }
