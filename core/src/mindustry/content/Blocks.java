@@ -1750,7 +1750,6 @@ public class Blocks implements ContentList{
                 new UnitPlan(UnitTypes.risso, 60f * 45f, with(Items.silicon, 20, Items.metaglass, 35)),
             };
             size = 3;
-            requiresWater = true;
             consumes.power(1.2f);
         }};
 

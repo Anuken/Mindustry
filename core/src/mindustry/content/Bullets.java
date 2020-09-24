@@ -42,7 +42,7 @@ public class Bullets implements ContentList{
     @Override
     public void load(){
 
-        artilleryDense = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryDense = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -63,7 +63,7 @@ public class Bullets implements ContentList{
             collidesAir = false;
         }};
 
-        artilleryPlastic = new ArtilleryBulletType(3.4f, 12, "shell"){{
+        artilleryPlastic = new ArtilleryBulletType(3.4f, 20, "shell"){{
             hitEffect = Fx.plasticExplosion;
             knockback = 1f;
             lifetime = 80f;
@@ -77,7 +77,7 @@ public class Bullets implements ContentList{
             frontColor = Pal.plastaniumFront;
         }};
 
-        artilleryHoming = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryHoming = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -91,7 +91,7 @@ public class Bullets implements ContentList{
             homingRange = 50f;
         }};
 
-        artilleryIncendiary = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryIncendiary = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -105,7 +105,7 @@ public class Bullets implements ContentList{
             trailEffect = Fx.incendTrail;
         }};
 
-        artilleryExplosive = new ArtilleryBulletType(2f, 12, "shell"){{
+        artilleryExplosive = new ArtilleryBulletType(2f, 20, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;

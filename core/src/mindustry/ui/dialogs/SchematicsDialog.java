@@ -64,7 +64,7 @@ public class SchematicsDialog extends BaseDialog{
 
             t.update(() -> {
                 if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
-                    if(!Vars.state.rules.schematicAllowed){
+                    if(!Vars.state.rules.schematicsAllowed){
                         ui.showInfo("@schematic.disabled");
                     }else{
                         control.input.useSchematic(firstSchematic);
@@ -150,7 +150,7 @@ public class SchematicsDialog extends BaseDialog{
                         if(state.isMenu()){
                             showInfo(s);
                         }else{
-                            if(!Vars.state.rules.schematicAllowed){
+                            if(!Vars.state.rules.schematicsAllowed){
                                 ui.showInfo("@schematic.disabled");
                             }else{
                                 control.input.useSchematic(s);
