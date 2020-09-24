@@ -156,6 +156,7 @@ public class UnitTypes implements ContentList{
 
             mechStepParticles = true;
             mechStepShake = 0.15f;
+            singleTarget = true;
 
             weapons.add(
             new Weapon("scepter-weapon"){{

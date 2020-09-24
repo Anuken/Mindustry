@@ -1148,7 +1148,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
             itemDuration = 90f;
-            consumes.liquid(Liquids.water, 0.09f);
+            consumes.liquid(Liquids.water, 0.1f);
             hasLiquids = true;
             size = 2;
         }};
@@ -1268,7 +1268,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
 
-            consumes.power(1.25f);
+            consumes.power(1.5f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
