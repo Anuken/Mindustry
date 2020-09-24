@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.struct.IntSet.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -64,6 +65,15 @@ public class ItemBridge extends Block{
 
         Tmp.v1.set(otherReq.drawx(), otherReq.drawy()).sub(req.drawx(), req.drawy()).setLength(tilesize/2f);
 
+        Draw.color(Vars.shadowColor);
+        Lines.line(
+        bridgeRegion,
+        req.drawx() + Tmp.v1.x - (size / 3),
+        req.drawy() + Tmp.v1.y - (size / 3),
+        otherReq.drawx() - Tmp.v1.x - (size / 3),
+        otherReq.drawy() - Tmp.v1.y - (size / 3), false
+        );
+        Draw.color();
         Lines.line(
         bridgeRegion,
         req.drawx() + Tmp.v1.x,

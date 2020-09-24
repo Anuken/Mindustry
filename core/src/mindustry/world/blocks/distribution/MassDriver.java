@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -187,6 +188,12 @@ public class MassDriver extends Block{
             Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.turret);
+
+            Draw.color(Vars.shadowColor);
+            Draw.rect(region, 
+            x + Angles.trnsx(rotation + 180f, reload * knockback) - (size / 2f),
+            y + Angles.trnsy(rotation + 180f, reload * knockback) - (size / 2f), rotation - 90);
+            Draw.color();
 
             Draw.rect(region,
             x + Angles.trnsx(rotation + 180f, reload * knockback),

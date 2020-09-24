@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -70,6 +71,9 @@ public class RepairPoint extends Block{
             Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.turret);
+            Draw.color(Vars.shadowColor);
+            Draw.rect(region, x - (size / 2f), y - (size / 2f), rotation - 90);
+            Draw.color();
             Draw.rect(region, x, y, rotation - 90);
 
             if(target != null && Angles.angleDist(angleTo(target), rotation) < 30f){

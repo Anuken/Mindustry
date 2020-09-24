@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -309,6 +310,10 @@ public class Drill extends Block{
                 Draw.color();
             }
 
+            Draw.color(Vars.shadowColor);
+            Draw.rect(rotatorRegion, x - (size / 2.5f), y - (size / 2.5f), timeDrilled * rotateSpeed);
+            Draw.rect(topRegion, x - (size / 2f), y - (size / 2f));
+            Draw.color();
             Draw.rect(rotatorRegion, x, y, timeDrilled * rotateSpeed);
 
             Draw.rect(topRegion, x, y);
