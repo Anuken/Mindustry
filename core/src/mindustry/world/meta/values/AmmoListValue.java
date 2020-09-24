@@ -37,6 +37,10 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     bt.add(Core.bundle.format("bullet.damage", type.damage));
                 }
 
+                if(type.speed > 0){
+                    sep(bt, Core.bundle.format("bullet.speed", Strings.fixed(type.speed, 1)));
+                }
+
                 if(type.splashDamage > 0){
                     sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                 }
@@ -50,6 +54,19 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.knockback", Strings.fixed(type.knockback, 1)));
                 }
 
+                if(type.homingPower > 0.01f){
+                    sep(bt, Core.bundle.format("bullet.homing", Strings.fixed(type.homingPower, 1), Strings.fixed(type.homingRange / tilesize, 1)));
+                }
+
+                if(type.lightning > 0){
+                    sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage == -1 ? type.damage : type.lightningDamage));
+                }
+
+                if(type.fragBullet != null){
+                    sep(bt, Core.bundle.format("bullet.fragbullets", type.fragBullets, Strings.fixed(type.fragBullet.damage, 1)));
+                }
+
+                /** status effects go here: */
                 if((type.status == StatusEffects.burning || type.status == StatusEffects.melting) || type.incendAmount > 0){
                     sep(bt, "@bullet.incendiary");
                 }
@@ -62,16 +79,8 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, "@bullet.tarred");
                 }
 
-                if(type.homingPower > 0.01f){
-                    sep(bt, "@bullet.homing");
-                }
-
-                if(type.lightning > 0){
-                    sep(bt, "@bullet.shock");
-                }
-
-                if(type.fragBullet != null){
-                    sep(bt, "@bullet.frag");
+                if(type.status != StatusEffects.none) {
+                    sep(bt, Core.bundle.format("bullet.statusduration", Strings.fixed(type.statusDuration / 60f, 1)));
                 }
             }).left().padTop(-9);
             table.row();
