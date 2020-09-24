@@ -20,7 +20,7 @@ import mindustry.world.meta.*;
 
 public class CommandCenter extends Block{
     public TextureRegionDrawable[] commandRegions = new TextureRegionDrawable[UnitCommand.all.length];
-    public Color topColor = Pal.command, bottomColor = Color.valueOf("5e5e5e");
+    public Color topColor = null, bottomColor = Color.valueOf("5e5e5e");
     public Effect effect = Fx.commandSend;
 
     public CommandCenter(String name){
@@ -63,7 +63,11 @@ public class CommandCenter extends Block{
 
             Draw.color(bottomColor);
             Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy() - 1, size, size);
-            Draw.color(topColor);
+            if(topColor == null){
+                Draw.color(team.color);
+            }else{
+                Draw.color(topColor);
+            }
             Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy(), size, size);
             Draw.color();
         }
