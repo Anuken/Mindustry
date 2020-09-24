@@ -24,7 +24,7 @@ public class SuicideAI extends GroundAI{
 
         Building core = unit.closestEnemyCore();
 
-        boolean rotate = false, shoot = false;
+        boolean rotate = false, shoot = false, moveToTarget = false;
 
         if(!Units.invalidateTarget(target, unit, unit.range())){
             rotate = true;
@@ -55,11 +55,14 @@ public class SuicideAI extends GroundAI{
             }
 
             if(!blocked){
+                moveToTarget = true;
                 //move towards target directly
                 unit.moveAt(vec.set(target).sub(unit).limit(unit.type().speed));
             }
 
-        }else{
+        }
+
+        if(!moveToTarget){
             if(command() == UnitCommand.rally){
                 Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
 

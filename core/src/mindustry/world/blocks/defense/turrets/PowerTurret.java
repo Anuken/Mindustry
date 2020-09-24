@@ -22,7 +22,7 @@ public class PowerTurret extends Turret{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, entity -> ((TurretBuild)entity).target != null);
+        consumes.powerCond(powerUse, (TurretBuild entity) -> entity.target != null || (entity.logicControlled() && entity.logicShooting));
         super.init();
     }
 

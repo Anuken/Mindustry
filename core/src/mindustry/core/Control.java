@@ -326,6 +326,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.rules.sector = sector;
                 //assign origin when launching
                 state.secinfo.origin = origin;
+                state.secinfo.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);
@@ -334,7 +335,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playTutorial(){
-        ui.showInfo("There is no tutorial yet.");
+        ui.showInfo("@indev.notready");
         //TODO implement
         //ui.showInfo("death");
         /*
@@ -434,7 +435,7 @@ public class Control implements ApplicationListener, Loadable{
         //just a regular reminder
         if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
             app.post(() -> app.post(() -> {
-                ui.showStartupInfo("@indevpopup");
+                ui.showStartupInfo("@indev.popup");
             }));
         }
 

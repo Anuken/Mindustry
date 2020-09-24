@@ -21,6 +21,7 @@ public enum StatUnit{
     perMinute,
     timesSpeed(false),
     percent(false),
+    shieldHealth,
     none,
     items;
 

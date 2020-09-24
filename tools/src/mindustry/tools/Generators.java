@@ -315,7 +315,7 @@ public class Generators{
 
                 Color outc = Pal.darkerMetal;
                 //Func<Image, Image> outlineS = i -> i.shadow(0.8f, 9);
-                Func<Image, Image> outline = i -> i.outline(4, outc);
+                Func<Image, Image> outline = i -> i.outline(3, outc);
                 Cons<TextureRegion> outliner = t -> {
                     if(t != null && t.found()){
                         ImagePacker.replace(t, outline.get(ImagePacker.get(t)));
@@ -338,6 +338,7 @@ public class Generators{
                 outliner.get(type.footRegion);
                 outliner.get(type.legBaseRegion);
                 outliner.get(type.baseJointRegion);
+                if(type.constructor.get() instanceof Legsc) outliner.get(type.legRegion);
 
                 Image image = ImagePacker.get(type.region);
 

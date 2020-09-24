@@ -11,14 +11,22 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
+import static mindustry.Vars.*;
+
 public class UnitTypes implements ContentList{
     //region definitions
 
-    //ground
+    //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
-    //ground + builder + miner + commander
+    //mech + builder + miner + commander
     public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType nova, pulsar, quasar;
+
+    //mech + commander
+    public static @EntityDef({Unitc.class, Mechc.class, Commanderc.class}) UnitType vela;
+
+    //legs + commander
+    public static @EntityDef({Unitc.class, Legsc.class, Commanderc.class}) UnitType corvus;
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
@@ -37,6 +45,12 @@ public class UnitTypes implements ContentList{
 
     //air + building + mining + payload
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
+
+    //air + building + payload
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad;
+
+    //air + building + payload + command
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, Commanderc.class}) UnitType oct;
 
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
@@ -254,7 +268,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.52f;
+            speed = 0.55f;
             hitsize = 8f;
             health = 110f;
             buildSpeed = 0.8f;
@@ -280,7 +294,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
-            speed = 0.62f;
+            speed = 0.65f;
             hitsize = 10f;
             health = 320f;
             buildSpeed = 0.9f;
@@ -330,7 +344,7 @@ public class UnitTypes implements ContentList{
             armor = 9f;
             landShake = 2f;
 
-            commandLimit = 24;
+            commandLimit = 18;
             mechFrontSway = 0.55f;
 
             speed = 0.4f;
@@ -357,6 +371,136 @@ public class UnitTypes implements ContentList{
                     sideAngle = 45f;
                     sideWidth = 1f;
                     sideLength = 70f;
+                    colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+                }};
+            }});
+        }};
+
+        vela = new UnitType("vela"){{
+            hitsize = 23f;
+
+            rotateSpeed = 1.6f;
+            canDrown = false;
+            mechFrontSway = 1f;
+
+            mechStepParticles = true;
+            mechStepShake = 0.15f;
+
+            speed = 0.35f;
+            boostMultiplier = 2.1f;
+            engineOffset = 12f;
+            engineSize = 6f;
+            lowAltitude = true;
+
+            health = 6000f;
+            armor = 7f;
+            canBoost = true;
+            landShake = 4f;
+
+            commandLimit = 20;
+
+            weapons.add(new Weapon("vela-weapon"){{
+                mirror = false;
+                top = false;
+                shake = 4f;
+                shootY = 13f;
+                x = y = 0f;
+
+                firstShotDelay = Fx.greenLaserChargeSmall.lifetime - 1f;
+
+                reload = 320f;
+                recoil = 0f;
+                shootSound = Sounds.laser;
+                continuous = true;
+                cooldownTime = 200f;
+
+                bullet = new ContinuousLaserBulletType(16){{
+                    length = 150f;
+                    hitEffect = Fx.hitMeltHeal;
+                    drawSize = 420f;
+                    lifetime = 160f;
+                    shake = 1f;
+                    despawnEffect = Fx.smokeCloud;
+                    smokeEffect = Fx.none;
+
+                    shootEffect = Fx.greenLaserChargeSmall;
+
+                    incendChance = 0.02f;
+                    incendSpread = 5f;
+                    incendAmount = 1;
+
+                    colors = new Color[]{Pal.heal.cpy().a(.2f), Pal.heal.cpy().a(.5f), Pal.heal.cpy().mul(1.2f), Color.white};
+                }};
+
+                shootStatus = StatusEffects.slow;
+                shootStatusDuration = bullet.lifetime + firstShotDelay;
+            }});
+        }};
+
+        corvus = new UnitType("corvus"){{
+            mineTier = 1;
+            hitsize = 29f;
+            itemCapacity = 80;
+            health = 19000f;
+            buildSpeed = 1.7f;
+            armor = 9f;
+            landShake = 1.5f;
+            rotateSpeed = 1.5f;
+
+            commandLimit = 20;
+
+            legCount = 4;
+            legLength = 14f;
+            legBaseOffset = 11f;
+            legMoveSpace = 1.5f;
+            legTrns = 0.58f;
+            hovering = true;
+            visualElevation = 0.2f;
+            allowLegStep = true;
+
+            speed = 0.3f;
+
+            mineTier = 2;
+            mineSpeed = 7f;
+            drawShields = false;
+
+            weapons.add(new Weapon("corvus-weapon"){{
+                top = false;
+                mirror = false;
+                shake = 14f;
+                shootY = 5f;
+                x = y = 0;
+                reload = 350f;
+                recoil = 0f;
+                shootSound = Sounds.laser;
+
+                cooldownTime = 350f;
+
+                shootStatusDuration = 60f * 2f;
+                shootStatus = StatusEffects.unmoving;
+                firstShotDelay = Fx.greenLaserCharge.lifetime;
+
+                bullet = new LaserBulletType(){{
+                    length = 500f;
+                    damage = 520f;
+                    width = 75f;
+
+                    lifetime = 65f;
+
+                    lightningSpacing = 35f;
+                    lightningLength = 5;
+                    lightningDelay = 1.1f;
+                    lightningLengthRand = 15;
+                    lightningDamage = 50;
+                    lightningAngleRand = 40f;
+                    largeHit = true;
+                    lightColor = lightningColor = Pal.heal;
+
+                    shootEffect = Fx.greenLaserCharge;
+
+                    sideAngle = 15f;
+                    sideWidth = 0f;
+                    sideLength = 0f;
                     colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                 }};
             }});
@@ -402,6 +546,7 @@ public class UnitTypes implements ContentList{
             targetAir = false;
             health = 600;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
+
             legCount = 4;
             legLength = 9f;
             legTrns = 0.6f;
@@ -600,8 +745,8 @@ public class UnitTypes implements ContentList{
             drag = 0.1f;
             speed = 0.5f;
             hitsize = 21f;
-            health = 23000;
-            armor = 14f;
+            health = 22000;
+            armor = 13f;
 
             rotateSpeed = 1.9f;
 
@@ -726,7 +871,6 @@ public class UnitTypes implements ContentList{
             faceTarget = false;
             engineOffset = 5.5f;
             range = 140f;
-            crashDamageMultiplier = 4f;
 
             weapons.add(new Weapon(){{
                 y = 0f;
@@ -744,6 +888,7 @@ public class UnitTypes implements ContentList{
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
+            hitsize = 9f;
             targetAir = false;
             engineOffset = 7.8f;
             range = 140f;
@@ -1010,6 +1155,7 @@ public class UnitTypes implements ContentList{
             abilities.add(new HealFieldAbility(5f, 60f * 5, 50f));
 
             weapons.add(new Weapon("heal-weapon-mount"){{
+                top = false;
                 y = -2.5f;
                 x = 3.5f;
                 reload = 30f;
@@ -1042,6 +1188,8 @@ public class UnitTypes implements ContentList{
 
             mineTier = 2;
             health = 500;
+            armor = 2f;
+            armor = 5f;
             speed = 1.8f;
             accel = 0.06f;
             drag = 0.017f;
@@ -1051,7 +1199,7 @@ public class UnitTypes implements ContentList{
             rotateShooting = false;
             hitsize = 15f;
             engineSize = 3f;
-            payloadCapacity = 4 * (8 * 8);
+            payloadCapacity = (2 * 2) * tilePayload;
             buildSpeed = 2.5f;
 
             weapons.add(
@@ -1071,6 +1219,87 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
+        quad = new UnitType("quad"){{
+            armor = 4f;
+            health = 6000;
+            speed = 1.2f;
+            rotateSpeed = 2f;
+            accel = 0.05f;
+            drag = 0.017f;
+            lowAltitude = false;
+            flying = true;
+            engineOffset = 12f;
+            engineSize = 6f;
+            rotateShooting = false;
+            hitsize = 32f;
+            payloadCapacity = (3 * 3) * tilePayload;
+            buildSpeed = 2.5f;
+            range = 140f;
+            targetAir = false;
+
+            weapons.add(
+            new Weapon(){{
+                x = y = 0f;
+                mirror = false;
+                reload = 60f;
+                minShootVelocity = 0.01f;
+
+                bullet = new BasicBulletType(){{
+                    sprite = "large-bomb";
+                    width = height = 120/4f;
+
+                    range = 30f;
+                    ignoreRotation = true;
+
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                    mixColorTo = Color.white;
+
+                    shootCone = 180f;
+                    ejectEffect = Fx.none;
+                    shootSound = Sounds.none;
+                    despawnShake = 4f;
+
+                    collidesAir = false;
+
+                    lifetime = 70f;
+
+                    despawnEffect = Fx.greenBomb;
+                    hitEffect = Fx.massiveExplosion;
+                    keepVelocity = false;
+                    spin = 2f;
+
+                    shrinkX = shrinkY = 0.7f;
+
+                    speed = 0.001f;
+                    collides = false;
+
+                    splashDamage = 240f;
+                    splashDamageRadius = 115f;
+                }};
+            }});
+        }};
+
+        oct = new UnitType("oct"){{
+            armor = 16f;
+            health = 24000;
+            speed = 0.6f;
+            rotateSpeed = 1f;
+            accel = 0.04f;
+            drag = 0.018f;
+            flying = true;
+            engineOffset = 46f;
+            engineSize = 7.8f;
+            rotateShooting = false;
+            hitsize = 60f;
+            payloadCapacity = (5.3f * 5.3f) * tilePayload;
+            buildSpeed = 4f;
+            drawShields = false;
+            commandLimit = 25;
+
+            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
+        }};
+
         //endregion
         //region naval attack
 
@@ -1081,7 +1310,6 @@ public class UnitTypes implements ContentList{
             health = 280;
             accel = 0.4f;
             rotateSpeed = 3.3f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             trailLength = 20;
             rotateShooting = false;
 
@@ -1133,14 +1361,12 @@ public class UnitTypes implements ContentList{
             armor = 4f;
             accel = 0.3f;
             rotateSpeed = 2.6f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
             trailLength = 20;
             trailX = 5.5f;
             trailY = -4f;
             trailScl = 1.9f;
-            rotateShooting = false;
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
@@ -1175,8 +1401,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 1.8f;
             drag = 0.17f;
             hitsize = 16f;
-            armor = 6f;
-            immunities = ObjectSet.with(StatusEffects.wet);
+            armor = 7f;
             rotateShooting = false;
 
             trailLength = 22;
@@ -1184,7 +1409,7 @@ public class UnitTypes implements ContentList{
             trailY = -9f;
             trailScl = 1.5f;
 
-            abilities.add(new HealFieldAbility(22f, 60f * 4, 70f), new ShieldFieldAbility(20f, 40f, 60f * 4, 60f));
+            abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 4, 60f));
 
             weapons.add(new Weapon("large-artillery"){{
                 reload = 65f;
@@ -1271,7 +1496,6 @@ public class UnitTypes implements ContentList{
             hitsize = 39f;
             accel = 0.2f;
             rotateSpeed = 1.3f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
             trailLength = 50;
@@ -1356,10 +1580,9 @@ public class UnitTypes implements ContentList{
             armor = 16f;
             accel = 0.19f;
             rotateSpeed = 0.9f;
-            immunities = ObjectSet.with(StatusEffects.wet);
             rotateShooting = false;
 
-            float spawnTime = 60f * 25f;
+            float spawnTime = 60f * 15f;
 
             abilities.add(new UnitSpawnAbility(flare, spawnTime, 19.25f, -31.75f), new UnitSpawnAbility(flare, spawnTime, -19.25f, -31.75f));
 
@@ -1410,7 +1633,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;
-            speed = 2.6f;
+            speed = 2.8f;
             rotateSpeed = 15f;
             accel = 0.1f;
             itemCapacity = 30;
@@ -1444,7 +1667,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             buildSpeed = 0.75f;
             drag = 0.05f;
-            speed = 2.9f;
+            speed = 3f;
             rotateSpeed = 17f;
             accel = 0.1f;
             itemCapacity = 50;
@@ -1484,7 +1707,7 @@ public class UnitTypes implements ContentList{
             mineTier = 2;
             buildSpeed = 1f;
             drag = 0.05f;
-            speed = 3.4f;
+            speed = 3.5f;
             rotateSpeed = 19f;
             accel = 0.11f;
             itemCapacity = 70;

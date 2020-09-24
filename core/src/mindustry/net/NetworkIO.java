@@ -42,8 +42,6 @@ public class NetworkIO{
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
-            //campaign is not valid in multiplayer
-            state.rules.sector = null;
             state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
 
             state.wave = stream.readInt();

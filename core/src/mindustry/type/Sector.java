@@ -275,6 +275,10 @@ public class Sector{
         Core.settings.put(key(key), value);
     }
 
+    public String toString(){
+        return planet.name + "#" + id;
+    }
+
     /** Projects this sector onto a 4-corner square for use in map gen.
      * Allocates a new object. Do not call in the main loop. */
     private SectorRect makeRect(){

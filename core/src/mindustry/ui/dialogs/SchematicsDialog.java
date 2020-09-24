@@ -10,7 +10,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -333,7 +332,7 @@ public class SchematicsDialog extends BaseDialog{
             cont.add(new SchematicImage(schem)).maxSize(800f);
             cont.row();
 
-            Seq<ItemStack> arr = schem.requirements();
+            ItemSeq arr = schem.requirements();
             cont.table(r -> {
                 int i = 0;
                 for(ItemStack s : arr){

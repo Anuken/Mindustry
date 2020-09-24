@@ -29,6 +29,8 @@ public class Weapon{
     public boolean rotate = false;
     /** whether to draw the outline on top. */
     public boolean top = true;
+    /** whether to hold the bullet in place while firing */
+    public boolean continuous;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
     public float rotateSpeed = 20f;
     /** weapon reload in frames */
@@ -54,6 +56,8 @@ public class Weapon{
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
     /** delay in ticks between shots */
+    public float firstShotDelay = 0;
+    /** delay in ticks between shots */
     public float shotDelay = 0;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
@@ -77,6 +81,10 @@ public class Weapon{
     public TextureRegion outlineRegion;
     /** heat region tint */
     public Color heatColor = Pal.turretHeat;
+    /** status effect applied when shooting */
+    public StatusEffect shootStatus = StatusEffects.none;
+    /** status effect duration when shot */
+    public float shootStatusDuration = 60f * 5f;
 
     public Weapon(String name){
         this.name = name;

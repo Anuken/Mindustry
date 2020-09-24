@@ -67,7 +67,7 @@ public class Floor extends Block{
 
     protected TextureRegion[][] edges;
     protected Seq<Block> blenders = new Seq<>();
-    protected IntSet blended = new IntSet();
+    protected Bits blended = new Bits(256);
     protected TextureRegion edgeRegion;
 
     public Floor(String name){
@@ -170,30 +170,43 @@ public class Floor extends Block{
         return drownTime > 0;
     }
 
-    public void drawNonLayer(Tile tile){
+    public void drawNonLayer(Tile tile, CacheLayer layer){
         Mathf.rand.setSeed(tile.pos());
 
-        drawEdges(tile, true);
-    }
-
-    protected void drawEdges(Tile tile){
-        drawEdges(tile, false);
-    }
-
-    protected void drawEdges(Tile tile, boolean sameLayer){
         blenders.clear();
         blended.clear();
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.getNearby(point);
-            if(other != null && doEdge(other.floor(), sameLayer) && other.floor().edges() != null){
-                if(blended.add(other.floor().id)){
+            if(other != null && other.floor().cacheLayer == layer && other.floor().edges() != null){
+                if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
                 }
             }
         }
 
+        drawBlended(tile);
+    }
+
+    protected void drawEdges(Tile tile){
+        blenders.clear();
+        blended.clear();
+
+        for(int i = 0; i < 8; i++){
+            Point2 point = Geometry.d8[i];
+            Tile other = tile.getNearby(point);
+            if(other != null && doEdge(other.floor()) && other.floor().cacheLayer == cacheLayer && other.floor().edges() != null){
+                if(!blended.getAndSet(other.floor().id)){
+                    blenders.add(other.floor());
+                }
+            }
+        }
+
+        drawBlended(tile);
+    }
+
+    protected void drawBlended(Tile tile){
         blenders.sort(a -> a.id);
 
         for(Block block : blenders){
@@ -201,23 +214,18 @@ public class Floor extends Block{
                 Point2 point = Geometry.d8[i];
                 Tile other = tile.getNearby(point);
                 if(other != null && other.floor() == block){
-                    TextureRegion region = edge((Floor)block, 2 - (point.x + 1), 2 - (point.y + 1));
+                    TextureRegion region = edge((Floor)block, 1 - point.x, 1 - point.y);
                     Draw.rect(region, tile.worldx(), tile.worldy());
-
-                    if(!sameLayer && block.cacheLayer.ordinal() > cacheLayer.ordinal()){
-                        Draw.rect(block.variantRegions()[0], tile.worldx() + point.x*tilesize, tile.worldy() + point.y*tilesize);
-                    }
                 }
             }
         }
-
     }
 
     //'new' style of edges with shadows instead of colors, not used currently
     protected void drawEdgesFlat(Tile tile, boolean sameLayer){
         for(int i = 0; i < 4; i++){
             Tile other = tile.getNearby(i);
-            if(other != null && doEdge(other.floor(), sameLayer)){
+            if(other != null && doEdge(other.floor())){
                 Color color = other.floor().mapColor;
                 Draw.color(color.r, color.g, color.b, 1f);
                 Draw.rect(edgeRegion, tile.worldx(), tile.worldy(), i*90);
@@ -231,8 +239,8 @@ public class Floor extends Block{
         return ((Floor)blendGroup).edges;
     }
 
-    protected boolean doEdge(Floor other, boolean sameLayer){
-        return (((other.blendGroup.id > blendGroup.id) || edges() == null) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer));
+    protected boolean doEdge(Floor other){
+        return other.blendGroup.id > blendGroup.id || edges() == null;
     }
 
     TextureRegion edge(Floor block, int x, int y){

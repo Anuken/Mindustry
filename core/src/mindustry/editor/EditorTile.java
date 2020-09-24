@@ -46,14 +46,14 @@ public class EditorTile extends Tile{
             return;
         }
 
-        //if(this.block == type && (build == null || build.rotation == rotation)){
-        //    ui.editor.editor.renderer().updatePoint(x, y);
-        //    return;
-        //}
+        if(this.block == type && (build == null || build.rotation == rotation)){
+            update();
+            return;
+        }
 
-        if(rotation != 0) op(OpType.rotation, (byte)rotation);
-        if(team() != Team.derelict) op(OpType.team, (byte)team().id);
         op(OpType.block, block.id);
+        if(rotation != 0) op(OpType.rotation, (byte)rotation);
+        if(team != Team.derelict) op(OpType.team, (byte)team.id);
         super.setBlock(type, team, rotation);
     }
 
@@ -87,7 +87,7 @@ public class EditorTile extends Tile{
         if(skip()){
             super.fireChanged();
         }else{
-            ui.editor.editor.renderer().updatePoint(x, y);
+            update();
         }
     }
 
@@ -119,6 +119,10 @@ public class EditorTile extends Tile{
             if(block.hasLiquids) build.liquids(new LiquidModule());
             if(block.hasPower) build.power(new PowerModule());
         }
+    }
+
+    private void update(){
+        ui.editor.editor.renderer.updatePoint(x, y);
     }
 
     private boolean skip(){

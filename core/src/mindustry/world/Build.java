@@ -59,7 +59,7 @@ public class Build{
         result.beforePlaceBegan(tile, previous);
 
         tile.setBlock(sub, team, rotation);
-        tile.<ConstructBuild>bc().setConstruct(previous, result);
+        tile.<ConstructBuild>bc().setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
 
         result.placeBegan(tile, previous);
 
@@ -91,7 +91,7 @@ public class Build{
         }
 
         if(type.isMultiblock()){
-            if((type.canReplace(tile.block()) || (tile.block instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == type)) &&
+            if(((type.canReplace(tile.block()) || tile.block.alwaysReplace) || (tile.block instanceof ConstructBlock && tile.<ConstructBuild>bc().cblock == type)) &&
                 type.canPlaceOn(tile, team) && tile.interactable(team)){
 
                 //if the block can be replaced but the sizes differ, check all the spaces around the block to make sure it can fit
@@ -105,7 +105,7 @@ public class Build{
                             int wx = dx + offsetx + x, wy = dy + offsety + y;
 
                             Tile check = world.tile(wx, wy);
-                            if(check == null || (!check.block.alwaysReplace && check.block != tile.block)) return false;
+                            if(check == null || !check.interactable(team) || (!check.block.alwaysReplace && check.block != tile.block && !(check.block.size == 1 && type.canReplace(check.block)))) return false;
                         }
                     }
                 }

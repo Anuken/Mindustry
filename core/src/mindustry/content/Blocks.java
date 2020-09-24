@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     repairPoint, resupplyPoint,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell,
+    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
     launchPad, launchPadLarge,
@@ -316,6 +316,7 @@ public class Blocks implements ContentList{
 
         snowBoulder = new Boulder("snow-boulder"){{
             variants = 2;
+            snow.asFloor().decoration = ice.asFloor().decoration = iceSnow.asFloor().decoration = this;
         }};
 
         dirtWall = new StaticWall("dirt-wall"){{
@@ -342,6 +343,7 @@ public class Blocks implements ContentList{
 
         sandWall = new StaticWall("sand-wall"){{
             variants = 2;
+            sandWater.asFloor().wall = this;
         }};
 
         saltWall = new StaticWall("salt-wall");
@@ -801,7 +803,7 @@ public class Blocks implements ContentList{
         }};
 
         door = new Door("door"){{
-            requirements(Category.defense, with(Items.graphite, 6, Items.silicon, 4));
+            requirements(Category.defense, with(Items.titanium, 6, Items.silicon, 4));
             health = 100 * wallHealthMultiplier;
         }};
 
@@ -1146,7 +1148,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
             itemDuration = 90f;
-            consumes.liquid(Liquids.water, 0.07f);
+            consumes.liquid(Liquids.water, 0.09f);
             hasLiquids = true;
             size = 2;
         }};
@@ -1266,7 +1268,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
 
-            consumes.power(1f);
+            consumes.power(1.25f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
@@ -1319,7 +1321,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.copper, 3000, Items.lead, 3000, Items.silicon, 2000));
 
             unitType = UnitTypes.beta;
-            health = 2000;
+            health = 3500;
             itemCapacity = 9000;
             size = 4;
 
@@ -1330,7 +1332,7 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.copper, 8000, Items.lead, 8000, Items.silicon, 5000, Items.thorium, 4000));
 
             unitType = UnitTypes.gamma;
-            health = 4000;
+            health = 6000;
             itemCapacity = 13000;
             size = 5;
 
@@ -1376,7 +1378,7 @@ public class Blocks implements ContentList{
             ammoUseEffect = Fx.shellEjectSmall;
             health = 250;
             inaccuracy = 2f;
-            rotatespeed = 10f;
+            rotateSpeed = 10f;
         }};
 
         scatter = new ItemTurret("scatter"){{
@@ -1394,7 +1396,7 @@ public class Blocks implements ContentList{
             targetGround = false;
 
             recoilAmount = 2f;
-            rotatespeed = 15f;
+            rotateSpeed = 15f;
             inaccuracy = 17f;
             shootCone = 35f;
 
@@ -1497,8 +1499,8 @@ public class Blocks implements ContentList{
             }};
             reloadTime = 35f;
             shootCone = 40f;
-            rotatespeed = 8f;
-            powerUse = 4f;
+            rotateSpeed = 8f;
+            powerUse = 3f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1596,8 +1598,10 @@ public class Blocks implements ContentList{
             health = 220 * size * size;
             shootSound = Sounds.shotgun;
 
+            float brange = range + 10f;
+
             ammo(Items.thorium, new ShrapnelBulletType(){{
-                length = range + 10f;
+                length = brange;
                 damage = 105f;
                 ammoMultiplier = 6f;
             }});
@@ -1646,7 +1650,7 @@ public class Blocks implements ContentList{
             range = 200f;
             size = 3;
             recoilAmount = 3f;
-            rotatespeed = 10f;
+            rotateSpeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootSnap;
@@ -1691,7 +1695,7 @@ public class Blocks implements ContentList{
             reloadTime = 90f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
-            powerUse = 14f;
+            powerUse = 17f;
             shootSound = Sounds.laserbig;
             activeSound = Sounds.beam;
             activeSoundVolume = 2f;
@@ -1803,6 +1807,8 @@ public class Blocks implements ContentList{
                 new UpgradePlan(UnitTypes.spiroct, UnitTypes.arkyid, with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650)),
                 new UpgradePlan(UnitTypes.fortress, UnitTypes.scepter, with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650)),
                 new UpgradePlan(UnitTypes.bryde, UnitTypes.sei, with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650)),
+                new UpgradePlan(UnitTypes.mega, UnitTypes.quad, with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650)),
+                new UpgradePlan(UnitTypes.quasar, UnitTypes.vela, with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650)),
             };
         }};
 
@@ -1819,6 +1825,8 @@ public class Blocks implements ContentList{
                 new UpgradePlan(UnitTypes.arkyid, UnitTypes.toxopid, with(Items.silicon, 1000, Items.plastanium, 600, Items.surgealloy, 500, Items.phasefabric, 350)),
                 new UpgradePlan(UnitTypes.scepter, UnitTypes.reign, with(Items.silicon, 1000, Items.plastanium, 600, Items.surgealloy, 500, Items.phasefabric, 350)),
                 new UpgradePlan(UnitTypes.sei, UnitTypes.omura, with(Items.silicon, 1000, Items.plastanium, 600, Items.surgealloy, 500, Items.phasefabric, 350)),
+                new UpgradePlan(UnitTypes.quad, UnitTypes.oct, with(Items.silicon, 1000, Items.plastanium, 600, Items.surgealloy, 500, Items.phasefabric, 350)),
+                new UpgradePlan(UnitTypes.vela, UnitTypes.corvus, with(Items.silicon, 1000, Items.plastanium, 600, Items.surgealloy, 500, Items.phasefabric, 350)),
             };
         }};
 
@@ -1952,9 +1960,16 @@ public class Blocks implements ContentList{
         }};
 
         memoryCell = new MemoryBlock("memory-cell"){{
-            requirements(Category.logic, with(Items.graphite, 40, Items.silicon, 40));
+            requirements(Category.logic, with(Items.graphite, 30, Items.silicon, 30));
 
             memoryCapacity = 64;
+        }};
+
+        memoryBank = new MemoryBlock("memory-bank"){{
+            requirements(Category.logic, with(Items.graphite, 80, Items.silicon, 80, Items.phasefabric, 30));
+
+            memoryCapacity = 512;
+            size = 2;
         }};
 
         logicDisplay = new LogicDisplay("logic-display"){{

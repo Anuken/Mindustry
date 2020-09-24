@@ -846,7 +846,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, universe.seconds(), (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 
