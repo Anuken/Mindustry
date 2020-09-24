@@ -12,7 +12,7 @@ public class DrawRotator extends DrawBlock{
     @Override
     public void draw(GenericCrafterBuild entity){
         Draw.rect(entity.block.region, entity.x, entity.y);
-        Draw.color(Vars.shadowColor);
+        Draw.color(Vars.specialShadowColor);
         Draw.rect(rotator, entity.x - (entity.size / 2.5f), entity.y - (entity.size / 2.5f), entity.totalProgress * 2f);
         Draw.color();
         Draw.rect(rotator, entity.x, entity.y, entity.totalProgress * 2f);

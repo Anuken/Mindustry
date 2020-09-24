@@ -85,7 +85,7 @@ public class Separator extends Block{
 
             Draw.reset();
             if(Core.atlas.isFound(spinnerRegion)){
-                Draw.color(Vars.shadowColor);
+                Draw.color(Vars.specialShadowColor);
                 Draw.rect(spinnerRegion, x - (size / 2.5f), y - (size / 2.5f), totalProgress * spinnerSpeed);
                 Draw.color();
                 Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);

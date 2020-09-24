@@ -310,7 +310,7 @@ public class Drill extends Block{
                 Draw.color();
             }
 
-            Draw.color(Vars.shadowColor);
+            Draw.color(Vars.specialShadowColor);
             Draw.rect(rotatorRegion, x - (size / 2.5f), y - (size / 2.5f), timeDrilled * rotateSpeed);
             Draw.rect(topRegion, x - (size / 2f), y - (size / 2f));
             Draw.color();

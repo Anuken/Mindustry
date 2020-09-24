@@ -71,7 +71,7 @@ public class RepairPoint extends Block{
             Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.turret);
-            Draw.color(Vars.shadowColor);
+            Draw.color(Vars.specialShadowColor);
             Draw.rect(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.color();
             Draw.rect(region, x, y, rotation - 90);

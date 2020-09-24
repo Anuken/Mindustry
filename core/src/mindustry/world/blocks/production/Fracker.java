@@ -50,7 +50,7 @@ public class Fracker extends SolidPump{
             Draw.rect(liquidRegion, x, y);
             Draw.color();
 
-            Draw.color(Vars.shadowColor);
+            Draw.color(Vars.specialShadowColor);
             Draw.rect(rotatorRegion, x - (size / 2.5f), y - (size / 2.5f), pumpTime);
             Draw.rect(topRegion, x - (size / 2f), y - (size / 2f));
             Draw.color();

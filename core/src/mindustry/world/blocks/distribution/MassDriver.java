@@ -189,7 +189,7 @@ public class MassDriver extends Block{
 
             Draw.z(Layer.turret);
 
-            Draw.color(Vars.shadowColor);
+            Draw.color(Vars.specialShadowColor);
             Draw.rect(region, 
             x + Angles.trnsx(rotation + 180f, reload * knockback) - (size / 2f),
             y + Angles.trnsy(rotation + 180f, reload * knockback) - (size / 2f), rotation - 90);
