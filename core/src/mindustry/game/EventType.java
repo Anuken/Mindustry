@@ -40,7 +40,6 @@ public class EventType{
 
     public static class WinEvent{}
     public static class LoseEvent{}
-    public static class LaunchEvent{}
     public static class ResizeEvent{}
     public static class MapMakeEvent{}
     public static class MapPublishEvent{}

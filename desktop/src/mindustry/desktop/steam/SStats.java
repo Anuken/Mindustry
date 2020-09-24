@@ -196,13 +196,14 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        Events.on(LaunchEvent.class, e -> {
-            if(state.rules.tutorial){
-                completeTutorial.complete();
-            }
-
-            SStat.timesLaunched.add();
-        });
+        //TODO
+        //Events.on(LaunchEvent.class, e -> {
+        //    if(state.rules.tutorial){
+        //        completeTutorial.complete();
+        //    }
+//
+        //    SStat.timesLaunched.add();
+        //});
 
         Events.on(LaunchItemEvent.class, e -> {
             SStat.itemsLaunched.add(e.stack.amount);
