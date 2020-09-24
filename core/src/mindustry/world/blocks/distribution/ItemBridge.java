@@ -68,10 +68,10 @@ public class ItemBridge extends Block{
         Draw.color(Vars.specialShadowColor);
         Lines.line(
         bridgeRegion,
-        req.drawx() + Tmp.v1.x - (size / 3),
-        req.drawy() + Tmp.v1.y - (size / 3),
-        otherReq.drawx() - Tmp.v1.x - (size / 3),
-        otherReq.drawy() - Tmp.v1.y - (size / 3), false
+        req.drawx() + Tmp.v1.x - (size / 2),
+        req.drawy() + Tmp.v1.y - (size / 2),
+        otherReq.drawx() - Tmp.v1.x - (size / 2),
+        otherReq.drawy() - Tmp.v1.y - (size / 2), false
         );
         Draw.color();
         Lines.line(
