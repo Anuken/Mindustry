@@ -33,7 +33,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     }
 
     boolean mining(){
-        return mineTile != null;
+        return mineTile != null && !(((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding());
     }
 
     @Override
@@ -51,13 +51,12 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         }
 
         if(mineTile == null || core == null || mineTile.block() != Blocks.air || dst(mineTile.worldx(), mineTile.worldy()) > miningRange
-        || (((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding())
         || mineTile.drop() == null || !canMine(mineTile.drop())){
             mineTile = null;
             mineTimer = 0f;
-        }else{
+        }else if(mining()){
             Item item = mineTile.drop();
-            rotation(Mathf.slerpDelta(rotation(), angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f));
+            lookAt(angleTo(mineTile.worldx(), mineTile.worldy()));
             mineTimer += Time.delta *type.mineSpeed;
 
             if(Mathf.chance(0.06 * Time.delta)){

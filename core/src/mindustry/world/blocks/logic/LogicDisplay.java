@@ -9,8 +9,8 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class LogicDisplay extends Block{
     public static final byte
@@ -34,11 +34,18 @@ public class LogicDisplay extends Block{
         solid = true;
     }
 
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.displaySize, "@x@", displaySize, displaySize);
+    }
+
     public class LogicDisplayBuild extends Building{
         public FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
-        public LongQueue commands = new LongQueue(LExecutor.maxDisplayBuffer);
+        public LongQueue commands = new LongQueue(256);
 
         @Override
         public void draw(){
@@ -60,7 +67,6 @@ public class LogicDisplay extends Block{
                     buffer.begin();
                     Draw.color(color);
                     Lines.stroke(stroke);
-                    Lines.precise(true);
 
                     while(!commands.isEmpty()){
                         long c = commands.removeFirst();
@@ -80,8 +86,6 @@ public class LogicDisplay extends Block{
                             case commandStroke: this.stroke = x; Lines.stroke(x); break;
                         }
                     }
-
-                    Lines.precise(false);
 
                     buffer.end();
                     Draw.proj(Tmp.m1);

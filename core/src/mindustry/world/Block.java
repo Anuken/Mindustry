@@ -15,6 +15,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -616,6 +617,18 @@ public class Block extends UnlockableContent{
     }
 
     @Override
+    public ItemStack[] researchRequirements(){
+        ItemStack[] out = new ItemStack[requirements.length];
+        for(int i = 0; i < out.length; i++){
+            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20, 10);
+
+            out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
+        }
+
+        return out;
+    }
+
+    @Override
     public void getDependencies(Cons<UnlockableContent> cons){
         //just requires items
         for(ItemStack stack : requirements){
@@ -673,7 +686,7 @@ public class Block extends UnlockableContent{
     public void load(){
         region = Core.atlas.find(name);
 
-        if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
+        if(cracks == null || (cracks[0][0].texture != null && cracks[0][0].texture.isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];
             for(int size = 1; size <= maxCrackSize; size++){
                 for(int i = 0; i < crackRegions; i++){

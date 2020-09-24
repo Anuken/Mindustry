@@ -30,6 +30,7 @@ public class JoinDialog extends BaseDialog{
     Table global = new Table();
     Table hosts = new Table();
     int totalHosts;
+    int refreshes;
 
     public JoinDialog(){
         super("@joingame");
@@ -95,6 +96,8 @@ public class JoinDialog extends BaseDialog{
     }
 
     void refreshAll(){
+        refreshes ++;
+
         refreshLocal();
         refreshRemote();
         refreshGlobal();
@@ -327,12 +330,15 @@ public class JoinDialog extends BaseDialog{
     }
 
     void refreshGlobal(){
+        int cur = refreshes;
+
         global.clear();
         global.background(null);
         for(String host : defaultServers){
             String resaddress = host.contains(":") ? host.split(":")[0] : host;
             int resport = host.contains(":") ? Strings.parseInt(host.split(":")[1]) : port;
             net.pingHost(resaddress, resport, res -> {
+                if(refreshes != cur) return;
                 res.port = resport;
                 addGlobalHost(res);
             }, e -> {});
@@ -406,7 +412,7 @@ public class JoinDialog extends BaseDialog{
     void safeConnect(String ip, int port, int version){
         if(version != Version.build && Version.build != -1 && version != -1){
             ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
-            Core.bundle.format("server.versions", Version.build, version));
+                Core.bundle.format("server.versions", Version.build, version));
         }else{
             connect(ip, port);
         }
@@ -427,7 +433,7 @@ public class JoinDialog extends BaseDialog{
         }
 
         //get servers
-        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonURL, result -> {
+        Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonV6URL, result -> {
             try{
                 Jval val = Jval.read(result.getResultAsString());
                 Core.app.post(() -> {

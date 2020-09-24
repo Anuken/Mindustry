@@ -3,6 +3,7 @@ package mindustry.world.blocks.logic;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class MemoryBlock extends Block{
     public int memoryCapacity = 32;
@@ -13,8 +14,21 @@ public class MemoryBlock extends Block{
         solid = true;
     }
 
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.memoryCapacity, memoryCapacity, StatUnit.none);
+    }
+
     public class MemoryBuild extends Building{
         public double[] memory = new double[memoryCapacity];
+
+        //massive byte size means picking up causes sync issues
+        @Override
+        public boolean canPickup(){
+            return false;
+        }
 
         @Override
         public void write(Writes write){
@@ -31,9 +45,9 @@ public class MemoryBlock extends Block{
             super.read(read, revision);
 
             int amount = read.i();
-            memory = memory.length != amount ? new double[amount] : memory;
             for(int i = 0; i < amount; i++){
-                memory[i] = read.d();
+                double val = read.d();
+                if(i < memory.length) memory[i] = val;
             }
         }
     }

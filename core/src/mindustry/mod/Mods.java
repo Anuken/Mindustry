@@ -192,10 +192,10 @@ public class Mods implements Loadable{
 
     private PageType getPage(AtlasRegion region){
         return
-            region.getTexture() == Core.atlas.find("white").getTexture() ? PageType.main :
-            region.getTexture() == Core.atlas.find("stone1").getTexture() ? PageType.environment :
-            region.getTexture() == Core.atlas.find("clear-editor").getTexture() ? PageType.editor :
-            region.getTexture() == Core.atlas.find("whiteui").getTexture() ? PageType.ui :
+            region.texture == Core.atlas.find("white").texture ? PageType.main :
+            region.texture == Core.atlas.find("stone1").texture ? PageType.environment :
+            region.texture == Core.atlas.find("clear-editor").texture ? PageType.editor :
+            region.texture == Core.atlas.find("whiteui").texture ? PageType.ui :
             PageType.main;
     }
 
@@ -600,9 +600,14 @@ public class Mods implements Loadable{
                 zip = zip.list()[0];
             }
 
-            Fi metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
+            Fi metaf =
+                zip.child("mod.json").exists() ? zip.child("mod.json") :
+                zip.child("mod.hjson").exists() ? zip.child("mod.hjson") :
+                zip.child("plugin.json").exists() ? zip.child("plugin.json") :
+                zip.child("plugin.hjson");
+
             if(!metaf.exists()){
-                Log.warn("Mod @ doesn't have a 'mod.json'/'mod.hjson'/'plugin.json' file, skipping.", sourceFile);
+                Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", sourceFile);
                 throw new IllegalArgumentException("Invalid file: No mod.json found.");
             }
 
@@ -646,7 +651,9 @@ public class Mods implements Loadable{
                 meta.hidden = true;
             }
 
-            Log.info("Loaded mod '@' in @", meta.name, Time.elapsed());
+            if(!headless){
+                Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
+            }
             return new LoadedMod(sourceFile, zip, mainMod, meta);
 
         }catch(Exception e){

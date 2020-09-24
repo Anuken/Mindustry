@@ -17,7 +17,7 @@ public enum EditorTool{
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
 
             Tile tile = editor.tile(x, y);
-            editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
+            editor.drawBlock = tile.block() == Blocks.air || !tile.block().inEditor ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
     },
     line(KeyCode.l, "replace", "orthogonal"){

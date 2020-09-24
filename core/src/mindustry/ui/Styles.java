@@ -54,9 +54,9 @@ public class Styles{
         }};
         
         waveb = new ButtonStyle(){{
-            up = buttonEdge4;
-            over = buttonEdgeOver4;
-            disabled = buttonEdge4;
+            up = wavepane;
+            over = wavepane; //TODO wrong
+            disabled = wavepane;
         }};
 
         defaultt = new TextButtonStyle(){{
@@ -183,6 +183,9 @@ public class Styles{
             over = buttonRightOver;
             down = buttonRightDown;
             up = buttonRight;
+            disabled = buttonRightDisabled;
+            imageDisabledColor = Color.clear;
+            imageUpColor = Color.white;
         }};
         emptyi = new ImageButtonStyle(){{
             imageDownColor = Pal.accent;

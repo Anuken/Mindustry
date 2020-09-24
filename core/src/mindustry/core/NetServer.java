@@ -131,7 +131,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(Time.millis() < info.lastKicked){
+            if(Time.millis() < admins.getKickTime(uuid, con.address)){
                 con.kick(KickReason.recentKick);
                 return;
             }
@@ -593,36 +593,36 @@ public class NetServer implements ApplicationListener{
         if(player.isBuilder()){
             player.builder().clearBuilding();
             player.builder().updateBuilding(building);
+
+            if(requests != null){
+                for(BuildPlan req : requests){
+                    if(req == null) continue;
+                    Tile tile = world.tile(req.x, req.y);
+                    if(tile == null || (!req.breaking && req.block == null)) continue;
+                    //auto-skip done requests
+                    if(req.breaking && tile.block() == Blocks.air){
+                        continue;
+                    }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || (tile.build != null && tile.build.rotation == req.rotation))){
+                        continue;
+                    }else if(con.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
+                        continue;
+                    }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
+                        action.block = req.block;
+                        action.rotation = req.rotation;
+                        action.config = req.config;
+                    })){
+                        //force the player to remove this request if that's not the case
+                        Call.removeQueueBlock(player.con, req.x, req.y, req.breaking);
+                        con.rejectedRequests.add(req);
+                        continue;
+                    }
+                    player.builder().plans().addLast(req);
+                }
+            }
         }
 
         if(player.isMiner()){
             player.miner().mineTile(mining);
-        }
-
-        if(requests != null){
-            for(BuildPlan req : requests){
-                if(req == null) continue;
-                Tile tile = world.tile(req.x, req.y);
-                if(tile == null || (!req.breaking && req.block == null)) continue;
-                //auto-skip done requests
-                if(req.breaking && tile.block() == Blocks.air){
-                    continue;
-                }else if(!req.breaking && tile.block() == req.block && (!req.block.rotate || (tile.build != null && tile.build.rotation == req.rotation))){
-                    continue;
-                }else if(con.rejectedRequests.contains(r -> r.breaking == req.breaking && r.x == req.x && r.y == req.y)){ //check if request was recently rejected, and skip it if so
-                    continue;
-                }else if(!netServer.admins.allowAction(player, req.breaking ? ActionType.breakBlock : ActionType.placeBlock, tile, action -> { //make sure request is allowed by the server
-                    action.block = req.block;
-                    action.rotation = req.rotation;
-                    action.config = req.config;
-                })){
-                    //force the player to remove this request if that's not the case
-                    Call.removeQueueBlock(player.con, req.x, req.y, req.breaking);
-                    con.rejectedRequests.add(req);
-                    continue;
-                }
-                player.builder().plans().addLast(req);
-            }
         }
 
         con.rejectedRequests.clear();
@@ -846,7 +846,7 @@ public class NetServer implements ApplicationListener{
         byte[] stateBytes = syncStream.toByteArray();
 
         //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, (short)stateBytes.length, net.compressSnapshot(stateBytes));
+        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.serverPaused, state.gameOver, universe.seconds(), (short)stateBytes.length, net.compressSnapshot(stateBytes));
 
         viewport.setSize(player.con.viewWidth, player.con.viewHeight).setCenter(player.con.viewX, player.con.viewY);
 

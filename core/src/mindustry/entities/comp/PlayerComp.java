@@ -71,6 +71,10 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit.icon();
     }
 
+    public boolean displayAmmo(){
+        return unit instanceof BlockUnitc || state.rules.unitAmmo;
+    }
+
     public void reset(){
         team = state.rules.defaultTeam;
         admin = typing = false;
@@ -88,7 +92,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return unit.isNull() ? 20 : unit.type().hitsize * 2f;
+        return unit.isNull() ? 20 : unit.type().hitSize * 2f;
     }
 
     @Override
@@ -130,7 +134,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             deathTimer += Time.delta;
             if(deathTimer >= deathDelay){
                 //request spawn - this happens serverside only
-                core.requestSpawn(base());
+                core.requestSpawn(self());
                 deathTimer = 0;
             }
         }
@@ -187,7 +191,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             }
         }
 
-        Events.fire(new UnitChangeEvent(base(), unit));
+        Events.fire(new UnitChangeEvent(self(), unit));
     }
 
     boolean dead(){

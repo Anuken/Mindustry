@@ -86,14 +86,14 @@ public class SettingsMenuDialog extends SettingsDialog{
         dataDialog.addCloseButton();
 
         dataDialog.cont.table(Tex.button, t -> {
-            t.defaults().size(270f, 60f).left();
+            t.defaults().size(280f, 60f).left();
             TextButtonStyle style = Styles.cleart;
 
             t.button("@settings.cleardata", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
                 for(String value : Core.settings.keys()){
                     if(value.contains("usid") || value.contains("uuid")){
-                        map.put(value, Core.settings.getString(value));
+                        map.put(value, Core.settings.get(value, null));
                     }
                 }
                 Core.settings.clear();
@@ -419,6 +419,9 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
         dest.delete();
+
+        //load data so it's saved on exit
+        settings.load();
     }
 
     private void back(){

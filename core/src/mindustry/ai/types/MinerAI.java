@@ -15,14 +15,6 @@ public class MinerAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(unit.moving()){
-            unit.lookAt(unit.vel.angle());
-        }
-
-        if(unit.isFlying()){
-            unit.wobble();
-        }
-
         Building core = unit.closestCore();
 
         if(!(unit instanceof Minerc) || core == null) return;
@@ -52,7 +44,7 @@ public class MinerAI extends AIController{
                 }
 
                 if(ore != null){
-                    moveTo(ore, unit.type().range / 1.5f);
+                    moveTo(ore, unit.type().range / 2f);
 
                     if(unit.within(ore, unit.type().range)){
                         miner.mineTile(ore);

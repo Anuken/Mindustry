@@ -1,5 +1,6 @@
 package mindustry.entities;
 
+import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
@@ -19,6 +20,15 @@ public class Units{
     private static boolean boolResult;
 
     @Remote(called = Loc.server)
+    public static void unitCapDeath(Unit unit){
+        if(unit != null){
+            unit.dead = true;
+            Fx.unitCapKill.at(unit);
+            Core.app.post(() -> Call.unitDestroy(unit.id));
+        }
+    }
+
+    @Remote(called = Loc.server)
     public static void unitDeath(int uid){
         Unit unit = Groups.unit.getByID(uid);
 
@@ -29,6 +39,21 @@ public class Units{
 
         if(unit != null){
             unit.killed();
+        }
+    }
+
+    //destroys immediately
+    @Remote(called = Loc.server)
+    public static void unitDestroy(int uid){
+        Unit unit = Groups.unit.getByID(uid);
+
+        //if there's no unit don't add it later and get it stuck as a ghost
+        if(netClient != null){
+            netClient.addRemovedEntity(uid);
+        }
+
+        if(unit != null){
+            unit.destroy();
         }
     }
 

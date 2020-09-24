@@ -71,7 +71,7 @@ abstract class BuilderComp implements Unitc{
         Tile tile = world.tile(current.x, current.y);
 
         if(within(tile, finalPlaceDst)){
-            rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
+            lookAt(angleTo(tile));
         }
 
         if(!(tile.block() instanceof ConstructBlock)){
@@ -108,9 +108,9 @@ abstract class BuilderComp implements Unitc{
         ConstructBuild entity = tile.bc();
 
         if(current.breaking){
-            entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            entity.construct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.config);
+            entity.construct(self(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.config);
         }
 
         current.stuck = Mathf.equal(current.progress, entity.progress);

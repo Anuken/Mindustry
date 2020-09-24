@@ -440,7 +440,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, short coreDataLen, byte[] coreData){
+    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, short coreDataLen, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
@@ -452,6 +452,8 @@ public class NetClient implements ApplicationListener{
             state.wave = wave;
             state.enemies = enemies;
             state.serverPaused = paused;
+
+            universe.updateNetSeconds(timeData);
 
             netClient.byteStream.setBytes(net.decompressSnapshot(coreData, coreDataLen));
             DataInputStream input = netClient.dataStream;
@@ -545,6 +547,10 @@ public class NetClient implements ApplicationListener{
     /** When set, any disconnects will be ignored and no dialogs will be shown. */
     public void setQuiet(){
         quiet = true;
+    }
+
+    public void clearRemovedEntity(int id){
+        removed.remove(id);
     }
 
     public void addRemovedEntity(int id){

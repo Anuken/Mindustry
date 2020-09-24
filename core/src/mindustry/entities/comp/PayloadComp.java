@@ -25,15 +25,15 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     boolean canPickup(Unit unit){
-        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity;
+        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f;
     }
 
     boolean canPickup(Building build){
-        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity;
+        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f;
     }
 
     boolean canPickupPayload(Payload pay){
-        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity;
+        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity + 0.001f;
     }
 
     boolean hasPayload(){
@@ -48,6 +48,9 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         unit.remove();
         payloads.add(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
+        if(Vars.net.client()){
+            Vars.netClient.clearRemovedEntity(unit.id);
+        }
     }
 
     void pickup(Building tile){
@@ -71,6 +74,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     boolean tryDropPayload(Payload payload){
         Tile on = tileOn();
 
+        //clear removed state of unit so it can be synced
+        if(Vars.net.client() && payload instanceof UnitPayload){
+            Vars.netClient.clearRemovedEntity(((UnitPayload)payload).unit.id);
+        }
+
         //drop off payload on an acceptor if possible
         if(on != null && on.build != null && on.build.acceptPayload(on.build, payload)){
             Fx.unitDrop.at(on.build);
@@ -90,7 +98,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Unit u = payload.unit;
 
         //can't drop ground units
-        if(((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f) || (!floorOn().isLiquid && u instanceof WaterMovec)){
+        if(!u.canPass(tileX(), tileY())){
             return false;
         }
 

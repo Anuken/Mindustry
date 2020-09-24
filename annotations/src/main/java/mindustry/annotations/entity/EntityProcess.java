@@ -77,7 +77,11 @@ public class EntityProcess extends BaseProcessor{
                 for(Smethod elem : component.methods()){
                     if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
                     //get all statements in the method, store them
-                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString());
+                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString()
+                        //replace all self() invocations with this
+                        .replaceAll("this\\.<(.*)>self\\(\\)", "this")
+                        .replaceAll("self\\(\\)", "this")
+                    );
                 }
             }
 

@@ -43,7 +43,8 @@ public class Pathfinder implements Runnable{
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
-            (PathTile.deep(tile) ? 70 : 0),
+            (PathTile.deep(tile) ? 70 : 0) +
+            (PathTile.damages(tile) ? 30 : 0),
 
         //legs
         (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
@@ -52,14 +53,15 @@ public class Pathfinder implements Runnable{
         //water
         (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 + //TODO cannot go through blocks - pathfinding isn't great
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
-            (PathTile.deep(tile) ? -1 : 0)
+            (PathTile.deep(tile) ? -1 : 0) +
+            (PathTile.damages(tile) ? 35 : 0)
     );
 
     //maps team, cost, type to flow field
     Flowfield[][][] cache;
 
     /** tile data, see PathTileStruct */
-    int[][] tiles;
+    int[][] tiles = new int[0][0];
     /** unordered array of path data for iteration only. DO NOT iterate or access this in the main thread. */
     Seq<Flowfield> threadList = new Seq<>(), mainList = new Seq<>();
     /** handles task scheduling on the update thread. */
@@ -122,7 +124,8 @@ public class Pathfinder implements Runnable{
             nearLiquid,
             nearGround,
             nearSolid,
-            tile.floor().isDeep()
+            tile.floor().isDeep(),
+            tile.floor().damageTaken > 0.00001f
         );
     }
 
@@ -514,5 +517,7 @@ public class Pathfinder implements Runnable{
         boolean nearSolid;
         //whether this block is deep / drownable
         boolean deep;
+        //whether the floor damages
+        boolean damages;
     }
 }

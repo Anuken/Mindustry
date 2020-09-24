@@ -18,10 +18,10 @@ import static mindustry.Vars.*;
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
 
-    private final Context context = new Context();
-    private StringMap tags = new StringMap();
-    private MapRenderer renderer = new MapRenderer(this);
+    public StringMap tags = new StringMap();
+    public MapRenderer renderer = new MapRenderer(this);
 
+    private final Context context = new Context();
     private OperationStack stack = new OperationStack();
     private DrawOperation currentOp;
     private boolean loading;
@@ -31,8 +31,8 @@ public class MapEditor{
     public Block drawBlock = Blocks.stone;
     public Team drawTeam = Team.sharded;
 
-    public StringMap getTags(){
-        return tags;
+    public boolean isLoading(){
+        return loading;
     }
 
     public void beginEdit(int width, int height){
@@ -52,7 +52,7 @@ public class MapEditor{
         if(map.file.parent().parent().name().equals("1127400") && steam){
             tags.put("steamid",  map.file.parent().name());
         }
-        MapIO.loadMap(map, context);
+        load(() -> MapIO.loadMap(map, context));
         renderer.resize(width(), height());
         loading = false;
     }
@@ -210,10 +210,6 @@ public class MapEditor{
         }
     }
 
-    public MapRenderer renderer(){
-        return renderer;
-    }
-
     public void resize(int width, int height){
         clearOp();
 
@@ -227,8 +223,14 @@ public class MapEditor{
                 int px = offsetX + x, py = offsetY + y;
                 if(previous.in(px, py)){
                     tiles.set(x, y, previous.getn(px, py));
-                    tiles.getn(x, y).x = (short)x;
-                    tiles.getn(x, y).y = (short)y;
+                    Tile tile = tiles.getn(x, y);
+                    tile.x = (short)x;
+                    tile.y = (short)y;
+
+                    if(tile.build != null && tile.isCenter()){
+                        tile.build.x = x * tilesize + tile.block().offset;
+                        tile.build.y = y * tilesize + tile.block().offset;
+                    }
                 }else{
                     tiles.set(x, y, new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0));
                 }

@@ -245,7 +245,8 @@ public class Logic implements ApplicationListener{
             if(entry.cooldown < 0 && !entry.weather.isActive()){
                 float duration = Mathf.random(entry.minDuration, entry.maxDuration);
                 entry.cooldown = duration + Mathf.random(entry.minFrequency, entry.maxFrequency);
-                Call.createWeather(entry.weather, entry.intensity, duration);
+                Tmp.v1.setToRandomDirection();
+                Call.createWeather(entry.weather, entry.intensity, duration, Tmp.v1.x, Tmp.v1.y);
             }
         }
     }
@@ -336,7 +337,14 @@ public class Logic implements ApplicationListener{
 
             //force pausing when the player is out of sector time
             if(state.isOutOfTime()){
-                state.set(State.paused);
+                if(!state.wasTimeout){
+                    universe.displayTimeEnd();
+                    state.wasTimeout = true;
+                }
+                //if no turn was run.
+                if(state.isOutOfTime()){
+                    state.set(State.paused);
+                }
             }
 
             if(!state.isPaused()){

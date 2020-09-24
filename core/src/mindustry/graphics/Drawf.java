@@ -150,15 +150,14 @@ public class Drawf{
     }
 
     public static void laser(Team team, TextureRegion line, TextureRegion edge, float x, float y, float x2, float y2, float rotation, float scale){
-        Tmp.v1.trns(rotation, 8f * scale * Draw.scl);
+        float scl = 8f * scale * Draw.scl;
+        float vx = Mathf.cosDeg(rotation) * scl, vy = Mathf.sinDeg(rotation) * scl;
 
-        Draw.rect(edge, x, y, edge.getWidth() * scale * Draw.scl, edge.getHeight() * scale * Draw.scl, rotation + 180);
-        Draw.rect(edge, x2, y2, edge.getWidth() * scale * Draw.scl, edge.getHeight() * scale * Draw.scl, rotation);
+        Draw.rect(edge, x, y, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation + 180);
+        Draw.rect(edge, x2, y2, edge.width * scale * Draw.scl, edge.height * scale * Draw.scl, rotation);
 
         Lines.stroke(12f * scale);
-        Lines.precise(true);
-        Lines.line(line, x + Tmp.v1.x, y + Tmp.v1.y, x2 - Tmp.v1.x, y2 - Tmp.v1.y, false, 0f);
-        Lines.precise(false);
+        Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
         Lines.stroke(1f);
 
         light(team, x, y, x2, y2);
@@ -171,6 +170,20 @@ public class Drawf{
 
     public static void construct(Building t, UnlockableContent content, float rotation, float progress, float speed, float time){
         construct(t, content.icon(Cicon.full), rotation, progress, speed, time);
+    }
+
+    public static void construct(float x, float y, TextureRegion region, float rotation, float progress, float speed, float time){
+        Shaders.build.region = region;
+        Shaders.build.progress = progress;
+        Shaders.build.color.set(Pal.accent);
+        Shaders.build.color.a = speed;
+        Shaders.build.time = -time / 20f;
+
+        Draw.shader(Shaders.build);
+        Draw.rect(region, x, y, rotation);
+        Draw.shader();
+
+        Draw.reset();
     }
 
     public static void construct(Building t, TextureRegion region, float rotation, float progress, float speed, float time){

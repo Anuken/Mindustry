@@ -17,7 +17,7 @@ import mindustry.world.blocks.production.*;
 import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
-    public float moveTime = 60f;
+    public float moveTime = 40f, moveForce = 201f;
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
@@ -53,6 +53,7 @@ public class PayloadConveyor extends Block{
     public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
+        public float curInterp, lastInterp;
         public @Nullable Building next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
@@ -99,6 +100,10 @@ public class PayloadConveyor extends Block{
         public void updateTile(){
             if(!enabled) return;
 
+            lastInterp = curInterp;
+            curInterp = fract();
+            //rollover skip
+            if(lastInterp > curInterp) lastInterp = 0f;
             progress = time() % moveTime;
 
             updatePayload();
@@ -108,6 +113,7 @@ public class PayloadConveyor extends Block{
             if(curStep > step){
                 boolean valid = step != -1;
                 step = curStep;
+                boolean had = item != null;
 
                 if(valid && stepAccepted != curStep && item != null){
                     if(next != null){
@@ -129,7 +135,15 @@ public class PayloadConveyor extends Block{
                         }
                     }
                 }
+
+                if(had && item != null){
+                    moveFailed();
+                }
             }
+        }
+
+        public void moveFailed(){
+
         }
 
         public void moved(){
@@ -155,20 +169,20 @@ public class PayloadConveyor extends Block{
             float s = tilesize * size;
 
             //next
-            Tmp.v1.set((s-clipped.getWidth()*Draw.scl) + clipped.getWidth()/2f*Draw.scl - s/2f, s-clipped.getHeight()*Draw.scl + clipped.getHeight()/2f*Draw.scl - s/2f).rotate(rot);
+            Tmp.v1.set((s- clipped.width *Draw.scl) + clipped.width /2f*Draw.scl - s/2f, s- clipped.height *Draw.scl + clipped.height /2f*Draw.scl - s/2f).rotate(rot);
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
             clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trprev, 0), topRegion);
 
             //prev
-            Tmp.v1.set(- s/2f + clipped.getWidth()/2f*Draw.scl,  - s/2f + clipped.getHeight()/2f*Draw.scl).rotate(rot);
+            Tmp.v1.set(- s/2f + clipped.width /2f*Draw.scl,  - s/2f + clipped.height /2f*Draw.scl).rotate(rot);
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
                     Draw.alpha(1f - Interp.pow5In.apply(fract()));
                     //prev from back
-                    Tmp.v1.set(- s/2f + clipped.getWidth()/2f*Draw.scl,  - s/2f + clipped.getHeight()/2f*Draw.scl).rotate(i * 90 + 180);
+                    Tmp.v1.set(- s/2f + clipped.width /2f*Draw.scl,  - s/2f + clipped.height /2f*Draw.scl).rotate(i * 90 + 180);
                     Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, i * 90 + 180);
                 }
             }
@@ -190,6 +204,14 @@ public class PayloadConveyor extends Block{
 
         public float time(){
             return Time.time();
+        }
+
+        @Override
+        public void unitOn(Unit unit){
+            //calculate derivative of units moved last frame
+            float delta = (curInterp - lastInterp) * size * tilesize;
+            Tmp.v1.trns(rotdeg(), delta * moveForce).scl(1f / Math.max(unit.mass(), 201f));
+            unit.move(Tmp.v1.x, Tmp.v1.y);
         }
 
         @Override
@@ -265,12 +287,12 @@ public class PayloadConveyor extends Block{
             boolean overlaps = Intersector.intersectRectangles(bounds, sprite, over);
 
             TextureRegion out = Tmp.tr1;
-            out.set(region.getTexture());
+            out.set(region.texture);
 
             if(overlaps){
-                float w = region.getU2() - region.getU();
-                float h = region.getV2() - region.getV();
-                float x = region.getU(), y = region.getV();
+                float w = region.u2 - region.u;
+                float h = region.v2 - region.v;
+                float x = region.u, y = region.v;
                 float newX = (over.x - sprite.x) / sprite.width * w + x;
                 float newY = (over.y - sprite.y) / sprite.height * h + y;
                 float newW = (over.width / sprite.width) * w, newH = (over.height / sprite.height) * h;

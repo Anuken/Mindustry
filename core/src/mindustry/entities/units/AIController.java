@@ -17,6 +17,7 @@ public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
     protected static final int timerTarget = 0;
     protected static final int timerTarget2 = 1;
+    protected static final int timerTarget3 = 2;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
@@ -33,6 +34,7 @@ public class AIController implements UnitController{
 
     @Override
     public void updateUnit(){
+        updateVisuals();
         updateTargeting();
         updateMovement();
     }
@@ -41,13 +43,23 @@ public class AIController implements UnitController{
         return unit.team.data().command;
     }
 
+    protected void updateVisuals(){
+
+        if(unit.isFlying()){
+            unit.wobble();
+
+            if(unit.moving()){
+                unit.lookAt(unit.vel.angle());
+            }
+        }
+    }
+
     protected void updateMovement(){
 
     }
 
     protected void updateTargeting(){
         if(unit.hasWeapons()){
-
             updateWeapons();
         }
     }
@@ -140,7 +152,7 @@ public class AIController implements UnitController{
             vec.rotate((circleLength - vec.len()) / circleLength * 180f);
         }
 
-        vec.setLength(speed * Time.delta);
+        vec.setLength(speed);
 
         unit.moveAt(vec);
     }
@@ -152,7 +164,7 @@ public class AIController implements UnitController{
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
 
-        vec.setLength(unit.type().speed * Time.delta * length);
+        vec.setLength(unit.type().speed * length);
         if(length < -0.5f){
             vec.rotate(180f);
         }else if(length < 0){

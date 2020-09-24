@@ -5,7 +5,6 @@ import arc.util.noise.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
-import mindustry.type.Sector.*;
 import mindustry.world.*;
 
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
@@ -24,7 +23,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
         if(noise < 0.15){
             for(Ptile other : tile.tiles){
-                if(sector.planet.getSector(other).is(SectorAttribute.base)){
+                if(sector.planet.getSector(other).generateEnemyBase){
                     any = false;
                     break;
                 }
@@ -32,7 +31,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         }
 
         if(any){
-            sector.data.attributes |= (1 << SectorAttribute.base.ordinal());
+            sector.generateEnemyBase = true;
         }
     }
 

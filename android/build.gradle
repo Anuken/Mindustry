@@ -34,7 +34,8 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
 
-    if(localArc()) compileOnly fileTree(dir: '../../Arc/backends/backend-android/libs', include: ['*.jar'])
+    //android dependencies magically disappear during compilation, thanks gradle!
+    if(new File(projectDir.parent, '../Arc').exists()) compileOnly fileTree(dir: '../../Arc/backends/backend-android/libs', include: ['*.jar'])
 }
 
 task deploy(type: Copy){
@@ -98,7 +99,7 @@ android{
                 keyAlias RELEASE_KEY_ALIAS
                 keyPassword RELEASE_KEY_PASSWORD
             }else{
-                println("No keystore info property found!")
+                println("No keystore property found. Releases will be unsigned.")
             }
         }
     }

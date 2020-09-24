@@ -59,7 +59,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public int rotation;
     public boolean droppingItem;
     public Group uiGroup;
-    public boolean isBuilding = true, buildWasAutoPaused = false;
+    public boolean isBuilding = true, buildWasAutoPaused = false, wasShooting = false;
     public @Nullable UnitType controlledType;
 
     public @Nullable Schematic lastSchematic;
@@ -113,7 +113,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Payloadc pay = (Payloadc)unit;
 
         if(target.isAI() && target.isGrounded() && pay.canPickup(target)
-        && target.within(unit, unit.type().hitsize * 2f + target.type().hitsize * 2f)){
+        && target.within(unit, unit.type().hitSize * 2f + target.type().hitSize * 2f)){
             Call.pickedUnitPayload(player, target);
         }
     }
@@ -236,7 +236,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building tile){
-        if(player == null || tile == null || !player.within(tile, buildingRange)) return;
+        if(player == null || tile == null || !player.within(tile, buildingRange) || tile.items == null) return;
 
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile, action -> {
@@ -292,7 +292,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated() && !unit.dead){
+        }else if(unit.isAI() && unit.team == player.team() && !unit.dead){
             if(!net.client()){
                 player.unit(unit);
             }
@@ -324,7 +324,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             commander.clearCommand();
         }else{
 
-            commander.commandNearby(new SquareFormation());
+            //TODO try out some other formations
+            commander.commandNearby(new CircleFormation());
             Fx.commandSend.at(player);
         }
 
@@ -353,12 +354,18 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             player.builder().updateBuilding(isBuilding);
         }
 
+        if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && player.unit().ammo <= 0){
+            player.unit().type().weapons.first().noAmmoSound.at(player.unit());
+        }
+
+        wasShooting = player.shooting;
+
         if(!player.dead()){
             controlledType = player.unit().type();
         }
 
         if(controlledType != null && player.dead()){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated() && !u.dead);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.dead);
 
             if(unit != null){
                 Call.unitControl(player, unit);
@@ -368,7 +375,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void checkUnit(){
         if(controlledType != null){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated() && !u.dead);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.dead);
             if(unit == null && controlledType == UnitTypes.block){
                 unit = world.buildWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.buildWorld(player.x, player.y)).unit() : null;
             }
@@ -388,7 +395,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(!(unit instanceof Payloadc)) return;
         Payloadc pay = (Payloadc)unit;
 
-        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitSize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
         if(target != null){
             Call.requestUnitPayload(player, target);
         }else{
@@ -924,7 +931,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && !u.deactivated());
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI());
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
@@ -974,6 +981,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             uiGroup.touchable = Touchable.childrenOnly;
             uiGroup.setFillParent(true);
             ui.hudGroup.addChild(uiGroup);
+            uiGroup.toBack();
             buildUI(uiGroup);
 
             frag.add();
@@ -1068,15 +1076,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset + dx*trns,
         y * tilesize + block.offset - 1 + dy*trns,
-        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-        Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+        Core.atlas.find("place-arrow").width * Draw.scl,
+        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
 
         Draw.color(!valid ? Pal.remove : Pal.accent);
         Draw.rect(Core.atlas.find("place-arrow"),
         x * tilesize + block.offset + dx*trns,
         y * tilesize + block.offset + dy*trns,
-        Core.atlas.find("place-arrow").getWidth() * Draw.scl,
-        Core.atlas.find("place-arrow").getHeight() * Draw.scl, rotation * 90 - 90);
+        Core.atlas.find("place-arrow").width * Draw.scl,
+        Core.atlas.find("place-arrow").height * Draw.scl, rotation * 90 - 90);
     }
 
     void iterateLine(int startX, int startY, int endX, int endY, Cons<PlaceLine> cons){

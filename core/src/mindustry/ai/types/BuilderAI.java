@@ -12,7 +12,7 @@ import mindustry.world.blocks.ConstructBlock.*;
 import static mindustry.Vars.*;
 
 public class BuilderAI extends AIController{
-    float buildRadius = 700;
+    float buildRadius = 1500;
     boolean found = false;
     @Nullable Builderc following;
 
@@ -87,7 +87,7 @@ public class BuilderAI extends AIController{
             }
 
             //find new request
-            if(!unit.team().data().blocks.isEmpty() && following == null){
+            if(!unit.team().data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
                 Queue<BlockPlan> blocks = unit.team().data().blocks;
                 BlockPlan block = blocks.first();
 

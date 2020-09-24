@@ -5,11 +5,13 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.struct.ObjectIntMap.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -19,7 +21,6 @@ import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.type.*;
-import mindustry.type.Sector.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -33,9 +34,15 @@ public class World{
     public @NonNull Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
+    private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
 
+    }
+
+    /** Adds a custom handler function for loading a custom map - usually a generated one. */
+    public void addMapLoader(Map map, Runnable loader){
+        customMapLoaders.put(map, loader);
     }
 
     public boolean isInvalidMap(){
@@ -255,9 +262,71 @@ public class World{
 
         state.rules.weather.clear();
 
-        if(sector.is(SectorAttribute.rainy)) state.rules.weather.add(new WeatherEntry(Weathers.rain));
-        if(sector.is(SectorAttribute.snowy)) state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        if(sector.is(SectorAttribute.desert)) state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
+        //apply weather based on terrain
+        ObjectIntMap<Block> floorc = new ObjectIntMap<>();
+        ObjectSet<UnlockableContent> content = new ObjectSet<>();
+
+        float waterFloors = 0, totalFloors = 0;
+
+        for(Tile tile : world.tiles){
+            if(world.getDarkness(tile.x, tile.y) >= 3){
+                continue;
+            }
+
+            Liquid liquid = tile.floor().liquidDrop;
+            if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
+            if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
+            if(liquid != null) content.add(liquid);
+
+            if(!tile.block().isStatic()){
+                totalFloors ++;
+                if(liquid == Liquids.water){
+                    waterFloors += tile.floor().isDeep() ? 1f : 0.7f;
+                }
+                floorc.increment(tile.floor());
+                if(tile.overlay() != Blocks.air){
+                    floorc.increment(tile.overlay());
+                }
+            }
+        }
+
+        //sort counts in descending order
+        Seq<Entry<Block>> entries = floorc.entries().toArray();
+        entries.sort(e -> -e.value);
+        //remove all blocks occuring < 30 times - unimportant
+        entries.removeAll(e -> e.value < 30);
+
+        Block[] floors = new Block[entries.size];
+        int[] floorCounts = new int[entries.size];
+        for(int i = 0; i < entries.size; i++){
+            floorCounts[i] = entries.get(i).value;
+            floors[i] = entries.get(i).key;
+        }
+
+        //TODO bad code
+        boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
+        boolean hasRain = !hasSnow && floors[0].name.contains("water");
+        boolean hasDesert = !hasSnow && !hasRain && floors[0].name.contains("sand");
+        boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
+
+        if(hasSnow){
+            state.rules.weather.add(new WeatherEntry(Weathers.snow));
+        }
+
+        if(hasRain){
+            state.rules.weather.add(new WeatherEntry(Weathers.rain));
+        }
+
+        if(hasDesert){
+            state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
+        }
+
+        if(hasSpores){
+            state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
+        }
+
+        state.secinfo.resources = content.asArray();
+        state.secinfo.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
 
     }
 
@@ -270,6 +339,12 @@ public class World{
     }
 
     public void loadMap(Map map, Rules checkRules){
+        //load using custom loader if possible
+        if(customMapLoaders.containsKey(map)){
+            customMapLoaders.get(map).run();
+            return;
+        }
+
         try{
             SaveIO.load(map.file, new FilterContext(map));
         }catch(Throwable e){
@@ -444,7 +519,7 @@ public class World{
             dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
         }
 
-        if(state.hasSector()){
+        if(state.hasSector() && state.getSector().preset == null){
             int circleBlend = 14;
             //quantized angle
             float offset = state.getSector().rect.rotation + 90;

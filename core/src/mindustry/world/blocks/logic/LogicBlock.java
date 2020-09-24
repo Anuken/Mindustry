@@ -34,7 +34,6 @@ public class LogicBlock extends Block{
         update = true;
         solid = true;
         configurable = true;
-        sync = true;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
@@ -69,7 +68,7 @@ public class LogicBlock extends Block{
         if(name.contains("-")){
             String[] split = name.split("-");
             //filter out 'large' at the end of block names
-            if(split.length >= 2 && split[split.length - 1].equals("large")){
+            if(split.length >= 2 && (split[split.length - 1].equals("large") || Strings.canParseFloat(split[split.length - 1]))){
                 name = split[split.length - 2];
             }else{
                 name = split[split.length - 1];
@@ -319,6 +318,12 @@ public class LogicBlock extends Block{
             }
         }
 
+        //logic blocks cause write problems when picked up
+        @Override
+        public boolean canPickup(){
+            return false;
+        }
+
         @Override
         public float range(){
             return range;
@@ -416,24 +421,14 @@ public class LogicBlock extends Block{
             return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
         }
 
-
-
         @Override
         public void buildConfiguration(Table table){
-            Table cont = new Table();
-            cont.defaults().size(40);
 
-            cont.button(Icon.pencil, Styles.clearTransi, () -> {
+            table.button(Icon.pencil, Styles.clearTransi, () -> {
                 Vars.ui.logic.show(code, code -> {
                     configure(compress(code, relativeConnections()));
                 });
-            });
-
-            //cont.button(Icon.refreshSmall, Styles.clearTransi, () -> {
-
-            //});
-
-            table.add(cont);
+            }).size(40);
         }
 
         @Override
