@@ -172,7 +172,7 @@ public class Universe{
                     }
 
                     //export to another sector
-                    if(sector.save.meta.secinfo.destination != null){
+                    if(sector.save != null && sector.save.meta != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.destination != null){
                         Sector to = sector.save.meta.secinfo.destination;
                         if(to.save != null){
                             ItemSeq items = to.getExtraItems();

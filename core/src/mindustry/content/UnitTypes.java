@@ -46,8 +46,11 @@ public class UnitTypes implements ContentList{
     //air + building + mining + payload
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
 
-    //air + building + payload TODO implement
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad, oct;
+    //air + building + payload
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad;
+
+    //air + building + payload + command
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, Commanderc.class}) UnitType oct;
 
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
@@ -341,7 +344,7 @@ public class UnitTypes implements ContentList{
             armor = 9f;
             landShake = 2f;
 
-            commandLimit = 24;
+            commandLimit = 18;
             mechFrontSway = 0.55f;
 
             speed = 0.4f;
@@ -394,7 +397,7 @@ public class UnitTypes implements ContentList{
             canBoost = true;
             landShake = 4f;
 
-            commandLimit = 32;
+            commandLimit = 20;
 
             weapons.add(new Weapon("vela-weapon"){{
                 mirror = false;
@@ -444,7 +447,7 @@ public class UnitTypes implements ContentList{
             landShake = 1.5f;
             rotateSpeed = 1.5f;
 
-            commandLimit = 24;
+            commandLimit = 20;
 
             legCount = 4;
             legLength = 14f;
@@ -1292,6 +1295,7 @@ public class UnitTypes implements ContentList{
             payloadCapacity = (5.3f * 5.3f) * tilePayload;
             buildSpeed = 4f;
             drawShields = false;
+            commandLimit = 25;
 
             abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
         }};

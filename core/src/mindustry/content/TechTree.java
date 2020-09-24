@@ -211,7 +211,9 @@ public class TechTree implements ContentList{
                                                 });
 
                                                 node(memoryCell, () -> {
+                                                    node(memoryBank, () -> {
 
+                                                    });
                                                 });
                                             });
 

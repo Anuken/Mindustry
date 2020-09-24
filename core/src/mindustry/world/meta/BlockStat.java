@@ -11,6 +11,7 @@ public enum BlockStat{
     displaySize(StatCategory.general),
     buildTime(StatCategory.general),
     buildCost(StatCategory.general),
+    memoryCapacity(StatCategory.general),
 
     itemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),

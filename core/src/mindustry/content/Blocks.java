@@ -83,7 +83,7 @@ public class Blocks implements ContentList{
     repairPoint, resupplyPoint,
 
     //logic
-    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell,
+    message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
     launchPad, launchPadLarge,
@@ -316,6 +316,7 @@ public class Blocks implements ContentList{
 
         snowBoulder = new Boulder("snow-boulder"){{
             variants = 2;
+            snow.asFloor().decoration = ice.asFloor().decoration = iceSnow.asFloor().decoration = this;
         }};
 
         dirtWall = new StaticWall("dirt-wall"){{
@@ -1147,7 +1148,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
             itemDuration = 90f;
-            consumes.liquid(Liquids.water, 0.07f);
+            consumes.liquid(Liquids.water, 0.09f);
             hasLiquids = true;
             size = 2;
         }};
@@ -1499,7 +1500,7 @@ public class Blocks implements ContentList{
             reloadTime = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
-            powerUse = 4f;
+            powerUse = 3f;
             targetAir = false;
             range = 90f;
             shootEffect = Fx.lightningShoot;
@@ -1694,7 +1695,7 @@ public class Blocks implements ContentList{
             reloadTime = 90f;
             firingMoveFract = 0.5f;
             shootDuration = 220f;
-            powerUse = 14f;
+            powerUse = 17f;
             shootSound = Sounds.laserbig;
             activeSound = Sounds.beam;
             activeSoundVolume = 2f;
@@ -1963,9 +1964,16 @@ public class Blocks implements ContentList{
         }};
 
         memoryCell = new MemoryBlock("memory-cell"){{
-            requirements(Category.logic, with(Items.graphite, 40, Items.silicon, 40));
+            requirements(Category.logic, with(Items.graphite, 30, Items.silicon, 30));
 
             memoryCapacity = 64;
+        }};
+
+        memoryBank = new MemoryBlock("memory-bank"){{
+            requirements(Category.logic, with(Items.graphite, 80, Items.silicon, 80, Items.phasefabric, 30));
+
+            memoryCapacity = 512;
+            size = 2;
         }};
 
         logicDisplay = new LogicDisplay("logic-display"){{
