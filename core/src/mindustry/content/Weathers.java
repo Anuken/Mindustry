@@ -170,12 +170,13 @@ public class Weathers implements ContentList{
         sandstorm = new Weather("sandstorm"){
             TextureRegion region;
             float size = 140f, padding = size, invDensity = 1500f, baseSpeed = 6.1f;
-            float force = 0.45f;
+            float force = 0.4f;
             Color color = Color.valueOf("f7cba4");
             Texture noise;
 
             {
                 attrs.set(Attribute.light, -0.1f);
+                opacityMultiplier = 0.85f;
             }
 
             @Override

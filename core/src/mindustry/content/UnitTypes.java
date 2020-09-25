@@ -885,7 +885,7 @@ public class UnitTypes implements ContentList{
             weapons.add(new Weapon(){{
                 y = 0f;
                 x = 2f;
-                reload = 15f;
+                reload = 13f;
                 ejectEffect = Fx.shellEjectSmall;
                 bullet = Bullets.standardCopper;
                 shootSound = Sounds.shoot;
