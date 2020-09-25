@@ -32,7 +32,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
 
     //legs + building
-    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
+    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, octopid;
 
     //air (no special traits)
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
@@ -750,7 +750,7 @@ public class UnitTypes implements ContentList{
             }});
         }};
 
-        toxopid = new UnitType("toxopid"){{
+        octopid = new UnitType("octopid"){{
             drag = 0.1f;
             speed = 0.5f;
             hitSize = 21f;
@@ -811,7 +811,7 @@ public class UnitTypes implements ContentList{
                 }};
             }});
 
-            weapons.add(new Weapon("toxopid-cannon"){{
+            weapons.add(new Weapon("octopid-cannon"){{
                 y = -14f;
                 x = 0f;
                 shootY = 22f;
