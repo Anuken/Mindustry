@@ -1,6 +1,6 @@
 package mindustry.entities.comp;
 
-import arc.Events;
+import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
