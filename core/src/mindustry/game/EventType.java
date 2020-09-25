@@ -270,6 +270,14 @@ public class EventType{
         }
     }
 
+    public static class UnitDrownEvent{
+        public final Unit unit;
+
+        public UnitDrownEvent(Unit unit){
+            this.unit = unit;
+        }
+    }
+
     public static class UnitCreateEvent{
         public final Unit unit;
 
