@@ -72,8 +72,6 @@ public class Vars implements Loadable{
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
-    /** shadow color for turrets */
-    public static final float turretShadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
     /** units outside of this bound will die instantly */
