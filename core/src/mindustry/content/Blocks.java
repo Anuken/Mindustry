@@ -1458,7 +1458,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.splash;
         }};
 
-        tsunami = new LiquidTurret("tsunami") {{
+        tsunami = new LiquidTurret("tsunami"){{
             requirements(Category.turret, with(Items.metaglass, 100, Items.lead, 400, Items.titanium, 250));
             ammo(
                     Liquids.water, Bullets.waterShot,
