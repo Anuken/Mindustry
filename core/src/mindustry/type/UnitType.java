@@ -34,7 +34,7 @@ import mindustry.world.consumers.*;
 import static mindustry.Vars.*;
 
 public class UnitType extends UnlockableContent{
-    public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f), outlineSpace = 0.01f;
+    public static final float shadowTX = -12, shadowTY = -13, outlineSpace = 0.01f;
     private static final Vec2 legOffset = new Vec2();
 
     /** If true, the unit is always at elevation 1. */
@@ -409,7 +409,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        Draw.color(shadowColor);
+        Draw.color(Pal.shadow);
         float e = Math.max(unit.elevation, visualElevation);
         Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
         Draw.color();
@@ -594,7 +594,7 @@ public class UnitType extends UnlockableContent{
             if(leg.moving && visualElevation > 0){
                 float scl = visualElevation;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
-                Draw.color(shadowColor);
+                Draw.color(Pal.shadow);
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
                 Draw.color();
             }
