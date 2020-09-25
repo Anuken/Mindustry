@@ -1781,7 +1781,7 @@ public class Blocks implements ContentList{
             size = 5;
             consumes.power(6f);
 
-            blockUnitBuildSpeed = 4f;
+            blockUnitBuildSpeed = 3f;
 
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.pulsar, UnitTypes.quasar, with(Items.silicon, 100, Items.lead, 30, Items.plastanium, 20)),
@@ -1800,7 +1800,7 @@ public class Blocks implements ContentList{
             consumes.power(13f);
             consumes.liquid(Liquids.cryofluid, 1f);
             liquidCapacity = 60f;
-            blockUnitBuildSpeed = 5f;
+            blockUnitBuildSpeed = 10f;
 
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.zenith, UnitTypes.antumbra, with(Items.silicon, 850, Items.titanium, 750, Items.plastanium, 650)),
@@ -1819,6 +1819,7 @@ public class Blocks implements ContentList{
             consumes.power(25f);
             consumes.liquid(Liquids.cryofluid, 3f);
             liquidCapacity = 180f;
+            blockUnitBuildSpeed = 15f;
 
             upgrades = new UpgradePlan[]{
                 new UpgradePlan(UnitTypes.antumbra, UnitTypes.eclipse, with(Items.silicon, 1000, Items.plastanium, 600, Items.surgealloy, 500, Items.phasefabric, 350)),
