@@ -33,7 +33,7 @@ public class CrashSender{
             + "OS: " + System.getProperty("os.name") + " x" + (OS.is64Bit ? "64" : "32") + "\n"
             + "Java Version: " + System.getProperty("java.version") + "\n"
             + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
-            + mods.list().size + " Mods: " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)
+            + mods.list().size + " Mods: " + (mods.list().isEmpty() ? "none" : mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version))
             + "\n\n" + error;
     }
 
