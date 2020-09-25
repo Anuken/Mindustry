@@ -935,7 +935,7 @@ public class UnitTypes implements ContentList{
             drag = 0.016f;
             flying = true;
             range = 140f;
-            hitSize = 18f;
+            hitSize = 20f;
             lowAltitude = true;
             armor = 5f;
 
