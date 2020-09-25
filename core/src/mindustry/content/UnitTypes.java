@@ -973,9 +973,9 @@ public class UnitTypes implements ContentList{
         }};
 
         antumbra = new UnitType("antumbra"){{
-            speed = 1.13f;
-            accel = 0.035f;
-            drag = 0.05f;
+            speed = 0.8f;
+            accel = 0.04f;
+            drag = 0.04f;
             rotateSpeed = 1.9f;
             flying = true;
             lowAltitude = true;
@@ -1046,9 +1046,9 @@ public class UnitTypes implements ContentList{
         }};
 
         eclipse = new UnitType("eclipse"){{
-            speed = 1.09f;
-            accel = 0.02f;
-            drag = 0.05f;
+            speed = 0.52f;
+            accel = 0.04f;
+            drag = 0.04f;
             rotateSpeed = 1f;
             flying = true;
             lowAltitude = true;

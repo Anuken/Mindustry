@@ -169,7 +169,7 @@ public class ResearchDialog extends BaseDialog{
             if(net.client()){
                 //TODO make this not display every time
                 //TODO rework this in the future
-                ui.showInfo("campaign.multiplayer");
+                ui.showInfo("@campaign.multiplayer");
             }
         });
 
