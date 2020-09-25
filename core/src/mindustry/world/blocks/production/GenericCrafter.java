@@ -82,7 +82,6 @@ public class GenericCrafter extends Block{
         public float progress;
         public float totalProgress;
         public float warmup;
-        public int size = this.size;
 
         @Override
         public void draw(){
