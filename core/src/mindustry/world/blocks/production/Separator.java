@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -85,9 +84,6 @@ public class Separator extends Block{
 
             Draw.reset();
             if(Core.atlas.isFound(spinnerRegion)){
-                Draw.color(Vars.specialShadowColor);
-                Draw.rect(spinnerRegion, x - (size / 2.5f), y - (size / 2.5f), totalProgress * spinnerSpeed);
-                Draw.color();
                 Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);
             }
         }
