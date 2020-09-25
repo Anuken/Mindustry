@@ -1827,7 +1827,7 @@ public class Blocks implements ContentList{
 
             upgrades = new UnitType[][]{
                 {UnitTypes.antumbra, UnitTypes.eclipse},
-                {UnitTypes.arkyid, UnitTypes.toxopid},
+                {UnitTypes.arkyid, UnitTypes.octopid},
                 {UnitTypes.scepter, UnitTypes.reign},
                 {UnitTypes.sei, UnitTypes.omura},
                 {UnitTypes.quad, UnitTypes.oct},
