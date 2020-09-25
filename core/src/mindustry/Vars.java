@@ -63,7 +63,7 @@ public class Vars implements Loadable{
     /** URL to the JSON file containing all the BE servers. Only queried in the V6 alpha (will be removed once it's out). */
     public static final String serverJsonV6URL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
     /** URL of the github issue report template.*/
-    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
+    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<String> defaultServers = Seq.with();
     /** maximum distance between mine and core that supports automatic transferring */
