@@ -333,16 +333,30 @@ public class Generators{
                 outliner.get(type.baseJointRegion);
                 if(type.constructor.get() instanceof Legsc) outliner.get(type.legRegion);
 
-                Image image = ImagePacker.get(type.region);
+                Image image = outline.get(ImagePacker.get(type.region));
 
-                outline.get(image).save(type.name + "-outline");
+                image.save(type.name + "-outline");
 
+                //draw mech parts
                 if(type.constructor.get() instanceof Mechc){
                     image.drawCenter(type.baseRegion);
                     image.drawCenter(type.legRegion);
                     image.drawCenter(type.legRegion, true, false);
                     image.draw(type.region);
                 }
+
+                //draw outlines
+                for(Weapon weapon : type.weapons){
+                    weapon.load();
+
+                    image.draw(outline.get(ImagePacker.get(weapon.region)),
+                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
+                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
+                    weapon.flipSprite, false);
+                }
+
+                //draw base region on top to mask weapons
+                image.draw(type.region);
 
                 Image baseCell = ImagePacker.get(type.cellRegion);
                 Image cell = new Image(type.cellRegion.width, type.cellRegion.height);
@@ -353,7 +367,7 @@ public class Generators{
                 for(Weapon weapon : type.weapons){
                     weapon.load();
 
-                    image.draw(weapon.region,
+                    image.draw(weapon.top ? outline.get(ImagePacker.get(weapon.region)) : ImagePacker.get(weapon.region),
                     (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
                     (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
                     weapon.flipSprite, false);
