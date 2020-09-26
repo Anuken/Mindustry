@@ -206,5 +206,10 @@ public class DefaultWaves{
         //{mono, poly, mega, quad, oct}, //do not attack
         {flare, horizon, zenith, antumbra, eclipse}
         };
+
+        //required progression:
+        //- main progression of units, up to wave ~20
+        //- changes from
+        //- extra periodic patterns
     }
 }
