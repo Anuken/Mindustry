@@ -1,15 +1,12 @@
 package mindustry.world.blocks.logic;
 
-import arc.scene.ui.layout.Table;
-import arc.util.Align;
+import arc.scene.ui.layout.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
-import mindustry.ui.Styles;
-import mindustry.ui.dialogs.BaseDialog;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import java.awt.*;
 
 public class MemoryBlock extends Block{
     public int memoryCapacity = 32;
@@ -28,7 +25,7 @@ public class MemoryBlock extends Block{
         stats.add(BlockStat.memoryCapacity, memoryCapacity, StatUnit.none);
     }
 
-    public class MemoryBuild extends Building implements mindustry.world.blocks.logic.MemoryBuild {
+    public class MemoryBuild extends Building {
         public double[] memory = new double[memoryCapacity];
 
         @Override
