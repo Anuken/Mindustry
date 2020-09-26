@@ -17,6 +17,7 @@ import static mindustry.Vars.tilesize;
 public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
     public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public LiquidTurret(String name){
         super(name);
@@ -63,8 +64,9 @@ public class LiquidTurret extends Turret{
                 Draw.color(liquids.current().color);
                 Draw.alpha(liquids.total() / liquidCapacity);
                 Draw.rect(liquidRegion, x + tr2.x, y + tr2.y, rotation - 90);
-                Draw.color();
+                Draw.reset();
             }
+            if(Core.atlas.isFound(liquidRegion)) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
         }
 
         @Override
