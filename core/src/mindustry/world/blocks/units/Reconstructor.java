@@ -160,12 +160,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public void updateTile(){
-            //update plan (this was the only way I could get it to work help help help help)
-            try {
-                currentPlan = upgrade(payload.unit.type());
-            } catch(NullPointerException npe) {
-                currentPlan = UpgradePlan.empty;
-            }
+            currentPlan = payload == null ? currentPlan = UpgradePlan.empty : upgrade(payload.unit.type());
 
             //update capacities
             for(ItemStack stack : currentPlan.requirements){
@@ -224,7 +219,6 @@ public class Reconstructor extends UnitBlock{
         }
 
         public UpgradePlan upgrade(UnitType type){
-            if(type == null) return UpgradePlan.empty;
             for(UpgradePlan plan : upgrades) {
                 if(plan.base == type) return plan;
             }
