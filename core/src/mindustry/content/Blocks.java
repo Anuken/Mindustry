@@ -1753,6 +1753,7 @@ public class Blocks implements ContentList{
             };
             size = 3;
             consumes.power(1.2f);
+            floating = true;
         }};
 
         additiveReconstructor = new Reconstructor("additive-reconstructor"){{
