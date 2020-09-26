@@ -58,7 +58,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public TextureRegion[] icons(){
-            return new TextureRegion[]{baseRegion, region, topRegion}
+            return Core.atlas.isFound(topRegion) ? new TextureRegion[]{baseRegion, region, topRegion} : super.icons();
         }
 
         @Override
