@@ -52,7 +52,7 @@ public class GameState{
 
     /** @return whether the player is in a campaign and they are out of sector time */
     public boolean isOutOfTime(){
-        return isCampaign() && isGame() && getSector().getTimeSpent() >= turnDuration;
+        return isCampaign() && isGame() && getSector().getTimeSpent() >= turnDuration && !net.active();
     }
 
     public boolean hasSector(){

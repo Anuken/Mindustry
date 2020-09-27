@@ -18,8 +18,6 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @Import Vec2 vel;
     @Import UnitType type;
 
-    /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
-    static final float minAimDst = 18f;
     /** temporary weapon sequence number */
     static int sequenceNum = 0;
 
@@ -67,7 +65,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     /** Aim at something. This will make all mounts point at it. */
     void aim(float x, float y){
         Tmp.v1.set(x, y).sub(this.x, this.y);
-        if(Tmp.v1.len() < minAimDst) Tmp.v1.setLength(minAimDst);
+        if(Tmp.v1.len() < type.aimDst) Tmp.v1.setLength(type.aimDst);
 
         x = Tmp.v1.x + this.x;
         y = Tmp.v1.y + this.y;
