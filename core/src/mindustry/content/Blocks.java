@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax, clapper,
 
     //units
     commandCenter,
@@ -1526,6 +1526,24 @@ public class Blocks implements ContentList{
             rotateSpeed = 10;
 
             consumes.powerCond(3f, (TractorBeamBuild e) -> e.target != null);
+        }};
+        
+        clapper = new ItemTurret("clapper"){{
+            requirements(Category.turret, with(Items.plastanium, 230, Items.graphite, 150, Items.surgealloy, 130, Items.metaglass, 70));
+            ammo(
+            Items.graphite, plastBomb
+            );
+            targetAir = false;
+            health = 2400;
+            size = 4;
+            inaccuracy = 1.1f;
+            reloadTime = 120f;
+            shots: 1;
+            range: 200f;
+            recoilAmount: 7f;
+            cooldown: 0.01f;
+            shootShake: 5f;
+            rotateSpeed = 8f;
         }};
 
         swarmer = new ItemTurret("swarmer"){{
