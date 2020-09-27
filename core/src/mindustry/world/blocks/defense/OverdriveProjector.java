@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -44,7 +45,7 @@ public class OverdriveProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
-        if(hasBoost) {
+        if(hasBoost && Core.settings.getBool("phasedrange")) {
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor);
         }
     }

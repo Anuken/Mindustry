@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -53,7 +54,9 @@ public class MendProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor);
+        if(Core.settings.getBool("phasedrange")) {
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor);
+        }
     }
 
     public class MendBuild extends Building{

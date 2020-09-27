@@ -21,7 +21,8 @@ import static mindustry.Vars.*;
 public class ForceProjector extends Block{
     public final int timerUse = timers++;
     public float phaseUseTime = 350f;
-
+    public Color phaseColor = Color.valueOf("ffd59e");
+    
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
@@ -78,6 +79,16 @@ public class ForceProjector extends Block{
         Lines.stroke(1f);
         Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color();
+
+        if(Core.settings.getBool("phasedrange")) {
+            Draw.color(Pal.gray);
+            Lines.stroke(3f);
+            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
+            Draw.color(phaseColor);
+            Lines.stroke(1f);
+            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
+            Draw.color();
+        }
     }
 
     public class ForceBuild extends Building{
