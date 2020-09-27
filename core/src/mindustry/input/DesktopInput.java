@@ -200,7 +200,7 @@ public class DesktopInput extends InputHandler{
             }
             panning = false;
 
-            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
         }else if(!player.dead() && !panning){
             Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
         }
@@ -354,7 +354,7 @@ public class DesktopInput extends InputHandler{
         }).visible(() -> state.isCampaign()).tooltip("@planetmap");
 
         table.button(Icon.up, Styles.clearPartiali, () -> {
-            ui.planet.show(state.getSector(), player.team().core());
+            ui.planet.showLaunch(state.getSector(), player.team().core());
         }).visible(() -> state.isCampaign()).tooltip("@launchcore").disabled(b -> player.team().core() == null);
     }
 
@@ -596,7 +596,7 @@ public class DesktopInput extends InputHandler{
     }
 
     protected void updateMovement(Unit unit){
-        boolean omni = !(unit instanceof WaterMovec);
+        boolean omni = unit.type().omniMovement;
         boolean ground = unit.isGrounded();
 
         float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);

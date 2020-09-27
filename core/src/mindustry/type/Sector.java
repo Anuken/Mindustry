@@ -31,9 +31,6 @@ public class Sector{
     public float baseCoverage;
     public boolean generateEnemyBase;
 
-    //TODO implement a dynamic launch period
-    public int launchPeriod = 10;
-
     public Sector(Planet planet, Ptile tile){
         this.planet = planet;
         this.tile = tile;
@@ -100,7 +97,7 @@ public class Sector{
 
     public boolean isBeingPlayed(){
         //after the launch dialog, a sector is no longer considered being played
-        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.launched && !Vars.state.gameOver;
+        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver;
     }
 
     public boolean isCaptured(){
@@ -132,16 +129,6 @@ public class Sector{
     public int getSize(){
         int res = (int)(rect.radius * 3200);
         return res % 2 == 0 ? res : res + 1;
-    }
-
-    //TODO implement
-    public boolean isLaunchWave(int wave){
-        return metCondition() && wave % launchPeriod == 0;
-    }
-
-    public boolean metCondition(){
-        //TODO implement
-        return false;
     }
 
     //TODO this should be stored in a more efficient structure, and be updated each turn
@@ -273,6 +260,10 @@ public class Sector{
 
     private void put(String key, Object value){
         Core.settings.put(key(key), value);
+    }
+
+    public String toString(){
+        return planet.name + "#" + id;
     }
 
     /** Projects this sector onto a 4-corner square for use in map gen.

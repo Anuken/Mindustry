@@ -16,7 +16,7 @@ public class FlyingAI extends AIController{
                 moveTo(target, unit.range() * 0.8f);
                 unit.lookAt(target);
             }else{
-                attack(80f);
+                attack(100f);
             }
         }
 
@@ -25,8 +25,7 @@ public class FlyingAI extends AIController{
         }
 
         if(command() == UnitCommand.rally){
-            target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
-            moveTo(target, 60f);
+            moveTo(targetFlag(unit.x, unit.y, BlockFlag.rally, false), 60f);
         }
     }
 

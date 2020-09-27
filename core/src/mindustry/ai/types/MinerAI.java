@@ -44,7 +44,7 @@ public class MinerAI extends AIController{
                 }
 
                 if(ore != null){
-                    moveTo(ore, unit.type().range / 1.5f);
+                    moveTo(ore, unit.type().range / 2f);
 
                     if(unit.within(ore, unit.type().range)){
                         miner.mineTile(ore);

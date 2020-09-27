@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.net.*;
 
 import java.io.*;
@@ -42,7 +43,7 @@ public class ScriptMainGenerator{
 
         classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
         || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()));
-        classes.add(NetConnection.class);
+        classes.add(NetConnection.class, SaveIO.class);
 
         classes.distinct();
         classes.sortComparing(Class::getName);

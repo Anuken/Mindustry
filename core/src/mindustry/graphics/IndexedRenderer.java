@@ -11,7 +11,7 @@ import arc.util.*;
 public class IndexedRenderer implements Disposable{
     private static final int vsize = 5;
 
-    private Shader program = new Shader(
+    private final Shader program = new Shader(
     "attribute vec4 a_position;\n" +
     "attribute vec4 a_color;\n" +
     "attribute vec2 a_texCoord0;\n" +

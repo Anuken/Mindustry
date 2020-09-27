@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.EnumSet;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -163,6 +164,11 @@ public class BlockIndexer{
     /** Get all allied blocks with a flag. */
     public TileArray getAllied(Team team, BlockFlag type){
         return flagMap[team.id][type.ordinal()];
+    }
+
+    @Nullable
+    public Tile findClosestFlag(float x, float y, Team team, BlockFlag flag){
+        return Geometry.findClosest(x, y, getAllied(team, flag));
     }
 
     public boolean eachBlock(Teamc team, float range, Boolf<Building> pred, Cons<Building> cons){

@@ -40,7 +40,6 @@ public class EventType{
 
     public static class WinEvent{}
     public static class LoseEvent{}
-    public static class LaunchEvent{}
     public static class ResizeEvent{}
     public static class MapMakeEvent{}
     public static class MapPublishEvent{}
@@ -267,6 +266,14 @@ public class EventType{
         public final Unit unit;
 
         public UnitDestroyEvent(Unit unit){
+            this.unit = unit;
+        }
+    }
+
+    public static class UnitDrownEvent{
+        public final Unit unit;
+
+        public UnitDrownEvent(Unit unit){
             this.unit = unit;
         }
     }

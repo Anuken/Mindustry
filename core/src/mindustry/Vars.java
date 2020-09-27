@@ -63,7 +63,7 @@ public class Vars implements Loadable{
     /** URL to the JSON file containing all the BE servers. Only queried in the V6 alpha (will be removed once it's out). */
     public static final String serverJsonV6URL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
     /** URL of the github issue report template.*/
-    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
+    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<String> defaultServers = Seq.with();
     /** maximum distance between mine and core that supports automatic transferring */
@@ -87,15 +87,17 @@ public class Vars implements Loadable{
     /** turns needed to destroy a sector completely */
     public static final float sectorDestructionTurns = 3f;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
-    public static final float minArmorDamage = 0.05f;
+    public static final float minArmorDamage = 0.1f;
     /** launch animation duration */
     public static final float launchDuration = 140f;
+    /** size of tiles in units */
+    public static final int tilesize = 8;
+    /** size of one tile payload (^2) */
+    public static final float tilePayload = tilesize * tilesize;
     /** tile used in certain situations, instead of null */
     public static Tile emptyTile;
     /** for map generator dialog */
     public static boolean updateEditorOnChange = false;
-    /** size of tiles in units */
-    public static final int tilesize = 8;
     /** all choosable player colors in join/host dialog */
     public static final Color[] playerColors = {
         Color.valueOf("82759a"),

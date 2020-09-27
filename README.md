@@ -22,9 +22,9 @@ First, make sure you have [JDK 14](https://adoptopenjdk.net/) installed. Open a 
 
 #### Windows
 
-_Running:_ `gradlew.bat desktop:run`  
-_Building:_ `gradlew.bat desktop:dist`  
-_Sprite Packing:_ `gradlew.bat tools:pack`
+_Running:_ `gradlew desktop:run`  
+_Building:_ `gradlew desktop:dist`  
+_Sprite Packing:_ `gradlew tools:pack`
 
 #### Linux/Mac OS
 
@@ -70,3 +70,7 @@ Post feature requests and feedback [here](https://github.com/Anuken/Mindustry-Su
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/io.anuke.mindustry/)
+
+[<img src="https://flathub.org/assets/badges/flathub-badge-en.svg"
+     alt="Download On Flathub"
+     height="60">](https://flathub.org/apps/details/com.github.Anuken.Mindustry)

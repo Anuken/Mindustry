@@ -295,16 +295,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         //TODO better waves
         state.rules.spawns = defaultWaves.get();
-
-        float waveScaling = 1f + difficulty*2;
-
-        //scale up the spawning base on difficulty (this is just for testing)
-        for(SpawnGroup group : state.rules.spawns){
-            group.unitAmount *= waveScaling;
-            if(group.unitScaling != SpawnGroup.never){
-                group.unitScaling /= waveScaling;
-            }
-        }
     }
 
     @Override

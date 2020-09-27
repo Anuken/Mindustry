@@ -11,6 +11,7 @@ public enum BlockStat{
     displaySize(StatCategory.general),
     buildTime(StatCategory.general),
     buildCost(StatCategory.general),
+    memoryCapacity(StatCategory.general),
 
     itemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),
@@ -48,6 +49,8 @@ public enum BlockStat{
     targetsGround(StatCategory.shooting),
     damage(StatCategory.shooting),
     ammo(StatCategory.shooting),
+    shieldHealth(StatCategory.shooting),
+    cooldownTime(StatCategory.shooting),
 
     booster(StatCategory.optional),
     boostEffect(StatCategory.optional),

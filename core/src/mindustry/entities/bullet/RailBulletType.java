@@ -4,6 +4,12 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
+//TODO this class is bad for multiple reasons, remove/replace it.
+//- effects unreliable
+//- not really hitscan but works like it
+//- buggy trails
+//- looks bad
+//- generally unreliable
 public class RailBulletType extends BulletType{
     public Effect pierceEffect = Fx.hitBulletSmall, updateEffect = Fx.none;
     /** Multiplier of damage decreased per health pierced. */
@@ -37,7 +43,9 @@ public class RailBulletType extends BulletType{
 
     @Override
     public void update(Bullet b){
-        updateEffect.at(b.x, b.y, b.rotation());
+        if(b.timer(1, 0.9f)){
+            updateEffect.at(b.x, b.y, b.rotation());
+        }
     }
 
     @Override

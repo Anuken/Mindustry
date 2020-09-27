@@ -71,6 +71,8 @@ public abstract class BulletType extends Content{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
+    /** Bullet range override. */
+    public float range = -1f;
 
     //additional effects
 
@@ -96,13 +98,13 @@ public abstract class BulletType extends Content{
 
     public Color lightningColor = Pal.surge;
     public int lightning;
-    public int lightningLength = 5;
+    public int lightningLength = 5, lightningLengthRand = 0;
     /** Use a negative value to use default bullet damage. */
     public float lightningDamage = -1;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
-    public float hitShake = 0f;
+    public float hitShake = 0f, despawnShake = 0f;
 
     public int puddles;
     public float puddleRange;
@@ -126,7 +128,7 @@ public abstract class BulletType extends Content{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return speed * lifetime * (1f - drag);
+        return Math.max(speed * lifetime * (1f - drag), range);
     }
 
     public boolean collides(Bullet bullet, Building tile){
@@ -179,13 +181,15 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength + Mathf.random(lightningLengthRand));
         }
     }
 
     public void despawned(Bullet b){
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         hitSound.at(b);
+
+        Effect.shake(despawnShake, despawnShake, b);
 
         if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
             hit(b);
@@ -275,9 +279,8 @@ public abstract class BulletType extends Content{
         bullet.damage = damage < 0 ? this.damage : damage;
         bullet.add();
 
-        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX() / Time.delta, ((Hitboxc)owner).deltaY() / Time.delta);
+        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
         return bullet;
-
     }
 
     public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){

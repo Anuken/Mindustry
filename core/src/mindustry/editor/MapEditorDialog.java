@@ -257,6 +257,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
             player.clearUnit();
             Groups.unit.clear();
+            Groups.build.clear();
             logic.play();
         });
     }

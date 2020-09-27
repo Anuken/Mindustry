@@ -369,6 +369,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean canReplace(Block other){
+        if(other.alwaysReplace) return true;
         return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size == other.size;
     }
 

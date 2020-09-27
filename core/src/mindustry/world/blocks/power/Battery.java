@@ -2,8 +2,10 @@ package mindustry.world.blocks.power;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.tilesize;
 
@@ -17,6 +19,7 @@ public class Battery extends PowerDistributor{
         super(name);
         outputsPower = true;
         consumesPower = true;
+        flags = EnumSet.of(BlockFlag.powerResupply);
     }
 
     public class BatteryBuild extends Building{

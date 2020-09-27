@@ -93,7 +93,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                 ObjectMap<String, Object> map = new ObjectMap<>();
                 for(String value : Core.settings.keys()){
                     if(value.contains("usid") || value.contains("uuid")){
-                        map.put(value, Core.settings.getString(value));
+                        map.put(value, Core.settings.get(value, null));
                     }
                 }
                 Core.settings.clear();

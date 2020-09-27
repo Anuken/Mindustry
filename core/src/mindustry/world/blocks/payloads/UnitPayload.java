@@ -8,6 +8,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.*;
+import mindustry.entities.EntityCollisions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -47,15 +48,16 @@ public class UnitPayload implements Payload{
             return false;
         }
 
-        //naval units need water.
-        if(unit instanceof WaterMovec){
+        //check if unit can be dumped here
+        SolidPred solid = unit.solidity();
+        if(solid != null){
             int tx = unit.tileX(), ty = unit.tileY();
-            boolean nearEmpty = !EntityCollisions.waterSolid(tx, ty);
+            boolean nearEmpty = !solid.solid(tx, ty);
             for(Point2 p : Geometry.d4){
-                nearEmpty |= !EntityCollisions.waterSolid(tx + p.x, ty + p.y);
+                nearEmpty |= !solid.solid(tx + p.x, ty + p.y);
             }
 
-            //cannot dump on dry land
+            //cannot dump on solid blocks
             if(!nearEmpty) return false;
         }
 

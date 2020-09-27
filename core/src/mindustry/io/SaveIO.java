@@ -126,6 +126,10 @@ public class SaveIO{
         }
     }
 
+    public static void load(String saveName) throws SaveException{
+        load(saveDirectory.child(saveName + ".msav"));
+    }
+
     public static void load(Fi file) throws SaveException{
         load(file, world.context);
     }

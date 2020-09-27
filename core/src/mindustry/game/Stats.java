@@ -22,6 +22,7 @@ public class Stats{
     /** Friendly buildings destroyed. */
     public int buildingsDestroyed;
 
+    //TODO fix
     public RankResult calculateRank(Sector zone, boolean launched){
         float score = 0;
 
