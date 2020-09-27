@@ -130,6 +130,8 @@ public class Bullets implements ContentList{
             backColor = Pal.heal;
             frontColor = Color.white;
             mixColorTo = Color.white;
+            trailColor = Pal.heal;
+            trailChance = 0.2f;
             shootCone = 180f;
             ejectEffect = Fx.none;
             shootSound = Sounds.none;
