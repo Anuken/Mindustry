@@ -1534,9 +1534,7 @@ public class Blocks implements ContentList{
             targetAir = false;
             health = 2400;
             size = 4;
-            inaccuracy = 1.1f;
             reloadTime = 120f;
-            shots: 1;
             range: 200f;
             recoilAmount: 7f;
             cooldown: 0.01f;
