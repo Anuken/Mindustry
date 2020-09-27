@@ -1535,10 +1535,10 @@ public class Blocks implements ContentList{
             health = 2400;
             size = 4;
             reloadTime = 120f;
-            range: 200f;
-            recoilAmount: 7f;
-            cooldown: 0.01f;
-            shootShake: 5f;
+            range = 200f;
+            recoilAmount = 7f;
+            cooldown = 0.01f;
+            shootShake = 5f;
             rotateSpeed = 8f;
         }};
 
