@@ -329,6 +329,9 @@ public class TechTree implements ContentList{
 
                             node(ripple, () -> {
                                 node(fuse, () -> {
+                                    node(clapper, () -> {
+                                        
+                                    });
 
                                 });
                             });
