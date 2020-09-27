@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -633,6 +634,8 @@ public class LStatements{
 
     @RegisterStatement("jump")
     public static class JumpStatement extends LStatement{
+        private static Color last = new Color();
+
         public transient StatementElem dest;
 
         public int destIndex;
@@ -644,17 +647,28 @@ public class LStatements{
         public void build(Table table){
             table.add("if ").padLeft(4);
 
-            field(table, value, str -> value = str);
-
-            table.button(b -> {
-                b.label(() -> op.symbol);
-                b.clicked(() -> showSelect(b, ConditionOp.all, op, o -> op = o));
-            }, Styles.logict, () -> {}).size(48f, 40f).pad(4f).color(table.color);
-
-            field(table, compare, str -> compare = str);
+            last = table.color;
+            table.table(this::rebuild);
 
             table.add().growX();
             table.add(new JumpButton(() -> dest, s -> dest = s)).size(30).right().padLeft(-8);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+            table.setColor(last);
+
+            if(op != ConditionOp.always) field(table, value, str -> value = str);
+
+            table.button(b -> {
+                b.label(() -> op.symbol);
+                b.clicked(() -> showSelect(b, ConditionOp.all, op, o -> {
+                    op = o;
+                    rebuild(table);
+                }));
+            }, Styles.logict, () -> {}).size(op == ConditionOp.always ? 80f : 48f, 40f).pad(4f).color(table.color);
+
+            if(op != ConditionOp.always) field(table, compare, str -> compare = str);
         }
 
         //elements need separate conversion logic

@@ -27,13 +27,13 @@ public class CrashSender{
     public static String createReport(String error){
         String report = "Oh no, Mindustry crashed!\n";
         if(mods.list().size == 0){
-            report += "Please report this at https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md\n\n";
+            report += "Please report this at " + Vars.reportIssueURL + "\n\n";
         }
         return report + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
             + "OS: " + System.getProperty("os.name") + " x" + (OS.is64Bit ? "64" : "32") + "\n"
             + "Java Version: " + System.getProperty("java.version") + "\n"
             + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
-            + mods.list().size + " Mods: " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version)
+            + mods.list().size + " Mods: " + (mods.list().isEmpty() ? "none" : mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version))
             + "\n\n" + error;
     }
 

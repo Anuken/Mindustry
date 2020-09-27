@@ -8,7 +8,9 @@ public enum RadarTarget{
     enemy((team, other) -> team != other.team),
     ally((team, other) -> team == other.team),
     player((team, other) -> other.isPlayer()),
+    attacker((pos, other) -> other.canShoot()),
     flying((team, other) -> other.isFlying()),
+    boss((team, other) -> other.isBoss()),
     ground((team, other) -> other.isGrounded());
 
     public final RadarTargetFunc func;

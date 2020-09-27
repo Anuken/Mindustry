@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
@@ -26,7 +25,6 @@ import mindustry.input.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
 
@@ -173,8 +171,6 @@ public class HudFragment extends Fragment{
                 s.button(Icon.play, Styles.righti, 30f, () -> {
                     if(net.client() && player.admin){
                         Call.adminRequest(player, AdminAction.wave);
-                    }else if(inLaunchWave()){
-                        ui.showConfirm("@confirm", "@launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
                     }else{
                         logic.skipWave();
                     }
@@ -576,40 +572,6 @@ public class HudFragment extends Fragment{
         Core.scene.add(image);
     }
 
-    private void showLaunchConfirm(){
-        BaseDialog dialog = new BaseDialog("@launch");
-        dialog.update(() -> {
-            if(!inLaunchWave()){
-                dialog.hide();
-            }
-        });
-        dialog.cont.add("@launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
-        dialog.buttons.defaults().size(200f, 54f).pad(2f);
-        dialog.setFillParent(false);
-        dialog.buttons.button("@cancel", dialog::hide);
-        dialog.buttons.button("@ok", () -> {
-            dialog.hide();
-            Call.launchZone();
-        });
-        dialog.keyDown(KeyCode.escape, dialog::hide);
-        dialog.keyDown(KeyCode.back, dialog::hide);
-        dialog.show();
-    }
-
-    //TODO launching is disabled, possibly forever
-    private boolean inLaunchWave(){
-        return false;
-        /*
-        return state.hasSector() &&
-            state.getSector().metCondition() &&
-            !net.client() &&
-            state.wave % state.getSector().launchPeriod == 0 && !spawner.isSpawning();*/
-    }
-
-    private boolean canLaunch(){
-        return inLaunchWave() && state.enemies <= 0;
-    }
-
     private void toggleMenus(){
         if(flip != null){
             flip.getStyle().imageUp = shown ? Icon.downOpen : Icon.upOpen;
@@ -741,7 +703,7 @@ public class HudFragment extends Fragment{
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? Pal.ammo : Pal.health);
+                b.color.set(player.displayAmmo() ? player.dead() ? Pal.ammo : player.unit().type().ammoType.color : Pal.health);
             });
 
             t.getChildren().get(1).toFront();
@@ -751,22 +713,6 @@ public class HudFragment extends Fragment{
             builder.setLength(0);
             builder.append(wavef.get(state.wave));
             builder.append("\n");
-
-            if(inLaunchWave()){
-                builder.append("[#");
-                Tmp.c1.set(Color.white).lerp(state.enemies > 0 ? Color.white : Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
-                builder.append("]");
-
-                if(!canLaunch()){
-                    builder.append(Core.bundle.get("launch.unable2"));
-                }else{
-                    builder.append(Core.bundle.get("launch"));
-                    builder.append("\n");
-                    builder.append(Core.bundle.format("launch.next", state.wave + state.getSector().launchPeriod));
-                    builder.append("\n");
-                }
-                builder.append("[]\n");
-            }
 
             if(state.enemies > 0){
                 if(state.enemies == 1){
@@ -786,13 +732,8 @@ public class HudFragment extends Fragment{
             return builder;
         }).growX().pad(8f);
 
-        table.setDisabled(() -> !canLaunch());
+        table.setDisabled(true);
         table.visible(() -> state.rules.waves);
-        table.clicked(() -> {
-            if(canLaunch()){
-                showLaunchConfirm();
-            }
-        });
 
         return table;
     }

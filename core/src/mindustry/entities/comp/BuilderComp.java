@@ -71,7 +71,7 @@ abstract class BuilderComp implements Unitc{
         Tile tile = world.tile(current.x, current.y);
 
         if(within(tile, finalPlaceDst)){
-            rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
+            lookAt(angleTo(tile));
         }
 
         if(!(tile.block() instanceof ConstructBlock)){

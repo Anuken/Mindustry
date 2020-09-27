@@ -30,9 +30,8 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable{
 
-    @Import boolean hovering;
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
-    @Import boolean dead;
+    @Import boolean hovering, dead;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo;
     @Import Team team;
     @Import int id;
 
@@ -41,6 +40,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     boolean spawnedByCore;
 
     transient Seq<Ability> abilities = new Seq<>(0);
+    private transient float resupplyTime = Mathf.random(10f);
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -191,7 +191,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.maxHealth = type.health;
         this.drag = type.drag;
         this.armor = type.armor;
-        this.hitSize = type.hitsize;
+        this.hitSize = type.hitSize;
         this.hovering = type.hovering;
 
         if(controller == null) controller(type.createController());
@@ -244,6 +244,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void update(){
 
         type.update(self());
+
+        if(state.rules.unitAmmo && ammo < type.ammoCapacity - 0.0001f){
+            resupplyTime += Time.delta;
+
+            //resupply only at a fixed interval to prevent lag
+            if(resupplyTime > 10f){
+                type.ammoType.resupply(self());
+                resupplyTime = 0f;
+            }
+        }
 
         if(abilities.size > 0){
             for(Ability a : abilities){
@@ -366,7 +376,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(!headless){
             for(int i = 0; i < type.wreckRegions.length; i++){
                 if(type.wreckRegions[i].found()){
-                    float range = type.hitsize/4f;
+                    float range = type.hitSize /4f;
                     Tmp.v1.rnd(range);
                     Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
                 }

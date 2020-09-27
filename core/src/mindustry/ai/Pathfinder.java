@@ -43,7 +43,7 @@ public class Pathfinder implements Runnable{
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
-            (PathTile.deep(tile) ? 70 : 0) +
+            (PathTile.deep(tile) ? 6000 : 0) +
             (PathTile.damages(tile) ? 30 : 0),
 
         //legs
@@ -116,7 +116,7 @@ public class Pathfinder implements Runnable{
         }
 
         return PathTile.get(
-            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 127),
+            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 80),
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,

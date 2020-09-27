@@ -34,7 +34,7 @@ import mindustry.world.consumers.*;
 import static mindustry.Vars.*;
 
 public class UnitType extends UnlockableContent{
-    public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f), outlineSpace = 0.01f;
+    public static final float shadowTX = -12, shadowTY = -13, outlineSpace = 0.01f;
     private static final Vec2 legOffset = new Vec2();
 
     /** If true, the unit is always at elevation 1. */
@@ -51,6 +51,7 @@ public class UnitType extends UnlockableContent{
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
+    public float aimDst = -1f;
     public int commandLimit = 24;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
@@ -72,7 +73,8 @@ public class UnitType extends UnlockableContent{
     public Color mechLegColor = Pal.darkMetal;
 
     public int itemCapacity = -1;
-    public int ammoCapacity = 220;
+    public int ammoCapacity = -1;
+    public AmmoType ammoType = AmmoTypes.copper;
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
@@ -80,7 +82,7 @@ public class UnitType extends UnlockableContent{
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
     public float strafePenalty = 0.5f;
-    public float hitsize = 6f;
+    public float hitSize = 6f;
     public float itemOffsetY = 3f;
     public float lightRadius = 60f, lightOpacity = 0.6f;
     public Color lightColor = Pal.powerLight;
@@ -136,41 +138,6 @@ public class UnitType extends UnlockableContent{
 
     public void update(Unit unit){
 
-        if(unit instanceof Mechc && !unit.isFlying()){
-            updateMechEffects(unit);
-        }
-    }
-
-    public void updateMechEffects(Unit unit){
-        Mechc mech = (Mechc)unit;
-
-        float extend = walkExtend((Mechc)unit, false);
-        float base = walkExtend((Mechc)unit, true);
-        float extendScl = base % 1f;
-
-        float lastExtend = mech.walkExtension();
-
-        if(extendScl < lastExtend && base % 2f > 1f){
-            int side = -Mathf.sign(extend);
-            float width = hitsize / 2f * side, length = mechStride * 1.35f;
-
-            float cx = unit.x + Angles.trnsx(mech.baseRotation(), length, width),
-            cy = unit.y + Angles.trnsy(mech.baseRotation(), length, width);
-
-            if(mechStepShake > 0){
-                Effect.shake(mechStepShake, mechStepShake, cx, cy);
-            }
-
-            if(mechStepParticles){
-                Tile tile = world.tileWorld(cx, cy);
-                if(tile != null){
-                    Color color = tile.floor().mapColor;
-                    Fx.unitLand.at(cx, cy, hitsize/8f, color);
-                }
-            }
-        }
-
-        mech.walkExtension(extendScl);
     }
 
     public void landed(Unit unit){}
@@ -184,13 +151,13 @@ public class UnitType extends UnlockableContent{
         table.row();
 
         table.table(bars -> {
-            bars.defaults().growX().height(18f).pad(4);
+            bars.defaults().growX().height(20f).pad(4);
 
             bars.add(new Bar("blocks.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar("blocks.ammo", Pal.ammo, () -> unit.ammo / ammoCapacity));
+                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("blocks.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
         }).growX();
@@ -237,24 +204,28 @@ public class UnitType extends UnlockableContent{
         singleTarget = weapons.size <= 1;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round(hitsize * 7, 20), 20);
+            itemCapacity = Math.max(Mathf.round(hitSize * 7, 20), 20);
         }
 
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                range = Math.min(range, weapon.bullet.range() + hitsize/2f);
+                range = Math.min(range, weapon.bullet.range() + hitSize /2f);
             }
         }
 
         if(mechStride < 0){
-            mechStride = 4f + (hitsize-8f)/2.1f;
+            mechStride = 4f + (hitSize -8f)/2.1f;
+        }
+
+        if(aimDst < 0){
+            aimDst = weapons.contains(w -> !w.rotate) ? hitSize * 2f : hitSize / 2f;
         }
 
         if(mechStepShake < 0){
-            mechStepShake = Mathf.round((hitsize - 11f) / 9f);
-            mechStepParticles = hitsize > 15f;
+            mechStepShake = Mathf.round((hitSize - 11f) / 9f);
+            mechStepParticles = hitSize > 15f;
         }
 
         canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
@@ -281,6 +252,15 @@ public class UnitType extends UnlockableContent{
             }
         }
         this.weapons = mapped;
+
+        //dynamically create ammo capacity based on firing rate
+        if(ammoCapacity < 0){
+            float shotsPerSecond = weapons.sumf(w -> 60f / w.reload);
+            //duration of continuous fire without reload
+            float targetSeconds = 30;
+
+            ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
+        }
     }
 
     @CallSuper
@@ -342,7 +322,7 @@ public class UnitType extends UnlockableContent{
 
     public void draw(Unit unit){
         Mechc mech = unit instanceof Mechc ? (Mechc)unit : null;
-        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitsize/4000f, 0, 0.01f);
+        float z = unit.elevation > 0.5f ? (lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : groundLayer + Mathf.clamp(hitSize / 4000f, 0, 0.01f);
 
         if(unit.controller().isBeingControlled(player.unit())){
             drawControl(unit);
@@ -359,10 +339,10 @@ public class UnitType extends UnlockableContent{
             drawMech(mech);
 
             //side
-            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(walkExtend(mech, true), 2f/Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f/Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
 
             //front
-            legOffset.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(walkExtend(mech, true), 1f/Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+            legOffset.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f/Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
 
             unit.trns(legOffset.x, legOffset.y);
         }
@@ -434,7 +414,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        Draw.color(shadowColor);
+        Draw.color(Pal.shadow);
         float e = Math.max(unit.elevation, visualElevation);
         Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
         Draw.color();
@@ -619,7 +599,7 @@ public class UnitType extends UnlockableContent{
             if(leg.moving && visualElevation > 0){
                 float scl = visualElevation;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
-                Draw.color(shadowColor);
+                Draw.color(Pal.shadow);
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
                 Draw.color();
             }
@@ -656,8 +636,8 @@ public class UnitType extends UnlockableContent{
 
         float e = unit.elevation;
 
-        float sin = Mathf.lerp(Mathf.sin(walkExtend(mech, true), 2f / Mathf.PI, 1f), 0f, e);
-        float extension = Mathf.lerp(walkExtend(mech, false), 0, e);
+        float sin = Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f / Mathf.PI, 1f), 0f, e);
+        float extension = Mathf.lerp(mech.walkExtend(false), 0, e);
         float boostTrns = e * 2f;
 
         Floor floor = unit.isFlying() ? Blocks.air.asFloor() : unit.floorOn();
@@ -688,20 +668,6 @@ public class UnitType extends UnlockableContent{
         Draw.rect(baseRegion, unit, mech.baseRotation() - 90);
 
         Draw.mixcol();
-    }
-
-    public float walkExtend(Mechc mech, boolean scaled){
-
-        //now ranges from -maxExtension to maxExtension*3
-        float raw = mech.walkTime() % (mechStride * 4);
-
-        if(scaled) return raw / mechStride;
-
-        if(raw > mechStride*3) raw = raw - mechStride * 4;
-        else if(raw > mechStride*2) raw = mechStride * 2 - raw;
-        else if(raw > mechStride) raw = mechStride * 2 - raw;
-
-        return raw;
     }
 
     public void applyColor(Unit unit){

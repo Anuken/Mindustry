@@ -113,7 +113,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Payloadc pay = (Payloadc)unit;
 
         if(target.isAI() && target.isGrounded() && pay.canPickup(target)
-        && target.within(unit, unit.type().hitsize * 2f + target.type().hitsize * 2f)){
+        && target.within(unit, unit.type().hitSize * 2f + target.type().hitSize * 2f)){
             Call.pickedUnitPayload(player, target);
         }
     }
@@ -395,7 +395,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(!(unit instanceof Payloadc)) return;
         Payloadc pay = (Payloadc)unit;
 
-        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitSize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
         if(target != null){
             Call.requestUnitPayload(player, target);
         }else{

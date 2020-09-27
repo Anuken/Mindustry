@@ -208,6 +208,7 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.slag;
             isLiquid = true;
             cacheLayer = CacheLayer.slag;
+            attributes.set(Attribute.heat, 0.85f);
         }};
 
         stone = new Floor("stone");
@@ -265,7 +266,7 @@ public class Blocks implements ContentList{
             variants = 3;
             status = StatusEffects.muddy;
             statusDuration = 30f;
-            attributes.set(Attribute.water, 2f);
+            attributes.set(Attribute.water, 1f);
             cacheLayer = CacheLayer.mud;
             albedo = 0.35f;
         }};
@@ -865,7 +866,8 @@ public class Blocks implements ContentList{
             size = 2;
             reload = 250f;
             range = 85f;
-            healPercent = 14f;
+            healPercent = 11f;
+            phaseBoost = 15f;
             health = 80 * size * size;
             consumes.item(Items.phasefabric).boost();
         }};
@@ -1142,13 +1144,14 @@ public class Blocks implements ContentList{
             powerProduction = 1.8f;
             generateEffect = Fx.redgeneratespark;
             size = 2;
+            floating = true;
         }};
 
         steamGenerator = new BurnerGenerator("steam-generator"){{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
             itemDuration = 90f;
-            consumes.liquid(Liquids.water, 0.09f);
+            consumes.liquid(Liquids.water, 0.1f);
             hasLiquids = true;
             size = 2;
         }};
@@ -1268,7 +1271,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
 
-            consumes.power(1.25f);
+            consumes.power(1.5f);
         }};
 
         cultivator = new Cultivator("cultivator"){{
@@ -1751,6 +1754,7 @@ public class Blocks implements ContentList{
             };
             size = 3;
             consumes.power(1.2f);
+            floating = true;
         }};
 
         additiveReconstructor = new Reconstructor("additive-reconstructor"){{

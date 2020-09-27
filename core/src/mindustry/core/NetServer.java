@@ -131,7 +131,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(Time.millis() < info.lastKicked){
+            if(Time.millis() < admins.getKickTime(uuid, con.address)){
                 con.kick(KickReason.recentKick);
                 return;
             }

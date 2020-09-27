@@ -84,6 +84,18 @@ public class Drawf{
         Draw.color();
     }
 
+    public static void shadow(TextureRegion region, float x, float y, float rotation){
+        Draw.color(Pal.shadow);
+        Draw.rect(region, x, y, rotation);
+        Draw.color();
+    }
+
+    public static void shadow(TextureRegion region, float x, float y){
+        Draw.color(Pal.shadow);
+        Draw.rect(region, x, y);
+        Draw.color();
+    }
+
     public static void dashCircle(float x, float y, float rad, Color color){
         Lines.stroke(3f, Pal.gray);
         Lines.dashCircle(x, y, rad);

@@ -130,7 +130,7 @@ public class UnitFactory extends UnitBlock{
             Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow());
 
             if(units.any()){
-                ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(units.indexOf(unit)));
+                ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(Structs.indexOf(plans, u -> u.unit == unit)));
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }

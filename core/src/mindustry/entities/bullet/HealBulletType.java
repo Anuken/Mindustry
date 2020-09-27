@@ -21,6 +21,7 @@ public class HealBulletType extends BulletType{
         despawnEffect = Fx.hitLaser;
         collidesTeam = true;
         hittable = false;
+        reflectable = false;
     }
 
     public HealBulletType(){

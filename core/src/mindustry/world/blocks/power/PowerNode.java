@@ -27,7 +27,6 @@ public class PowerNode extends PowerBlock{
     protected static BuildPlan otherReq;
 
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
-    protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -42,6 +41,7 @@ public class PowerNode extends PowerBlock{
         configurable = true;
         consumesPower = false;
         outputsPower = false;
+        canOverdrive = false;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;

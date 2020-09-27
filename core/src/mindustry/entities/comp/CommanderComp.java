@@ -73,7 +73,7 @@ abstract class CommanderComp implements Unitc{
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
-        float spacing = hitSize() * 1f;
+        float spacing = hitSize() * 0.65f;
         minFormationSpeed = type().speed;
 
         controlling.addAll(units);

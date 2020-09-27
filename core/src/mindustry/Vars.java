@@ -63,7 +63,7 @@ public class Vars implements Loadable{
     /** URL to the JSON file containing all the BE servers. Only queried in the V6 alpha (will be removed once it's out). */
     public static final String serverJsonV6URL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
     /** URL of the github issue report template.*/
-    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
+    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<String> defaultServers = Seq.with();
     /** maximum distance between mine and core that supports automatic transferring */
@@ -72,8 +72,6 @@ public class Vars implements Loadable{
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
-    /** shadow color for turrets */
-    public static final float turretShadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
     /** units outside of this bound will die instantly */
