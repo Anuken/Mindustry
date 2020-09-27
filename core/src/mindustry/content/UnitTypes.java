@@ -1300,7 +1300,7 @@ public class UnitTypes implements ContentList{
 
         oct = new UnitType("oct"){{
             armor = 16f;
-            health = 24000;
+            health = 31000;
             speed = 0.6f;
             rotateSpeed = 1f;
             accel = 0.04f;
