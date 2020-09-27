@@ -642,13 +642,26 @@ public class LStatements{
 
         @Override
         public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
             table.add("if ").padLeft(4);
 
-            field(table, value, str -> value = str);
+            if(!op.alone) {
+                field(table, value, str -> value = str);
+            }
 
             table.button(b -> {
                 b.label(() -> op.symbol);
-                b.clicked(() -> showSelect(b, ConditionOp.all, op, o -> op = o));
+                b.clicked(() -> {
+                    showSelect(b, ConditionOp.all, op, o -> {
+                        op = o;
+                        rebuild(table);
+                    });
+                });
             }, Styles.logict, () -> {}).size(48f, 40f).pad(4f).color(table.color);
 
             field(table, compare, str -> compare = str);
