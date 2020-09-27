@@ -18,7 +18,7 @@ public class Bullets implements ContentList{
     public static BulletType
 
     //artillery
-    artilleryDense, artilleryPlastic, artilleryPlasticFrag, artilleryHoming, artilleryIncendiary, artilleryExplosive,
+    artilleryDense, artilleryPlastic, artilleryPlasticFrag, artilleryHoming, artilleryIncendiary, artilleryExplosive, plastBomb,
 
     //flak
     flakScrap, flakLead, flakGlass, flakGlassFrag,
@@ -119,6 +119,33 @@ public class Bullets implements ContentList{
 
             status = StatusEffects.blasted;
             statusDuration = 60f;
+        }};
+        
+        plastBomb = new BasicBulletType(2f, 20, "bullet"){{
+            
+            sprite = "large-bomb";
+            width = height = 30f;
+            range = 30f;
+            ignoreRotation = true;
+            backColor = Pal.heal;
+            frontColor = Color.white;
+            mixColorTo = Color.white;
+            shootCone = 180f;
+            ejectEffect = Fx.none;
+            shootSound = Sounds.none;
+            despawnShake = 4f;
+            collidesAir = false;
+            lifetime = 70f;
+            despawnEffect = Fx.greenBomb;
+            hitEffect = Fx.massiveExplosion;
+            keepVelocity = false;
+            spin = 2f;
+            shrinkX = shrinkY = 0.7f;
+            speed = 2.87f;
+            collides = true;
+            splashDamage = 240f;
+            splashDamageRadius = 115f;
+            reloadMultiplier = 1f;
         }};
 
         flakGlassFrag = new BasicBulletType(3f, 5, "bullet"){{
