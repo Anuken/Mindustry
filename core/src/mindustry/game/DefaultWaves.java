@@ -211,5 +211,13 @@ public class DefaultWaves{
         //- main progression of units, up to wave ~20
         //- changes from
         //- extra periodic patterns
+
+
+
+        //max reasonable wave, after which everything gets boring
+        int cap = 300;
+        for(int i = 0; i < cap; i++){
+
+        }
     }
 }
