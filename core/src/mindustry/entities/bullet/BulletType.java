@@ -77,6 +77,7 @@ public abstract class BulletType extends Content{
     //additional effects
 
     public float fragCone = 360f;
+    public float fragAngle = 0f;
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public BulletType fragBullet = null;
@@ -101,6 +102,8 @@ public abstract class BulletType extends Content{
     public int lightningLength = 5, lightningLengthRand = 0;
     /** Use a negative value to use default bullet damage. */
     public float lightningDamage = -1;
+    public float lightningCone = 360f;
+    public float lightningAngle = 0f;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
@@ -156,7 +159,7 @@ public abstract class BulletType extends Content{
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.range(fragCone/2);
+                float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
@@ -181,7 +184,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength + Mathf.random(lightningLengthRand));
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
         }
     }
 
