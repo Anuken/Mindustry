@@ -12,7 +12,6 @@ public enum ConditionOp{
     lessThanEq("<=", (a, b) -> a <= b, false),
     notEqual("not", (a, b) -> Math.abs(a - b) >= 0.000001, (a, b) -> a != b, false);
 
-
     public static final ConditionOp[] all = values();
 
     public final CondObjOpLambda objFunction;
@@ -30,7 +29,6 @@ public enum ConditionOp{
         this.objFunction = objFunction;
         this.alone = alone;
     }
-
 
     @Override
     public String toString(){
