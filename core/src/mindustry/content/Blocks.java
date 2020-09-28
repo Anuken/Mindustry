@@ -209,6 +209,9 @@ public class Blocks implements ContentList{
             isLiquid = true;
             cacheLayer = CacheLayer.slag;
             attributes.set(Attribute.heat, 0.85f);
+
+            lightRadius = 65f;
+            lightColor = Color.orange.cpy().a(0.4f);
         }};
 
         stone = new Floor("stone");
@@ -243,7 +246,7 @@ public class Blocks implements ContentList{
             blendGroup = basalt;
 
             emitLight = true;
-            lightRadius = 60f;
+            lightRadius = 50f;
             lightColor = Color.orange.cpy().a(0.3f);
         }};
 
