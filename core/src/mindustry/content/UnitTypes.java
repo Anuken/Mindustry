@@ -419,7 +419,7 @@ public class UnitTypes implements ContentList{
                 continuous = true;
                 cooldownTime = 200f;
 
-                bullet = new ContinuousLaserBulletType(17){{
+                bullet = new ContinuousLaserBulletType(20){{
                     length = 150f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
@@ -430,7 +430,7 @@ public class UnitTypes implements ContentList{
 
                     shootEffect = Fx.greenLaserChargeSmall;
 
-                    incendChance = 0.02f;
+                    incendChance = 0.05f;
                     incendSpread = 5f;
                     incendAmount = 1;
 
@@ -489,7 +489,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LaserBulletType(){{
                     length = 500f;
-                    damage = 520f;
+                    damage = 550f;
                     width = 75f;
 
                     lifetime = 65f;
