@@ -921,6 +921,25 @@ public class Fx{
         Drawf.tri(e.x, e.y, w, 17f * e.fout(), e.rotation);
         Drawf.tri(e.x, e.y, w, 4f * e.fout(), e.rotation + 180f);
     }),
+    
+    bigPlastShoot = new Effect(15, e -> {
+    
+        Color[] colors = {Pal.heal, Color.white};
+        float[] size1 = {30f, 21f, 13f, 9f};
+        float[] size2 = {10f, 7f, 13f, 9f};
+        float[] size3 = {20f, 17f, 8f, 4f};
+    
+        for(int i = 0; i < 2; i++){
+        
+        color(colors[i]);
+        Drawf.tri(e.x, e.y, size1[i+2] * e.fout(), size1[i] * e.fout(), e.rotation);
+        Drawf.tri(e.x, e.y, size2[i+2] * e.fout(), size2[i] * e.fout(), e.rotation + 180f);
+        Drawf.tri(e.x, e.y, size3[i+2] * e.fout(), size3[i] * e.fout(), e.rotation - 45f);
+        Drawf.tri(e.x, e.y, size3[i+2] * e.fout(), size3[i] * e.fout(), e.rotation + 45f);
+        
+        };
+    
+    }),
 
     shootSmallSmoke = new Effect(20f, e -> {
         color(Pal.lighterOrange, Color.lightGray, Color.gray, e.fin());

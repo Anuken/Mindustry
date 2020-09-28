@@ -126,28 +126,25 @@ public class Bullets implements ContentList{
             sprite = "large-bomb";
             width = height = 30f;
             range = 30f;
-            ignoreRotation = true;
             backColor = Pal.heal;
             frontColor = Color.white;
             mixColorTo = Color.white;
             trailColor = Pal.heal;
             trailChance = 0.2f;
-            shootCone = 180f;
-            ejectEffect = Fx.none;
-            shootSound = Sounds.none;
+            shootEffect = Fx.bigPlastShoot;
+            smokeEffect = Fx.none
             despawnShake = 4f;
             collidesAir = false;
             lifetime = 70f;
             despawnEffect = Fx.greenBomb;
             hitEffect = Fx.massiveExplosion;
-            keepVelocity = false;
             spin = 2f;
             shrinkX = shrinkY = 0.7f;
             speed = 2.87f;
             collides = true;
             splashDamage = 240f;
             splashDamageRadius = 115f;
-            reloadMultiplier = 1f;
+            Multiplier = 1f;
         }};
 
         flakGlassFrag = new BasicBulletType(3f, 5, "bullet"){{

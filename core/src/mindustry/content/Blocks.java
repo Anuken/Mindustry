@@ -1530,7 +1530,7 @@ public class Blocks implements ContentList{
         
         clapper = new ItemTurret("clapper"){{
             requirements(Category.turret, with(Items.plastanium, 230, Items.graphite, 150, Items.surgealloy, 130, Items.metaglass, 70));
-            ammo(Items.plastanium, plastBomb);
+            ammo(Items.plastanium, Bullets.plastBomb);
             targetAir = false;
             health = 2400;
             size = 4;
