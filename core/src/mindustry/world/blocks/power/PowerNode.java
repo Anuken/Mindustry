@@ -37,7 +37,6 @@ public class PowerNode extends PowerBlock{
 
     public PowerNode(String name){
         super(name);
-        expanded = true;
         configurable = true;
         consumesPower = false;
         outputsPower = false;
@@ -392,7 +391,7 @@ public class PowerNode extends PowerBlock{
 
                 if(!linkValid(this, link)) continue;
 
-                if(link.block instanceof PowerNode && !(link.pos() < tile.pos())) continue;
+                if(link.block instanceof PowerNode && link.id >= id) continue;
 
                 drawLaser(team, x, y, link.x, link.y, size, link.block.size);
             }
