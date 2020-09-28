@@ -112,7 +112,7 @@ public class EditorTile extends Tile{
         
         Block block = block();
 
-        if(block.hasEntity()){
+        if(block.hasBuilding()){
             build = entityprov.get().init(this, team, false, rotation);
             build.cons = new ConsumeModule(build);
             if(block.hasItems) build.items = new ItemModule();
