@@ -1239,7 +1239,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        if(sensor == LAccess.totalItems && items != null return items.total();
+        if(sensor == LAccess.totalItems && items != null) return items.total();
         if(sensor == LAccess.totalLiquids && liquids != null) return liquids.total();
         return 0;
     }
