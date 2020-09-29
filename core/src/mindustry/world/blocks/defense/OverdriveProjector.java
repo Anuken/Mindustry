@@ -57,10 +57,10 @@ public class OverdriveProjector extends Block{
             Drawf.arrow(x * tilesize - close, y * tilesize, x * tilesize - far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
             Drawf.arrow(x * tilesize, y * tilesize + close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);*/
             
-            for(int i - 0; i < 360; i += 60){
-              close.trns(i, 0, range + phaseRadiusBoost/2 - phaseRadiusBoost/10);
-              far.trns(i, 0, range + phaseRadiusBoost/2 + phaseRadiusBoost/10);
-              Drawf.arrow(x * tilesize + close.x, y * tilesize + close.y, x * tilesize + far.x, y * tilesize + far.y, size * tilesize + sin, 4f + sin, phaseColor);
+            for(int i - 0; i < 360; i++){
+                close.trns(i, 0 * 60, range + phaseRadiusBoost/2 - phaseRadiusBoost/10);
+                far.trns(i, 0 * 60, range + phaseRadiusBoost/2 + phaseRadiusBoost/10);
+                Drawf.arrow(x * tilesize + close.x, y * tilesize + close.y, x * tilesize + far.x, y * tilesize + far.y, size * tilesize + sin, 4f + sin, phaseColor);
             }
             
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor);
