@@ -417,7 +417,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         dead = true;
 
         //don't waste time when the unit is already on the ground, just destroy it
-        if(isGrounded()){
+        if(!type.flying){
             destroy();
         }
     }

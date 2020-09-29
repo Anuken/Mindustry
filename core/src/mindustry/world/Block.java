@@ -499,7 +499,7 @@ public class Block extends UnlockableContent{
         return variantRegions;
     }
 
-    public boolean hasEntity(){
+    public boolean hasBuilding(){
         return destructible || update;
     }
 

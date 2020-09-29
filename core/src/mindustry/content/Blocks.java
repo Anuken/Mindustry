@@ -210,8 +210,9 @@ public class Blocks implements ContentList{
             cacheLayer = CacheLayer.slag;
             attributes.set(Attribute.heat, 0.85f);
 
-            lightRadius = 65f;
-            lightColor = Color.orange.cpy().a(0.4f);
+            emitLight = true;
+            lightRadius = 40f;
+            lightColor = Color.orange.cpy().a(0.38f);
         }};
 
         stone = new Floor("stone");
