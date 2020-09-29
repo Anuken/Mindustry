@@ -32,6 +32,8 @@ public class ForceProjector extends Block{
     public float cooldownBrokenBase = 0.35f;
     public float basePowerDraw = 0.2f;
     public @Load("@-top") TextureRegion topRegion;
+    protected close = new Vec2();
+    protected far = new Vec2();
 
     static ForceBuild paramEntity;
     static final Cons<Shielderc> shieldConsumer = trait -> {
@@ -82,13 +84,19 @@ public class ForceProjector extends Block{
 
         if(Core.settings.getBool("phasedrange")) {
             float sin = Mathf.absin(Time.time(), 6f, 1f);
-            float close = radius + phaseRadiusBoost/2 - phaseRadiusBoost/10;
+            /*float close = radius + phaseRadiusBoost/2 - phaseRadiusBoost/10;
             float far = radius + phaseRadiusBoost/2 + phaseRadiusBoost/10;
             
             Drawf.arrow(x * tilesize + close, y * tilesize, x * tilesize + far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize, y * tilesize - close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize - close, y * tilesize, x * tilesize + far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize, y * tilesize + close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize, y * tilesize - close, x * tilesize, y * tilesize - far, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize - close, y * tilesize, x * tilesize - far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize, y * tilesize + close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);*/
+            
+            for(int i - 0; i < 360; i + 60){
+              close.trns(i, 0, radius + phaseRadiusBoost/2 - phaseRadiusBoost/10);
+              far.trns(i, 0, radius + phaseRadiusBoost/2 + phaseRadiusBoost/10);
+              Drawf.arrow(x * tilesize + close.x, y * tilesize + close.y, x * tilesize + far.x, y * tilesize + far.y, size * tilesize + sin, 4f + sin, phaseColor);
+            }
             
             Draw.color(Pal.gray);
             Lines.stroke(3f);

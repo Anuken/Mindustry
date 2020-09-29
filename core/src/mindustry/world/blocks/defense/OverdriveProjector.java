@@ -27,6 +27,8 @@ public class OverdriveProjector extends Block{
     public boolean hasBoost = true;
     public Color baseColor = Color.valueOf("feb380");
     public Color phaseColor = Color.valueOf("ffd59e");
+    protected close = new Vec2();
+    protected far = new Vec2();
 
     public OverdriveProjector(String name){
         super(name);
@@ -47,13 +49,19 @@ public class OverdriveProjector extends Block{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
         if(hasBoost && Core.settings.getBool("phasedrange")) {
             float sin = Mathf.absin(Time.time(), 6f, 1f);
-            float close = range + phaseRangeBoost/2 - phaseRangeBoost/10;
+            /*float close = range + phaseRangeBoost/2 - phaseRangeBoost/10;
             float far = range + phaseRangeBoost/2 + phaseRangeBoost/10;
             
             Drawf.arrow(x * tilesize + close, y * tilesize, x * tilesize + far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize, y * tilesize - close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize - close, y * tilesize, x * tilesize + far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize, y * tilesize + close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize, y * tilesize - close, x * tilesize, y * tilesize - far, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize - close, y * tilesize, x * tilesize - far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize, y * tilesize + close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);*/
+            
+            for(int i - 0; i < 360; i + 60){
+              close.trns(i, 0, range + phaseRadiusBoost/2 - phaseRadiusBoost/10);
+              far.trns(i, 0, range + phaseRadiusBoost/2 + phaseRadiusBoost/10);
+              Drawf.arrow(x * tilesize + close.x, y * tilesize + close.y, x * tilesize + far.x, y * tilesize + far.y, size * tilesize + sin, 4f + sin, phaseColor);
+            }
             
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor);
         }
