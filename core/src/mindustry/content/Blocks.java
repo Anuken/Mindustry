@@ -1465,26 +1465,6 @@ public class Blocks implements ContentList{
             shootSound = Sounds.splash;
         }};
 
-        tsunami = new LiquidTurret("tsunami"){{
-            requirements(Category.turret, with(Items.metaglass, 100, Items.lead, 400, Items.titanium, 250));
-            ammo(
-                    Liquids.water, Bullets.waterShot,
-                    Liquids.slag, Bullets.slagShot,
-                    Liquids.cryofluid, Bullets.cryoShot,
-                    Liquids.oil, Bullets.oilShot
-            );
-            size = 4;
-            recoilAmount = 0f;
-            reloadTime = 1f;
-            inaccuracy = 10f;
-            shootCone = 45f;
-            liquidCapacity = 40f;
-            shootEffect = Fx.shootLiquid;
-            range = 220f;
-            health = 250 * size * size;
-            shootSound = Sounds.splash;
-        }};
-
         lancer = new ChargeTurret("lancer"){{
             requirements(Category.turret, with(Items.copper, 25, Items.lead, 50, Items.silicon, 45));
             range = 155f;
@@ -1607,6 +1587,26 @@ public class Blocks implements ContentList{
             shootLength = 5f;
             bulletDamage = 25f;
             reloadTime = 10f;
+        }};
+
+        tsunami = new LiquidTurret("tsunami"){{
+            requirements(Category.turret, with(Items.metaglass, 100, Items.lead, 400, Items.titanium, 250, Items.thorium, 100));
+            ammo(
+                    Liquids.water, Bullets.waterShot,
+                    Liquids.slag, Bullets.slagShot,
+                    Liquids.cryofluid, Bullets.cryoShot,
+                    Liquids.oil, Bullets.oilShot
+            );
+            size = 3;
+            recoilAmount = 0f;
+            reloadTime = 1f;
+            inaccuracy = 10f;
+            shootCone = 45f;
+            liquidCapacity = 25f;
+            shootEffect = Fx.shootLiquid;
+            range = 180f;
+            health = 250 * size * size;
+            shootSound = Sounds.splash;
         }};
 
         fuse = new ItemTurret("fuse"){{
