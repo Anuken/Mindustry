@@ -1582,7 +1582,7 @@ public class Blocks implements ContentList{
             health = 250 * size * size;
             range = 140f;
             hasPower = true;
-            consumes.power(8f);
+            consumes.powerCond(8f, (PointDefenseBuild b) -> b.target != null);
             size = 2;
             shootLength = 5f;
             bulletDamage = 25f;
