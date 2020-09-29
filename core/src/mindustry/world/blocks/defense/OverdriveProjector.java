@@ -50,17 +50,9 @@ public class OverdriveProjector extends Block{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
         if(hasBoost && Core.settings.getBool("phasedrange")) {
             float sin = Mathf.absin(Time.time(), 6f, 1f);
-            /*float close = range + phaseRangeBoost/2 - phaseRangeBoost/10;
-            float far = range + phaseRangeBoost/2 + phaseRangeBoost/10;
-            
-            Drawf.arrow(x * tilesize + close, y * tilesize, x * tilesize + far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize, y * tilesize - close, x * tilesize, y * tilesize - far, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize - close, y * tilesize, x * tilesize - far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize, y * tilesize + close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);*/
-            
             for(int i = 0; i < 360; i += 60){
-                close.trns(i, 0, range + phaseRangeBoost/2 - phaseRangeBoost/10);
-                far.trns(i, 0, range + phaseRangeBoost/2 + phaseRangeBoost/10);
+                close.trns(i, 0, range + phaseRangeBoost - (4 + sin));
+                far.trns(i, 0, range + phaseRangeBoost);
                 Drawf.arrow(x * tilesize + close.x, y * tilesize + close.y, x * tilesize + far.x, y * tilesize + far.y, size * tilesize + sin, 4f + sin, phaseColor);
             }
             
