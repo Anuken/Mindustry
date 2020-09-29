@@ -85,8 +85,8 @@ public class ForceProjector extends Block{
         if(Core.settings.getBool("phasedrange")) {
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
-                close.trns(i, 0, radius + phaseRadiusBoost - (8 + sin));
-                far.trns(i, 0, radius + phaseRadiusBoost - (4 + sin));
+                close.trns(i, 0, radius - sin);
+                far.trns(i, 0, radius + phaseRadiusBoost);
                 Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, size * tilesize + sin, 4f + sin, phaseColor);
             }
             
