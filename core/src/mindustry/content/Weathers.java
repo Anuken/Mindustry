@@ -170,12 +170,13 @@ public class Weathers implements ContentList{
         sandstorm = new Weather("sandstorm"){
             TextureRegion region;
             float size = 140f, padding = size, invDensity = 1500f, baseSpeed = 6.1f;
-            float force = 0.45f;
+            float force = 0.4f * 0;
             Color color = Color.valueOf("f7cba4");
             Texture noise;
 
             {
                 attrs.set(Attribute.light, -0.1f);
+                opacityMultiplier = 0.8f;
             }
 
             @Override
@@ -250,7 +251,7 @@ public class Weathers implements ContentList{
 
         sporestorm = new Weather("sporestorm"){
             TextureRegion region;
-            float size = 5f, padding = size, invDensity = 2000f, baseSpeed = 4.3f, force = 0.28f;
+            float size = 5f, padding = size, invDensity = 2000f, baseSpeed = 4.3f, force = 0.28f * 0;
             Color color = Color.valueOf("7457ce");
             Texture noise;
 
@@ -259,6 +260,7 @@ public class Weathers implements ContentList{
                 attrs.set(Attribute.light, -0.15f);
                 status = StatusEffects.sporeSlowed;
                 statusGround = false;
+                opacityMultiplier = 0.85f;
             }
 
             @Override

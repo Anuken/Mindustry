@@ -209,6 +209,7 @@ public class Block extends UnlockableContent{
     public @Load("@-team") TextureRegion teamRegion;
     public TextureRegion[] teamRegions;
 
+    //TODO make this not static
     public static TextureRegion[][] cracks;
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempTileEnts = new Seq<>();
@@ -369,6 +370,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean canReplace(Block other){
+        if(other.alwaysReplace) return true;
         return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size == other.size;
     }
 
@@ -498,7 +500,7 @@ public class Block extends UnlockableContent{
         return variantRegions;
     }
 
-    public boolean hasEntity(){
+    public boolean hasBuilding(){
         return destructible || update;
     }
 

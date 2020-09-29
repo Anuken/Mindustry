@@ -27,7 +27,6 @@ public class PowerNode extends PowerBlock{
     protected static BuildPlan otherReq;
 
     protected final ObjectSet<PowerGraph> graphs = new ObjectSet<>();
-    protected final Vec2 t1 = new Vec2(), t2 = new Vec2();
 
     public @Load("laser") TextureRegion laser;
     public @Load("laser-end") TextureRegion laserEnd;
@@ -38,10 +37,10 @@ public class PowerNode extends PowerBlock{
 
     public PowerNode(String name){
         super(name);
-        expanded = true;
         configurable = true;
         consumesPower = false;
         outputsPower = false;
+        canOverdrive = false;
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
@@ -392,7 +391,7 @@ public class PowerNode extends PowerBlock{
 
                 if(!linkValid(this, link)) continue;
 
-                if(link.block instanceof PowerNode && !(link.pos() < tile.pos())) continue;
+                if(link.block instanceof PowerNode && link.id >= id) continue;
 
                 drawLaser(team, x, y, link.x, link.y, size, link.block.size);
             }

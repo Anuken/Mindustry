@@ -257,7 +257,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                 if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
-                        if(block.hasEntity()){
+                        if(block.hasBuilding()){
                             try{
                                 readChunk(stream, true, in -> {
                                     byte revision = in.readByte();

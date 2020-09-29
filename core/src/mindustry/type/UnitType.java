@@ -34,7 +34,7 @@ import mindustry.world.consumers.*;
 import static mindustry.Vars.*;
 
 public class UnitType extends UnlockableContent{
-    public static final float shadowTX = -12, shadowTY = -13, shadowColor = Color.toFloatBits(0, 0, 0, 0.22f), outlineSpace = 0.01f;
+    public static final float shadowTX = -12, shadowTY = -13, outlineSpace = 0.01f;
     private static final Vec2 legOffset = new Vec2();
 
     /** If true, the unit is always at elevation 1. */
@@ -51,6 +51,7 @@ public class UnitType extends UnlockableContent{
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
+    public float aimDst = -1f;
     public int commandLimit = 24;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
@@ -216,6 +217,10 @@ public class UnitType extends UnlockableContent{
 
         if(mechStride < 0){
             mechStride = 4f + (hitSize -8f)/2.1f;
+        }
+
+        if(aimDst < 0){
+            aimDst = weapons.contains(w -> !w.rotate) ? hitSize * 2f : hitSize / 2f;
         }
 
         if(mechStepShake < 0){
@@ -409,7 +414,7 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        Draw.color(shadowColor);
+        Draw.color(Pal.shadow);
         float e = Math.max(unit.elevation, visualElevation);
         Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
         Draw.color();
@@ -594,7 +599,7 @@ public class UnitType extends UnlockableContent{
             if(leg.moving && visualElevation > 0){
                 float scl = visualElevation;
                 float elev = Mathf.slope(1f - leg.stage) * scl;
-                Draw.color(shadowColor);
+                Draw.color(Pal.shadow);
                 Draw.rect(footRegion, leg.base.x + shadowTX * elev, leg.base.y + shadowTY * elev, position.angleTo(leg.base));
                 Draw.color();
             }

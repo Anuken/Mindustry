@@ -25,7 +25,6 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
-import java.net.*;
 
 import static mindustry.Vars.*;
 
@@ -634,12 +633,11 @@ public class Mods implements Loadable{
             //make sure the main class exists before loading it; if it doesn't just don't put it there
             if(mainFile.exists()){
                 //mobile versions don't support class mods
-                if(mobile){
-                    throw new IllegalArgumentException("Java class mods are not supported on mobile.");
+                if(ios){
+                    throw new IllegalArgumentException("Java class mods are not supported on iOS.");
                 }
 
-                URLClassLoader classLoader = new URLClassLoader(new URL[]{sourceFile.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
-                Class<?> main = classLoader.loadClass(mainClass);
+                Class<?> main = platform.loadJar(sourceFile, mainClass);
                 metas.put(main, meta);
                 mainMod = (Mod)main.getDeclaredConstructor().newInstance();
             }else{

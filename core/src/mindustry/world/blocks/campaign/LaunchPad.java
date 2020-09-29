@@ -129,6 +129,11 @@ public class LaunchPad extends Block{
 
         @Override
         public void buildConfiguration(Table table){
+            if(!state.isCampaign()){
+                deselect();
+                return;
+            }
+
             table.button(Icon.upOpen, Styles.clearTransi, () -> {
                 ui.planet.showSelect(state.rules.sector, other -> state.secinfo.destination = other);
                 deselect();

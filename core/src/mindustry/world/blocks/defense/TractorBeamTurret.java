@@ -107,9 +107,7 @@ public class TractorBeamTurret extends Block{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
-            Draw.color(Vars.turretShadowColor);
-            Draw.rect(region, x - (size / 2f), y - (size / 2f), rotation - 90);
-            Draw.color();
+            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
 
             //draw laser if applicable

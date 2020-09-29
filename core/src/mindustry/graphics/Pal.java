@@ -47,6 +47,7 @@ public class Pal{
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
     darkerGray = new Color(0.2f, 0.2f, 0.2f, 1f),
     darkestGray = new Color(0.1f, 0.1f, 0.1f, 1f),
+    shadow = new Color(0, 0, 0, 0.22f),
     ammo = Color.valueOf("ff8947"),
     rubble = Color.valueOf("1c1817"),
 

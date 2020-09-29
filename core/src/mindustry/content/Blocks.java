@@ -208,6 +208,11 @@ public class Blocks implements ContentList{
             liquidDrop = Liquids.slag;
             isLiquid = true;
             cacheLayer = CacheLayer.slag;
+            attributes.set(Attribute.heat, 0.85f);
+
+            emitLight = true;
+            lightRadius = 40f;
+            lightColor = Color.orange.cpy().a(0.38f);
         }};
 
         stone = new Floor("stone");
@@ -242,7 +247,7 @@ public class Blocks implements ContentList{
             blendGroup = basalt;
 
             emitLight = true;
-            lightRadius = 60f;
+            lightRadius = 50f;
             lightColor = Color.orange.cpy().a(0.3f);
         }};
 
@@ -865,7 +870,8 @@ public class Blocks implements ContentList{
             size = 2;
             reload = 250f;
             range = 85f;
-            healPercent = 14f;
+            healPercent = 11f;
+            phaseBoost = 15f;
             health = 80 * size * size;
             consumes.item(Items.phasefabric).boost();
         }};
@@ -1142,6 +1148,7 @@ public class Blocks implements ContentList{
             powerProduction = 1.8f;
             generateEffect = Fx.redgeneratespark;
             size = 2;
+            floating = true;
         }};
 
         steamGenerator = new BurnerGenerator("steam-generator"){{
@@ -1771,6 +1778,7 @@ public class Blocks implements ContentList{
             };
             size = 3;
             consumes.power(1.2f);
+            floating = true;
         }};
 
         additiveReconstructor = new Reconstructor("additive-reconstructor"){{
