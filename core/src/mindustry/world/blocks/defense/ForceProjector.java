@@ -81,6 +81,15 @@ public class ForceProjector extends Block{
         Draw.color();
 
         if(Core.settings.getBool("phasedrange")) {
+            float sin = Mathf.absin(Time.time(), 6f, 1f);
+            float close = radius + phaseRadiusBoost/2 - phaseRadiusBoost/10;
+            float far = radius + phaseRadiusBoost/2 + phaseRadiusBoost/10;
+            
+            Drawf.arrow(x * tilesize + close, y * tilesize, x * tilesize + far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize, y * tilesize - close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize - close, y * tilesize, x * tilesize + far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
+            Drawf.arrow(x * tilesize, y * tilesize + close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);
+            
             Draw.color(Pal.gray);
             Lines.stroke(3f);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
