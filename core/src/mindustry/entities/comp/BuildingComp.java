@@ -1213,23 +1213,34 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.x) return x;
-        if(sensor == LAccess.y) return y;
-        if(sensor == LAccess.team) return team.id;
-        if(sensor == LAccess.health) return health;
-        if(sensor == LAccess.maxHealth) return maxHealth();
-        if(sensor == LAccess.efficiency) return efficiency();
-        if(sensor == LAccess.rotation) return rotation;
-        if(sensor == LAccess.totalItems && items != null) return items.total();
+        switch(sensor){
+        case LAccess.x: return x;
+        case LAccess.y: return y;
+        case LAccess.team: return team.id;
+        case LAccess.health: return health;
+        case LAccess.maxHealth: return maxHealth();
+        case LAccess.efficiency: return efficiency();
+        case LAccess.rotation: return rotation;
+        case LAccess.itemCapacity: return block.itemCapacity;
+        case LAccess.liquidCapacity: return block.liquidCapacity;
+        case LAccess.powerCapacity: return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
+        }
+
+        if(power != null){
+            if(sensor == LAccess.totalPower && block.consumes.hasPower()){
+                return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+            }
+
+            switch(sensor){
+            case LAcesss.powerNetIn: return power.graph.getLastScaledPowerIn() * 60;
+            case LAcesss.powerNetOut: return power.graph.getLastScaledPowerOut() * 60;
+            case LAcesss.powerNetCapacity: return power.graph.getLastCapacity();
+            case LAcesss.powerStored: return power.graph.getLastPowerStored();
+            }
+        }
+
+        if(sensor == LAccess.totalItems && items != null return items.total();
         if(sensor == LAccess.totalLiquids && liquids != null) return liquids.total();
-        if(sensor == LAccess.totalPower && power != null && block.consumes.hasPower()) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-        if(sensor == LAccess.itemCapacity) return block.itemCapacity;
-        if(sensor == LAccess.liquidCapacity) return block.liquidCapacity;
-        if(sensor == LAccess.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
-        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getLastScaledPowerIn() * 60;
-        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getLastScaledPowerOut() * 60;
-        if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
-        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getLastCapacity();
         return 0;
     }
 
@@ -1252,6 +1263,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(type == LAccess.enabled){
             enabled = !Mathf.zero((float)p1);
             enabledControlTime = timeToUncontrol;
+        }else if(type == LAccess.rotation && block.rotate){
+            rotation = Mathf.mod((int) p1, 4);
+            tile.rotation = rotation;
+            tile.updateProximity();
+            tile.noSleep();
         }
     }
 

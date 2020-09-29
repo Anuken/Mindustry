@@ -18,7 +18,6 @@ public enum LAccess{
     maxHealth,
     heat,
     efficiency,
-    rotation,
     x,
     y,
     shootX,
@@ -29,7 +28,9 @@ public enum LAccess{
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
-    shoot("x", "y", "shoot"),;
+    shoot("x", "y", "shoot"),
+    // set a rotatable block's direction.
+    rotation("dir");
 
     public final String[] parameters;
 
