@@ -70,9 +70,7 @@ public class Cultivator extends GenericCrafter{
         public void draw(){
             Draw.rect(region, x, y);
 
-            Draw.color(plantColor);
-            Draw.alpha(warmup);
-            Draw.rect(middleRegion, x, y);
+            Drawf.liquid(middleRegion, x, y, warmup, plantColor);
 
             Draw.color(bottomColor, plantColorLight, warmup);
 
