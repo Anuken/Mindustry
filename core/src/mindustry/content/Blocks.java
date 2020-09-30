@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //units
     commandCenter,
@@ -1587,6 +1587,30 @@ public class Blocks implements ContentList{
             shootLength = 5f;
             bulletDamage = 25f;
             reloadTime = 10f;
+        }};
+
+        tsunami = new LiquidTurret("tsunami"){{
+            requirements(Category.turret, with(Items.metaglass, 100, Items.lead, 400, Items.titanium, 250, Items.thorium, 100));
+            ammo(
+                Liquids.water, Bullets.heavyWaterShot,
+                Liquids.slag, Bullets.heavySlagShot,
+                Liquids.cryofluid, Bullets.heavyCryoShot,
+                Liquids.oil, Bullets.heavyOilShot
+            );
+            size = 3;
+            recoilAmount = 0f;
+            reloadTime = 2f;
+            shots = 2;
+            velocityInaccuracy = 0.1f;
+            inaccuracy = 4f;
+            recoilAmount = 1f;
+            restitution = 0.04f;
+            shootCone = 45f;
+            liquidCapacity = 40f;
+            shootEffect = Fx.shootLiquid;
+            range = 190f;
+            health = 250 * size * size;
+            shootSound = Sounds.splash;
         }};
 
         fuse = new ItemTurret("fuse"){{
