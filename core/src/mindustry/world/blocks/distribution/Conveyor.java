@@ -124,7 +124,7 @@ public class Conveyor extends Block implements Autotiler{
                     int dir = rotation - i;
                     float rot = i == 0 ? rotation * 90 : (dir)*90;
 
-                    Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.BOTTOM : SliceMode.TOP), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, rot);
+                    Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.bottom : SliceMode.top), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, rot);
                 }
             }
 

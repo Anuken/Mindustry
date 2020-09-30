@@ -88,14 +88,14 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 if((blending & (1 << i)) != 0){
                     int dir = r - i;
                     float rot = i == 0 ? rotation : (dir)*90;
-                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.BOTTOM : SliceMode.TOP);
+                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top);
                 }
             }
 
             Draw.z(Layer.block);
 
             Draw.scl(xscl, yscl);
-            drawAt(x, y, blendbits, rotation, SliceMode.NO_SLICE);
+            drawAt(x, y, blendbits, rotation, SliceMode.noSlice);
             Draw.reset();
         }
 
