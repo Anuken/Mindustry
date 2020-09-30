@@ -27,14 +27,14 @@ public class CachedTile extends Tile{
         Block block = block();
 
         if(block.hasBuilding()){
-            Building n = entityprov.get();
-            n.cons(new ConsumeModule(build));
-            n.tile(this);
-            n.block(block);
-            if(block.hasItems) n.items = new ItemModule();
-            if(block.hasLiquids) n.liquids(new LiquidModule());
-            if(block.hasPower) n.power(new PowerModule());
-            build = n;
+            Building building = entityprov.get();
+            building.cons(new ConsumeModule(build));
+            building.tile(this);
+            building.block(block);
+            if(block.hasItems) building.items = new ItemModule();
+            if(block.hasLiquids) building.liquids(new LiquidModule());
+            if(block.hasPower) building.power(new PowerModule());
+            build = building;
         }
     }
 }
