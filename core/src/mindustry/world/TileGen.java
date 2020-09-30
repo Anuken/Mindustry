@@ -11,9 +11,7 @@ public class TileGen{
         reset();
     }
 
-    /**
-     * Resets this TileGen back to its normal state.
-     */
+    /** Resets this TileGen back to its normal state. */
     public void reset(){
         floor = Blocks.stone;
         block = Blocks.air;

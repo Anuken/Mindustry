@@ -11,19 +11,13 @@ import java.util.*;
  * Contains a list of tiles with extended behavior
  */
 public class Tiles implements Iterable<Tile>{
-    /**
-     * The width of the tilemap
-     */
+    /** The width of the tilemap */
     public final int width;
 
-    /**
-     * The height of the tilemap
-     */
+    /** The height of the tilemap */
     public final int height;
 
-    /**
-     * The internal array contianing the list of tiles
-     */
+    /** The internal array contianing the list of tiles */
     final Tile[] array;
 
     /**
@@ -49,11 +43,7 @@ public class Tiles implements Iterable<Tile>{
         }
     }
 
-    /**
-     * Fills this tile set with empty air tiles.
-     *
-     * @
-     */
+    /** Fills this tile set with empty air tiles. */
     public void fill(){
         for(int i = 0; i < array.length; i++){
             array[i] = new Tile(i % width, i / width);
@@ -135,7 +125,7 @@ public class Tiles implements Iterable<Tile>{
     /**
      * Get a tile at an int position (not equivalent to geti)
      *
-     * @param pos The int position
+     * @param pos The int position (x and y coordinate packed into an integer)
      *
      * @return a tile at an int position
      */
@@ -153,12 +143,10 @@ public class Tiles implements Iterable<Tile>{
         }
     }
 
-    /**
-     * iterating through the entire map is expensive anyway, so a new allocation doesn't make much of a difference
-     * @return The TileIterator tied to this tile array.
-     */
+    /** @return The TileIterator tied to this tile array. */
     @Override
     public Iterator<Tile> iterator(){
+        // iterating through the entire map is expensive anyway, so a new allocation doesn't make much of a difference
         return new TileIterator();
     }
 
@@ -167,9 +155,7 @@ public class Tiles implements Iterable<Tile>{
      */
     private class TileIterator implements Iterator<Tile>{
 
-        /**
-         * The index at which the {@link TileIterator} lies.
-         */
+        /** The index at which the {@link TileIterator} lies. */
         int index = 0;
 
         TileIterator(){

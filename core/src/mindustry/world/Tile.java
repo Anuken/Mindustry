@@ -62,9 +62,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return relativeTo(tile.x, tile.y);
     }
 
-    /**
-     * @return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile.
-     */
+    /** @return relative rotation to a coordinate. Returns -1 if the coordinate is not near this tile. */
     public byte relativeTo(int cx, int cy){
         if(x == cx && y == cy - 1) return 1;
         if(x == cx && y == cy + 1) return 3;
