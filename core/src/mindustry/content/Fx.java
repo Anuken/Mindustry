@@ -455,6 +455,79 @@ public class Fx{
 
     }),
 
+    instBomb = new Effect(15f, 100f, e -> {
+        color(Pal.bulletYellowBack);
+        stroke(e.fout() * 4f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * 20f);
+
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 6f, 80f * e.fout(), i*90 + 45);
+        }
+
+        color();
+        for(int i = 0; i < 4; i++){
+            Drawf.tri(e.x, e.y, 3f, 30f * e.fout(), i*90 + 45);
+        }
+    }),
+
+    instTrail = new Effect(30, e -> {
+        for(int i = 0; i < 2; i++){
+            color(i == 0 ? Pal.bulletYellowBack : Pal.bulletYellow);
+
+            float m = i == 0 ? 1f : 0.5f;
+
+            float rot = e.rotation + 180f;
+            float w = 15f * e.fout() * m;
+            Drawf.tri(e.x, e.y, w, (30f + Mathf.randomSeedRange(e.id, 15f)) * m, rot);
+            Drawf.tri(e.x, e.y, w, 10f * m, rot + 180f);
+        }
+    }),
+
+    instShoot = new Effect(24f, e -> {
+        e.scaled(10f, b -> {
+            color(Color.white, Pal.bulletYellowBack, b.fin());
+            stroke(b.fout() * 3f + 0.2f);
+            Lines.circle(b.x, b.y, b.fin() * 50f);
+        });
+
+        color(Pal.bulletYellowBack);
+
+        for(int i : Mathf.signs){
+            Drawf.tri(e.x, e.y, 13f * e.fout(), 85f, e.rotation + 90f * i);
+            Drawf.tri(e.x, e.y, 13f * e.fout(), 50f, e.rotation + 20f * i);
+        }
+    }),
+
+    instHit = new Effect(20f, 200f, e -> {
+        color(Pal.bulletYellowBack);
+
+        for(int i = 0; i < 2; i++){
+            color(i == 0 ? Pal.bulletYellowBack : Pal.bulletYellow);
+
+            float m = i == 0 ? 1f : 0.5f;
+
+            for(int j = 0; j < 5; j++){
+                float rot = e.rotation + Mathf.randomSeedRange(e.id + j, 50f);
+                float w = 23f * e.fout() * m;
+                Drawf.tri(e.x, e.y, w, (80f + Mathf.randomSeedRange(e.id + j, 40f)) * m, rot);
+                Drawf.tri(e.x, e.y, w, 20f * m, rot + 180f);
+            }
+        }
+
+        e.scaled(10f, c -> {
+            color(Pal.bulletYellow);
+            stroke(c.fout() * 2f + 0.2f);
+            Lines.circle(e.x, e.y, c.fin() * 30f);
+        });
+
+        e.scaled(12f, c -> {
+            color(Pal.bulletYellowBack);
+            randLenVectors(e.id, 25, 5f + e.fin() * 80f, e.rotation, 60f, (x, y) -> {
+                Fill.square(e.x + x, e.y + y, c.fout() * 3f, 45f);
+            });
+        });
+    }),
+
     hitLaser = new Effect(8, e -> {
         color(Color.white, Pal.heal, e.fin());
         stroke(0.5f + e.fout());
@@ -1074,28 +1147,11 @@ public class Fx{
     }),
 
     railHit = new Effect(18f, 200f, e -> {
-        if(true){
-            color(Pal.orangeSpark);
+        color(Pal.orangeSpark);
 
-            for(int i : Mathf.signs){
-                Drawf.tri(e.x, e.y, 10f * e.fout(), 60f, e.rotation + 140f * i);
-            }
-        }else{
-            e.scaled(7f, b -> {
-                color(Color.white, Color.lightGray, b.fin());
-                stroke(b.fout() * 2f + 0.2f);
-                Lines.circle(b.x, b.y, b.fin() * 28f);
-            });
-
-            color(Pal.orangeSpark);
-            float rot = e.rotation + Mathf.randomSeedRange(e.id, 20f);
-            float w = 9f * e.fout();
-
-            Drawf.tri(e.x, e.y, w, 100f, rot);
-            Drawf.tri(e.x, e.y, w, 10f, rot + 180f);
+        for(int i : Mathf.signs){
+            Drawf.tri(e.x, e.y, 10f * e.fout(), 60f, e.rotation + 140f * i);
         }
-
-
     }),
 
     lancerLaserShoot = new Effect(21f, e -> {
@@ -1109,7 +1165,7 @@ public class Fx{
 
     lancerLaserShootSmoke = new Effect(26f, e -> {
         color(Color.white);
-        float length = e.data == null || !(e.data instanceof Float) ? 70f : (Float)e.data;
+        float length = !(e.data instanceof Float) ? 70f : (Float)e.data;
 
         randLenVectors(e.id, 7, length, e.rotation, 0f, (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 9f);

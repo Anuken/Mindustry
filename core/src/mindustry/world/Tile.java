@@ -508,7 +508,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             }
         }
 
-        if(block.hasEntity()){
+        if(block.hasBuilding()){
             build = entityprov.get().init(this, team, block.update && !state.isEditor(), rotation);
         }
     }
