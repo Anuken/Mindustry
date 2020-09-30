@@ -46,20 +46,20 @@ public class PlacementFragment extends Fragment{
     int blockSelectSeq;
     long blockSelectSeqMillis;
     Binding[] blockSelect = {
-        Binding.block_select_01,
-        Binding.block_select_02,
-        Binding.block_select_03,
-        Binding.block_select_04,
-        Binding.block_select_05,
-        Binding.block_select_06,
-        Binding.block_select_07,
-        Binding.block_select_08,
-        Binding.block_select_09,
-        Binding.block_select_10,
-        Binding.block_select_left,
-        Binding.block_select_right,
-        Binding.block_select_up,
-        Binding.block_select_down
+        Binding.blockSelect01,
+        Binding.blockSelect02,
+        Binding.blockSelect03,
+        Binding.blockSelect04,
+        Binding.blockSelect05,
+        Binding.blockSelect06,
+        Binding.blockSelect07,
+        Binding.blockSelect08,
+        Binding.blockSelect019,
+        Binding.blockSelect10,
+        Binding.blockSelectLeft,
+        Binding.blockSelectRight,
+        Binding.blockSelectUp,
+        Binding.blockSelectDown
     };
 
     public PlacementFragment(){
@@ -171,7 +171,7 @@ public class PlacementFragment extends Fragment{
             }
         }
 
-        if(Core.input.keyTap(Binding.category_prev)){
+        if(Core.input.keyTap(Binding.categoryPrevious)){
             do{
                 currentCategory = currentCategory.prev();
             }while(categoryEmpty[currentCategory.ordinal()]);
@@ -179,7 +179,7 @@ public class PlacementFragment extends Fragment{
             return true;
         }
 
-        if(Core.input.keyTap(Binding.category_next)){
+        if(Core.input.keyTap(Binding.categoryNext)){
             do{
                 currentCategory = currentCategory.next();
             }while(categoryEmpty[currentCategory.ordinal()]);

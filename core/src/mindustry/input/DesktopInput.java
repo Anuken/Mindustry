@@ -67,11 +67,11 @@ public class DesktopInput extends InputHandler{
             t.touchable(() -> t.color.a < 0.1f ? Touchable.disabled : Touchable.childrenOnly);
             t.table(Styles.black6, b -> {
                 b.defaults().left();
-                b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pause_building).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format(!isBuilding ?  "resumebuilding" : "pausebuilding", Core.keybinds.get(Binding.pauseBuilding).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.label(() -> Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clear_building).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format("cancelbuilding", Core.keybinds.get(Binding.clearBuilding).key.toString())).style(Styles.outlineLabel);
                 b.row();
-                b.label(() -> Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematic_select).key.toString())).style(Styles.outlineLabel);
+                b.label(() -> Core.bundle.format("selectschematic", Core.keybinds.get(Binding.schematicSelect).key.toString())).style(Styles.outlineLabel);
             }).margin(10f);
         });
 
@@ -81,8 +81,8 @@ public class DesktopInput extends InputHandler{
             t.table(Styles.black6, b -> {
                 b.defaults().left();
                 b.label(() -> Core.bundle.format("schematic.flip",
-                    Core.keybinds.get(Binding.schematic_flip_x).key.toString(),
-                    Core.keybinds.get(Binding.schematic_flip_y).key.toString())).style(Styles.outlineLabel).visible(() -> Core.settings.getBool("hints"));
+                    Core.keybinds.get(Binding.schematicFlipX).key.toString(),
+                    Core.keybinds.get(Binding.schematicFlipY).key.toString())).style(Styles.outlineLabel).visible(() -> Core.settings.getBool("hints"));
                 b.row();
                 b.table(a -> {
                     a.button("@schematic.add", Icon.save, this::showSchematicSave).colspan(2).size(250f, 50f).disabled(f -> lastSchematic == null || lastSchematic.file != null);
@@ -99,10 +99,10 @@ public class DesktopInput extends InputHandler{
 
         //draw break selection
         if(mode == breaking){
-            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
+            drawBreakSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematicSelect) ? maxLength : Vars.maxSchematicSize);
         }
 
-        if(Core.input.keyDown(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
+        if(Core.input.keyDown(Binding.schematicSelect) && !Core.scene.hasKeyboard() && mode != breaking){
             drawSelection(schemX, schemY, cursorX, cursorY, Vars.maxSchematicSize);
         }
 
@@ -177,7 +177,7 @@ public class DesktopInput extends InputHandler{
     public void update(){
         super.update();
 
-        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content))){
+        if(net.active() && Core.input.keyTap(Binding.playerList) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content))){
             ui.listfrag.toggle();
         }
 
@@ -189,18 +189,18 @@ public class DesktopInput extends InputHandler{
             panning = true;
         }
 
-        if((Math.abs(Core.input.axis(Binding.move_x)) > 0 || Math.abs(Core.input.axis(Binding.move_y)) > 0 || input.keyDown(Binding.mouse_move)) && (!scene.hasField())){
+        if((Math.abs(Core.input.axis(Binding.moveX)) > 0 || Math.abs(Core.input.axis(Binding.moveY)) > 0 || input.keyDown(Binding.mouseMove)) && (!scene.hasField())){
             panning = false;
         }
 
         //TODO awful UI state checking code
         if(((player.dead() || state.isPaused()) && !ui.chatfrag.shown()) && (!scene.hasField() && !scene.hasDialog())){
-            if(input.keyDown(Binding.mouse_move)){
+            if(input.keyDown(Binding.mouseMove)){
                 panCam = true;
             }
             panning = false;
 
-            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.moveX), Core.input.axis(Binding.moveY)).nor().scl(camSpeed));
         }else if(!player.dead() && !panning){
             Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
         }
@@ -242,8 +242,8 @@ public class DesktopInput extends InputHandler{
         if(state.isMenu() || Core.scene.hasDialog()) return;
 
         //zoom camera
-        if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonal_placement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
-            && !Core.input.keyDown(Binding.rotateplaced) && (Core.input.keyDown(Binding.diagonal_placement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
+        if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonalPlacement)) && !ui.chatfrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
+            && !Core.input.keyDown(Binding.rotatePlaced) && (Core.input.keyDown(Binding.diagonalPlacement) || ((!isPlacing() || !block.rotate) && selectRequests.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -270,7 +270,7 @@ public class DesktopInput extends InputHandler{
             selectScale = 0f;
         }
 
-        if(!Core.input.keyDown(Binding.diagonal_placement) && Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
+        if(!Core.input.keyDown(Binding.diagonalPlacement) && Math.abs((int)Core.input.axisTap(Binding.rotate)) > 0){
             rotation = Mathf.mod(rotation + (int)Core.input.axisTap(Binding.rotate), 4);
 
             if(sreq != null){
@@ -307,7 +307,7 @@ public class DesktopInput extends InputHandler{
                 cursorType = ui.unloadCursor;
             }
 
-            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotateplaced) && cursor.block().rotate && cursor.block().quickRotate){
+            if(cursor.build != null && cursor.interactable(player.team()) && !isPlacing() && Math.abs(Core.input.axisTap(Binding.rotate)) > 0 && Core.input.keyDown(Binding.rotatePlaced) && cursor.block().rotate && cursor.block().quickRotate){
                 Call.rotateBlock(player, cursor.build, Core.input.axisTap(Binding.rotate) > 0);
             }
         }
@@ -388,16 +388,16 @@ public class DesktopInput extends InputHandler{
             player.miner().mineTile(null);
         }
 
-        if(Core.input.keyTap(Binding.clear_building)){
+        if(Core.input.keyTap(Binding.clearBuilding)){
             player.builder().clearBuilding();
         }
 
-        if(Core.input.keyTap(Binding.schematic_select) && !Core.scene.hasKeyboard() && mode != breaking){
+        if(Core.input.keyTap(Binding.schematicSelect) && !Core.scene.hasKeyboard() && mode != breaking){
             schemX = rawCursorX;
             schemY = rawCursorY;
         }
 
-        if(Core.input.keyTap(Binding.schematic_menu) && !Core.scene.hasKeyboard()){
+        if(Core.input.keyTap(Binding.schematicMenu) && !Core.scene.hasKeyboard()){
             if(ui.schematics.isShown()){
                 ui.schematics.hide();
             }else{
@@ -406,12 +406,12 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(Core.input.keyTap(Binding.clear_building) || isPlacing()){
+        if(Core.input.keyTap(Binding.clearBuilding) || isPlacing()){
             lastSchematic = null;
             selectRequests.clear();
         }
 
-        if(Core.input.keyRelease(Binding.schematic_select) && !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
+        if(Core.input.keyRelease(Binding.schematicSelect) && !Core.scene.hasKeyboard() && selectX == -1 && selectY == -1 && schemX != -1 && schemY != -1){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             useSchematic(lastSchematic);
             if(selectRequests.isEmpty()){
@@ -422,11 +422,11 @@ public class DesktopInput extends InputHandler{
         }
 
         if(!selectRequests.isEmpty()){
-            if(Core.input.keyTap(Binding.schematic_flip_x)){
+            if(Core.input.keyTap(Binding.schematicFlipX)){
                 flipRequests(selectRequests, true);
             }
 
-            if(Core.input.keyTap(Binding.schematic_flip_y)){
+            if(Core.input.keyTap(Binding.schematicFlipY)){
                 flipRequests(selectRequests, false);
             }
         }
@@ -443,7 +443,7 @@ public class DesktopInput extends InputHandler{
             lineRequests.clear();
         }
 
-        if(Core.input.keyTap(Binding.pause_building)){
+        if(Core.input.keyTap(Binding.pauseBuilding)){
             isBuilding = !isBuilding;
             buildWasAutoPaused = false;
 
@@ -461,7 +461,7 @@ public class DesktopInput extends InputHandler{
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
             BuildPlan req = getRequest(cursorX, cursorY);
 
-            if(Core.input.keyDown(Binding.break_block)){
+            if(Core.input.keyDown(Binding.breakBlock)){
                 mode = none;
             }else if(!selectRequests.isEmpty()){
                 flushRequests(selectRequests);
@@ -491,7 +491,7 @@ public class DesktopInput extends InputHandler{
         }else if(Core.input.keyTap(Binding.deselect) && !selectRequests.isEmpty()){
             selectRequests.clear();
             lastSchematic = null;
-        }else if(Core.input.keyTap(Binding.break_block) && !Core.scene.hasMouse() && player.isBuilder()){
+        }else if(Core.input.keyTap(Binding.breakBlock) && !Core.scene.hasMouse() && player.isBuilder()){
             //is recalculated because setting the mode to breaking removes potential multiblock cursor offset
             deleting = false;
             mode = breaking;
@@ -511,7 +511,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(mode == placing && block != null){
-            if(!overrideLineRotation && !Core.input.keyDown(Binding.diagonal_placement) && (selectX != cursorX || selectY != cursorY) && ((int)Core.input.axisTap(Binding.rotate) != 0)){
+            if(!overrideLineRotation && !Core.input.keyDown(Binding.diagonalPlacement) && (selectX != cursorX || selectY != cursorY) && ((int)Core.input.axisTap(Binding.rotate) != 0)){
                 rotation = ((int)((Angles.angle(selectX, selectY, cursorX, cursorY) + 45) / 90f)) % 4;
                 overrideLineRotation = true;
             }
@@ -519,20 +519,20 @@ public class DesktopInput extends InputHandler{
             overrideLineRotation = false;
         }
 
-        if(Core.input.keyRelease(Binding.break_block) && Core.input.keyDown(Binding.schematic_select) && mode == breaking){
+        if(Core.input.keyRelease(Binding.breakBlock) && Core.input.keyDown(Binding.schematicSelect) && mode == breaking){
             lastSchematic = schematics.create(schemX, schemY, rawCursorX, rawCursorY);
             schemX = -1;
             schemY = -1;
         }
 
-        if(Core.input.keyRelease(Binding.break_block) || Core.input.keyRelease(Binding.select)){
+        if(Core.input.keyRelease(Binding.breakBlock) || Core.input.keyRelease(Binding.select)){
 
             if(mode == placing && block != null){ //touch up while placing, place everything in selection
                 flushRequests(lineRequests);
                 lineRequests.clear();
                 Events.fire(new LineConfirmEvent());
             }else if(mode == breaking){ //touch up while breaking, break everything in selection
-                removeSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematic_select) ? maxLength : Vars.maxSchematicSize);
+                removeSelection(selectX, selectY, cursorX, cursorY, !Core.input.keyDown(Binding.schematicSelect) ? maxLength : Vars.maxSchematicSize);
                 if(lastSchematic != null){
                     useSchematic(lastSchematic);
                     lastSchematic = null;
@@ -553,11 +553,11 @@ public class DesktopInput extends InputHandler{
             mode = none;
         }
 
-        if(Core.input.keyTap(Binding.toggle_block_status)){
+        if(Core.input.keyTap(Binding.toggleBlockStatus)){
             Core.settings.put("blockstatus", !Core.settings.getBool("blockstatus"));
         }
 
-        if(Core.input.keyTap(Binding.toggle_power_lines)){
+        if(Core.input.keyTap(Binding.togglePowerLines)){
             if(Core.settings.getInt("lasersopacity") == 0){
                 Core.settings.put("lasersopacity", Core.settings.getInt("preferredlaseropacity", 100));
             }else{
@@ -609,12 +609,12 @@ public class DesktopInput extends InputHandler{
         }
 
         float speed = baseSpeed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
-        float xa = Core.input.axis(Binding.move_x);
-        float ya = Core.input.axis(Binding.move_y);
+        float xa = Core.input.axis(Binding.moveX);
+        float ya = Core.input.axis(Binding.moveY);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
         movement.set(xa, ya).nor().scl(speed);
-        if(Core.input.keyDown(Binding.mouse_move)){
+        if(Core.input.keyDown(Binding.mouseMove)){
             movement.add(input.mouseWorld().sub(player).scl(1f / 25f * speed)).limit(speed);
         }
 

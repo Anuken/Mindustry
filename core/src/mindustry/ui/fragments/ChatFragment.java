@@ -67,16 +67,16 @@ public class ChatFragment extends Table{
             }
 
             if(shown){
-                if(input.keyTap(Binding.chat_history_prev) && historyPos < history.size - 1){
+                if(input.keyTap(Binding.chatHistoryPrevious) && historyPos < history.size - 1){
                     if(historyPos == 0) history.set(0, chatfield.getText());
                     historyPos++;
                     updateChat();
                 }
-                if(input.keyTap(Binding.chat_history_next) && historyPos > 0){
+                if(input.keyTap(Binding.chatHistoryNext) && historyPos > 0){
                     historyPos--;
                     updateChat();
                 }
-                scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chat_scroll), 0, Math.max(0, messages.size - messagesShown));
+                scrollPos = (int)Mathf.clamp(scrollPos + input.axis(Binding.chatScroll), 0, Math.max(0, messages.size - messagesShown));
             }
         });
 
