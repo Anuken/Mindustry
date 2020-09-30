@@ -57,7 +57,7 @@ public class MendProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
-        if(Core.settings.getBool("phasedrange")) {
+        if(consumes.getItem().items[0].item.unlockedNow()) {
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
                 close.trns(i, 0, range - sin);
