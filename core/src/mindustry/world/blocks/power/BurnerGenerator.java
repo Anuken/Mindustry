@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import arc.graphics.g2d.*;
+import mindustry.graphics.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.type.*;
 

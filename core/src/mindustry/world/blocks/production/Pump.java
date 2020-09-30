@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.game.*;
 import mindustry.type.*;
+import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;

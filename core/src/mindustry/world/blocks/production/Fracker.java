@@ -1,6 +1,7 @@
 package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
+import mindustry.graphics.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.world.meta.*;
 

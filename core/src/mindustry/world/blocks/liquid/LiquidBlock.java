@@ -3,6 +3,7 @@ package mindustry.world.blocks.liquid;
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 

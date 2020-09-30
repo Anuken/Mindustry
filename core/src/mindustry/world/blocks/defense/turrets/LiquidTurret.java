@@ -7,6 +7,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.graphics.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
