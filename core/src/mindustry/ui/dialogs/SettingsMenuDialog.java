@@ -336,7 +336,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             graphics.checkPref("coreitems", false);
         }
-        graphics.checkPref("phasedrange", false);
         graphics.checkPref("minimap", !mobile);
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
