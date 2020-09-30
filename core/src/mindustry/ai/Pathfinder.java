@@ -103,13 +103,15 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        boolean nearLiquid = false, nearSolid = false;
+        //TODO nearGround is just the inverse of nearLiquid?
+        boolean nearLiquid = false, nearSolid = false, nearGround = false;
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.getNearby(i);
             if(other != null){
                 if(other.floor().isLiquid) nearLiquid = true;
                 if(other.solid()) nearSolid = true;
+                if(!other.floor().isLiquid) nearGround = true;
             }
         }
 
@@ -120,7 +122,7 @@ public class Pathfinder implements Runnable{
             tile.floor().isLiquid,
             tile.staticDarkness() >= 2,
             nearLiquid,
-            !nearLiquid, // means its near the ground
+            nearGround,
             nearSolid,
             tile.floor().isDeep(),
             tile.floor().damageTaken > 0.00001f
