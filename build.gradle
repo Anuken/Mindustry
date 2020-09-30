@@ -1,4 +1,9 @@
 buildscript{
+
+    if(JavaVersion.current() != JavaVersion.VERSION_14){
+        throw new GradleException("This build must be run with java 14")
+    }
+
     ext{
         getArcHash = {
             return new Properties().with{ p -> p.load(file('gradle.properties').newReader()); return p }["archash"]
