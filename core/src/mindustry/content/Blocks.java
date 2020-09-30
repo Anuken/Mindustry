@@ -1668,7 +1668,7 @@ public class Blocks implements ContentList{
         foreshadow = new ItemTurret("foreshadow"){{
             float brange = range = 500f;
 
-            requirements(Category.turret, with(Items.copper, 1000, Items.metaglass, 600, Items.surgealloy, 300, Items.plastanium, 175, Items.thorium, 350));
+            requirements(Category.turret, with(Items.copper, 1000, Items.metaglass, 600, Items.surgealloy, 300, Items.plastanium, 200, Items.silicon, 600));
             ammo(
             Items.surgealloy, new PointBulletType(){{
                 shootEffect = Fx.instShoot;
