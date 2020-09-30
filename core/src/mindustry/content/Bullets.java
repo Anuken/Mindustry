@@ -34,7 +34,7 @@ public class Bullets implements ContentList{
     standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //liquid
-    waterShot, cryoShot, slagShot, oilShot,
+    waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
 
     //environment, misc.
     damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag;
@@ -471,6 +471,32 @@ public class Bullets implements ContentList{
         }};
 
         oilShot = new LiquidBulletType(Liquids.oil){{
+            drag = 0.03f;
+        }};
+
+        heavyWaterShot = new LiquidBulletType(Liquids.water){{
+           knockback = 1.0f;
+           puddleSize = 1.0f;
+           damage = 4f;
+        }};
+
+        heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
+            knockback = 0.75f;
+            puddleSize = 1.0f;
+            damage = 4f;
+        }};
+
+        heavySlagShot = new LiquidBulletType(Liquids.slag){{
+            knockback = 0.75f;
+            puddleSize = 1.0f;
+            damage = 8f;
+            drag = 0.03f;
+        }};
+
+        heavyOilShot = new LiquidBulletType(Liquids.oil){{
+            knockback = 0.75f;
+            puddleSize = 1.0f;
+            damage = 4f;
             drag = 0.03f;
         }};
 

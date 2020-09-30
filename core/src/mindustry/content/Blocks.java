@@ -1592,14 +1592,14 @@ public class Blocks implements ContentList{
         tsunami = new LiquidTurret("tsunami"){{
             requirements(Category.turret, with(Items.metaglass, 100, Items.lead, 400, Items.titanium, 250, Items.thorium, 100));
             ammo(
-                    Liquids.water, Bullets.waterShot,
-                    Liquids.slag, Bullets.slagShot,
-                    Liquids.cryofluid, Bullets.cryoShot,
-                    Liquids.oil, Bullets.oilShot
+                    Liquids.water, Bullets.heavyWaterShot,
+                    Liquids.slag, Bullets.heavySlagShot,
+                    Liquids.cryofluid, Bullets.heavyCryoShot,
+                    Liquids.oil, Bullets.heavyOilShot
             );
             size = 3;
             recoilAmount = 0f;
-            reloadTime = 1f;
+            reloadTime = 2f;
             inaccuracy = 10f;
             shootCone = 45f;
             liquidCapacity = 25f;
