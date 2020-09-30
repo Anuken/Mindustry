@@ -1701,7 +1701,7 @@ public class Blocks implements ContentList{
                 trailEffect = Fx.instTrail;
                 despawnEffect = Fx.instBomb;
                 trailSpacing = 20f;
-                damage = 1300;
+                damage = 1250;
                 tileDamageMultiplier = 0.5f;
                 speed = brange;
                 hitShake = 6f;
