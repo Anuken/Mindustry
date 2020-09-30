@@ -80,6 +80,7 @@ public class EntityProcess extends BaseProcessor{
                         //replace all self() invocations with this
                         .replaceAll("this\\.<(.*)>self\\(\\)", "this")
                         .replaceAll("self\\(\\)", "this")
+                        .replaceAll(" yield ", "")
                     );
                 }
             }

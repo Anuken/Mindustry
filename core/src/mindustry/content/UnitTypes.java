@@ -419,7 +419,7 @@ public class UnitTypes implements ContentList{
                 continuous = true;
                 cooldownTime = 200f;
 
-                bullet = new ContinuousLaserBulletType(17){{
+                bullet = new ContinuousLaserBulletType(20){{
                     length = 150f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
@@ -430,7 +430,7 @@ public class UnitTypes implements ContentList{
 
                     shootEffect = Fx.greenLaserChargeSmall;
 
-                    incendChance = 0.02f;
+                    incendChance = 0.05f;
                     incendSpread = 5f;
                     incendAmount = 1;
 
@@ -446,7 +446,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             hitSize = 29f;
             itemCapacity = 80;
-            health = 19000f;
+            health = 18000f;
             buildSpeed = 1.7f;
             armor = 9f;
             landShake = 1.5f;
@@ -488,8 +488,8 @@ public class UnitTypes implements ContentList{
                 firstShotDelay = Fx.greenLaserCharge.lifetime;
 
                 bullet = new LaserBulletType(){{
-                    length = 500f;
-                    damage = 520f;
+                    length = 460f;
+                    damage = 550f;
                     width = 75f;
 
                     lifetime = 65f;

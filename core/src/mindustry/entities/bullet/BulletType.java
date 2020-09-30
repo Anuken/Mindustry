@@ -71,12 +71,16 @@ public abstract class BulletType extends Content{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
+    /** Whether to move the bullet back depending on delta to fix some delta-time realted issues.
+     * Do not change unless you know what you're doing. */
+    public boolean backMove = true;
     /** Bullet range override. */
     public float range = -1f;
 
     //additional effects
 
     public float fragCone = 360f;
+    public float fragAngle = 0f;
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
     public BulletType fragBullet = null;
@@ -101,6 +105,8 @@ public abstract class BulletType extends Content{
     public int lightningLength = 5, lightningLengthRand = 0;
     /** Use a negative value to use default bullet damage. */
     public float lightningDamage = -1;
+    public float lightningCone = 360f;
+    public float lightningAngle = 0f;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
@@ -156,7 +162,7 @@ public abstract class BulletType extends Content{
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.range(fragCone/2);
+                float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
                 fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
@@ -181,7 +187,7 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength + Mathf.random(lightningLengthRand));
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
         }
     }
 
@@ -209,7 +215,7 @@ public abstract class BulletType extends Content{
         }
 
         if(instantDisappear){
-            b.time(lifetime);
+            b.time = lifetime;
         }
     }
 
@@ -271,7 +277,11 @@ public abstract class BulletType extends Content{
         bullet.owner = owner;
         bullet.team = team;
         bullet.vel.trns(angle, speed * velocityScl);
-        bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        if(backMove){
+            bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        }else{
+            bullet.set(x, y);
+        }
         bullet.lifetime = lifetime * lifetimeScl;
         bullet.data = data;
         bullet.drag = drag;

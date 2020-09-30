@@ -45,7 +45,7 @@ public class GroundAI extends AIController{
             }
         }
 
-        if(unit.type().canBoost && unit.canPassOn()){
+        if(unit.type().canBoost && unit.tileOn() != null && !unit.tileOn().solid()){
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 

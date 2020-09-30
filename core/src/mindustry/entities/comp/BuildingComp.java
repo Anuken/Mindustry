@@ -1213,31 +1213,35 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.x) return x;
-        if(sensor == LAccess.y) return y;
-        if(sensor == LAccess.team) return team.id;
-        if(sensor == LAccess.health) return health;
-        if(sensor == LAccess.maxHealth) return maxHealth();
-        if(sensor == LAccess.efficiency) return efficiency();
-        if(sensor == LAccess.rotation) return rotation;
-        if(sensor == LAccess.totalItems && items != null) return items.total();
-        if(sensor == LAccess.totalLiquids && liquids != null) return liquids.total();
-        if(sensor == LAccess.totalPower && power != null && block.consumes.hasPower()) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-        if(sensor == LAccess.itemCapacity) return block.itemCapacity;
-        if(sensor == LAccess.liquidCapacity) return block.liquidCapacity;
-        if(sensor == LAccess.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
-        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getLastScaledPowerIn() * 60;
-        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getLastScaledPowerOut() * 60;
-        if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
-        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getLastCapacity();
-        return 0;
+        return switch(sensor){
+            case x -> x;
+            case y -> y;
+            case team -> team.id;
+            case health -> health;
+            case maxHealth -> maxHealth();
+            case efficiency -> efficiency();
+            case rotation -> rotation;
+            case totalItems -> items == null ? 0 : items.total();
+            case totalLiquids -> liquids == null ? 0 : liquids.total();
+            case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+            case itemCapacity -> block.itemCapacity;
+            case liquidCapacity -> block.liquidCapacity;
+            case powerCapacity -> block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
+            case powerNetIn -> power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
+            case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
+            case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
+            case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
+            default -> 0;
+        };
     }
 
     @Override
     public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.type) return block;
+        return switch(sensor){
+            case type -> block;
+            default -> noSensed;
+        };
 
-        return noSensed;
     }
 
     @Override

@@ -26,7 +26,7 @@ public class CachedTile extends Tile{
 
         Block block = block();
 
-        if(block.hasEntity()){
+        if(block.hasBuilding()){
             Building n = entityprov.get();
             n.cons(new ConsumeModule(build));
             n.tile(this);
