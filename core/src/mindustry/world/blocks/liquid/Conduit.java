@@ -103,10 +103,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             Draw.color(botColor);
             Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
 
-            Draw.color(liquids.current().color);
-            Draw.alpha(smoothLiquid);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
-            Draw.color();
+            Drawf.liquid(sliced(botRegions[bits], slice), x, y, smoothLiquid, liquids.current().color, rotation);
 
             Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
         }
