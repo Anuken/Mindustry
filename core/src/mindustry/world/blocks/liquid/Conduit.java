@@ -95,7 +95,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             Draw.z(Layer.block);
 
             Draw.scl(xscl, yscl);
-            drawAt(x, y, blendbits, rotation, SliceMode.noSlice);
+            drawAt(x, y, blendbits, rotation, SliceMode.none);
             Draw.reset();
         }
 

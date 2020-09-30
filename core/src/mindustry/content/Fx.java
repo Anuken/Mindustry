@@ -138,12 +138,13 @@ public class Fx{
         stroke(3f * e.fout());
         color(e.color, Color.white, e.fin());
 
-        beginLine();
-        lines.each(Lines::linePoint);
-        linePoint(e.x, e.y);
-        endLine();
+        for(int i = 0; i < lines.size - 1; i++){
+            Vec2 cur = lines.get(i);
+            Vec2 next = lines.get(i + 1);
 
-        int i = 0;
+            Lines.line(cur.x, cur.y, next.x, next.y, false);
+        }
+
         for(Vec2 p : lines){
             Fill.circle(p.x, p.y, Lines.getStroke() / 2f);
         }

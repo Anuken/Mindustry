@@ -375,10 +375,9 @@ public class Bullets implements ContentList{
         }};
 
         //this is just a copy of the damage lightning bullet that doesn't damage air units
-        damageLightningGround = new BulletType(0.0001f, 0f){{
-            collidesAir = false;
-        }};
+        damageLightningGround = new BulletType(0.0001f, 0f){};
         JsonIO.copy(damageLightning, damageLightningGround);
+        damageLightningGround.collidesAir = false;
 
         healBullet = new HealBulletType(5.2f, 13){{
             healPercent = 3f;

@@ -26,7 +26,7 @@ public interface Autotiler{
      * The mode to slice a texture at.
      */
     enum SliceMode{
-        noSlice,
+        none,
         bottom,
         top
     }
@@ -39,7 +39,7 @@ public interface Autotiler{
      * @return The sliced texture
      */
     default TextureRegion sliced(TextureRegion input, SliceMode mode){
-        return mode == SliceMode.noSlice ? input : mode == SliceMode.bottom ? botHalf(input) : topHalf(input);
+        return mode == SliceMode.none ? input : mode == SliceMode.bottom ? botHalf(input) : topHalf(input);
     }
 
     /**
