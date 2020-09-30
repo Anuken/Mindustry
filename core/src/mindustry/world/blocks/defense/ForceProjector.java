@@ -84,18 +84,10 @@ public class ForceProjector extends Block{
 
         if(Core.settings.getBool("phasedrange")) {
             float sin = Mathf.absin(Time.time(), 6f, 1f);
-            /*float close = radius + phaseRadiusBoost/2 - phaseRadiusBoost/10;
-            float far = radius + phaseRadiusBoost/2 + phaseRadiusBoost/10;
-            
-            Drawf.arrow(x * tilesize + close, y * tilesize, x * tilesize + far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize, y * tilesize - close, x * tilesize, y * tilesize - far, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize - close, y * tilesize, x * tilesize - far, y * tilesize, size * tilesize + sin, 4f + sin, phaseColor);
-            Drawf.arrow(x * tilesize, y * tilesize + close, x * tilesize, y * tilesize + far, size * tilesize + sin, 4f + sin, phaseColor);*/
-            
             for(int i = 0; i < 360; i += 60){
-                close.trns(i, 0, radius + phaseRadiusBoost/2 - phaseRadiusBoost/10);
-                far.trns(i, 0, radius + phaseRadiusBoost/2 + phaseRadiusBoost/10);
-                Drawf.arrow(x * tilesize + close.x, y * tilesize + close.y, x * tilesize + far.x, y * tilesize + far.y, size * tilesize + sin, 4f + sin, phaseColor);
+                close.trns(i, 0, radius - sin);
+                far.trns(i, 0, radius + phaseRadiusBoost);
+                Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, size * tilesize + sin, 4f + sin, phaseColor);
             }
             
             Draw.color(Pal.gray);
