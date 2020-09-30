@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, spectre, meltdown, segment, parallax, tsunami,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami
 
     //units
     commandCenter,
@@ -1582,7 +1582,7 @@ public class Blocks implements ContentList{
             health = 250 * size * size;
             range = 140f;
             hasPower = true;
-            consumes.power(8f);
+            consumes.powerCond(8f, (PointDefenseBuild b) -> b.target != null);
             size = 2;
             shootLength = 5f;
             bulletDamage = 25f;
@@ -1685,6 +1685,48 @@ public class Blocks implements ContentList{
             health = 145 * size * size;
         }};
 
+        foreshadow = new ItemTurret("foreshadow"){{
+            float brange = range = 500f;
+
+            requirements(Category.turret, with(Items.copper, 1000, Items.metaglass, 600, Items.surgealloy, 300, Items.plastanium, 175, Items.thorium, 350));
+            ammo(
+            Items.surgealloy, new PointBulletType(){{
+                shootEffect = Fx.instShoot;
+                hitEffect = Fx.instHit;
+                smokeEffect = Fx.smokeCloud;
+                trailEffect = Fx.instTrail;
+                despawnEffect = Fx.instBomb;
+                trailSpacing = 20f;
+                damage = 1300;
+                tileDamageMultiplier = 0.5f;
+                speed = brange;
+                hitShake = 6f;
+                ammoMultiplier = 1f;
+            }}
+            );
+
+            rotateSpeed = 2.5f;
+            reloadTime = 200f;
+            restitution = 0.2f;
+            ammoUseEffect = Fx.shellEjectBig;
+            recoilAmount = 5f;
+            restitution = 0.009f;
+            cooldown = 0.009f;
+            shootShake = 4f;
+            shots = 1;
+            size = 4;
+            shootCone = 2f;
+            shootSound = Sounds.shootBig;
+            unitSort = (u, x, y) -> -u.maxHealth;
+
+            coolantMultiplier = 0.09f;
+
+            health = 150 * size * size;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
+
+            consumes.powerCond(10f, (TurretBuild entity) -> entity.target != null || (entity.logicControlled() && entity.logicShooting));
+        }};
+
         spectre = new ItemTurret("spectre"){{
             requirements(Category.turret, with(Items.copper, 900, Items.graphite, 300, Items.surgealloy, 250, Items.plastanium, 175, Items.thorium, 250));
             ammo(
@@ -1707,7 +1749,7 @@ public class Blocks implements ContentList{
             shootCone = 24f;
             shootSound = Sounds.shootBig;
 
-            health = 155 * size * size;
+            health = 160 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
         }};
 
