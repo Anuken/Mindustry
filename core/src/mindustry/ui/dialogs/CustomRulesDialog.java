@@ -186,8 +186,6 @@ public class CustomRulesDialog extends BaseDialog{
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
         main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
-
-        //TODO add weather patterns
     }
 
     void number(String text, Floatc cons, Floatp prov){
