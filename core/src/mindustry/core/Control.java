@@ -191,10 +191,6 @@ public class Control implements ApplicationListener, Loadable{
 
     }
 
-    void resetCamera(){
-
-    }
-
     @Override
     public void loadAsync(){
         Draw.scl = 1f / Core.atlas.find("scale_marker").width;

@@ -173,6 +173,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
+        check("@rules.enemyLights", b -> rules.enemyLights = b, () -> rules.enemyLights);
 
         main.button(b -> {
             b.left();
@@ -185,8 +186,6 @@ public class CustomRulesDialog extends BaseDialog{
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
         main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
-
-        //TODO add weather patterns
     }
 
     void number(String text, Floatc cons, Floatp prov){

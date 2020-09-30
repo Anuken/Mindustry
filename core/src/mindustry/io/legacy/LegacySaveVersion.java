@@ -61,7 +61,7 @@ public abstract class LegacySaveVersion extends SaveVersion{
                     tile.setBlock(block);
                 }
 
-                if(block.hasEntity()){
+                if(block.hasBuilding()){
                     try{
                         readChunk(stream, true, in -> {
                             byte version = in.readByte();

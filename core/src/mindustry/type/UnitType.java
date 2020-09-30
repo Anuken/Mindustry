@@ -51,6 +51,7 @@ public class UnitType extends UnlockableContent{
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
+    public float aimDst = -1f;
     public int commandLimit = 24;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
@@ -216,6 +217,10 @@ public class UnitType extends UnlockableContent{
 
         if(mechStride < 0){
             mechStride = 4f + (hitSize -8f)/2.1f;
+        }
+
+        if(aimDst < 0){
+            aimDst = weapons.contains(w -> !w.rotate) ? hitSize * 2f : hitSize / 2f;
         }
 
         if(mechStepShake < 0){

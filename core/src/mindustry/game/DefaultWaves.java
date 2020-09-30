@@ -1,6 +1,8 @@
 package mindustry.game;
 
+import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.type.*;
 
@@ -197,7 +199,8 @@ public class DefaultWaves{
         return spawns == null ? new Seq<>() : spawns;
     }
 
-    private static void generate(){
+    //TODO move elsewhere
+    public static Seq<SpawnGroup> generate(){
         UnitType[][] species = {
         {dagger, mace, fortress, scepter, reign},
         {nova, pulsar, quasar, vela, corvus},
@@ -208,8 +211,63 @@ public class DefaultWaves{
         };
 
         //required progression:
-        //- main progression of units, up to wave ~20
-        //- changes from
         //- extra periodic patterns
+
+        Seq<SpawnGroup> out = new Seq<>();
+
+        //max reasonable wave, after which everything gets boring
+        int cap = 400;
+
+        //main sequence
+        float shieldStart = 30, shieldsPerWave = 12;
+        UnitType[] curSpecies = Structs.random(species);
+        int curTier = 0;
+
+        for(int i = 0; i < cap;){
+            int f = i;
+            int next = Mathf.random(15, 25);
+
+            float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
+
+            //main progression
+            out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
+                unitAmount = f == 0 ? 1 : 10;
+                begin = f;
+                end = f + next >= cap ? never : f + next;
+                max = 16;
+                unitScaling = Mathf.random(1f, 2f);
+                shields = shieldAmount;
+                shieldScaling = shieldsPerWave;
+            }});
+
+            //extra progression that tails out, blends in
+            out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
+                unitAmount = 6;
+                begin = f + next;
+                end = f + next + Mathf.random(8, 12);
+                max = 10;
+                unitScaling = Mathf.random(2f);
+                spacing = Mathf.random(2, 3);
+                shields = shieldAmount;
+                shieldScaling = shieldsPerWave;
+            }});
+
+            i += next;
+            if(curTier < 3 || Mathf.chance(0.2)){
+                curTier ++;
+            }
+
+            //do not spawn bosses
+            curTier = Math.min(curTier, 3);
+
+            //small chance to switch species
+            if(Mathf.chance(0.2)){
+                curSpecies = Structs.random(species);
+            }
+        }
+
+
+
+        return out;
     }
 }

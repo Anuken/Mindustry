@@ -105,12 +105,10 @@ public class NetClient implements ApplicationListener{
             Time.runTask(3f, ui.loadfrag::hide);
 
             if(packet.reason != null){
-                if(packet.reason.equals("closed")){
-                    ui.showSmall("@disconnect", "@disconnect.closed");
-                }else if(packet.reason.equals("timeout")){
-                    ui.showSmall("@disconnect", "@disconnect.timeout");
-                }else if(packet.reason.equals("error")){
-                    ui.showSmall("@disconnect", "@disconnect.error");
+                switch(packet.reason){
+                    case "closed" -> ui.showSmall("@disconnect", "@disconnect.closed");
+                    case "timeout" -> ui.showSmall("@disconnect", "@disconnect.timeout");
+                    case "error" -> ui.showSmall("@disconnect", "@disconnect.error");
                 }
             }else{
                 ui.showErrorMessage("@disconnect");

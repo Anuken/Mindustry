@@ -251,7 +251,7 @@ public class MassDriver extends Block{
             data.to = target;
             int totalUsed = 0;
             for(int i = 0; i < content.items().size; i++){
-                int maxTransfer = Math.min(items.get(content.item(i)), ((MassDriver)tile.block()).itemCapacity - totalUsed);
+                int maxTransfer = Math.min(items.get(content.item(i)), tile.block().itemCapacity - totalUsed);
                 data.items[i] = maxTransfer;
                 totalUsed += maxTransfer;
                 items.remove(content.item(i), maxTransfer);

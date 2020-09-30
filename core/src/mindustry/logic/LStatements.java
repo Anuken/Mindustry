@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.func.*;
+import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -154,39 +155,37 @@ public class LStatements{
                 s.setColor(table.color);
 
                 switch(type){
-                    case clear:
+                    case clear -> {
                         fields(s, "r", x, v -> x = v);
                         fields(s, "g", y, v -> y = v);
                         fields(s, "b", p1, v -> p1 = v);
-                        break;
-                    case color:
+                    }
+                    case color -> {
                         fields(s, "r", x, v -> x = v);
                         fields(s, "g", y, v -> y = v);
                         fields(s, "b", p1, v -> p1 = v);
                         row(s);
                         fields(s, "a", p2, v -> p2 = v);
-                        break;
-                    case stroke:
+                    }
+                    case stroke -> {
                         s.add().width(4);
                         fields(s, x, v -> x = v);
-                        break;
-                    case line:
+                    }
+                    case line -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
                         fields(s, "x2", p1, v -> p1 = v);
                         fields(s, "y2", p2, v -> p2 = v);
-                        break;
-                    case rect:
-                    case lineRect:
+                    }
+                    case rect, lineRect -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
                         fields(s, "width", p1, v -> p1 = v);
                         fields(s, "height", p2, v -> p2 = v);
-                        break;
-                    case poly:
-                    case linePoly:
+                    }
+                    case poly, linePoly -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
@@ -194,8 +193,8 @@ public class LStatements{
                         fields(s, "radius", p2, v -> p2 = v);
                         row(s);
                         fields(s, "rotation", p3, v -> p3 = v);
-                        break;
-                    case triangle:
+                    }
+                    case triangle -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
@@ -204,7 +203,7 @@ public class LStatements{
                         row(s);
                         fields(s, "x3", p3, v -> p3 = v);
                         fields(s, "y3", p4, v -> p4 = v);
-                        break;
+                    }
                 }
             }).expand().left();
         }
@@ -633,6 +632,8 @@ public class LStatements{
 
     @RegisterStatement("jump")
     public static class JumpStatement extends LStatement{
+        private static Color last = new Color();
+
         public transient StatementElem dest;
 
         public int destIndex;
@@ -644,17 +645,28 @@ public class LStatements{
         public void build(Table table){
             table.add("if ").padLeft(4);
 
-            field(table, value, str -> value = str);
-
-            table.button(b -> {
-                b.label(() -> op.symbol);
-                b.clicked(() -> showSelect(b, ConditionOp.all, op, o -> op = o));
-            }, Styles.logict, () -> {}).size(48f, 40f).pad(4f).color(table.color);
-
-            field(table, compare, str -> compare = str);
+            last = table.color;
+            table.table(this::rebuild);
 
             table.add().growX();
             table.add(new JumpButton(() -> dest, s -> dest = s)).size(30).right().padLeft(-8);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+            table.setColor(last);
+
+            if(op != ConditionOp.always) field(table, value, str -> value = str);
+
+            table.button(b -> {
+                b.label(() -> op.symbol);
+                b.clicked(() -> showSelect(b, ConditionOp.all, op, o -> {
+                    op = o;
+                    rebuild(table);
+                }));
+            }, Styles.logict, () -> {}).size(op == ConditionOp.always ? 80f : 48f, 40f).pad(4f).color(table.color);
+
+            if(op != ConditionOp.always) field(table, compare, str -> compare = str);
         }
 
         //elements need separate conversion logic

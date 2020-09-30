@@ -37,7 +37,7 @@ public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
 
-    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
+    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
