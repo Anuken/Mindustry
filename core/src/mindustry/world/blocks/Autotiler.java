@@ -151,25 +151,20 @@ public interface Autotiler{
      * @param bits The blending value array
      */
     default void transformCase(int num, int[] bits){
-        switch (num){
-            case 0:
-                bits[0] = 3;
-                break;
-            case 1:
-                bits[0] = 4;
-            case 2:
-                bits[0] = 2;
-                break;
-            case 3:
-                bits[0] = 2;
-                bits[2] = -1;
-                break;
-            case 4:
-                bits[0] = 1;
-                bits[2] = -1;
-                break;
-            case 5:
-                bits[0] = 1;
+        if(num == 0){
+            bits[0] = 3;
+        }else if(num == 1){
+            bits[0] = 4;
+        }else if(num == 2){
+            bits[0] = 2;
+        }else if(num == 3){
+            bits[0] = 2;
+            bits[2] = -1;
+        }else if(num == 4){
+            bits[0] = 1;
+            bits[2] = -1;
+        }else if(num == 5){
+            bits[0] = 1;
         }
     }
 
