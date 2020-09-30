@@ -474,30 +474,38 @@ public class Bullets implements ContentList{
             drag = 0.03f;
         }};
 
-        heavyWaterShot = new LiquidBulletType(Liquids.water){{
-           knockback = 1.0f;
-           puddleSize = 10f;
-           damage = 4f;
+        heavyWaterShot = new LiquidBulletType(Liquids.water) {{
+            lifetime = 60f;
+            speed = 4f;
+            knockback = 1.0f;
+            puddleSize = 8f;
+            damage = 4f;
         }};
 
         heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
+            lifetime = 60f;
+            speed = 4f;
             knockback = 0.75f;
-            puddleSize = 10f;
+            puddleSize = 8f;
             damage = 4f;
         }};
 
         heavySlagShot = new LiquidBulletType(Liquids.slag){{
+            lifetime = 60f;
+            speed = 4f;
             knockback = 0.75f;
-            puddleSize = 10f;
+            puddleSize = 8f;
             damage = 8f;
-            drag = 0.03f;
+            drag = 0.015f;
         }};
 
         heavyOilShot = new LiquidBulletType(Liquids.oil){{
+            lifetime = 60f;
+            speed = 4f;
             knockback = 0.75f;
-            puddleSize = 10f;
+            puddleSize = 8f;
             damage = 4f;
-            drag = 0.03f;
+            drag = 0.015f;
         }};
 
         driverBolt = new MassDriverBolt();
