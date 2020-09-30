@@ -96,7 +96,7 @@ public class ForceProjector extends Block{
             for(int i = 0; i < 360; i += 60){
                 close.trns(i, 0, radius - sin);
                 far.trns(i, 0, radius + phaseRadiusBoost);
-                Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRadiusBoost, 4f + sin, phaseColor);
+                Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRadiusBoost*0.4 + sin, 4f + sin, phaseColor);
             }
             
             Draw.color(Pal.gray);
