@@ -7,6 +7,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.graphics.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -59,10 +60,7 @@ public class LiquidTurret extends Turret{
             super.draw();
             
             if(liquidRegion.found()){
-                Draw.color(liquids.current().color);
-                Draw.alpha(liquids.total() / liquidCapacity);
-                Draw.rect(liquidRegion, x + tr2.x, y + tr2.y, rotation - 90);
-                Draw.reset();
+                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
             }
             if(topRegion.found()) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
         }

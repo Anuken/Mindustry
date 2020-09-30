@@ -20,7 +20,7 @@ public class FloorRenderer implements Disposable{
     //TODO find out number with best performance
     private static final int chunksize = mobile ? 16 : 32;
 
-    private Chunk[][] cache;
+    private int[][][] cache;
     private MultiCacheBatch cbatch;
     private IntSet drawnLayerSet = new IntSet();
     private IntSet recacheSet = new IntSet();
@@ -63,11 +63,11 @@ public class FloorRenderer implements Disposable{
                 if(!Structs.inBounds(worldx, worldy, cache))
                     continue;
 
-                Chunk chunk = cache[worldx][worldy];
+                int[] chunk = cache[worldx][worldy];
 
                 //loop through all layers, and add layer index if it exists
                 for(int i = 0; i < layers; i++){
-                    if(chunk.caches[i] != -1 && i != CacheLayer.walls.ordinal()){
+                    if(chunk[i] != -1 && i != CacheLayer.walls.ordinal()){
                         drawnLayerSet.add(i);
                     }
                 }
@@ -154,9 +154,9 @@ public class FloorRenderer implements Disposable{
                     continue;
                 }
 
-                Chunk chunk = cache[worldx][worldy];
-                if(chunk.caches[layer.ordinal()] == -1) continue;
-                cbatch.drawCache(chunk.caches[layer.ordinal()]);
+                int[] chunk = cache[worldx][worldy];
+                if(chunk[layer.ordinal()] == -1) continue;
+                cbatch.drawCache(chunk[layer.ordinal()]);
             }
         }
 
@@ -165,7 +165,7 @@ public class FloorRenderer implements Disposable{
 
     private void cacheChunk(int cx, int cy){
         used.clear();
-        Chunk chunk = cache[cx][cy];
+        int[] chunk = cache[cx][cy];
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize && tilex < world.width(); tilex++){
             for(int tiley = cy * chunksize; tiley < (cy + 1) * chunksize && tiley < world.height(); tiley++){
@@ -184,15 +184,15 @@ public class FloorRenderer implements Disposable{
         }
     }
 
-    private void cacheChunkLayer(int cx, int cy, Chunk chunk, CacheLayer layer){
+    private void cacheChunkLayer(int cx, int cy, int[] chunk, CacheLayer layer){
         Batch current = Core.batch;
         Core.batch = cbatch;
 
         //begin a new cache
-        if(chunk.caches[layer.ordinal()] == -1){
+        if(chunk[layer.ordinal()] == -1){
             cbatch.beginCache();
         }else{
-            cbatch.beginCache(chunk.caches[layer.ordinal()]);
+            cbatch.beginCache(chunk[layer.ordinal()]);
         }
 
         for(int tilex = cx * chunksize; tilex < (cx + 1) * chunksize; tilex++){
@@ -218,7 +218,7 @@ public class FloorRenderer implements Disposable{
 
         Core.batch = current;
         cbatch.reserve(layer.capacity * chunksize * chunksize);
-        chunk.caches[layer.ordinal()] = cbatch.endCache();
+        chunk[layer.ordinal()] = cbatch.endCache();
     }
 
     public void clearTiles(){
@@ -227,15 +227,14 @@ public class FloorRenderer implements Disposable{
         recacheSet.clear();
         int chunksx = Mathf.ceil((float)(world.width()) / chunksize),
         chunksy = Mathf.ceil((float)(world.height()) / chunksize);
-        cache = new Chunk[chunksx][chunksy];
-        cbatch = new MultiCacheBatch(chunksize * chunksize * 8);
+        cache = new int[chunksx][chunksy][CacheLayer.all.length];
+        cbatch = new MultiCacheBatch(chunksize * chunksize * 9);
 
         Time.mark();
 
         for(int x = 0; x < chunksx; x++){
             for(int y = 0; y < chunksy; y++){
-                cache[x][y] = new Chunk();
-                Arrays.fill(cache[x][y].caches, -1);
+                Arrays.fill(cache[x][y], -1);
 
                 cacheChunk(x, y);
             }
@@ -249,15 +248,6 @@ public class FloorRenderer implements Disposable{
         if(cbatch != null){
             cbatch.dispose();
             cbatch = null;
-        }
-    }
-
-    private static class Chunk{
-        /** Maps cache layer ID to cache ID in the batch.
-         * -1 means that this cache is unoccupied. */
-        int[] caches = new int[CacheLayer.all.length];
-
-        Chunk(){
         }
     }
 }

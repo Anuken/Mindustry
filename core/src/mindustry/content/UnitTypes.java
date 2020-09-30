@@ -446,7 +446,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             hitSize = 29f;
             itemCapacity = 80;
-            health = 19000f;
+            health = 18000f;
             buildSpeed = 1.7f;
             armor = 9f;
             landShake = 1.5f;
@@ -488,7 +488,7 @@ public class UnitTypes implements ContentList{
                 firstShotDelay = Fx.greenLaserCharge.lifetime;
 
                 bullet = new LaserBulletType(){{
-                    length = 500f;
+                    length = 460f;
                     damage = 550f;
                     width = 75f;
 

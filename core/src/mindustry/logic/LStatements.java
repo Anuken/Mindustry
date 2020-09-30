@@ -155,39 +155,37 @@ public class LStatements{
                 s.setColor(table.color);
 
                 switch(type){
-                    case clear:
+                    case clear -> {
                         fields(s, "r", x, v -> x = v);
                         fields(s, "g", y, v -> y = v);
                         fields(s, "b", p1, v -> p1 = v);
-                        break;
-                    case color:
+                    }
+                    case color -> {
                         fields(s, "r", x, v -> x = v);
                         fields(s, "g", y, v -> y = v);
                         fields(s, "b", p1, v -> p1 = v);
                         row(s);
                         fields(s, "a", p2, v -> p2 = v);
-                        break;
-                    case stroke:
+                    }
+                    case stroke -> {
                         s.add().width(4);
                         fields(s, x, v -> x = v);
-                        break;
-                    case line:
+                    }
+                    case line -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
                         fields(s, "x2", p1, v -> p1 = v);
                         fields(s, "y2", p2, v -> p2 = v);
-                        break;
-                    case rect:
-                    case lineRect:
+                    }
+                    case rect, lineRect -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
                         fields(s, "width", p1, v -> p1 = v);
                         fields(s, "height", p2, v -> p2 = v);
-                        break;
-                    case poly:
-                    case linePoly:
+                    }
+                    case poly, linePoly -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
@@ -195,8 +193,8 @@ public class LStatements{
                         fields(s, "radius", p2, v -> p2 = v);
                         row(s);
                         fields(s, "rotation", p3, v -> p3 = v);
-                        break;
-                    case triangle:
+                    }
+                    case triangle -> {
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
@@ -205,7 +203,7 @@ public class LStatements{
                         row(s);
                         fields(s, "x3", p3, v -> p3 = v);
                         fields(s, "y3", p4, v -> p4 = v);
-                        break;
+                    }
                 }
             }).expand().left();
         }
