@@ -12,6 +12,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -82,7 +83,15 @@ public class ForceProjector extends Block{
         Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color();
 
-        if(consumes.getItem().items[0].item.unlockedNow()) {
+        boolean boosterUnlocked = true;
+        for(ItemStack item : consumes.getItem().items) {
+            if(!item.item.unlockedNow()) {
+                boosterUnlocked = false;
+                break;
+            }
+        }
+
+        if(boosterUnlocked) {
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
                 close.trns(i, 0, radius - sin);

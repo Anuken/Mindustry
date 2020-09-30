@@ -10,6 +10,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -48,7 +49,16 @@ public class OverdriveProjector extends Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
-        if(hasBoost && consumes.getItem().items[0].item.unlockedNow()) {
+
+        boolean boosterUnlocked = true;
+        for(ItemStack item : consumes.getItem().items) {
+            if(!item.item.unlockedNow()) {
+                boosterUnlocked = false;
+                break;
+            }
+        }
+
+        if(hasBoost && boosterUnlocked) {
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
                 close.trns(i, 0, range - sin);
