@@ -39,6 +39,13 @@ public class BurnerGenerator extends ItemLiquidGenerator{
                 Draw.rect(turbineRegions[1], x, y, -totalTime * turbineSpeed);
 
                 Draw.rect(capRegion, x, y);
+
+                if(hasLiquids){
+                    Draw.color(liquids.current().color);
+                    Draw.alpha(liquids.currentAmount() / liquidCapacity);
+                    Draw.rect(liquidRegion, x, y);
+                    Draw.color();
+                }
             }
         }
     }

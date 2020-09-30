@@ -39,7 +39,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
                 powerProduction = 0.1f;
                 itemDuration = fakeItemDuration;
                 maxLiquidGenerate = maximumLiquidUsage;
-                entityType = ItemLiquidGeneratorBuild::new;
+                buildType = ItemLiquidGeneratorBuild::new;
             }
 
             @Override

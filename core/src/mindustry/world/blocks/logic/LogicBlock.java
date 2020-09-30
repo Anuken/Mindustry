@@ -16,7 +16,7 @@ import mindustry.logic.LAssembler.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.meta.*;
 
 import java.io.*;
@@ -25,8 +25,6 @@ import java.util.zip.*;
 import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
-    public static final int maxInstructions = 1500;
-
     public int maxInstructionScale = 5;
     public int instructionsPerTick = 1;
     public float range = 8 * 10;
@@ -70,7 +68,7 @@ public class LogicBlock extends Block{
         if(name.contains("-")){
             String[] split = name.split("-");
             //filter out 'large' at the end of block names
-            if(split.length >= 2 && split[split.length - 1].equals("large")){
+            if(split.length >= 2 && (split[split.length - 1].equals("large") || Strings.canParseFloat(split[split.length - 1]))){
                 name = split[split.length - 2];
             }else{
                 name = split[split.length - 1];
@@ -270,7 +268,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str, maxInstructions);
+                    LAssembler asm = LAssembler.assemble(str, LExecutor.maxInstructions);
 
                     //store connections
                     for(LogicLink link : links){
@@ -315,9 +313,15 @@ public class LogicBlock extends Block{
                     e.printStackTrace();
 
                     //handle malformed code and replace it with nothing
-                    executor.load("", maxInstructions);
+                    executor.load("", LExecutor.maxInstructions);
                 }
             }
+        }
+
+        //logic blocks cause write problems when picked up
+        @Override
+        public boolean canPickup(){
+            return false;
         }
 
         @Override
@@ -361,15 +365,17 @@ public class LogicBlock extends Block{
                 updateCode();
             }
 
-            accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
+            if(enabled){
+                accumulator += edelta() * instructionsPerTick * (consValid() ? 1 : 0);
 
-            if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
+                if(accumulator > maxInstructionScale * instructionsPerTick) accumulator = maxInstructionScale * instructionsPerTick;
 
-            for(int i = 0; i < (int)accumulator; i++){
-                if(executor.initialized()){
-                    executor.runOnce();
+                for(int i = 0; i < (int)accumulator; i++){
+                    if(executor.initialized()){
+                        executor.runOnce();
+                    }
+                    accumulator --;
                 }
-                accumulator --;
             }
         }
 
@@ -412,27 +418,17 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof BuildEntity);
+            return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
         }
-
-
 
         @Override
         public void buildConfiguration(Table table){
-            Table cont = new Table();
-            cont.defaults().size(40);
 
-            cont.button(Icon.pencil, Styles.clearTransi, () -> {
+            table.button(Icon.pencil, Styles.clearTransi, () -> {
                 Vars.ui.logic.show(code, code -> {
                     configure(compress(code, relativeConnections()));
                 });
-            });
-
-            //cont.button(Icon.refreshSmall, Styles.clearTransi, () -> {
-
-            //});
-
-            table.add(cont);
+            }).size(40);
         }
 
         @Override

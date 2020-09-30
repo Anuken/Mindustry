@@ -57,12 +57,12 @@ public class ChatFragment extends Table{
                 }
             }
 
-            return net.active();
+            return net.active() && ui.hudfrag.shown();
         });
 
         update(() -> {
 
-            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null || ui.minimapfrag.shown())){
+            if(net.active() && input.keyTap(Binding.chat) && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null || ui.minimapfrag.shown()) && !ui.scriptfrag.shown()){
                 toggle();
             }
 
@@ -227,6 +227,7 @@ public class ChatFragment extends Table{
     }
 
     public void addMessage(String message, String sender){
+        if(sender == null && message == null) return;
         messages.insert(0, new ChatMessage(message, sender));
 
         fadetime += 1f;
@@ -244,7 +245,7 @@ public class ChatFragment extends Table{
             this.message = message;
             this.sender = sender;
             if(sender == null){ //no sender, this is a server message?
-                formattedMessage = message;
+                formattedMessage = message == null ? "" : message;
             }else{
                 formattedMessage = "[coral][[" + sender + "[coral]]:[white] " + message;
             }

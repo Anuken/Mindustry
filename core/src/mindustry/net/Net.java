@@ -1,10 +1,11 @@
 package mindustry.net;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
-import arc.util.*;
+import arc.net.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
@@ -13,6 +14,7 @@ import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.nio.*;
+import java.nio.channels.*;
 
 import static mindustry.Vars.*;
 
@@ -34,6 +36,16 @@ public class Net{
 
     public Net(NetProvider provider){
         this.provider = provider;
+    }
+
+    public void handleException(Throwable e){
+        if(e instanceof ArcNetException){
+            Core.app.post(() -> showError(new IOException("mismatch")));
+        }else if(e instanceof ClosedChannelException){
+            Core.app.post(() -> showError(new IOException("alreadyconnected")));
+        }else{
+            Core.app.post(() -> showError(e));
+        }
     }
 
     /** Display a network error. Call on the graphics thread. */
@@ -152,7 +164,9 @@ public class Net{
     }
 
     public void disconnect(){
-        Log.info("Disconnecting.");
+        if(active && !server){
+            Log.info("Disconnecting.");
+        }
         provider.disconnectClient();
         server = false;
         active = false;

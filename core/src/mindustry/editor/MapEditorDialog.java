@@ -116,9 +116,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.button("@editor.export", Icon.upload, () -> createDialog("@editor.export",
             "@editor.exportfile", "@editor.exportfile.description", Icon.file,
-                (Runnable)() -> platform.export(editor.getTags().get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
+                (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
             "@editor.exportimage", "@editor.exportimage.description", Icon.fileImage,
-                (Runnable)() -> platform.export(editor.getTags().get("name", "unknown"), "png", file -> {
+                (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), "png", file -> {
                     Pixmap out = MapIO.writeImage(editor.tiles());
                     file.writePNG(out);
                     out.dispose();
@@ -129,16 +129,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(steam){
             menu.cont.button("@editor.publish.workshop", Icon.link, () -> {
-                Map builtin = maps.all().find(m -> m.name().equals(editor.getTags().get("name", "").trim()));
+                Map builtin = maps.all().find(m -> m.name().equals(editor.tags.get("name", "").trim()));
 
-                if(editor.getTags().containsKey("steamid") && builtin != null && !builtin.custom){
-                    platform.viewListingID(editor.getTags().get("steamid"));
+                if(editor.tags.containsKey("steamid") && builtin != null && !builtin.custom){
+                    platform.viewListingID(editor.tags.get("steamid"));
                     return;
                 }
 
                 Map map = save();
 
-                if(editor.getTags().containsKey("steamid") && map != null){
+                if(editor.tags.containsKey("steamid") && map != null){
                     platform.viewListing(map);
                     return;
                 }
@@ -156,7 +156,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
 
                 platform.publish(map);
-            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.getTags().containsKey("steamid") ? editor.getTags().get("author").equals(player.name) ? "@workshop.listing" : "@view.workshop" : "@editor.publish.workshop"));
+            }).padTop(-3).size(swidth * 2f + 10, 60f).update(b -> b.setText(editor.tags.containsKey("steamid") ? editor.tags.get("author").equals(player.name) ? "@workshop.listing" : "@view.workshop" : "@editor.publish.workshop"));
 
             menu.cont.row();
         }
@@ -235,7 +235,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         state.rules = (lastSavedRules == null ? new Rules() : lastSavedRules);
         lastSavedRules = null;
         saved = false;
-        editor.renderer().updateAll();
+        editor.renderer.updateAll();
     }
 
     private void playtest(){
@@ -254,14 +254,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 "height", editor.height()
             ));
             world.endMapLoad();
-            //add entities so they update. is this really needed?
-            for(Tile tile : world.tiles){
-                if(tile.build != null){
-                    tile.build.add();
-                }
-            }
             player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
             player.clearUnit();
+            Groups.unit.clear();
+            Groups.build.clear();
             logic.play();
         });
     }
@@ -269,10 +265,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
     public @Nullable Map save(){
         boolean isEditor = state.rules.editor;
         state.rules.editor = false;
-        String name = editor.getTags().get("name", "").trim();
-        editor.getTags().put("rules", JsonIO.write(state.rules));
-        editor.getTags().remove("width");
-        editor.getTags().remove("height");
+        String name = editor.tags.get("name", "").trim();
+        editor.tags.put("rules", JsonIO.write(state.rules));
+        editor.tags.remove("width");
+        editor.tags.remove("height");
 
         player.clearUnit();
 
@@ -286,7 +282,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             if(map != null && !map.custom){
                 handleSaveBuiltin(map);
             }else{
-                returned = maps.saveMap(editor.getTags());
+                returned = maps.saveMap(editor.tags);
                 ui.showInfoFade("@editor.saved");
             }
         }
@@ -357,7 +353,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
     @Override
     public void dispose(){
-        editor.renderer().dispose();
+        editor.renderer.dispose();
     }
 
     public void beginEditMap(Fi file){
@@ -576,21 +572,19 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         if(Core.input.ctrl()){
             //alt mode select
-            for(int i = 0; i < view.getTool().altModes.length + 1; i++){
-                if(Core.input.keyTap(KeyCode.valueOf("num" + (i + 1)))){
-                    view.getTool().mode = i - 1;
+            for(int i = 0; i < view.getTool().altModes.length; i++){
+                if(i + 1 < KeyCode.numbers.length && Core.input.keyTap(KeyCode.numbers[i + 1])){
+                    view.getTool().mode = i;
                 }
             }
         }else{
-            //tool select
-            for(int i = 0; i < EditorTool.values().length; i++){
-                if(Core.input.keyTap(KeyCode.valueOf("num" + (i + 1)))){
-                    view.setTool(EditorTool.values()[i]);
+            for(EditorTool tool : EditorTool.all){
+                if(Core.input.keyTap(tool.key)){
+                    view.setTool(tool);
                     break;
                 }
             }
         }
-
 
         if(Core.input.keyTap(KeyCode.escape)){
             if(!menu.isShown()){
@@ -619,14 +613,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 for(int x = 0; x < editor.width(); x++){
                     for(int y = 0; y < editor.height(); y++){
                         Tile tile = editor.tile(x, y);
-                        if(tile.block().breakable && tile.block() instanceof Rock){
+                        if(tile.block().breakable && tile.block() instanceof Boulder){
                             tile.setBlock(Blocks.air);
-                            editor.renderer().updatePoint(x, y);
+                            editor.renderer.updatePoint(x, y);
                         }
 
                         if(tile.overlay() != Blocks.air && tile.overlay() != Blocks.spawn){
                             tile.setOverlay(Blocks.air);
-                            editor.renderer().updatePoint(x, y);
+                            editor.renderer.updatePoint(x, y);
                         }
                     }
                 }

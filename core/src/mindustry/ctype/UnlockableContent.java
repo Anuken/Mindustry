@@ -8,6 +8,7 @@ import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -30,7 +31,7 @@ public abstract class UnlockableContent extends MappableContent{
 
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
-        this.unlocked = Core.settings != null && Core.settings.getBool(name + "-unlocked", false);
+        this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
     }
 
     public String displayDescription(){
@@ -41,6 +42,11 @@ public abstract class UnlockableContent extends MappableContent{
     @CallSuper
     public void createIcons(MultiPacker packer){
 
+    }
+
+    /** @return items needed to research this content */
+    public ItemStack[] researchRequirements(){
+        return ItemStack.empty;
     }
 
     public String emoji(){

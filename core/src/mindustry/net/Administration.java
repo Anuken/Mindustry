@@ -19,27 +19,18 @@ import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. */
+    public Seq<String> bannedIPs = new Seq<>();
+    public Seq<String> whitelist = new Seq<>();
+    public Seq<ChatFilter> chatFilters = new Seq<>();
+    public Seq<ActionFilter> actionFilters = new Seq<>();
+    public Seq<String> subnetBans = new Seq<>();
+    public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
+
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
-    private Seq<String> bannedIPs = new Seq<>();
-    private Seq<String> whitelist = new Seq<>();
-    private Seq<ChatFilter> chatFilters = new Seq<>();
-    private Seq<ActionFilter> actionFilters = new Seq<>();
-    private Seq<String> subnetBans = new Seq<>();
-    private IntIntMap lastPlaced = new IntIntMap();
 
     public Administration(){
         load();
-
-        Events.on(ResetEvent.class, e -> lastPlaced = new IntIntMap());
-
-        //keep track of who placed what on the server
-        Events.on(BlockBuildEndEvent.class, e -> {
-            //players should be able to configure their own tiles
-            if(net.server() && e.unit != null && e.unit.isPlayer()){
-                lastPlaced.put(e.tile.pos(), e.unit.getPlayer().id());
-            }
-        });
 
         //anti-spam
         addChatFilter((player, message) -> {
@@ -73,16 +64,11 @@ public class Administration{
         });
 
         //block interaction rate limit
+        //TODO when someone disconnects, a different player is mistakenly kicked for spamming actions
         addActionFilter(action -> {
             if(action.type != ActionType.breakBlock &&
                 action.type != ActionType.placeBlock &&
                 Config.antiSpam.bool()){
-
-                //make sure players can configure their own stuff, e.g. in schematics - but only once.
-                if(lastPlaced.get(action.tile.pos(), -1) == action.player.id()){
-                    lastPlaced.remove(action.tile.pos());
-                    return true;
-                }
 
                 Ratekeeper rate = action.player.getInfo().rate;
                 if(rate.allow(Config.interactRateWindow.num() * 1000, Config.interactRateLimit.num())){
@@ -90,7 +76,7 @@ public class Administration{
                 }else{
                     if(rate.occurences > Config.interactRateKick.num()){
                         action.player.kick("You are interacting with too many blocks.", 1000 * 30);
-                    }else{
+                    }else if(action.player.getInfo().messageTimer.get(60f * 2f)){
                         action.player.sendMessage("[scarlet]You are interacting with blocks too quickly.");
                     }
 
@@ -99,6 +85,20 @@ public class Administration{
             }
             return true;
         });
+    }
+
+    /** @return time at which a player would be pardoned for a kick (0 means they were never kicked) */
+    public long getKickTime(String uuid, String ip){
+        return Math.max(getInfo(uuid).lastKicked, kickedIPs.get(ip, 0L));
+    }
+
+    /** Sets up kick duration for a player. */
+    public void handleKicked(String uuid, String ip, long duration){
+        kickedIPs.put(ip, Math.max(kickedIPs.get(ip, 0L), Time.millis() + duration));
+
+        PlayerInfo info = getInfo(uuid);
+        info.timesKicked++;
+        info.lastKicked = Math.max(Time.millis() + duration, info.lastKicked);
     }
 
     public Seq<String> getSubnetBans(){
@@ -166,7 +166,7 @@ public class Administration{
         Core.settings.put("playerlimit", limit);
     }
 
-    public boolean getStrict(){
+    public boolean isStrict(){
         return Config.strict.bool();
     }
 
@@ -658,6 +658,7 @@ public class Administration{
         public transient String lastSentMessage;
         public transient int messageInfractions;
         public transient Ratekeeper rate = new Ratekeeper();
+        public transient Interval messageTimer = new Interval();
 
         PlayerInfo(String id){
             this.id = id;

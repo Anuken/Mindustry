@@ -231,7 +231,7 @@ public class TypeIO{
         if(!request.breaking){
             write.s(request.block.id);
             write.b((byte)request.rotation);
-            write.b(request.hasConfig ? (byte)1 : 0);
+            write.b(1); //always has config
             writeObject(write, request.config);
         }
     }
@@ -254,8 +254,9 @@ public class TypeIO{
             boolean hasConfig = read.b() == 1;
             Object config = readObject(read);
             currentRequest = new BuildPlan(Point2.x(position), Point2.y(position), rotation, content.block(block));
+            //should always happen, but is kept for legacy reasons just in case
             if(hasConfig){
-                currentRequest.configure(config);
+                currentRequest.config = config;
             }
         }
 

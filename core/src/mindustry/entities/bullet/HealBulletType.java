@@ -21,6 +21,7 @@ public class HealBulletType extends BulletType{
         despawnEffect = Fx.hitLaser;
         collidesTeam = true;
         hittable = false;
+        reflectable = false;
     }
 
     public HealBulletType(){
@@ -43,11 +44,11 @@ public class HealBulletType extends BulletType{
     }
 
     @Override
-    public void hitTile(Bullet b, Building tile){
+    public void hitTile(Bullet b, Building tile, float initialHealth){
         super.hit(b);
 
-        if(tile.team == b.team && !(tile.block() instanceof BuildBlock)){
-            Fx.healBlockFull.at(tile.x, tile.y, tile.block().size, Pal.heal);
+        if(tile.team == b.team && !(tile.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
             tile.heal(healPercent / 100f * tile.maxHealth());
         }
     }

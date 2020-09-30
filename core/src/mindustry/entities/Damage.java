@@ -20,6 +20,7 @@ import static mindustry.Vars.*;
 
 /** Utility class for damaging in an area. */
 public class Damage{
+    private static Tile furthest;
     private static Rect rect = new Rect();
     private static Rect hitrect = new Rect();
     private static Vec2 tr = new Vec2();
@@ -30,24 +31,26 @@ public class Damage{
     private static Unit tmpUnit;
 
     /** Creates a dynamic explosion based on specified parameters. */
-    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color){
-        for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
-            int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
-            Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
-        }
+    public static void dynamicExplosion(float x, float y, float flammability, float explosiveness, float power, float radius, Color color, boolean damage){
+        if(damage){
+            for(int i = 0; i < Mathf.clamp(power / 20, 0, 6); i++){
+                int branches = 5 + Mathf.clamp((int)(power / 30), 1, 20);
+                Time.run(i * 2f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3, x, y, Mathf.random(360f), branches + Mathf.range(2)));
+            }
 
-        for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-            Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
-        }
+            for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
+                Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
+            }
 
-        int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
+            int waves = Mathf.clamp((int)(explosiveness / 4), 0, 30);
 
-        for(int i = 0; i < waves; i++){
-            int f = i;
-            Time.run(i * 2f, () -> {
-                Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
-                Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
-            });
+            for(int i = 0; i < waves; i++){
+                int f = i;
+                Time.run(i * 2f, () -> {
+                    Damage.damage(x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), explosiveness / 2f);
+                    Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
+                });
+            }
         }
 
         if(explosiveness > 15f){
@@ -74,6 +77,28 @@ public class Damage{
         }
     }
 
+    public static float findLaserLength(Bullet b, float length){
+        Tmp.v1.trns(b.rotation(), length);
+
+        furthest = null;
+
+        boolean found = world.raycast(b.tileX(), b.tileY(), world.toTile(b.x + Tmp.v1.x), world.toTile(b.y + Tmp.v1.y),
+        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
+
+        return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+    }
+
+    /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
+    public static float collideLaser(Bullet b, float length, boolean large){
+        float resultLength = findLaserLength(b, length);
+
+        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large);
+
+        b.fdata = resultLength;
+
+        return resultLength;
+    }
+
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
         collideLine(hitter, team, effect, x, y, angle, length, false);
     }
@@ -83,6 +108,8 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
+        length = findLaserLength(hitter, length);
+
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
@@ -130,13 +157,8 @@ public class Damage{
             if(!e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
 
             e.hitbox(hitrect);
-            Rect other = hitrect;
-            other.y -= expand;
-            other.x -= expand;
-            other.width += expand * 2;
-            other.height += expand * 2;
 
-            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
+            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
 
             if(vec != null){
                 effect.at(vec.x, vec.y);

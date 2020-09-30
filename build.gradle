@@ -32,11 +32,11 @@ allprojects{
 
     ext{
         versionNumber = '6'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'pre-alpha'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'alpha'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
-        rhinoVersion = 'eeb327d141146663ff3924bd20d2a5da8a6439cc'
+        rhinoVersion = '8437435dab9993769d72739608580d40c5343285'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -200,7 +200,6 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
         implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
@@ -239,7 +238,6 @@ project(":ios"){
 
         implementation arcModule("natives:natives-ios")
         implementation arcModule("natives:natives-freetype-ios")
-        implementation arcModule("natives:natives-box2d-ios")
         implementation arcModule("backends:backend-robovm")
 
         compileOnly project(":annotations")
@@ -261,7 +259,6 @@ project(":core"){
         doLast{
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
-            def buildVersion = props["build"]
             def loglines = file("../changelog").text.split("\n")
             def maxLength = 460
 
@@ -273,7 +270,6 @@ project(":core"){
                 }
             }
             def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
-            new File(changelogs, buildVersion + ".txt").text = (result)
             new File(changelogs, androidVersion + ".txt").text = (result)
         }
     }
@@ -284,7 +280,6 @@ project(":core"){
         api "org.lz4:lz4-java:1.4.1"
         api arcModule("arc-core")
         api arcModule("extensions:freetype")
-        api arcModule("extensions:box2d")
         api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
@@ -301,7 +296,6 @@ project(":server"){
 
     dependencies{
         implementation project(":core")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
     }
 }
@@ -314,7 +308,6 @@ project(":tests"){
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
         testImplementation arcModule("backends:backend-headless")
-        testImplementation arcModule("natives:natives-box2d-desktop")
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
     }
 
@@ -336,7 +329,6 @@ project(":tools"){
 
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
     }
 }

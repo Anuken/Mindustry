@@ -11,7 +11,7 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
-public class ForceFieldAbility implements Ability{
+public class ForceFieldAbility extends Ability{
     /** Shield radius. */
     public float radius = 60f;
     /** Shield regen speed in damage/tick. */
@@ -21,22 +21,26 @@ public class ForceFieldAbility implements Ability{
     /** Cooldown after the shield is broken, in ticks. */
     public float cooldown = 60f * 5;
 
-    private float realRad;
-    private Unit paramUnit;
-    private final Cons<Shielderc> shieldConsumer = trait -> {
+    /** State. */
+    protected float radiusScale, alpha;
+
+    private static float realRad;
+    private static Unit paramUnit;
+    private static ForceFieldAbility paramField;
+    private static final Cons<Shielderc> shieldConsumer = trait -> {
         if(trait.team() != paramUnit.team && Intersector.isInsideHexagon(paramUnit.x, paramUnit.y, realRad * 2f, trait.x(), trait.y()) && paramUnit.shield > 0){
             trait.absorb();
             Fx.absorb.at(trait);
 
             //break shield
             if(paramUnit.shield <= trait.damage()){
-                paramUnit.shield -= cooldown * regen;
+                paramUnit.shield -= paramField.cooldown * paramField.regen;
 
-                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, radius, paramUnit.team.color);
+                Fx.shieldBreak.at(paramUnit.x, paramUnit.y, paramField.radius, paramUnit.team.color);
             }
 
             paramUnit.shield -= trait.damage();
-            paramUnit.shieldAlpha = 1f;
+            paramField.alpha = 1f;
         }
     };
 
@@ -55,14 +59,17 @@ public class ForceFieldAbility implements Ability{
             unit.shield += Time.delta * regen;
         }
 
+        alpha = Math.max(alpha - Time.delta/10f, 0f);
+
         if(unit.shield > 0){
-            unit.timer2 = Mathf.lerpDelta(unit.timer2, 1f, 0.06f);
+            radiusScale = Mathf.lerpDelta(radiusScale, 1f, 0.06f);
             paramUnit = unit;
+            paramField = this;
             checkRadius(unit);
 
             Groups.bullet.intersect(unit.x - realRad, unit.y - realRad, realRad * 2f, realRad * 2f, shieldConsumer);
         }else{
-            unit.timer2 = 0f;
+            radiusScale = 0f;
         }
     }
 
@@ -73,7 +80,7 @@ public class ForceFieldAbility implements Ability{
         if(unit.shield > 0){
             Draw.z(Layer.shields);
 
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(unit.shieldAlpha));
+            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
 
             if(Core.settings.getBool("animatedshields")){
                 Fill.poly(unit.x, unit.y, 6, realRad);
@@ -89,6 +96,6 @@ public class ForceFieldAbility implements Ability{
 
     private void checkRadius(Unit unit){
         //timer2 is used to store radius scale as an effect
-        realRad = unit.timer2 * radius;
+        realRad = radiusScale * radius;
     }
 }

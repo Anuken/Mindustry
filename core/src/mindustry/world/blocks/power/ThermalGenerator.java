@@ -22,7 +22,7 @@ public class ThermalGenerator extends PowerGenerator{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.tiles, attribute);
+        stats.add(BlockStat.tiles, attribute, floating);
     }
 
     @Override

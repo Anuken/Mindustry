@@ -19,6 +19,7 @@ public class Junction extends Block{
         solid = true;
         group = BlockGroup.transportation;
         unloadable = false;
+        noUpdateDisabled = true;
     }
 
     @Override

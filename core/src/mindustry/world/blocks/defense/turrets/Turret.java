@@ -52,7 +52,7 @@ public abstract class Turret extends Block{
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
-    public float rotatespeed = 5f; //in degrees per tick
+    public float rotateSpeed = 5f; //in degrees per tick
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
@@ -77,6 +77,7 @@ public abstract class Turret extends Block{
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
     public Cons<TurretBuild> heatDrawer = tile -> {
         if(tile.heat <= 0.00001f) return;
+
         Draw.color(heatColor, tile.heat);
         Draw.blend(Blending.additive);
         Draw.rect(heatRegion, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
@@ -201,6 +202,7 @@ public abstract class Turret extends Block{
 
             tr2.trns(rotation, -recoil);
 
+            Drawf.shadow(region, x + tr2.x - (size / 2f), y + tr2.y - (size / 2f), rotation - 90);
             drawer.get(this);
 
             if(heatRegion != Core.atlas.find("error")){
@@ -237,7 +239,7 @@ public abstract class Turret extends Block{
                         canShoot = unit.isShooting();
                     }else if(logicControlled()){ //logic behavior
                         canShoot = logicShooting;
-                    }else if(peekAmmo() != null){ //default AI behavior
+                    }else{ //default AI behavior
                         BulletType type = peekAmmo();
                         float speed = type.speed;
                         //slow bullets never intersect
@@ -311,7 +313,7 @@ public abstract class Turret extends Block{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotatespeed * delta() * baseReloadSpeed());
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed());
         }
 
         public boolean shouldTurn(){
@@ -436,7 +438,7 @@ public abstract class Turret extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            if(revision == 1){
+            if(revision >= 1){
                 reload = read.f();
                 rotation = read.f();
             }

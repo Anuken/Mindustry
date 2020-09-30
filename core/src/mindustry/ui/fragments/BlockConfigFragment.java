@@ -61,7 +61,7 @@ public class BlockConfigFragment extends Fragment{
                 }
 
                 table.setOrigin(Align.center);
-                if(configTile == null || configTile.block() == Blocks.air || !configTile.isValid()){
+                if(configTile == null || configTile.block == Blocks.air || !configTile.isValid()){
                     hideConfig();
                 }else{
                     configTile.updateTableAlign(table);

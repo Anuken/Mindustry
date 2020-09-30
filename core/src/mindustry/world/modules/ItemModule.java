@@ -135,6 +135,15 @@ public class ItemModule extends BlockModule{
         return true;
     }
 
+    public boolean has(ItemSeq items){
+        for(Item item : content.items()){
+            if(!has(item, items.get(item))){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean has(Iterable<ItemStack> stacks){
         for(ItemStack stack : stacks){
             if(!has(stack.item, stack.amount)) return false;
@@ -244,6 +253,12 @@ public class ItemModule extends BlockModule{
         }
     }
 
+    public void undoFlow(Item item){
+        if(flow != null){
+            cacheSums[item.id] -= 1;
+        }
+    }
+
     public void addAll(ItemModule items){
         for(int i = 0; i < items.items.length; i++){
             add(i, items.items[i]);
@@ -261,6 +276,10 @@ public class ItemModule extends BlockModule{
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
     }
 
+    public void remove(ItemSeq stacks){
+        stacks.each(this::remove);
+    }
+
     public void remove(Iterable<ItemStack> stacks){
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
     }
@@ -276,30 +295,30 @@ public class ItemModule extends BlockModule{
 
     @Override
     public void write(Writes write){
-        byte amount = 0;
+        int amount = 0;
         for(int item : items){
             if(item > 0) amount++;
         }
 
-        write.b(amount); //amount of items
+        write.s(amount); //amount of items
 
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                write.b(i); //item ID
+                write.s(i); //item ID
                 write.i(items[i]); //item amount
             }
         }
     }
 
     @Override
-    public void read(Reads read){
+    public void read(Reads read, boolean legacy){
         //just in case, reset items
         Arrays.fill(items, 0);
-        int count = read.ub();
+        int count = legacy ? read.ub() : read.s();
         total = 0;
 
         for(int j = 0; j < count; j++){
-            int itemid = read.ub();
+            int itemid = legacy ? read.ub() : read.s();
             int itemamount = read.i();
             items[content.item(itemid).id] = itemamount;
             total += itemamount;

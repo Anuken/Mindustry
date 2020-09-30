@@ -491,7 +491,7 @@ public class UI implements ApplicationListener, Loadable{
         Table t = new Table();
         t.touchable = Touchable.disabled;
         t.background(Styles.black3).margin(8f)
-        .add(text).style(Styles.outlineLabel);
+        .add(text).style(Styles.outlineLabel).labelAlign(Align.center);
         t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
         t.actions(Actions.fadeOut(3, Interp.pow4In), Actions.remove());
         Core.scene.add(t);

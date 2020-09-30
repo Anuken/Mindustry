@@ -72,7 +72,7 @@ public class Tiles implements Iterable<Tile>{
         return get(Point2.x(pos), Point2.y(pos));
     }
 
-    public void each(Cons<Tile> cons){
+    public void eachTile(Cons<Tile> cons){
         for(Tile tile : array){
             cons.get(tile);
         }

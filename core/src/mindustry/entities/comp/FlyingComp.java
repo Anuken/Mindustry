@@ -1,10 +1,12 @@
 package mindustry.entities.comp;
 
+import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.environment.*;
 
@@ -74,7 +76,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         }
 
         if(!hovering && isGrounded() && floor.isLiquid){
-            if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= 7f){
+            if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= (7f + hitSize()/8f)){
                 floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
                 splashTimer = 0f;
             }
@@ -90,7 +92,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             //TODO is the netClient check necessary?
             if(drownTime >= 0.999f && !net.client()){
                 kill();
-                //TODO drown event!
+                Events.fire(new UnitDrownEvent(self()));
             }
         }else{
             drownTime = Mathf.lerpDelta(drownTime, 0f, 0.03f);

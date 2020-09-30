@@ -25,27 +25,36 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     Object data;
     BulletType type;
     float damage;
+    float fdata;
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
-        for(Team team : team.enemies()){
-            consumer.get(teamIndex.tree(team));
+        if(team.active()){
+            for(Team team : team.enemies()){
+                consumer.get(teamIndex.tree(team));
+            }
+        }else{
+            for(Team other : Team.all){
+                if(other != team && teamIndex.count(other) > 0){
+                    consumer.get(teamIndex.tree(other));
+                }
+            }
         }
     }
 
     @Override
     public void drawBullets(){
-        type.draw(base());
+        type.draw(self());
     }
 
     @Override
     public void add(){
-        type.init(base());
+        type.init(self());
     }
 
     @Override
     public void remove(){
-        type.despawned(base());
+        type.despawned(self());
         collided.clear();
     }
 
@@ -83,10 +92,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @MethodPriority(100)
     @Override
     public void collision(Hitboxc other, float x, float y){
-        type.hit(base(), x, y);
+        type.hit(self(), x, y);
+        float health = 0f;
 
         if(other instanceof Healthc){
             Healthc h = (Healthc)other;
+            health = h.health();
             h.damage(damage);
         }
 
@@ -102,30 +113,40 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         }else{
             collided.add(other.id());
         }
+
+        type.hitEntity(self(), other, health);
     }
 
     @Override
     public void update(){
-        type.update(base());
+        type.update(self());
 
         if(type.collidesTiles && type.collides && type.collidesGround){
             world.raycastEach(world.toTile(lastX()), world.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
                 Building tile = world.build(x, y);
-                if(tile == null) return false;
+                if(tile == null || !isAdded()) return false;
 
-                if(tile.collide(base()) && type.collides(base(), tile) && !tile.dead() && (type.collidesTeam || tile.team != team)){
+                if(tile.collide(self()) && type.collides(self(), tile) && !tile.dead() && (type.collidesTeam || tile.team != team) && !(type.pierceBuilding && collided.contains(tile.id))){
                     boolean remove = false;
 
+                    float health = tile.health;
+
                     if(tile.team != team){
-                        remove = tile.collision(base());
+                        remove = tile.collision(self());
                     }
 
                     if(remove || type.collidesTeam){
-                        type.hitTile(base(), tile);
-                        remove();
+                        if(!type.pierceBuilding){
+                            remove();
+                        }else{
+                            collided.add(tile.id);
+                        }
                     }
-                    return true;
+
+                    type.hitTile(self(), tile, health);
+
+                    return !type.pierceBuilding;
                 }
 
                 return false;
@@ -137,8 +158,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public void draw(){
         Draw.z(Layer.bullet);
 
-        type.draw(base());
-        type.drawLight(base());
+        type.draw(self());
+        type.drawLight(self());
     }
 
     /** Sets the bullet's rotation in degrees. */

@@ -74,11 +74,13 @@ importPackage(Packages.mindustry.gen)
 importPackage(Packages.mindustry.graphics)
 importPackage(Packages.mindustry.graphics.g3d)
 importPackage(Packages.mindustry.input)
+importPackage(Packages.mindustry.io)
 importPackage(Packages.mindustry.logic)
 importPackage(Packages.mindustry.maps)
 importPackage(Packages.mindustry.maps.filters)
 importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
+importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.type)
 importPackage(Packages.mindustry.ui)
 importPackage(Packages.mindustry.ui.dialogs)
@@ -124,7 +126,7 @@ const BlockBuildBeginEvent = Packages.mindustry.game.EventType.BlockBuildBeginEv
 const ResearchEvent = Packages.mindustry.game.EventType.ResearchEvent
 const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
-const BuildinghangeEvent = Packages.mindustry.game.EventType.BuildinghangeEvent
+const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
 const ConfigEvent = Packages.mindustry.game.EventType.ConfigEvent
 const DepositEvent = Packages.mindustry.game.EventType.DepositEvent
@@ -152,7 +154,6 @@ const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
 const MapPublishEvent = Packages.mindustry.game.EventType.MapPublishEvent
 const MapMakeEvent = Packages.mindustry.game.EventType.MapMakeEvent
 const ResizeEvent = Packages.mindustry.game.EventType.ResizeEvent
-const LaunchEvent = Packages.mindustry.game.EventType.LaunchEvent
 const LoseEvent = Packages.mindustry.game.EventType.LoseEvent
 const WinEvent = Packages.mindustry.game.EventType.WinEvent
 const Trigger = Packages.mindustry.game.EventType.Trigger

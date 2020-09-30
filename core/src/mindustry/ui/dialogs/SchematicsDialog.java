@@ -10,8 +10,8 @@ import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
+import mindustry.Vars;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -64,8 +64,12 @@ public class SchematicsDialog extends BaseDialog{
 
             t.update(() -> {
                 if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
-                    control.input.useSchematic(firstSchematic);
-                    hide();
+                    if(!Vars.state.rules.schematicsAllowed){
+                        ui.showInfo("@schematic.disabled");
+                    }else{
+                        control.input.useSchematic(firstSchematic);
+                        hide();
+                    }
                 }
             });
 
@@ -146,8 +150,12 @@ public class SchematicsDialog extends BaseDialog{
                         if(state.isMenu()){
                             showInfo(s);
                         }else{
-                            control.input.useSchematic(s);
-                            hide();
+                            if(!Vars.state.rules.schematicsAllowed){
+                                ui.showInfo("@schematic.disabled");
+                            }else{
+                                control.input.useSchematic(s);
+                                hide();
+                            }
                         }
                     }).pad(4).style(Styles.cleari).get();
 
@@ -333,7 +341,7 @@ public class SchematicsDialog extends BaseDialog{
             cont.add(new SchematicImage(schem)).maxSize(800f);
             cont.row();
 
-            Seq<ItemStack> arr = schem.requirements();
+            ItemSeq arr = schem.requirements();
             cont.table(r -> {
                 int i = 0;
                 for(ItemStack s : arr){
