@@ -481,6 +481,7 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 2f;
             statusDuration = 60f * 4f;
+            damage = 0.1f;
         }};
 
         heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
@@ -491,6 +492,7 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 2f;
             statusDuration = 60f * 4f;
+            damage = 0.1f;
         }};
 
         heavySlagShot = new LiquidBulletType(Liquids.slag){{
@@ -512,6 +514,7 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 2f;
             statusDuration = 60f * 4f;
+            damage = 0.1f;
         }};
 
         driverBolt = new MassDriverBolt();
