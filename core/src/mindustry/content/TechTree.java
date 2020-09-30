@@ -350,8 +350,10 @@ public class TechTree implements ContentList{
                         });
 
                         node(lancer, () -> {
-                            node(meltdown, () -> {
+                            node(foreshadow, () -> {
+                                node(meltdown, () -> {
 
+                                });
                             });
 
                             node(shockMine, () -> {

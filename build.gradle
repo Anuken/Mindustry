@@ -173,18 +173,29 @@ allprojects{
     }
 
     tasks.withType(JavaCompile){
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        targetCompatibility = 8
+        sourceCompatibility = 14
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
     }
 }
 
-//compile with java 8 compatibility for everything except the annotati project
+configure(project(":annotations")){
+    tasks.withType(JavaCompile){
+        targetCompatibility = 8
+        sourceCompatibility = 8
+    }
+}
+
+//compile with java 8 compatibility for everything except the annotation project
 configure(subprojects - project(":annotations")){
     tasks.withType(JavaCompile){
         if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-            options.compilerArgs.addAll(['--release', '8'])
+            options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
+        }
+
+        doFirst{
+            options.compilerArgs = options.compilerArgs.findAll{it != '--enable-preview' }
         }
     }
 
@@ -288,6 +299,8 @@ project(":core"){
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
+        annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.3.0'
+
     }
 }
 
