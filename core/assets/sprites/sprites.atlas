@@ -1649,21 +1649,21 @@ coal-centrifuge
   orig: 64, 64
   offset: 0, 0
   index: -1
-cryofluid-mixer-bottom
+cryofluidmixer-bottom
   rotate: false
   xy: 3029, 2409
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-cryofluid-mixer-liquid
+cryofluidmixer-liquid
   rotate: false
   xy: 3095, 2409
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-cryofluid-mixer-top
+cryofluidmixer-top
   rotate: false
   xy: 3373, 2371
   size: 64, 64
@@ -3133,7 +3133,7 @@ block-craters-full
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-cryofluid-mixer-full
+block-cryofluidmixer-full
   rotate: false
   xy: 1961, 2146
   size: 64, 64
@@ -9563,7 +9563,7 @@ editor-craters1
   orig: 32, 32
   offset: 0, 0
   index: -1
-cryofluid-mixer-icon-editor
+cryofluidmixer-icon-editor
   rotate: false
   xy: 2079, 299
   size: 64, 64
@@ -12644,35 +12644,35 @@ block-craters-xlarge
   orig: 48, 48
   offset: 0, 0
   index: -1
-block-cryofluid-mixer-large
+block-cryofluidmixer-large
   rotate: false
   xy: 2338, 371
   size: 40, 40
   orig: 40, 40
   offset: 0, 0
   index: -1
-block-cryofluid-mixer-medium
+block-cryofluidmixer-medium
   rotate: false
   xy: 1652, 169
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-block-cryofluid-mixer-small
+block-cryofluidmixer-small
   rotate: false
   xy: 1706, 7
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
-block-cryofluid-mixer-tiny
+block-cryofluidmixer-tiny
   rotate: false
   xy: 2509, 184
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-block-cryofluid-mixer-xlarge
+block-cryofluidmixer-xlarge
   rotate: false
   xy: 1907, 463
   size: 48, 48
