@@ -129,6 +129,27 @@ public class Drawf{
         Draw.reset();
     }
 
+    public static void hexagon(float x, float y, float rad, Color color) {
+        hexagon(x, y, rad, color, 1f);
+    }
+
+    public static void hexagon(float x, float y, float rad, Color color, float alpha) {
+        hexagon(x, y, rad, color, color, 0f, alpha);
+    }
+
+    public static void hexagon(float x, float y, float rad, Color color, Color tintColor, float force, float alpha) {
+        Draw.color(Pal.gray);
+        Lines.stroke(3f);
+        Draw.alpha(alpha);
+        Lines.poly(x, y, 6, rad);
+        Draw.reset();
+        Draw.tint(color, tintColor, force);
+        Lines.stroke(1f);
+        Draw.alpha(alpha);
+        Lines.poly(x, y, 6, rad);
+        Draw.reset();
+    }
+
     public static void circles(float x, float y, float rad){
         circles(x, y, rad, Pal.accent);
     }

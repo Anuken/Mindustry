@@ -80,13 +80,7 @@ public class ForceProjector extends Block{
         super.drawPlace(x, y, rotation, valid);
 
         //inner circle
-        Draw.color(Pal.gray);
-        Lines.stroke(3f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
-        Draw.color(player.team().color);
-        Lines.stroke(1f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
-        Draw.color();
+        Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius, player.team().color);
 
         boolean boosterUnlocked = true;
         for(ItemStack item : consumes.getItem().items) {
@@ -101,27 +95,10 @@ public class ForceProjector extends Block{
             float transparency = Time.time() % 90f / 90f;
 
             //expanding hexagon
-            Draw.color(Pal.gray);
-            Lines.stroke(3f);
-            Draw.alpha(1f - transparency);
-            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
-            Draw.reset();
-            Draw.tint(player.team().color, phaseColor, expandProgress);
-            Lines.stroke(1f);
-            Draw.alpha(1f - transparency);
-            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
-            Draw.reset();
+            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, phaseColor, expandProgress, 1f - transparency);
 
             //outside hexagon
-            Draw.color(Pal.gray);
-            Lines.stroke(3f);
-            Draw.alpha(0.25f);
-            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
-            Draw.color(phaseColor);
-            Lines.stroke(1f);
-            Draw.alpha(0.25f);
-            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
-            Draw.reset();
+            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, 0.25f);
 
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
