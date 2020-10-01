@@ -5,11 +5,13 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
+import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class MemoryBlock extends Block{
     public int memoryCapacity = 32;
+    private Runnable rebuild = null;
 
     public MemoryBlock(String name){
         super(name);
@@ -25,20 +27,35 @@ public class MemoryBlock extends Block{
         stats.add(BlockStat.memoryCapacity, memoryCapacity, StatUnit.none);
     }
 
-    public class MemoryBuild extends Building{
+    public class MemoryBuild extends Building {
         public double[] memory = new double[memoryCapacity];
 
         @Override
         public void buildConfiguration(Table table){
-            table.table(Styles.black6, t -> {
-                t.pane(p -> {
-                    p.align(Align.left);
-                    for (int i = 0; i < memory.length; i++) {
-                        p.add(i + ": " + memory[i]).align(Align.left);
-                        p.row();
-                    }
-                }).height(120f).growX().margin(10f).pad(10f);
-            });
+            rebuild = () -> {
+                BaseDialog dialog = new BaseDialog("Memory Contents");
+                dialog.cont.table(t -> {
+                    t.table(Tex.button, tt -> {
+                        tt.pane(Styles.smallPane, p -> {
+                            p.align(Align.left);
+                            for (int i = 0; i < memory.length; i++) {
+                                p.add(i + ": " + memory[i]).align(Align.left);
+                                p.row();
+                            }
+                        }).growX().growY().margin(10f).pad(10f);
+                    }).width(300f).growX().growY();
+
+                    t.row();
+
+                    t.button("Reload", () -> {
+                        dialog.hide();
+                        rebuild.run();
+                    }).width(300f);
+                });
+                dialog.addCloseButton();
+                dialog.show();
+            };
+            rebuild.run();
         }
         //massive byte size means picking up causes sync issues
         @Override
