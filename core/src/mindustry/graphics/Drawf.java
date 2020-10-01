@@ -109,9 +109,15 @@ public class Drawf{
     }
 
     public static void dashCircle(float x, float y, float rad, Color color){
+        dashCircle(x, y, rad, color, 1f);
+    }
+
+    public static void dashCircle(float x, float y, float rad, Color color, float alpha){
         Lines.stroke(3f, Pal.gray);
+        Draw.alpha(alpha);
         Lines.dashCircle(x, y, rad);
         Lines.stroke(1f, color);
+        Draw.alpha(alpha);
         Lines.dashCircle(x, y, rad);
         Draw.reset();
     }

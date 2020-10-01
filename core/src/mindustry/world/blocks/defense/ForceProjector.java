@@ -98,12 +98,26 @@ public class ForceProjector extends Block{
                 far.trns(i, 0, radius + phaseRadiusBoost);
                 Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRadiusBoost/4f + sin, 4f + sin, phaseColor);
             }
-            
+
+            //expanding circle
             Draw.color(Pal.gray);
             Lines.stroke(3f);
+            Draw.alpha(1f - ((Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f));
+            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRadiusBoost);
+            Draw.color(phaseColor);
+            Lines.stroke(1f);
+            Draw.alpha(1f - ((Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f));
+            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRadiusBoost);
+            Draw.color();
+
+            //outside circle
+            Draw.color(Pal.gray);
+            Lines.stroke(3f);
+            Draw.alpha(0.5f);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
             Draw.color(phaseColor);
             Lines.stroke(1f);
+            Draw.alpha(0.5f);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
             Draw.color();
         }
