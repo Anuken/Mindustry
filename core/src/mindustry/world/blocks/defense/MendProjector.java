@@ -70,7 +70,7 @@ public class MendProjector extends Block{
 
         if(boosterUnlocked) {
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
-            float transparency = Time.time() %90f / 90f;
+            float transparency = Time.time() % 90f / 90f;
             //expanding circle
             Draw.color(Pal.gray);
             Lines.stroke(3f);
