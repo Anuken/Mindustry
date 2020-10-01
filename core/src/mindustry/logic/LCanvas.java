@@ -348,7 +348,7 @@ public class LCanvas extends Table{
     public static class JumpButton extends ImageButton{
         Color hoverColor = Pal.place;
         Color defaultColor = Color.white;
-        @NonNull Prov<StatementElem> to;
+        Prov<StatementElem> to;
         boolean selecting;
         float mx, my;
         ClickListener listener;
@@ -356,7 +356,7 @@ public class LCanvas extends Table{
 
         JumpCurve curve;
 
-        public JumpButton(@NonNull Prov<StatementElem> getter, Cons<StatementElem> setter){
+        public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter){
             super(Tex.logicNode, Styles.colori);
 
             to = getter;

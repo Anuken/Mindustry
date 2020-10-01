@@ -66,7 +66,7 @@ public class AmmoTypes implements ContentList{
     }
 
     public static class ItemAmmoType extends AmmoType{
-        public @NonNull Item item;
+        public Item item;
 
         public ItemAmmoType(Item item){
             this.item = item;

@@ -19,7 +19,7 @@ public class GameState{
     /** Whether the game is in game over state. */
     public boolean gameOver = false, serverPaused = false, wasTimeout;
     /** Map that is currently being played on. */
-    public @NonNull Map map = emptyMap;
+    public Map map = emptyMap;
     /** The current game rules. */
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */

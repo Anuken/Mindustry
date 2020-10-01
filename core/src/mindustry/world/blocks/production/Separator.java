@@ -3,12 +3,11 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -18,7 +17,7 @@ import mindustry.world.meta.values.*;
  * Extracts a random list of items from an input item and an input liquid.
  */
 public class Separator extends Block{
-    public @NonNull ItemStack[] results;
+    public ItemStack[] results;
     public float craftTime;
 
     public @Load("@-liquid") TextureRegion liquidRegion;

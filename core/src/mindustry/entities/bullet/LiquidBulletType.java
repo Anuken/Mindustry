@@ -13,7 +13,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class LiquidBulletType extends BulletType{
-    public @NonNull Liquid liquid;
+    public Liquid liquid;
     public float puddleSize = 6f;
 
     public LiquidBulletType(@Nullable Liquid liquid){

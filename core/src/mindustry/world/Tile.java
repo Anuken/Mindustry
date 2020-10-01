@@ -26,9 +26,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     /** Tile entity, usually null. */
     public @Nullable Building build;
     public short x, y;
-    protected @NonNull Block block;
-    protected @NonNull Floor floor;
-    protected @NonNull Floor overlay;
+    protected Block block;
+    protected Floor floor;
+    protected Floor overlay;
     protected boolean changing = false;
 
     public Tile(int x, int y){
@@ -130,15 +130,15 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return block.solid && !block.synthetic() && block.fillsTile;
     }
 
-    public @NonNull Floor floor(){
+    public Floor floor(){
         return floor;
     }
 
-    public @NonNull Block block(){
+    public Block block(){
         return block;
     }
 
-    public @NonNull Floor overlay(){
+    public Floor overlay(){
         return overlay;
     }
 
@@ -173,11 +173,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return team().id;
     }
 
-    public void setBlock(@NonNull Block type, Team team, int rotation){
+    public void setBlock(Block type, Team team, int rotation){
         setBlock(type, team, rotation, type::newBuilding);
     }
 
-    public void setBlock(@NonNull Block type, Team team, int rotation, Prov<Building> entityprov){
+    public void setBlock(Block type, Team team, int rotation, Prov<Building> entityprov){
         changing = true;
 
         if(type.isStatic() || this.block.isStatic()){
@@ -232,16 +232,16 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         changing = false;
     }
 
-    public void setBlock(@NonNull Block type, Team team){
+    public void setBlock(Block type, Team team){
         setBlock(type, team, 0);
     }
 
-    public void setBlock(@NonNull Block type){
+    public void setBlock(Block type){
         setBlock(type, Team.derelict, 0);
     }
 
     /** This resets the overlay! */
-    public void setFloor(@NonNull Floor type){
+    public void setFloor(Floor type){
         this.floor = type;
         this.overlay = (Floor)Blocks.air;
 
@@ -252,7 +252,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     /** Sets the floor, preserving overlay.*/
-    public void setFloorUnder(@NonNull Floor floor){
+    public void setFloorUnder(Floor floor){
         Block overlay = this.overlay;
         setFloor(floor);
         setOverlay(overlay);
@@ -326,7 +326,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         setOverlay(content.block(ore));
     }
 
-    public void setOverlay(@NonNull Block block){
+    public void setOverlay(Block block){
         this.overlay = (Floor)block;
 
         recache();

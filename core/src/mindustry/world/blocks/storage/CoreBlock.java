@@ -154,7 +154,7 @@ public class CoreBlock extends StorageBlock{
     public class CoreBuild extends Building implements ControlBlock{
         public int storageCapacity;
         //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
-        public @NonNull BlockUnitc unit = Nulls.blockUnit;
+        public BlockUnitc unit = Nulls.blockUnit;
 
         @Override
         public void created(){

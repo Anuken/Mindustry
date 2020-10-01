@@ -74,7 +74,7 @@ public class Team implements Comparable<Team>{
 
     /** @return the core items for this team, or an empty item module.
      * Never add to the resulting item module, as it is mutable. */
-    public @NonNull ItemModule items(){
+    public ItemModule items(){
         return core() == null ? ItemModule.empty : core().items;
     }
 

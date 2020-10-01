@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 
 public class StatusFieldAbility extends Ability{
-    public @NonNull StatusEffect effect;
+    public StatusEffect effect;
     public float duration = 60, reload = 100, range = 20;
     public Effect applyEffect = Fx.heal;
     public Effect activeEffect = Fx.overdriveWave;
@@ -17,7 +17,7 @@ public class StatusFieldAbility extends Ability{
 
     StatusFieldAbility(){}
 
-    public StatusFieldAbility(@NonNull StatusEffect effect, float duration, float reload, float range){
+    public StatusFieldAbility(StatusEffect effect, float duration, float reload, float range){
         this.duration = duration;
         this.reload = reload;
         this.range = range;

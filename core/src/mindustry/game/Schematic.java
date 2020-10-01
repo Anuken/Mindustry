@@ -21,7 +21,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     /** Associated mod. If null, no mod is associated with this schematic. */
     public @Nullable LoadedMod mod;
 
-    public Schematic(Seq<Stile> tiles, @NonNull StringMap tags, int width, int height){
+    public Schematic(Seq<Stile> tiles, StringMap tags, int width, int height){
         this.tiles = tiles;
         this.tags = tags;
         this.width = width;
@@ -52,7 +52,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         return tiles.contains(s -> s.block instanceof CoreBlock);
     }
 
-    public @NonNull CoreBlock findCore(){
+    public CoreBlock findCore(){
         Stile tile = tiles.find(s -> s.block instanceof CoreBlock);
         if(tile == null) throw new IllegalArgumentException("Schematic is missing a core!");
         return (CoreBlock)tile.block;
@@ -118,7 +118,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     public static class Stile{
-        public @NonNull Block block;
+        public Block block;
         public short x, y;
         public Object config;
         public byte rotation;

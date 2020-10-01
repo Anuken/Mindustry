@@ -1,11 +1,10 @@
 package mindustry.world.blocks.defense.turrets;
 
-import arc.util.ArcAnnotate.*;
 import mindustry.entities.bullet.*;
 import mindustry.world.meta.*;
 
 public class PowerTurret extends Turret{
-    public @NonNull BulletType shootType;
+    public BulletType shootType;
     public float powerUse = 1f;
 
     public PowerTurret(String name){

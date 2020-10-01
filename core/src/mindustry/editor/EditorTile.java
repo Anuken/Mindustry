@@ -19,7 +19,7 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setFloor(@NonNull Floor type){
+    public void setFloor(Floor type){
         if(skip()){
             super.setFloor(type);
             return;

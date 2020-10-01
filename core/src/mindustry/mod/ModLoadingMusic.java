@@ -5,7 +5,7 @@ import arc.mock.*;
 import arc.util.ArcAnnotate.*;
 
 public class ModLoadingMusic implements Music{
-    public @NonNull Music music = new MockMusic();
+    public Music music = new MockMusic();
 
     @Override
     public void play(){
