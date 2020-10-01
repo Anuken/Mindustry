@@ -59,7 +59,7 @@ public class OverdriveProjector extends Block{
             }
         }
 
-        if(boosterUnlocked) {
+        if(hasBoost && boosterUnlocked) {
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
             float transparency = Time.time() %90f / 90f;
             //expanding circle
