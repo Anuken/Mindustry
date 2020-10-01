@@ -220,7 +220,7 @@ public class BlockIndexer{
 
     public void notifyTileDamaged(Building entity){
         if(damagedTiles[entity.team.id] == null){
-            damagedTiles[entity.team.id] = new ObjectSet<Building>();
+            damagedTiles[entity.team.id] = new ObjectSet<>();
         }
 
         damagedTiles[entity.team.id].add(entity);

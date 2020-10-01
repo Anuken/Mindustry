@@ -459,6 +459,10 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            if(selected != null){
+                Call.tileTap(player, selected);
+            }
+
             BuildPlan req = getRequest(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){

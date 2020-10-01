@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -78,11 +79,8 @@ public class Separator extends Block{
         public void draw(){
             super.draw();
 
-            Draw.color(liquids.current().color);
-            Draw.alpha(liquids.total() / liquidCapacity);
-            Draw.rect(liquidRegion, x, y);
+            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
 
-            Draw.reset();
             if(Core.atlas.isFound(spinnerRegion)){
                 Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);
             }

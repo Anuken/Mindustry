@@ -1,6 +1,7 @@
 package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
+import mindustry.graphics.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.world.meta.*;
 
@@ -44,10 +45,7 @@ public class Fracker extends SolidPump{
             Draw.rect(region, x, y);
             super.drawCracks();
 
-            Draw.color(result.color);
-            Draw.alpha(liquids.get(result) / liquidCapacity);
-            Draw.rect(liquidRegion, x, y);
-            Draw.color();
+            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, result.color);
 
             Draw.rect(rotatorRegion, x, y, pumpTime);
             Draw.rect(topRegion, x, y);

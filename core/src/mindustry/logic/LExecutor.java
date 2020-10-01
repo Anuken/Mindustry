@@ -577,7 +577,7 @@ public class LExecutor{
             if(address != -1){
                 Var va = exec.vars[value];
                 Var vb = exec.vars[compare];
-                boolean cmp = false;
+                boolean cmp;
 
                 if(op.objFunction != null && (va.isobj || vb.isobj)){
                     //use object function if provided, and one of the variables is an object

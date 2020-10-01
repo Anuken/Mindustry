@@ -103,7 +103,6 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        //TODO nearGround is just the inverse of nearLiquid?
         boolean nearLiquid = false, nearSolid = false, nearGround = false;
 
         for(int i = 0; i < 4; i++){
@@ -469,7 +468,7 @@ public class Pathfinder implements Runnable{
         /** search frontier, these are Pos objects */
         IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */
-        IntSeq targets = new IntSeq();
+        final IntSeq targets = new IntSeq();
         /** current search ID */
         int search = 1;
         /** last updated time */

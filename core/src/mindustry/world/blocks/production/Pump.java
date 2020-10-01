@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.game.*;
 import mindustry.type.*;
+import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
@@ -85,10 +86,7 @@ public class Pump extends LiquidBlock{
         public void draw(){
             Draw.rect(name, x, y);
 
-            Draw.color(liquids.current().color);
-            Draw.alpha(liquids.total() / liquidCapacity);
-            Draw.rect(liquidRegion, x, y);
-            Draw.color();
+            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
         }
 
         @Override
