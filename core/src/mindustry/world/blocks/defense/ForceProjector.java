@@ -106,7 +106,8 @@ public class ForceProjector extends Block{
             Lines.stroke(3f);
             Draw.alpha(1f - expandProgress);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
-            Draw.tint(player.team().color.lerp, phaseColor, expandProgress);
+            Draw.reset();
+            Draw.tint(player.team().color, phaseColor, expandProgress);
             Lines.stroke(1f);
             Draw.alpha(1f - expandProgress);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
