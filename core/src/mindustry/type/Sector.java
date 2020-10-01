@@ -3,7 +3,6 @@ package mindustry.type;
 import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
-import arc.struct.ObjectIntMap.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -152,6 +151,26 @@ public class Sector{
         }else{
             ItemSeq recv = getExtraItems();
 
+            if(save != null){
+                //"shave off" extra items
+
+                ItemSeq count = new ItemSeq();
+
+                //add items already present
+                count.add(save.meta.secinfo.coreItems);
+
+                count.add(calculateReceivedItems());
+
+                int capacity = save.meta.secinfo.storageCapacity;
+
+                //when over capacity, add that to the extra items
+                count.each((i, a) -> {
+                    if(a > capacity){
+                        recv.remove(i, (a - capacity));
+                    }
+                });
+            }
+
             recv.remove(item, amount);
 
             setExtraItems(recv);
@@ -166,21 +185,19 @@ public class Sector{
             count.add(state.rules.defaultTeam.items());
         }else if(save != null){
             //add items already present
-            for(Entry<Item> ent : save.meta.secinfo.coreItems){
-                count.add(ent.key, ent.value);
-            }
+            count.add(save.meta.secinfo.coreItems);
 
             count.add(calculateReceivedItems());
 
             int capacity = save.meta.secinfo.storageCapacity;
 
             //validation
-            for(Item item : content.items()){
+            count.each((item, amount) -> {
                 //ensure positive items
-                if(count.get(item) < 0) count.set(item, 0);
+                if(amount < 0) count.set(item, 0);
                 //cap the items
-                if(count.get(item) > capacity) count.set(item, capacity);
-            }
+                if(amount > capacity) count.set(item, capacity);
+            });
         }
 
         return count;
@@ -196,7 +213,7 @@ public class Sector{
             save.meta.secinfo.production.each((item, stat) -> count.add(item, (int)(stat.mean * seconds)));
 
             //add received items
-            getExtraItems().each(count::add);
+            count.add(getExtraItems());
         }
 
         return count;
@@ -244,14 +261,14 @@ public class Sector{
         return Core.settings.getFloat(key("time-spent"));
     }
 
-    public void setSecondsPassed(long number){
-        put("seconds-passed", number);
+    public void setSecondsPassed(int number){
+        put("secondsi-passed", number);
     }
 
     /** @return how much time has passed in this sector without the player resuming here.
      * Used for resource production calculations. */
-    public long getSecondsPassed(){
-        return Core.settings.getLong(key("seconds-passed"));
+    public int getSecondsPassed(){
+        return Core.settings.getInt(key("secondsi-passed"));
     }
 
     private String key(String key){
