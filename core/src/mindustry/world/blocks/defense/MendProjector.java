@@ -75,7 +75,7 @@ public class MendProjector extends Block{
                 Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
             }
             
-            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f
+            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
             //expanding circle
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, baseColor.lerp(phaseColor, expandProgress), 1f - expandProgress);
 
