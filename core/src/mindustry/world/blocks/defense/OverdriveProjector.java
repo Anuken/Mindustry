@@ -59,17 +59,19 @@ public class OverdriveProjector extends Block{
         }
 
         if(hasBoost && boosterUnlocked) {
+            //expanding circle
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRangeBoost, phaseColor, 1f - (Time.time() % 90f / 90f));
+
+            //outside circle
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.25f);
+
+            //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
                 close.trns(i, 0, range - sin);
                 far.trns(i, 0, range + phaseRangeBoost);
                 Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
             }
-            //expanding circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRangeBoost, phaseColor, 1f - ((Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f));
-
-            //outside circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
         }
     }
 
