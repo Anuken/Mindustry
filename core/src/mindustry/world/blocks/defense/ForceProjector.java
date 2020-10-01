@@ -106,11 +106,11 @@ public class ForceProjector extends Block{
             Lines.stroke(3f);
             Draw.alpha(1f - expandProgress);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
-            Draw.color(player.team().color.lerp(phaseColor, expandProgress));
+            Draw.tint(player.team().color.lerp, phaseColor, expandProgress);
             Lines.stroke(1f);
             Draw.alpha(1f - expandProgress);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
-            Draw.color();
+            Draw.reset();
 
             //outside circle
             Draw.color(Pal.gray);
@@ -121,7 +121,7 @@ public class ForceProjector extends Block{
             Lines.stroke(1f);
             Draw.alpha(0.5f);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
-            Draw.color();
+            Draw.reset();
         }
     }
 
