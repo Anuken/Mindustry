@@ -68,9 +68,17 @@ public class OverdriveProjector extends Block{
             }
             
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
-            Draw.tint(baseColor, phaseColor, expandProgress);
             //expanding circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, Draw.getMixColor(), 1f - expandProgress);
+            Draw.color(Pal.gray);
+            Lines.stroke(3f);
+            Draw.alpha(1f - expandProgress);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost);
+            Draw.reset();
+            Draw.tint(baseColor, phaseColor, expandProgress);
+            Lines.stroke(1f);
+            Draw.alpha(1f - expandProgress);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost);
+            Draw.reset();
 
             //outside circle
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
