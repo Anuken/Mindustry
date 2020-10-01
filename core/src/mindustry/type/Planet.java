@@ -24,7 +24,7 @@ public class Planet extends UnlockableContent{
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
-    public PlanetMesh mesh;
+    public @Nullable PlanetMesh mesh;
     /** Position in global coordinates. Will be 0,0,0 until the Universe updates it. */
     public Vec3 position = new Vec3();
     /** Grid used for the sectors on the planet. Null if this planet can't be landed on. */
@@ -32,7 +32,7 @@ public class Planet extends UnlockableContent{
     /** Generator that will make the planet. Can be null for planets that don't need to be landed on. */
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
-    public @NonNull Seq<Sector> sectors;
+    public Seq<Sector> sectors;
     /** Radius of this planet's sphere. Does not take into account sattelites. */
     public float radius;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
@@ -60,7 +60,7 @@ public class Planet extends UnlockableContent{
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
-    public @NonNull Planet solarSystem;
+    public Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
     public Seq<Planet> children = new Seq<>();
     /** Sattelites orbiting this planet. */

@@ -87,8 +87,8 @@ public class BuilderAI extends AIController{
             }
 
             //find new request
-            if(!unit.team().data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
-                Queue<BlockPlan> blocks = unit.team().data().blocks;
+            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
+                Queue<BlockPlan> blocks = unit.team.data().blocks;
                 BlockPlan block = blocks.first();
 
                 //check if it's already been placed

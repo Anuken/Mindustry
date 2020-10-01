@@ -152,7 +152,7 @@ public abstract class Turret extends Block{
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
-        public @NonNull BlockUnitc unit = Nulls.blockUnit;
+        public BlockUnitc unit = Nulls.blockUnit;
 
         @Override
         public float range(){

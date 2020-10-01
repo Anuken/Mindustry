@@ -34,7 +34,7 @@ public class Bullets implements ContentList{
     standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //liquid
-    waterShot, cryoShot, slagShot, oilShot,
+    waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
 
     //environment, misc.
     damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag;
@@ -471,6 +471,50 @@ public class Bullets implements ContentList{
 
         oilShot = new LiquidBulletType(Liquids.oil){{
             drag = 0.03f;
+        }};
+
+        heavyWaterShot = new LiquidBulletType(Liquids.water){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.7f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
+        }};
+
+        heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
+        }};
+
+        heavySlagShot = new LiquidBulletType(Liquids.slag){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            damage = 6f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+        }};
+
+        heavyOilShot = new LiquidBulletType(Liquids.oil){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
         }};
 
         driverBolt = new MassDriverBolt();

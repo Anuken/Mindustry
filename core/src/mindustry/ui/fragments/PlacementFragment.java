@@ -124,18 +124,17 @@ public class PlacementFragment extends Fragment{
                     for(int j = 0; j < blocks.size; j++){
                         if(blocks.get(j) == currentBlock){
                             switch(i){
-                                case 10: //left
-                                    j = (j - 1 + blocks.size) % blocks.size;
-                                    break;
-                                case 11: //right
-                                    j = (j + 1) % blocks.size;
-                                    break;
-                                case 12: //up
+                                //left
+                                case 10 -> j = (j - 1 + blocks.size) % blocks.size;
+                                //right
+                                case 11 -> j = (j + 1) % blocks.size;
+                                //up
+                                case 12 -> {
                                     j = (j > 3 ? j - 4 : blocks.size - blocks.size % 4 + j);
                                     j -= (j < blocks.size ? 0 : 4);
-                                    break;
-                                case 13: //down
-                                    j = (j < blocks.size - 4 ? j + 4 : j % 4);
+                                }
+                                //down
+                                case 13 -> j = (j < blocks.size - 4 ? j + 4 : j % 4);
                             }
                             input.block = blocks.get(j);
                             selectedBlocks.put(currentCategory, input.block);

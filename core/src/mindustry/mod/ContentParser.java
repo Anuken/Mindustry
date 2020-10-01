@@ -37,7 +37,7 @@ public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
 
-    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
+    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
@@ -440,6 +440,8 @@ public class ContentParser{
     }
 
     public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
+        Log.err("Error for @ / @:\n@\n", content, file, Strings.getStackTrace(error));
+
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
         content.minfo.error = makeError(error, file);
@@ -545,7 +547,7 @@ public class ContentParser{
             try{
                 if(field.field.getType().isPrimitive()) return;
 
-                if(field.field.isAnnotationPresent(NonNull.class) && field.field.get(object) == null){
+                if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null){
                     throw new RuntimeException("'" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
                 }
             }catch(Exception e){

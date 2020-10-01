@@ -299,7 +299,7 @@ project(":core"){
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
-        annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.3.0'
+        annotationProcessor 'com.github.Anuken:jabel:40eec868af'
 
     }
 }

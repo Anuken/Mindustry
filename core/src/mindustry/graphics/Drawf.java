@@ -97,17 +97,15 @@ public class Drawf{
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color, float rotation){
-        Draw.color(color);
-        Draw.alpha(alpha);
+        Draw.color(color, alpha);
         Draw.rect(region, x, y, rotation);
-        Draw.reset();
+        Draw.color();
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color){
-        Draw.color(color);
-        Draw.alpha(alpha);
+        Draw.color(color, alpha);
         Draw.rect(region, x, y);
-        Draw.reset();
+        Draw.color();
     }
 
     public static void dashCircle(float x, float y, float rad, Color color){

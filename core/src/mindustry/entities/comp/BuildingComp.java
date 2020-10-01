@@ -421,7 +421,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @param todump payload to dump.
      * @return whether the payload was moved successfully
      */
-    public boolean movePayload(@NonNull Payload todump){
+    public boolean movePayload(Payload todump){
         int trns = block.size/2 + 1;
         Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
@@ -438,7 +438,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @param todump payload to dump.
      * @return whether the payload was moved successfully
      */
-    public boolean dumpPayload(@NonNull Payload todump){
+    public boolean dumpPayload(Payload todump){
         if(proximity.size == 0) return false;
 
         int dump = this.dump;

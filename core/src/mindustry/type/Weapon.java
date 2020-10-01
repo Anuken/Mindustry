@@ -4,7 +4,6 @@ import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -16,7 +15,7 @@ public class Weapon{
     /** displayed weapon region */
     public String name;
     /** bullet shot */
-    public @NonNull BulletType bullet;
+    public BulletType bullet;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */

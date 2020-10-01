@@ -13,7 +13,7 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class LiquidBulletType extends BulletType{
-    public @NonNull Liquid liquid;
+    public Liquid liquid;
     public float puddleSize = 6f;
 
     public LiquidBulletType(@Nullable Liquid liquid){
@@ -25,7 +25,7 @@ public class LiquidBulletType extends BulletType{
         }
 
         ammoMultiplier = 1f;
-        lifetime = 74f;
+        lifetime = 34f;
         statusDuration = 60f * 2f;
         despawnEffect = Fx.none;
         hitEffect = Fx.hitLiquid;
@@ -62,7 +62,7 @@ public class LiquidBulletType extends BulletType{
     public void draw(Bullet b){
         Draw.color(liquid.color, Color.white, b.fout() / 100f);
 
-        Fill.circle(b.x, b.y, 3f);
+        Fill.circle(b.x, b.y, puddleSize / 2);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class LiquidBulletType extends BulletType{
         Puddles.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
-            float intensity = 400f;
+            float intensity = 400f * puddleSize/6f;
             Fires.extinguish(world.tileWorld(hitx, hity), intensity);
             for(Point2 p : Geometry.d4){
                 Fires.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);

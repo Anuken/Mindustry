@@ -695,9 +695,9 @@ public class Administration{
     /** Defines a (potentially dangerous) action that a player has done in the world.
      * These objects are pooled; do not cache them! */
     public static class PlayerAction implements Poolable{
-        public @NonNull Player player;
-        public @NonNull ActionType type;
-        public @NonNull Tile tile;
+        public Player player;
+        public ActionType type;
+        public Tile tile;
 
         /** valid for block placement events only */
         public @Nullable Block block;
