@@ -994,6 +994,13 @@ public class Blocks implements ContentList{
             size = 2;
         }};
 
+        splitter = new Router("splitter"){{
+            requirements(Category.distribution, with(Items.lead, 3, Items.copper, 5, Items.titanium, 2, Items.thorium, 1));
+            size = 3;
+            health = 450;
+            speed = 3;
+        }};
+
         overflowGate = new OverflowGate("overflow-gate"){{
             requirements(Category.distribution, with(Items.lead, 2, Items.copper, 4));
             buildCostMultiplier = 3f;
