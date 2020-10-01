@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, flame, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, brazier, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //units
     commandCenter,
@@ -1551,7 +1551,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.missile;
         }};
         
-        flame = new ItemTurret("flame"){{
+        brazier = new ItemTurret("brazier"){{
             requirements(Category.turret, with(Items.metaglass, 70, Items.titanium, 120, Items.plastanium, 65, Items.silicon, 95));
             ammo(
             Items.blastCompound, Bullets.missileMinBlast,
