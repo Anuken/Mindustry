@@ -72,12 +72,12 @@ public class OverdriveProjector extends Block{
             Draw.color(Pal.gray);
             Lines.stroke(3f);
             Draw.alpha(1f - expandProgress);
-            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRangeBoost);
             Draw.reset();
             Draw.tint(baseColor, phaseColor, expandProgress);
             Lines.stroke(1f);
             Draw.alpha(1f - expandProgress);
-            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRangeBoost);
             Draw.reset();
 
             //outside circle
