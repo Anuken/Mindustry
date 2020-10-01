@@ -99,7 +99,8 @@ public class ForceProjector extends Block{
         if(hasBoost && boosterUnlocked) {
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
             float transparency = Time.time() % 90f / 90f;
-            //expanding circle
+
+            //expanding hexagon
             Draw.color(Pal.gray);
             Lines.stroke(3f);
             Draw.alpha(1f - transparency);
@@ -111,7 +112,7 @@ public class ForceProjector extends Block{
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
             Draw.reset();
 
-            //outside circle
+            //outside hexagon
             Draw.color(Pal.gray);
             Lines.stroke(3f);
             Draw.alpha(0.25f);
