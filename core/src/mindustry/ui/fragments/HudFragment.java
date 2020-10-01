@@ -33,10 +33,6 @@ public class HudFragment extends Fragment{
 
     public final PlacementFragment blockfrag = new PlacementFragment();
 
-    //TODO localize
-    public String sectorText = "Out of sector time.";
-    public Seq<Sector> attackedSectors = new Seq<>();
-
     private ImageButton flip;
     private Table lastUnlockTable;
     private Table lastUnlockLayout;
@@ -66,6 +62,20 @@ public class HudFragment extends Fragment{
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
             coreItems.clear();
+        });
+
+        Events.on(TurnEvent.class, e -> {
+            Seq<Sector> attacked = universe.getAttacked(state.getSector().planet);
+
+            if(attacked.any()){
+
+                //TODO localize
+                String text = attacked.size > 1 ? attacked.size + " sectors attacked." : "Sector " + attacked.first().id + " under attack.";
+
+                showToast(Icon.warning, text);
+            }
+
+            //ui.announce("[accent][[ Turn " + universe.turn() + " ]\n[scarlet]" + attackedSectors.size + "[lightgray] sector(s) attacked.");
         });
 
         //paused table
@@ -271,37 +281,6 @@ public class HudFragment extends Fragment{
             });
             t.table(Tex.button, top -> top.add("@coreattack").pad(2)
             .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
-        });
-
-        //paused table for when the player is out of time
-        parent.fill(t -> {
-            t.top().visible(() -> false);
-            t.table(Styles.black5, top -> {
-                //TODO localize
-                top.add(sectorText).style(Styles.outlineLabel).color(Pal.accent).update(l -> {
-                    l.color.a = Mathf.absin(Time.globalTime(), 7f, 1f);
-                    l.setText(sectorText);
-                }).colspan(2);
-                top.row();
-
-                top.defaults().pad(2).size(150f, 54f);
-                //TODO localize
-                top.button("Skip", () -> {
-                    universe.runTurn();
-                    state.set(State.playing);
-
-                    //announce turn info only when something is skipped.
-                    ui.announce("[accent][[ Turn " + universe.turn() + " ]\n[scarlet]" + attackedSectors.size + "[lightgray] sector(s) attacked.");
-                });
-
-                //TODO localize
-                top.button("Switch Sectors", () -> {
-                    ui.paused.runExitSave();
-
-                    //switch to first attacked sector
-                    control.playSector(attackedSectors.first());
-                }).disabled(b -> attackedSectors.isEmpty());
-            }).margin(8).growX();
         });
 
         //tutorial text

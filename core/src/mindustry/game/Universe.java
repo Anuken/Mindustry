@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -54,25 +53,9 @@ public class Universe{
         }
     }
 
-    public void displayTimeEnd(){
-        if(!headless){
-            //check if any sectors are under attack to display this
-            Seq<Sector> attacked = state.getSector().planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed() && s.getSecondsPassed() > 1);
-
-            if(attacked.any()){
-                state.set(State.paused);
-
-                //TODO localize
-                String text = attacked.size > 1 ? attacked.size + " sectors attacked." : "Sector " + attacked.first().id + " under attack.";
-
-                ui.hudfrag.sectorText = text;
-                ui.hudfrag.attackedSectors = attacked;
-                ui.announce(text);
-            }else{
-                //autorun next turn
-                universe.runTurn();
-            }
-        }
+    /** @return sectors attacked on the current planet, minus the ones that are being played on right now. */
+    public Seq<Sector> getAttacked(Planet planet){
+        return planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed() && s.getSecondsPassed() > 1);
     }
 
     /** Update planet rotations, global time and relevant state. */

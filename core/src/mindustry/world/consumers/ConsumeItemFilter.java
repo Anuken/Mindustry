@@ -13,8 +13,7 @@ import mindustry.world.meta.values.*;
 import static mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
-    public final @NonNull
-    Boolf<Item> filter;
+    public final @NonNull Boolf<Item> filter;
 
     public ConsumeItemFilter(Boolf<Item> item){
         this.filter = item;

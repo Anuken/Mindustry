@@ -1580,13 +1580,13 @@ public class Blocks implements ContentList{
             requirements(Category.turret, with(Items.silicon, 130, Items.thorium, 80, Items.phasefabric, 40));
 
             health = 250 * size * size;
-            range = 140f;
+            range = 160f;
             hasPower = true;
             consumes.powerCond(8f, (PointDefenseBuild b) -> b.target != null);
             size = 2;
             shootLength = 5f;
             bulletDamage = 25f;
-            reloadTime = 10f;
+            reloadTime = 9f;
         }};
 
         tsunami = new LiquidTurret("tsunami"){{
@@ -1701,7 +1701,7 @@ public class Blocks implements ContentList{
                 trailEffect = Fx.instTrail;
                 despawnEffect = Fx.instBomb;
                 trailSpacing = 20f;
-                damage = 1250;
+                damage = 1350;
                 tileDamageMultiplier = 0.5f;
                 speed = brange;
                 hitShake = 6f;
