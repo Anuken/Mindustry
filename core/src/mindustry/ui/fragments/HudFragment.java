@@ -70,7 +70,7 @@ public class HudFragment extends Fragment{
 
         //paused table
         parent.fill(t -> {
-            t.top().visible(() -> state.isPaused() && !state.isOutOfTime()).touchable = Touchable.disabled;
+            t.top().visible(() -> state.isPaused()).touchable = Touchable.disabled;
             t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
@@ -275,7 +275,7 @@ public class HudFragment extends Fragment{
 
         //paused table for when the player is out of time
         parent.fill(t -> {
-            t.top().visible(() -> state.isOutOfTime());
+            t.top().visible(() -> false);
             t.table(Styles.black5, top -> {
                 //TODO localize
                 top.add(sectorText).style(Styles.outlineLabel).color(Pal.accent).update(l -> {

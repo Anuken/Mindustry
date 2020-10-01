@@ -282,18 +282,6 @@ public class Logic implements ApplicationListener{
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
             }
 
-            //force pausing when the player is out of sector time
-            if(state.isOutOfTime()){
-                if(!state.wasTimeout){
-                    universe.displayTimeEnd();
-                    state.wasTimeout = true;
-                }
-                //if no turn was run.
-                if(state.isOutOfTime()){
-                    state.set(State.paused);
-                }
-            }
-
             if(!state.isPaused()){
                 if(state.isCampaign()){
                     state.secinfo.update();
