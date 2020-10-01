@@ -95,7 +95,7 @@ public class ForceProjector extends Block{
             float transparency = Time.time() % 90f / 90f;
 
             //expanding hexagon
-            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, phaseColor, expandProgress, 1f - transparency);
+            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost, player.team().color, phaseColor, expandProgress, 1f - transparency);
 
             //outside hexagon
             Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, 0.25f);
