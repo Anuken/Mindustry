@@ -323,10 +323,12 @@ public class TechTree implements ContentList{
 
                         node(salvo, () -> {
                             node(swarmer, () -> {
+                                node(flame, () -> {
                                 node(cyclone, () -> {
                                     node(spectre, () -> {
 
                                     });
+                                });
                                 });
                             });
 
