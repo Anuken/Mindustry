@@ -28,6 +28,7 @@ public class MendProjector extends Block{
     public float phaseBoost = 12f;
     public float phaseRangeBoost = 50f;
     public float useTime = 400f;
+    public boolean hasBoost = true;
     protected Vec2 close = new Vec2();
     protected Vec2 far = new Vec2();
 
@@ -50,9 +51,11 @@ public class MendProjector extends Block{
 
         stats.add(BlockStat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
         stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
-
-        stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        
+        if(hasBoost){
+            stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+            stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        }
     }
 
     @Override
@@ -68,7 +71,7 @@ public class MendProjector extends Block{
             }
         }
 
-        if(boosterUnlocked) {
+        if(hasBoost && boosterUnlocked) {
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
             float transparency = Time.time() % 90f / 90f;
             //expanding circle
@@ -105,9 +108,11 @@ public class MendProjector extends Block{
         public void updateTile(){
             heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
             charge += heat * delta();
-
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
-
+            
+            if(hasBoost){
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
+            }
+            
             if(cons.optionalValid() && timer(timerUse, useTime) && efficiency() > 0){
                 consume();
             }
@@ -127,7 +132,7 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            if(!cons().optionalValid()) {
+            if(!cons().optionalValid() || !hasBoost) {
                 indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
                 Drawf.dashCircle(x, y, realRange, baseColor);
             } else {
