@@ -74,7 +74,7 @@ public class Blocks implements ContentList{
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
 
     //turrets
-    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
+    duo, scatter, scorch, hail, arc, wave, lancer, swarmer, flame, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //units
     commandCenter,
@@ -1549,6 +1549,28 @@ public class Blocks implements ContentList{
             size = 2;
             health = 300 * size * size;
             shootSound = Sounds.missile;
+        }};
+        
+        flame = new ItemTurret("flame"){{
+            requirements(Category.turret, with(Items.metaglass, 70, Items.titanium, 120, Items.plastanium, 65, Items.silicon, 95));
+            ammo(
+            Items.blastCompound, Bullets.missileExplosive,
+            Items.pyratite, Bullets.missileIncendiary,
+            Items.sporePod, Bullets.missileSurge
+            );
+            health = 210f * size * size;
+            size = 3;
+            inaccuracy = 5f;
+            reloadTime = 2f;
+            alternate = true;
+            shots = 2;
+            range = 170f;
+            spread = 10f;
+            cooldown = 0.1f;
+            recoilAmount = 4f;
+            shootShake = 1.2f;
+            shootSound = Sounds.missile;
+            
         }};
 
         salvo = new ItemTurret("salvo"){{
