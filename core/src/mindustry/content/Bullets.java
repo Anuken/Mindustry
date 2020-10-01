@@ -27,7 +27,7 @@ public class Bullets implements ContentList{
     fragGlass, fragExplosive, fragPlastic, fragSurge, fragGlassFrag, fragPlasticFrag,
 
     //missiles
-    missileExplosive, missileIncendiary, missileSurge,
+    missileExplosive, missileIncendiary, missileSurge, missileMinSpore, missileMinBlast, missileMinPyro,
 
     //standard
     standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
@@ -280,6 +280,37 @@ public class Bullets implements ContentList{
             despawnEffect = Fx.blastExplosion;
             lightning = 2;
             lightningLength = 10;
+        }};
+        
+        missileMinSpore = new MissileBulletType(3f, 11){{
+            lifetime = 60f;
+            width = 5f;
+            height = 6f;
+            shootEffect = Fx.shootSmallFlame;
+            smokeEffect = Fx.shootBigSmoke;
+            hitEffect = Fx.hitFlameSmall;
+        }};
+
+        missileMinBlast = new MissileBulletType(3.5f, 13){{
+            lifetime = 60f;
+            width = 7f;
+            height = 9f;
+            shootEffect = Fx.shootSmallFlame;
+            smokeEffect = Fx.shootBigSmoke;
+            hitEffect = Fx.hitFlameSmall;
+            splashDamageRadius = 18f;
+            splashDamage = 8;
+        }};
+        
+        missileMinPyro = new MissileBulletType(3.2f, 15){{
+            lifetime = 60f;
+            width = 7f;
+            height = 8f;
+            shootEffect = Fx.shootSmallFlame;
+            smokeEffect = Fx.shootBigSmoke;
+            hitEffect = Fx.hitFlameSmall;
+            status = StatusEffects.burning;
+            statusDuration = 100f;
         }};
 
         standardCopper = new BasicBulletType(2.5f, 9){{

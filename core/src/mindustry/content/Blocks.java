@@ -1554,9 +1554,9 @@ public class Blocks implements ContentList{
         flame = new ItemTurret("flame"){{
             requirements(Category.turret, with(Items.metaglass, 70, Items.titanium, 120, Items.plastanium, 65, Items.silicon, 95));
             ammo(
-            Items.blastCompound, Bullets.missileExplosive,
-            Items.pyratite, Bullets.missileIncendiary,
-            Items.sporePod, Bullets.missileSurge
+            Items.blastCompound, Bullets.missileMinBlast,
+            Items.pyratite, Bullets.missileMinPyro,
+            Items.sporePod, Bullets.missileMinSpore
             );
             health = 210f * size * size;
             size = 3;
