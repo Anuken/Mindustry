@@ -65,6 +65,9 @@ public class UnitType extends UnlockableContent{
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
 
+    public int ammoResupplyAmount = 10;
+    public float ammoResupplyRange = 100f;
+
     public float mechSideSway = 0.54f, mechFrontSway = 0.1f;
     public float mechStride = -1f;
     public float mechStepShake = -1f;

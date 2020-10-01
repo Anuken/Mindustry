@@ -50,7 +50,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad;
 
     //air + building + payload + command
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, Commanderc.class}) UnitType oct;
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, Commanderc.class, AmmoDistributec.class}) UnitType oct;
 
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
@@ -1314,6 +1314,9 @@ public class UnitTypes implements ContentList{
             buildSpeed = 4f;
             drawShields = false;
             commandLimit = 6;
+
+            ammoCapacity = 1300;
+            ammoResupplyAmount = 20;
 
             abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
         }};
