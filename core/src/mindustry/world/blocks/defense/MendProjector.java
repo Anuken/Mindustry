@@ -81,12 +81,12 @@ public class MendProjector extends Block{
             Draw.color(Pal.gray);
             Lines.stroke(3f);
             Draw.alpha(1f - expandProgress);
-            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRangeBoost);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
             Draw.reset();
             Draw.tint(baseColor, phaseColor, expandProgress);
             Lines.stroke(1f);
             Draw.alpha(1f - expandProgress);
-            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRangeBoost);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
             Draw.reset();
             
             //outside circle
