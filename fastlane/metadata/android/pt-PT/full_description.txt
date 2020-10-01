@@ -1,0 +1,14 @@
+Cria e elabora e fornece correntes de correias transportadoras para aumentar a munição das tuas torretas, produz materiais para usar em construções, e defende as tuas estruturas de ondas de inimigos. Joga com os teus amigos em multiplataforma multijogador jogos cooperativos, ou desafia eles em batalhas em equipa modo PvP.
+
+Recursos incluidos:
+- 24 mapas integrados
+- Uma campanha completa com uma estrutura tecnológica em árvore e áreas para desbloquear
+- 4 ondas de chefes poderosas para derrotar
+- Sistema de transporte de Energias, Líquidos e Itens
+- 19 tipos diferentes de drones, mechas e navios
+- Mais de 120 blocos de tecnologia para dominar
+- Mais de 75 diferentes blocos de ambiente
+- Multijogador multiplataforma através de redes locais ou servidores dedicados
+- Regras personalizadas do jogo: altere os custos de bloqueio, estatísticas do inimigo, itens iniciais, tempo das ondas e muito mais
+- Um editor poderoso, com ferramentas para gerar aleatoriamente minérios, terrenos, decoração e aplicar simetria a mapas
+- Layouts de rondas de mapa personalizáveis

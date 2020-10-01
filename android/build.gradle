@@ -8,6 +8,8 @@ buildscript{
     }
 
     dependencies{
+        //IMPORTANT NOTICE: any version of the plugin after 3.4.1 will break builds
+        //it appears abstract methods don't get desugared properly (if at all)
         classpath 'com.android.tools.build:gradle:3.4.1'
     }
 }
@@ -19,9 +21,7 @@ configurations{ natives }
 repositories{
     mavenCentral()
     jcenter()
-    maven{
-        url "https://maven.google.com"
-    }
+    maven{ url "https://maven.google.com" }
 }
 
 dependencies{
@@ -29,16 +29,13 @@ dependencies{
 
     implementation arcModule("backends:backend-android")
     implementation 'com.jakewharton.android.repackaged:dalvik-dx:9.0.0_r3'
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
-    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
-    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
-    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
-    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+
+    natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
+    natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
+    natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
+
+    //android dependencies magically disappear during compilation, thanks gradle!
+    if(new File(projectDir.parent, '../Arc').exists()) compileOnly fileTree(dir: '../../Arc/backends/backend-android/libs', include: ['*.jar'])
 }
 
 task deploy(type: Copy){
@@ -50,7 +47,7 @@ task deploy(type: Copy){
 }
 
 android{
-    buildToolsVersion '29.0.2'
+    buildToolsVersion '29.0.3'
     compileSdkVersion 29
     sourceSets{
         main{
@@ -102,7 +99,7 @@ android{
                 keyAlias RELEASE_KEY_ALIAS
                 keyPassword RELEASE_KEY_PASSWORD
             }else{
-                println("No keystore info property found!")
+                println("No keystore property found. Releases will be unsigned.")
             }
         }
     }
@@ -119,25 +116,11 @@ android{
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
 task copyAndroidNatives(){
-    file("libs/armeabi/").mkdirs()
-    file("libs/armeabi-v7a/").mkdirs()
-    file("libs/arm64-v8a/").mkdirs()
-    file("libs/x86_64/").mkdirs()
-    file("libs/x86/").mkdirs()
-
     configurations.natives.files.each{ jar ->
-        def outputDir = null
-        if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-        if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-        if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-        if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-        if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-        if(outputDir != null){
-            copy{
-                from zipTree(jar)
-                into outputDir
-                include "*.so"
-            }
+        copy{
+            from zipTree(jar)
+            into file("libs/")
+            include "**"
         }
     }
 }
@@ -161,5 +144,5 @@ task run(type: Exec){
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/io.anuke.mindustry.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'io.anuke.mindustry/mindustry.android.AndroidLauncher'
 }

@@ -1,0 +1,14 @@
+Crea elaboradas cadenas de suministros para cargar tus torretas, produce materiales para crear estructuras y defiendelas de oleadas de enemigos. Juega con tus amigos en un multijugador cooperativo multiplataforma, o pelea contra ellos en batallas PvP por equipos.
+
+Características:
+- 24 mapas oficiales integrados
+- Una campaña, con un completo árbol de tecnologias y áreas desbloqueables
+- 4 poderosos jefes de oleada que derrotar
+- Sistemas de transporte de energía, minerales y líquidos
+- 19 tipos de drones, mecanoides y naves
+- Mas de 120 bloques desbloqueables por tecnologias
+- Más de 75 bloques de ambiente, con distintos biomas por descubrir.
+- Multijugador multiplataforma tanto por redes locales (LAN) como en servidores dedicados.
+- Reglas personalizadas: Configura costos, fuerza de los enemigos, recursos iniciales, tiempo entre oleadas, y más
+- Un poderoso editor, con herramientas para generar terreno y ores automaticamente, decorar y aplicar simetría.
+- Oleadas personalizables.

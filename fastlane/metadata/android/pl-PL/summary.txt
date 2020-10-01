@@ -1,1 +1,1 @@
-Bazująca na przetrwaniu i zarządzaniu fabryką sandboxowa gra typu obrony wieży.
+Bazująca na przetrwaniu i zarządzaniu fabryką sandboxowa gra typu tower-defense.
