@@ -59,13 +59,24 @@ public class OverdriveProjector extends Block{
             }
         }
 
-        if(hasBoost && boosterUnlocked) {
+        if(boosterUnlocked) {
+            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+            float transparency = Time.time() %90f / 90f;
             //expanding circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRangeBoost, phaseColor, 1f - (Time.time() % 90f / 90f));
-
+            Draw.color(Pal.gray);
+            Lines.stroke(3f);
+            Draw.alpha(1f - transparency);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
+            Draw.reset();
+            Draw.tint(baseColor, phaseColor, expandProgress);
+            Lines.stroke(1f);
+            Draw.alpha(1f - transparency);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
+            Draw.reset();
+            
             //outside circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.25f);
-
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
+            
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
@@ -73,21 +84,6 @@ public class OverdriveProjector extends Block{
                 far.trns(i, 0, range + phaseRangeBoost);
                 Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
             }
-            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
-            //expanding circle
-            Draw.color(Pal.gray);
-            Lines.stroke(3f);
-            Draw.alpha(1f - expandProgress);
-            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
-            Draw.reset();
-            Draw.tint(baseColor, phaseColor, expandProgress);
-            Lines.stroke(1f);
-            Draw.alpha(1f - expandProgress);
-            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
-            Draw.reset();
-
-            //outside circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
         }
     }
 
