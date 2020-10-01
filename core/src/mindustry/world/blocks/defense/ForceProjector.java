@@ -93,23 +93,17 @@ public class ForceProjector extends Block{
         }
 
         if(boosterUnlocked) {
-            float sin = Mathf.absin(Time.time(), 6f, 1f);
-            for(int i = 0; i < 360; i += 60){
-                close.trns(i, 0, radius - sin);
-                far.trns(i, 0, radius + phaseRadiusBoost);
-                Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRadiusBoost/4f + sin, 4f + sin, phaseColor);
-            }
-            
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+            float transparency = Time.time() % 90f / 90f;
             //expanding circle
             Draw.color(Pal.gray);
             Lines.stroke(3f);
-            Draw.alpha(1f - expandProgress);
+            Draw.alpha(1f - transparency);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
             Draw.reset();
             Draw.tint(player.team().color, phaseColor, expandProgress);
             Lines.stroke(1f);
-            Draw.alpha(1f - expandProgress);
+            Draw.alpha(1f - transparency);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
             Draw.reset();
 
