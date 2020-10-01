@@ -5,6 +5,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.AmmoTypes.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -53,10 +54,10 @@ public class ResupplyPoint extends Block{
     public static boolean resupply(Building tile, float range, int ammoAmount, Color ammoColor){
         if(!state.rules.unitAmmo) return false;
 
-        Unit unit = Units.closest(tile.team, tile.x, tile.y, range, u -> u.ammo() <= u.type().ammoCapacity - ammoAmount);
+        Unit unit = Units.closest(tile.team, tile.x, tile.y, range, u -> u.type().ammoType instanceof ItemAmmoType && u.ammo <= u.type().ammoCapacity - ammoAmount);
         if(unit != null){
             Fx.itemTransfer.at(tile.x, tile.y, ammoAmount / 2f, ammoColor, unit);
-            unit.ammo(Math.min(unit.ammo() + ammoAmount, unit.type().ammoCapacity));
+            unit.ammo = Math.min(unit.ammo + ammoAmount, unit.type().ammoCapacity);
             return true;
         }
 

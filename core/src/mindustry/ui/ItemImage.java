@@ -8,15 +8,17 @@ import mindustry.type.*;
 public class ItemImage extends Stack{
 
     public ItemImage(TextureRegion region, int amount){
-        Table t = new Table().left().bottom();
-        t.add(amount + "").name("item-label");
-        t.pack();
 
         add(new Table(o -> {
             o.left();
             o.add(new Image(region)).size(32f);
         }));
-        add(t);
+
+        add(new Table(t -> {
+            t.left().bottom();
+            t.add(amount + "");
+            t.pack();
+        }));
     }
 
     public ItemImage(TextureRegion region){
@@ -27,12 +29,18 @@ public class ItemImage extends Stack{
     }
 
     public ItemImage(ItemStack stack){
-        add(new Image(stack.item.icon(Cicon.medium)));
+
+        add(new Table(o -> {
+            o.left();
+            o.add(new Image(stack.item.icon(Cicon.medium))).size(32f);
+        }));
 
         if(stack.amount != 0){
-            Table t = new Table().left().bottom();
-            t.add(stack.amount + "").name("item-label").style(Styles.outlineLabel);
-            add(t);
+            add(new Table(t -> {
+                t.left().bottom();
+                t.add(stack.amount + "").style(Styles.outlineLabel);
+                t.pack();
+            }));
         }
     }
 }

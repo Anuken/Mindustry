@@ -155,7 +155,7 @@ public class Shaders{
             setUniformf("u_progress", progress);
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
-            setUniformf("u_texsize", region.texture.getWidth(), region.texture.height);
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 
@@ -175,7 +175,7 @@ public class Shaders{
             setUniformf("u_uv", region.u, region.v);
             setUniformf("u_uv2", region.u2, region.v2);
             setUniformf("u_time", Time.time());
-            setUniformf("u_texsize", region.texture.getWidth(), region.texture.height);
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 

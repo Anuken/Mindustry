@@ -163,6 +163,19 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
+    @Override
+    public Dialog show(){
+        Core.app.post(() -> {
+            if(net.client()){
+                //TODO make this not display every time
+                //TODO rework this in the future
+                ui.showInfo("@campaign.multiplayer");
+            }
+        });
+
+        return super.show();
+    }
+
     void treeLayout(){
         float spacing = 20f;
         LayoutNode node = new LayoutNode(root, null);

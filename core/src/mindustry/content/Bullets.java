@@ -34,7 +34,7 @@ public class Bullets implements ContentList{
     standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //liquid
-    waterShot, cryoShot, slagShot, oilShot,
+    waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
 
     //environment, misc.
     damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag;
@@ -42,7 +42,7 @@ public class Bullets implements ContentList{
     @Override
     public void load(){
 
-        artilleryDense = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryDense = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -63,7 +63,7 @@ public class Bullets implements ContentList{
             collidesAir = false;
         }};
 
-        artilleryPlastic = new ArtilleryBulletType(3.4f, 12, "shell"){{
+        artilleryPlastic = new ArtilleryBulletType(3.4f, 20, "shell"){{
             hitEffect = Fx.plasticExplosion;
             knockback = 1f;
             lifetime = 80f;
@@ -77,7 +77,7 @@ public class Bullets implements ContentList{
             frontColor = Pal.plastaniumFront;
         }};
 
-        artilleryHoming = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryHoming = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -91,7 +91,7 @@ public class Bullets implements ContentList{
             homingRange = 50f;
         }};
 
-        artilleryIncendiary = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryIncendiary = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -105,7 +105,7 @@ public class Bullets implements ContentList{
             trailEffect = Fx.incendTrail;
         }};
 
-        artilleryExplosive = new ArtilleryBulletType(2f, 12, "shell"){{
+        artilleryExplosive = new ArtilleryBulletType(2f, 20, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -375,10 +375,9 @@ public class Bullets implements ContentList{
         }};
 
         //this is just a copy of the damage lightning bullet that doesn't damage air units
-        damageLightningGround = new BulletType(0.0001f, 0f){{
-            collidesAir = false;
-        }};
+        damageLightningGround = new BulletType(0.0001f, 0f){};
         JsonIO.copy(damageLightning, damageLightningGround);
+        damageLightningGround.collidesAir = false;
 
         healBullet = new HealBulletType(5.2f, 13){{
             healPercent = 3f;
@@ -472,6 +471,50 @@ public class Bullets implements ContentList{
 
         oilShot = new LiquidBulletType(Liquids.oil){{
             drag = 0.03f;
+        }};
+
+        heavyWaterShot = new LiquidBulletType(Liquids.water){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.7f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
+        }};
+
+        heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
+        }};
+
+        heavySlagShot = new LiquidBulletType(Liquids.slag){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            damage = 6f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+        }};
+
+        heavyOilShot = new LiquidBulletType(Liquids.oil){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
         }};
 
         driverBolt = new MassDriverBolt();

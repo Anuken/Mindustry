@@ -43,7 +43,8 @@ public class Pathfinder implements Runnable{
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
-            (PathTile.deep(tile) ? 70 : 0),
+            (PathTile.deep(tile) ? 6000 : 0) +
+            (PathTile.damages(tile) ? 30 : 0),
 
         //legs
         (team, tile) -> PathTile.legSolid(tile) ? impassable : 1 +
@@ -52,7 +53,8 @@ public class Pathfinder implements Runnable{
         //water
         (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 + //TODO cannot go through blocks - pathfinding isn't great
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
-            (PathTile.deep(tile) ? -1 : 0)
+            (PathTile.deep(tile) ? -1 : 0) +
+            (PathTile.damages(tile) ? 35 : 0)
     );
 
     //maps team, cost, type to flow field
@@ -101,7 +103,6 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        //TODO nearGround is just the inverse of nearLiquid?
         boolean nearLiquid = false, nearSolid = false, nearGround = false;
 
         for(int i = 0; i < 4; i++){
@@ -114,7 +115,7 @@ public class Pathfinder implements Runnable{
         }
 
         return PathTile.get(
-            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 127),
+            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 80),
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,
@@ -122,7 +123,8 @@ public class Pathfinder implements Runnable{
             nearLiquid,
             nearGround,
             nearSolid,
-            tile.floor().isDeep()
+            tile.floor().isDeep(),
+            tile.floor().damageTaken > 0.00001f
         );
     }
 
@@ -466,7 +468,7 @@ public class Pathfinder implements Runnable{
         /** search frontier, these are Pos objects */
         IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */
-        IntSeq targets = new IntSeq();
+        final IntSeq targets = new IntSeq();
         /** current search ID */
         int search = 1;
         /** last updated time */
@@ -514,5 +516,7 @@ public class Pathfinder implements Runnable{
         boolean nearSolid;
         //whether this block is deep / drownable
         boolean deep;
+        //whether the floor damages
+        boolean damages;
     }
 }

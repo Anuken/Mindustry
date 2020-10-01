@@ -8,6 +8,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -29,17 +30,17 @@ import static mindustry.Vars.*;
 @Component(base = true)
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable{
 
-    @Import boolean hovering;
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health;
-    @Import boolean dead;
+    @Import boolean hovering, dead;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo;
     @Import Team team;
     @Import int id;
 
     private UnitController controller;
     private UnitType type;
-    boolean spawnedByCore, deactivated; //TODO remove deactivation boolean
+    boolean spawnedByCore;
 
     transient Seq<Ability> abilities = new Seq<>(0);
+    private transient float resupplyTime = Mathf.random(10f);
 
     public void moveAt(Vec2 vector){
         moveAt(vector, type.accel);
@@ -69,29 +70,33 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Replace
     public float clipSize(){
-        return type.region.width * 2f;
+        return Math.max(type.region.width * 2f, type.clipSize);
     }
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.totalItems) return stack().amount;
-        if(sensor == LAccess.rotation) return rotation;
-        if(sensor == LAccess.health) return health;
-        if(sensor == LAccess.maxHealth) return maxHealth;
-        if(sensor == LAccess.x) return x;
-        if(sensor == LAccess.y) return y;
-        if(sensor == LAccess.team) return team.id;
-        if(sensor == LAccess.shooting) return isShooting() ? 1 : 0;
-        if(sensor == LAccess.shootX) return aimX();
-        if(sensor == LAccess.shootY) return aimY();
-        return 0;
+        return switch(sensor){
+            case totalItems -> stack().amount;
+            case rotation -> rotation;
+            case health -> health;
+            case maxHealth -> maxHealth;
+            case x -> x;
+            case y -> y;
+            case team -> team.id;
+            case shooting -> isShooting() ? 1 : 0;
+            case shootX -> aimX();
+            case shootY -> aimY();
+            default -> 0;
+        };
     }
 
     @Override
     public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.type) return type;
+        return switch(sensor){
+            case type -> type;
+            default -> noSensed;
+        };
 
-        return noSensed;
     }
 
     @Override
@@ -103,7 +108,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     @Replace
     public boolean canDrown(){
-        return isGrounded() && !hovering && type.canDrown && !(this instanceof WaterMovec);
+        return isGrounded() && !hovering && type.canDrown;
+    }
+
+    @Override
+    @Replace
+    public boolean canShoot(){
+        //cannot shoot while boosting
+        return !(type.canBoost && isFlying());
     }
 
     @Override
@@ -149,8 +161,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type;
     }
 
+    /** @return pathfinder path type for calculating costs */
+    public int pathType(){
+        return Pathfinder.costGround;
+    }
+
     public void lookAt(float angle){
-        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta);
+        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta * speedMultiplier());
     }
 
     public void lookAt(Position pos){
@@ -178,7 +195,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.maxHealth = type.health;
         this.drag = type.drag;
         this.armor = type.armor;
-        this.hitSize = type.hitsize;
+        this.hitSize = type.hitSize;
         this.hovering = type.hovering;
 
         if(controller == null) controller(type.createController());
@@ -206,12 +223,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void add(){
 
         //check if over unit cap
-        if(count() > cap() && !spawnedByCore){
-            deactivated = true;
-
-            if(!dead){
-                Call.unitCapDeath(self());
-            }
+        if(count() > cap() && !spawnedByCore && !dead){
+            Call.unitCapDeath(self());
+            teamIndex.updateCount(team, type, -1);
         }
     }
 
@@ -232,22 +246,23 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void update(){
-        //activate the unit when possible
-        if(!net.client() && deactivated && teamIndex.countActive(team, type) < Units.getCap(team)){
-            teamIndex.updateActiveCount(team, type, 1);
-            deactivated = false;
+
+        type.update(self());
+
+        if(state.rules.unitAmmo && ammo < type.ammoCapacity - 0.0001f){
+            resupplyTime += Time.delta;
+
+            //resupply only at a fixed interval to prevent lag
+            if(resupplyTime > 10f){
+                type.ammoType.resupply(self());
+                resupplyTime = 0f;
+            }
         }
 
-        if(!deactivated){
-            type.update(self());
-
-            if(abilities.size > 0){
-                for(Ability a : abilities){
-                    a.update(self());
-                }
+        if(abilities.size > 0){
+            for(Ability a : abilities){
+                a.update(self());
             }
-        }else if(!dead){
-            Call.unitCapDeath(self());
         }
 
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
@@ -305,29 +320,26 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             if(floor.damageTaken > 0f){
                 damageContinuous(floor.damageTaken);
             }
+        }
 
-            if(tile.solid()){
-                if(type.canBoost){
-                    elevation = 1f;
-                }else if(!net.client()){
-                    kill();
-                }
+        //kill entities on tiles that are solid to them
+        if(tile != null && !canPassOn()){
+            //boost if possible
+            if(type.canBoost){
+                elevation = 1f;
+            }else if(!net.client()){
+                kill();
             }
         }
 
         //AI only updates on the server
-        if(!net.client() && !dead && !deactivated){
+        if(!net.client() && !dead){
             controller.updateUnit();
         }
 
         //clear controller when it becomes invalid
         if(!controller.isValidController()){
             resetController();
-        }
-
-        //do not control anything when deactivated
-        if(deactivated){
-            controlWeapons(false, false);
         }
 
         //remove units spawned by the core
@@ -362,13 +374,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying){
-            Damage.damage(team,x, y, hitSize * 1.1f, hitSize * type.crashDamageMultiplier, true, false, true);
+            Damage.damage(team,x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 5f, true, false, true);
         }
 
         if(!headless){
             for(int i = 0; i < type.wreckRegions.length; i++){
                 if(type.wreckRegions[i].found()){
-                    float range = type.hitsize/4f;
+                    float range = type.hitSize /4f;
                     Tmp.v1.rnd(range);
                     Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
                 }
@@ -409,7 +421,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         dead = true;
 
         //don't waste time when the unit is already on the ground, just destroy it
-        if(isGrounded()){
+        if(!type.flying){
             destroy();
         }
     }

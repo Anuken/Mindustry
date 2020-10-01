@@ -25,15 +25,15 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     boolean canPickup(Unit unit){
-        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity;
+        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f;
     }
 
     boolean canPickup(Building build){
-        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity;
+        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f;
     }
 
     boolean canPickupPayload(Payload pay){
-        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity;
+        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity + 0.001f;
     }
 
     boolean hasPayload(){
@@ -98,7 +98,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Unit u = payload.unit;
 
         //can't drop ground units
-        if(((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f) || (!floorOn().isLiquid && u instanceof WaterMovec)){
+        if(!u.canPass(tileX(), tileY())){
             return false;
         }
 
@@ -122,7 +122,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Building tile = payload.entity;
         int tx = Vars.world.toTile(x - tile.block.offset), ty = Vars.world.toTile(y - tile.block.offset);
         Tile on = Vars.world.tile(tx, ty);
-        if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation)){
+        if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
 

@@ -14,7 +14,6 @@ public class TeamIndexProcess implements AsyncProcess{
     private QuadTree<Unit>[] trees = new QuadTree[Team.all.length];
     private int[] counts = new int[Team.all.length];
     private int[][] typeCounts = new int[Team.all.length][0];
-    private int[][] activeCounts = new int[Team.all.length][0];
 
     public QuadTree<Unit> tree(Team team){
         if(trees[team.id] == null) trees[team.id] = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
@@ -30,10 +29,6 @@ public class TeamIndexProcess implements AsyncProcess{
         return typeCounts[team.id].length <= type.id ? 0 : typeCounts[team.id][type.id];
     }
 
-    public int countActive(Team team, UnitType type){
-        return activeCounts[team.id].length <= type.id ? 0 : activeCounts[team.id][type.id];
-    }
-
     public void updateCount(Team team, UnitType type, int amount){
         counts[team.id] += amount;
         if(typeCounts[team.id].length <= type.id){
@@ -42,16 +37,8 @@ public class TeamIndexProcess implements AsyncProcess{
         typeCounts[team.id][type.id] += amount;
     }
 
-    public void updateActiveCount(Team team, UnitType type, int amount){
-        if(activeCounts[team.id].length <= type.id){
-            activeCounts[team.id] = new int[Vars.content.units().size];
-        }
-        activeCounts[team.id][type.id] += amount;
-    }
-
     private void count(Unit unit){
         updateCount(unit.team, unit.type(), 1);
-        if(!unit.deactivated) updateActiveCount(unit.team, unit.type(), 1);
 
         if(unit instanceof Payloadc){
             ((Payloadc)unit).payloads().each(p -> {
@@ -77,7 +64,6 @@ public class TeamIndexProcess implements AsyncProcess{
             }
 
             Arrays.fill(typeCounts[team.id], 0);
-            Arrays.fill(activeCounts[team.id], 0);
         }
 
         Arrays.fill(counts, 0);

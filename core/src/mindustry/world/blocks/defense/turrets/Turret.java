@@ -14,6 +14,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -51,7 +52,7 @@ public abstract class Turret extends Block{
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
-    public float rotatespeed = 5f; //in degrees per tick
+    public float rotateSpeed = 5f; //in degrees per tick
     public float shootCone = 8f;
     public float shootShake = 0f;
     /** Positioning stuff*/
@@ -73,6 +74,7 @@ public abstract class Turret extends Block{
     public float coolantMultiplier = 5f;
     /** Effect displayed when coolant is used. */
     public Effect coolEffect = Fx.fuelburn;
+    public Sortf unitSort = Unit::dst2;
 
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
@@ -208,6 +210,7 @@ public abstract class Turret extends Block{
 
             tr2.trns(rotation, -recoil);
 
+            Drawf.shadow(region, x + tr2.x - (size / 2f), y + tr2.y - (size / 2f), rotation - 90);
             drawer.get(this);
 
             if(heatRegion != Core.atlas.find("error")){
@@ -311,14 +314,14 @@ public abstract class Turret extends Block{
 
         protected void findTarget(){
             if(targetAir && !targetGround){
-                target = Units.closestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded());
+                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded(), unitSort);
             }else{
-                target = Units.closestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround));
+                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> true, unitSort);
             }
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotatespeed * delta() * baseReloadSpeed());
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed());
         }
 
         public boolean shouldTurn(){
@@ -390,7 +393,7 @@ public abstract class Turret extends Block{
         }
 
         protected void bullet(BulletType type, float angle){
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
 
             type.create(this, team, x + tr.x, y + tr.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
         }

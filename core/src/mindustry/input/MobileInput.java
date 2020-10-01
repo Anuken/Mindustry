@@ -558,6 +558,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
+
+        Call.tileTap(player, cursor);
+
         Tile linked = cursor.build == null ? cursor : cursor.build.tile;
 
         if(!player.dead()){
@@ -804,7 +807,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(type == null) return;
 
         boolean flying = type.flying;
-        boolean omni = !(unit instanceof WaterMovec);
+        boolean omni = unit.type().omniMovement;
         boolean legs = unit.isGrounded();
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&

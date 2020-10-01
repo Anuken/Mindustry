@@ -39,11 +39,11 @@ deploy:
   on:
     repo: Anuken/Mindustry
     tags: true
-- provider: script
-  script: bash update_wiki.sh
-  on:
-    repo: Anuken/Mindustry
-    tags: true
+#- provider: script
+#  script: bash update_wiki.sh
+#  on:
+#    repo: Anuken/Mindustry
+#    tags: true
 env:
   global:
   - secure: TqlUl/ojjkCMVOGbCTKz7Cnr4F08UyWzY/CiJ0vvUOGJGZ1qm7XavAlDf5XT0egU4mvr37THubFO8vojbqmrmy0oZnYh3njKFA8axgyZ8PyKkjGHOfd0i6qyEWsOr9H90/2X8r3LwEeLaDFyHpu3wljIGBjweg53g2qwmDwCFa9UR80FJZ+xDB+rD6B3cXT0DTEkCoLZXLqXm0Y3HvBdSuBL1LR/FNb2BSxNq+tNLGiz1kdQZV5erausbbZypBoGxzz63xAnyz2kkFz73A8xQYVTzGbFodTPz7HM13GVZ5s43I03Y+HYyHBgBaSLziO2hi2kzVJccOwzBp7wS4fs1MqsFY5+IeWJ9k+hm89NiYT7+6zlEgoUMlIniny1qLqWTzx7btUeuC/y/h5TVBNgaV+z0jmHycHfeSyq5I+vmX4J8qe3wmaN8TcdqYKU5nIznOTk3CM5Fzu0Bs9vkCkOxmormmcjMFW1RbdOLc/hpZWZggsBA88sNEAI8eq+r5QEeqzeCx8YKoZDjdrsqvgLMc3El3gS9oMGxkn0Y/TEcqs9Tc4BXtTkqIA68hD0DYzlAxYjVbbkAI9Hh9lHNvV3Dr/oCkGXQ/HflM143kj1L3tSBZpqeqQE2XhngB5nqpS3OZTmZbMTQ8qD2luU18yaTGMLF5tJS/fdKPRx0gQ1kL8=

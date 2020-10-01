@@ -24,7 +24,7 @@ public class Units{
         if(unit != null){
             unit.dead = true;
             Fx.unitCapKill.at(unit);
-            Core.app.post(() -> Call.unitDeath(unit.id));
+            Core.app.post(() -> Call.unitDestroy(unit.id));
         }
     }
 
@@ -39,6 +39,21 @@ public class Units{
 
         if(unit != null){
             unit.killed();
+        }
+    }
+
+    //destroys immediately
+    @Remote(called = Loc.server)
+    public static void unitDestroy(int uid){
+        Unit unit = Groups.unit.getByID(uid);
+
+        //if there's no unit don't add it later and get it stuck as a ghost
+        if(netClient != null){
+            netClient.addRemovedEntity(uid);
+        }
+
+        if(unit != null){
+            unit.destroy();
         }
     }
 
@@ -160,6 +175,18 @@ public class Units{
         }
     }
 
+    /** Returns the closest target enemy. First, units are checked, then tile entities. */
+    public static Teamc bestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Building> tilePred, Sortf sort){
+        if(team == Team.derelict) return null;
+
+        Unit unit = bestEnemy(team, x, y, range, unitPred, sort);
+        if(unit != null){
+            return unit;
+        }else{
+            return findEnemyTile(team, x, y, range, tilePred);
+        }
+    }
+
     /** Returns the closest enemy of this team. Filter by predicate. */
     public static Unit closestEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate){
         if(team == Team.derelict) return null;
@@ -171,6 +198,26 @@ public class Units{
             if(e.dead() || !predicate.get(e)) return;
 
             float dst2 = e.dst2(x, y);
+            if(dst2 < range*range && (result == null || dst2 < cdist)){
+                result = e;
+                cdist = dst2;
+            }
+        });
+
+        return result;
+    }
+
+    /** Returns the closest enemy of this team using a custom comparison function. Filter by predicate. */
+    public static Unit bestEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate, Sortf sort){
+        if(team == Team.derelict) return null;
+
+        result = null;
+        cdist = 0f;
+
+        nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
+            if(e.dead() || !predicate.get(e)) return;
+
+            float dst2 = sort.cost(e, x, y);
             if(dst2 < range*range && (result == null || dst2 < cdist)){
                 result = e;
                 cdist = dst2;
@@ -282,4 +329,7 @@ public class Units{
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
     }
 
+    public interface Sortf{
+        float cost(Unit unit, float x, float y);
+    }
 }

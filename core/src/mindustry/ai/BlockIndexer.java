@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.EnumSet;
 import arc.struct.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -165,6 +166,11 @@ public class BlockIndexer{
         return flagMap[team.id][type.ordinal()];
     }
 
+    @Nullable
+    public Tile findClosestFlag(float x, float y, Team team, BlockFlag flag){
+        return Geometry.findClosest(x, y, getAllied(team, flag));
+    }
+
     public boolean eachBlock(Teamc team, float range, Boolf<Building> pred, Cons<Building> cons){
         return eachBlock(team.team(), team.getX(), team.getY(), range, pred, cons);
     }
@@ -214,7 +220,7 @@ public class BlockIndexer{
 
     public void notifyTileDamaged(Building entity){
         if(damagedTiles[entity.team.id] == null){
-            damagedTiles[entity.team.id] = new ObjectSet<Building>();
+            damagedTiles[entity.team.id] = new ObjectSet<>();
         }
 
         damagedTiles[entity.team.id].add(entity);

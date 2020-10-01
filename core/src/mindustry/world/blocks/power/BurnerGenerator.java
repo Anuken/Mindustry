@@ -1,6 +1,7 @@
 package mindustry.world.blocks.power;
 
 import arc.graphics.g2d.*;
+import mindustry.graphics.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.type.*;
 
@@ -39,6 +40,10 @@ public class BurnerGenerator extends ItemLiquidGenerator{
                 Draw.rect(turbineRegions[1], x, y, -totalTime * turbineSpeed);
 
                 Draw.rect(capRegion, x, y);
+
+                if(hasLiquids){
+                    Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
+                }
             }
         }
     }

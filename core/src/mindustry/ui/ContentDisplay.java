@@ -130,7 +130,7 @@ public class ContentDisplay{
 
     public static void displayUnit(Table table, UnitType unit){
         table.table(title -> {
-            title.image(unit.icon(Cicon.xlarge));
+            title.image(unit.icon(Cicon.xlarge)).size(8 * 6).scaling(Scaling.fit);
             title.add("[accent]" + unit.localizedName).padLeft(5);
         });
 

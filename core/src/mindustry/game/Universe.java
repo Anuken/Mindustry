@@ -20,7 +20,7 @@ public class Universe{
     private int turn;
 
     private Schematic lastLoadout;
-    private Seq<ItemStack> lastLaunchResources = new Seq<>();
+    private ItemSeq lastLaunchResources = new ItemSeq();
 
     public Universe(){
         load();
@@ -104,14 +104,14 @@ public class Universe{
         }
     }
 
-    public Seq<ItemStack> getLaunchResources(){
-        lastLaunchResources = Core.settings.getJson("launch-resources", Seq.class, ItemStack.class, Seq::new);
+    public ItemSeq getLaunchResources(){
+        lastLaunchResources = Core.settings.getJson("launch-resources-seq", ItemSeq.class, ItemSeq::new);
         return lastLaunchResources;
     }
 
-    public void updateLaunchResources(Seq<ItemStack> stacks){
+    public void updateLaunchResources(ItemSeq stacks){
         this.lastLaunchResources = stacks;
-        Core.settings.putJson("launch-resources", ItemStack.class, lastLaunchResources);
+        Core.settings.putJson("launch-resources-seq", lastLaunchResources);
     }
 
     /** Updates selected loadout for future deployment. */
@@ -165,7 +165,20 @@ public class Universe{
                             //if so, just delete the save for now. it's lost.
                             //TODO don't delete it later maybe
                             sector.save.delete();
+                            //clear recieved
+                            sector.setExtraItems(new ItemSeq());
                             sector.save = null;
+                        }
+                    }
+
+                    //export to another sector
+                    if(sector.save != null && sector.save.meta != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.destination != null){
+                        Sector to = sector.save.meta.secinfo.destination;
+                        if(to.save != null){
+                            ItemSeq items = to.getExtraItems();
+                            //calculated exported items to this sector
+                            sector.save.meta.secinfo.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed)));
+                            to.setExtraItems(items);
                         }
                     }
 

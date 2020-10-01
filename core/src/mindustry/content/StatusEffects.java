@@ -9,7 +9,7 @@ import mindustry.type.StatusEffect;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed;
+    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed;
 
     @Override
     public void load(){
@@ -43,6 +43,14 @@ public class StatusEffects implements ContentList{
                     result.set(this, time);
                 }));
             });
+        }};
+
+        unmoving = new StatusEffect("unmoving"){{
+            speedMultiplier = 0.001f;
+        }};
+
+        slow = new StatusEffect("slow"){{
+            speedMultiplier = 0.4f;
         }};
 
         wet = new StatusEffect("wet"){{

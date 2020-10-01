@@ -109,6 +109,9 @@ public class TechTree implements ContentList{
 
                 node(Items.coal, with(Items.lead, 3000), () -> {
                     node(Items.graphite, with(Items.coal, 1000), () -> {
+                        node(illuminator, () -> {
+                        });
+
                         node(graphitePress, () -> {
                             node(Items.titanium, with(Items.graphite, 6000, Items.copper, 10000, Items.lead, 10000), () -> {
                                 node(pneumaticDrill, () -> {
@@ -211,7 +214,9 @@ public class TechTree implements ContentList{
                                                 });
 
                                                 node(memoryCell, () -> {
+                                                    node(memoryBank, () -> {
 
+                                                    });
                                                 });
                                             });
 
@@ -263,7 +268,7 @@ public class TechTree implements ContentList{
                             node(steamGenerator, () -> {
                                 node(thermalGenerator, () -> {
                                     node(differentialGenerator, () -> {
-                                        node(thoriumReactor, () -> {
+                                        node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
                                             node(impactReactor, () -> {
 
                                             });
@@ -342,11 +347,17 @@ public class TechTree implements ContentList{
 
                                 });
                             });
+
+                            node(tsunami, () -> {
+
+                            });
                         });
 
                         node(lancer, () -> {
-                            node(meltdown, () -> {
+                            node(foreshadow, () -> {
+                                node(meltdown, () -> {
 
+                                });
                             });
 
                             node(shockMine, () -> {
@@ -376,7 +387,11 @@ public class TechTree implements ContentList{
                     node(nova, () -> {
                         node(pulsar, () -> {
                             node(quasar, () -> {
+                                node(vela, () -> {
+                                    node(corvus, () -> {
 
+                                    });
+                                });
                             });
                         });
                     });
@@ -409,7 +424,11 @@ public class TechTree implements ContentList{
                         node(mono, () -> {
                             node(poly, () -> {
                                 node(mega, () -> {
+                                    node(quad, () -> {
+                                        node(oct, () -> {
 
+                                        });
+                                    });
                                 });
                             });
                         });
@@ -538,7 +557,7 @@ public class TechTree implements ContentList{
     }
 
     public static TechNode node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
-        TechNode node = new TechNode(content, empty, children);
+        TechNode node = new TechNode(content, content.researchRequirements(), children);
         node.objectives = objectives;
         return node;
     }

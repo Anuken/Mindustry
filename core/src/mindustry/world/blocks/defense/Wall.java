@@ -1,6 +1,7 @@
 package mindustry.world.blocks.defense;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -20,11 +21,13 @@ public class Wall extends Block{
     public float lightningDamage = 20f;
     public int lightningLength = 17;
     public Color lightningColor = Pal.surge;
+    public Sound lightningSound = Sounds.spark;
 
     public float chanceDeflect = 10f;
     public boolean flashHit;
     public Color flashColor = Color.white;
     public boolean deflect;
+    public Sound deflectSound = Sounds.none;
 
     public Wall(String name){
         super(name);
@@ -32,6 +35,7 @@ public class Wall extends Block{
         destructible = true;
         group = BlockGroup.walls;
         buildCostMultiplier = 5f;
+        canOverdrive = false;
     }
 
     @Override
@@ -55,7 +59,8 @@ public class Wall extends Block{
 
     @Override
     public boolean canReplace(Block other){
-        return super.canReplace(other) && health > other.health && size == other.size;
+        if(other.alwaysReplace) return true;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && other != this && size >= other.size;
     }
 
     public class WallBuild extends Building{
@@ -94,6 +99,7 @@ public class Wall extends Block{
             if(lightningChance > 0){
                 if(Mathf.chance(lightningChance)){
                     Lightning.create(team, lightningColor, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
+                    lightningSound.at(tile, Mathf.random(0.9f, 1.1f));
                 }
             }
 
@@ -104,6 +110,9 @@ public class Wall extends Block{
 
                 //bullet reflection chance depends on bullet damage
                 if(!Mathf.chance(chanceDeflect / bullet.damage())) return true;
+
+                //make sound
+                deflectSound.at(tile, Mathf.random(0.9f, 1.1f));
 
                 //translate bullet back to where it was upon collision
                 bullet.trns(-bullet.vel.x, -bullet.vel.y);

@@ -107,7 +107,9 @@ public class ConstructBlock extends Block{
 
     public static void constructed(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
         Call.constructFinish(tile, block, builder, rotation, team, config);
-        tile.build.placed();
+        if(tile.build != null){
+            tile.build.placed();
+        }
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));

@@ -113,7 +113,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Payloadc pay = (Payloadc)unit;
 
         if(target.isAI() && target.isGrounded() && pay.canPickup(target)
-        && target.within(unit, unit.type().hitsize * 2f + target.type().hitsize * 2f)){
+        && target.within(unit, unit.type().hitSize * 2f + target.type().hitSize * 2f)){
             Call.pickedUnitPayload(player, target);
         }
     }
@@ -274,6 +274,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Core.app.post(() -> Events.fire(new ConfigEvent(tile, player, value)));
     }
 
+    //only useful for servers or local mods, and is not replicated across clients
+    //uses unreliable packets due to high frequency
+    @Remote(targets = Loc.both, called = Loc.both, unreliable = true)
+    public static void tileTap(@Nullable Player player, Tile tile){
+        if(tile == null) return;
+
+        Events.fire(new TapEvent(player, tile));
+    }
+
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void unitControl(Player player, @Nullable Unit unit){
         if(player == null) return;
@@ -292,7 +301,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
-        }else if(unit.isAI() && unit.team == player.team() && !unit.deactivated() && !unit.dead){
+        }else if(unit.isAI() && unit.team == player.team() && !unit.dead){
             if(!net.client()){
                 player.unit(unit);
             }
@@ -365,7 +374,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         if(controlledType != null && player.dead()){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated() && !u.dead);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.dead);
 
             if(unit != null){
                 Call.unitControl(player, unit);
@@ -375,7 +384,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void checkUnit(){
         if(controlledType != null){
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.deactivated() && !u.dead);
+            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type() == controlledType && !u.dead);
             if(unit == null && controlledType == UnitTypes.block){
                 unit = world.buildWorld(player.x, player.y) instanceof ControlBlock ? ((ControlBlock)world.buildWorld(player.x, player.y)).unit() : null;
             }
@@ -395,7 +404,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(!(unit instanceof Payloadc)) return;
         Payloadc pay = (Payloadc)unit;
 
-        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitsize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+        Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitSize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
         if(target != null){
             Call.requestUnitPayload(player, target);
         }else{
@@ -931,7 +940,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI() && !u.deactivated());
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI());
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);

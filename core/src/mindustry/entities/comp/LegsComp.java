@@ -4,15 +4,15 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.EntityCollisions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
-
-import static mindustry.Vars.*;
 
 @Component
 abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
@@ -26,8 +26,14 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
     @Replace
     @Override
-    public void move(float cx, float cy){
-        collisions.moveCheck(this, cx, cy, !type.allowLegStep ? EntityCollisions::solid : EntityCollisions::legsSolid);
+    public SolidPred solidity(){
+        return !type.allowLegStep ? EntityCollisions::solid : EntityCollisions::legsSolid;
+    }
+
+    @Override
+    @Replace
+    public int pathType(){
+        return Pathfinder.costLegs;
     }
 
     @Override

@@ -45,13 +45,12 @@ public class GroundAI extends AIController{
             }
         }
 
-        if(unit.type().canBoost && !unit.onSolid()){
+        if(unit.type().canBoost && unit.tileOn() != null && !unit.tileOn().solid()){
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
         if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type().rotateShooting){
             if(unit.type().hasWeapons()){
-                //TODO certain units should not look at the target, e.g. ships
                 unit.lookAt(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
@@ -74,15 +73,12 @@ public class GroundAI extends AIController{
         }*/
     }
 
-    protected void moveTo(int pathType){
-        int costType =
-            unit instanceof Legsc ? Pathfinder.costLegs :
-            unit instanceof WaterMovec ? Pathfinder.costWater :
-            Pathfinder.costGround;
+    protected void moveTo(int pathTarget){
+        int costType = unit.pathType();
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathType));
+        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
 
         if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
 
