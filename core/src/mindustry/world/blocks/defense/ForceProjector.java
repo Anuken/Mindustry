@@ -26,6 +26,7 @@ public class ForceProjector extends Block{
     
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
+    public boolean hasBoost = true;
     public float radius = 101.7f;
     public float breakage = 550f;
     public float cooldownNormal = 1.75f;
@@ -67,8 +68,11 @@ public class ForceProjector extends Block{
         stats.add(BlockStat.shieldHealth, breakage, StatUnit.none);
         stats.add(BlockStat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        
+        if(hasBoost){
+            stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+            stats.add(BlockStat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        }
     }
 
     @Override
@@ -92,7 +96,7 @@ public class ForceProjector extends Block{
             }
         }
 
-        if(boosterUnlocked) {
+        if(hasBoost && boosterUnlocked) {
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
             float transparency = Time.time() % 90f / 90f;
             //expanding circle
@@ -151,9 +155,11 @@ public class ForceProjector extends Block{
         @Override
         public void updateTile(){
             boolean phaseValid = consumes.get(ConsumeType.item).valid(this);
-
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
-
+            
+            if(hasBoost){
+               phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
+            }
+            
             if(phaseValid && !broken && timer(timerUse, phaseUseTime) && efficiency() > 0){
                 consume();
             }
