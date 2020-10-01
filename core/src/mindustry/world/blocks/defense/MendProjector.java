@@ -19,8 +19,8 @@ import static mindustry.Vars.*;
 
 public class MendProjector extends Block{
     public final int timerUse = timers++;
-    public Color baseColor = Color.valueOf("84f491");
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color baseColor = Pal.heal;
+    public Color phaseColor = Pal.accent;
     public @Load("@-top") TextureRegion topRegion;
     public float reload = 250f;
     public float range = 60f;
@@ -57,6 +57,7 @@ public class MendProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        //inner circle
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
         boolean boosterUnlocked = true;

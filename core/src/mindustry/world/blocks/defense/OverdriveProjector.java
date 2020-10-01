@@ -27,8 +27,8 @@ public class OverdriveProjector extends Block{
     public float useTime = 400f;
     public float phaseRangeBoost = 20f;
     public boolean hasBoost = true;
-    public Color baseColor = Color.valueOf("feb380");
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color baseColor = Pal.overdrive;
+    public Color phaseColor = Pal.accent;
     protected Vec2 close = new Vec2();
     protected Vec2 far = new Vec2();
 
@@ -48,6 +48,7 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        //inner circle
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
         boolean boosterUnlocked = true;
