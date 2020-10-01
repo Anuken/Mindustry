@@ -19,8 +19,8 @@ import static mindustry.Vars.*;
 
 public class MendProjector extends Block{
     public final int timerUse = timers++;
-    public Color baseColor = Color.valueOf("84f491");
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color baseColor = Pal.heal;
+    public Color phaseColor = Pal.accent;
     public @Load("@-top") TextureRegion topRegion;
     public float reload = 250f;
     public float range = 60f;
@@ -28,6 +28,7 @@ public class MendProjector extends Block{
     public float phaseBoost = 12f;
     public float phaseRangeBoost = 50f;
     public float useTime = 400f;
+    public boolean hasBoost = true;
     protected Vec2 close = new Vec2();
     protected Vec2 far = new Vec2();
 
@@ -50,13 +51,16 @@ public class MendProjector extends Block{
 
         stats.add(BlockStat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
         stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
-
-        stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        
+        if(hasBoost){
+            stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+            stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        }
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        //inner circle
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
         boolean boosterUnlocked = true;
@@ -67,13 +71,24 @@ public class MendProjector extends Block{
             }
         }
 
-        if(boosterUnlocked) {
+        if(hasBoost && boosterUnlocked) {
+            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+            float transparency = Time.time() % 90f / 90f;
             //expanding circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRangeBoost, phaseColor, 1f - (Time.time() % 90f / 90f));
-
+            Draw.color(Pal.gray);
+            Lines.stroke(3f);
+            Draw.alpha(1f - transparency);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
+            Draw.reset();
+            Draw.tint(baseColor, phaseColor, expandProgress);
+            Lines.stroke(1f);
+            Draw.alpha(1f - transparency);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
+            Draw.reset();
+            
             //outside circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.25f);
-
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
+            
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
@@ -93,9 +108,11 @@ public class MendProjector extends Block{
         public void updateTile(){
             heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
             charge += heat * delta();
-
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
-
+            
+            if(hasBoost){
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
+            }
+            
             if(cons.optionalValid() && timer(timerUse, useTime) && efficiency() > 0){
                 consume();
             }
@@ -115,7 +132,7 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            if(!cons().optionalValid()) {
+            if(!cons().optionalValid() || !hasBoost) {
                 indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
                 Drawf.dashCircle(x, y, realRange, baseColor);
             } else {

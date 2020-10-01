@@ -22,10 +22,11 @@ import static mindustry.Vars.*;
 public class ForceProjector extends Block{
     public final int timerUse = timers++;
     public float phaseUseTime = 350f;
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color phaseColor = Pal.accent;
     
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
+    public boolean hasBoost = true;
     public float radius = 101.7f;
     public float breakage = 550f;
     public float cooldownNormal = 1.75f;
@@ -67,14 +68,18 @@ public class ForceProjector extends Block{
         stats.add(BlockStat.shieldHealth, breakage, StatUnit.none);
         stats.add(BlockStat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        
+        if(hasBoost){
+            stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+            stats.add(BlockStat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        }
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
+        //inner circle
         Draw.color(Pal.gray);
         Lines.stroke(3f);
         Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
@@ -91,17 +96,20 @@ public class ForceProjector extends Block{
             }
         }
 
-        if(boosterUnlocked) {
+        if(hasBoost && boosterUnlocked) {
+            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+            float transparency = Time.time() % 90f / 90f;
             //expanding circle
             Draw.color(Pal.gray);
             Lines.stroke(3f);
-            Draw.alpha(1f - (Time.time() % 90f / 90f));
-            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRadiusBoost);
-            Draw.color(phaseColor);
+            Draw.alpha(1f - transparency);
+            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
+            Draw.reset();
+            Draw.tint(player.team().color, phaseColor, expandProgress);
             Lines.stroke(1f);
-            Draw.alpha(1f - (Time.time() % 90f / 90f));
-            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRadiusBoost);
-            Draw.color();
+            Draw.alpha(1f - transparency);
+            Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + expandProgress * phaseRadiusBoost);
+            Draw.reset();
 
             //outside circle
             Draw.color(Pal.gray);
@@ -112,7 +120,7 @@ public class ForceProjector extends Block{
             Lines.stroke(1f);
             Draw.alpha(0.25f);
             Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius + phaseRadiusBoost);
-            Draw.color();
+            Draw.reset();
 
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
@@ -147,9 +155,11 @@ public class ForceProjector extends Block{
         @Override
         public void updateTile(){
             boolean phaseValid = consumes.get(ConsumeType.item).valid(this);
-
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
-
+            
+            if(hasBoost){
+               phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
+            }
+            
             if(phaseValid && !broken && timer(timerUse, phaseUseTime) && efficiency() > 0){
                 consume();
             }

@@ -27,8 +27,8 @@ public class OverdriveProjector extends Block{
     public float useTime = 400f;
     public float phaseRangeBoost = 20f;
     public boolean hasBoost = true;
-    public Color baseColor = Color.valueOf("feb380");
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color baseColor = Pal.overdrive;
+    public Color phaseColor = Pal.accent;
     protected Vec2 close = new Vec2();
     protected Vec2 far = new Vec2();
 
@@ -48,6 +48,7 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
+        //inner circle
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
         boolean boosterUnlocked = true;
@@ -59,12 +60,23 @@ public class OverdriveProjector extends Block{
         }
 
         if(hasBoost && boosterUnlocked) {
+            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+            float transparency = Time.time() %90f / 90f;
             //expanding circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f * phaseRangeBoost, phaseColor, 1f - (Time.time() % 90f / 90f));
-
+            Draw.color(Pal.gray);
+            Lines.stroke(3f);
+            Draw.alpha(1f - transparency);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
+            Draw.reset();
+            Draw.tint(baseColor, phaseColor, expandProgress);
+            Lines.stroke(1f);
+            Draw.alpha(1f - transparency);
+            Lines.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost);
+            Draw.reset();
+            
             //outside circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.25f);
-
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
+            
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
