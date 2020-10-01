@@ -27,7 +27,7 @@ public class MemoryBlock extends Block{
         stats.add(BlockStat.memoryCapacity, memoryCapacity, StatUnit.none);
     }
 
-    public class MemoryBuild extends Building {
+    public class MemoryBuild extends Building{
         public double[] memory = new double[memoryCapacity];
 
         @Override
