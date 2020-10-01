@@ -32,7 +32,12 @@ public class TechTree implements ContentList{
                         node(launchPad, () -> {
                         });
 
-                        node(distributor);
+
+                        node(distributor, () -> {
+                            node(splitter, () -> {
+
+                            });
+                        });
                         node(sorter, () -> {
                             node(invertedSorter);
                             node(overflowGate, () -> {
