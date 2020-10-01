@@ -289,6 +289,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootSmallFlame;
             smokeEffect = Fx.shootBigSmoke;
             hitEffect = Fx.hitFlameSmall;
+            trailColor = Pal.surge;
         }};
 
         missileMinBlast = new MissileBulletType(3.5f, 13){{
@@ -298,6 +299,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootSmallFlame;
             smokeEffect = Fx.shootBigSmoke;
             hitEffect = Fx.hitFlameSmall;
+            trailColor = Pal.surge;
             splashDamageRadius = 18f;
             splashDamage = 8;
         }};
@@ -309,6 +311,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootSmallFlame;
             smokeEffect = Fx.shootBigSmoke;
             hitEffect = Fx.hitFlameSmall;
+            trailColor = Pal.surge;
             status = StatusEffects.burning;
             statusDuration = 100f;
         }};
