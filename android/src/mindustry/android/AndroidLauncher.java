@@ -101,7 +101,7 @@ public class AndroidLauncher extends AndroidApplication{
                                 public InputStream read(){
                                     try{
                                         return getContentResolver().openInputStream(uri);
-                                    }catch(IOException e){
+                                    }catch(Exception e){//exception is parent class of every sub class exception like IO exception,etc. if any of the exception occure it will handle every kind of compile time execption or run time exception 
                                         throw new ArcRuntimeException(e);
                                     }
                                 }
@@ -110,7 +110,7 @@ public class AndroidLauncher extends AndroidApplication{
                                 public OutputStream write(boolean append){
                                     try{
                                         return getContentResolver().openOutputStream(uri);
-                                    }catch(IOException e){
+                                    }catch(Exception e){
                                         throw new ArcRuntimeException(e);
                                     }
                                 }
@@ -254,7 +254,7 @@ public class AndroidLauncher extends AndroidApplication{
                     }
                 }));
             }
-        }catch(IOException e){
+        }catch(Exception e){
             e.printStackTrace();
         }
     }
