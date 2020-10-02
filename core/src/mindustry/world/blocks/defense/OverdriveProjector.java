@@ -64,7 +64,7 @@ public class OverdriveProjector extends Block{
             float transparency = Time.time() %90f / 90f;
 
             //expanding circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, baseColor, phaseColor, expandProgress, 1f - transparency);
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, Tmp.c1.set(baseColor).lerp(phaseColor, transparency), 1f - transparency);
             
             //outside circle
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
