@@ -1309,6 +1309,21 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
+        oilExtractor = new SolidPump("magma-drill"){{
+            requirements(Category.production, with(Items.titanium, 150, Items.metaglass, 175, Items.plastanium, 115, Items.thorium, 35, Items.silicon, 55));
+            result = Liquids.slag;
+            updateEffect = Fx.pulverize;
+            liquidCapacity = 60f;
+            updateEffectChance = 0.05f;
+            pumpAmount = 0.25f;
+            size = 3;
+            baseEfficiency = 0.5f;
+            attribute = Attribute.heat;
+            rotateSpeed = 0f;
+            itemUseTime = 60f;
+            consumes.power(3f);
+        }};
+
         //endregion
         //region storage
 
