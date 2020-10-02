@@ -1317,10 +1317,10 @@ public class Blocks implements ContentList{
             updateEffectChance = 0.05f;
             pumpAmount = 0.25f;
             size = 3;
+            health = 450;
             baseEfficiency = 0.5f;
             attribute = Attribute.heat;
             rotateSpeed = -0.8f;
-            itemUseTime = 60f;
             consumes.power(6.75f);
         }};
 
