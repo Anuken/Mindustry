@@ -391,18 +391,18 @@ public class UnitTypes implements ContentList{
             mechStepShake = 0.15f;
             ammoType = AmmoTypes.powerHigh;
 
-            speed = 0.35f;
+            speed = 9f;
             boostMultiplier = 2.1f;
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
 
-            health = 6500f;
-            armor = 7f;
+            health = 99999f;
+            armor = 999f;
             canBoost = true;
             landShake = 4f;
 
-            commandLimit = 8;
+            commandLimit = 9999;
 
             weapons.add(new Weapon("vela-weapon"){{
                 mirror = false;
@@ -422,9 +422,9 @@ public class UnitTypes implements ContentList{
                 bullet = new ContinuousLaserBulletType(20){{
                     length = 150f;
                     hitEffect = Fx.hitMeltHeal;
-                    drawSize = 420f;
-                    lifetime = 160f;
-                    shake = 1f;
+                    drawSize = 99999f;
+                    lifetime = 9999f;
+                    shake = 99f;
                     despawnEffect = Fx.smokeCloud;
                     smokeEffect = Fx.none;
 
@@ -446,16 +446,16 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             hitSize = 29f;
             itemCapacity = 80;
-            health = 18000f;
+            health = 99999999f;
             buildSpeed = 1.7f;
-            armor = 9f;
+            armor = 999f;
             landShake = 1.5f;
             rotateSpeed = 1.5f;
 
-            commandLimit = 8;
+            commandLimit = 999999;
 
-            legCount = 4;
-            legLength = 14f;
+            legCount = 999;
+            legLength = 999f;
             legBaseOffset = 11f;
             legMoveSpace = 1.5f;
             legTrns = 0.58f;
@@ -465,7 +465,7 @@ public class UnitTypes implements ContentList{
             ammoType = AmmoTypes.powerHigh;
             groundLayer = Layer.legUnit;
 
-            speed = 0.3f;
+            speed = 9f;
 
             mineTier = 2;
             mineSpeed = 7f;
@@ -489,7 +489,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LaserBulletType(){{
                     length = 460f;
-                    damage = 550f;
+                    damage = 9999999f;
                     width = 75f;
 
                     lifetime = 65f;
