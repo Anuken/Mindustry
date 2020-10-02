@@ -1319,7 +1319,7 @@ public class Blocks implements ContentList{
             size = 3;
             baseEfficiency = 0.5f;
             attribute = Attribute.heat;
-            rotateSpeed = 0f;
+            rotateSpeed = -0.8f;
             itemUseTime = 60f;
             consumes.power(3f);
         }};
