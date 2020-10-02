@@ -11,7 +11,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class PayloadAcceptor extends Block{
     public float payloadSpeed = 0.5f;

@@ -3,7 +3,7 @@ package mindustry.world.blocks.experimental;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class BlockUnloader extends BlockLoader{
 

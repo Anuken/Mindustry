@@ -1,9 +1,9 @@
 package mindustry.ui.dialogs;
 
-import arc.Core;
-import arc.scene.ui.layout.Table;
+import arc.*;
+import arc.scene.ui.layout.*;
 import mindustry.gen.*;
-import mindustry.net.Administration.TraceInfo;
+import mindustry.net.Administration.*;
 
 public class TraceDialog extends BaseDialog{
 

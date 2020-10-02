@@ -2,11 +2,11 @@ package mindustry.game;
 
 import arc.*;
 import arc.assets.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;

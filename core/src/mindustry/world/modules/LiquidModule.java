@@ -1,14 +1,14 @@
 package mindustry.world.modules;
 
 import arc.math.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.type.*;
 
 import java.util.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class LiquidModule extends BlockModule{
     private static final int windowSize = 3, updateInterval = 60;

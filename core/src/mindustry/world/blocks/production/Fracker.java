@@ -1,8 +1,8 @@
 package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
-import mindustry.graphics.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.graphics.*;
 import mindustry.world.meta.*;
 
 public class Fracker extends SolidPump{

@@ -1,7 +1,6 @@
 package mindustry.editor;
 
 import arc.func.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
 import mindustry.game.*;

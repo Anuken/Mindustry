@@ -4,7 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
 
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 
 public enum CacheLayer{
     water{

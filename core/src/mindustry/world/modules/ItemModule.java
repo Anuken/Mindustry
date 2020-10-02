@@ -9,7 +9,7 @@ import mindustry.type.*;
 
 import java.util.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class ItemModule extends BlockModule{
     public static final ItemModule empty = new ItemModule();

@@ -3,7 +3,6 @@ package mindustry.mod;
 import arc.audio.*;
 import arc.math.geom.*;
 import arc.mock.*;
-import arc.util.ArcAnnotate.*;
 
 public class ModLoadingSound implements Sound{
     public Sound sound = new MockSound();

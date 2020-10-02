@@ -1,6 +1,6 @@
 package mindustry.world.meta;
 
-import arc.Core;
+import arc.*;
 
 /** A specific category for a stat. */
 public enum StatCategory{

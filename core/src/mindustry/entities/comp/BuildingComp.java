@@ -1238,6 +1238,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
+            case enabled -> enabled ? 1 : 0;
             default -> 0;
         };
     }

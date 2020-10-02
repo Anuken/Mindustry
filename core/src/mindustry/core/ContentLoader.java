@@ -1,9 +1,9 @@
 package mindustry.core;
 
 import arc.files.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -13,8 +13,8 @@ import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static arc.Core.files;
-import static mindustry.Vars.mods;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 /**
  * Loads all game content.

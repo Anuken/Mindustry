@@ -1,7 +1,6 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -14,6 +13,7 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.*;

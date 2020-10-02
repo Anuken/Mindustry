@@ -17,7 +17,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class BaseRegistry{
     public Seq<BasePart> cores = new Seq<>();

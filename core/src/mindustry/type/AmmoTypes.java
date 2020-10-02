@@ -1,6 +1,5 @@
 package mindustry.type;
 
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.ctype.*;

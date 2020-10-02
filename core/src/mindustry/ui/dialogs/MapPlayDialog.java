@@ -4,7 +4,6 @@ import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.*;

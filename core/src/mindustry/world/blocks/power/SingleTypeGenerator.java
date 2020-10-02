@@ -1,7 +1,6 @@
 package mindustry.world.blocks.power;
 
-import mindustry.type.Item;
-import mindustry.type.Liquid;
+import mindustry.type.*;
 
 public class SingleTypeGenerator extends ItemLiquidGenerator{
 

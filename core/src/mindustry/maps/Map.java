@@ -1,11 +1,11 @@
 package mindustry.maps;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;

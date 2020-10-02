@@ -1,24 +1,22 @@
 package mindustry.editor;
 
-import arc.Core;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.input.GestureDetector;
-import arc.input.GestureDetector.GestureListener;
-import arc.input.KeyCode;
-import arc.math.Mathf;
+import arc.input.*;
+import arc.input.GestureDetector.*;
+import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.Element;
+import arc.scene.*;
 import arc.scene.event.*;
-import arc.scene.ui.TextField;
-import arc.scene.ui.layout.Scl;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.graphics.Pal;
-import mindustry.input.Binding;
-import mindustry.ui.GridImage;
+import mindustry.graphics.*;
+import mindustry.input.*;
+import mindustry.ui.*;
 
-import static mindustry.Vars.mobile;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;

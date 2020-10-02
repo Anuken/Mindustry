@@ -467,8 +467,7 @@ public class Block extends UnlockableContent{
 
     /** Never use outside of the editor! */
     public TextureRegion editorIcon(){
-        if(editorIcon == null) editorIcon = Core.atlas.find(name + "-icon-editor");
-        return editorIcon;
+        return editorIcon == null ? (editorIcon = Core.atlas.find(name + "-icon-editor")) : editorIcon;
     }
 
     /** Never use outside of the editor! */
@@ -485,21 +484,16 @@ public class Block extends UnlockableContent{
     }
 
     protected TextureRegion[] icons(){
-        return new TextureRegion[]{region};
+        //use team region in vanilla team blocks
+        return teamRegion.found() && minfo.mod == null ? new TextureRegion[]{region, teamRegions[Team.sharded.id]} : new TextureRegion[]{region};
     }
 
     public TextureRegion[] getGeneratedIcons(){
-        if(generatedIcons == null){
-            generatedIcons = icons();
-        }
-        return generatedIcons;
+        return generatedIcons == null ? (generatedIcons = icons()) : generatedIcons;
     }
 
     public TextureRegion[] variantRegions(){
-        if(variantRegions == null){
-            variantRegions = new TextureRegion[]{icon(Cicon.full)};
-        }
-        return variantRegions;
+        return variantRegions == null ? (variantRegions = new TextureRegion[]{icon(Cicon.full)}) : variantRegions;
     }
 
     public boolean hasBuilding(){

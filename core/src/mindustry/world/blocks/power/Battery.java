@@ -8,7 +8,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class Battery extends PowerDistributor{
     public @Load("@-top") TextureRegion topRegion;

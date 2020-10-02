@@ -1,15 +1,15 @@
 package mindustry.world.blocks.distribution;
 
 import arc.math.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class OverflowGate extends Block{
     public float speed = 1f;

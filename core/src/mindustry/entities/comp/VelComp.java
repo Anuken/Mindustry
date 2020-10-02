@@ -2,8 +2,8 @@ package mindustry.entities.comp;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.EntityCollisions.*;
 import mindustry.gen.*;

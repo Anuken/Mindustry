@@ -1,6 +1,6 @@
 package mindustry.graphics;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 
 public class Pal{
     public static Color

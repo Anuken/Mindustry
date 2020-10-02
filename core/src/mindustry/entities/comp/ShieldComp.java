@@ -5,7 +5,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.minArmorDamage;
+import static mindustry.Vars.*;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{

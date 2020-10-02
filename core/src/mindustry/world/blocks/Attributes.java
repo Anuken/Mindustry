@@ -2,7 +2,7 @@ package mindustry.world.blocks;
 
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
-import mindustry.world.meta.Attribute;
+import mindustry.world.meta.*;
 
 import java.util.*;
 

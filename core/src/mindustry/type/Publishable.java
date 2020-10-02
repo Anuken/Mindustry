@@ -1,7 +1,7 @@
 package mindustry.type;
 
-import arc.struct.*;
 import arc.files.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.*;
 

@@ -2,7 +2,6 @@ package mindustry.mod;
 
 import arc.audio.*;
 import arc.mock.*;
-import arc.util.ArcAnnotate.*;
 
 public class ModLoadingMusic implements Music{
     public Music music = new MockMusic();

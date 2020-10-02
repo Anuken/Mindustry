@@ -1,8 +1,8 @@
 package mindustry.ctype;
 
 import arc.files.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 

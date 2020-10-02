@@ -1,6 +1,5 @@
 package mindustry.entities.abilities;
 
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;

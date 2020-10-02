@@ -10,7 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 /** Renders overlay lights. Client only. */
 public class LightRenderer{

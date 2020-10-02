@@ -5,7 +5,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 @Component
 abstract class TeamComp implements Posc{

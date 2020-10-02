@@ -11,7 +11,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class LiquidSource extends Block{
 

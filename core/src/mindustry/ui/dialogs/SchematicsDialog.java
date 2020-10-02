@@ -11,7 +11,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.Vars;
+import mindustry.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;

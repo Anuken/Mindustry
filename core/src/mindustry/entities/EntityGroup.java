@@ -8,7 +8,7 @@ import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.collisions;
+import static mindustry.Vars.*;
 
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")

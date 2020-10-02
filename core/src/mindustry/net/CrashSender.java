@@ -2,9 +2,9 @@ package mindustry.net;
 
 import arc.*;
 import arc.Net.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
@@ -19,8 +19,8 @@ import java.text.*;
 import java.util.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.mods;
 import static mindustry.Vars.net;
+import static mindustry.Vars.*;
 
 public class CrashSender{
 
