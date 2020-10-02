@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -14,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -216,6 +218,16 @@ public class StackConveyor extends Block implements Autotiler{
                             e.cooldown = 1;
                         }
                     }
+                }
+            }
+        }
+
+        @Override
+        public void overwrote(Seq<Building> builds){
+            if(builds.first() instanceof ConveyorBuild build){
+                Item item = build.items.first();
+                if(item != null){
+                    handleStack(item, build.items.get(itemCapacity), null);
                 }
             }
         }

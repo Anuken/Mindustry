@@ -85,7 +85,7 @@ public abstract class BulletType extends Content{
     public float fragAngle = 0f;
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
-    public BulletType fragBullet = null;
+    public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
     public Color trailColor = Pal.missileYellowBack;

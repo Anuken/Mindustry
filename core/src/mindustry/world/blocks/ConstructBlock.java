@@ -5,6 +5,7 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -62,6 +63,7 @@ public class ConstructBlock extends Block{
         if(tile == null) return;
 
         float healthf = tile.build == null ? 1f : tile.build.healthf();
+        Seq<Building> prev = tile.build instanceof ConstructBuild ? ((ConstructBuild)tile.build).prevBuild : null;
 
         tile.setBlock(block, team, rotation);
 
@@ -70,6 +72,10 @@ public class ConstructBlock extends Block{
 
             if(config != null){
                 tile.build.configured(builder, config);
+            }
+
+            if(prev != null && prev.size > 0){
+                tile.build.overwrote(prev);
             }
         }
 
@@ -126,6 +132,7 @@ public class ConstructBlock extends Block{
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
          */
         public @Nullable Block cblock;
+        public @Nullable Seq<Building> prevBuild;
 
         public float progress = 0;
         public float buildCost;

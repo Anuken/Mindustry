@@ -2,6 +2,7 @@ package mindustry.world.blocks.power;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
@@ -30,6 +31,16 @@ public class Battery extends PowerDistributor{
             Draw.color();
 
             Draw.rect(topRegion, x, y);
+        }
+
+        @Override
+        public void overwrote(Seq<Building> previous){
+            for(Building other : previous){
+                if(other.power != null && other.block.consumes.hasPower() && other.block.consumes.getPower().buffered){
+                    float amount = other.block.consumes.getPower().capacity * other.power.status;
+                    power.status = Mathf.clamp(power.status + amount / block.consumes.getPower().capacity);
+                }
+            }
         }
     }
 }

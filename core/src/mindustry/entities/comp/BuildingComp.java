@@ -849,6 +849,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
+    /**
+     * Called when a block is placed over some other blocks. This seq will always have at least one item.
+     * Should load some previous state, if necessary. */
+    public void overwrote(Seq<Building> previous){
+
+    }
+
     public void onRemoved(){
     }
 

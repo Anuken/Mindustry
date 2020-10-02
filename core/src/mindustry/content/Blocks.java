@@ -1350,17 +1350,20 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
             itemCapacity = 1000;
+            group = BlockGroup.storage;
         }};
 
         container = new StorageBlock("container"){{
             requirements(Category.effect, with(Items.titanium, 100));
             size = 2;
             itemCapacity = 300;
+            group = BlockGroup.storage;
         }};
 
         unloader = new Unloader("unloader"){{
             requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
             speed = 6f;
+            group = BlockGroup.transportation;
         }};
 
         //endregion

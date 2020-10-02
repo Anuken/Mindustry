@@ -198,6 +198,8 @@ public class Block extends UnlockableContent{
     public boolean instantTransfer = false;
     /** Whether you can rotate this block with Keybind rotateplaced + Scroll Wheel. */
     public boolean quickRotate = true;
+    /** Main subclass. Non-anonymous. */
+    public @Nullable Class<?> subclass;
 
     public Prov<Building> buildType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
@@ -371,7 +373,7 @@ public class Block extends UnlockableContent{
 
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size == other.size;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && (size == other.size || (size >= other.size && subclass != null && subclass == other.subclass));
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
@@ -589,6 +591,8 @@ public class Block extends UnlockableContent{
             if(current.isAnonymousClass()){
                 current = current.getSuperclass();
             }
+
+            subclass = current;
 
             while(buildType == null && Block.class.isAssignableFrom(current)){
                 //first class that is subclass of Building

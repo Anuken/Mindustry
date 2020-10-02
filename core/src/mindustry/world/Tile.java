@@ -389,19 +389,27 @@ public class Tile implements Position, QuadTreeObject, Displayable{
      */
     public Seq<Tile> getLinkedTilesAs(Block block, Seq<Tile> tmpArray){
         tmpArray.clear();
+        getLinkedTilesAs(block, tmpArray::add);
+        return tmpArray;
+    }
+
+    /**
+     * Returns the list of all tiles linked to this multiblock if it were this block.
+     * The result contains all linked tiles, including this tile itself.
+     */
+    public void getLinkedTilesAs(Block block, Cons<Tile> tmpArray){
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;
             for(int dx = 0; dx < block.size; dx++){
                 for(int dy = 0; dy < block.size; dy++){
                     Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(other != null) tmpArray.add(other);
+                    if(other != null) tmpArray.get(other);
                 }
             }
         }else{
-            tmpArray.add(this);
+            tmpArray.get(this);
         }
-        return tmpArray;
     }
 
     public Rect getHitbox(Rect rect){
