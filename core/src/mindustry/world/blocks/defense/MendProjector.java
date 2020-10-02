@@ -29,8 +29,6 @@ public class MendProjector extends Block{
     public float phaseRangeBoost = 50f;
     public float useTime = 400f;
     public boolean hasBoost = true;
-    protected Vec2 close = new Vec2();
-    protected Vec2 far = new Vec2();
 
     public MendProjector(String name){
         super(name);
@@ -75,18 +73,18 @@ public class MendProjector extends Block{
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
             float transparency = Time.time() % 90f / 90f;
 
-            //expanding circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, baseColor, phaseColor, expandProgress, 1f - transparency);
-            
             //outside circle
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
+            
+            //expanding circle
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, Tmp.c1.set(baseColor).lerp(phaseColor, transparency), 1f - transparency);
             
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
-                close.trns(i, 0, range - sin);
-                far.trns(i, 0, range + phaseRangeBoost);
-                Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
+                Tmp.v1.trns(i, 0, range - sin);
+                Tmp.v2.trns(i, 0, range + phaseRangeBoost);
+                Drawf.arrow(x * tilesize + offset + Tmp.v1.x, y * tilesize + offset + Tmp.v1.y, x * tilesize + offset + Tmp.v2.x, y * tilesize + offset + Tmp.v2.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
             }
         }
     }
