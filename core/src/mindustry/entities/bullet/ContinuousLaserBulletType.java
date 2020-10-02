@@ -37,6 +37,7 @@ public class ContinuousLaserBulletType extends BulletType{
         incendSpread = 5;
         incendChance = 0.4f;
         lightColor = Color.orange;
+        absorbable = false;
     }
 
     protected ContinuousLaserBulletType(){

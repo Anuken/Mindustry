@@ -170,7 +170,6 @@ public class Universe{
                 }
             }
         }
-        //TODO events
 
         Events.fire(new TurnEvent());
 

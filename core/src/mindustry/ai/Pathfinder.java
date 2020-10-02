@@ -51,7 +51,7 @@ public class Pathfinder implements Runnable{
             (PathTile.solid(tile) ? 5 : 0),
 
         //water
-        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 + //TODO cannot go through blocks - pathfinding isn't great
+        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? -1 : 0) +
             (PathTile.damages(tile) ? 35 : 0)

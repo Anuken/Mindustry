@@ -71,6 +71,8 @@ public abstract class BulletType extends Content{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
+    /** Whether this projectile can be absorbed by shields. */
+    public boolean absorbable = true;
     /** Whether to move the bullet back depending on delta to fix some delta-time realted issues.
      * Do not change unless you know what you're doing. */
     public boolean backMove = true;

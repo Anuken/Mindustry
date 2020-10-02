@@ -105,7 +105,7 @@ public class Separator extends Block{
                 int count = 0;
                 Item item = null;
 
-                //TODO guaranteed desync since items are random
+                //guaranteed desync since items are random - won't be fixed and probably isn't too important
                 for(ItemStack stack : results){
                     if(i >= count && i < count + stack.amount){
                         item = stack.item;

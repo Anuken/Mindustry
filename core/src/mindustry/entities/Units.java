@@ -215,12 +215,12 @@ public class Units{
         cdist = 0f;
 
         nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
-            if(e.dead() || !predicate.get(e)) return;
+            if(e.dead() || !predicate.get(e) || !e.within(x, y, range)) return;
 
-            float dst2 = sort.cost(e, x, y);
-            if(dst2 < range*range && (result == null || dst2 < cdist)){
+            float cost = sort.cost(e, x, y);
+            if(result == null || cost < cdist){
                 result = e;
-                cdist = dst2;
+                cdist = cost;
             }
         });
 
