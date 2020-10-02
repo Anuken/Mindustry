@@ -16,7 +16,10 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -30,8 +33,8 @@ public class Drill extends Block{
     public int tier;
     /** Base time to drill one ore, in frames. */
     public float drillTime = 300;
-    /** How many times faster the drill will progress when boosted by liquid. */
-    public float liquidBoostIntensity = 1.6f;
+    /** How powerful coolants are. */
+    public float coolantMultiplier = 25f;
     /** Speed at which the drill speeds up. */
     public float warmupSpeed = 0.02f;
 
@@ -156,9 +159,8 @@ public class Drill extends Block{
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
-        if(liquidBoostIntensity != 1){
-            stats.add(BlockStat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
-        }
+
+        stats.add(BlockStat.booster, new DrillBoosterListValue(1f, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
     }
 
     @Override
@@ -211,6 +213,8 @@ public class Drill extends Block{
         public float warmup;
         public float timeDrilled;
         public float lastDrillSpeed;
+        public float liquidBoostIntensity;
+
 
         public int dominantItems;
         public Item dominantItem;
@@ -258,9 +262,10 @@ public class Drill extends Block{
             if(items.total() < itemCapacity && dominantItems > 0 && consValid()){
 
                 float speed = 1f;
-
-                if(cons.optionalValid()){
-                    speed = liquidBoostIntensity;
+                
+                if(cons().optionalValid()){
+                    updateCooling();
+                    speed = (float) Math.sqrt(liquidBoostIntensity);
                 }
 
                 speed *= efficiency(); // Drill slower when not at full power
@@ -287,6 +292,14 @@ public class Drill extends Block{
 
                 drillEffect.at(getX() + Mathf.range(size), getY() + Mathf.range(size), dominantItem.color);
             }
+
+        }
+
+        protected void updateCooling(){
+            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+            Liquid liquid = liquids.current();
+            liquidBoostIntensity = 1f + (maxUsed * liquid.heatCapacity * coolantMultiplier);
+            liquids.remove(liquid, maxUsed);
         }
 
         @Override
@@ -320,5 +333,4 @@ public class Drill extends Block{
             }
         }
     }
-
 }
