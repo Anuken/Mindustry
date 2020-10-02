@@ -34,8 +34,6 @@ public class ForceProjector extends Block{
     public float cooldownBrokenBase = 0.35f;
     public float basePowerDraw = 0.2f;
     public @Load("@-top") TextureRegion topRegion;
-    protected Vec2 close = new Vec2();
-    protected Vec2 far = new Vec2();
 
     static ForceBuild paramEntity;
     static final Cons<Shielderc> shieldConsumer = trait -> {
@@ -79,7 +77,7 @@ public class ForceProjector extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        //inner circle
+        //inner hexagon
         Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius, player.team().color);
 
         boolean boosterUnlocked = true;
@@ -93,19 +91,19 @@ public class ForceProjector extends Block{
         if(hasBoost && boosterUnlocked) {
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
             float transparency = Time.time() % 90f / 90f;
-
-            //expanding hexagon
-            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost, player.team().color, phaseColor, expandProgress, 1f - transparency);
-
+            
             //outside hexagon
             Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, 0.25f);
+            
+            //expanding hexagon
+            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost, Tmp.c1.set(player.team().color).lerp(phaseColor, expandProgress), 1f - transparency);
 
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
             for(int i = 0; i < 360; i += 60){
-                close.trns(i, 0, radius - sin);
-                far.trns(i, 0, radius + phaseRadiusBoost);
-                Drawf.arrow(x * tilesize + offset + close.x, y * tilesize + offset + close.y, x * tilesize + offset + far.x, y * tilesize + offset + far.y, phaseRadiusBoost/4f + sin, 4f + sin, phaseColor);
+                Tmp.v1.trns(i, 0, radius - sin);
+                Tmp.v2.trns(i, 0, radius + phaseRadiusBoost);
+                Drawf.arrow(x * tilesize + offset + Tmp.v1.x, y * tilesize + offset + Tmp.v1.y, x * tilesize + offset + Tmp.v2.x, y * tilesize + offset + Tmp.v2.y, phaseRadiusBoost/4f + sin, 4f + sin, phaseColor);
             }
         }
     }
