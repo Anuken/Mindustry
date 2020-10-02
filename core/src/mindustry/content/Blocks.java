@@ -68,7 +68,7 @@ public class Blocks implements ContentList{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //production
-    mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator, magmaDrill
+    mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator, magmaDrill,
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
