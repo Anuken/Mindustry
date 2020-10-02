@@ -177,6 +177,9 @@ public class TechTree implements ContentList{
                                             node(incinerator, () -> {
                                                 node(Items.scrap, with(Items.copper, 20000, Items.sand, 10000), () -> {
                                                     node(Liquids.slag, with(Items.scrap, 4000), () -> {
+                                                        node(magmaDrill, with(Items.thorium, 5000, Items.silicon, 20000, Items.scrap, 40000, Items.plastanium, 15000), () -> {
+
+                                                        });
                                                         node(melter, () -> {
                                                             node(Items.surgealloy, with(Items.thorium, 20000, Items.silicon, 30000, Items.lead, 40000), () -> {
                                                                 node(surgeSmelter, () -> {
