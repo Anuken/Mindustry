@@ -1305,7 +1305,7 @@ public class Blocks implements ContentList{
             itemUseTime = 60f;
 
             consumes.item(Items.sand);
-            consumes.power(3f);
+            consumes.power(6.75f);
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
