@@ -546,6 +546,7 @@ public class Blocks implements ContentList{
             craftTime = 70f;
             size = 3;
             hasPower = hasLiquids = true;
+            drawer = new DrawGlow();
             itemCapacity = 20;
             boostScale = 0.20f;
             liquidCapacity = 90f;
