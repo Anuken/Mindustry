@@ -68,7 +68,7 @@ public class Blocks implements ContentList{
     impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
 
     //production
-    mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
+    mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator, magmaDrill
 
     //storage
     coreShard, coreFoundation, coreNucleus, vault, container, unloader,
@@ -1309,7 +1309,7 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
-        oilExtractor = new SolidPump("magma-drill"){{
+        magmaDrill = new SolidPump("magma-drill"){{
             requirements(Category.production, with(Items.titanium, 150, Items.metaglass, 175, Items.plastanium, 115, Items.thorium, 35, Items.silicon, 55));
             result = Liquids.slag;
             updateEffect = Fx.pulverize;
