@@ -6,6 +6,7 @@ import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
+import mindustry.world.Block;
 
 import static mindustry.Vars.tilesize;
 
@@ -20,6 +21,12 @@ public class Battery extends PowerDistributor{
         outputsPower = true;
         consumesPower = true;
         flags = EnumSet.of(BlockFlag.powerResupply);
+    }
+
+    @Override
+    public boolean canReplace(Block other){
+        if(other.alwaysReplace) return true;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && other != this && size >= other.size;
     }
 
     public class BatteryBuild extends Building{
