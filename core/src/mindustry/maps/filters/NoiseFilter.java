@@ -11,7 +11,7 @@ import static mindustry.maps.filters.FilterOption.wallsOnly;
 
 public class NoiseFilter extends GenerateFilter{
     float scl = 40, threshold = 0.5f, octaves = 3f, falloff = 0.5f;
-    Block floor = Blocks.stone, block = Blocks.rocks;
+    Block floor = Blocks.stone, block = Blocks.stoneWall;
 
     @Override
     public FilterOption[] options(){

@@ -168,8 +168,11 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
-            //make note of whether there was an entity here
-            stream.writeBoolean(tile.build != null);
+            boolean savedata = tile.block().saveData;
+            byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
+
+            //make note of whether there was an entity/rotation here
+            stream.writeByte(packed);
 
             //only write the entity for multiblocks once - in the center
             if(tile.build != null){
@@ -182,6 +185,8 @@ public abstract class SaveVersion extends SaveFileReader{
                 }else{
                     stream.writeBoolean(false);
                 }
+            }else if(savedata){
+                stream.writeByte(tile.data);
             }else{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
@@ -237,7 +242,9 @@ public abstract class SaveVersion extends SaveFileReader{
                 Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
-                boolean hadEntity = stream.readBoolean();
+                byte packedCheck = stream.readByte();
+                boolean hadEntity = (packedCheck & 1) != 0;
+                boolean hadData = (packedCheck & 2) != 0;
 
                 if(hadEntity){
                     isCenter = stream.readBoolean();
@@ -250,7 +257,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                 if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
-                        if(block.hasEntity()){
+                        if(block.hasBuilding()){
                             try{
                                 readChunk(stream, true, in -> {
                                     byte revision = in.readByte();
@@ -264,6 +271,9 @@ public abstract class SaveVersion extends SaveFileReader{
                             skipChunk(stream, true);
                         }
                     }
+                }else if(hadData){
+                    tile.setBlock(block);
+                    tile.data = stream.readByte();
                 }else{
                     int consecutives = stream.readUnsignedByte();
 
@@ -321,6 +331,11 @@ public abstract class SaveVersion extends SaveFileReader{
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
                 byte typeid = in.readByte();
+                if(EntityMapping.map(typeid) == null){
+                    in.skipBytes(lastRegionLength - 1);
+                    return;
+                }
+
                 Entityc entity = (Entityc)EntityMapping.map(typeid).get();
                 entity.read(Reads.get(in));
                 entity.add();

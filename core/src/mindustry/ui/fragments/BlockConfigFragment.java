@@ -7,17 +7,18 @@ import arc.scene.actions.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
 public class BlockConfigFragment extends Fragment{
-    private Table table = new Table();
-    private Building configTile;
+    Table table = new Table();
+    Building configTile;
 
     @Override
     public void build(Group parent){
-        table.visible(false);
+        table.visible = false;
         parent.addChild(table);
 
         //hacky way to hide block config when in menu
@@ -27,15 +28,20 @@ public class BlockConfigFragment extends Fragment{
             public void act(float delta){
                 super.act(delta);
                 if(state.isMenu()){
-                    table.visible(false);
+                    table.visible = false;
                     configTile = null;
                 }
             }
         });
+
+        Events.on(ResetEvent.class, e -> {
+            table.visible = false;
+            configTile = null;
+        });
     }
 
     public boolean isShown(){
-        return table.isVisible() && configTile != null;
+        return table.visible && configTile != null;
     }
 
     public Building getSelectedTile(){
@@ -46,7 +52,7 @@ public class BlockConfigFragment extends Fragment{
         if(tile.configTapped()){
             configTile = tile;
 
-            table.visible(true);
+            table.visible = true;
             table.clear();
             tile.buildConfiguration(table);
             table.pack();
@@ -61,7 +67,7 @@ public class BlockConfigFragment extends Fragment{
                 }
 
                 table.setOrigin(Align.center);
-                if(configTile == null || configTile.block() == Blocks.air || !configTile.isValid()){
+                if(configTile == null || configTile.block == Blocks.air || !configTile.isValid()){
                     hideConfig();
                 }else{
                     configTile.updateTableAlign(table);

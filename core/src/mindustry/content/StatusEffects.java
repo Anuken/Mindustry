@@ -9,7 +9,7 @@ import mindustry.type.StatusEffect;
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{
-    public static StatusEffect none, burning, freezing, wet, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss;
+    public static StatusEffect none, burning, freezing, unmoving, slow, wet, muddy, melting, sapped, tarred, overdrive, overclock, shielded, shocked, blasted, corroded, boss, sporeSlowed;
 
     @Override
     public void load(){
@@ -17,7 +17,7 @@ public class StatusEffects implements ContentList{
         none = new StatusEffect("none");
 
         burning = new StatusEffect("burning"){{
-            damage = 0.08f; //over 10 seconds, this would be 48 damage
+            damage = 0.12f; //over 8 seconds, this would be 60 damage
             effect = Fx.burning;
 
             init(() -> {
@@ -45,14 +45,23 @@ public class StatusEffects implements ContentList{
             });
         }};
 
+        unmoving = new StatusEffect("unmoving"){{
+            speedMultiplier = 0.001f;
+        }};
+
+        slow = new StatusEffect("slow"){{
+            speedMultiplier = 0.4f;
+        }};
+
         wet = new StatusEffect("wet"){{
             color = Color.royal;
-            speedMultiplier = 0.9f;
+            speedMultiplier = 0.94f;
             effect = Fx.wet;
+            effectChance = 0.09f;
 
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
-                    unit.damagePierce(20f);
+                    unit.damagePierce(14f);
                     if(unit.team() == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
@@ -60,6 +69,13 @@ public class StatusEffects implements ContentList{
                 }));
                 opposite(burning);
             });
+        }};
+		
+        muddy = new StatusEffect("muddy"){{
+            color = Color.valueOf("46382a");
+            speedMultiplier = 0.94f;
+            effect = Fx.muddy;
+            effectChance = 0.09f;
         }};
 
         melting = new StatusEffect("melting"){{
@@ -79,6 +95,12 @@ public class StatusEffects implements ContentList{
             armorMultiplier = 0.8f;
             effect = Fx.sapped;
             effectChance = 0.1f;
+        }};
+
+        sporeSlowed = new StatusEffect("spore-slowed"){{
+            speedMultiplier = 0.8f;
+            effect = Fx.sapped;
+            effectChance = 0.04f;
         }};
 
         tarred = new StatusEffect("tarred"){{
@@ -114,13 +136,14 @@ public class StatusEffects implements ContentList{
 
         boss = new StatusEffect("boss"){{
             permanent = true;
+            damageMultiplier = 1.5f;
+            armorMultiplier = 1.5f;
         }};
 
         shocked = new StatusEffect("shocked");
 
         blasted = new StatusEffect("blasted");
 
-        //no effects, just small amounts of damage.
         corroded = new StatusEffect("corroded"){{
             damage = 0.1f;
         }};

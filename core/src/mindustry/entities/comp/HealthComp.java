@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 
 @Component
-abstract class HealthComp implements Entityc{
+abstract class HealthComp implements Entityc, Posc{
     static final float hitDuration = 9f;
 
     float health;

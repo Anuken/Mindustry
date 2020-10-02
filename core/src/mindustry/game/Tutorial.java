@@ -23,9 +23,9 @@ public class Tutorial{
     private static final int mineCopper = 18;
     private static final int blocksToBreak = 3, blockOffset = -6;
 
-    private ObjectSet<String> events = new ObjectSet<>();
-    private ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
-    private int sentence;
+    ObjectSet<String> events = new ObjectSet<>();
+    ObjectIntMap<Block> blocksPlaced = new ObjectIntMap<>();
+    int sentence;
     public TutorialStage stage = TutorialStage.values()[0];
 
     public Tutorial(){
@@ -250,7 +250,7 @@ public class Tutorial{
             Building core = state.teams.playerCores().first();
 
             for(int i = 0; i < blocksToBreak; i++){
-                if(world.tile(core.tile().x + blockOffset, core.tile().y + i).block() == Blocks.scrapWall){
+                if(world.tile(core.tile.x + blockOffset, core.tile.y + i).block() == Blocks.scrapWall){
                     return false;
                 }
             }

@@ -1,8 +1,9 @@
 package mindustry.ui.fragments;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.*;
-import arc.input.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
@@ -24,12 +25,11 @@ import mindustry.input.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
-    private static final float dsize = 47.2f;
+    private static final float dsize = 65f;
 
     public final PlacementFragment blockfrag = new PlacementFragment();
 
@@ -61,22 +61,46 @@ public class HudFragment extends Fragment{
         //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
+            coreItems.clear();
         });
 
         Events.on(TurnEvent.class, e -> {
-            ui.announce("[accent][[ Turn " + universe.turn() + " ]");
+            Seq<Sector> attacked = universe.getAttacked(state.getSector().planet);
+
+            if(attacked.any()){
+
+                //TODO localize
+                String text = attacked.size > 1 ? attacked.size + " sectors attacked." : "Sector " + attacked.first().id + " under attack.";
+
+                showToast(Icon.warning, text);
+            }
+
+            //ui.announce("[accent][[ Turn " + universe.turn() + " ]\n[scarlet]" + attackedSectors.size + "[lightgray] sector(s) attacked.");
         });
 
         //paused table
         parent.fill(t -> {
-            t.top().visible(() -> state.isPaused() && !state.isOutOfTime()).touchable(Touchable.disabled);
-            t.table(Styles.black5, top -> top.add("$paused").style(Styles.outlineLabel).pad(8f)).growX();
+            t.top().visible(() -> state.isPaused()).touchable = Touchable.disabled;
+            t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
+        });
+
+        //minimap + position
+        parent.fill(t -> {
+            t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
+            //minimap
+            t.add(new Minimap());
+            t.row();
+            //position
+            t.label(() -> player.tileX() + "," + player.tileY())
+            .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
+            .touchable(Touchable.disabled);
+            t.top().right();
         });
 
         //TODO tear this all down
         //menu at top left
         parent.fill(cont -> {
-            cont.setName("overlaymarker");
+            cont.name = "overlaymarker";
             cont.top().left();
 
             if(mobile){
@@ -121,6 +145,8 @@ public class HudFragment extends Fragment{
                     }).update(i -> {
                         if(net.active() && mobile){
                             i.getStyle().imageUp = Icon.chat;
+                        }else if(state.isCampaign()){
+                            i.getStyle().imageUp = Icon.tree;
                         }else{
                             i.getStyle().imageUp = Icon.book;
                         }
@@ -144,52 +170,56 @@ public class HudFragment extends Fragment{
 
             cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight());
 
-            {
-                wavesMain.visible(() -> shown && !state.isEditor());
-                wavesMain.top().left();
-                Stack stack = new Stack();
-                Button waves = new Button(Styles.waveb);
-                Table btable = new Table().margin(0);
+            wavesMain.visible(() -> shown && !state.isEditor());
+            wavesMain.top().left();
 
-                stack.add(waves);
-                stack.add(btable);
+            wavesMain.table(s -> {
+                //wave info button with text
+                s.add(makeStatusTable()).grow();
 
-                addWaveTable(waves);
-                addPlayButton(btable);
-                wavesMain.add(stack).width(dsize * 5 + 4f);
-                wavesMain.row();
-                wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
-                .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
-                wavesMain.row();
-            }
+                //table with button to skip wave
+                s.button(Icon.play, Styles.righti, 30f, () -> {
+                    if(net.client() && player.admin){
+                        Call.adminRequest(player, AdminAction.wave);
+                    }else{
+                        logic.skipWave();
+                    }
+                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).visible(() -> state.rules.waves);
+            }).width(dsize * 5 + 4f);
 
-            {
-                editorMain.table(Tex.buttonEdge4, t -> {
-                    //t.margin(0f);
-                    t.add("$editor.teams").growX().left();
-                    t.row();
-                    t.table(teams -> {
-                        teams.left();
-                        int i = 0;
-                        for(Team team : Team.baseTeams){
-                            ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
-                                .size(50f).margin(6f).get();
-                            button.getImageCell().grow();
-                            button.getStyle().imageUpColor = team.color;
-                            button.update(() -> button.setChecked(player.team() == team));
+            wavesMain.row();
 
-                            if(++i % 3 == 0){
-                                teams.row();
-                            }
+            wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
+            .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
+
+            wavesMain.row();
+
+            editorMain.table(Tex.buttonEdge4, t -> {
+                //t.margin(0f);
+                t.add("@editor.teams").growX().left();
+                t.row();
+                t.table(teams -> {
+                    teams.left();
+                    int i = 0;
+                    for(Team team : Team.baseTeams){
+                        ImageButton button = teams.button(Tex.whiteui, Styles.clearTogglePartiali, 40f, () -> Call.setPlayerTeamEditor(player, team))
+                            .size(50f).margin(6f).get();
+                        button.getImageCell().grow();
+                        button.getStyle().imageUpColor = team.color;
+                        button.update(() -> button.setChecked(player.team() == team));
+
+                        if(++i % 3 == 0){
+                            teams.row();
                         }
-                    }).left();
-                }).width(dsize * 5 + 4f);
-                editorMain.visible(() -> shown && state.isEditor());
-            }
+                    }
+                }).left();
+            }).width(dsize * 5 + 4f);
+            editorMain.visible(() -> shown && state.isEditor());
+
 
             //fps display
             cont.table(info -> {
-                info.touchable(Touchable.disabled);
+                info.touchable = Touchable.disabled;
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
                 info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
@@ -201,28 +231,16 @@ public class HudFragment extends Fragment{
             }).top().left();
         });
 
-        parent.fill(t -> {
-            t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
-            //minimap
-            t.add(new Minimap());
-            t.row();
-            //position
-            t.label(() -> player.tileX() + "," + player.tileY())
-                .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
-                .touchable(Touchable.disabled);
-            t.top().right();
-        });
-
         //core items
         parent.fill(t -> {
             t.top().add(coreItems);
-            t.visible(() -> Core.settings.getBool("coreitems") && !mobile);
+            t.visible(() -> Core.settings.getBool("coreitems") && !mobile && !state.isPaused() && shown);
         });
 
         //spawner warning
         parent.fill(t -> {
-            t.touchable(Touchable.disabled);
-            t.table(Styles.black, c -> c.add("$nearpoint")
+            t.touchable = Touchable.disabled;
+            t.table(Styles.black, c -> c.add("@nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time(), 10f, 1f))))
             .get().setAlignment(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(spawner.playerNear()), 0.1f)).get().color.a = 0f;
@@ -230,17 +248,17 @@ public class HudFragment extends Fragment{
 
         parent.fill(t -> {
             t.visible(() -> netServer.isWaitingForPlayers());
-            t.table(Tex.button, c -> c.add("$waiting.players"));
+            t.table(Tex.button, c -> c.add("@waiting.players"));
         });
 
         //'core is under attack' table
         parent.fill(t -> {
-            t.touchable(Touchable.disabled);
+            t.touchable = Touchable.disabled;
             float notifDuration = 240f;
             float[] coreAttackTime = {0};
             float[] coreAttackOpacity = {0};
 
-            Events.on(Trigger.teamCoreDamage, () -> {
+            Events.run(Trigger.teamCoreDamage, () -> {
                 coreAttackTime[0] = notifDuration;
             });
 
@@ -250,7 +268,7 @@ public class HudFragment extends Fragment{
                     return false;
                 }
 
-                t.getColor().a = coreAttackOpacity[0];
+                t.color.a = coreAttackOpacity[0];
                 if(coreAttackTime[0] > 0){
                     coreAttackOpacity[0] = Mathf.lerpDelta(coreAttackOpacity[0], 1f, 0.1f);
                 }else{
@@ -261,29 +279,8 @@ public class HudFragment extends Fragment{
 
                 return coreAttackOpacity[0] > 0;
             });
-            t.table(Tex.button, top -> top.add("$coreattack").pad(2)
-            .update(label -> label.getColor().set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
-        });
-
-        //paused table for when the player is out of time
-        parent.fill(t -> {
-            t.top().visible(() -> state.isOutOfTime());
-            t.table(Styles.black5, top -> {
-                //TODO localize when done
-                top.add("Out of sector time.").style(Styles.outlineLabel).color(Pal.accent).update(l -> l.color.a = Mathf.absin(Time.globalTime(), 7f, 1f)).colspan(2);
-                top.row();
-
-                top.defaults().pad(2).size(150f, 54f);
-                top.button("Next Turn", () -> {
-                    universe.runTurn();
-                    state.set(State.playing);
-                });
-
-                top.button("Back to Planet", () -> {
-                    ui.paused.runExitSave();
-                    ui.planet.show();
-                });
-            }).margin(8).growX();
+            t.table(Tex.button, top -> top.add("@coreattack").pad(2)
+            .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
         //tutorial text
@@ -311,7 +308,7 @@ public class HudFragment extends Fragment{
         //'saving' indicator
         parent.fill(t -> {
             t.bottom().visible(() -> control.saves.isSaving());
-            t.add("$saving").style(Styles.outlineLabel);
+            t.add("@saving").style(Styles.outlineLabel);
         });
 
         parent.fill(p -> {
@@ -324,10 +321,11 @@ public class HudFragment extends Fragment{
                     showHudText = false;
                 }
             });
-            p.touchable(Touchable.disabled);
+            p.touchable = Touchable.disabled;
         });
 
         //TODO DEBUG: rate table
+        if(false)
         parent.fill(t -> {
             t.bottom().left();
             t.table(Styles.black6, c -> {
@@ -458,7 +456,7 @@ public class HudFragment extends Fragment{
 
                 //add to table
                 table.add(in).padRight(8);
-                table.add("$unlocked");
+                table.add("@unlocked");
                 table.pack();
 
                 //create container table which will align and move
@@ -519,7 +517,7 @@ public class HudFragment extends Fragment{
 
     public void showLaunchDirect(){
         Image image = new Image();
-        image.getColor().a = 0f;
+        image.color.a = 0f;
         image.setFillParent(true);
         image.actions(Actions.fadeIn(launchDuration / 60f, Interp.pow2In), Actions.delay(8f / 60f), Actions.remove());
         Core.scene.add(image);
@@ -527,7 +525,7 @@ public class HudFragment extends Fragment{
 
     public void showLaunch(){
         Image image = new Image();
-        image.getColor().a = 0f;
+        image.color.a = 0f;
         image.setFillParent(true);
         image.actions(Actions.fadeIn(40f / 60f));
         image.update(() -> {
@@ -540,8 +538,8 @@ public class HudFragment extends Fragment{
 
     public void showLand(){
         Image image = new Image();
-        image.getColor().a = 1f;
-        image.touchable(Touchable.disabled);
+        image.color.a = 1f;
+        image.touchable = Touchable.disabled;
         image.setFillParent(true);
         image.actions(Actions.fadeOut(0.8f), Actions.remove());
         image.update(() -> {
@@ -553,37 +551,6 @@ public class HudFragment extends Fragment{
         Core.scene.add(image);
     }
 
-    private void showLaunchConfirm(){
-        BaseDialog dialog = new BaseDialog("$launch");
-        dialog.update(() -> {
-            if(!inLaunchWave()){
-                dialog.hide();
-            }
-        });
-        dialog.cont.add("$launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
-        dialog.buttons.defaults().size(200f, 54f).pad(2f);
-        dialog.setFillParent(false);
-        dialog.buttons.button("$cancel", dialog::hide);
-        dialog.buttons.button("$ok", () -> {
-            dialog.hide();
-            Call.launchZone();
-        });
-        dialog.keyDown(KeyCode.escape, dialog::hide);
-        dialog.keyDown(KeyCode.back, dialog::hide);
-        dialog.show();
-    }
-
-    private boolean inLaunchWave(){
-        return state.hasSector() &&
-            state.getSector().metCondition() &&
-            !net.client() &&
-            state.wave % state.getSector().launchPeriod == 0 && !spawner.isSpawning();
-    }
-
-    private boolean canLaunch(){
-        return inLaunchWave() && state.enemies <= 0;
-    }
-
     private void toggleMenus(){
         if(flip != null){
             flip.getStyle().imageUp = shown ? Icon.downOpen : Icon.upOpen;
@@ -592,7 +559,9 @@ public class HudFragment extends Fragment{
         shown = !shown;
     }
 
-    private void addWaveTable(Button table){
+    private Table makeStatusTable(){
+        Button table = new Button(Styles.waveb);
+
         StringBuilder ibuild = new StringBuilder();
 
         IntFormat wavef = new IntFormat("wave");
@@ -614,31 +583,115 @@ public class HudFragment extends Fragment{
         });
 
         table.clearChildren();
-        table.touchable(Touchable.enabled);
+        table.touchable = Touchable.enabled;
 
         StringBuilder builder = new StringBuilder();
 
-        table.setName("waves");
+        table.name = "waves";
+
+        table.marginTop(0).marginBottom(4).marginLeft(4);
+
+        class SideBar extends Element{
+            public final Floatp amount;
+            public final boolean flip;
+            public final Boolp flash;
+
+            float last, blink, value;
+
+            public SideBar(Floatp amount, Boolp flash, boolean flip){
+                this.amount = amount;
+                this.flip = flip;
+                this.flash = flash;
+
+                setColor(Pal.health);
+            }
+
+            @Override
+            public void draw(){
+                float next = amount.get();
+
+                if(next < last && flash.get()){
+                    blink = 1f;
+                }
+
+                blink = Mathf.lerpDelta(blink, 0f, 0.2f);
+                value = Mathf.lerpDelta(value, next, 0.15f);
+                last = next;
+
+                drawInner(Pal.darkishGray);
+
+                Draw.beginStencil();
+
+                Fill.crect(x, y, width, height * value);
+
+                Draw.beginStenciled();
+
+                drawInner(Tmp.c1.set(color).lerp(Color.white, blink));
+
+                Draw.endStencil();
+            }
+
+            void drawInner(Color color){
+                if(flip){
+                    x += width;
+                    width = -width;
+                }
+
+                float stroke = width * 0.35f;
+                float bh = height/2f;
+                Draw.color(color);
+
+                Fill.quad(
+                x, y,
+                x + stroke, y,
+                x + width, y + bh,
+                x + width - stroke, y + bh
+                );
+
+                Fill.quad(
+                x + width, y + bh,
+                x + width - stroke, y + bh,
+                x, y + height,
+                x + stroke, y + height
+                );
+
+                Draw.reset();
+
+                if(flip){
+                    width = -width;
+                    x -= width;
+                }
+            }
+        }
+
+        table.stack(
+        new Element(){
+            @Override
+            public void draw(){
+                Draw.color(Pal.darkerGray);
+                Fill.poly(x + width/2f, y + height/2f, 6, height / Mathf.sqrt3);
+                Draw.reset();
+                Drawf.shadow(x + width/2f, y + height/2f, height * 1.13f);
+            }
+        },
+        new Table(t -> {
+            float bw = 40f;
+            float pad = -20;
+            t.margin(0);
+
+            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
+            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
+            t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
+                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type().ammoType.color : Pal.health);
+            });
+
+            t.getChildren().get(1).toFront();
+        })).size(120f, 80).padRight(4);
+
         table.labelWrap(() -> {
             builder.setLength(0);
             builder.append(wavef.get(state.wave));
             builder.append("\n");
-
-            if(inLaunchWave()){
-                builder.append("[#");
-                Tmp.c1.set(Color.white).lerp(state.enemies > 0 ? Color.white : Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
-                builder.append("]");
-
-                if(!canLaunch()){
-                    builder.append(Core.bundle.get("launch.unable2"));
-                }else{
-                    builder.append(Core.bundle.get("launch"));
-                    builder.append("\n");
-                    builder.append(Core.bundle.format("launch.next", state.wave + state.getSector().launchPeriod));
-                    builder.append("\n");
-                }
-                builder.append("[]\n");
-            }
 
             if(state.enemies > 0){
                 if(state.enemies == 1){
@@ -658,29 +711,14 @@ public class HudFragment extends Fragment{
             return builder;
         }).growX().pad(8f);
 
-        table.setDisabled(() -> !canLaunch());
+        table.setDisabled(true);
         table.visible(() -> state.rules.waves);
-        table.clicked(() -> {
-            if(canLaunch()){
-                showLaunchConfirm();
-            }
-        });
+
+        return table;
     }
 
     private boolean canSkipWave(){
         return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
-    private void addPlayButton(Table table){
-        table.right().button(Icon.play, Styles.righti, 30f, () -> {
-            if(net.client() && player.admin){
-                Call.adminRequest(player, AdminAction.wave);
-            }else if(inLaunchWave()){
-                ui.showConfirm("$confirm", "$launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
-            }else{
-                logic.skipWave();
-            }
-        }).growY().fillX().right().width(40f)
-        .visible(this::canSkipWave);
-    }
 }

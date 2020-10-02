@@ -17,10 +17,10 @@ public enum Category{
     crafting,
     /** Blocks that create units. */
     units,
-    /** Things that upgrade the player such as mech pads. */
-    upgrade,
     /** Things for storage or passive effects. */
-    effect;
+    effect,
+    /** Blocks related to logic. */
+    logic;
 
     public static final Category[] all = values();
 

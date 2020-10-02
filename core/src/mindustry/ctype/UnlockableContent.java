@@ -1,12 +1,14 @@
 package mindustry.ctype;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -29,7 +31,7 @@ public abstract class UnlockableContent extends MappableContent{
 
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
-        this.unlocked = Core.settings != null && Core.settings.getBool(name + "-unlocked", false);
+        this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
     }
 
     public String displayDescription(){
@@ -40,6 +42,15 @@ public abstract class UnlockableContent extends MappableContent{
     @CallSuper
     public void createIcons(MultiPacker packer){
 
+    }
+
+    /** @return items needed to research this content */
+    public ItemStack[] researchRequirements(){
+        return ItemStack.empty;
+    }
+
+    public String emoji(){
+        return Fonts.getUnicodeStr(name);
     }
 
     /** Returns a specific content icon, or the region {contentType}-{name} if not found.*/
@@ -53,6 +64,12 @@ public abstract class UnlockableContent extends MappableContent{
                 Core.atlas.find(name + "1")))));
         }
         return cicons[icon.ordinal()];
+    }
+
+    /** Iterates through any implicit dependencies of this content.
+     * For blocks, this would be the items required to build it. */
+    public void getDependencies(Cons<UnlockableContent> cons){
+
     }
 
     /** This should show all necessary info about this content in the specified table. */

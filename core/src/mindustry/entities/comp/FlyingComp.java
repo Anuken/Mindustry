@@ -1,10 +1,12 @@
 package mindustry.entities.comp;
 
+import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.environment.*;
 
@@ -14,7 +16,7 @@ import static mindustry.Vars.net;
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
 
-    @Import float x, y;
+    @Import float x, y, speedMultiplier;
     @Import Vec2 vel;
 
     @SyncLocal float elevation;
@@ -50,13 +52,13 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
 
     void moveAt(Vec2 vector, float acceleration){
         Vec2 t = tmp1.set(vector).scl(floorSpeedMultiplier()); //target vector
-        tmp2.set(t).sub(vel).limit(acceleration * vector.len()); //delta vector
+        tmp2.set(t).sub(vel).limit(acceleration * vector.len() * Time.delta); //delta vector
         vel.add(tmp2);
     }
 
     float floorSpeedMultiplier(){
         Floor on = isFlying() || hovering ? Blocks.air.asFloor() : floorOn();
-        return on.speedMultiplier;
+        return on.speedMultiplier * speedMultiplier;
     }
 
     @Override
@@ -74,7 +76,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
         }
 
         if(!hovering && isGrounded() && floor.isLiquid){
-            if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= 7f){
+            if((splashTimer += Mathf.dst(deltaX(), deltaY())) >= (7f + hitSize()/8f)){
                 floor.walkEffect.at(x, y, hitSize() / 8f, floor.mapColor);
                 splashTimer = 0f;
             }
@@ -90,7 +92,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             //TODO is the netClient check necessary?
             if(drownTime >= 0.999f && !net.client()){
                 kill();
-                //TODO drown event!
+                Events.fire(new UnitDrownEvent(self()));
             }
         }else{
             drownTime = Mathf.lerpDelta(drownTime, 0f, 0.03f);

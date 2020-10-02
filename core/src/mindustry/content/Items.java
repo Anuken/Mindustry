@@ -31,7 +31,7 @@ public class Items implements ContentList{
         }};
 
         sand = new Item("sand", Color.valueOf("f7cba4")){{
-
+            alwaysUnlocked = true;
         }};
 
         coal = new Item("coal", Color.valueOf("272727")){{
@@ -84,7 +84,7 @@ public class Items implements ContentList{
         }};
 
         pyratite = new Item("pyratite", Color.valueOf("ffaa5f")){{
-            flammability = 1.5f;
+            flammability = 1.4f;
             explosiveness = 0.4f;
         }};
     }

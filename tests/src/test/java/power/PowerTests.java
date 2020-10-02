@@ -7,6 +7,7 @@ import mindustry.*;
 import mindustry.core.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.power.PowerGenerator.*;
 import mindustry.world.consumers.*;
 import org.junit.jupiter.api.*;
 
@@ -54,7 +55,7 @@ public class PowerTests extends PowerTestFixture{
 
         void simulateDirectConsumption(float producedPower, float requiredPower, float expectedSatisfaction, String parameterDescription){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-            producerTile.<PowerGenerator.GeneratorEntity>bc().productionEfficiency = 1f;
+            producerTile.<GeneratorBuild>bc().productionEfficiency = 1f;
             Tile directConsumerTile = createFakeTile(0, 1, createFakeDirectConsumer(requiredPower));
 
             PowerGraph powerGraph = new PowerGraph();
@@ -64,7 +65,7 @@ public class PowerTests extends PowerTestFixture{
             assertEquals(producedPower * Time.delta, powerGraph.getPowerProduced(), Mathf.FLOAT_ROUNDING_ERROR);
             assertEquals(requiredPower * Time.delta, powerGraph.getPowerNeeded(), Mathf.FLOAT_ROUNDING_ERROR);
 
-            // Update and check for the expected power status of the consumer
+            //Update and check for the expected power status of the consumer
             powerGraph.update();
             assertEquals(expectedSatisfaction, directConsumerTile.build.power.status, Mathf.FLOAT_ROUNDING_ERROR, parameterDescription + ": Satisfaction of direct consumer did not match");
         }
@@ -94,7 +95,7 @@ public class PowerTests extends PowerTestFixture{
 
             if(producedPower > 0.0f){
                 Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(producedPower));
-                producerTile.<PowerGenerator.GeneratorEntity>bc().productionEfficiency = 1f;
+                producerTile.<GeneratorBuild>bc().productionEfficiency = 1f;
                 powerGraph.add(producerTile.build);
             }
             Tile directConsumerTile = null;
@@ -119,7 +120,7 @@ public class PowerTests extends PowerTestFixture{
         @Test
         void directConsumptionStopsWithNoPower(){
             Tile producerTile = createFakeTile(0, 0, createFakeProducerBlock(10.0f));
-            producerTile.<PowerGenerator.GeneratorEntity>bc().productionEfficiency = 1.0f;
+            producerTile.<GeneratorBuild>bc().productionEfficiency = 1.0f;
             Tile consumerTile = createFakeTile(0, 1, createFakeDirectConsumer(5.0f));
 
             PowerGraph powerGraph = new PowerGraph();

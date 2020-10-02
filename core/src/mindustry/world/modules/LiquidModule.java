@@ -11,35 +11,47 @@ import java.util.*;
 import static mindustry.Vars.content;
 
 public class LiquidModule extends BlockModule{
-    private static final int windowSize = 60, updateInterval = 60;
-    private static Interval flowTimer = new Interval(1);
+    private static final int windowSize = 3, updateInterval = 60;
+    private static final Interval flowTimer = new Interval(2);
+    private static final float pollScl = 20f;
 
     private float[] liquids = new float[content.liquids().size];
     private float total;
     private Liquid current = content.liquid(0);
     private float smoothLiquid;
 
+    private boolean hadFlow;
     private @Nullable WindowedMean flow;
     private float lastAdded, currentFlowRate;
 
     public void update(boolean showFlow){
         smoothLiquid = Mathf.lerpDelta(smoothLiquid, currentAmount(), 0.1f);
         if(showFlow){
-            if(flow == null) flow = new WindowedMean(windowSize);
-            flow.add(lastAdded);
-            lastAdded = 0;
-            if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
-                currentFlowRate = flow.hasEnoughData() ? flow.mean() / Time.delta : -1f;
+            if(flowTimer.get(1, pollScl)){
+
+                if(flow == null) flow = new WindowedMean(windowSize);
+                if(lastAdded > 0.0001f) hadFlow = true;
+
+                flow.add(lastAdded);
+                lastAdded = 0;
+                if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
+                    currentFlowRate = flow.hasEnoughData() ? flow.mean() / pollScl : -1f;
+                }
             }
         }else{
             currentFlowRate = -1f;
             flow = null;
+            hadFlow = false;
         }
     }
 
     /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
     public float getFlowRate(){
         return currentFlowRate * 60;
+    }
+
+    public boolean hadFlow(){
+        return hadFlow;
     }
 
     public float smoothAmount(){
@@ -110,29 +122,29 @@ public class LiquidModule extends BlockModule{
 
     @Override
     public void write(Writes write){
-        byte amount = 0;
+        int amount = 0;
         for(float liquid : liquids){
             if(liquid > 0) amount++;
         }
 
-        write.b(amount); //amount of liquids
+        write.s(amount); //amount of liquids
 
         for(int i = 0; i < liquids.length; i++){
             if(liquids[i] > 0){
-                write.b(i); //liquid ID
-                write.f(liquids[i]); //item amount
+                write.s(i); //liquid ID
+                write.f(liquids[i]); //liquid amount
             }
         }
     }
 
     @Override
-    public void read(Reads read){
+    public void read(Reads read, boolean legacy){
         Arrays.fill(liquids, 0);
         total = 0f;
-        byte count = read.b();
+        int count = legacy ? read.ub() : read.s();
 
         for(int j = 0; j < count; j++){
-            int liquidid = read.b();
+            int liquidid = legacy ? read.ub() : read.s();
             float amount = read.f();
             liquids[liquidid] = amount;
             if(amount > 0){

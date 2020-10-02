@@ -34,6 +34,10 @@ public class Consumers{
         return get(ConsumeType.power);
     }
 
+    public ConsumeItems getItem(){
+        return get(ConsumeType.item);
+    }
+
     public boolean hasPower(){
         return has(ConsumeType.power);
     }
@@ -52,8 +56,8 @@ public class Consumers{
     }
 
     /** Creates a consumer which only consumes power when the condition is met. */
-    public ConsumePower powerCond(float usage, Boolf<Building> cons){
-        return add(new ConditionalConsumePower(usage, cons));
+    public <T extends Building> ConsumePower powerCond(float usage, Boolf<T> cons){
+        return add(new ConditionalConsumePower(usage, (Boolf<Building>)cons));
     }
 
     /**

@@ -26,11 +26,11 @@ public class UnitBlock extends PayloadAcceptor{
 
     @Remote(called = Loc.server)
     public static void unitBlockSpawn(Tile tile){
-        if(!(tile.build instanceof UnitBlockEntity)) return;
-        tile.<UnitBlockEntity>bc().spawned();
+        if(!(tile.build instanceof UnitBuild)) return;
+        tile.<UnitBuild>bc().spawned();
     }
 
-    public class UnitBlockEntity extends PayloadAcceptorEntity<UnitPayload>{
+    public class UnitBuild extends PayloadAcceptorBuild<UnitPayload>{
         public float progress, time, speedScl;
 
         public void spawned(){
@@ -55,7 +55,9 @@ public class UnitBlock extends PayloadAcceptor{
 
         @Override
         public void dumpPayload(){
-            Call.unitBlockSpawn(tile);
+            if(payload.dump()){
+                Call.unitBlockSpawn(tile);
+            }
         }
     }
 }

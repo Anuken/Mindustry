@@ -94,7 +94,6 @@ public class Control implements ApplicationListener, Loadable{
             tutorial.reset();
 
             hiscore = false;
-
             saves.resetSave();
         });
 
@@ -109,20 +108,24 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(GameOverEvent.class, event -> {
             state.stats.wavesLasted = state.wave;
-            Effects.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
+            Effect.shake(5, 6, Core.camera.position.x, Core.camera.position.y);
             //the restart dialog can show info for any number of scenarios
             Call.gameOver(event.winner);
         });
 
+        //add player when world loads regardless
+        Events.on(WorldLoadEvent.class, e -> {
+            player.add();
+        });
+
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
-            player.add();
             if(state.rules.pvp && !net.active()){
                 try{
                     net.host(port);
                     player.admin(true);
                 }catch(IOException e){
-                    ui.showException("$server.error", e);
+                    ui.showException("@server.error", e);
                     state.set(State.menu);
                 }
             }
@@ -152,12 +155,6 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(ZoneRequireCompleteEvent.class, e -> {
-            if(e.objective.display() != null){
-                ui.hudfrag.showToast(Core.bundle.format("zone.requirement.complete", e.zoneForMet.localizedName, e.objective.display()));
-            }
-        });
-
         //delete save on campaign game over
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){
@@ -171,7 +168,7 @@ public class Control implements ApplicationListener, Loadable{
             }
         });
 
-        Events.on(Trigger.newGame, () -> {
+        Events.run(Trigger.newGame, () -> {
             Building core = player.closestCore();
 
             if(core == null) return;
@@ -185,10 +182,10 @@ public class Control implements ApplicationListener, Loadable{
 
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
+            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
-                Effects.shake(5f, 5f, core);
+                Effect.shake(5f, 5f, core);
             });
         });
 
@@ -196,7 +193,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void loadAsync(){
-        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
+        Draw.scl = 1f / Core.atlas.find("scale_marker").width;
 
         Core.input.setCatch(KeyCode.back, true);
 
@@ -257,7 +254,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     //TODO move
-    public void handleLaunch(CoreEntity tile){
+    public void handleLaunch(CoreBuild tile){
         LaunchCorec ent = LaunchCore.create();
         ent.set(tile);
         ent.block(Blocks.coreShard);
@@ -277,11 +274,13 @@ public class Control implements ApplicationListener, Loadable{
         ui.loadAnd(() -> {
             ui.planet.hide();
             SaveSlot slot = sector.save;
+            sector.planet.setLastSector(sector);
             if(slot != null && !clearSectors){
 
                 try{
                     net.reset();
                     slot.load();
+                    slot.setAutosave(true);
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
@@ -311,7 +310,7 @@ public class Control implements ApplicationListener, Loadable{
                 }catch(SaveException e){
                     Log.err(e);
                     sector.save = null;
-                    Time.runTask(10f, () -> ui.showErrorMessage("$save.corrupted"));
+                    Time.runTask(10f, () -> ui.showErrorMessage("@save.corrupted"));
                     slot.delete();
                     playSector(origin, sector);
                 }
@@ -323,6 +322,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.rules.sector = sector;
                 //assign origin when launching
                 state.secinfo.origin = origin;
+                state.secinfo.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);
@@ -331,6 +331,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playTutorial(){
+        ui.showInfo("@indev.notready");
         //TODO implement
         //ui.showInfo("death");
         /*
@@ -429,10 +430,13 @@ public class Control implements ApplicationListener, Loadable{
 
         //just a regular reminder
         if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
-            ui.showInfo("[scarlet]6.0 is not supposed to be played.[] Go do something else.");
+            app.post(() -> app.post(() -> {
+                ui.showStartupInfo("@indev.popup");
+            }));
         }
 
-        //play tutorial on stop
+        //play tutorial on start
+        //TODO no tutorial right now
         if(!settings.getBool("playedtutorial", false)){
             //Core.app.post(() -> Core.app.post(this::playTutorial));
         }
@@ -440,7 +444,7 @@ public class Control implements ApplicationListener, Loadable{
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             Core.app.post(() -> Core.app.post(() -> {
-                BaseDialog dialog = new BaseDialog("$confirm");
+                BaseDialog dialog = new BaseDialog("@confirm");
                 dialog.setFillParent(true);
 
                 float[] countdown = {60 * 11};
@@ -459,9 +463,9 @@ public class Control implements ApplicationListener, Loadable{
                 }).pad(10f).expand().center();
 
                 dialog.buttons.defaults().size(200f, 60f);
-                dialog.buttons.button("$uiscale.cancel", exit);
+                dialog.buttons.button("@uiscale.cancel", exit);
 
-                dialog.buttons.button("$ok", () -> {
+                dialog.buttons.button("@ok", () -> {
                     Core.settings.put("uiscalechanged", false);
                     dialog.hide();
                 });
@@ -515,7 +519,7 @@ public class Control implements ApplicationListener, Loadable{
                 platform.updateRPC();
             }
 
-            if(Core.input.keyTap(Binding.pause) && !state.isOutOfTime() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 

@@ -110,7 +110,6 @@ public class ApplicationTests{
         Time.setDeltaProvider(() -> 1000f);
         Time.update();
         Time.update();
-        Time.setDeltaProvider(() -> 1f);
         Groups.unit.update();
         assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
     }
@@ -289,7 +288,6 @@ public class ApplicationTests{
         state.set(State.playing);
 
         world.tile(0, 0).setBlock(Blocks.conveyor);
-        world.tile(0, 0).rotation(0);
         world.tile(0, 0).build.acceptStack(Items.copper, 1000, null);
     }
 
@@ -372,15 +370,14 @@ public class ApplicationTests{
         Seq<Building> entities = Seq.with(world.tile(0, 0).build);
 
         for(int i = 0; i < length; i++){
-            world.tile(i + 1, 0).setBlock(Blocks.conveyor);
-            world.tile(i + 1, 0).rotation(0);
+            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.derelict, 0);
             entities.add(world.tile(i + 1, 0).build);
         }
 
         world.tile(length + 1, 0).setBlock(new Block("___"){{
             hasItems = true;
             destructible = true;
-            entityType = () -> new Building(){
+            buildType = () -> new Building(){
                 @Override
                 public void handleItem(Building source, Item item){
                     itemsa[0] ++;
@@ -526,6 +523,9 @@ public class ApplicationTests{
 
         Time.setDeltaProvider(() -> 9999f);
 
+        //prevents range issues
+        state.rules.infiniteResources = true;
+
         d1.update();
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
@@ -533,7 +533,10 @@ public class ApplicationTests{
 
         d2.clearBuilding();
         d2.addBuild(new BuildPlan(1, 1));
-        d2.update();
+
+        for(int i = 0; i < 3; i++){
+            d2.update();
+        }
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -571,7 +574,7 @@ public class ApplicationTests{
                     }catch(Throwable t){
                         fail("Failed to update block '" + tile.block() + "'.", t);
                     }
-                    assertEquals(tile.block(), tile.build.block());
+                    assertEquals(tile.block(), tile.build.block);
                     assertEquals(tile.block().health, tile.build.health());
                 }
             }

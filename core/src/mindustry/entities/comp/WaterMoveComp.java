@@ -4,15 +4,16 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.EntityCollisions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
-
-import static mindustry.Vars.*;
 
 //just a proof of concept
 @Component
@@ -35,13 +36,26 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
         }
     }
 
+    @Override
+    @Replace
+    public int pathType(){
+        return Pathfinder.costWater;
+    }
+
+    @Override
+    public void add(){
+        tleft.clear();
+        tright.clear();
+    }
+
+    @Override
     public void draw(){
         float z = Draw.z();
 
         Draw.z(Layer.debris);
 
-        Floor floor = floorOn();
-        Color color = Tmp.c1.set(floor.mapColor).mul(1.5f);
+        Floor floor = tileOn() == null ? Blocks.air.asFloor() : tileOn().floor();
+        Color color = Tmp.c1.set(floor.mapColor.equals(Color.black) ? Blocks.water.mapColor : floor.mapColor).mul(1.5f);
         trailColor.lerp(color, Mathf.clamp(Time.delta * 0.04f));
 
         tleft.draw(trailColor, type.trailScl);
@@ -52,25 +66,19 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
     @Replace
     @Override
-    public void move(float cx, float cy){
-        if(isGrounded()){
-            collisions.moveCheck(this, cx, cy, EntityCollisions::waterSolid);
-        }else{
-            x += cx;
-            y += cy;
-        }
-    }
-
-    @Replace
-    @Override
-    public boolean canDrown(){
-        return false;
+    public SolidPred solidity(){
+        return isFlying() ? null : EntityCollisions::waterSolid;
     }
 
     @Replace
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
         return on.isDeep() ? 1.3f : 1f;
+    }
+
+    public boolean onLiquid(){
+        Tile tile = tileOn();
+        return tile != null && tile.floor().isLiquid;
     }
 }
 

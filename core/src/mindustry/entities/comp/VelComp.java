@@ -1,9 +1,14 @@
 package mindustry.entities.comp;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.EntityCollisions.*;
 import mindustry.gen.*;
+
+import static mindustry.Vars.*;
 
 @Component
 abstract class VelComp implements Posc{
@@ -18,7 +23,24 @@ abstract class VelComp implements Posc{
     @Override
     public void update(){
         move(vel.x * Time.delta, vel.y * Time.delta);
-        vel.scl(1f - drag * Time.delta);
+        vel.scl(Mathf.clamp(1f - drag * Time.delta));
+    }
+
+    /** @return function to use for check solid state. if null, no checking is done. */
+    @Nullable
+    SolidPred solidity(){
+        return null;
+    }
+
+    /** @return whether this entity can move through a location*/
+    boolean canPass(int tileX, int tileY){
+        SolidPred s = solidity();
+        return s == null || !s.solid(tileX, tileY);
+    }
+
+    /** @return whether this entity can exist on its current location*/
+    boolean canPassOn(){
+        return canPass(tileX(), tileY());
     }
 
     boolean moving(){
@@ -26,7 +48,13 @@ abstract class VelComp implements Posc{
     }
 
     void move(float cx, float cy){
-        x += cx;
-        y += cy;
+        SolidPred check = solidity();
+
+        if(check != null){
+            collisions.move(self(), cx, cy, check);
+        }else{
+            x += cx;
+            y += cy;
+        }
     }
 }

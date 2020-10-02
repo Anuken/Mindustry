@@ -12,10 +12,13 @@ import mindustry.graphics.*;
 public class ContinuousLaserBulletType extends BulletType{
     public float length = 220f;
     public float shake = 1f;
+    public float fadeTime = 16f;
     public Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
     public float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
     public float[] strokes = {2f, 1.5f, 1f, 0.3f};
     public float[] lenscales = {1f, 1.12f, 1.15f, 1.17f};
+    public float width = 9f, oscScl = 0.8f, oscMag = 1.5f;
+    public boolean largeHit = true;
 
     public ContinuousLaserBulletType(float damage){
         super(0.001f, damage);
@@ -25,12 +28,16 @@ public class ContinuousLaserBulletType extends BulletType{
         hitSize = 4;
         drawSize = 420f;
         lifetime = 16f;
+        keepVelocity = false;
         pierce = true;
         hittable = false;
         hitColor = colors[2];
+        collidesTiles = false;
         incendAmount = 1;
         incendSpread = 5;
         incendChance = 0.4f;
+        lightColor = Color.orange;
+        absorbable = false;
     }
 
     protected ContinuousLaserBulletType(){
@@ -43,36 +50,45 @@ public class ContinuousLaserBulletType extends BulletType{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        drawSize = Math.max(drawSize, length*2f);
+    }
+
+    @Override
     public void update(Bullet b){
         //TODO possible laser absorption from blocks
 
         //damage every 5 ticks
         if(b.timer(1, 5f)){
-            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), length, true);
+            Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), length, largeHit);
         }
 
         if(shake > 0){
-            Effects.shake(shake, shake, b);
+            Effect.shake(shake, shake, b);
         }
     }
 
     @Override
     public void draw(Bullet b){
-        float baseLen = length * b.fout();
+        float realLength = Damage.findLaserLength(b, length);
+        float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
+        float baseLen = realLength * fout;
 
         Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
         for(int s = 0; s < colors.length; s++){
             Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
             for(int i = 0; i < tscales.length; i++){
                 Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * 35f);
-                Lines.stroke((9f + Mathf.absin(Time.time(), 0.8f, 1.5f)) * b.fout() * strokes[s] * tscales[i]);
-                Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], CapStyle.none);
+                Lines.stroke((width + Mathf.absin(Time.time(), oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
+                Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
             }
         }
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
 
-        Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 40, Color.orange, 0.7f);
+        Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 40, lightColor, 0.7f);
         Draw.reset();
     }
 

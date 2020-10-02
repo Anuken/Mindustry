@@ -24,6 +24,7 @@ import mindustry.editor.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.LogicDialog;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.fragments.*;
@@ -67,6 +68,7 @@ public class UI implements ApplicationListener, Loadable{
     public SchematicsDialog schematics;
     public ModsDialog mods;
     public ColorPicker picker;
+    public LogicDialog logic;
 
     public Cursor drillCursor, unloadCursor;
 
@@ -85,7 +87,7 @@ public class UI implements ApplicationListener, Loadable{
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
 
-        Core.assets.getAll(BitmapFont.class, new Seq<>()).each(font -> font.setUseIntegerPositions(true));
+        Core.assets.getAll(Font.class, new Seq<>()).each(font -> font.setUseIntegerPositions(true));
         Core.scene = new Scene();
         Core.input.addProcessor(Core.scene);
 
@@ -99,6 +101,7 @@ public class UI implements ApplicationListener, Loadable{
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
 
         Tooltips.getInstance().animations = false;
+        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black5).margin(4f).add(text));
 
         Core.settings.setErrorHandler(e -> {
             e.printStackTrace();
@@ -118,12 +121,14 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public Seq<AssetDescriptor> getDependencies(){
-        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", BitmapFont.class), new AssetDescriptor<>("default", BitmapFont.class), new AssetDescriptor<>("chat", BitmapFont.class));
+        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", Font.class), new AssetDescriptor<>("default", Font.class), new AssetDescriptor<>("chat", Font.class));
     }
 
     @Override
     public void update(){
         if(disableUI || Core.scene == null) return;
+
+        Events.fire(Trigger.uiDrawBegin);
 
         Core.scene.act();
         Core.scene.draw();
@@ -140,6 +145,8 @@ public class UI implements ApplicationListener, Loadable{
             control.tutorial.draw();
             Draw.flush();
         }
+
+        Events.fire(Trigger.uiDrawEnd);
     }
 
     @Override
@@ -178,14 +185,15 @@ public class UI implements ApplicationListener, Loadable{
         research = new ResearchDialog();
         mods = new ModsDialog();
         schematics = new SchematicsDialog();
+        logic = new LogicDialog();
 
         Group group = Core.scene.root;
 
         menuGroup.setFillParent(true);
-        menuGroup.touchable(Touchable.childrenOnly);
+        menuGroup.touchable = Touchable.childrenOnly;
         menuGroup.visible(() -> state.isMenu());
         hudGroup.setFillParent(true);
-        hudGroup.touchable(Touchable.childrenOnly);
+        hudGroup.touchable = Touchable.childrenOnly;
         hudGroup.visible(() -> state.isGame());
 
         Core.scene.add(menuGroup);
@@ -217,14 +225,17 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     public TextureRegionDrawable getIcon(String name){
-        if(Icon.icons.containsKey(name)){
-            return Icon.icons.get(name);
-        }
+        if(Icon.icons.containsKey(name)) return Icon.icons.get(name);
         return Core.atlas.getDrawable("error");
     }
 
+    public TextureRegionDrawable getIcon(String name, String def){
+        if(Icon.icons.containsKey(name)) return Icon.icons.get(name);
+        return getIcon(def);
+    }
+
     public void loadAnd(Runnable call){
-        loadAnd("$loading", call);
+        loadAnd("@loading", call);
     }
 
     public void loadAnd(String text, Runnable call){
@@ -238,7 +249,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showTextInput(String titleText, String dtext, int textLength, String def, boolean inumeric, Cons<String> confirmed){
         if(mobile){
             Core.input.getTextInput(new TextInput(){{
-                this.title = (titleText.startsWith("$") ? Core.bundle.get(titleText.substring(1)) : titleText);
+                this.title = (titleText.startsWith("@") ? Core.bundle.get(titleText.substring(1)) : titleText);
                 this.text = def;
                 this.numeric = inumeric;
                 this.maxLength = textLength;
@@ -251,11 +262,11 @@ public class UI implements ApplicationListener, Loadable{
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
                 field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
                 buttons.defaults().size(120, 54).pad(4);
-                buttons.button("$ok", () -> {
+                buttons.button("@ok", () -> {
                     confirmed.get(field.getText());
                     hide();
                 }).disabled(b -> field.getText().isEmpty());
-                buttons.button("$cancel", this::hide);
+                buttons.button("@cancel", this::hide);
                 keyDown(KeyCode.enter, () -> {
                     String text = field.getText();
                     if(!text.isEmpty()){
@@ -282,6 +293,7 @@ public class UI implements ApplicationListener, Loadable{
 
     public void showInfoFade(String info){
         Table table = new Table();
+        table.touchable = Touchable.disabled;
         table.setFillParent(true);
         table.actions(Actions.fadeOut(7f, Interp.fade), Actions.remove());
         table.top().add(info).style(Styles.outlineLabel).padTop(10);
@@ -292,7 +304,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showInfoToast(String info, float duration){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -305,7 +317,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -318,7 +330,7 @@ public class UI implements ApplicationListener, Loadable{
     public void showLabel(String info, float duration, float worldx, float worldy){
         Table table = new Table();
         table.setFillParent(true);
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
         });
@@ -340,10 +352,18 @@ public class UI implements ApplicationListener, Loadable{
         new Dialog(""){{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.center, Align.center);
-            buttons.button("$ok", () -> {
+            buttons.button("@ok", () -> {
                 hide();
                 listener.run();
             }).size(110, 50).pad(4);
+        }}.show();
+    }
+
+    public void showStartupInfo(String info){
+        new Dialog(""){{
+            getCell(cont).growX();
+            cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.left);
+            buttons.button("@ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -351,13 +371,13 @@ public class UI implements ApplicationListener, Loadable{
         new Dialog(""){{
             setFillParent(true);
             cont.margin(15f);
-            cont.add("$error.title");
+            cont.add("@error.title");
             cont.row();
             cont.image().width(300f).pad(2).height(4f).color(Color.scarlet);
             cont.row();
             cont.add(text).pad(2f).growX().wrap().get().setAlignment(Align.center);
             cont.row();
-            cont.button("$ok", this::hide).size(120, 50).pad(4);
+            cont.button("@ok", this::hide).size(120, 50).pad(4);
         }}.show();
     }
 
@@ -372,17 +392,17 @@ public class UI implements ApplicationListener, Loadable{
 
             setFillParent(true);
             cont.margin(15);
-            cont.add("$error.title").colspan(2);
+            cont.add("@error.title").colspan(2);
             cont.row();
             cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
             cont.row();
-            cont.add((text.startsWith("$") ? Core.bundle.get(text.substring(1)) : text) + (message == null ? "" : "\n[lightgray](" + message + ")")).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
+            cont.add((text.startsWith("@") ? Core.bundle.get(text.substring(1)) : text) + (message == null ? "" : "\n[lightgray](" + message + ")")).colspan(2).wrap().growX().center().get().setAlignment(Align.center);
             cont.row();
 
             Collapser col = new Collapser(base -> base.pane(t -> t.margin(14f).add(Strings.neatError(exc)).color(Color.lightGray).left()), true);
 
-            cont.button("$details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
-            cont.button("$ok", this::hide).size(110, 50).fillX().left();
+            cont.button("@details", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
+            cont.button("@ok", this::hide).size(110, 50).fillX().left();
             cont.row();
             cont.add(col).colspan(2).pad(2);
         }}.show();
@@ -399,14 +419,14 @@ public class UI implements ApplicationListener, Loadable{
             cont.row();
             cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
-            buttons.button("$ok", this::hide).size(110, 50).pad(4);
+            buttons.button("@ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
     public void showInfoText(String titleText, String text){
         new Dialog(titleText){{
             cont.margin(15).add(text).width(400f).wrap().left().get().setAlignment(Align.left, Align.left);
-            buttons.button("$ok", this::hide).size(110, 50).pad(4);
+            buttons.button("@ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -415,7 +435,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.margin(10).add(text);
             titleTable.row();
             titleTable.image().color(Pal.accent).height(3f).growX().pad(2f);
-            buttons.button("$ok", this::hide).size(110, 50).pad(4);
+            buttons.button("@ok", this::hide).size(110, 50).pad(4);
         }}.show();
     }
 
@@ -428,8 +448,8 @@ public class UI implements ApplicationListener, Loadable{
         dialog.cont.add(text).width(mobile ? 400f : 500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.button("$cancel", dialog::hide);
-        dialog.buttons.button("$ok", () -> {
+        dialog.buttons.button("@cancel", dialog::hide);
+        dialog.buttons.button("@ok", () -> {
             dialog.hide();
             confirmed.run();
         });
@@ -469,10 +489,11 @@ public class UI implements ApplicationListener, Loadable{
 
     public void announce(String text){
         Table t = new Table();
+        t.touchable = Touchable.disabled;
         t.background(Styles.black3).margin(8f)
-        .add(text).style(Styles.outlineLabel);
+        .add(text).style(Styles.outlineLabel).labelAlign(Align.center);
         t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
-        t.actions(Actions.fadeOut(3, Interp.pow4In));
+        t.actions(Actions.fadeOut(3, Interp.pow4In), Actions.remove());
         Core.scene.add(t);
     }
 
@@ -481,22 +502,44 @@ public class UI implements ApplicationListener, Loadable{
         dialog.cont.add(text).width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
         dialog.buttons.defaults().size(200f, 54f).pad(2f);
         dialog.setFillParent(false);
-        dialog.buttons.button("$ok", () -> {
+        dialog.buttons.button("@ok", () -> {
             dialog.hide();
             confirmed.run();
         });
         dialog.show();
     }
 
-    public String formatAmount(int number){
-        if(number >= 1000000){
-            return Strings.fixed(number / 1000000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
-        }else if(number >= 10000){
+    //TODO move?
+
+    public static String formatAmount(long number){
+        if(number >= 1_000_000_000){
+            return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
+        }else if(number >= 1_000_000){
+            return Strings.fixed(number / 1_000_000f, 1) + "[gray]" + Core.bundle.get("unit.millions") + "[]";
+        }else if(number >= 10_000){
             return number / 1000 + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else if(number >= 1000){
             return Strings.fixed(number / 1000f, 1) + "[gray]" + Core.bundle.get("unit.thousands") + "[]";
         }else{
             return number + "";
+        }
+    }
+
+    public static int roundAmount(int number){
+        if(number >= 1_000_000_000){
+            return Mathf.round(number, 100_000_000);
+        }else if(number >= 1_000_000){
+            return Mathf.round(number, 100_000);
+        }else if(number >= 10_000){
+            return Mathf.round(number, 1000);
+        }else if(number >= 1000){
+            return Mathf.round(number, 100);
+        }else if(number >= 100){
+            return Mathf.round(number, 100);
+        }else if(number >= 10){
+            return Mathf.round(number, 10);
+        }else{
+            return number;
         }
     }
 }

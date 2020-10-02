@@ -15,6 +15,7 @@ import arc.util.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -56,6 +57,8 @@ public class Block extends UnlockableContent{
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
+    /** whether to display flow rate */
+    public boolean displayFlow = true;
     /** whether this block is visible in the editor */
     public boolean inEditor = true;
     /** the last configuration value applied to this block. */
@@ -74,12 +77,16 @@ public class Block extends UnlockableContent{
     public boolean solidifes;
     /** whether this is rotateable */
     public boolean rotate;
+    /** for static blocks only: if true, tile data() is saved in world data. */
+    public boolean saveData;
     /** whether you can break this with rightclick */
     public boolean breakable;
     /** whether to add this block to brokenblocks */
     public boolean rebuildable = true;
     /** whether this water can only be placed on water */
     public boolean requiresWater = false;
+    /** whether this water can be placed on any liquids, anywhere */
+    public boolean placeableLiquid = false;
     /** whether this floor can be placed on. */
     public boolean placeableOn = true;
     /** whether this block has insulating properties. */
@@ -88,6 +95,14 @@ public class Block extends UnlockableContent{
     public boolean squareSprite = true;
     /** whether this block absorbs laser attacks. */
     public boolean absorbLasers = false;
+    /** if false, the status is never drawn */
+    public boolean enableDrawStatus = true;
+    /** whether to draw disabled status */
+    public boolean drawDisabled = true;
+    /** whether to automatically reset enabled status after a logic block has not interacted for a while. */
+    public boolean autoResetEnabled = true;
+    /** if true, the block stops updating when disabled */
+    public boolean noUpdateDisabled = false;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -181,8 +196,12 @@ public class Block extends UnlockableContent{
     public float buildCostMultiplier = 1f;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
+    /** Whether you can rotate this block with Keybind rotateplaced + Scroll Wheel. */
+    public boolean quickRotate = true;
+    /** Main subclass. Non-anonymous. */
+    public @Nullable Class<?> subclass;
 
-    protected Prov<Building> entityType = null; //initialized later
+    public Prov<Building> buildType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
 
     protected TextureRegion[] generatedIcons;
@@ -192,6 +211,7 @@ public class Block extends UnlockableContent{
     public @Load("@-team") TextureRegion teamRegion;
     public TextureRegion[] teamRegions;
 
+    //TODO make this not static
     public static TextureRegion[][] cracks;
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempTileEnts = new Seq<>();
@@ -203,7 +223,7 @@ public class Block extends UnlockableContent{
 
     public Block(String name){
         super(name);
-        initEntity();
+        initBuilding();
     }
 
     public void drawBase(Tile tile){
@@ -211,7 +231,7 @@ public class Block extends UnlockableContent{
         if(tile.build != null){
             tile.build.draw();
         }else{
-            Draw.rect(region, tile.drawx(), tile.drawy(), rotate ? tile.rotation * 90 : 0);
+            Draw.rect(region, tile.drawx(), tile.drawy());
         }
     }
 
@@ -234,7 +254,7 @@ public class Block extends UnlockableContent{
         if(renderer.pixelator.enabled()) return 0;
 
         Color color = valid ? Pal.accent : Pal.remove;
-        BitmapFont font = Fonts.outline;
+        Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
@@ -261,7 +281,8 @@ public class Block extends UnlockableContent{
         return width;
     }
 
-    public float sumAttribute(Attribute attr, int x, int y){
+    public float sumAttribute(@Nullable Attribute attr, int x, int y){
+        if(attr == null) return 0;
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
@@ -310,6 +331,10 @@ public class Block extends UnlockableContent{
             stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
         }
 
+        if(instantTransfer){
+            stats.add(BlockStat.maxConsecutive, 2, StatUnit.none);
+        }
+
         consumes.display(stats);
 
         // Note: Power stats are added by the consumers.
@@ -347,12 +372,20 @@ public class Block extends UnlockableContent{
     }
 
     public boolean canReplace(Block other){
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size == other.size;
+        if(other.alwaysReplace) return true;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && (size == other.size || (size >= other.size && subclass != null && subclass == other.subclass));
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
         return this;
+    }
+
+    public Object nextConfig(){
+        if(saveConfig && lastConfig != null){
+            return lastConfig;
+        }
+        return null;
     }
 
     public void drawRequest(BuildPlan req, Eachable<BuildPlan> list, boolean valid){
@@ -370,7 +403,7 @@ public class Block extends UnlockableContent{
         TextureRegion reg = getRequestRegion(req, list);
         Draw.rect(reg, req.drawx(), req.drawy(), !rotate ? 0 : req.rotation * 90);
 
-        if(req.hasConfig){
+        if(req.config != null){
             drawRequestConfig(req, list);
         }
     }
@@ -394,6 +427,11 @@ public class Block extends UnlockableContent{
 
     public void drawRequestConfigTop(BuildPlan req, Eachable<BuildPlan> list){
 
+    }
+
+    /** Transforms the internal position of this config using the specified function, and return the result. */
+    public Object pointConfig(Object config, Cons<Point2> transformer){
+        return config;
     }
 
     /** Configure when a null value is passed.*/
@@ -464,12 +502,12 @@ public class Block extends UnlockableContent{
         return variantRegions;
     }
 
-    public boolean hasEntity(){
+    public boolean hasBuilding(){
         return destructible || update;
     }
 
-    public final Building newEntity(){
-        return entityType.get();
+    public final Building newBuilding(){
+        return buildType.get();
     }
 
     public Rect bounds(int x, int y, Rect rect){
@@ -545,7 +583,7 @@ public class Block extends UnlockableContent{
         Arrays.sort(requirements, Structs.comparingInt(i -> i.item.id));
     }
 
-    protected void initEntity(){
+    protected void initBuilding(){
         //attempt to find the first declared class and use it as the entity type
         try{
             Class<?> current = getClass();
@@ -554,13 +592,15 @@ public class Block extends UnlockableContent{
                 current = current.getSuperclass();
             }
 
-            while(entityType == null && Block.class.isAssignableFrom(current)){
+            subclass = current;
+
+            while(buildType == null && Block.class.isAssignableFrom(current)){
                 //first class that is subclass of Building
                 Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Building.class.isAssignableFrom(t) && !t.isInterface());
                 if(type != null){
                     //these are inner classes, so they have an implicit parameter generated
                     Constructor<? extends Building> cons = (Constructor<? extends Building>)type.getDeclaredConstructor(type.getDeclaringClass());
-                    entityType = () -> {
+                    buildType = () -> {
                         try{
                             return cons.newInstance(this);
                         }catch(Exception e){
@@ -576,9 +616,29 @@ public class Block extends UnlockableContent{
         }catch(Throwable ignored){
         }
 
-        if(entityType == null){
+        if(buildType == null){
             //assign default value
-            entityType = Building::create;
+            buildType = Building::create;
+        }
+    }
+
+    @Override
+    public ItemStack[] researchRequirements(){
+        ItemStack[] out = new ItemStack[requirements.length];
+        for(int i = 0; i < out.length; i++){
+            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20, 10);
+
+            out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
+        }
+
+        return out;
+    }
+
+    @Override
+    public void getDependencies(Cons<UnlockableContent> cons){
+        //just requires items
+        for(ItemStack stack : requirements){
+            cons.get(stack.item);
         }
     }
 
@@ -599,6 +659,10 @@ public class Block extends UnlockableContent{
         //initialize default health based on size
         if(health == -1){
             health = size * size * 40;
+        }
+
+        if(group == BlockGroup.transportation || consumes.has(ConsumeType.item) || category == Category.distribution){
+            acceptsItems = true;
         }
 
         offset = ((size + 1) % 2) * tilesize / 2f;
@@ -628,7 +692,7 @@ public class Block extends UnlockableContent{
     public void load(){
         region = Core.atlas.find(name);
 
-        if(cracks == null || (cracks[0][0].getTexture() != null && cracks[0][0].getTexture().isDisposed())){
+        if(cracks == null || (cracks[0][0].texture != null && cracks[0][0].texture.isDisposed())){
             cracks = new TextureRegion[maxCrackSize][crackRegions];
             for(int size = 1; size <= maxCrackSize; size++){
                 for(int i = 0; i < crackRegions; i++){

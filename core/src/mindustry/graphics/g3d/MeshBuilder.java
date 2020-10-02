@@ -4,11 +4,10 @@ import arc.graphics.*;
 import arc.graphics.VertexAttributes.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
-import arc.util.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 
 public class MeshBuilder{
-    private static final Vec3 v1 = new Vec3(), v2 = new Vec3(), v3 = new Vec3();
+    private static final Vec3 v1 = new Vec3(), v2 = new Vec3(), v3 = new Vec3(), v4 = new Vec3();
     private static final float[] floats = new float[3 + 3 + 1];
     private static Mesh mesh;
 
@@ -111,7 +110,7 @@ public class MeshBuilder{
     }
 
     private static Vec3 normal(Vec3 v1, Vec3 v2, Vec3 v3){
-        return Tmp.v32.set(v2).sub(v1).crs(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z).nor();
+        return v4.set(v2).sub(v1).crs(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z).nor();
     }
 
     private static void verts(Vec3 a, Vec3 b, Vec3 c, Vec3 normal, Color color){

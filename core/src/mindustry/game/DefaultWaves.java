@@ -1,41 +1,51 @@
 package mindustry.game;
 
-import arc.struct.Seq;
+import arc.math.*;
+import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
-import mindustry.type.ItemStack;
+import mindustry.type.*;
+
+import static mindustry.content.UnitTypes.*;
 
 public class DefaultWaves{
     private Seq<SpawnGroup> spawns;
 
     public Seq<SpawnGroup> get(){
-        if(spawns == null && UnitTypes.dagger != null){
+        if(spawns == null && dagger != null){
             spawns = Seq.with(
-            new SpawnGroup(UnitTypes.dagger){{
+            new SpawnGroup(dagger){{
                 end = 10;
                 unitScaling = 2f;
             }},
 
-            new SpawnGroup(UnitTypes.crawler){{
+            new SpawnGroup(crawler){{
                 begin = 4;
                 end = 13;
                 unitAmount = 2;
                 unitScaling = 1.5f;
             }},
 
-            new SpawnGroup(UnitTypes.flare){{
+            new SpawnGroup(flare){{
                 begin = 12;
                 end = 16;
                 unitScaling = 1f;
             }},
 
-            new SpawnGroup(UnitTypes.dagger){{
+            new SpawnGroup(dagger){{
                 begin = 11;
                 unitScaling = 1.7f;
                 spacing = 2;
                 max = 4;
             }},
 
-            new SpawnGroup(UnitTypes.mace){{
+            new SpawnGroup(pulsar){{
+                begin = 13;
+                spacing = 3;
+                unitScaling = 0.5f;
+            }},
+
+            new SpawnGroup(mace){{
                 begin = 7;
                 spacing = 3;
                 unitScaling = 2;
@@ -43,28 +53,28 @@ public class DefaultWaves{
                 end = 30;
             }},
 
-            new SpawnGroup(UnitTypes.dagger){{
+            new SpawnGroup(dagger){{
                 begin = 8;
                 unitScaling = 1;
                 unitAmount = 4;
                 spacing = 2;
             }},
 
-            new SpawnGroup(UnitTypes.mace){{
+            new SpawnGroup(mace){{
                 begin = 28;
                 spacing = 3;
                 unitScaling = 1;
                 end = 40;
             }},
 
-            new SpawnGroup(UnitTypes.mace){{
+            new SpawnGroup(mace){{
                 begin = 45;
                 spacing = 3;
                 unitScaling = 2;
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.mace){{
+            new SpawnGroup(mace){{
                 begin = 120;
                 spacing = 2;
                 unitScaling = 3;
@@ -72,13 +82,13 @@ public class DefaultWaves{
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.flare){{
+            new SpawnGroup(flare){{
                 begin = 16;
                 unitScaling = 1;
                 spacing = 2;
             }},
 
-            new SpawnGroup(UnitTypes.dagger){{
+            new SpawnGroup(dagger){{
                 begin = 82;
                 spacing = 3;
                 unitAmount = 4;
@@ -86,7 +96,7 @@ public class DefaultWaves{
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.dagger){{
+            new SpawnGroup(dagger){{
                 begin = 41;
                 spacing = 5;
                 unitAmount = 1;
@@ -94,7 +104,7 @@ public class DefaultWaves{
                 effect = StatusEffects.shielded;
             }},
 
-            new SpawnGroup(UnitTypes.fortress){{
+            new SpawnGroup(fortress){{
                 begin = 40;
                 spacing = 5;
                 unitAmount = 2;
@@ -102,7 +112,7 @@ public class DefaultWaves{
                 max = 20;
             }},
 
-            new SpawnGroup(UnitTypes.dagger){{
+            new SpawnGroup(dagger){{
                 begin = 35;
                 spacing = 3;
                 unitAmount = 4;
@@ -111,7 +121,7 @@ public class DefaultWaves{
                 end = 60;
             }},
 
-            new SpawnGroup(UnitTypes.dagger){{
+            new SpawnGroup(dagger){{
                 begin = 42;
                 spacing = 3;
                 unitAmount = 4;
@@ -120,14 +130,14 @@ public class DefaultWaves{
                 end = 130;
             }},
 
-            new SpawnGroup(UnitTypes.horizon){{
+            new SpawnGroup(horizon){{
                 begin = 40;
                 unitAmount = 2;
                 spacing = 2;
                 unitScaling = 2;
             }},
 
-            new SpawnGroup(UnitTypes.flare){{
+            new SpawnGroup(flare){{
                 begin = 50;
                 unitAmount = 4;
                 unitScaling = 3;
@@ -135,7 +145,7 @@ public class DefaultWaves{
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(UnitTypes.zenith){{
+            new SpawnGroup(zenith){{
                 begin = 50;
                 unitAmount = 2;
                 unitScaling = 3;
@@ -143,42 +153,42 @@ public class DefaultWaves{
                 max = 16;
             }},
 
-            new SpawnGroup(UnitTypes.horizon){{
+            new SpawnGroup(horizon){{
                 begin = 53;
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
             }},
 
-            new SpawnGroup(UnitTypes.atrax){{
+            new SpawnGroup(atrax){{
                 begin = 31;
                 unitAmount = 4;
                 unitScaling = 1;
                 spacing = 3;
             }},
 
-            new SpawnGroup(UnitTypes.vestige){{
+            new SpawnGroup(scepter){{
                 begin = 41;
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 30;
             }},
 
-            new SpawnGroup(UnitTypes.cataclyst){{
+            new SpawnGroup(reign){{
                 begin = 81;
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
             }},
 
-            new SpawnGroup(UnitTypes.antumbra){{
+            new SpawnGroup(antumbra){{
                 begin = 131;
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
             }},
 
-            new SpawnGroup(UnitTypes.horizon){{
+            new SpawnGroup(horizon){{
                 begin = 90;
                 unitAmount = 2;
                 unitScaling = 3;
@@ -187,5 +197,77 @@ public class DefaultWaves{
             );
         }
         return spawns == null ? new Seq<>() : spawns;
+    }
+
+    //TODO move elsewhere
+    public static Seq<SpawnGroup> generate(){
+        UnitType[][] species = {
+        {dagger, mace, fortress, scepter, reign},
+        {nova, pulsar, quasar, vela, corvus},
+        {crawler, atrax, spiroct, arkyid, toxopid},
+        //{risso, minke, bryde, sei, omura}, //questionable choices
+        //{mono, poly, mega, quad, oct}, //do not attack
+        {flare, horizon, zenith, antumbra, eclipse}
+        };
+
+        //required progression:
+        //- extra periodic patterns
+
+        Seq<SpawnGroup> out = new Seq<>();
+
+        //max reasonable wave, after which everything gets boring
+        int cap = 400;
+
+        //main sequence
+        float shieldStart = 30, shieldsPerWave = 12;
+        UnitType[] curSpecies = Structs.random(species);
+        int curTier = 0;
+
+        for(int i = 0; i < cap;){
+            int f = i;
+            int next = Mathf.random(15, 25);
+
+            float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
+
+            //main progression
+            out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
+                unitAmount = f == 0 ? 1 : 10;
+                begin = f;
+                end = f + next >= cap ? never : f + next;
+                max = 16;
+                unitScaling = Mathf.random(1f, 2f);
+                shields = shieldAmount;
+                shieldScaling = shieldsPerWave;
+            }});
+
+            //extra progression that tails out, blends in
+            out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
+                unitAmount = 6;
+                begin = f + next;
+                end = f + next + Mathf.random(8, 12);
+                max = 10;
+                unitScaling = Mathf.random(2f);
+                spacing = Mathf.random(2, 3);
+                shields = shieldAmount;
+                shieldScaling = shieldsPerWave;
+            }});
+
+            i += next;
+            if(curTier < 3 || Mathf.chance(0.2)){
+                curTier ++;
+            }
+
+            //do not spawn bosses
+            curTier = Math.min(curTier, 3);
+
+            //small chance to switch species
+            if(Mathf.chance(0.2)){
+                curSpecies = Structs.random(species);
+            }
+        }
+
+
+
+        return out;
     }
 }

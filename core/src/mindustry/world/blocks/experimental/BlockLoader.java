@@ -40,7 +40,7 @@ public class BlockLoader extends PayloadAcceptor{
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((BlockLoaderEntity)entity)::fraction));
+        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, ((BlockLoaderBuild)entity)::fraction));
     }
 
     @Override
@@ -50,13 +50,13 @@ public class BlockLoader extends PayloadAcceptor{
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
-    public class BlockLoaderEntity extends PayloadAcceptorEntity<BlockPayload>{
+    public class BlockLoaderBuild extends PayloadAcceptorBuild<BlockPayload>{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return super.acceptPayload(source, payload) &&
                 (payload instanceof BlockPayload) &&
-                ((((BlockPayload)payload).entity.block().hasItems && ((BlockPayload)payload).block().unloadable && ((BlockPayload)payload).block().itemCapacity >= 10)/* ||
+                ((((BlockPayload)payload).entity.block.hasItems && ((BlockPayload)payload).block().unloadable && ((BlockPayload)payload).block().itemCapacity >= 10)/* ||
                 ((BlockPayload)payload).entity.block().hasLiquids && ((BlockPayload)payload).block().liquidCapacity >= 10f)*/);
         }
 
@@ -71,7 +71,7 @@ public class BlockLoader extends PayloadAcceptor{
 
             //draw input
             for(int i = 0; i < 4; i++){
-                if(blends(i) && i != rotation()){
+                if(blends(i) && i != rotation){
                     Draw.rect(inRegion, x, y, i * 90);
                 }
             }
@@ -127,7 +127,7 @@ public class BlockLoader extends PayloadAcceptor{
         }
 
         public float fraction(){
-            return payload == null ? 0f : payload.entity.items.total() / (float)payload.entity.block().itemCapacity;
+            return payload == null ? 0f : payload.entity.items.total() / (float)payload.entity.block.itemCapacity;
         }
 
         public boolean shouldExport(){

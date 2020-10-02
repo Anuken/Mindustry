@@ -19,7 +19,7 @@ public class TractorBeamTurret extends Block{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
-    public @Load("block-$size") TextureRegion baseRegion;
+    public @Load("block-@size") TextureRegion baseRegion;
     public @Load("@-laser") TextureRegion laser;
     public @Load("@-laser-end") TextureRegion laserEnd;
 
@@ -31,6 +31,7 @@ public class TractorBeamTurret extends Block{
     public float scaledForce = 0f;
     public float damage = 0f;
     public boolean targetAir = true, targetGround = false;
+    public Color laserColor = Color.white;
 
     public TractorBeamTurret(String name){
         super(name);
@@ -60,7 +61,7 @@ public class TractorBeamTurret extends Block{
         stats.add(BlockStat.damage, damage * 60f, StatUnit.perSecond);
     }
 
-    public class TractorBeamEntity extends Building{
+    public class TractorBeamBuild extends Building{
         public float rotation = 90;
         public @Nullable Unit target;
         public float lastX, lastY, strength;
@@ -75,16 +76,16 @@ public class TractorBeamTurret extends Block{
             }
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().flying){
+            if(target != null && target.within(this, range) && target.team() != team && target.type().flying && efficiency() > 0.01f){
                 any = true;
                 float dest = angleTo(target);
-                rotation = Angles.moveToward(rotation,dest, rotateSpeed * edelta());
+                rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 lastX = target.x;
                 lastY = target.y;
                 strength = Mathf.lerpDelta(strength, 1f, 0.1f);
 
                 if(damage > 0){
-                    target.damageContinuous(damage);
+                    target.damageContinuous(damage * efficiency());
                 }
 
                 //shoot when possible
@@ -105,6 +106,7 @@ public class TractorBeamTurret extends Block{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
+            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
 
             //draw laser if applicable
@@ -113,7 +115,7 @@ public class TractorBeamTurret extends Block{
                 float ang = angleTo(lastX, lastY);
                 float len = 5f;
 
-                Draw.mixcol(Color.white, Mathf.absin(4f, 0.6f));
+                Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
 
                 Drawf.laser(team, laser, laserEnd,
                 x + Angles.trnsx(ang, len), y + Angles.trnsy(ang, len),

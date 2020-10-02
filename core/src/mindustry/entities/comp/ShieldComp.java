@@ -23,7 +23,6 @@ abstract class ShieldComp implements Healthc, Posc{
     @Override
     public void damage(float amount){
         //apply armor
-        //TODO balancing of armor stats & minArmorDamage
         amount = Math.max(amount - armor, minArmorDamage * amount);
 
         hitTime = 1f;

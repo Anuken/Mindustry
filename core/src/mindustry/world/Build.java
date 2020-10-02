@@ -3,18 +3,21 @@ package mindustry.world;
 import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
 public class Build{
+    private static final IntSet tmp = new IntSet();
 
     @Remote(called = Loc.server)
     public static void beginBreak(Team team, int x, int y){
@@ -22,7 +25,7 @@ public class Build{
             return;
         }
 
-        Tile tile = world.Building(x, y);
+        Tile tile = world.tileBuilding(x, y);
         //this should never happen, but it doesn't hurt to check for links
         float prevPercent = 1f;
 
@@ -30,13 +33,14 @@ public class Build{
             prevPercent = tile.build.healthf();
         }
 
-        int rotation = tile.rotation();
+        int rotation = tile.build != null ? tile.build.rotation : 0;
         Block previous = tile.block();
-        Block sub = BuildBlock.get(previous.size);
+        Block sub = ConstructBlock.get(previous.size);
 
         tile.setBlock(sub, team, rotation);
-        tile.<BuildEntity>bc().setDeconstruct(previous);
-        tile.build.health(tile.build.maxHealth() * prevPercent);
+        tile.<ConstructBuild>bc().setDeconstruct(previous);
+        tile.build.health = tile.build.maxHealth * prevPercent;
+
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
@@ -54,12 +58,24 @@ public class Build{
         if(tile == null) return;
 
         Block previous = tile.block();
-        Block sub = BuildBlock.get(result.size);
+        Block sub = ConstructBlock.get(result.size);
+        Seq<Building> prevBuild = new Seq<>(9);
 
         result.beforePlaceBegan(tile, previous);
+        tmp.clear();
+
+        tile.getLinkedTilesAs(result, t -> {
+            if(t.build != null && t.build.team == team && tmp.add(t.build.id)){
+                prevBuild.add(t.build);
+            }
+        });
 
         tile.setBlock(sub, team, rotation);
-        tile.<BuildEntity>bc().setConstruct(previous, result);
+
+        ConstructBuild build = tile.bc();
+
+        build.setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
+        build.prevBuild = prevBuild;
 
         result.placeBegan(tile, previous);
 
@@ -68,8 +84,13 @@ public class Build{
 
     /** Returns whether a tile can be placed at this location by this team. */
     public static boolean validPlace(Block type, Team team, int x, int y, int rotation){
+        return validPlace(type, team, x, y, rotation, true);
+    }
+
+    /** Returns whether a tile can be placed at this location by this team. */
+    public static boolean validPlace(Block type, Team team, int x, int y, int rotation, boolean checkVisible){
         //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
-        if(type == null || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible()))){
+        if(type == null || (checkVisible && (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible())))){
             return false;
         }
 
@@ -90,65 +111,39 @@ public class Build{
             return false;
         }
 
-        if(type.isMultiblock()){
-            if((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type)) &&
-                type.canPlaceOn(tile, team) && tile.interactable(team)){
-
-                //if the block can be replaced but the sizes differ, check all the spaces around the block to make sure it can fit
-                if(type.size != tile.block().size){
-                    int offsetx = -(type.size - 1) / 2;
-                    int offsety = -(type.size - 1) / 2;
-
-                    //this does not check *all* the conditions for placeability yet
-                    for(int dx = 0; dx < type.size; dx++){
-                        for(int dy = 0; dy < type.size; dy++){
-                            int wx = dx + offsetx + x, wy = dy + offsety + y;
-
-                            Tile check = world.tile(wx, wy);
-                            if(check == null || (!check.block.alwaysReplace && check.block != tile.block)) return false;
-                        }
-                    }
-                }
-
-                //make sure that the new block can fit the old one
-                return type.bounds(x, y, Tmp.r1).grow(0.01f).contains(tile.block.bounds(tile.centerX(), tile.centerY(), Tmp.r2));
-            }
-
-            if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type)){
-                return false;
-            }
-
-            if(!type.canPlaceOn(tile, team)){
-                return false;
-            }
-
-            int offsetx = -(type.size - 1) / 2;
-            int offsety = -(type.size - 1) / 2;
-            for(int dx = 0; dx < type.size; dx++){
-                for(int dy = 0; dy < type.size; dy++){
-                    Tile other = world.tile(x + dx + offsetx, y + dy + offsety);
-                    if(
-                        other == null ||
-                        !other.block().alwaysReplace ||
-                        !other.floor().placeableOn ||
-                        (other.floor().isDeep() && !type.floating && !type.requiresWater) ||
-                        (type.requiresWater && tile.floor().liquidDrop != Liquids.water)
-                    ){
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }else{
-            return tile.interactable(team)
-                && (contactsShallows(tile.x, tile.y, type) || type.requiresWater)
-                && (!tile.floor().isDeep() || type.floating || type.requiresWater)
-                && tile.floor().placeableOn
-                && (!type.requiresWater || tile.floor().liquidDrop == Liquids.water)
-                && (((type.canReplace(tile.block()) || (tile.block instanceof BuildBlock && tile.<BuildEntity>bc().cblock == type))
-                && !(type == tile.block() && rotation == tile.rotation() && type.rotate)) || tile.block().alwaysReplace || tile.block() == Blocks.air)
-                && tile.block().isMultiblock() == type.isMultiblock() && type.canPlaceOn(tile, team);
+        if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
+            return false;
         }
+
+        if(!type.canPlaceOn(tile, team)){
+            return false;
+        }
+
+        int offsetx = -(type.size - 1) / 2;
+        int offsety = -(type.size - 1) / 2;
+
+        for(int dx = 0; dx < type.size; dx++){
+            for(int dy = 0; dy < type.size; dy++){
+                int wx = dx + offsetx + tile.x, wy = dy + offsety + tile.y;
+
+
+                Tile check = world.tile(wx, wy);
+
+                if(
+                check == null || //nothing there
+                (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
+                (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate) || //same block, same rotation
+                !check.interactable(team) || //cannot interact
+                !check.floor().placeableOn || //solid wall
+                    !((type.canReplace(check.block()) || //can replace type
+                        (check.block instanceof ConstructBlock && check.<ConstructBuild>bc().cblock == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
+                    type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
+                (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
+                ) return false;
+            }
+        }
+
+        return true;
     }
 
     public static boolean contactsGround(int x, int y, Block block){

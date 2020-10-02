@@ -20,15 +20,16 @@ public class Shaders{
     public static UnitBuild build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, tar, slag;
+    public static SurfaceShader water, mud, tar, slag;
     public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
-    public static MeshShader mesh = new MeshShader();
+    public static MeshShader mesh;
     public static Shader unlit;
     public static Shader screenspace;
 
     public static void init(){
+        mesh = new MeshShader();
         blockbuild = new BlockBuild();
         try{
             shield = new ShieldShader();
@@ -41,6 +42,7 @@ public class Shaders{
         darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
+        mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
         planet = new PlanetShader();
@@ -151,9 +153,9 @@ public class Shaders{
             setUniformf("u_time", time);
             setUniformf("u_color", color);
             setUniformf("u_progress", progress);
-            setUniformf("u_uv", region.getU(), region.getV());
-            setUniformf("u_uv2", region.getU2(), region.getV2());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_uv", region.u, region.v);
+            setUniformf("u_uv2", region.u2, region.v2);
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 
@@ -170,10 +172,10 @@ public class Shaders{
         public void apply(){
             setUniformf("u_progress", progress);
             setUniformf("u_color", color);
-            setUniformf("u_uv", region.getU(), region.getV());
-            setUniformf("u_uv2", region.getU2(), region.getV2());
+            setUniformf("u_uv", region.u, region.v);
+            setUniformf("u_uv2", region.u2, region.v2);
             setUniformf("u_time", Time.time());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 

@@ -37,11 +37,13 @@ public class Floor extends Block{
     /** Effect displayed when drowning on this floor. */
     public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
-    public @NonNull StatusEffect status = StatusEffects.none;
+    public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
     /** liquids that drop from this block, used for pumps */
     public @Nullable Liquid liquidDrop = null;
+    /** Multiplier for pumped liquids, used for deep water. */
+    public float liquidMultiplier = 1f;
     /** item that drops from this block, used for drills */
     public @Nullable Item itemDrop = null;
     /** whether this block can be drowned in */
@@ -65,7 +67,7 @@ public class Floor extends Block{
 
     protected TextureRegion[][] edges;
     protected Seq<Block> blenders = new Seq<>();
-    protected IntSet blended = new IntSet();
+    protected Bits blended = new Bits(256);
     protected TextureRegion edgeRegion;
 
     public Floor(String name){
@@ -101,16 +103,15 @@ public class Floor extends Block{
         super.init();
 
         if(wall == Blocks.air){
-            wall = content.block(name + "Rocks");
-            if(wall == null) wall = content.block(name + "rocks");
-            if(wall == null) wall = content.block(name.replace("darksand", "dune") + "rocks");
+            wall = content.block(name + "-wall");
+            if(wall == null) wall = content.block(name.replace("darksand", "dune") + "-wall");
         }
 
         //keep default value if not found...
         if(wall == null) wall = Blocks.air;
 
         if(decoration == Blocks.air){
-            decoration = content.blocks().min(b -> b instanceof Rock && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
+            decoration = content.blocks().min(b -> b instanceof Boulder && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
         }
     }
 
@@ -148,7 +149,7 @@ public class Floor extends Block{
 
     @Override
     public void drawBase(Tile tile){
-        Mathf.random.setSeed(tile.pos());
+        Mathf.rand.setSeed(tile.pos());
 
         Draw.rect(variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))], tile.worldx(), tile.worldy());
 
@@ -169,30 +170,43 @@ public class Floor extends Block{
         return drownTime > 0;
     }
 
-    public void drawNonLayer(Tile tile){
-        Mathf.random.setSeed(tile.pos());
+    public void drawNonLayer(Tile tile, CacheLayer layer){
+        Mathf.rand.setSeed(tile.pos());
 
-        drawEdges(tile, true);
-    }
-
-    protected void drawEdges(Tile tile){
-        drawEdges(tile, false);
-    }
-
-    protected void drawEdges(Tile tile, boolean sameLayer){
         blenders.clear();
         blended.clear();
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
             Tile other = tile.getNearby(point);
-            if(other != null && doEdge(other.floor(), sameLayer) && other.floor().edges() != null){
-                if(blended.add(other.floor().id)){
+            if(other != null && other.floor().cacheLayer == layer && other.floor().edges() != null){
+                if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
                 }
             }
         }
 
+        drawBlended(tile);
+    }
+
+    protected void drawEdges(Tile tile){
+        blenders.clear();
+        blended.clear();
+
+        for(int i = 0; i < 8; i++){
+            Point2 point = Geometry.d8[i];
+            Tile other = tile.getNearby(point);
+            if(other != null && doEdge(other.floor()) && other.floor().cacheLayer == cacheLayer && other.floor().edges() != null){
+                if(!blended.getAndSet(other.floor().id)){
+                    blenders.add(other.floor());
+                }
+            }
+        }
+
+        drawBlended(tile);
+    }
+
+    protected void drawBlended(Tile tile){
         blenders.sort(a -> a.id);
 
         for(Block block : blenders){
@@ -200,23 +214,18 @@ public class Floor extends Block{
                 Point2 point = Geometry.d8[i];
                 Tile other = tile.getNearby(point);
                 if(other != null && other.floor() == block){
-                    TextureRegion region = edge((Floor)block, 2 - (point.x + 1), 2 - (point.y + 1));
+                    TextureRegion region = edge((Floor)block, 1 - point.x, 1 - point.y);
                     Draw.rect(region, tile.worldx(), tile.worldy());
-
-                    if(!sameLayer && block.cacheLayer.ordinal() > cacheLayer.ordinal()){
-                        Draw.rect(block.variantRegions()[0], tile.worldx() + point.x*tilesize, tile.worldy() + point.y*tilesize);
-                    }
                 }
             }
         }
-
     }
 
     //'new' style of edges with shadows instead of colors, not used currently
     protected void drawEdgesFlat(Tile tile, boolean sameLayer){
         for(int i = 0; i < 4; i++){
             Tile other = tile.getNearby(i);
-            if(other != null && doEdge(other.floor(), sameLayer)){
+            if(other != null && doEdge(other.floor())){
                 Color color = other.floor().mapColor;
                 Draw.color(color.r, color.g, color.b, 1f);
                 Draw.rect(edgeRegion, tile.worldx(), tile.worldy(), i*90);
@@ -230,8 +239,8 @@ public class Floor extends Block{
         return ((Floor)blendGroup).edges;
     }
 
-    protected boolean doEdge(Floor other, boolean sameLayer){
-        return (((other.blendGroup.id > blendGroup.id) || edges() == null) && (other.cacheLayer.ordinal() > this.cacheLayer.ordinal() || !sameLayer));
+    protected boolean doEdge(Floor other){
+        return other.blendGroup.id > blendGroup.id || edges() == null;
     }
 
     TextureRegion edge(Floor block, int x, int y){

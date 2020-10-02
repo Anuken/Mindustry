@@ -23,11 +23,11 @@ public class GridImage extends Element{
         int jumpy = (int)(Math.max(minspace, yspace) / yspace);
 
         for(int x = 0; x <= imageWidth; x += jumpx){
-            Fill.crect((int)(getX() + xspace * x - s), getY() - s, 2, getHeight() + (x == imageWidth ? 1 : 0));
+            Fill.crect((int)(this.x + xspace * x - s), y - s, 2, getHeight() + (x == imageWidth ? 1 : 0));
         }
 
         for(int y = 0; y <= imageHeight; y += jumpy){
-            Fill.crect(getX() - s, (int)(getY() + y * yspace - s), getWidth(), 2);
+            Fill.crect(x - s, (int)(this.y + y * yspace - s), getWidth(), 2);
         }
     }
 

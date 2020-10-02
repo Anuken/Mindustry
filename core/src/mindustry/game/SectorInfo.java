@@ -2,9 +2,10 @@ package mindustry.game;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -23,7 +24,7 @@ public class SectorInfo{
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
     /** Items stored in all cores. */
-    public ObjectIntMap<Item> coreItems = new ObjectIntMap<>();
+    public ItemSeq coreItems = new ItemSeq();
     /** The best available core type. */
     public Block bestCoreType = Blocks.air;
     /** Max storage capacity. */
@@ -32,6 +33,10 @@ public class SectorInfo{
     public boolean hasCore = true;
     /** Sector that was launched from. */
     public @Nullable Sector origin;
+    /** Launch destination. */
+    public @Nullable Sector destination;
+    /** Resources known to occur at this sector. */
+    public Seq<UnlockableContent> resources = new Seq<>();
     /** Time spent at this sector. Do not use unless you know what you're doing. */
     public transient float internalTimeSpent;
 
@@ -39,6 +44,12 @@ public class SectorInfo{
     private transient Interval time = new Interval();
     /** Core item storage to prevent spoofing. */
     private transient int[] lastCoreItems;
+
+    /** @return the real location items go when launched on this sector */
+    public Sector getRealDestination(){
+        //on multiplayer the destination is, by default, the first captured sector (basically random)
+        return !net.client() || destination != null ? destination : state.rules.sector.planet.sectors.find(Sector::hasBase);
+    }
 
     /** Updates export statistics. */
     public void handleItemExport(ItemStack stack){
@@ -64,12 +75,12 @@ public class SectorInfo{
         //update core items
         coreItems.clear();
 
-        CoreEntity entity = state.rules.defaultTeam.core();
+        CoreBuild entity = state.rules.defaultTeam.core();
 
         if(entity != null){
             ItemModule items = entity.items;
             for(int i = 0; i < items.length(); i++){
-                coreItems.put(content.item(i), items.get(i));
+                coreItems.set(content.item(i), items.get(i));
             }
         }
 
@@ -77,18 +88,22 @@ public class SectorInfo{
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
 
-        //update sector's internal time spent counter1
+        //update sector's internal time spent counter
         state.rules.sector.setTimeSpent(internalTimeSpent);
     }
 
-    /** Update averages of various stats.
+    /** Update averages of various stats, updates some special sector logic.
      * Called every frame. */
     public void update(){
+        //updating in multiplayer as a client doesn't make sense
+        if(net.client()) return;
+
         internalTimeSpent += Time.delta;
 
-        //time spent exceeds turn duration!
-        if(internalTimeSpent >= turnDuration && internalTimeSpent - Time.delta < turnDuration){
-            universe.displayTimeEnd();
+        //autorun turns
+        if(internalTimeSpent >= turnDuration){
+            internalTimeSpent = 0;
+            universe.runTurn();
         }
 
         //create last stored core items
@@ -97,7 +112,7 @@ public class SectorInfo{
             updateCoreDeltas();
         }
 
-        CoreEntity ent = state.rules.defaultTeam.core();
+        CoreBuild ent = state.rules.defaultTeam.core();
 
         //refresh throughput
         if(time.get(refreshPeriod)){
@@ -140,19 +155,8 @@ public class SectorInfo{
         }
     }
 
-    /** @return the items in this sector now, taking into account production and items received. */
-    public ObjectIntMap<Item> getCurrentItems(Sector sector){
-        ObjectIntMap<Item> map = new ObjectIntMap<>();
-        map.putAll(coreItems);
-        long seconds = sector.getSecondsPassed();
-        production.each((item, stat) -> map.increment(item, (int)(stat.mean * seconds)));
-        //increment based on received items
-        sector.getReceivedItems().each(stack -> map.increment(stack.item, stack.amount));
-        return map;
-    }
-
     private void updateCoreDeltas(){
-        CoreEntity ent = state.rules.defaultTeam.core();
+        CoreBuild ent = state.rules.defaultTeam.core();
         for(int i = 0; i < lastCoreItems.length; i++){
             lastCoreItems[i] = ent == null ? 0 : ent.items.get(i);
         }
@@ -171,5 +175,9 @@ public class SectorInfo{
 
         /** mean in terms of items produced per refresh rate (currently, per second) */
         public float mean;
+
+        public String toString(){
+            return mean + "";
+        }
     }
 }

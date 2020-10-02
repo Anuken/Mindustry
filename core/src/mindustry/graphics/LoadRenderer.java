@@ -98,7 +98,6 @@ public class LoadRenderer implements Disposable{
 
         float w = Core.graphics.getWidth(), h = Core.graphics.getHeight(), s = Scl.scl();
         //s = 2f;
-        Lines.precise(true);
 
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
@@ -172,7 +171,7 @@ public class LoadRenderer implements Disposable{
         Lines.poly(w/2, h/2, 4, rad2);
 
         if(assets.isLoaded("tech")){
-            BitmapFont font = assets.get("tech");
+            Font font = assets.get("tech");
             font.getData().markupEnabled = true;
 
             int panei = 0;
@@ -461,13 +460,12 @@ public class LoadRenderer implements Disposable{
             String key = name.contains("script") ? "scripts" : name.contains("content") ? "content" : name.contains("mod") ? "mods" : name.contains("msav") ||
             name.contains("maps") ? "map" : name.contains("ogg") || name.contains("mp3") ? "sound" : name.contains("png") ? "image" : "system";
 
-            BitmapFont font = assets.get("tech");
+            Font font = assets.get("tech");
             font.setColor(Pal.accent);
             Draw.color(Color.black);
-            font.draw(red + "[[[[ " +key + " ]]\n\n"+orange+"<" + Version.modifier + " " + (Version.build == 0 ? " [init]" : Version.build == -1 ? " custom" : " " + Version.build) + ">", w/2f, h/2f + 110*s, Align.center);
+            font.draw(red + "[[[[ " + key + " ]]\n"+orange+"<" + Version.modifier + " " + (Version.build == 0 ? " [init]" : Version.build == -1 ? " custom" : " " + Version.build) + ">", w/2f, h/2f + 110*s, Align.center);
         }
 
-        Lines.precise(false);
         Draw.flush();
 
         fx.end();

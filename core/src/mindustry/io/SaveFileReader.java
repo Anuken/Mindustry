@@ -8,11 +8,7 @@ import mindustry.world.*;
 import java.io.*;
 
 public abstract class SaveFileReader{
-    protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
-    protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
-    protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
-    protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
-    protected final ObjectMap<String, String> fallback = ObjectMap.of(
+    public static final ObjectMap<String, String> fallback = ObjectMap.of(
     "dart-mech-pad", "legacy-mech-pad",
     "dart-ship-pad", "legacy-mech-pad",
     "javelin-ship-pad", "legacy-mech-pad",
@@ -34,8 +30,36 @@ public abstract class SaveFileReader{
     "titan-factory", "legacy-unit-factory",
     "fortress-factory", "legacy-unit-factory",
 
-    "command-center", "legacy-command-center"
+    "mass-conveyor", "payload-conveyor",
+    "vestige", "scepter",
+    "turbine-generator", "steam-generator",
+
+    "rocks", "stone-wall",
+    "sporerocks", "spore-wall",
+    "icerocks", "ice-wall",
+    "dunerocks", "dune-wall",
+    "sandrocks", "sand-wall",
+    "shalerocks", "shale-wall",
+    "snowrocks", "snow-wall",
+    "saltrocks", "salt-wall",
+    "dirtwall", "dirt-wall",
+
+    "ignarock", "basalt",
+    "holostone", "dacite",
+    "holostone-wall", "dacite-wall",
+    "rock", "boulder",
+    "snowrock", "snow-boulder",
+    "cliffs", "stone-wall", 
+
+    "cryofluidmixer", "cryofluid-mixer"
     );
+
+    protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();
+    protected final DataOutputStream dataBytes = new DataOutputStream(byteOutput);
+    protected final ReusableByteOutStream byteOutputSmall = new ReusableByteOutStream();
+    protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
+
+    protected int lastRegionLength;
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
         counter.resetCount();
@@ -90,6 +114,7 @@ public abstract class SaveFileReader{
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
     public int readChunk(DataInput input, boolean isShort, IORunner<DataInput> runner) throws IOException{
         int length = isShort ? input.readUnsignedShort() : input.readInt();
+        lastRegionLength = length;
         runner.accept(input);
         return length;
     }

@@ -42,28 +42,12 @@ public class ImagePacker{
                 BufferedImage image = ImageIO.read(path.file());
 
                 if(image == null) throw new IOException("image " + path.absolutePath() + " is null for terrible reasons");
-                GenRegion region = new GenRegion(fname, path){
-
-                    @Override
-                    public int getX(){
-                        return 0;
-                    }
-
-                    @Override
-                    public int getY(){
-                        return 0;
-                    }
-
-                    @Override
-                    public int getWidth(){
-                        return image.getWidth();
-                    }
-
-                    @Override
-                    public int getHeight(){
-                        return image.getHeight();
-                    }
-                };
+                GenRegion region = new GenRegion(fname, path){{
+                    width = image.getWidth();
+                    height = image.getHeight();
+                    u2 = v2 = 1f;
+                    u = v = 0f;
+                }};
 
                 regionCache.put(fname, region);
                 imageCache.put(fname, image);
@@ -105,7 +89,7 @@ public class ImagePacker{
             }
         };
 
-        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
+        Draw.scl = 1f / Core.atlas.find("scale_marker").width;
 
         Time.mark();
         Generators.generate();
@@ -123,7 +107,7 @@ public class ImagePacker{
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
         Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids(), Vars.content.units());
-        cont.removeAll(u -> u instanceof BuildBlock || u == Blocks.air);
+        cont.removeAll(u -> u instanceof ConstructBlock || u == Blocks.air);
 
         int minid = 0xF8FF;
         for(String key : map.keys()){
@@ -177,6 +161,15 @@ public class ImagePacker{
         GenRegion.validate(region);
 
         return new Image(imageCache.get(((AtlasRegion)region).name));
+    }
+
+    static void replace(String name, Image image){
+        image.save(name);
+        ((GenRegion)Core.atlas.find(name)).path.delete();
+    }
+
+    static void replace(TextureRegion region, Image image){
+        replace(((GenRegion)region).name, image);
     }
 
     static void err(String message, Object... args){

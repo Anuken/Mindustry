@@ -10,7 +10,7 @@ public class DrawMixer extends DrawBlock{
     public TextureRegion liquid, top, bottom;
 
     @Override
-    public void draw(GenericCrafterEntity entity){
+    public void draw(GenericCrafterBuild entity){
         float rotation = entity.block.rotate ? entity.rotdeg() : 0;
 
         Draw.rect(bottom, entity.x, entity.y, rotation);

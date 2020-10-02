@@ -60,7 +60,7 @@ public class OverdriveProjector extends Block{
         }
     }
 
-    public class OverdriveEntity extends Building{
+    public class OverdriveBuild extends Building{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
@@ -76,10 +76,10 @@ public class OverdriveProjector extends Block{
             charge += heat * Time.delta;
 
             if(hasBoost){
-                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
             }
 
-            if(timer(timerUse, useTime) && efficiency() > 0){
+            if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
                 consume();
             }
 
@@ -96,7 +96,7 @@ public class OverdriveProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+            indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
 
             Drawf.dashCircle(x, y, realRange, baseColor);
         }

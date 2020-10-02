@@ -1,8 +1,10 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -41,7 +43,19 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("progress", (ReconstructorEntity entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+
+        bars.add("progress", (ReconstructorBuild entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        bars.add("units", (ReconstructorBuild e) ->
+        new Bar(
+            () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
+                Core.bundle.format("bar.unitcap",
+                Fonts.getUnicodeStr(e.unit().name),
+                teamIndex.countType(e.team, e.unit()),
+                Units.getCap(e.team)
+            ),
+            () -> Pal.power,
+            () -> e.unit() == null ? 0f : (float)teamIndex.countType(e.team, e.unit()) / Units.getCap(e.team)
+        ));
     }
 
     @Override
@@ -64,7 +78,7 @@ public class Reconstructor extends UnitBlock{
         super.init();
     }
 
-    public class ReconstructorEntity extends UnitBlockEntity{
+    public class ReconstructorBuild extends UnitBuild{
 
         public float fraction(){
             return progress / constructTime;
@@ -73,7 +87,7 @@ public class Reconstructor extends UnitBlock{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             return this.payload == null
-                && relativeTo(source) != rotation()
+                && relativeTo(source) != rotation
                 && payload instanceof UnitPayload
                 && hasUpgrade(((UnitPayload)payload).unit.type());
         }
@@ -89,7 +103,7 @@ public class Reconstructor extends UnitBlock{
 
             //draw input
             for(int i = 0; i < 4; i++){
-                if(blends(i) && i != rotation()){
+                if(blends(i) && i != rotation){
                     Draw.rect(inRegion, x, y, i * 90);
                 }
             }
@@ -126,14 +140,14 @@ public class Reconstructor extends UnitBlock{
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
-                            progress += edelta();
+                            progress += edelta() * state.rules.unitBuildSpeedMultiplier;
                         }
 
                         //upgrade the unit
                         if(progress >= constructTime){
                             payload.unit = upgrade(payload.unit.type()).create(payload.unit.team());
                             progress = 0;
-                            Effects.shake(2f, 3f, this);
+                            Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
                             consume();
                         }
@@ -145,17 +159,53 @@ public class Reconstructor extends UnitBlock{
             time += edelta() * speedScl * state.rules.unitBuildSpeedMultiplier;
         }
 
+        @Override
+        public boolean shouldConsume(){
+            return constructing();
+        }
+
+        public UnitType unit(){
+            if(payload == null) return null;
+
+            UnitType t = upgrade(payload.unit.type());
+            return t != null && t.unlockedNow() ? t : null;
+        }
+
         public boolean constructing(){
             return payload != null && hasUpgrade(payload.unit.type());
         }
 
         public boolean hasUpgrade(UnitType type){
-            return upgrade(type) != null;
+            UnitType t = upgrade(type);
+            return t != null && t.unlockedNow();
         }
 
         public UnitType upgrade(UnitType type){
             UnitType[] r =  Structs.find(upgrades, arr -> arr[0] == type);
             return r == null ? null : r[1];
         }
+
+        @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
+        public void write(Writes write){
+            super.write(write);
+
+            write.f(progress);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            if(revision == 1){
+                progress = read.f();
+            }
+
+        }
+
     }
 }

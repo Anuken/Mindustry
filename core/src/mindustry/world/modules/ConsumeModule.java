@@ -37,7 +37,7 @@ public class ConsumeModule extends BlockModule{
         optionalValid = true;
         boolean docons = entity.shouldConsume() && entity.productionValid();
 
-        for(Consume cons : entity.block().consumes.all()){
+        for(Consume cons : entity.block.consumes.all()){
             if(cons.isOptional()) continue;
 
             if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
@@ -47,7 +47,7 @@ public class ConsumeModule extends BlockModule{
             valid &= cons.valid(entity);
         }
 
-        for(Consume cons : entity.block().consumes.optionals()){
+        for(Consume cons : entity.block.consumes.optionals()){
             if(docons && cons.isUpdate() && prevValid && cons.valid(entity)){
                 cons.update(entity);
             }
@@ -57,17 +57,17 @@ public class ConsumeModule extends BlockModule{
     }
 
     public void trigger(){
-        for(Consume cons : entity.block().consumes.all()){
+        for(Consume cons : entity.block.consumes.all()){
             cons.trigger(entity);
         }
     }
 
     public boolean valid(){
-        return valid && entity.shouldConsume();
+        return valid && entity.shouldConsume() && entity.enabled;
     }
 
     public boolean optionalValid(){
-        return valid() && optionalValid;
+        return valid() && optionalValid && entity.enabled;
     }
 
     @Override

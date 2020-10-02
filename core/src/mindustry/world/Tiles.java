@@ -11,7 +11,7 @@ import java.util.*;
 public class Tiles implements Iterable<Tile>{
     public final int width, height;
 
-    private final Tile[] array;
+    final Tile[] array;
 
     public Tiles(int width, int height){
         this.array = new Tile[width * height];
@@ -50,20 +50,20 @@ public class Tiles implements Iterable<Tile>{
     }
 
     /** @return a tile at coordinates; throws an exception if out of bounds */
-    public @NonNull Tile getn(int x, int y){
+    public Tile getn(int x, int y){
         if(x < 0 || x >= width || y < 0 || y >= height) throw new IllegalArgumentException(x + ", " + y + " out of bounds: width=" + width + ", height=" + height);
         return array[y*width + x];
     }
 
     /** @return a tile at coordinates, clamped. */
-    public @NonNull Tile getc(int x, int y){
+    public Tile getc(int x, int y){
         x = Mathf.clamp(x, 0, width - 1);
         y = Mathf.clamp(y, 0, height - 1);
         return array[y*width + x];
     }
 
     /** @return a tile at an iteration index [0, width * height] */
-    public @NonNull Tile geti(int idx){
+    public Tile geti(int idx){
         return array[idx];
     }
 
@@ -72,7 +72,7 @@ public class Tiles implements Iterable<Tile>{
         return get(Point2.x(pos), Point2.y(pos));
     }
 
-    public void each(Cons<Tile> cons){
+    public void eachTile(Cons<Tile> cons){
         for(Tile tile : array){
             cons.get(tile);
         }
@@ -86,6 +86,9 @@ public class Tiles implements Iterable<Tile>{
 
     private class TileIterator implements Iterator<Tile>{
         int index = 0;
+
+        TileIterator(){
+        }
 
         @Override
         public boolean hasNext(){

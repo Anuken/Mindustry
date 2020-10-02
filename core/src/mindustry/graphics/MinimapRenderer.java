@@ -36,7 +36,11 @@ public class MinimapRenderer implements Disposable{
         });
 
         //make sure to call on the graphics thread
-        Events.on(BuildinghangeEvent.class, event -> Core.app.post(() -> update(event.tile)));
+        Events.on(TileChangeEvent.class, event -> {
+            if(!ui.editor.isShown()){
+                update(event.tile);
+            }
+        });
     }
 
     public Pixmap getPixmap(){
@@ -118,8 +122,8 @@ public class MinimapRenderer implements Disposable{
         float dy = (Core.camera.position.y / tilesize);
         dx = Mathf.clamp(dx, sz, world.width() - sz);
         dy = Mathf.clamp(dy, sz, world.height() - sz);
-        float invTexWidth = 1f / texture.getWidth();
-        float invTexHeight = 1f / texture.getHeight();
+        float invTexWidth = 1f / texture.width;
+        float invTexHeight = 1f / texture.height;
         float x = dx - sz, y = world.height() - dy - sz, width = sz * 2, height = sz * 2;
         region.set(x * invTexWidth, y * invTexHeight, (x + width) * invTexWidth, (y + height) * invTexHeight);
         return region;
@@ -172,7 +176,7 @@ public class MinimapRenderer implements Disposable{
     }
 
     public void drawLabel(float x, float y, String text, Color color){
-        BitmapFont font = Fonts.outline;
+        Font font = Fonts.outline;
         GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
         font.getData().setScale(1 / 1.5f / Scl.scl(1f));

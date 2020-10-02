@@ -35,6 +35,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         solid = false;
         floating = true;
         conveyorPlacement = true;
+        noUpdateDisabled = true;
     }
 
     @Override
@@ -59,12 +60,12 @@ public class Conduit extends LiquidBlock implements Autotiler{
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conduit &&
-            Mathf.mod(req.tile().rotation() - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
+            Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? Blocks.liquidJunction : this;
     }
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return otherblock.hasLiquids && otherblock.outputsLiquid && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
+        return otherblock.hasLiquids && (otherblock.outputsLiquid || (lookingAt(tile, rotation, otherx, othery, otherblock))) && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
     @Override
@@ -72,14 +73,14 @@ public class Conduit extends LiquidBlock implements Autotiler{
         return new TextureRegion[]{Core.atlas.find("conduit-bottom"), topRegions[0]};
     }
 
-    public class ConduitEntity extends LiquidBlockEntity{
+    public class ConduitBuild extends LiquidBuild{
         public float smoothLiquid;
         public int blendbits, xscl, yscl, blending;
 
         @Override
         public void draw(){
             float rotation = rotdeg();
-            int r = rotation();
+            int r = this.rotation;
 
             //draw extra conduits facing this one for tiling purposes
             Draw.z(Layer.blockUnder);
@@ -87,25 +88,22 @@ public class Conduit extends LiquidBlock implements Autotiler{
                 if((blending & (1 << i)) != 0){
                     int dir = r - i;
                     float rot = i == 0 ? rotation : (dir)*90;
-                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? 1 : 2);
+                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top);
                 }
             }
 
             Draw.z(Layer.block);
 
             Draw.scl(xscl, yscl);
-            drawAt(x, y, blendbits, rotation, 0);
+            drawAt(x, y, blendbits, rotation, SliceMode.none);
             Draw.reset();
         }
 
-        protected void drawAt(float x, float y, int bits, float rotation, int slice){
+        protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
             Draw.color(botColor);
             Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
 
-            Draw.color(liquids.current().color);
-            Draw.alpha(smoothLiquid);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
-            Draw.color();
+            Drawf.liquid(sliced(botRegions[bits], slice), x, y, smoothLiquid, liquids.current().color, rotation);
 
             Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
         }
@@ -114,7 +112,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            int[] bits = buildBlending(tile, rotation(), null, true);
+            int[] bits = buildBlending(tile, rotation, null, true);
             blendbits = bits[0];
             xscl = bits[1];
             yscl = bits[2];
@@ -125,7 +123,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public boolean acceptLiquid(Building source, Liquid liquid, float amount){
             noSleep();
             return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
-                && ((source.relativeTo(tile.x, tile.y) + 2) % 4 != tile.rotation());
+                && ((source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
         }
 
         @Override

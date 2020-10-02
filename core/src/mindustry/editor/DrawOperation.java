@@ -50,7 +50,7 @@ public class DrawOperation{
         }else if(type == OpType.block.ordinal()){
             return tile.blockID();
         }else if(type == OpType.rotation.ordinal()){
-            return tile.rotation();
+            return tile.build == null ? 0 : (byte)tile.build.rotation;
         }else if(type == OpType.team.ordinal()){
             return (byte)tile.getTeamID();
         }else if(type == OpType.overlay.ordinal()){
@@ -64,17 +64,21 @@ public class DrawOperation{
             if(type == OpType.floor.ordinal()){
                 tile.setFloor((Floor)content.block(to));
             }else if(type == OpType.block.ordinal()){
+                tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
+
                 Block block = content.block(to);
-                tile.setBlock(block, tile.team(), tile.rotation());
+                tile.setBlock(block, tile.team(), tile.build == null ? 0 : tile.build.rotation);
+
+                tile.getLinkedTiles(t -> editor.renderer.updatePoint(t.x, t.y));
             }else if(type == OpType.rotation.ordinal()){
-                tile.rotation(to);
+                if(tile.build != null) tile.build.rotation = to;
             }else if(type == OpType.team.ordinal()){
                 tile.setTeam(Team.get(to));
             }else if(type == OpType.overlay.ordinal()){
                 tile.setOverlayID(to);
             }
         });
-        editor.renderer().updatePoint(tile.x, tile.y);
+        editor.renderer.updatePoint(tile.x, tile.y);
     }
 
     @Struct

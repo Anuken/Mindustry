@@ -18,16 +18,16 @@ abstract class BlockUnitComp implements Unitc{
         this.tile = tile;
 
         //sets up block stats
-        maxHealth(tile.block().health);
+        maxHealth(tile.block.health);
         health(tile.health());
-        hitSize(tile.block().size * tilesize * 0.7f);
+        hitSize(tile.block.size * tilesize * 0.7f);
         set(tile);
     }
 
     @Override
     public void update(){
         if(tile != null){
-            team = tile.team();
+            team = tile.team;
         }
     }
 
@@ -61,7 +61,7 @@ abstract class BlockUnitComp implements Unitc{
     public void team(Team team){
         if(tile != null && this.team != team){
             this.team = team;
-            if(tile.team() != team){
+            if(tile.team != team){
                 tile.team(team);
             }
         }

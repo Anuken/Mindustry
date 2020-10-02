@@ -19,6 +19,7 @@ public class MusicControl{
     public Seq<Music> ambientMusic = Seq.with();
     /** darker music, used in times of conflict  */
     public Seq<Music> darkMusic = Seq.with();
+
     protected Music lastRandomPlayed;
     protected Interval timer = new Interval();
     protected @Nullable Music current;

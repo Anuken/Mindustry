@@ -1,17 +1,15 @@
 package mindustry.world.consumers;
 
 import arc.func.*;
-import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 public class ConsumeItemDynamic extends Consume{
-    public final @NonNull Func<Building, ItemStack[]> items;
+    public final Func<Building, ItemStack[]> items;
 
     public <T extends Building> ConsumeItemDynamic(Func<T, ItemStack[]> items){
         this.items = (Func<Building, ItemStack[]>)items;
@@ -31,20 +29,24 @@ public class ConsumeItemDynamic extends Consume{
     public void build(Building tile, Table table){
         ItemStack[][] current = {items.get(tile)};
 
-        table.update(() -> {
-            if(current[0] != items.get(tile)){
-                rebuild(tile, table);
-                current[0] = items.get(tile);
-            }
-        });
+        table.table(cont -> {
+            table.update(() -> {
+                if(current[0] != items.get(tile)){
+                    rebuild(tile, cont);
+                    current[0] = items.get(tile);
+                }
+            });
 
-        rebuild(tile, table);
+            rebuild(tile, cont);
+        });
     }
 
     private void rebuild(Building tile, Table table){
+        table.clear();
+
         for(ItemStack stack : items.get(tile)){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
-            () -> tile.items != null && tile.items.has(stack.item, stack.amount))).size(8 * 4).padRight(6 * Mathf.digits(stack.amount));
+            () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
         }
     }
 

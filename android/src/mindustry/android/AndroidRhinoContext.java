@@ -41,6 +41,11 @@ public class AndroidRhinoContext{
                 public Object getDynamicSecurityDomain(Object o){
                     return null;
                 }
+
+                @Override
+                public Object callWithDomain(Object o, Context context, Callable callable, Scriptable scriptable, Scriptable scriptable1, Object[] objects){
+                    return null;
+                }
             });
 
         AndroidContextFactory factory;
@@ -121,7 +126,7 @@ public class AndroidRhinoContext{
                 }
                 return loadClass(dex, name);
             }catch(IOException | ClassNotFoundException e){
-                throw new FatalLoadingException(e);
+                throw new RuntimeException("Failed to define class", e);
             }
         }
 
@@ -148,14 +153,6 @@ public class AndroidRhinoContext{
                 }
             }
             return loadedClass;
-        }
-    }
-
-
-    /** Might be thrown in any Rhino method that loads bytecode if the loading failed. */
-    public static class FatalLoadingException extends RuntimeException{
-        FatalLoadingException(Throwable t){
-            super("Failed to define class", t);
         }
     }
 

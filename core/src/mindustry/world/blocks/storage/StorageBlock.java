@@ -1,5 +1,6 @@
 package mindustry.world.blocks.storage;
 
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -20,7 +21,7 @@ public abstract class StorageBlock extends Block{
         return false;
     }
 
-    public class StorageBlockEntity extends Building{
+    public class StorageBuild extends Building{
         protected @Nullable Building linkedCore;
 
         @Override
@@ -38,6 +39,23 @@ public abstract class StorageBlock extends Block{
             if(linkedCore != null){
                 linkedCore.drawSelect();
             }
+        }
+
+        @Override
+        public void overwrote(Seq<Building> previous){
+            for(Building other : previous){
+                if(other.items != null){
+                    items.addAll(other.items);
+                }
+            }
+
+            //ensure item counts are not too high
+            items.each((i, a) -> items.set(i, Math.min(a, itemCapacity)));
+        }
+
+        @Override
+        public boolean canPickup(){
+            return linkedCore == null;
         }
     }
 }

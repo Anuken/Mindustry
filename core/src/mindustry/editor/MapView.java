@@ -22,7 +22,7 @@ import static mindustry.Vars.ui;
 
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;
-    private EditorTool tool = EditorTool.pencil;
+    EditorTool tool = EditorTool.pencil;
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
@@ -31,11 +31,11 @@ public class MapView extends Element implements GestureListener{
     private Rect rect = new Rect();
     private Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
 
-    private boolean drawing;
-    private int lastx, lasty;
-    private int startx, starty;
-    private float mousex, mousey;
-    private EditorTool lastTool;
+    boolean drawing;
+    int lastx, lasty;
+    int startx, starty;
+    float mousex, mousey;
+    EditorTool lastTool;
 
     public MapView(MapEditor editor){
         this.editor = editor;
@@ -46,7 +46,7 @@ public class MapView extends Element implements GestureListener{
         }
 
         Core.input.getInputProcessors().insert(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
-        touchable(Touchable.enabled);
+        this.touchable = Touchable.enabled;
 
         Point2 firstTouch = new Point2();
 
@@ -204,7 +204,7 @@ public class MapView extends Element implements GestureListener{
         zoom = Mathf.clamp(zoom, 0.2f, 20f);
     }
 
-    private Point2 project(float x, float y){
+    Point2 project(float x, float y){
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
@@ -213,9 +213,9 @@ public class MapView extends Element implements GestureListener{
         y = (y - getHeight() / 2 + sclheight / 2 - offsety * zoom) / sclheight * editor.height();
 
         if(editor.drawBlock.size % 2 == 0 && tool != EditorTool.eraser){
-            return Tmp.g1.set((int)(x - 0.5f), (int)(y - 0.5f));
+            return Tmp.p1.set((int)(x - 0.5f), (int)(y - 0.5f));
         }else{
-            return Tmp.g1.set((int)x, (int)y);
+            return Tmp.p1.set((int)x, (int)y);
         }
     }
 
@@ -248,14 +248,20 @@ public class MapView extends Element implements GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(2f);
         Lines.rect(centerx - sclwidth / 2 - 1, centery - sclheight / 2 - 1, sclwidth + 2, sclheight + 2);
-        editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
+        editor.renderer.draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
         Draw.reset();
 
         if(grid){
             Draw.color(Color.gray);
             image.setBounds(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
             image.draw();
-            Draw.color();
+
+            Lines.stroke(3f);
+            Draw.color(Pal.accent);
+            Lines.line(centerx - sclwidth/2f, centery, centerx + sclwidth/2f, centery);
+            Lines.line(centerx, centery - sclheight/2f, centerx, centery + sclheight/2f);
+
+            Draw.reset();
         }
 
         int index = 0;

@@ -24,7 +24,7 @@ public class MapRenderer implements Disposable{
 
     public MapRenderer(MapEditor editor){
         this.editor = editor;
-        this.texture = Core.atlas.find("clear-editor").getTexture();
+        this.texture = Core.atlas.find("clear-editor").texture;
     }
 
     public void resize(int width, int height){
@@ -110,18 +110,13 @@ public class MapRenderer implements Disposable{
         if(wall != Blocks.air && wall.synthetic()){
             region = !Core.atlas.isFound(wall.editorIcon()) || !center ? Core.atlas.find("clear-editor") : wall.editorIcon();
 
-            if(wall.rotate){
-                mesh.draw(idxWall, region,
-                wx * tilesize + wall.offset, wy * tilesize + wall.offset,
-                region.getWidth() * Draw.scl, region.getHeight() * Draw.scl, tile.rotdeg() - 90);
-            }else{
-                float width = region.getWidth() * Draw.scl, height = region.getHeight() * Draw.scl;
+            float width = region.width * Draw.scl, height = region.height * Draw.scl;
 
-                mesh.draw(idxWall, region,
-                wx * tilesize + wall.offset + (tilesize - width) / 2f,
-                wy * tilesize + wall.offset + (tilesize - height) / 2f,
-                width, height);
-            }
+            mesh.draw(idxWall, region,
+            wx * tilesize + wall.offset + (tilesize - width) / 2f,
+            wy * tilesize + wall.offset + (tilesize - height) / 2f,
+            width, height,
+            tile.build == null || !wall.rotate ? 0 : tile.build.rotdeg());
         }else{
             region = floor.editorVariantRegions()[Mathf.randomSeed(idxWall, 0, floor.editorVariantRegions().length - 1)];
 
@@ -135,15 +130,15 @@ public class MapRenderer implements Disposable{
             region = Core.atlas.find("block-border-editor");
         }else if(!wall.synthetic() && wall != Blocks.air && center){
             region = !Core.atlas.isFound(wall.editorIcon()) ? Core.atlas.find("clear-editor") : wall.editorIcon();
-            offsetX = tilesize / 2f - region.getWidth() / 2f * Draw.scl;
-            offsetY = tilesize / 2f - region.getHeight() / 2f * Draw.scl;
+            offsetX = tilesize / 2f - region.width / 2f * Draw.scl;
+            offsetY = tilesize / 2f - region.height / 2f * Draw.scl;
         }else if(wall == Blocks.air && !tile.overlay().isAir()){
             region = tile.overlay().editorVariantRegions()[Mathf.randomSeed(idxWall, 0, tile.overlay().editorVariantRegions().length - 1)];
         }else{
             region = Core.atlas.find("clear-editor");
         }
 
-        float width = region.getWidth() * Draw.scl, height = region.getHeight() * Draw.scl;
+        float width = region.width * Draw.scl, height = region.height * Draw.scl;
         if(!wall.synthetic() && wall != Blocks.air && !wall.isMultiblock()){
             offsetX = 0;
             offsetY = 0;

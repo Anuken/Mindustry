@@ -28,7 +28,7 @@ public class LiquidJunction extends LiquidBlock{
         return new TextureRegion[]{region};
     }
 
-    public class LiquidJunctionEntity extends Building{
+    public class LiquidJunctionBuild extends Building{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
@@ -36,10 +36,12 @@ public class LiquidJunction extends LiquidBlock{
 
         @Override
         public Building getLiquidDestination(Building source, Liquid liquid){
+            if(!enabled) return this;
+
             int dir = source.relativeTo(tile.x, tile.y);
             dir = (dir + 4) % 4;
             Building next = nearby(dir);
-            if(next == null || (!next.acceptLiquid(this, liquid, 0f) && !(next.block() instanceof LiquidJunction))){
+            if(next == null || (!next.acceptLiquid(this, liquid, 0f) && !(next.block instanceof LiquidJunction))){
                 return this;
             }
             return next.getLiquidDestination(this, liquid);

@@ -14,12 +14,13 @@ import static mindustry.Vars.content;
 public class ItemModule extends BlockModule{
     public static final ItemModule empty = new ItemModule();
 
-    private static final int windowSize = 60 * 4;
+    private static final int windowSize = 6;
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;
     private static float[] displayFlow;
-    private static Bits cacheBits = new Bits();
-    private static Interval flowTimer = new Interval(1);
+    private static final Bits cacheBits = new Bits();
+    private static final Interval flowTimer = new Interval(2);
+    private static final float pollScl = 20f;
 
     protected int[] items = new int[content.items().size];
     protected int total;
@@ -41,38 +42,42 @@ public class ItemModule extends BlockModule{
 
     public void update(boolean showFlow){
         if(showFlow){
-            if(flow == null){
-                if(cacheFlow == null || cacheFlow.length != items.length){
-                    cacheFlow = new WindowedMean[items.length];
-                    for(int i = 0; i < items.length; i++){
-                        cacheFlow[i] = new WindowedMean(windowSize);
+            //update the flow at 30fps at most
+            if(flowTimer.get(1, pollScl)){
+
+                if(flow == null){
+                    if(cacheFlow == null || cacheFlow.length != items.length){
+                        cacheFlow = new WindowedMean[items.length];
+                        for(int i = 0; i < items.length; i++){
+                            cacheFlow[i] = new WindowedMean(windowSize);
+                        }
+                        cacheSums = new float[items.length];
+                        displayFlow = new float[items.length];
+                    }else{
+                        for(int i = 0; i < items.length; i++){
+                            cacheFlow[i].reset();
+                        }
+                        Arrays.fill(cacheSums, 0);
+                        cacheBits.clear();
                     }
-                    cacheSums = new float[items.length];
-                    displayFlow = new float[items.length];
-                }else{
-                    for(int i = 0; i < items.length; i++){
-                        cacheFlow[i].reset();
-                    }
-                    Arrays.fill(cacheSums, 0);
-                    cacheBits.clear();
+
+                    Arrays.fill(displayFlow, -1);
+
+                    flow = cacheFlow;
                 }
 
-                Arrays.fill(displayFlow, -1);
+                boolean updateFlow = flowTimer.get(30);
 
-                flow = cacheFlow;
-            }
+                for(int i = 0; i < items.length; i++){
+                    flow[i].add(cacheSums[i]);
+                    if(cacheSums[i] > 0){
+                        cacheBits.set(i);
+                    }
+                    cacheSums[i] = 0;
 
-            boolean updateFlow = flowTimer.get(30);
-
-            for(int i = 0; i < items.length; i++){
-                flow[i].add(cacheSums[i]);
-                if(cacheSums[i] > 0){
-                    cacheBits.set(i);
-                }
-                cacheSums[i] = 0;
-
-                if(updateFlow){
-                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / Time.delta : -1;
+                    if(updateFlow){
+                        displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / pollScl : -1;
+                    }
                 }
             }
         }else{
@@ -130,6 +135,15 @@ public class ItemModule extends BlockModule{
         return true;
     }
 
+    public boolean has(ItemSeq items){
+        for(Item item : content.items()){
+            if(!has(item, items.get(item))){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean has(Iterable<ItemStack> stacks){
         for(ItemStack stack : stacks){
             if(!has(stack.item, stack.amount)) return false;
@@ -166,6 +180,7 @@ public class ItemModule extends BlockModule{
         return total > 0;
     }
 
+    @Nullable
     public Item first(){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
@@ -175,6 +190,7 @@ public class ItemModule extends BlockModule{
         return null;
     }
 
+    @Nullable
     public Item take(){
         for(int i = 0; i < items.length; i++){
             int index = (i + takeRotation);
@@ -190,6 +206,7 @@ public class ItemModule extends BlockModule{
     }
 
     /** Begins a speculative take operation. This returns the item that would be returned by #take(), but does not change state. */
+    @Nullable
     public Item beginTake(){
         for(int i = 0; i < items.length; i++){
             int index = (i + takeRotation);
@@ -239,6 +256,12 @@ public class ItemModule extends BlockModule{
         }
     }
 
+    public void undoFlow(Item item){
+        if(flow != null){
+            cacheSums[item.id] -= 1;
+        }
+    }
+
     public void addAll(ItemModule items){
         for(int i = 0; i < items.items.length; i++){
             add(i, items.items[i]);
@@ -256,6 +279,10 @@ public class ItemModule extends BlockModule{
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
     }
 
+    public void remove(ItemSeq stacks){
+        stacks.each(this::remove);
+    }
+
     public void remove(Iterable<ItemStack> stacks){
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
     }
@@ -271,30 +298,30 @@ public class ItemModule extends BlockModule{
 
     @Override
     public void write(Writes write){
-        byte amount = 0;
+        int amount = 0;
         for(int item : items){
             if(item > 0) amount++;
         }
 
-        write.b(amount); //amount of items
+        write.s(amount); //amount of items
 
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
-                write.b(i); //item ID
+                write.s(i); //item ID
                 write.i(items[i]); //item amount
             }
         }
     }
 
     @Override
-    public void read(Reads read){
+    public void read(Reads read, boolean legacy){
         //just in case, reset items
         Arrays.fill(items, 0);
-        byte count = read.b();
+        int count = legacy ? read.ub() : read.s();
         total = 0;
 
         for(int j = 0; j < count; j++){
-            int itemid = read.b();
+            int itemid = legacy ? read.ub() : read.s();
             int itemamount = read.i();
             items[content.item(itemid).id] = itemamount;
             total += itemamount;

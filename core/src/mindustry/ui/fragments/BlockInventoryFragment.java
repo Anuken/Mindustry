@@ -31,12 +31,12 @@ public class BlockInventoryFragment extends Fragment{
     private static final float holdWithdraw = 20f;
     private static final float holdShrink = 120f;
 
-    private Table table = new Table();
-    private Building tile;
-    private float holdTime = 0f, emptyTime;
-    private boolean holding;
-    private float[] shrinkHoldTimes = new float[content.items().size];
-    private Item lastItem;
+    Table table = new Table();
+    Building tile;
+    float holdTime = 0f, emptyTime;
+    boolean holding;
+    float[] shrinkHoldTimes = new float[content.items().size];
+    Item lastItem;
 
     {
         Events.on(WorldLoadEvent.class, e -> hide());
@@ -44,9 +44,11 @@ public class BlockInventoryFragment extends Fragment{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Building tile, Item item, int amount){
-        if(player == null || tile == null || !tile.interactable(player.team())) return;
-        amount = Mathf.clamp(amount, 0, player.unit().itemCapacity());
+        if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange)) return;
+        amount = Math.min(player.unit().maxAccepted(item), amount);
         int fa = amount;
+
+        if(amount == 0) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
@@ -65,7 +67,7 @@ public class BlockInventoryFragment extends Fragment{
 
     @Override
     public void build(Group parent){
-        table.setName("inventory");
+        table.name = "inventory";
         table.setTransform(true);
         parent.setTransform(true);
         parent.addChild(table);
@@ -77,7 +79,7 @@ public class BlockInventoryFragment extends Fragment{
             return;
         }
         this.tile = t;
-        if(tile == null || !tile.block().isAccessible() || tile.items.total() == 0)
+        if(tile == null || !tile.block.isAccessible() || tile.items.total() == 0)
             return;
         rebuild(true);
     }
@@ -90,7 +92,7 @@ public class BlockInventoryFragment extends Fragment{
             table.clearListeners();
             table.update(null);
         }), Actions.visible(false));
-        table.touchable(Touchable.disabled);
+        table.touchable = Touchable.disabled;
         tile = null;
     }
 
@@ -103,10 +105,10 @@ public class BlockInventoryFragment extends Fragment{
         table.clearChildren();
         table.clearActions();
         table.background(Tex.inventory);
-        table.touchable(Touchable.enabled);
+        table.touchable = Touchable.enabled;
         table.update(() -> {
 
-            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block().isAccessible() || emptyTime >= holdShrink){
+            if(state.isMenu() || tile == null || !tile.isValid() || !tile.block.isAccessible() || emptyTime >= holdShrink){
                 hide();
             }else{
                 if(tile.items.total() == 0){
@@ -129,7 +131,7 @@ public class BlockInventoryFragment extends Fragment{
                 }
 
                 updateTablePosition();
-                if(tile.block().hasItems){
+                if(tile.block.hasItems){
                     boolean dirty = false;
                     if(shrinkHoldTimes.length != content.items().size) shrinkHoldTimes = new float[content.items().size];
 
@@ -155,7 +157,7 @@ public class BlockInventoryFragment extends Fragment{
         table.margin(4f);
         table.defaults().size(8 * 5).pad(4f);
 
-        if(tile.block().hasItems){
+        if(tile.block.hasItems){
 
             for(int i = 0; i < content.items().size; i++){
                 Item item = content.item(i);
@@ -163,7 +165,7 @@ public class BlockInventoryFragment extends Fragment{
 
                 container.add(i);
 
-                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused();
+                Boolp canPick = () -> player.unit().acceptsItem(item) && !state.isPaused() && player.within(tile, itemTransferRange);
 
                 HandCursorListener l = new HandCursorListener();
                 l.setEnabled(canPick);
@@ -209,7 +211,7 @@ public class BlockInventoryFragment extends Fragment{
 
         updateTablePosition();
 
-        table.visible(true);
+        table.visible = true;
 
         if(actions){
             table.setScale(0f, 1f);
@@ -231,7 +233,7 @@ public class BlockInventoryFragment extends Fragment{
     }
 
     private void updateTablePosition(){
-        Vec2 v = Core.input.mouseScreen(tile.x + tile.block().size * tilesize / 2f, tile.y + tile.block().size * tilesize / 2f);
+        Vec2 v = Core.input.mouseScreen(tile.x + tile.block.size * tilesize / 2f, tile.y + tile.block.size * tilesize / 2f);
         table.pack();
         table.setPosition(v.x, v.y, Align.topLeft);
     }

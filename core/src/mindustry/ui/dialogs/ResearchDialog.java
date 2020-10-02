@@ -14,8 +14,10 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -24,38 +26,93 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
 import mindustry.ui.layout.TreeLayout.*;
-import mindustry.world.modules.*;
 
 import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class ResearchDialog extends BaseDialog{
-    private final float nodeSize = Scl.scl(60f);
-    private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
-    private TechTreeNode root = new TechTreeNode(TechTree.root, null);
-    private Rect bounds = new Rect();
-    private View view;
+    final float nodeSize = Scl.scl(60f);
+    ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
+    TechTreeNode root = new TechTreeNode(TechTree.root, null);
+    Rect bounds = new Rect();
+    ItemsDisplay itemDisplay;
+    View view;
+
+    ItemSeq items;
 
     public ResearchDialog(){
         super("");
 
         titleTable.remove();
         margin(0f).marginBottom(8);
-        cont.add(view = new View()).grow().get();
+        cont.stack(view = new View(), itemDisplay = new ItemsDisplay()).grow();
 
         shouldPause = true;
 
         shown(() -> {
+
+            items = new ItemSeq(){
+                //store sector item amounts for modifications
+                ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
+
+                {
+                    //add global counts of each sector
+                    for(Planet planet : content.planets()){
+                        for(Sector sector : planet.sectors){
+                            if(sector.hasSave()){
+                                ItemSeq cached = sector.calculateItems();
+                                add(cached);
+                                cache.put(sector, cached);
+                            }
+                        }
+                    }
+                }
+
+                //this is the only method that actually modifies the sequence itself.
+                @Override
+                public void add(Item item, int amount){
+                    //only have custom removal logic for when the sequence gets items taken out of it (e.g. research)
+                    if(amount < 0){
+                        //remove items from each sector's storage, one by one
+
+                        //negate amount since it's being *removed* - this makes it positive
+                        amount = -amount;
+
+                        //% that gets removed from each sector
+                        double percentage = (double)amount / get(item);
+                        int[] counter = {amount};
+                        cache.each((sector, seq) -> {
+                            if(counter[0] == 0) return;
+
+                            //amount that will be removed
+                            int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
+
+                            //actually remove it from the sector
+                            sector.removeItem(item, toRemove);
+                            seq.remove(item, toRemove);
+
+                            counter[0] -= toRemove;
+                        });
+
+                        //negate again to display correct number
+                        amount = -amount;
+                    }
+
+                    super.add(item, amount);
+                }
+            };
+
             checkNodes(root);
             treeLayout();
+
         });
 
         hidden(ui.planet::setup);
 
         addCloseButton();
 
-        buttons.button("$database", Icon.book, () -> {
+        buttons.button("@database", Icon.book, () -> {
             hide();
             ui.database.show();
         }).size(210f, 64f);
@@ -64,7 +121,7 @@ public class ResearchDialog extends BaseDialog{
         addListener(new InputListener(){
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                view.setScale(Mathf.clamp(view.getScaleX() - amountY / 10f * view.getScaleX(), 0.25f, 1f));
+                view.setScale(Mathf.clamp(view.scaleX - amountY / 10f * view.scaleX, 0.25f, 1f));
                 view.setOrigin(Align.center);
                 view.setTransform(true);
                 return true;
@@ -77,11 +134,13 @@ public class ResearchDialog extends BaseDialog{
             }
         });
 
-        addListener(new ElementGestureListener(){
+        touchable = Touchable.enabled;
+
+        addCaptureListener(new ElementGestureListener(){
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
                 if(view.lastZoom < 0){
-                    view.lastZoom = view.getScaleX();
+                    view.lastZoom = view.scaleX;
                 }
 
                 view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 0.25f, 1f));
@@ -91,21 +150,30 @@ public class ResearchDialog extends BaseDialog{
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                view.lastZoom = view.getScaleX();
+                view.lastZoom = view.scaleX;
             }
 
             @Override
             public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
-                view.panX += deltaX / view.getScaleX();
-                view.panY += deltaY / view.getScaleY();
+                view.panX += deltaX / view.scaleX;
+                view.panY += deltaY / view.scaleY;
                 view.moved = true;
                 view.clamp();
             }
         });
     }
 
-    ItemModule items(){
-        return state.rules.defaultTeam.items();
+    @Override
+    public Dialog show(){
+        Core.app.post(() -> {
+            if(net.client()){
+                //TODO make this not display every time
+                //TODO rework this in the future
+                ui.showInfo("@campaign.multiplayer");
+            }
+        });
+
+        return super.show();
     }
 
     void treeLayout(){
@@ -170,17 +238,24 @@ public class ResearchDialog extends BaseDialog{
     void checkNodes(TechTreeNode node){
         boolean locked = locked(node.node);
         if(!locked) node.visible = true;
+        node.selectable = selectable(node.node);
         for(TechTreeNode l : node.children){
             l.visible = !locked;
             checkNodes(l);
         }
+
+        itemDisplay.rebuild(items);
+    }
+
+    boolean selectable(TechNode node){
+        return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());
     }
 
     void showToast(String info){
         Table table = new Table();
         table.actions(Actions.fadeOut(0.5f, Interp.fade), Actions.remove());
         table.top().add(info);
-        table.setName("toast");
+        table.name = "toast";
         table.update(() -> {
             table.toFront();
             table.setPosition(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() - 21, Align.top);
@@ -207,7 +282,7 @@ public class ResearchDialog extends BaseDialog{
 
     class TechTreeNode extends TreeNode<TechTreeNode>{
         final TechNode node;
-        boolean visible = true;
+        boolean visible = true, selectable = true;
 
         TechTreeNode(TechNode node, TechTreeNode parent){
             this.node = node;
@@ -230,7 +305,7 @@ public class ResearchDialog extends BaseDialog{
         Table infoTable = new Table();
 
         {
-            infoTable.touchable(Touchable.enabled);
+            infoTable.touchable = Touchable.enabled;
 
             for(TechTreeNode node : nodes){
                 ImageButton button = new ImageButton(node.node.content.icon(Cicon.medium), Styles.nodei);
@@ -256,8 +331,8 @@ public class ResearchDialog extends BaseDialog{
                                 }
                             });
                         }
-                    }else if(items().has(node.node.requirements) && locked(node.node)){
-                        unlock(node.node);
+                    }else if(canSpend(node.node) && locked(node.node)){
+                        spend(node.node);
                     }
                 });
                 button.hovered(() -> {
@@ -273,15 +348,16 @@ public class ResearchDialog extends BaseDialog{
                     }
                 });
                 button.touchable(() -> !node.visible ? Touchable.disabled : Touchable.enabled);
-                button.setUserObject(node.node);
+                button.userObject = node.node;
                 button.setSize(nodeSize);
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !items().has(node.node.requirements) ? Tex.buttonRed : Tex.button;
-                    ((TextureRegionDrawable)button.getStyle().imageUp)
-                    .setRegion(node.visible ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
-                    button.getImage().setColor(!locked(node.node) ? Color.white : Color.gray);
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || !canSpend(node.node) ? Tex.buttonRed : Tex.button;
+
+                    ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
+                    button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
+                    button.getImage().setScaling(Scaling.bounded);
                 });
                 addChild(button);
             }
@@ -313,9 +389,61 @@ public class ResearchDialog extends BaseDialog{
             panY = ry - bounds.y - oy;
         }
 
+        boolean canSpend(TechNode node){
+            if(!selectable(node)) return false;
+
+            if(node.requirements.length == 0) return true;
+
+            //can spend when there's at least 1 item that can be spent (non complete)
+            for(int i = 0; i < node.requirements.length; i++){
+                if(node.finishedRequirements[i].amount < node.requirements[i].amount && items.has(node.requirements[i].item)){
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        void spend(TechNode node){
+            boolean complete = true;
+
+            boolean[] shine = new boolean[node.requirements.length];
+            boolean[] usedShine = new boolean[content.items().size];
+
+            for(int i = 0; i < node.requirements.length; i++){
+                ItemStack req = node.requirements[i];
+                ItemStack completed = node.finishedRequirements[i];
+
+                //amount actually taken from inventory
+                int used = Math.min(req.amount - completed.amount, items.get(req.item));
+                items.remove(req.item, used);
+                completed.amount += used;
+
+                if(used > 0){
+                    shine[i] = true;
+                    usedShine[req.item.id] = true;
+                }
+
+                //disable completion if the completed amount has not reached requirements
+                if(completed.amount < req.amount){
+                    complete = false;
+                }
+            }
+
+            if(complete){
+                unlock(node);
+            }
+
+            node.save();
+
+            //??????
+            Core.scene.act();
+            rebuild(shine);
+            itemDisplay.rebuild(items, usedShine);
+        }
+
         void unlock(TechNode node){
             node.content.unlock();
-            items().remove(node.requirements);
             showToast(Core.bundle.format("researched", node.content.localizedName));
             checkNodes(root);
             hoverNode = null;
@@ -327,6 +455,11 @@ public class ResearchDialog extends BaseDialog{
         }
 
         void rebuild(){
+            rebuild(null);
+        }
+
+        //pass an array of stack indexes that should shine here
+        void rebuild(@Nullable boolean[] shine){
             ImageButton button = hoverNode;
 
             infoTable.remove();
@@ -335,7 +468,7 @@ public class ResearchDialog extends BaseDialog{
 
             if(button == null) return;
 
-            TechNode node = (TechNode)button.getUserObject();
+            TechNode node = (TechNode)button.userObject;
 
             infoTable.exited(() -> {
                 if(hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){
@@ -344,42 +477,92 @@ public class ResearchDialog extends BaseDialog{
                 }
             });
 
-            infoTable.update(() -> infoTable.setPosition(button.getX() + button.getWidth(), button.getY() + button.getHeight(), Align.topLeft));
+            infoTable.update(() -> infoTable.setPosition(button.x + button.getWidth(), button.y + button.getHeight(), Align.topLeft));
 
             infoTable.left();
             infoTable.background(Tex.button).margin(8f);
 
+            boolean selectable = selectable(node);
+
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
+                if(selectable){
+                    b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
+                }
                 b.add().grow();
                 b.table(desc -> {
                     desc.left().defaults().left();
-                    desc.add(node.content.localizedName);
+                    desc.add(selectable ? node.content.localizedName : "[accent]???");
                     desc.row();
                     if(locked(node)){
+
                         desc.table(t -> {
                             t.left();
-                            for(ItemStack req : node.requirements){
-                                t.table(list -> {
-                                    list.left();
-                                    list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
-                                    list.add(req.item.localizedName).color(Color.lightGray);
-                                    list.label(() -> " " + (player.team().core() != null ? Math.min(player.team().core().items.get(req.item), req.amount) + " / " : "") + req.amount)
-                                    .update(l -> l.setColor(items().has(req.item, req.amount) ? Color.lightGray : Color.scarlet));//TODO
-                                }).fillX().left();
-                                t.row();
-                            }
+                            if(selectable){
 
-                            //TODO test if this works
-                            if(node.objectives.length > 0){
+                                //check if there is any progress, add research progress text
+                                if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
+                                    float sum = 0f, used = 0f;
+                                    boolean shiny = false;
+
+                                    for(int i = 0; i < node.requirements.length; i++){
+                                        sum += node.requirements[i].item.cost * node.requirements[i].amount;
+                                        used += node.finishedRequirements[i].item.cost * node.finishedRequirements[i].amount;
+                                        if(shine != null) shiny |= shine[i];
+                                    }
+
+                                    int percent = (int)(used / sum * 100);
+                                    Label label = t.add(Core.bundle.format("research.progress", percent)).left().get();
+
+                                    if(shiny){
+                                        label.setColor(Pal.accent);
+                                        label.actions(Actions.color(Color.lightGray, 0.75f, Interp.fade));
+                                    }else{
+                                        label.setColor(Color.lightGray);
+                                    }
+
+                                    t.row();
+                                }
+
+                                for(int i = 0; i < node.requirements.length; i++){
+                                    ItemStack req = node.requirements[i];
+                                    ItemStack completed = node.finishedRequirements[i];
+
+                                    //skip finished stacks
+                                    if(req.amount <= completed.amount) continue;
+                                    boolean shiny = shine != null && shine[i];
+
+                                    t.table(list -> {
+                                        int reqAmount = req.amount - completed.amount;
+
+                                        list.left();
+                                        list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
+                                        list.add(req.item.localizedName).color(Color.lightGray);
+                                        Label label = list.label(() -> " " +
+                                                UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "
+                                            + UI.formatAmount(reqAmount)).get();
+
+                                        Color targetColor = items.has(req.item) ? Color.lightGray : Color.scarlet;
+
+                                        if(shiny){
+                                            label.setColor(Pal.accent);
+                                            label.actions(Actions.color(targetColor, 0.75f, Interp.fade));
+                                        }else{
+                                            label.setColor(targetColor);
+                                        }
+
+                                    }).fillX().left();
+                                    t.row();
+                                }
+                            }else if(node.objectives.size > 0){
                                 t.table(r -> {
-                                    r.add("$complete").colspan(2).left();
+                                    r.add("@complete").colspan(2).left();
                                     r.row();
                                     for(Objective o : node.objectives){
-                                        r.image(Icon.right).padRight(4);
-                                        r.add(o.display()).color(Color.lightGray);
+                                        if(o.complete()) continue;
+
+                                        r.add("> " + o.display()).color(Color.lightGray).left();
                                         r.image(o.complete() ? Icon.ok : Icon.cancel, o.complete() ? Color.lightGray : Color.scarlet).padLeft(3);
                                         r.row();
                                     }
@@ -388,19 +571,19 @@ public class ResearchDialog extends BaseDialog{
                             }
                         });
                     }else{
-                        desc.add("$completed");
+                        desc.add("@completed");
                     }
                 }).pad(9);
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.button("$research", Icon.ok, Styles.nodet, () -> unlock(node))
-                    .disabled(i -> !items().has(node.requirements)).growX().height(44f).colspan(3);
+                    b.button("@research", Icon.ok, Styles.nodet, () -> spend(node))
+                    .disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
             });
 
             infoTable.row();
-            if(node.content.description != null){
+            if(node.content.description != null && selectable){
                 infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray).growX()).fillX();
             }
 
@@ -413,13 +596,16 @@ public class ResearchDialog extends BaseDialog{
         public void drawChildren(){
             clamp();
             float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
+            Draw.sort(true);
 
             for(TechTreeNode node : nodes){
                 if(!node.visible) continue;
                 for(TechTreeNode child : node.children){
                     if(!child.visible) continue;
+                    boolean lock = locked(node.node) || locked(child.node);
+                    Draw.z(lock ? 1f : 2f);
 
-                    Lines.stroke(Scl.scl(4f), locked(node.node) || locked(child.node) ? Pal.gray : Pal.accent);
+                    Lines.stroke(Scl.scl(4f), lock ? Pal.gray : Pal.accent);
                     Draw.alpha(parentAlpha);
                     if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width*3){
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
@@ -430,6 +616,7 @@ public class ResearchDialog extends BaseDialog{
                 }
             }
 
+            Draw.sort(false);
             Draw.reset();
             super.drawChildren();
         }

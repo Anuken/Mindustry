@@ -11,7 +11,7 @@ project.ext.assetsDir = new File("../core/assets")
 
 def enableTemplates = true
 def JDK_DIR = "$System.env.JDK_DIR"
-def ICON_DIR = new File("core/assets/icons/icon.icns")
+def ICON_DIR = new File("$rootDir/core/assets/icons/icon.icns")
 def spriteHashFile = new File(project.rootDir, "build/spritehash")
 
 def hashDirectory = {
@@ -44,6 +44,8 @@ task run(dependsOn: classes, type: JavaExec){
     if(System.getProperty("os.name").toLowerCase().contains("mac")){
         jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
     }
+
+    jvmArgs += "-XX:+ShowCodeDetailsInExceptionMessages"
 
     /*spriteHashFile.parentFile.mkdirs()
     String spriteHash = hashDirectory()
@@ -127,13 +129,13 @@ PackrConfig.Platform.values().each{ platform ->
                     verbose = true
                     bundleIdentifier = getPackage() + ".mac"
                     iconResource = ICON_DIR
-                    outDir = file("build/packr/output")
+                    outDir = file("$rootDir/desktop/build/packr/output")
                     mainClass = project.ext.mainClassName
-                    classpath = ["desktop/build/packr/desktop.jar"]
-                    removePlatformLibs = ["desktop/build/packr/desktop.jar"]
+                    classpath = ["$rootDir/desktop/build/packr/desktop.jar".toString()]
+                    removePlatformLibs = ["$rootDir/desktop/build/packr/desktop.jar".toString()]
 
                     vmArgs = []
-                    minimizeJre = "desktop/packr_minimize.json"
+                    minimizeJre = "$rootDir/desktop/packr_minimize.json".toString()
                     jdk = JDK_DIR + "jdk-${platform.toString().toLowerCase()}.zip"
 
                     if(platform == PackrConfig.Platform.MacOS){
