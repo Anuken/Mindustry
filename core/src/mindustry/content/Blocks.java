@@ -1305,7 +1305,7 @@ public class Blocks implements ContentList{
             itemUseTime = 60f;
 
             consumes.item(Items.sand);
-            consumes.power(6.75f);
+            consumes.power(3f);
             consumes.liquid(Liquids.water, 0.15f);
         }};
 
@@ -1321,7 +1321,7 @@ public class Blocks implements ContentList{
             attribute = Attribute.heat;
             rotateSpeed = -0.8f;
             itemUseTime = 60f;
-            consumes.power(3f);
+            consumes.power(6.75f);
         }};
 
         //endregion
