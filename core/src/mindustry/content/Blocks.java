@@ -947,7 +947,7 @@ public class Blocks implements ContentList{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 180;
             speed = 0.08f;
-            displayedSpeed = 10f;
+            displayedSpeed = 11f;
         }};
 
         junction = new Junction("junction"){{
