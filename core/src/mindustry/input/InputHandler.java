@@ -10,6 +10,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
@@ -489,7 +490,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     protected void showSchematicSave(){
         if(lastSchematic == null) return;
 
-        ui.showTextInput("@schematic.add", "@name", "", text -> {
+        Cons2<String, String> saveSchematic = (text, description) -> {
             Schematic replacement = schematics.all().find(s -> s.name().equals(text));
             if(replacement != null){
                 ui.showConfirm("@confirm", "@schematic.replace", () -> {
@@ -499,11 +500,40 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 });
             }else{
                 lastSchematic.tags.put("name", text);
+                lastSchematic.tags.put("description", description);
                 schematics.add(lastSchematic);
                 ui.showInfoFade("@schematic.saved");
                 ui.schematics.showInfo(lastSchematic);
             }
-        });
+        };
+
+        new Dialog("@schematic.add"){{
+            cont.margin(30).add("@name").padRight(6f);
+            TextField nameField = cont.field("", t -> {}).size(330f, 50f).addInputDialog().get();
+
+            cont.row();
+
+            cont.margin(30).add("@editor.description").padRight(6f);
+            TextField descripionField = cont.field("", t -> {}).size(330f, 50f).addInputDialog().get();
+
+            buttons.defaults().size(120, 54).pad(4);
+            buttons.button("@ok", () -> {
+                saveSchematic.get(nameField.getText(), descripionField.getText());
+                hide();
+            }).disabled(b -> nameField.getText().isEmpty());
+            buttons.button("@cancel", this::hide);
+
+            keyDown(KeyCode.enter, () -> {
+                String text = nameField.getText();
+                if(!text.isEmpty()){
+                    saveSchematic.get(text, descripionField.getText());
+                    hide();
+                }
+            });
+            keyDown(KeyCode.escape, this::hide);
+            keyDown(KeyCode.back, this::hide);
+            show();
+        }};
     }
 
     public void rotateRequests(Seq<BuildPlan> requests, int direction){

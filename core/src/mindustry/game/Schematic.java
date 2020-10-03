@@ -62,6 +62,10 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         return tags.get("name", "unknown");
     }
 
+    public String description(){
+        return tags.get("description", "");
+    }
+
     public void save(){
         schematics.saveChanges(this);
     }
@@ -90,7 +94,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
 
     @Override
     public String steamDescription(){
-        return null;
+        return description();
     }
 
     @Override
