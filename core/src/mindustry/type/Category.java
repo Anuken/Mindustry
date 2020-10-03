@@ -21,6 +21,9 @@ public enum Category{
     effect,
     /** Blocks related to logic. */
     logic;
+    
+    // in case someone is bad at English
+    public static final Category defence = defense;
 
     public static final Category[] all = values();
 
