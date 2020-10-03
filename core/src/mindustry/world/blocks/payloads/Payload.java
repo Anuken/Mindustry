@@ -26,8 +26,8 @@ public interface Payload{
     }
 
     /** @return whether this payload fits on a standard 3x3 conveyor. */
-    default boolean fits(){
-        return size() / tilesize <= 2.5f;
+    default boolean fits(int size){
+        return size * size() / tilesize <= 7.5f;
     }
 
     /** writes the payload for saving. */
