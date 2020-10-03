@@ -3,7 +3,7 @@ package mindustry.entities.comp;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.ai.formations.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;

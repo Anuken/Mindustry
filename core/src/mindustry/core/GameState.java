@@ -1,7 +1,7 @@
 package mindustry.core;
 
 import arc.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;

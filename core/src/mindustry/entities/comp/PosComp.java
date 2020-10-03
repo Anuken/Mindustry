@@ -1,7 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -55,7 +55,8 @@ abstract class PosComp implements Position{
         return tile != null && tile.solid();
     }
 
-    @Nullable Tile tileOn(){
+    @Nullable
+    Tile tileOn(){
         return world.tileWorld(x, y);
     }
 

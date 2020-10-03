@@ -3,7 +3,7 @@ package mindustry.game;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
@@ -24,7 +24,8 @@ public class Teams{
         active.add(get(Team.crux));
     }
 
-    public @Nullable CoreBuild closestEnemyCore(float x, float y, Team team){
+    public @Nullable
+    CoreBuild closestEnemyCore(float x, float y, Team team){
         for(Team enemy : team.enemies()){
             CoreBuild tile = Geometry.findClosest(x, y, enemy.cores());
             if(tile != null) return tile;

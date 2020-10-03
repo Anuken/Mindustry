@@ -9,7 +9,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;

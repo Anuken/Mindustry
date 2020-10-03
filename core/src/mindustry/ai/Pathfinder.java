@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.annotations.Annotations.*;
@@ -187,6 +186,8 @@ public class Pathfinder implements Runnable{
                     for(Flowfield data : threadList){
                         updateFrontier(data, maxUpdate / threadList.size);
 
+                        //TODO implement timeouts... or don't
+                        /*
                         //remove flowfields that have 'timed out' so they can be garbage collected and no longer waste space
                         if(data.refreshRate > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
                             //make sure it doesn't get removed twice
@@ -195,12 +196,11 @@ public class Pathfinder implements Runnable{
                             Team team = data.team;
 
                             Core.app.post(() -> {
-                                //TODO ?????
                                 //remove its used state
-                                //if(fieldMap[team.id] != null){
-                                //    fieldMap[team.id].remove(data.target);
-                                //    fieldMapUsed[team.id].remove(data.target);
-                                //}
+                                if(fieldMap[team.id] != null){
+                                    fieldMap[team.id].remove(data.target);
+                                    fieldMapUsed[team.id].remove(data.target);
+                                }
                                 //remove from main thread list
                                 mainList.remove(data);
                             });
@@ -209,7 +209,7 @@ public class Pathfinder implements Runnable{
                                 //remove from this thread list with a delay
                                 threadList.remove(data);
                             });
-                        }
+                        }*/
                     }
                 }
 

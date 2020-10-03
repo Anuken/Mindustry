@@ -2,7 +2,6 @@ package mindustry.entities.units;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.*;

@@ -4,7 +4,6 @@ import arc.*;
 import arc.audio.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;

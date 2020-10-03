@@ -2,7 +2,6 @@ package mindustry.world.modules;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.type.*;

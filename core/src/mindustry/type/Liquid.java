@@ -2,7 +2,7 @@ package mindustry.type;
 
 import arc.graphics.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.ui.*;

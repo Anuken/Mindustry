@@ -5,7 +5,6 @@ import arc.assets.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.*;

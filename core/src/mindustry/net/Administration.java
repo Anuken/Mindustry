@@ -3,7 +3,6 @@ package mindustry.net;
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.pooling.Pool.*;

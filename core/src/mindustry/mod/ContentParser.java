@@ -8,7 +8,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.mock.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;

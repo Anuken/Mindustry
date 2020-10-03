@@ -13,7 +13,6 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;

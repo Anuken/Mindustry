@@ -1,6 +1,6 @@
 package mindustry.entities.comp;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -17,7 +17,8 @@ abstract class TeamComp implements Posc{
         return team.rules().cheat;
     }
 
-    public @Nullable Building core(){
+    public @Nullable
+    Building core(){
         return team.core();
     }
 

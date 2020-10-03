@@ -3,7 +3,7 @@ package mindustry.world;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 
 import java.util.*;
 
@@ -45,7 +45,8 @@ public class Tiles implements Iterable<Tile>{
     }
 
     /** @return a tile at coordinates, or null if out of bounds */
-    public @Nullable Tile get(int x, int y){
+    public @Nullable
+    Tile get(int x, int y){
         return (x < 0 || x >= width || y < 0 || y >= height) ? null : array[y*width + x];
     }
 

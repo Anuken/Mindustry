@@ -2,13 +2,14 @@ package mindustry.type;
 
 import arc.files.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 
 /** Defines a piece of content that can be published on the Workshop. */
 public interface Publishable{
     /** @return workshop item ID, or null if this isn't on the workshop. */
-    @Nullable String getSteamID();
+    @Nullable
+    String getSteamID();
     /** adds a steam ID to this item once it's published. should save the item to make sure this change is persisted. */
     void addSteamID(String id);
     /** removes the item ID; called when the item isn't found. */

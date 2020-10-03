@@ -3,7 +3,6 @@ package mindustry.ai;
 import arc.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;

@@ -8,7 +8,6 @@ import arc.input.*;
 import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.audio.*;

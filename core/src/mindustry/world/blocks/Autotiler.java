@@ -3,7 +3,6 @@ package mindustry.world.blocks;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -149,20 +148,19 @@ public interface Autotiler{
      * @param bits The blending value array
      */
     default void transformCase(int num, int[] bits){
-        if(num == 0){
-            bits[0] = 3;
-        }else if(num == 1){
-            bits[0] = 4;
-        }else if(num == 2){
-            bits[0] = 2;
-        }else if(num == 3){
-            bits[0] = 2;
-            bits[2] = -1;
-        }else if(num == 4){
-            bits[0] = 1;
-            bits[2] = -1;
-        }else if(num == 5){
-            bits[0] = 1;
+        switch(num){
+            case 0 -> bits[0] = 3;
+            case 1 -> bits[0] = 4;
+            case 2 -> bits[0] = 2;
+            case 3 -> {
+                bits[0] = 2;
+                bits[2] = -1;
+            }
+            case 4 -> {
+                bits[0] = 1;
+                bits[2] = -1;
+            }
+            case 5 -> bits[0] = 1;
         }
     }
 

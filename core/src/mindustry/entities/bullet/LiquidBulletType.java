@@ -3,7 +3,7 @@ package mindustry.entities.bullet;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;

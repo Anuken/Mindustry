@@ -1,7 +1,7 @@
 package mindustry.world.blocks.storage;
 
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;

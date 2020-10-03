@@ -1,6 +1,6 @@
 package mindustry.world.blocks.payloads;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;

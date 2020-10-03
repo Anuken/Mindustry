@@ -3,7 +3,6 @@ package mindustry.entities.bullet;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;

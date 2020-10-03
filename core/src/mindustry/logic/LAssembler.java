@@ -2,7 +2,7 @@ package mindustry.logic;
 
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
@@ -202,7 +202,8 @@ public class LAssembler{
         }
     }
 
-    public @Nullable BVar getVar(String name){
+    public @Nullable
+    BVar getVar(String name){
         return vars.get(name);
     }
 
