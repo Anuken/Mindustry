@@ -145,10 +145,7 @@ public abstract class BulletType extends Content{
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
         if(status == StatusEffects.burning) {
-            Tile buildTile = world.tileWorld(tile.x, tile.y);
-            if(buildTile != null){
-                Fires.create(buildTile);
-            }
+            Fires.create(tile.tile);
         }
         hit(b);
     }
