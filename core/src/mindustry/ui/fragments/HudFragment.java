@@ -58,7 +58,6 @@ public class HudFragment extends Fragment{
             showToast(Icon.warning, "Sector " + e.sector.id + " [scarlet]lost!");
         });
 
-        //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
             coreItems.clear();

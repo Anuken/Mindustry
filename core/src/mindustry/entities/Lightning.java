@@ -32,8 +32,6 @@ public class Lightning{
         createLightningInternal(bullet, lastSeed++, bullet.team, color, damage, x, y, targetAngle, length);
     }
 
-    //TODO remote method
-    //@Remote(called = Loc.server, unreliable = true)
     private static void createLightningInternal(Bullet hitter, int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
         random.setSeed(seed);
         hit.clear();

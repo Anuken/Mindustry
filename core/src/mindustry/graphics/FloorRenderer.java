@@ -17,7 +17,6 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class FloorRenderer implements Disposable{
-    //TODO find out number with best performance
     private static final int chunksize = mobile ? 16 : 32;
 
     private int[][][] cache;

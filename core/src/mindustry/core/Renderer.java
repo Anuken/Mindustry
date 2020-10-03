@@ -217,8 +217,6 @@ public class Renderer implements ApplicationListener{
             pixelator.register();
         }
 
-        //TODO fx
-
         Draw.draw(Layer.background, this::drawBackground);
         Draw.draw(Layer.floor, blocks.floor::drawFloor);
         Draw.draw(Layer.block - 1, blocks::drawShadows);

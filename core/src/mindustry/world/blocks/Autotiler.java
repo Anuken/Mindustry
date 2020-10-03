@@ -11,7 +11,6 @@ import mindustry.world.*;
 
 import java.util.*;
 
-//TODO documentation
 public interface Autotiler{
 
     /**
@@ -109,7 +108,6 @@ public interface Autotiler{
         blendresult[0] = 0;
         blendresult[1] = blendresult[2] = 1;
 
-        // TODO code refactoring maybe?
         int num =
         (blends(tile, rotation, directional, 2, world) && blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 3, world)) ? 0 :
         (blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 3, world)) ? 1 :

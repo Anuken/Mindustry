@@ -359,7 +359,6 @@ public class UnitType extends UnlockableContent{
             drawPayload((Unit & Payloadc)unit);
         }
 
-        //TODO
         drawOcclusion(unit);
 
         Draw.z(z - outlineSpace);
@@ -623,7 +622,6 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        //TODO should be below/above legs
         if(baseRegion.found()){
             Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
         }

@@ -481,7 +481,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void update(){
-        //TODO find out why this happens on Android
+        //this happens on Android and nobody knows why
         if(assets == null) return;
 
         saves.update();
