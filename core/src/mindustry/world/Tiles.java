@@ -45,8 +45,8 @@ public class Tiles implements Iterable<Tile>{
     }
 
     /** @return a tile at coordinates, or null if out of bounds */
-    public @Nullable
-    Tile get(int x, int y){
+    @Nullable
+    public Tile get(int x, int y){
         return (x < 0 || x >= width || y < 0 || y >= height) ? null : array[y*width + x];
     }
 

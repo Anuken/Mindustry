@@ -3,7 +3,6 @@ package mindustry.annotations.entity;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;

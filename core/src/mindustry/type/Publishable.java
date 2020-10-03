@@ -17,7 +17,8 @@ public interface Publishable{
     /** @return default title of the listing. */
     String steamTitle();
     /** @return standard steam listing description, may be null. this is editable by users after release.*/
-    @Nullable String steamDescription();
+    @Nullable
+    String steamDescription();
     /** @return the tag that this content has. e.g. 'schematic' or 'map'. */
     String steamTag();
     /** @return a folder with everything needed for this piece of content in it; does not need to be a copy. */

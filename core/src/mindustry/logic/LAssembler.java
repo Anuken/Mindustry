@@ -202,8 +202,8 @@ public class LAssembler{
         }
     }
 
-    public @Nullable
-    BVar getVar(String name){
+    @Nullable
+    public BVar getVar(String name){
         return vars.get(name);
     }
 
