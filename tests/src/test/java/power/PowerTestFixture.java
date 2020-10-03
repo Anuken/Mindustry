@@ -43,21 +43,21 @@ public class PowerTestFixture{
 
     protected static PowerGenerator createFakeProducerBlock(float producedPower){
         return new PowerGenerator("fakegen"){{
-            entityType = () -> new GeneratorEntity();
+            buildType = () -> new GeneratorBuild();
             powerProduction = producedPower;
         }};
     }
 
     protected static Battery createFakeBattery(float capacity){
         return new Battery("fakebattery"){{
-            entityType = () -> new BatteryEntity();
+            buildType = () -> new BatteryBuild();
             consumes.powerBuffered(capacity);
         }};
     }
 
     protected static Block createFakeDirectConsumer(float powerPerTick){
         return new PowerBlock("fakedirectconsumer"){{
-            entityType = Building::create;
+            buildType = Building::create;
             consumes.power(powerPerTick);
         }};
     }
@@ -86,7 +86,7 @@ public class PowerTestFixture{
             Reflect.set(Tile.class, tile, "floor", Blocks.sand);
 
             // Simulate the "changed" method. Calling it through reflections would require half the game to be initialized.
-            tile.build = block.newEntity().init(tile, Team.sharded, false, 0);
+            tile.build = block.newBuilding().init(tile, Team.sharded, false, 0);
             if(block.hasPower){
                 tile.build.power.graph = new PowerGraph(){
                     //assume there's always something consuming power

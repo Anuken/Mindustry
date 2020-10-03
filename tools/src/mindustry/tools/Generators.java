@@ -2,6 +2,7 @@ package mindustry.tools;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -126,7 +127,7 @@ public class Generators{
             Image colors = new Image(content.blocks().size, 1);
 
             for(Block block : content.blocks()){
-                if(block.isAir() || block instanceof BuildBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
+                if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
 
                 block.load();
 
@@ -172,7 +173,7 @@ public class Generators{
                         int radius = 4;
                         GenRegion region = (GenRegion)regions[regions.length - 1];
                         Image base = ImagePacker.get(region);
-                        Image out = last = new Image(region.getWidth(), region.getHeight());
+                        Image out = last = new Image(region.width, region.height);
                         for(int x = 0; x < out.width; x++){
                             for(int y = 0; y < out.height; y++){
 
@@ -213,7 +214,7 @@ public class Generators{
                         }
 
                         //draw shard (default team top) on top of first sprite
-                        if(i == 1 && shardTeamTop != null){
+                        if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
                             image.draw(shardTeamTop);
                         }
                     }
@@ -232,18 +233,22 @@ public class Generators{
 
                     boolean hasEmpty = false;
                     Color average = new Color();
+                    float asum = 0f;
                     for(int x = 0; x < image.width; x++){
                         for(int y = 0; y < image.height; y++){
                             Color color = image.getColor(x, y);
-                            average.r += color.r;
-                            average.g += color.g;
-                            average.b += color.b;
+                            average.r += color.r*color.a;
+                            average.g += color.g*color.a;
+                            average.b += color.b*color.a;
+                            asum += color.a;
                             if(color.a < 0.9f){
                                 hasEmpty = true;
                             }
                         }
                     }
-                    average.mul(1f / (image.width * image.height));
+
+                    average.mul(1f / asum);
+
                     if(block instanceof Floor){
                         average.mul(0.8f);
                     }else{
@@ -302,18 +307,37 @@ public class Generators{
         ImagePacker.generate("unit-icons", () -> content.units().each(type -> {
             if(type.isHidden()) return; //hidden units don't generate
 
+            ObjectSet<String> outlined = new ObjectSet<>();
+
             try{
                 type.load();
                 type.init();
 
-                Image image = ImagePacker.get(type.parts > 0 ? type.partRegions[0] : type.region);
-                for(int i = 1; i < type.parts; i++){
-                    image.draw(ImagePacker.get(type.partRegions[i]));
-                }
-                if(type.parts > 0){
-                    image.save(type.name);
+                Color outc = Pal.darkerMetal;
+                Func<Image, Image> outline = i -> i.outline(3, outc);
+                Cons<TextureRegion> outliner = t -> {
+                    if(t != null && t.found()){
+                        ImagePacker.replace(t, outline.get(ImagePacker.get(t)));
+                    }
+                };
+
+                for(Weapon weapon : type.weapons){
+                    if(outlined.add(weapon.name) && ImagePacker.has(weapon.name)){
+                        outline.get(ImagePacker.get(weapon.name)).save(weapon.name + "-outline");
+                    }
                 }
 
+                outliner.get(type.jointRegion);
+                outliner.get(type.footRegion);
+                outliner.get(type.legBaseRegion);
+                outliner.get(type.baseJointRegion);
+                if(type.constructor.get() instanceof Legsc) outliner.get(type.legRegion);
+
+                Image image = outline.get(ImagePacker.get(type.region));
+
+                image.save(type.name + "-outline");
+
+                //draw mech parts
                 if(type.constructor.get() instanceof Mechc){
                     image.drawCenter(type.baseRegion);
                     image.drawCenter(type.legRegion);
@@ -321,16 +345,21 @@ public class Generators{
                     image.draw(type.region);
                 }
 
-                Image baseCell = ImagePacker.get(type.parts > 0 ? type.partCellRegions[0] : type.cellRegion);
-                for(int i = 1; i < type.parts; i++){
-                    baseCell.draw(ImagePacker.get(type.partCellRegions[i]));
+                //draw outlines
+                for(Weapon weapon : type.weapons){
+                    weapon.load();
+
+                    image.draw(outline.get(ImagePacker.get(weapon.region)),
+                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
+                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
+                    weapon.flipSprite, false);
                 }
 
-                if(type.parts > 0){
-                    image.save(type.name + "-cell");
-                }
+                //draw base region on top to mask weapons
+                image.draw(type.region);
 
-                Image cell = new Image(type.cellRegion.getWidth(), type.cellRegion.getHeight());
+                Image baseCell = ImagePacker.get(type.cellRegion);
+                Image cell = new Image(type.cellRegion.width, type.cellRegion.height);
                 cell.each((x, y) -> cell.draw(x, y, baseCell.getColor(x, y).mul(Color.valueOf("ffa665"))));
 
                 image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2);
@@ -338,9 +367,9 @@ public class Generators{
                 for(Weapon weapon : type.weapons){
                     weapon.load();
 
-                    image.draw(weapon.region,
-                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.getWidth() / 2f),
-                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.getHeight() / 2f),
+                    image.draw(weapon.top ? outline.get(ImagePacker.get(weapon.region)) : ImagePacker.get(weapon.region),
+                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
+                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
                     weapon.flipSprite, false);
                 }
 
@@ -382,7 +411,9 @@ public class Generators{
                 }
 
                 for(Cicon icon : Cicon.scaled){
-                    Image scaled = new Image(icon.size, icon.size);
+                    Vec2 size = Scaling.fit.apply(image.width, image.height, icon.size, icon.size);
+                    Image scaled = new Image((int)size.x, (int)size.y);
+
                     scaled.drawScaled(image);
                     scaled.save("../ui/unit-" + type.name + "-" + icon.name());
                 }

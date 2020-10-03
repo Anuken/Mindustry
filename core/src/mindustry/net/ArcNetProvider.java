@@ -1,10 +1,10 @@
 package mindustry.net;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.net.*;
 import arc.net.FrameworkMessage.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.pooling.*;
@@ -28,7 +28,9 @@ public class ArcNetProvider implements NetProvider{
     Thread serverThread;
 
     public ArcNetProvider(){
-        client = new Client(8192, 4096, new PacketSerializer());
+        ArcNet.errorHandler = e -> Log.debug(Strings.getStackTrace(e));
+
+        client = new Client(8192, 8192, new PacketSerializer());
         client.setDiscoveryPacket(packetSupplier);
         client.addListener(new NetListener(){
             @Override
@@ -59,14 +61,14 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         net.handleClientReceived(object);
                     }catch(Throwable e){
-                        handleException(e);
+                        net.handleException(e);
                     }
                 });
 
             }
         });
 
-        server = new Server(4096 * 2, 4096, new PacketSerializer());
+        server = new Server(8192, 8192, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
@@ -142,14 +144,14 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         client.run();
                     }catch(Exception e){
-                        if(!(e instanceof ClosedSelectorException)) handleException(e);
+                        if(!(e instanceof ClosedSelectorException)) net.handleException(e);
                     }
                 });
 
                 client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
-                handleException(e);
+                net.handleException(e);
             }
         });
     }
@@ -180,6 +182,7 @@ public class ArcNetProvider implements NetProvider{
         Threads.daemon(() -> {
             try{
                 DatagramSocket socket = new DatagramSocket();
+                long time = Time.millis();
                 socket.send(new DatagramPacket(new byte[]{-2, 1}, 2, InetAddress.getByName(address), port));
                 socket.setSoTimeout(2000);
 
@@ -187,7 +190,7 @@ public class ArcNetProvider implements NetProvider{
                 socket.receive(packet);
 
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
+                Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
 
                 Core.app.post(() -> valid.get(host));
             }catch(Exception e){
@@ -199,6 +202,7 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void discoverServers(Cons<Host> callback, Runnable done){
         Seq<InetAddress> foundAddresses = new Seq<>();
+        long time = Time.millis();
         client.discoverHosts(port, multicastGroup, multicastPort, 3000, packet -> {
             Core.app.post(() -> {
                 try{
@@ -206,7 +210,7 @@ public class ArcNetProvider implements NetProvider{
                         return;
                     }
                     ByteBuffer buffer = ByteBuffer.wrap(packet.getData());
-                    Host host = NetworkIO.readServerData(packet.getAddress().getHostAddress(), buffer);
+                    Host host = NetworkIO.readServerData((int)Time.timeSinceMillis(time), packet.getAddress().getHostAddress(), buffer);
                     callback.get(host);
                     foundAddresses.add(packet.getAddress());
                 }catch(Exception e){
@@ -263,16 +267,6 @@ public class ArcNetProvider implements NetProvider{
         }
 
         return null;
-    }
-
-    private void handleException(Throwable e){
-        if(e instanceof ArcNetException){
-            Core.app.post(() -> net.showError(new IOException("mismatch")));
-        }else if(e instanceof ClosedChannelException){
-            Core.app.post(() -> net.showError(new IOException("alreadyconnected")));
-        }else{
-            Core.app.post(() -> net.showError(e));
-        }
     }
 
     class ArcConnection extends NetConnection{

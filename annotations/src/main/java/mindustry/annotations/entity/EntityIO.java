@@ -38,12 +38,16 @@ public class EntityIO{
         this.serializer = serializer;
         this.name = name;
 
+        json.setIgnoreUnknownFields(true);
+
         directory.mkdirs();
 
         //load old revisions
         for(Fi fi : directory.list()){
             revisions.add(json.fromJson(Revision.class, fi));
         }
+
+        revisions.sort(r -> r.version);
 
         //next revision to be used
         int nextRevision = revisions.isEmpty() ? 0 : revisions.max(r -> r.version).version + 1;
@@ -61,11 +65,13 @@ public class EntityIO{
         //keep track of fields present in the entity
         presentFields.addAll(fields.map(f -> f.name));
 
+        Revision previous = revisions.isEmpty() ? null : revisions.peek();
+
         //add new revision if it doesn't match or there are no revisions
         if(revisions.isEmpty() || !revisions.peek().equal(fields)){
             revisions.add(new Revision(nextRevision,
-                fields.map(f -> new RevisionField(f.name, f.type.toString(),
-                f.type.isPrimitive() ? BaseProcessor.typeSize(f.type.toString()) : -1))));
+                fields.map(f -> new RevisionField(f.name, f.type.toString()))));
+            Log.warn("Adding new revision @ for @.\nPre = @\nNew = @\n", nextRevision, name, previous == null ? null : previous.fields.toString(", ", f -> f.name + ":" + f.type), fields.toString(", ", f -> f.name + ":" + f.type.toString()));
             //write revision
             directory.child(nextRevision + ".json").writeString(json.toJson(revisions.peek()));
         }
@@ -146,6 +152,12 @@ public class EntityIO{
                     ncont("else" );
 
                     io(field.type, "");
+
+                    //just assign the two values so jumping does not occur on de-possession
+                    if(sf){
+                        st(field.name + lastSuf + " = this." + field.name);
+                        st(field.name + targetSuf + " = this." + field.name);
+                    }
 
                     econt();
                 }
@@ -316,8 +328,7 @@ public class EntityIO{
             for(int i = 0; i < fields.size; i++){
                 RevisionField field = fields.get(i);
                 FieldSpec spec = specs.get(i);
-                //TODO when making fields, their primitive size may be overwritten by an annotation; check for that
-                if(!(field.type.equals(spec.type.toString()) && (!spec.type.isPrimitive() || BaseProcessor.typeSize(spec.type.toString()) == field.size))){
+                if(!field.type.replace("mindustry.gen.", "").equals(spec.type.toString().replace("mindustry.gen.", ""))){
                     return false;
                 }
             }
@@ -327,11 +338,9 @@ public class EntityIO{
 
     public static class RevisionField{
         String name, type;
-        int size; //in bytes
 
-        RevisionField(String name, String type, int size){
+        RevisionField(String name, String type){
             this.name = name;
-            this.size = size;
             this.type = type;
         }
 

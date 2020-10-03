@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -14,12 +13,13 @@ import static mindustry.Vars.*;
 
 /** Updates and handles state of the campaign universe. Has no relevance to other gamemodes. */
 public class Universe{
-    private long seconds;
+    private int seconds;
+    private int netSeconds;
     private float secondCounter;
     private int turn;
 
     private Schematic lastLoadout;
-    private Seq<ItemStack> lastLaunchResources = new Seq<>();
+    private ItemSeq lastLaunchResources = new ItemSeq();
 
     public Universe(){
         load();
@@ -53,25 +53,26 @@ public class Universe{
         }
     }
 
-    public void displayTimeEnd(){
-        if(!headless){
-            state.set(State.paused);
-
-            ui.announce("Next turn incoming.");
-        }
+    /** @return sectors attacked on the current planet, minus the ones that are being played on right now. */
+    public Seq<Sector> getAttacked(Planet planet){
+        return planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed() && s.getSecondsPassed() > 1);
     }
 
     /** Update planet rotations, global time and relevant state. */
     public void update(){
-        secondCounter += Time.delta / 60f;
 
-        if(secondCounter >= 1){
-            seconds += (int)secondCounter;
-            secondCounter %= 1f;
+        //only update time when not in multiplayer
+        if(!net.client()){
+            secondCounter += Time.delta / 60f;
 
-            //save every few seconds
-            if(seconds % 10 == 1){
-                save();
+            if(secondCounter >= 1){
+                seconds += (int)secondCounter;
+                secondCounter %= 1f;
+
+                //save every few seconds
+                if(seconds % 10 == 1){
+                    save();
+                }
             }
         }
 
@@ -86,14 +87,14 @@ public class Universe{
         }
     }
 
-    public Seq<ItemStack> getLaunchResources(){
-        lastLaunchResources = Core.settings.getJson("launch-resources", Seq.class, ItemStack.class, Seq::new);
+    public ItemSeq getLaunchResources(){
+        lastLaunchResources = Core.settings.getJson("launch-resources-seq", ItemSeq.class, ItemSeq::new);
         return lastLaunchResources;
     }
 
-    public void updateLaunchResources(Seq<ItemStack> stacks){
+    public void updateLaunchResources(ItemSeq stacks){
         this.lastLaunchResources = stacks;
-        Core.settings.putJson("launch-resources", ItemStack.class, lastLaunchResources);
+        Core.settings.putJson("launch-resources-seq", lastLaunchResources);
     }
 
     /** Updates selected loadout for future deployment. */
@@ -140,14 +141,27 @@ public class Universe{
                         sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
 
                         //check if the sector has been attacked too many times...
-                        if(sector.hasBase() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                        if(sector.hasBase() && sector.hasWaves() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
                             //fire event for losing the sector
                             Events.fire(new SectorLoseEvent(sector));
 
                             //if so, just delete the save for now. it's lost.
                             //TODO don't delete it later maybe
                             sector.save.delete();
+                            //clear recieved
+                            sector.setExtraItems(new ItemSeq());
                             sector.save = null;
+                        }
+                    }
+
+                    //export to another sector
+                    if(sector.save != null && sector.save.meta != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.destination != null){
+                        Sector to = sector.save.meta.secinfo.destination;
+                        if(to.save != null){
+                            ItemSeq items = to.getExtraItems();
+                            //calculated exported items to this sector
+                            sector.save.meta.secinfo.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed)));
+                            to.setExtraItems(items);
                         }
                     }
 
@@ -156,7 +170,6 @@ public class Universe{
                 }
             }
         }
-        //TODO events
 
         Events.fire(new TurnEvent());
 
@@ -178,25 +191,30 @@ public class Universe{
         return count;
     }
 
-    public float secondsMod(float mod, float scale){
-        return (seconds / scale) % mod;
+    public void updateNetSeconds(int value){
+        netSeconds = value;
     }
 
-    public long seconds(){
-        return seconds;
+    public float secondsMod(float mod, float scale){
+        return (seconds() / scale) % mod;
+    }
+
+    public int seconds(){
+        //use networked seconds when playing as client
+        return net.client() ? netSeconds : seconds;
     }
 
     public float secondsf(){
-        return seconds + secondCounter;
+        return seconds() + secondCounter;
     }
 
     private void save(){
-        Core.settings.put("utime", seconds);
+        Core.settings.put("utimei", seconds);
         Core.settings.put("turn", turn);
     }
 
     private void load(){
-        seconds = Core.settings.getLong("utime");
+        seconds = Core.settings.getInt("utimei");
         turn = Core.settings.getInt("turn");
     }
 

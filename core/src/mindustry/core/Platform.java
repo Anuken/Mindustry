@@ -14,9 +14,17 @@ import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import rhino.*;
 
+import java.net.*;
+
 import static mindustry.Vars.*;
 
 public interface Platform{
+
+    /** Dynamically loads a jar file. */
+    default Class<?> loadJar(Fi jar, String mainClass) throws Exception{
+        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
+        return classLoader.loadClass(mainClass);
+    }
 
     /** Steam: Update lobby visibility.*/
     default void updateLobby(){}
@@ -111,7 +119,7 @@ public interface Platform{
      * @param extension File extension to filter
      */
     default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-        new FileChooser(open ? "$open" : "$save", file -> file.extEquals(extension), open, file -> {
+        new FileChooser(open ? "@open" : "@save", file -> file.extEquals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
             }else{
@@ -121,7 +129,7 @@ public interface Platform{
     }
 
     /**
-     * Show a file chooser for multiple file types. Only supported on desktop.
+     * Show a file chooser for multiple file types.
      * @param cons Selection listener
      * @param extensions File extensions to filter
      */
@@ -129,7 +137,7 @@ public interface Platform{
         if(mobile){
             showFileChooser(true, extensions[0], cons);
         }else{
-            new FileChooser("$open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+            new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
         }
     }
 

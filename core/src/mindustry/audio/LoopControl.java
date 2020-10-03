@@ -2,9 +2,9 @@ package mindustry.audio;
 
 import arc.*;
 import arc.audio.*;
-import arc.struct.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import mindustry.*;
 
 public class LoopControl{

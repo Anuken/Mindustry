@@ -1,8 +1,8 @@
 package mindustry.maps.filters;
 
 import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
 

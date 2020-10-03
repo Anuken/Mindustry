@@ -52,7 +52,7 @@ public class ItemsDisplay extends Table{
                 }
             }).get().setScrollingDisabled(true, false), false).setDuration(0.3f);
 
-            c.button("$globalitems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
+            c.button("@globalitems", Icon.downOpen, Styles.clearTogglet, col::toggle).update(t -> {
                 t.setChecked(col.isCollapsed());
                 ((Image)t.getChildren().get(1)).setDrawable(col.isCollapsed() ? Icon.upOpen : Icon.downOpen);
             }).padBottom(4).left().fillX().margin(12f).minWidth(200f);

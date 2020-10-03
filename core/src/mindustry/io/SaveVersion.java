@@ -257,7 +257,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                 if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
-                        if(block.hasEntity()){
+                        if(block.hasBuilding()){
                             try{
                                 readChunk(stream, true, in -> {
                                     byte revision = in.readByte();
@@ -331,6 +331,11 @@ public abstract class SaveVersion extends SaveFileReader{
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
                 byte typeid = in.readByte();
+                if(EntityMapping.map(typeid) == null){
+                    in.skipBytes(lastRegionLength - 1);
+                    return;
+                }
+
                 Entityc entity = (Entityc)EntityMapping.map(typeid).get();
                 entity.read(Reads.get(in));
                 entity.add();

@@ -2,11 +2,11 @@ package mindustry.game;
 
 import arc.*;
 import arc.assets.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.util.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
@@ -23,14 +23,14 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Saves{
-    private Seq<SaveSlot> saves = new Seq<>();
-    private @Nullable SaveSlot current;
+    Seq<SaveSlot> saves = new Seq<>();
+    @Nullable SaveSlot current;
     private @Nullable SaveSlot lastSectorSave;
-    private AsyncExecutor previewExecutor = new AsyncExecutor(1);
+    AsyncExecutor previewExecutor = new AsyncExecutor(1);
     private boolean saving;
     private float time;
 
-    private long totalPlaytime;
+    long totalPlaytime;
     private long lastTimestamp;
 
     public Saves(){
@@ -61,6 +61,9 @@ public class Saves{
         //automatically assign sector save slots
         for(SaveSlot slot : saves){
             if(slot.getSector() != null){
+                if(slot.getSector().save != null){
+                    Log.warn("Sector @ has two corresponding saves: @ and @", slot.getSector(), slot.getSector().save.file, slot.file);
+                }
                 slot.getSector().save = slot;
             }
         }
@@ -75,7 +78,6 @@ public class Saves{
     }
 
     public void update(){
-        SaveSlot current = this.current;
 
         if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
@@ -90,14 +92,13 @@ public class Saves{
             if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
 
-                Time.runTask(2f, () -> {
-                    try{
-                        current.save();
-                    }catch(Throwable e){
-                        e.printStackTrace();
-                    }
-                    saving = false;
-                });
+                try{
+                    current.save();
+                }catch(Throwable e){
+                    e.printStackTrace();
+                }
+
+                Time.runTask(3f, () -> saving = false);
 
                 time = 0;
             }
@@ -128,6 +129,7 @@ public class Saves{
             sector.save.setName(sector.save.file.nameWithoutExtension());
             saves.add(sector.save);
         }
+        sector.save.setAutosave(true);
         sector.save.save();
         lastSectorSave = sector.save;
         Core.settings.put("last-sector-save", sector.save.getName());
@@ -165,9 +167,10 @@ public class Saves{
     }
 
     public void deleteAll(){
-        saves.clear();
-        for(Fi file : saveDirectory.list()){
-            file.delete();
+        for(SaveSlot slot : saves.copy()){
+            if(!slot.isSector()){
+                slot.delete();
+            }
         }
     }
 
@@ -187,7 +190,7 @@ public class Saves{
                 current = this;
                 totalPlaytime = meta.timePlayed;
                 savePreview();
-            }catch(Exception e){
+            }catch(Throwable e){
                 throw new SaveException(e);
             }
         }
@@ -270,7 +273,7 @@ public class Saves{
             mods.removeAll(Vars.mods.getModStrings());
 
             if(!mods.isEmpty()){
-                ui.showConfirm("$warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
+                ui.showConfirm("@warning", Core.bundle.format("mod.missing", mods.toString("\n")), run);
             }else{
                 run.run();
             }

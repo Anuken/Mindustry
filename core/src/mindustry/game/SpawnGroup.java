@@ -8,7 +8,7 @@ import mindustry.gen.*;
 import mindustry.io.legacy.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 /**
  * A spawn group defines spawn information for a specific type of unit, with optional extra information like

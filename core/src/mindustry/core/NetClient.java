@@ -2,6 +2,7 @@ package mindustry.core;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -11,6 +12,7 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -63,7 +65,7 @@ public class NetClient implements ApplicationListener{
             reset();
 
             ui.loadfrag.hide();
-            ui.loadfrag.show("$connecting.data");
+            ui.loadfrag.show("@connecting.data");
 
             ui.loadfrag.setButton(() -> {
                 ui.loadfrag.hide();
@@ -80,7 +82,7 @@ public class NetClient implements ApplicationListener{
             c.uuid = platform.getUUID();
 
             if(c.uuid == null){
-                ui.showErrorMessage("$invalidid");
+                ui.showErrorMessage("@invalidid");
                 ui.loadfrag.hide();
                 disconnectQuietly();
                 return;
@@ -103,15 +105,13 @@ public class NetClient implements ApplicationListener{
             Time.runTask(3f, ui.loadfrag::hide);
 
             if(packet.reason != null){
-                if(packet.reason.equals("closed")){
-                    ui.showSmall("$disconnect", "$disconnect.closed");
-                }else if(packet.reason.equals("timeout")){
-                    ui.showSmall("$disconnect", "$disconnect.timeout");
-                }else if(packet.reason.equals("error")){
-                    ui.showSmall("$disconnect", "$disconnect.error");
+                switch(packet.reason){
+                    case "closed" -> ui.showSmall("@disconnect", "@disconnect.closed");
+                    case "timeout" -> ui.showSmall("@disconnect", "@disconnect.timeout");
+                    case "error" -> ui.showSmall("@disconnect", "@disconnect.error");
                 }
             }else{
-                ui.showErrorMessage("$disconnect");
+                ui.showErrorMessage("@disconnect");
             }
         });
 
@@ -261,7 +261,7 @@ public class NetClient implements ApplicationListener{
             if(reason.extraText() != null){
                 ui.showText(reason.toString(), reason.extraText());
             }else{
-                ui.showText("$disconnect", reason.toString());
+                ui.showText("@disconnect", reason.toString());
             }
         }
         ui.loadfrag.hide();
@@ -271,7 +271,7 @@ public class NetClient implements ApplicationListener{
     public static void kick(String reason){
         netClient.disconnectQuietly();
         logic.reset();
-        ui.showText("$disconnect", reason, Align.left);
+        ui.showText("@disconnect", reason, Align.left);
         ui.loadfrag.hide();
     }
 
@@ -314,7 +314,6 @@ public class NetClient implements ApplicationListener{
         ui.showLabel(message, duration, worldx, worldy);
     }
 
-    /*
     @Remote(variants = Variant.both, unreliable = true)
     public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
         if(effect == null) return;
@@ -325,7 +324,7 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
         onEffect(effect, x, y, rotation, color);
-    }*/
+    }
 
     @Remote(variants = Variant.both)
     public static void infoToast(String message, float duration){
@@ -344,10 +343,11 @@ public class NetClient implements ApplicationListener{
         Groups.clear();
         netClient.removed.clear();
         logic.reset();
+        netClient.connecting = true;
 
         net.setClientLoaded(false);
 
-        ui.loadfrag.show("$connecting.data");
+        ui.loadfrag.show("@connecting.data");
 
         ui.loadfrag.setButton(() -> {
             ui.loadfrag.hide();
@@ -364,6 +364,9 @@ public class NetClient implements ApplicationListener{
 
     @Remote
     public static void playerDisconnect(int playerid){
+        if(netClient != null){
+            netClient.addRemovedEntity(playerid);
+        }
         Groups.player.removeByID(playerid);
     }
 
@@ -435,17 +438,20 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
-    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, short coreDataLen, byte[] coreData){
+    public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, short coreDataLen, byte[] coreData){
         try{
             if(wave > state.wave){
                 state.wave = wave;
                 Events.fire(new WaveEvent());
             }
 
+            state.gameOver = gameOver;
             state.wavetime = waveTime;
             state.wave = wave;
             state.enemies = enemies;
             state.serverPaused = paused;
+
+            universe.updateNetSeconds(timeData);
 
             netClient.byteStream.setBytes(net.decompressSnapshot(coreData, coreDataLen));
             DataInputStream input = netClient.dataStream;
@@ -481,7 +487,7 @@ public class NetClient implements ApplicationListener{
                 Log.err("Failed to load data!");
                 ui.loadfrag.hide();
                 quiet = true;
-                ui.showErrorMessage("$disconnect.data");
+                ui.showErrorMessage("@disconnect.data");
                 net.disconnect();
                 timeoutTime = 0f;
             }
@@ -541,6 +547,10 @@ public class NetClient implements ApplicationListener{
         quiet = true;
     }
 
+    public void clearRemovedEntity(int id){
+        removed.remove(id);
+    }
+
     public void addRemovedEntity(int id){
         removed.add(id);
     }
@@ -552,9 +562,25 @@ public class NetClient implements ApplicationListener{
     void sync(){
         if(timer.get(0, playerSyncTime)){
             BuildPlan[] requests = null;
-            if(player.isBuilder() && control.input.isBuilding){
+            if(player.isBuilder()){
                 //limit to 10 to prevent buffer overflows
                 int usedRequests = Math.min(player.builder().plans().size, 10);
+
+                int totalLength = 0;
+
+                //prevent buffer overflow by checking config length
+                for(int i = 0; i < usedRequests; i++){
+                    BuildPlan plan = player.builder().plans().get(i);
+                    if(plan.config instanceof byte[]){
+                        int length = ((byte[])plan.config).length;
+                        totalLength += length;
+                    }
+
+                    if(totalLength > 2048){
+                        usedRequests = i + 1;
+                        break;
+                    }
+                }
 
                 requests = new BuildPlan[usedRequests];
                 for(int i = 0; i < usedRequests; i++){
@@ -563,8 +589,11 @@ public class NetClient implements ApplicationListener{
             }
 
             Unit unit = player.dead() ? Nulls.unit : player.unit();
+            int uid = player.dead() ? -1 : unit.id;
 
-            Call.clientShapshot(lastSent++,
+            Call.clientSnapshot(
+            lastSent++,
+            uid,
             player.dead(),
             unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
@@ -572,10 +601,11 @@ public class NetClient implements ApplicationListener{
             unit instanceof Mechc ? ((Mechc)unit).baseRotation() : 0,
             unit.vel.x, unit.vel.y,
             player.miner().mineTile(),
-            player.boosting, player.shooting, ui.chatfrag.shown(),
+            player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,
-            Core.camera.width * viewScale, Core.camera.height * viewScale);
+            Core.camera.width * viewScale, Core.camera.height * viewScale
+            );
         }
 
         if(timer.get(1, 60)){

@@ -8,10 +8,10 @@ import mindustry.graphics.*;
 
 public class ColorPicker extends BaseDialog{
     private Cons<Color> cons = c -> {};
-    private Color current = new Color();
+    Color current = new Color();
 
     public ColorPicker(){
-        super("$pickcolor");
+        super("@pickcolor");
     }
 
     public void show(Color color, Cons<Color> consumer){
@@ -55,7 +55,7 @@ public class ColorPicker extends BaseDialog{
 
         buttons.clear();
         addCloseButton();
-        buttons.button("$ok", Icon.ok, () -> {
+        buttons.button("@ok", Icon.ok, () -> {
             cons.get(current);
             hide();
         });

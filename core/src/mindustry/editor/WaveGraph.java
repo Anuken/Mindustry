@@ -32,7 +32,6 @@ public class WaveGraph extends Table{
 
         rect((x, y, width, height) -> {
             Lines.stroke(Scl.scl(3f));
-            Lines.precise(true);
 
             GlyphLayout lay = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
             Font font = Fonts.outline;
@@ -122,7 +121,6 @@ public class WaveGraph extends Table{
 
             Pools.free(lay);
 
-            Lines.precise(false);
             Draw.reset();
         }).pad(4).padBottom(10).grow();
 
@@ -137,7 +135,7 @@ public class WaveGraph extends Table{
             ButtonGroup<Button> group = new ButtonGroup<>();
 
             for(Mode m : Mode.all){
-                t.button("$wavemode." + m.name(), Styles.fullTogglet, () -> {
+                t.button("@wavemode." + m.name(), Styles.fullTogglet, () -> {
                     mode = m;
                 }).group(group).height(35f).update(b -> b.setChecked(m == mode)).width(130f);
             }

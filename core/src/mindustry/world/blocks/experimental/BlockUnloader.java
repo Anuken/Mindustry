@@ -3,7 +3,7 @@ package mindustry.world.blocks.experimental;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class BlockUnloader extends BlockLoader{
 
@@ -16,7 +16,7 @@ public class BlockUnloader extends BlockLoader{
         return true;
     }
 
-    public class BlockUnloaderEntity extends BlockLoaderEntity{
+    public class BlockUnloaderBuild extends BlockLoaderBuild{
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -56,7 +56,7 @@ public class BlockUnloader extends BlockLoader{
 
         @Override
         public float fraction(){
-            return payload == null ? 0f : 1f - payload.entity.items.total() / (float)payload.entity.block().itemCapacity;
+            return payload == null ? 0f : 1f - payload.entity.items.total() / (float)payload.entity.block.itemCapacity;
         }
 
         @Override

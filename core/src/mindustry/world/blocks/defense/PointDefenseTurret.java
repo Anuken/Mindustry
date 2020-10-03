@@ -21,7 +21,7 @@ public class PointDefenseTurret extends Block{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
-    public @Load("block-$size") TextureRegion baseRegion;
+    public @Load("block-@size") TextureRegion baseRegion;
 
     public Color color = Color.white;
     public Effect beamEffect = Fx.pointBeam;
@@ -60,7 +60,7 @@ public class PointDefenseTurret extends Block{
         stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
     }
 
-    public class PointDefenseEntity extends Building{
+    public class PointDefenseBuild extends Building{
         public float rotation = 90, reload;
         public @Nullable Bullet target;
 
@@ -72,8 +72,13 @@ public class PointDefenseTurret extends Block{
                 target = Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team == team || !b.type().hittable ? Float.MAX_VALUE : b.dst2(this));
             }
 
+            //pooled bullets
+            if(target != null && !target.isAdded()){
+                target = null;
+            }
+
             //look at target
-            if(target != null && target.within(this, range) && target.team != team && target.type().hittable){
+            if(target != null && target.within(this, range) && target.team != team && target.type() != null && target.type().hittable){
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 reload -= edelta();
@@ -106,6 +111,7 @@ public class PointDefenseTurret extends Block{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
+            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
         }
 

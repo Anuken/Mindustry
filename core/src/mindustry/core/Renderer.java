@@ -28,6 +28,8 @@ public class Renderer implements ApplicationListener{
     public PlanetRenderer planets;
 
     public FrameBuffer effectBuffer = new FrameBuffer();
+    public float laserOpacity = 1f;
+
     private Bloom bloom;
     private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
@@ -59,8 +61,10 @@ public class Renderer implements ApplicationListener{
     @Override
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
+        Gl.clear(Gl.stencilBufferBit);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
+        laserOpacity = Core.settings.getInt("lasersopacity") / 100f;
 
         if(landTime > 0){
             landTime -= Time.delta;
@@ -138,7 +142,7 @@ public class Renderer implements ApplicationListener{
         }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
-            ui.showErrorMessage("$error.bloom");
+            ui.showErrorMessage("@error.bloom");
         }
     }
 
@@ -185,6 +189,8 @@ public class Renderer implements ApplicationListener{
     }
 
     public void draw(){
+        Events.fire(Trigger.preDraw);
+
         camera.update();
 
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
@@ -205,11 +211,11 @@ public class Renderer implements ApplicationListener{
 
         Draw.sort(true);
 
+        Events.fire(Trigger.draw);
+
         if(pixelator.enabled()){
             pixelator.register();
         }
-
-        //TODO fx
 
         Draw.draw(Layer.background, this::drawBackground);
         Draw.draw(Layer.floor, blocks.floor::drawFloor);
@@ -254,6 +260,8 @@ public class Renderer implements ApplicationListener{
         Draw.reset();
         Draw.flush();
         Draw.sort(false);
+
+        Events.fire(Trigger.postDraw);
     }
 
     private void drawBackground(){
@@ -265,9 +273,9 @@ public class Renderer implements ApplicationListener{
             float fract = landTime / Fx.coreLand.lifetime;
             Building entity = player.closestCore();
 
-            TextureRegion reg = entity.block().icon(Cicon.full);
+            TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;
-            float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
+            float s = reg.width * Draw.scl * scl * 4f * fract;
 
             Draw.color(Pal.lightTrail);
             Draw.rect("circle-shadow", entity.getX(), entity.getY(), s, s);
@@ -279,7 +287,7 @@ public class Renderer implements ApplicationListener{
 
             Draw.color();
             Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.getX(), entity.getY(), reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
+            Draw.rect(reg, entity.getX(), entity.getY(), reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
 
             Draw.reset();
         }
@@ -318,7 +326,7 @@ public class Renderer implements ApplicationListener{
         int memory = w * h * 4 / 1024 / 1024;
 
         if(memory >= 65){
-            ui.showInfo("$screenshot.invalid");
+            ui.showInfo("@screenshot.invalid");
             return;
         }
 

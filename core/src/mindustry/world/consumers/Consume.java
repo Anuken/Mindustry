@@ -1,9 +1,9 @@
 package mindustry.world.consumers;
 
+import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.scene.ui.layout.Table;
 import mindustry.gen.*;
-import mindustry.world.meta.BlockStats;
+import mindustry.world.meta.*;
 
 /** An abstract class that defines a type of resource that a block can consume. */
 public abstract class Consume{

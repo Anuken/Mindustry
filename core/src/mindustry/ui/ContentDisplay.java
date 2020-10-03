@@ -1,10 +1,11 @@
 package mindustry.ui;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -42,7 +43,7 @@ public class ContentDisplay{
 
             if(map.size == 0) continue;
 
-            table.add("$category." + cat.name()).color(Pal.accent).fillX();
+            table.add("@category." + cat.name()).color(Pal.accent).fillX();
             table.row();
 
             for(BlockStat stat : map.keys()){
@@ -129,7 +130,7 @@ public class ContentDisplay{
 
     public static void displayUnit(Table table, UnitType unit){
         table.table(title -> {
-            title.image(unit.icon(Cicon.xlarge)).size(8 * 6);
+            title.image(unit.icon(Cicon.xlarge)).size(8 * 6).scaling(Scaling.fit);
             title.add("[accent]" + unit.localizedName).padLeft(5);
         });
 
@@ -149,10 +150,16 @@ public class ContentDisplay{
 
         table.left().defaults().fillX();
 
-        table.add(Core.bundle.format("unit.health", unit.health));
-        table.row();
-        table.add(Core.bundle.format("unit.speed", Strings.fixed(unit.speed, 1)));
-        table.row();
+        Unit inst = unit.constructor.get();
+
+        //TODO more stats
+        table.add(Core.bundle.format("unit.health", unit.health)).row();
+        table.add(Core.bundle.format("unit.speed", Strings.fixed(unit.speed, 1))).row();
+        table.add(Core.bundle.format("unit.itemcapacity", unit.itemCapacity)).row();
+
+        if(inst instanceof Minerc) table.add(Core.bundle.format("unit.minespeed", (int)(unit.mineSpeed * 100f))).row();
+        if(inst instanceof Builderc) table.add(Core.bundle.format("unit.buildspeed", (int)(unit.buildSpeed * 100f))).row();
+
         table.row();
     }
 }

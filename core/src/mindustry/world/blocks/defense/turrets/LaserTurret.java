@@ -9,7 +9,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
@@ -25,7 +25,7 @@ public class LaserTurret extends PowerTurret{
 
     @Override
     public void init(){
-        consumes.powerCond(powerUse, entity -> ((LaserTurretEntity)entity).bullet != null || ((LaserTurretEntity)entity).target != null);
+        consumes.powerCond(powerUse, entity -> ((LaserTurretBuild)entity).bullet != null || ((LaserTurretBuild)entity).target != null);
         super.init();
     }
 
@@ -40,7 +40,7 @@ public class LaserTurret extends PowerTurret{
         stats.add(BlockStat.damage, shootType.damage * 60f / 5f, StatUnit.perSecond);
     }
 
-    public class LaserTurretEntity extends PowerTurretEntity{
+    public class LaserTurretBuild extends PowerTurretBuild{
         Bullet bullet;
         float bulletLife;
 
@@ -65,7 +65,7 @@ public class LaserTurret extends PowerTurret{
                     bullet = null;
                 }
             }else if(reload > 0){
-                Liquid liquid = liquids().current();
+                Liquid liquid = liquids.current();
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
 
                 float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity * coolantMultiplier;
@@ -96,7 +96,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotatespeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotateSpeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
         }
 
         @Override

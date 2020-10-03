@@ -98,7 +98,6 @@ public class LoadRenderer implements Disposable{
 
         float w = Core.graphics.getWidth(), h = Core.graphics.getHeight(), s = Scl.scl();
         //s = 2f;
-        Lines.precise(true);
 
         Draw.proj().setOrtho(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
 
@@ -464,10 +463,9 @@ public class LoadRenderer implements Disposable{
             Font font = assets.get("tech");
             font.setColor(Pal.accent);
             Draw.color(Color.black);
-            font.draw(red + "[[[[ " +key + " ]]\n\n"+orange+"<" + Version.modifier + " " + (Version.build == 0 ? " [init]" : Version.build == -1 ? " custom" : " " + Version.build) + ">", w/2f, h/2f + 110*s, Align.center);
+            font.draw(red + "[[[[ " + key + " ]]\n"+orange+"<" + Version.modifier + " " + (Version.build == 0 ? " [init]" : Version.build == -1 ? " custom" : " " + Version.build) + ">", w/2f, h/2f + 110*s, Align.center);
         }
 
-        Lines.precise(false);
         Draw.flush();
 
         fx.end();

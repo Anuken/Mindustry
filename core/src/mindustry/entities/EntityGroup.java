@@ -8,7 +8,7 @@ import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.collisions;
+import static mindustry.Vars.*;
 
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
@@ -57,7 +57,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         each(Entityc::update);
     }
 
-    public void copy(Seq arr){
+    public void copy(Seq<T> arr){
         arr.addAll(array);
     }
 
@@ -101,7 +101,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(map == null) throw new RuntimeException("Mapping is not enabled for group " + id + "!");
         T t = map.get(id);
         if(t != null){ //remove if present in map already
-            remove(t);
+            t.remove();
         }
     }
 

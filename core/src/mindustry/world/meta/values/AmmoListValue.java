@@ -1,19 +1,19 @@
 package mindustry.world.meta.values;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.ctype.UnlockableContent;
+import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.ui.Cicon;
+import mindustry.ui.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class AmmoListValue<T extends UnlockableContent> implements StatValue{
     private final ObjectMap<T, BulletType> map;
@@ -33,7 +33,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
             table.table(Tex.underline, bt -> {
                 bt.left().defaults().padRight(3).left();
 
-                if(type.damage > 0 && type.collides){
+                if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
                     bt.add(Core.bundle.format("bullet.damage", type.damage));
                 }
 
@@ -51,27 +51,27 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 }
 
                 if((type.status == StatusEffects.burning || type.status == StatusEffects.melting) || type.incendAmount > 0){
-                    sep(bt, "$bullet.incendiary");
+                    sep(bt, "@bullet.incendiary");
                 }
 
                 if(type.status == StatusEffects.freezing){
-                    sep(bt, "$bullet.freezing");
+                    sep(bt, "@bullet.freezing");
                 }
 
                 if(type.status == StatusEffects.tarred){
-                    sep(bt, "$bullet.tarred");
+                    sep(bt, "@bullet.tarred");
                 }
 
                 if(type.homingPower > 0.01f){
-                    sep(bt, "$bullet.homing");
+                    sep(bt, "@bullet.homing");
                 }
 
                 if(type.lightning > 0){
-                    sep(bt, "$bullet.shock");
+                    sep(bt, "@bullet.shock");
                 }
 
                 if(type.fragBullet != null){
-                    sep(bt, "$bullet.frag");
+                    sep(bt, "@bullet.frag");
                 }
             }).left().padTop(-9);
             table.row();

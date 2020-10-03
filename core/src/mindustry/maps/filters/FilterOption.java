@@ -17,13 +17,13 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 public abstract class FilterOption{
-    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full));
-    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full));
-    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full)));
-    public static final Boolf<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full)));
-    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full)));
+    public static final Boolf<Block> floorsOnly = b -> (b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full));
+    public static final Boolf<Block> wallsOnly = b -> (!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)) && b.inEditor;
+    public static final Boolf<Block> floorsOptional = b -> b == Blocks.air || ((b instanceof Floor && !(b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)));
+    public static final Boolf<Block> wallsOptional = b -> b == Blocks.air || ((!b.synthetic() && !(b instanceof Floor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full)));
+    public static final Boolf<Block> wallsOresOptional = b -> b == Blocks.air || (((!b.synthetic() && !(b instanceof Floor)) || (b instanceof OverlayFloor)) && !headless && Core.atlas.isFound(b.icon(Cicon.full))) && b.inEditor;
     public static final Boolf<Block> oresOnly = b -> b instanceof OverlayFloor && !headless && Core.atlas.isFound(b.icon(mindustry.ui.Cicon.full));
-    public static final Boolf<Block> anyOptional = b -> floorsOnly.get(b) || wallsOnly.get(b) || oresOnly.get(b) || b == Blocks.air;
+    public static final Boolf<Block> anyOptional = b -> (floorsOnly.get(b) || wallsOnly.get(b) || oresOnly.get(b) || b == Blocks.air) && b.inEditor;
 
     public abstract void build(Table table);
 
@@ -58,7 +58,7 @@ public abstract class FilterOption{
         @Override
         public void build(Table table){
             if(!display){
-                table.add("$filter.option." + name);
+                table.add("@filter.option." + name);
             }else{
                 table.label(() -> Core.bundle.get("filter.option." + name) + ": " + (int)getter.get());
             }
@@ -107,7 +107,7 @@ public abstract class FilterOption{
                 dialog.show();
             }).pad(4).margin(12f);
 
-            table.add("$filter.option." + name);
+            table.add("@filter.option." + name);
         }
     }
 }

@@ -6,7 +6,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class ChargeTurret extends PowerTurret{
     public float chargeTime = 30f;
@@ -19,7 +19,7 @@ public class ChargeTurret extends PowerTurret{
         super(name);
     }
 
-    public class ChargeTurretEntity extends PowerTurretEntity{
+    public class ChargeTurretBuild extends PowerTurretBuild{
         public boolean shooting;
 
         @Override

@@ -17,9 +17,9 @@ public class GameState{
     /** Wave countdown in ticks. */
     public float wavetime;
     /** Whether the game is in game over state. */
-    public boolean gameOver = false, launched = false, serverPaused = false;
+    public boolean gameOver = false, serverPaused = false, wasTimeout;
     /** Map that is currently being played on. */
-    public @NonNull Map map = emptyMap;
+    public Map map = emptyMap;
     /** The current game rules. */
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */
@@ -48,11 +48,6 @@ public class GameState{
     /** Note that being in a campaign does not necessarily mean having a sector. */
     public boolean isCampaign(){
         return rules.sector != null;
-    }
-
-    /** @return whether the player is in a campaign and they are out of sector time */
-    public boolean isOutOfTime(){
-        return isCampaign() && isGame() && getSector().getTimeSpent() >= turnDuration;
     }
 
     public boolean hasSector(){

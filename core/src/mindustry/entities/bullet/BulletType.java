@@ -24,7 +24,7 @@ public abstract class BulletType extends Content{
     public float hitSize = 4;
     public float drawSize = 40f;
     public float drag = 0f;
-    public boolean pierce;
+    public boolean pierce, pierceBuilding;
     public Effect hitEffect, despawnEffect;
 
     /** Effect created when shooting. */
@@ -54,7 +54,7 @@ public abstract class BulletType extends Content{
     /** Status effect applied on hit. */
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
-    public float statusDuration = 60 * 10f;
+    public float statusDuration = 60 * 8f;
     /** Whether this bullet type collides with tiles. */
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
@@ -69,13 +69,23 @@ public abstract class BulletType extends Content{
     public boolean scaleVelocity;
     /** Whether this bullet can be hit by point defense. */
     public boolean hittable = true;
+    /** Whether this bullet can be reflected. */
+    public boolean reflectable = true;
+    /** Whether this projectile can be absorbed by shields. */
+    public boolean absorbable = true;
+    /** Whether to move the bullet back depending on delta to fix some delta-time realted issues.
+     * Do not change unless you know what you're doing. */
+    public boolean backMove = true;
+    /** Bullet range override. */
+    public float range = -1f;
 
     //additional effects
 
     public float fragCone = 360f;
+    public float fragAngle = 0f;
     public int fragBullets = 9;
-    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f;
-    public BulletType fragBullet = null;
+    public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
+    public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
     public Color trailColor = Pal.missileYellowBack;
@@ -92,14 +102,17 @@ public abstract class BulletType extends Content{
     public float homingPower = 0f;
     public float homingRange = 50f;
 
+    public Color lightningColor = Pal.surge;
     public int lightning;
-    public int lightningLength = 5;
+    public int lightningLength = 5, lightningLengthRand = 0;
     /** Use a negative value to use default bullet damage. */
     public float lightningDamage = -1;
+    public float lightningCone = 360f;
+    public float lightningAngle = 0f;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
-    public float hitShake = 0f;
+    public float hitShake = 0f, despawnShake = 0f;
 
     public int puddles;
     public float puddleRange;
@@ -123,18 +136,22 @@ public abstract class BulletType extends Content{
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
-        return speed * lifetime * (1f - drag);
+        return Math.max(speed * lifetime * (1f - drag), range);
     }
 
     public boolean collides(Bullet bullet, Building tile){
         return true;
     }
 
-    public void hitTile(Bullet b, Building tile){
+    public void hitTile(Bullet b, Building tile, float initialHealth){
         if(status == StatusEffects.burning) {
             Damage.createIncend(b.x, b.y, damage/10f, (int) damage/10);
         }
         hit(b);
+    }
+
+    public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
+
     }
 
     public void hit(Bullet b){
@@ -145,13 +162,13 @@ public abstract class BulletType extends Content{
         hitEffect.at(x, y, b.rotation(), hitColor);
         hitSound.at(b);
 
-        Effects.shake(hitShake, hitShake, b);
+        Effect.shake(hitShake, hitShake, b);
 
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
-                float a = b.rotation() + Mathf.range(fragCone/2);
-                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax));
+                float a = b.rotation() + Mathf.range(fragCone/2) + fragAngle;
+                fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
             }
         }
 
@@ -175,13 +192,15 @@ public abstract class BulletType extends Content{
         }
 
         for(int i = 0; i < lightning; i++){
-            Lightning.create(b, Pal.surge, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, Mathf.random(360f), lightningLength);
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
         }
     }
 
     public void despawned(Bullet b){
         despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
         hitSound.at(b);
+
+        Effect.shake(despawnShake, despawnShake, b);
 
         if(fragBullet != null || splashDamageRadius > 0 || lightning > 0){
             hit(b);
@@ -201,7 +220,7 @@ public abstract class BulletType extends Content{
         }
 
         if(instantDisappear){
-            b.time(lifetime);
+            b.time = lifetime;
         }
     }
 
@@ -249,6 +268,10 @@ public abstract class BulletType extends Content{
         return create(parent.owner(), parent.team, x, y, angle);
     }
 
+    public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl, float lifeScale){
+        return create(parent.owner(), parent.team, x, y, angle, velocityScl, lifeScale);
+    }
+
     public Bullet create(Bullet parent, float x, float y, float angle, float velocityScl){
         return create(parent.owner(), parent.team, x, y, angle, velocityScl);
     }
@@ -259,7 +282,11 @@ public abstract class BulletType extends Content{
         bullet.owner = owner;
         bullet.team = team;
         bullet.vel.trns(angle, speed * velocityScl);
-        bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        if(backMove){
+            bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        }else{
+            bullet.set(x, y);
+        }
         bullet.lifetime = lifetime * lifetimeScl;
         bullet.data = data;
         bullet.drag = drag;
@@ -267,13 +294,12 @@ public abstract class BulletType extends Content{
         bullet.damage = damage < 0 ? this.damage : damage;
         bullet.add();
 
-        if(keepVelocity && owner instanceof Hitboxc) bullet.vel.add(((Hitboxc)owner).deltaX(), ((Hitboxc)owner).deltaY());
+        if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);
         return bullet;
-
     }
 
     public void createNet(Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
-        Call.createBullet(this, team, x, y, damage, angle, velocityScl, lifetimeScl);
+        Call.createBullet(this, team, x, y, angle, damage, velocityScl, lifetimeScl);
     }
 
     @Remote(called = Loc.server, unreliable = true)

@@ -1,9 +1,9 @@
 package mindustry.core;
 
 import arc.files.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -13,8 +13,8 @@ import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static arc.Core.files;
-import static mindustry.Vars.mods;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 /**
  * Loads all game content.
@@ -33,6 +33,7 @@ public class ContentLoader{
         new StatusEffects(),
         new Liquids(),
         new Bullets(),
+        new AmmoTypes(),
         new UnitTypes(),
         new Blocks(),
         new Loadouts(),
@@ -243,11 +244,11 @@ public class ContentLoader{
     }
 
     public Block block(int id){
-        return (Block)getByID(ContentType.block, id);
+        return getByID(ContentType.block, id);
     }
 
     public Block block(String name){
-        return (Block)getByName(ContentType.block, name);
+        return getByName(ContentType.block, name);
     }
 
     public Seq<Item> items(){
@@ -255,7 +256,7 @@ public class ContentLoader{
     }
 
     public Item item(int id){
-        return (Item)getByID(ContentType.item, id);
+        return getByID(ContentType.item, id);
     }
 
     public Seq<Liquid> liquids(){
@@ -263,7 +264,7 @@ public class ContentLoader{
     }
 
     public Liquid liquid(int id){
-        return (Liquid)getByID(ContentType.liquid, id);
+        return getByID(ContentType.liquid, id);
     }
 
     public Seq<BulletType> bullets(){
@@ -271,7 +272,7 @@ public class ContentLoader{
     }
 
     public BulletType bullet(int id){
-        return (BulletType)getByID(ContentType.bullet, id);
+        return getByID(ContentType.bullet, id);
     }
 
     public Seq<SectorPreset> sectors(){

@@ -1,8 +1,8 @@
 package mindustry.ctype;
 
 import arc.files.*;
-import arc.util.*;
 import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.mod.Mods.*;
 
@@ -10,8 +10,7 @@ import mindustry.mod.Mods.*;
 public abstract class Content implements Comparable<Content>, Disposable{
     public final short id;
     /** Info on which mod this content was loaded from. */
-    public @NonNull ModContentInfo minfo = new ModContentInfo();
-
+    public ModContentInfo minfo = new ModContentInfo();
 
     public Content(){
         this.id = (short)Vars.content.getBy(getContentType()).size;

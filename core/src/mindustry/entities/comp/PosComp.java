@@ -8,7 +8,7 @@ import mindustry.content.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 @Component
 abstract class PosComp implements Position{
@@ -45,9 +45,14 @@ abstract class PosComp implements Position{
         return tile == null || tile.block() != Blocks.air ? (Floor)Blocks.air : tile.floor();
     }
 
-     Block blockOn(){
+    Block blockOn(){
         Tile tile = tileOn();
         return tile == null ? Blocks.air : tile.block();
+    }
+
+    boolean onSolid(){
+        Tile tile = tileOn();
+        return tile != null && tile.solid();
     }
 
     @Nullable Tile tileOn(){

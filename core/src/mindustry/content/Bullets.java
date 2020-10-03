@@ -34,7 +34,7 @@ public class Bullets implements ContentList{
     standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //liquid
-    waterShot, cryoShot, slagShot, oilShot,
+    waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
 
     //environment, misc.
     damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag;
@@ -42,7 +42,7 @@ public class Bullets implements ContentList{
     @Override
     public void load(){
 
-        artilleryDense = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryDense = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -63,7 +63,7 @@ public class Bullets implements ContentList{
             collidesAir = false;
         }};
 
-        artilleryPlastic = new ArtilleryBulletType(3.4f, 12, "shell"){{
+        artilleryPlastic = new ArtilleryBulletType(3.4f, 20, "shell"){{
             hitEffect = Fx.plasticExplosion;
             knockback = 1f;
             lifetime = 80f;
@@ -77,7 +77,7 @@ public class Bullets implements ContentList{
             frontColor = Pal.plastaniumFront;
         }};
 
-        artilleryHoming = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryHoming = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -91,7 +91,7 @@ public class Bullets implements ContentList{
             homingRange = 50f;
         }};
 
-        artilleryIncendiary = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryIncendiary = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -105,7 +105,7 @@ public class Bullets implements ContentList{
             trailEffect = Fx.incendTrail;
         }};
 
-        artilleryExplosive = new ArtilleryBulletType(2f, 12, "shell"){{
+        artilleryExplosive = new ArtilleryBulletType(2f, 20, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -163,7 +163,7 @@ public class Bullets implements ContentList{
             width = 6f;
             height = 8f;
             hitEffect = Fx.flakExplosion;
-            splashDamage = 20f;
+            splashDamage = 22f;
             splashDamageRadius = 20f;
             fragBullet = flakGlassFrag;
             fragBullets = 5;
@@ -191,7 +191,7 @@ public class Bullets implements ContentList{
 
         fragGlass = new FlakBulletType(4f, 3){{
             lifetime = 70f;
-            ammoMultiplier = 5f;
+            ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
             width = 6f;
@@ -199,7 +199,7 @@ public class Bullets implements ContentList{
             hitEffect = Fx.flakExplosion;
             splashDamage = 18f;
             splashDamageRadius = 16f;
-            fragBullet = flakGlassFrag;
+            fragBullet = fragGlassFrag;
             fragBullets = 3;
             explodeRange = 20f;
             collidesGround = true;
@@ -221,8 +221,8 @@ public class Bullets implements ContentList{
         fragExplosive = new FlakBulletType(4f, 5){{
             shootEffect = Fx.shootBig;
             ammoMultiplier = 4f;
-            splashDamage = 15f;
-            splashDamageRadius = 34f;
+            splashDamage = 18f;
+            splashDamageRadius = 55f;
             collidesGround = true;
 
             status = StatusEffects.blasted;
@@ -230,7 +230,8 @@ public class Bullets implements ContentList{
         }};
 
         fragSurge = new FlakBulletType(4.5f, 13){{
-            splashDamage = 45f;
+            ammoMultiplier = 4f;
+            splashDamage = 50f;
             splashDamageRadius = 40f;
             lightning = 2;
             lightningLength = 7;
@@ -239,7 +240,7 @@ public class Bullets implements ContentList{
             explodeRange = 20f;
         }};
 
-        missileExplosive = new MissileBulletType(2.7f, 10){{
+        missileExplosive = new MissileBulletType(3.7f, 10){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
@@ -247,7 +248,6 @@ public class Bullets implements ContentList{
             splashDamageRadius = 30f;
             splashDamage = 30f;
             ammoMultiplier = 4f;
-            lifetime = 100f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
 
@@ -255,7 +255,7 @@ public class Bullets implements ContentList{
             statusDuration = 60f;
         }};
 
-        missileIncendiary = new MissileBulletType(2.9f, 12){{
+        missileIncendiary = new MissileBulletType(3.7f, 12){{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             width = 7f;
@@ -265,23 +265,21 @@ public class Bullets implements ContentList{
             homingPower = 0.08f;
             splashDamageRadius = 20f;
             splashDamage = 20f;
-            lifetime = 100f;
             hitEffect = Fx.blastExplosion;
             status = StatusEffects.burning;
         }};
 
-        missileSurge = new MissileBulletType(4.4f, 20){{
+        missileSurge = new MissileBulletType(3.7f, 18){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
             drag = -0.01f;
-            splashDamageRadius = 28f;
-            splashDamage = 40f;
-            lifetime = 100f;
+            splashDamageRadius = 25f;
+            splashDamage = 25f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
             lightning = 2;
-            lightningLength = 14;
+            lightningLength = 10;
         }};
 
         standardCopper = new BasicBulletType(2.5f, 9){{
@@ -377,10 +375,9 @@ public class Bullets implements ContentList{
         }};
 
         //this is just a copy of the damage lightning bullet that doesn't damage air units
-        damageLightningGround = new BulletType(0.0001f, 0f){{
-            collidesAir = false;
-        }};
+        damageLightningGround = new BulletType(0.0001f, 0f){};
         JsonIO.copy(damageLightning, damageLightningGround);
+        damageLightningGround.collidesAir = false;
 
         healBullet = new HealBulletType(5.2f, 13){{
             healPercent = 3f;
@@ -430,34 +427,27 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(3f, 15f){
-            {
-                ammoMultiplier = 3f;
-                hitSize = 7f;
-                lifetime = 42f;
-                pierce = true;
-                drag = 0.05f;
-                statusDuration = 60f * 4;
-                shootEffect = Fx.shootSmallFlame;
-                hitEffect = Fx.hitFlameSmall;
-                despawnEffect = Fx.none;
-                status = StatusEffects.burning;
-                keepVelocity = false;
-                hittable = false;
-            }
+        basicFlame = new BulletType(3.35f, 15f){{
+            ammoMultiplier = 3f;
+            hitSize = 7f;
+            lifetime = 18f;
+            pierce = true;
+            collidesAir = false;
+            statusDuration = 60f * 4;
+            shootEffect = Fx.shootSmallFlame;
+            hitEffect = Fx.hitFlameSmall;
+            despawnEffect = Fx.none;
+            status = StatusEffects.burning;
+            keepVelocity = false;
+            hittable = false;
+        }};
 
-            @Override
-            public float range(){
-                return 50f;
-            }
-        };
-
-        pyraFlame = new BulletType(3.3f, 22f){{
+        pyraFlame = new BulletType(3.35f, 22f){{
             ammoMultiplier = 4f;
             hitSize = 7f;
-            lifetime = 42f;
+            lifetime = 18f;
             pierce = true;
-            drag = 0.05f;
+            collidesAir = false;
             statusDuration = 60f * 6;
             shootEffect = Fx.shootPyraFlame;
             hitEffect = Fx.hitFlameSmall;
@@ -481,6 +471,50 @@ public class Bullets implements ContentList{
 
         oilShot = new LiquidBulletType(Liquids.oil){{
             drag = 0.03f;
+        }};
+
+        heavyWaterShot = new LiquidBulletType(Liquids.water){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.7f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
+        }};
+
+        heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
+        }};
+
+        heavySlagShot = new LiquidBulletType(Liquids.slag){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            damage = 6f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+        }};
+
+        heavyOilShot = new LiquidBulletType(Liquids.oil){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 2f;
+            statusDuration = 60f * 4f;
+            damage = 0.1f;
         }};
 
         driverBolt = new MassDriverBolt();

@@ -1,6 +1,7 @@
 package mindustry.ai;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.ArcAnnotate.*;
 import arc.util.*;
@@ -16,7 +17,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class BaseRegistry{
     public Seq<BasePart> cores = new Seq<>();
@@ -68,7 +69,7 @@ public class BaseRegistry{
                 }
                 schem.tiles.removeAll(s -> s.block.buildVisibility == BuildVisibility.sandboxOnly);
 
-                part.tier = schem.tiles.sumf(s -> s.block.buildCost / s.block.buildCostMultiplier);
+                part.tier = schem.tiles.sumf(s -> Mathf.pow(s.block.buildCost / s.block.buildCostMultiplier, 1.2f));
 
                 if(part.core != null){
                     cores.add(part);
@@ -92,7 +93,7 @@ public class BaseRegistry{
             }
         }
 
-        cores.sort(Structs.comps(Structs.comparingFloat(b -> b.core.health), Structs.comparingFloat(b -> b.tier)));
+        cores.sort(b -> b.tier);
         parts.sort();
         reqParts.each((key, arr) -> arr.sort());
     }

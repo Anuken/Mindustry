@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
@@ -70,7 +69,6 @@ public class Weathers implements ContentList{
             }
         };
 
-        //TODO should apply wet effect
         rain = new Weather("rain"){
             float yspeed = 5f, xspeed = 1.5f, padding = 16f, size = 40f, density = 1200f;
             TextureRegion[] splashes = new TextureRegion[12];
@@ -78,6 +76,7 @@ public class Weathers implements ContentList{
             {
                 attrs.set(Attribute.light, -0.2f);
                 attrs.set(Attribute.water, 0.2f);
+                status = StatusEffects.wet;
             }
 
             @Override
@@ -170,13 +169,14 @@ public class Weathers implements ContentList{
 
         sandstorm = new Weather("sandstorm"){
             TextureRegion region;
-            float yspeed = 0.3f, xspeed = 6f, size = 140f, padding = size, invDensity = 1500f;
-            Vec2 force = new Vec2(0.45f, 0.01f);
+            float size = 140f, padding = size, invDensity = 1500f, baseSpeed = 6.1f;
+            float force = 0.4f * 0;
             Color color = Color.valueOf("f7cba4");
             Texture noise;
 
             {
                 attrs.set(Attribute.light, -0.1f);
+                opacityMultiplier = 0.8f;
             }
 
             @Override
@@ -194,22 +194,26 @@ public class Weathers implements ContentList{
 
             @Override
             public void update(WeatherState state){
+                float speed = force * state.intensity;
+                float windx = state.windVector.x * speed, windy = state.windVector.y * speed;
 
                 for(Unit unit : Groups.unit){
-                    unit.impulse(force.x * state.intensity(), force.y * state.intensity());
+                    unit.impulse(windx, windy);
                 }
             }
 
             @Override
             public void drawOver(WeatherState state){
                 Draw.tint(color);
+                float speed = baseSpeed * state.intensity;
+                float windx = state.windVector.x * speed, windy = state.windVector.y * speed;
 
                 float scale = 1f / 2000f;
                 float scroll = Time.time() * scale;
-                Tmp.tr1.setTexture(noise);
+                Tmp.tr1.texture = noise;
                 Core.camera.bounds(Tmp.r1);
                 Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
-                Tmp.tr1.scroll(-xspeed * scroll, -yspeed * scroll);
+                Tmp.tr1.scroll(-windx * scroll, windy * scroll);
                 Draw.rect(Tmp.tr1, Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
 
                 rand.setSeed(0);
@@ -224,8 +228,8 @@ public class Weathers implements ContentList{
                     float scl = rand.random(0.5f, 1f);
                     float scl2 = rand.random(0.5f, 1f);
                     float sscl = rand.random(0.5f, 1f);
-                    float x = (rand.random(0f, world.unitWidth()) + Time.time() * xspeed * scl2);
-                    float y = (rand.random(0f, world.unitHeight()) - Time.time() * yspeed * scl);
+                    float x = (rand.random(0f, world.unitWidth()) + Time.time() * windx * scl2);
+                    float y = (rand.random(0f, world.unitHeight()) + Time.time() * windy * scl);
                     float alpha = rand.random(0.2f);
 
                     x += Mathf.sin(y, rand.random(30f, 80f), rand.random(1f, 7f));
@@ -247,14 +251,16 @@ public class Weathers implements ContentList{
 
         sporestorm = new Weather("sporestorm"){
             TextureRegion region;
-            float yspeed = 1f, xspeed = 4f, size = 5f, padding = size, invDensity = 2000f;
+            float size = 5f, padding = size, invDensity = 2000f, baseSpeed = 4.3f, force = 0.28f * 0;
             Color color = Color.valueOf("7457ce");
-            Vec2 force = new Vec2(0.25f, 0.01f);
             Texture noise;
 
             {
-                attrs.set(Attribute.spores, 0.5f);
-                attrs.set(Attribute.light, -0.1f);
+                attrs.set(Attribute.spores, 1f);
+                attrs.set(Attribute.light, -0.15f);
+                status = StatusEffects.sporeSlowed;
+                statusGround = false;
+                opacityMultiplier = 0.85f;
             }
 
             @Override
@@ -267,9 +273,11 @@ public class Weathers implements ContentList{
 
             @Override
             public void update(WeatherState state){
+                float speed = force * state.intensity;
+                float windx = state.windVector.x * speed, windy = state.windVector.y * speed;
 
                 for(Unit unit : Groups.unit){
-                    unit.impulse(force.x * state.intensity(), force.y * state.intensity());
+                    unit.impulse(windx, windy);
                 }
             }
 
@@ -283,12 +291,15 @@ public class Weathers implements ContentList{
                 Draw.alpha(state.opacity * 0.8f);
                 Draw.tint(color);
 
+                float speed = baseSpeed * state.intensity;
+                float windx = state.windVector.x * speed, windy = state.windVector.y * speed;
+
                 float scale = 1f / 2000f;
                 float scroll = Time.time() * scale;
-                Tmp.tr1.setTexture(noise);
+                Tmp.tr1.texture = noise;
                 Core.camera.bounds(Tmp.r1);
                 Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
-                Tmp.tr1.scroll(-xspeed * scroll, -yspeed * scroll);
+                Tmp.tr1.scroll(-windx * scroll, windy * scroll);
                 Draw.rect(Tmp.tr1, Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
 
                 rand.setSeed(0);
@@ -304,8 +315,8 @@ public class Weathers implements ContentList{
                     float scl = rand.random(0.5f, 1f);
                     float scl2 = rand.random(0.5f, 1f);
                     float sscl = rand.random(0.5f, 1f);
-                    float x = (rand.random(0f, world.unitWidth()) + Time.time() * xspeed * scl2);
-                    float y = (rand.random(0f, world.unitHeight()) - Time.time() * yspeed * scl);
+                    float x = (rand.random(0f, world.unitWidth()) + Time.time() * windx * scl2);
+                    float y = (rand.random(0f, world.unitHeight()) + Time.time() * windy * scl);
                     float alpha = rand.random(0.1f, 0.8f);
 
                     x += Mathf.sin(y, rand.random(30f, 80f), rand.random(1f, 7f));

@@ -1,14 +1,18 @@
 package mindustry.graphics;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 
 public class Pal{
-    public static final Color
+    public static Color
 
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
     sap = Color.valueOf("665c9f"),
+    sapBullet = Color.valueOf("bf92f9"),
+    sapBulletBack = Color.valueOf("6d56bf"),
+
+    spore = Color.valueOf("7457ce"),
 
     shield = Color.valueOf("ffd37f").a(0.7f),
     shieldIn = Color.black.cpy().a(0f),
@@ -42,6 +46,8 @@ public class Pal{
     lightishGray = Color.valueOf("a2a2a2"),
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
     darkerGray = new Color(0.2f, 0.2f, 0.2f, 1f),
+    darkestGray = new Color(0.1f, 0.1f, 0.1f, 1f),
+    shadow = new Color(0, 0, 0, 0.22f),
     ammo = Color.valueOf("ff8947"),
     rubble = Color.valueOf("1c1817"),
 
