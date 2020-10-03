@@ -191,7 +191,7 @@ public abstract class BulletType extends Content{
             }
 
             if(status == StatusEffects.burning) {
-                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != team, other -> {
+                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
                     Damage.createIncend(x, y, damage / 10f, (int)damage / 10);
                 });
             }
