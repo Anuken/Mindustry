@@ -145,7 +145,7 @@ public abstract class BulletType extends Content{
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
         if(status == StatusEffects.burning) {
-            Damage.createIncend(b.x, b.y, damage/10f, (int) damage/10);
+            Damage.createIncend(b.x, b.y, damage / 10f, (int)damage / 10);
         }
         hit(b);
     }
@@ -192,7 +192,7 @@ public abstract class BulletType extends Content{
 
             if(effect == StatusEffects.burning) {
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != team, other -> {
-                    Damage.createIncend(x, y, damage/10f, (int) damage/10);
+                    Damage.createIncend(x, y, damage / 10f, (int)damage / 10);
                 });
             }
         }
