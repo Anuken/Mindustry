@@ -45,7 +45,7 @@ public class Blocks implements ContentList{
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
 
     //crafting
-    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, plastaniumPolypress, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
@@ -566,6 +566,24 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.oil, 0.25f);
             consumes.power(3f);
             consumes.item(Items.titanium, 2);
+        }};
+
+        plastaniumPolypress = new GenericCrafter("plastanium-polypress"){{
+            requirements(Category.crafting, with(Items.silicon, 80, Items.lead, 115, Items.graphite, 60, Items.titanium, 80));
+            hasItems = true;
+            liquidCapacity = 135f;
+            craftTime = 75f;
+            outputItem = new ItemStack(Items.plastanium, 4);
+            size = 3;
+            health = 720;
+            hasPower = hasLiquids = true;
+            craftEffect = Fx.formsmoke;
+            updateEffect = Fx.plasticburn;
+            drawer = new DrawGlow();
+
+            consumes.liquid(Liquids.oil, 0.5f);
+            consumes.power(5f);
+            consumes.item(Items.titanium, 4);
         }};
 
         phaseWeaver = new GenericCrafter("phase-weaver"){{
