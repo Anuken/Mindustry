@@ -105,6 +105,7 @@ public class Weapon{
         region = Core.atlas.find(name, Core.atlas.find("clear"));
         heatRegion = Core.atlas.find(name + "-heat");
         outlineRegion = Core.atlas.find(name + "-outline");
+        chargeSound = shootSound;
     }
 
 }
