@@ -36,7 +36,7 @@ public class BasicBulletType extends BulletType{
 
     @Override
     public void load(){
-        backRegion = Core.atlas.find(sprite + "-back");
+        backRegion = Core.atlas.find(sprite + "-back", "clear");
         frontRegion = Core.atlas.find(sprite);
     }
 
