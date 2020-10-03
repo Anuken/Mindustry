@@ -50,8 +50,10 @@ public class BasicBulletType extends BulletType{
 
         Draw.mixcol(mix, mix.a);
 
-        Draw.color(backColor);
-        Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
+        if(backRegion != null){
+            Draw.color(backColor);
+            Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
+        }
         Draw.color(frontColor);
         Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() + offset);
 
