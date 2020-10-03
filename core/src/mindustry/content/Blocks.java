@@ -45,7 +45,7 @@ public class Blocks implements ContentList{
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
     
     //crafting
-    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, plastaniumCompositor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, plastaniumPolymerizer, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
@@ -537,7 +537,7 @@ public class Blocks implements ContentList{
             consumes.power(4f);
         }};
         
-        plastaniumCompositor = new AttributeCrafter("plastanium-compositor"){{
+        plastaniumPolymerizer = new AttributeCrafter("plastanium-polymerizer"){{
             requirements(Category.crafting, with(Items.titanium, 100, Items.graphite, 45, Items.plastanium, 60, Items.lead, 60, Items.silicon, 80));
             craftEffect = Fx.formsmoke;
             health = 450;

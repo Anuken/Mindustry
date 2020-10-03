@@ -6,13 +6,13 @@ import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 /** A smelter that gains efficiency from attribute tiles. */
-public class AttributeSmelter extends GenericCrafter{
+public class AttributeCrafter extends GenericCrafter{
     public Attribute attribute = Attribute.heat;
     public float baseEfficiency = 1f;
     public float boostScale = 1f;
     public float maxHeatBoost = 1f;
 
-    public AttributeSmelter(String name){
+    public AttributeCrafter(String name){
         super(name);
     }
 
@@ -40,7 +40,7 @@ public class AttributeSmelter extends GenericCrafter{
         stats.add(BlockStat.affinities, attribute, boostScale);
     }
 
-    public class AttributeSmelterBuild extends SmelterBuild{
+    public class AttributeCrafterBuild extends GenericCrafterBuild{
         public float attrsum;
 
         @Override
