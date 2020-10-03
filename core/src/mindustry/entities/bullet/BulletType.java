@@ -195,10 +195,7 @@ public abstract class BulletType extends Content{
 
             if(status == StatusEffects.burning) {
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
-                    Tile tile = world.tileWorld(other.x, other.y);
-                    if(tile != null){
-                        Fires.create(tile);
-                    }
+                    Fires.create(other.tile);
                 });
             }
         }
