@@ -6,6 +6,7 @@ import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
@@ -35,6 +36,7 @@ import java.lang.reflect.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
+    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class);
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
@@ -546,7 +548,7 @@ public class ContentParser{
             try{
                 if(field.field.getType().isPrimitive()) return;
 
-                if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null){
+                if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null && !implicitNullable.contains(field.field.getType())){
                     throw new RuntimeException("'" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
                 }
             }catch(Exception e){
