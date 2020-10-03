@@ -17,7 +17,7 @@ public class BasicBulletType extends BulletType{
     public float spin = 0;
     public String sprite;
 
-    public TextureRegion backRegion;
+    @Nullable public TextureRegion backRegion;
     public TextureRegion frontRegion;
 
     public BasicBulletType(float speed, float damage, String bulletSprite){
