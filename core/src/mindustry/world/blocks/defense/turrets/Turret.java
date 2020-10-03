@@ -16,6 +16,7 @@ import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -277,6 +278,14 @@ public abstract class Turret extends Block{
         @Override
         public void drawSelect(){
             Drawf.dashCircle(x, y, range, team.color);
+            if(target != null) {
+                float time = Time.time();
+                Lines.stroke(3f, Pal.gray);
+                Lines.square(target.getX(), target.getY(), 8 + 1f + Mathf.sinDeg(time*2), 45+time);
+                Lines.stroke(1f, Team.crux.color);
+                Lines.square(target.getX(), target.getY(), 8 + 1f + Mathf.sinDeg(time*2), 45+time);
+                Draw.reset();
+            }
         }
 
         @Override
