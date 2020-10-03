@@ -542,7 +542,7 @@ public class ContentParser{
     }
 
     void checkNullFields(Object object){
-        if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
+        if(object == null || object instanceof Number || object instanceof String || toBeParsed.contains(object) || object.getClass().getName().startsWith("arc.")) return;
 
         parser.getFields(object.getClass()).values().toSeq().each(field -> {
             try{

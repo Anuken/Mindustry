@@ -519,7 +519,7 @@ public class UnitTypes implements ContentList{
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
 
-            speed = 0.85f;
+            speed = 0.9f;
             hitSize = 8f;
             health = 180;
             mechSideSway = 0.25f;
@@ -536,7 +536,7 @@ public class UnitTypes implements ContentList{
                     speed = 1f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
-                    splashDamage = 55f;
+                    splashDamage = 60f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;

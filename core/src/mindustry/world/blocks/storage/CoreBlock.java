@@ -75,6 +75,8 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
+        stats.add(BlockStat.buildTime, 0, StatUnit.seconds);
+
         bars.add("capacity", (CoreBuild e) ->
             new Bar(
                 () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
