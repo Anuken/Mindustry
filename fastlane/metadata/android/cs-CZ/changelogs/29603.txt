@@ -1,0 +1,9 @@
+- Opraveno nesprávné číslování řádek v chybovách hláškách skriptů
+- Opravena černá obrazovka způsobená filtrem Bloom na některých zařízeních
+- Opraveny některé potíže s hudbou když je zvuk nastaven na 0% [Android]
+- Opravena IDčka klientů po nastavení na původní hodnoty
+- Opraveno nastavování dat na původní hodnoty na některých verzích [Android]
+- Přidány kategorie serverů (s přispěním uživatele @Quezler)
+- Přidána funkce require() pro skripty (s přispěním uživatele @DeltaNedas)
+- Optimalizovány a vyčištěny dopravníky
+- Vyladěna paleta energetických bloků

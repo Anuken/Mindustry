@@ -1,16 +1,19 @@
 package mindustry.io;
 
+import arc.*;
+import arc.files.*;
 import arc.struct.*;
-import arc.files.Fi;
-import arc.util.io.CounterInputStream;
-import arc.util.io.FastDeflaterOutputStream;
-import mindustry.Vars;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.*;
+import mindustry.game.EventType.*;
+import mindustry.io.legacy.*;
 import mindustry.io.versions.*;
-import mindustry.world.WorldContext;
+import mindustry.world.*;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.zip.InflaterInputStream;
+import java.util.*;
+import java.util.zip.*;
 
 import static mindustry.Vars.*;
 
@@ -18,7 +21,7 @@ public class SaveIO{
     /** Format header. This is the string 'MSAV' in ASCII. */
     public static final byte[] header = {77, 83, 65, 86};
     public static final IntMap<SaveVersion> versions = new IntMap<>();
-    public static final Array<SaveVersion> versionArray = Array.with(new Save1(), new Save2(), new Save3());
+    public static final Seq<SaveVersion> versionArray = Seq.with(new Save1(), new Save2(), new Save3(), new Save4());
 
     static{
         for(SaveVersion version : versionArray){
@@ -39,7 +42,7 @@ public class SaveIO{
         if(exists) file.moveTo(backupFileFor(file));
         try{
             write(file);
-        }catch(Exception e){
+        }catch(Throwable e){
             if(exists) backupFileFor(file).moveTo(file);
             throw new RuntimeException(e);
         }
@@ -54,9 +57,9 @@ public class SaveIO{
     }
 
     public static boolean isSaveValid(Fi file){
-        try{
-            return isSaveValid(new DataInputStream(new InflaterInputStream(file.read(bufferSize))));
-        }catch(Exception e){
+        try(DataInputStream stream = new DataInputStream(new InflaterInputStream(file.read(bufferSize)))){
+            return isSaveValid(stream);
+        }catch(Throwable e){
             return false;
         }
     }
@@ -65,8 +68,8 @@ public class SaveIO{
         try{
             getMeta(stream);
             return true;
-        }catch(Exception e){
-            e.printStackTrace();
+        }catch(Throwable e){
+            Log.err(e);
             return false;
         }
     }
@@ -74,7 +77,8 @@ public class SaveIO{
     public static SaveMeta getMeta(Fi file){
         try{
             return getMeta(getStream(file));
-        }catch(Exception e){
+        }catch(Throwable e){
+            Log.err(e);
             return getMeta(getBackupStream(file));
         }
     }
@@ -117,9 +121,13 @@ public class SaveIO{
             }else{
                 getVersion().write(stream, tags);
             }
-        }catch(Exception e){
+        }catch(Throwable e){
             throw new RuntimeException(e);
         }
+    }
+
+    public static void load(String saveName) throws SaveException{
+        load(saveDirectory.child(saveName + ".msav"));
     }
 
     public static void load(Fi file) throws SaveException{
@@ -131,7 +139,7 @@ public class SaveIO{
             //try and load; if any exception at all occurs
             load(new InflaterInputStream(file.read(bufferSize)), context);
         }catch(SaveException e){
-            e.printStackTrace();
+            Log.err(e);
             Fi backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
                 load(new InflaterInputStream(backup.read(bufferSize)), context);
@@ -141,7 +149,7 @@ public class SaveIO{
         }
     }
 
-    /** Loads from a deflated (!) input stream.*/
+    /** Loads from a deflated (!) input stream. */
     public static void load(InputStream is, WorldContext context) throws SaveException{
         try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();
@@ -150,7 +158,8 @@ public class SaveIO{
             SaveVersion ver = versions.get(version);
 
             ver.read(stream, counter, context);
-        }catch(Exception e){
+            Events.fire(new SaveLoadEvent());
+        }catch(Throwable e){
             throw new SaveException(e);
         }finally{
             world.setGenerating(false);

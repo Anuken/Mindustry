@@ -1,13 +1,11 @@
 package mindustry.input;
 
 import arc.*;
-import arc.struct.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.pooling.*;
 import mindustry.world.*;
-
-import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -15,7 +13,7 @@ public class Placement{
     private static final NormalizeResult result = new NormalizeResult();
     private static final NormalizeDrawResult drawResult = new NormalizeDrawResult();
     private static Bresenham2 bres = new Bresenham2();
-    private static Array<Point2> points = new Array<>();
+    private static Seq<Point2> points = new Seq<>();
 
     //for pathfinding
     private static IntFloatMap costs = new IntFloatMap();
@@ -23,7 +21,7 @@ public class Placement{
     private static IntSet closed = new IntSet();
 
     /** Normalize a diagonal line into points. */
-    public static Array<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
+    public static Seq<Point2> pathfindLine(boolean conveyors, int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
 
         points.clear();
@@ -39,7 +37,7 @@ public class Placement{
     }
 
     /** Normalize two points into one straight line, no diagonals. */
-    public static Array<Point2> normalizeLine(int startX, int startY, int endX, int endY){
+    public static Seq<Point2> normalizeLine(int startX, int startY, int endX, int endY){
         Pools.freeAll(points);
         points.clear();
         if(Math.abs(startX - endX) > Math.abs(startY - endY)){
@@ -97,17 +95,17 @@ public class Placement{
         int nodeLimit = 1000;
         int totalNodes = 0;
 
-        PriorityQueue<Tile> queue = new PriorityQueue<>(10, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + distanceHeuristic(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + distanceHeuristic(b.x, b.y, end.x, end.y)));
+        PQueue<Tile> queue = new PQueue<>(10, (a, b) -> Float.compare(costs.get(a.pos(), 0f) + distanceHeuristic(a.x, a.y, end.x, end.y), costs.get(b.pos(), 0f) + distanceHeuristic(b.x, b.y, end.x, end.y)));
         queue.add(start);
         boolean found = false;
-        while(!queue.isEmpty() && totalNodes++ < nodeLimit){
+        while(!queue.empty() && totalNodes++ < nodeLimit){
             Tile next = queue.poll();
             float baseCost = costs.get(next.pos(), 0f);
             if(next == end){
                 found = true;
                 break;
             }
-            closed.add(Pos.get(next.x, next.y));
+            closed.add(Point2.pack(next.x, next.y));
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
                 Tile child = world.tile(newx, newy);
@@ -129,11 +127,11 @@ public class Placement{
         Tile current = end;
         while(current != start && total++ < nodeLimit){
             if(current == null) return false;
-            int newPos = parents.get(current.pos(), Pos.invalid);
+            int newPos = parents.get(current.pos(), -1);
 
-            if(newPos == Pos.invalid) return false;
+            if(newPos == -1) return false;
 
-            points.add(Pools.obtain(Point2.class, Point2::new).set(Pos.x(newPos),  Pos.y(newPos)));
+            points.add(Pools.obtain(Point2.class, Point2::new).set(Point2.x(newPos), Point2.y(newPos)));
             current = world.tile(newPos);
         }
 
@@ -156,7 +154,7 @@ public class Placement{
     public static NormalizeDrawResult normalizeDrawArea(Block block, int startx, int starty, int endx, int endy, boolean snap, int maxLength, float scaling){
         normalizeArea(startx, starty, endx, endy, 0, snap, maxLength);
 
-        float offset = block.offset();
+        float offset = block.offset;
 
         drawResult.x = result.x * tilesize;
         drawResult.y = result.y * tilesize;
@@ -274,13 +272,5 @@ public class Placement{
         int getScaledY(int i){
             return y + (x2 - x > y2 - y ? 0 : i);
         }
-    }
-
-    public interface DistanceHeuristic{
-        float cost(int x1, int y1, int x2, int y2);
-    }
-
-    public interface TileHueristic{
-        float cost(Tile tile, Tile other);
     }
 }

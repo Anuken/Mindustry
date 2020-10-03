@@ -5,7 +5,6 @@ import mindustry.annotations.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
-import java.lang.annotation.*;
 
 public class Stype extends Selement<TypeElement>{
 
@@ -17,39 +16,41 @@ public class Stype extends Selement<TypeElement>{
         return new Stype((TypeElement)BaseProcessor.typeu.asElement(mirror));
     }
 
-    public Array<Stype> interfaces(){
-        return Array.with(e.getInterfaces()).map(Stype::of);
+    public String fullName(){
+        return mirror().toString();
     }
 
-    public Array<Stype> superclasses(){
-        Array<Stype> out = new Array<>();
-        Stype sup = superclass();
-        while(!sup.name().equals("Object")){
-            out.add(sup);
-            sup = sup.superclass();
-        }
-        return out;
+    public Seq<Stype> interfaces(){
+        return Seq.with(e.getInterfaces()).map(Stype::of);
+    }
+
+    public Seq<Stype> allInterfaces(){
+        return interfaces().flatMap(s -> s.allInterfaces().and(s)).distinct();
+    }
+
+    public Seq<Stype> superclasses(){
+        return Seq.with(BaseProcessor.typeu.directSupertypes(mirror())).map(Stype::of);
+    }
+
+    public Seq<Stype> allSuperclasses(){
+        return superclasses().flatMap(s -> s.allSuperclasses().and(s)).distinct();
     }
 
     public Stype superclass(){
         return new Stype((TypeElement)BaseProcessor.typeu.asElement(BaseProcessor.typeu.directSupertypes(mirror()).get(0)));
     }
 
-    public <A extends Annotation> A annotation(Class<A> annotation){
-        return e.getAnnotation(annotation);
+    public Seq<Svar> fields(){
+        return Seq.with(e.getEnclosedElements()).select(e -> e instanceof VariableElement).map(e -> new Svar((VariableElement)e));
     }
 
-    public Array<Svar> fields(){
-        return Array.with(e.getEnclosedElements()).select(e -> e instanceof VariableElement).map(e -> new Svar((VariableElement)e));
-    }
-
-    public Array<Smethod> methods(){
-        return Array.with(e.getEnclosedElements()).select(e -> e instanceof ExecutableElement
+    public Seq<Smethod> methods(){
+        return Seq.with(e.getEnclosedElements()).select(e -> e instanceof ExecutableElement
         && !e.getSimpleName().toString().contains("<")).map(e -> new Smethod((ExecutableElement)e));
     }
 
-    public Array<Smethod> constructors(){
-        return Array.with(e.getEnclosedElements()).select(e -> e instanceof ExecutableElement
+    public Seq<Smethod> constructors(){
+        return Seq.with(e.getEnclosedElements()).select(e -> e instanceof ExecutableElement
         && e.getSimpleName().toString().contains("<")).map(e -> new Smethod((ExecutableElement)e));
     }
 

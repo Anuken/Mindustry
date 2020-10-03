@@ -1,19 +1,16 @@
 package mindustry.editor;
 
-import mindustry.content.Blocks;
-import mindustry.core.GameState.State;
-import mindustry.editor.DrawOperation.OpType;
-import mindustry.game.Team;
-import mindustry.gen.TileOp;
-import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.blocks.*;
+import arc.func.*;
+import mindustry.content.*;
+import mindustry.editor.DrawOperation.*;
+import mindustry.game.*;
+import mindustry.gen.*;
+import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.modules.*;
 
-import static mindustry.Vars.state;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
-//TODO somehow remove or replace this class with a more flexible solution
 public class EditorTile extends Tile{
 
     public EditorTile(int x, int y, int floor, int overlay, int wall){
@@ -22,7 +19,7 @@ public class EditorTile extends Tile{
 
     @Override
     public void setFloor(Floor type){
-        if(state.is(State.playing)){
+        if(skip()){
             super.setFloor(type);
             return;
         }
@@ -42,109 +39,93 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setBlock(Block type){
-        if(state.is(State.playing)){
-            super.setBlock(type);
-            return;
-        }
-
-        if(block == type) return;
-        op(OpType.block, block.id);
-        if(rotation != 0) op(OpType.rotation, rotation);
-        if(team != 0) op(OpType.team, team);
-        super.setBlock(type);
-    }
-
-    @Override
     public void setBlock(Block type, Team team, int rotation){
-        if(state.is(State.playing)){
+        if(skip()){
             super.setBlock(type, team, rotation);
             return;
         }
 
-        setBlock(type);
-        setTeam(team);
-        rotation(rotation);
+        if(this.block == type && (build == null || build.rotation == rotation)){
+            update();
+            return;
+        }
+
+        op(OpType.block, block.id);
+        if(rotation != 0) op(OpType.rotation, (byte)rotation);
+        if(team != Team.derelict) op(OpType.team, (byte)team.id);
+        super.setBlock(type, team, rotation);
     }
 
     @Override
     public void setTeam(Team team){
-        if(state.is(State.playing)){
+        if(skip()){
             super.setTeam(team);
             return;
         }
 
         if(getTeamID() == team.id) return;
-        op(OpType.team, getTeamID());
+        op(OpType.team, (byte)getTeamID());
         super.setTeam(team);
     }
 
     @Override
-    public void rotation(int rotation){
-        if(state.is(State.playing)){
-            super.rotation(rotation);
-            return;
-        }
-
-        if(rotation == rotation()) return;
-        op(OpType.rotation, rotation());
-        super.rotation(rotation);
-    }
-
-    @Override
     public void setOverlay(Block overlay){
-        setOverlayID(overlay.id);
-    }
-
-    @Override
-    public void setOverlayID(short overlay){
-        if(state.is(State.playing)){
-            super.setOverlayID(overlay);
+        if(skip()){
+            super.setOverlay(overlay);
             return;
         }
 
         if(floor.isLiquid) return;
-        if(overlayID() == overlay) return;
+        if(overlay() == overlay) return;
         op(OpType.overlay, this.overlay.id);
-        super.setOverlayID(overlay);
+        super.setOverlay(overlay);
     }
 
     @Override
-    protected void preChanged(){
-        if(state.is(State.playing)){
-            super.preChanged();
-            return;
+    protected void fireChanged(){
+        if(skip()){
+            super.fireChanged();
+        }else{
+            update();
         }
-
-        super.setTeam(Team.derelict);
     }
 
     @Override
-    protected void changed(){
-        if(state.is(State.playing)){
-            super.changed();
+    public void recache(){
+        if(skip()){
+            super.recache();
+        }
+    }
+    
+    @Override
+    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+        if(skip()){
+            super.changeEntity(team, entityprov, rotation);
             return;
         }
 
-        entity = null;
+        build = null;
 
-        if(block == null){
-            block = Blocks.air;
-        }
-
-        if(floor == null){
-            floor = (Floor)Blocks.air;
-        }
-
+        if(block == null) block = Blocks.air;
+        if(floor == null) floor = (Floor)Blocks.air;
+        
         Block block = block();
 
-        if(block.hasEntity()){
-            entity = block.newEntity().init(this, false);
-            entity.cons = new ConsumeModule(entity);
-            if(block.hasItems) entity.items = new ItemModule();
-            if(block.hasLiquids) entity.liquids = new LiquidModule();
-            if(block.hasPower) entity.power = new PowerModule();
+        if(block.hasBuilding()){
+            build = entityprov.get().init(this, team, false, rotation);
+            build.cons = new ConsumeModule(build);
+            if(block.hasItems) build.items = new ItemModule();
+            if(block.hasLiquids) build.liquids(new LiquidModule());
+            if(block.hasPower) build.power(new PowerModule());
         }
+    }
+
+    private void update(){
+        ui.editor.editor.renderer.updatePoint(x, y);
+    }
+
+    private boolean skip(){
+        return state.isGame() || ui.editor.editor.isLoading();
     }
 
     private void op(OpType type, short value){

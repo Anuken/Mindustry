@@ -1,23 +1,30 @@
 package mindustry.core;
 
 import arc.*;
-import arc.Input.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
-import arc.scene.ui.*;
+import arc.struct.*;
+import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
-import org.mozilla.javascript.*;
+import rhino.*;
 
-import static mindustry.Vars.mobile;
+import java.net.*;
+
+import static mindustry.Vars.*;
 
 public interface Platform{
+
+    /** Dynamically loads a jar file. */
+    default Class<?> loadJar(Fi jar, String mainClass) throws Exception{
+        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
+        return classLoader.loadClass(mainClass);
+    }
 
     /** Steam: Update lobby visibility.*/
     default void updateLobby(){}
@@ -35,8 +42,8 @@ public interface Platform{
     default void viewListingID(String mapid){}
 
     /** Steam: Return external workshop maps to be loaded.*/
-    default Array<Fi> getWorkshopContent(Class<? extends Publishable> type){
-        return new Array<>(0);
+    default Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){
+        return new Seq<>(0);
     }
 
     /** Steam: Open workshop for maps.*/
@@ -58,29 +65,6 @@ public interface Platform{
         return c;
     }
 
-    /** Add a text input dialog that should show up after the field is tapped. */
-    default void addDialog(TextField field){
-        addDialog(field, 16);
-    }
-
-    /** See addDialog(). */
-    default void addDialog(TextField field, int maxLength){
-        if(!mobile) return; //this is mobile only, desktop doesn't need dialogs
-
-        field.tapped(() -> {
-            TextInput input = new TextInput();
-            input.text = field.getText();
-            input.maxLength = maxLength;
-            input.accepted = text -> {
-                field.clearText();
-                field.appendText(text);
-                field.change();
-                Core.input.setOnscreenKeyboardVisible(false);
-            };
-            Core.input.getTextInput(input);
-        });
-    }
-
     /** Update discord RPC. */
     default void updateRPC(){
     }
@@ -93,7 +77,6 @@ public interface Platform{
             new Rand().nextBytes(result);
             uuid = new String(Base64Coder.encode(result));
             Core.settings.put("uuid", uuid);
-            Core.settings.save();
             return uuid;
         }
         return uuid;
@@ -103,6 +86,32 @@ public interface Platform{
     default void shareFile(Fi file){
     }
 
+    default void export(String name, String extension, FileWriter writer){
+        if(!ios){
+            platform.showFileChooser(false, extension, file -> {
+                ui.loadAnd(() -> {
+                    try{
+                        writer.write(file);
+                    }catch(Throwable e){
+                        ui.showException(e);
+                        Log.err(e);
+                    }
+                });
+            });
+        }else{
+            ui.loadAnd(() -> {
+                try{
+                    Fi result = Core.files.local(name+ "." + extension);
+                    writer.write(result);
+                    platform.shareFile(result);
+                }catch(Throwable e){
+                    ui.showException(e);
+                    Log.err(e);
+                }
+            });
+        }
+    }
+
     /**
      * Show a file chooser.
      * @param cons Selection listener
@@ -110,13 +119,26 @@ public interface Platform{
      * @param extension File extension to filter
      */
     default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-        new FileChooser(open ? "$open" : "$save", file -> file.extension().toLowerCase().equals(extension), open, file -> {
+        new FileChooser(open ? "@open" : "@save", file -> file.extEquals(extension), open, file -> {
             if(!open){
                 cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
             }else{
                 cons.get(file);
             }
         }).show();
+    }
+
+    /**
+     * Show a file chooser for multiple file types.
+     * @param cons Selection listener
+     * @param extensions File extensions to filter
+     */
+    default void showMultiFileChooser(Cons<Fi> cons, String... extensions){
+        if(mobile){
+            showFileChooser(true, extensions[0], cons);
+        }else{
+            new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+        }
     }
 
     /** Hide the app. Android only. */
@@ -129,5 +151,9 @@ public interface Platform{
 
     /** Stops forcing the app into landscape orientation.*/
     default void endForceLandscape(){
+    }
+
+    interface FileWriter{
+        void write(Fi file) throws Throwable;
     }
 }

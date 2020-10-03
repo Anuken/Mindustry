@@ -1,7 +1,6 @@
 package mindustry.ui;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
@@ -16,6 +15,7 @@ import arc.scene.ui.ScrollPane.*;
 import arc.scene.ui.Slider.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.TextField.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -23,15 +23,15 @@ import static mindustry.gen.Tex.*;
 
 @StyleDefaults
 public class Styles{
-    public static Drawable black, black9, black8, black6, black3, none, flatDown, flatOver;
+    public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver;
     public static ButtonStyle defaultb, waveb;
-    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt;
-    public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
+    public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
+    public static ImageButtonStyle defaulti, nodei, righti, emptyi, emptytogglei, selecti, logici, geni, colori, cleari, clearFulli, clearPartiali, clearPartial2i, clearTogglei, clearTransi, clearToggleTransi, clearTogglePartiali;
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane;
     public static KeybindDialogStyle defaultKeybindDialog;
     public static SliderStyle defaultSlider, vSlider;
-    public static LabelStyle defaultLabel, outlineLabel;
-    public static TextFieldStyle defaultField, areaField;
+    public static LabelStyle defaultLabel, outlineLabel, techLabel;
+    public static TextFieldStyle defaultField, nodeField, areaField, nodeArea;
     public static CheckBoxStyle defaultCheck;
     public static DialogStyle defaultDialog, fullDialog;
 
@@ -40,6 +40,7 @@ public class Styles{
         black9 = whiteui.tint(0f, 0f, 0f, 0.9f);
         black8 = whiteui.tint(0f, 0f, 0f, 0.8f);
         black6 = whiteui.tint(0f, 0f, 0f, 0.6f);
+        black5 = whiteui.tint(0f, 0f, 0f, 0.5f);
         black3 = whiteui.tint(0f, 0f, 0f, 0.3f);
         none = whiteui.tint(0f, 0f, 0f, 0f);
         flatDown = createFlatDown();
@@ -53,9 +54,9 @@ public class Styles{
         }};
         
         waveb = new ButtonStyle(){{
-            up = buttonEdge4;
-            over = buttonEdgeOver4;
-            disabled = buttonEdge4;
+            up = wavepane;
+            over = wavepane; //TODO wrong
+            disabled = wavepane;
         }};
 
         defaultt = new TextButtonStyle(){{
@@ -92,6 +93,14 @@ public class Styles{
             down = flatOver;
             up = black;
         }};
+        logict = new TextButtonStyle(){{
+            over = flatOver;
+            font = Fonts.def;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            down = flatOver;
+            up = underlineWhite;
+        }};
         discordt = new TextButtonStyle(){{
             font = Fonts.def;
             fontColor = Color.white;
@@ -103,9 +112,9 @@ public class Styles{
             up = infoBanner;
         }};
         clearPartialt = new TextButtonStyle(){{
-            down = whiteui;
+            down = flatOver;
             up = pane;
-            over = flatDown;
+            over = flatDownBase;
             font = Fonts.def;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
@@ -148,7 +157,16 @@ public class Styles{
             disabled = buttonDisabled;
             disabledFontColor = Color.gray;
         }};
-
+        fullTogglet = new TextButtonStyle(){{
+            font = Fonts.def;
+            fontColor = Color.white;
+            checked = flatOver;
+            down = flatOver;
+            up = black;
+            over = flatOver;
+            disabled = black;
+            disabledFontColor = Color.gray;
+        }};
         defaulti = new ImageButtonStyle(){{
             down = buttonDown;
             up = button;
@@ -165,6 +183,9 @@ public class Styles{
             over = buttonRightOver;
             down = buttonRightDown;
             up = buttonRight;
+            disabled = buttonRightDisabled;
+            imageDisabledColor = Color.clear;
+            imageUpColor = Color.white;
         }};
         emptyi = new ImageButtonStyle(){{
             imageDownColor = Pal.accent;
@@ -178,6 +199,18 @@ public class Styles{
         selecti = new ImageButtonStyle(){{
             checked = buttonSelect;
             up = none;
+        }};
+        logici = new ImageButtonStyle(){{
+            //imageDownColor = Pal.accent;
+            imageUpColor = Color.black;
+        }};
+        geni = new ImageButtonStyle(){{
+            imageDownColor = Pal.accent;
+            imageUpColor = Color.black;
+        }};
+        colori = new ImageButtonStyle(){{
+            //imageDownColor = Pal.accent;
+            imageUpColor = Color.white;
         }};
         cleari = new ImageButtonStyle(){{
             down = flatOver;
@@ -193,6 +226,9 @@ public class Styles{
             down = flatDown;
             up = none;
             over = flatOver;
+            disabled = none;
+            imageDisabledColor = Color.gray;
+            imageUpColor = Color.white;
         }};
         clearPartial2i = new ImageButtonStyle(){{
             down = whiteui;
@@ -268,6 +304,10 @@ public class Styles{
             font = Fonts.outline;
             fontColor = Color.white;
         }};
+        techLabel = new LabelStyle(){{
+            font = Fonts.tech;
+            fontColor = Color.white;
+        }};
 
         defaultField = new TextFieldStyle(){{
             font = Fonts.chat;
@@ -281,12 +321,37 @@ public class Styles{
             messageFont = Fonts.def;
             messageFontColor = Color.gray;
         }};
+
+        nodeField = new TextFieldStyle(){{
+            font = Fonts.chat;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            disabledBackground = underlineDisabled;
+            selection = Tex.selection;
+            background = underlineWhite;
+            invalidBackground = underlineRed;
+            cursor = Tex.cursor;
+            messageFont = Fonts.def;
+            messageFontColor = Color.gray;
+        }};
+
         areaField = new TextFieldStyle(){{
             font = Fonts.chat;
             fontColor = Color.white;
             disabledFontColor = Color.gray;
             selection = Tex.selection;
             background = underline;
+            cursor = Tex.cursor;
+            messageFont = Fonts.def;
+            messageFontColor = Color.gray;
+        }};
+
+        nodeArea = new TextFieldStyle(){{
+            font = Fonts.chat;
+            fontColor = Color.white;
+            disabledFontColor = Color.gray;
+            selection = Tex.selection;
+            background = underlineWhite;
             cursor = Tex.cursor;
             messageFont = Fonts.def;
             messageFontColor = Color.gray;

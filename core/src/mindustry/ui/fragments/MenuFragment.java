@@ -57,15 +57,15 @@ public class MenuFragment extends Fragment{
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.bottom().left().addButton("", Styles.infot, ui.about::show).size(84, 45));
-            parent.fill(c -> c.bottom().right().addButton("", Styles.discordt, ui.discord::show).size(84, 45));
+            parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45));
+            parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45));
         }else if(becontrol.active()){
-            parent.fill(c -> c.bottom().right().addImageTextButton("$be.check", Icon.refresh, () -> {
+            parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
                 becontrol.checkUpdate(result -> {
                     ui.loadfrag.hide();
                     if(!result){
-                        ui.showInfo("$be.noupdates");
+                        ui.showInfo("@be.noupdates");
                     }
                 });
             }).size(200, 60).update(t -> {
@@ -73,13 +73,12 @@ public class MenuFragment extends Fragment{
             }));
         }
 
-        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
-
+        String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
             float logoscl = Scl.scl(1);
-            float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - Scl.scl(20));
-            float logoh = logow * (float)logo.getHeight() / logo.getWidth();
+            float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
+            float logoh = logow * (float)logo.height / logo.width;
 
             float fx = (int)(Core.graphics.getWidth() / 2f);
             float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
@@ -89,7 +88,7 @@ public class MenuFragment extends Fragment{
 
             Fonts.def.setColor(Color.white);
             Fonts.def.draw(versionText, fx, fy - logoh/2f, Align.center);
-        }).touchable(Touchable.disabled);
+        }).touchable = Touchable.disabled;
     }
 
     private void buildMobile(){
@@ -100,15 +99,15 @@ public class MenuFragment extends Fragment{
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton(Icon.play, "$campaign", () -> checkPlay(ui.deploy::show)),
-            custom = new MobileButton(Icon.rightOpenOut, "$customgame", () -> checkPlay(ui.custom::show)),
-            maps = new MobileButton(Icon.download, "$loadgame", () -> checkPlay(ui.load::show)),
-            join = new MobileButton(Icon.add, "$joingame", () -> checkPlay(ui.join::show)),
-            editor = new MobileButton(Icon.terrain, "$editor", () -> checkPlay(ui.maps::show)),
-            tools = new MobileButton(Icon.settings, "$settings", ui.settings::show),
-            mods = new MobileButton(Icon.book, "$mods", ui.mods::show),
-            donate = new MobileButton(Icon.link, "$website", () -> Core.net.openURI("https://anuke.itch.io/mindustry")),
-            exit = new MobileButton(Icon.exit, "$quit", () -> Core.app.exit());
+            play = new MobileButton(Icon.play, "@campaign", () -> checkPlay(ui.planet::show)),
+            custom = new MobileButton(Icon.rightOpenOut, "@customgame", () -> checkPlay(ui.custom::show)),
+            maps = new MobileButton(Icon.download, "@loadgame", () -> checkPlay(ui.load::show)),
+            join = new MobileButton(Icon.add, "@joingame", () -> checkPlay(ui.join::show)),
+            editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
+            tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
+            mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
+            donate = new MobileButton(Icon.link, "@website", () -> Core.app.openURI("https://anuke.itch.io/mindustry")),
+            exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
             container.marginTop(60f);
@@ -164,27 +163,27 @@ public class MenuFragment extends Fragment{
             t.defaults().width(width).height(70f);
 
             buttons(t,
-                new Buttoni("$play", Icon.play,
-                    new Buttoni("$campaign", Icon.play, () -> checkPlay(ui.deploy::show)),
-                    new Buttoni("$joingame", Icon.add, () -> checkPlay(ui.join::show)),
-                    new Buttoni("$customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                    new Buttoni("$loadgame", Icon.download, () -> checkPlay(ui.load::show)),
-                    new Buttoni("$tutorial", Icon.info, () -> checkPlay(control::playTutorial))
+                new Buttoni("@play", Icon.play,
+                    new Buttoni("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
+                    new Buttoni("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
+                    new Buttoni("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
+                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show)),
+                    new Buttoni("@tutorial", Icon.info, () -> checkPlay(control::playTutorial))
                 ),
-                new Buttoni("$editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.book, platform::openWorkshop) : null,
+                new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.book, platform::openWorkshop) : null,
                 new Buttoni(Core.bundle.get("mods"), Icon.bookOpen, ui.mods::show),
                 //not enough space for this button
-                //new Buttoni("$schematics", Icon.paste, ui.schematics::show),
-                new Buttoni("$settings", Icon.settings, ui.settings::show),
-                new Buttoni("$about.button", Icon.info, ui.about::show),
-                new Buttoni("$quit", Icon.exit, Core.app::exit)
+                //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
+                new Buttoni("@settings", Icon.settings, ui.settings::show),
+                new Buttoni("@about.button", Icon.info, ui.about::show),
+                new Buttoni("@quit", Icon.exit, Core.app::exit)
             );
 
         }).width(width).growY();
 
         container.table(background, t -> {
             submenu = t;
-            t.getColor().a = 0f;
+            t.color.a = 0f;
             t.top();
             t.defaults().width(width).height(70f);
             t.visible(() -> !t.getChildren().isEmpty());
@@ -196,13 +195,13 @@ public class MenuFragment extends Fragment{
         if(!mods.hasContentErrors()){
             run.run();
         }else{
-            ui.showInfo("$mod.noerrorplay");
+            ui.showInfo("@mod.noerrorplay");
         }
     }
 
     private void fadeInMenu(){
         submenu.clearActions();
-        submenu.actions(Actions.alpha(1f, 0.15f, Interpolation.fade));
+        submenu.actions(Actions.alpha(1f, 0.15f, Interp.fade));
     }
 
     private void fadeOutMenu(){
@@ -212,14 +211,14 @@ public class MenuFragment extends Fragment{
         }
 
         submenu.clearActions();
-        submenu.actions(Actions.alpha(1f), Actions.alpha(0f, 0.2f, Interpolation.fade), Actions.run(() -> submenu.clearChildren()));
+        submenu.actions(Actions.alpha(1f), Actions.alpha(0f, 0.2f, Interp.fade), Actions.run(() -> submenu.clearChildren()));
     }
 
     private void buttons(Table t, Buttoni... buttons){
         for(Buttoni b : buttons){
             if(b == null) continue;
             Button[] out = {null};
-            out[0] = t.addImageTextButton(b.text, b.icon, Styles.clearToggleMenut, () -> {
+            out[0] = t.button(b.text, b.icon, Styles.clearToggleMenut, () -> {
                 if(currentMenu == out[0]){
                     currentMenu = null;
                     fadeOutMenu();
@@ -244,7 +243,7 @@ public class MenuFragment extends Fragment{
         }
     }
 
-    private class Buttoni{
+    private static class Buttoni{
         final Drawable icon;
         final String text;
         final Runnable runnable;

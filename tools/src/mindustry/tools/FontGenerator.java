@@ -31,7 +31,7 @@ public class FontGenerator{
         String session = folder.child("session").readString();
         net.httpGet("http://fontello.com/" + session + "/get", result -> {
             try{
-                Streams.copyStream(result.getResultAsStream(), folder.child("font.zip").write());
+                Streams.copy(result.getResultAsStream(), folder.child("font.zip").write());
             }catch(IOException e){
                 throw new RuntimeException(e);
             }
@@ -40,7 +40,7 @@ public class FontGenerator{
         Log.info("Icon font...");
 
         ZipFi zip = new ZipFi(folder.child("font.zip"));
-        Fi dest = folder.child("font.ttf");
+        Fi dest = folder.child("font.woff");
         zip.list()[0].child("font").child("fontello.ttf").copyTo(dest);
         dest.copyTo(Fi.get("core/assets/fonts/icon.ttf"));
 

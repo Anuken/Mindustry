@@ -1,11 +1,1 @@
-apply plugin: "java"
-
-sourceCompatibility = 1.8
-
-sourceSets{
-    test{
-        resources{
-            srcDir "src/test/resources"
-        }
-    }
-}
+sourceSets.test.resources.srcDirs = ["src/test/resources"]

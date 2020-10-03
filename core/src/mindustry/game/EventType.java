@@ -1,13 +1,13 @@
 package mindustry.game;
 
-import arc.util.ArcAnnotate.*;
-import mindustry.core.GameState.State;
-import mindustry.ctype.UnlockableContent;
-import mindustry.entities.traits.BuilderTrait;
-import mindustry.entities.type.*;
+import arc.util.*;
+import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.net.*;
 import mindustry.type.*;
-import mindustry.world.Tile;
+import mindustry.world.*;
 
 public class EventType{
 
@@ -30,34 +30,72 @@ public class EventType{
         openWiki,
         teamCoreDamage,
         socketConfigChanged,
-        update
+        update,
+        draw,
+        preDraw,
+        postDraw,
+        uiDrawBegin,
+        uiDrawEnd
     }
 
     public static class WinEvent{}
-
     public static class LoseEvent{}
+    public static class ResizeEvent{}
+    public static class MapMakeEvent{}
+    public static class MapPublishEvent{}
+    public static class SaveLoadEvent{}
+    public static class ClientCreateEvent{}
+    public static class ServerLoadEvent{}
+    public static class DisposeEvent{}
+    public static class PlayEvent{}
+    public static class ResetEvent{}
+    public static class WaveEvent{}
+    public static class TurnEvent{}
+    /** Called when the player places a line, mobile or desktop.*/
+    public static class LineConfirmEvent{}
+    /** Called when a turret receives ammo, but only when the tutorial is active! */
+    public static class TurretAmmoDeliverEvent{}
+    /** Called when a core receives ammo, but only when the tutorial is active! */
+    public static class CoreItemDeliverEvent{}
+    /** Called when the player opens info for a specific block.*/
+    public static class BlockInfoEvent{}
+    /** Called when the client game is first loaded. */
+    public static class ClientLoadEvent{}
+    /** Called when a game begins and the world is loaded. */
+    public static class WorldLoadEvent{}
 
-    public static class LaunchEvent{}
+    /** Called when a sector is destroyed by waves when you're not there. */
+    public static class SectorLoseEvent{
+        public final Sector sector;
+
+        public SectorLoseEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
 
     public static class LaunchItemEvent{
         public final ItemStack stack;
 
-        public LaunchItemEvent(Item item, int amount){
-            this.stack = new ItemStack(item, amount);
+        public LaunchItemEvent(ItemStack stack){
+            this.stack = stack;
         }
     }
 
-    public static class MapMakeEvent{}
-
-    public static class MapPublishEvent{}
-
     public static class CommandIssueEvent{
-        public final Tile tile;
+        public final Building tile;
         public final UnitCommand command;
 
-        public CommandIssueEvent(Tile tile, UnitCommand command){
+        public CommandIssueEvent(Building tile, UnitCommand command){
             this.tile = tile;
             this.command = command;
+        }
+    }
+
+    public static class ClientPreConnectEvent{
+        public final Host host;
+
+        public ClientPreConnectEvent(Host host){
+            this.host = host;
         }
     }
 
@@ -71,88 +109,23 @@ public class EventType{
         }
     }
 
-    /** Called when a zone's requirements are met. */
-    public static class ZoneRequireCompleteEvent{
-        public final Zone zoneMet, zoneForMet;
-        public final Objective objective;
+    /** Called when a sector is conquered, e.g. a boss or base is defeated. */
+    public static class SectorCaptureEvent{
+        public final Sector sector;
 
-        public ZoneRequireCompleteEvent(Zone zoneMet, Zone zoneForMet, Objective objective){
-            this.zoneMet = zoneMet;
-            this.zoneForMet = zoneForMet;
-            this.objective = objective;
+        public SectorCaptureEvent(Sector sector){
+            this.sector = sector;
         }
-    }
-
-    /** Called when a zone's requirements are met. */
-    public static class ZoneConfigureCompleteEvent{
-        public final Zone zone;
-
-        public ZoneConfigureCompleteEvent(Zone zone){
-            this.zone = zone;
-        }
-    }
-
-    public static class ClientCreateEvent{
-
-    }
-
-    /** Called when the client game is first loaded. */
-    public static class ClientLoadEvent{
-
-    }
-
-    public static class ServerLoadEvent{
-
-    }
-
-    public static class ContentReloadEvent{
-
-    }
-
-    public static class DisposeEvent{
-
-    }
-
-    public static class PlayEvent{
-
-    }
-
-    public static class ResetEvent{
-
-    }
-
-    public static class WaveEvent{
-
-    }
-
-    /** Called when the player places a line, mobile or desktop.*/
-    public static class LineConfirmEvent{
-
-    }
-
-    /** Called when a turret recieves ammo, but only when the tutorial is active! */
-    public static class TurretAmmoDeliverEvent{
-
-    }
-
-    /** Called when a core recieves ammo, but only when the tutorial is active! */
-    public static class CoreItemDeliverEvent{
-
-    }
-
-    /** Called when the player opens info for a specific block.*/
-    public static class BlockInfoEvent{
-
     }
 
     /** Called when the player withdraws items from a block. */
     public static class WithdrawEvent{
-        public final Tile tile;
+        public final Building tile;
         public final Player player;
         public final Item item;
         public final int amount;
 
-        public WithdrawEvent(Tile tile, Player player, Item item, int amount){
+        public WithdrawEvent(Building tile, Player player, Item item, int amount){
             this.tile = tile;
             this.player = player;
             this.item = item;
@@ -162,12 +135,12 @@ public class EventType{
 
     /** Called when a player deposits items to a block.*/
     public static class DepositEvent{
-        public final Tile tile;
+        public final Building tile;
         public final Player player;
         public final Item item;
         public final int amount;
 
-        public DepositEvent(Tile tile, Player player, Item item, int amount){
+        public DepositEvent(Building tile, Player player, Item item, int amount){
             this.tile = tile;
             this.player = player;
             this.item = item;
@@ -175,27 +148,27 @@ public class EventType{
         }
     }
 
-    /** Called when the player taps a block. */
-    public static class TapEvent{
-        public final Tile tile;
+    /** Called when the player configures a specific building. */
+    public static class ConfigEvent{
+        public final Building tile;
         public final Player player;
+        public final Object value;
 
-        public TapEvent(Tile tile, Player player){
-            this.tile = tile;
-            this.player = player;
-        }
-    }
-
-    /** Called when the player sets a specific block. */
-    public static class TapConfigEvent{
-        public final Tile tile;
-        public final Player player;
-        public final int value;
-
-        public TapConfigEvent(Tile tile, Player player, int value){
+        public ConfigEvent(Building tile, Player player, Object value){
             this.tile = tile;
             this.player = player;
             this.value = value;
+        }
+    }
+
+    /** Called when a player taps any tile. */
+    public static class TapEvent{
+        public final Player player;
+        public final Tile tile;
+
+        public TapEvent(Player player, Tile tile){
+            this.tile = tile;
+            this.player = player;
         }
     }
 
@@ -207,12 +180,6 @@ public class EventType{
         }
     }
 
-    /** Called when a game begins and the world is loaded. */
-    public static class WorldLoadEvent{
-
-    }
-
-    /** Called from the logic thread. Do not access graphics here! */
     public static class TileChangeEvent{
         public final Tile tile;
 
@@ -265,15 +232,16 @@ public class EventType{
     public static class BlockBuildEndEvent{
         public final Tile tile;
         public final Team team;
-        public final @Nullable
-        Player player;
+        public final @Nullable Unit unit;
         public final boolean breaking;
+        public final @Nullable Object config;
 
-        public BlockBuildEndEvent(Tile tile, @Nullable Player player, Team team, boolean breaking){
+        public BlockBuildEndEvent(Tile tile, @Nullable Unit unit, Team team, boolean breaking, @Nullable Object config){
             this.tile = tile;
             this.team = team;
-            this.player = player;
+            this.unit = unit;
             this.breaking = breaking;
+            this.config = config;
         }
     }
 
@@ -284,10 +252,10 @@ public class EventType{
     public static class BuildSelectEvent{
         public final Tile tile;
         public final Team team;
-        public final BuilderTrait builder;
+        public final Builderc builder;
         public final boolean breaking;
 
-        public BuildSelectEvent(Tile tile, Team team, BuilderTrait builder, boolean breaking){
+        public BuildSelectEvent(Tile tile, Team team, Builderc builder, boolean breaking){
             this.tile = tile;
             this.team = team;
             this.builder = builder;
@@ -313,29 +281,33 @@ public class EventType{
         }
     }
 
-    public static class UnitCreateEvent{
-        public final BaseUnit unit;
+    public static class UnitDrownEvent{
+        public final Unit unit;
 
-        public UnitCreateEvent(BaseUnit unit){
+        public UnitDrownEvent(Unit unit){
             this.unit = unit;
         }
     }
 
-    public static class ResizeEvent{
+    public static class UnitCreateEvent{
+        public final Unit unit;
 
-    }
-
-    public static class MechChangeEvent{
-        public final Player player;
-        public final Mech mech;
-
-        public MechChangeEvent(Player player, Mech mech){
-            this.player = player;
-            this.mech = mech;
+        public UnitCreateEvent(Unit unit){
+            this.unit = unit;
         }
     }
 
-    /** Called after connecting; when a player recieves world data and is ready to play.*/
+    public static class UnitChangeEvent{
+        public final Player player;
+        public final Unit unit;
+
+        public UnitChangeEvent(Player player, Unit unit){
+            this.player = player;
+            this.unit = unit;
+        }
+    }
+
+    /** Called after connecting; when a player receives world data and is ready to play.*/
     public static class PlayerJoin{
         public final Player player;
 
@@ -380,7 +352,6 @@ public class EventType{
     public static class PlayerIpBanEvent{
         public final String ip;
 
-
         public PlayerIpBanEvent(String ip){
             this.ip = ip;
         }
@@ -388,7 +359,6 @@ public class EventType{
     
     public static class PlayerIpUnbanEvent{
         public final String ip;
-
 
         public PlayerIpUnbanEvent(String ip){
             this.ip = ip;

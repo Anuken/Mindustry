@@ -1,11 +1,11 @@
 package mindustry.ui;
 
-import arc.Core;
+import arc.*;
+import arc.graphics.*;
 import arc.scene.style.*;
-import arc.util.Strings;
-import arc.graphics.Color;
+import arc.util.*;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 
 public class Links{
     private static LinkEntry[] links;
@@ -16,7 +16,7 @@ public class Links{
             new LinkEntry("changelog", "https://github.com/Anuken/Mindustry/releases", Icon.list, Pal.accent.cpy()),
             new LinkEntry("trello", "https://trello.com/b/aE2tcUwF", Icon.trello, Color.valueOf("026aa7")),
             new LinkEntry("wiki", "https://mindustrygame.github.io/wiki/", Icon.book, Color.valueOf("0f142f")),
-            new LinkEntry("feathub", "https://github.com/Anuken/Mindustry-Suggestions/issues/new/choose/", Icon.add, Color.valueOf("ebebeb")),
+            new LinkEntry("suggestions", "https://github.com/Anuken/Mindustry-Suggestions/issues/new/choose/", Icon.add, Color.valueOf("ebebeb")),
             new LinkEntry("reddit", "https://www.reddit.com/r/Mindustry/", Icon.redditAlien, Color.valueOf("ee593b")),
             new LinkEntry("itch.io", "https://anuke.itch.io/mindustry", Icon.itchio, Color.valueOf("fa5c5c")),
             new LinkEntry("google-play", "https://play.google.com/store/apps/details?id=io.anuke.mindustry", Icon.googleplay, Color.valueOf("689f38")),
@@ -42,12 +42,10 @@ public class Links{
         public LinkEntry(String name, String link, Drawable icon, Color color){
             this.name = name;
             this.color = color;
-            this.description = Core.bundle.getNotNull("link." + name + ".description");
+            this.description = Core.bundle.get("link." + name + ".description", "");
             this.link = link;
             this.icon = icon;
-
-            String title = Core.bundle.getOrNull("link." + name + ".title");
-            this.title = title != null ? title : Strings.capitalize(name.replace("-", " "));
+            this.title = Core.bundle.get("link." + name + ".title", Strings.capitalize(name.replace("-", " ")));
         }
     }
 }

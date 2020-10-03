@@ -2,9 +2,9 @@ package mindustry.ui;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.scene.ui.Image;
-import arc.scene.ui.layout.Scl;
-import mindustry.graphics.Pal;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import mindustry.graphics.*;
 
 public class BorderImage extends Image{
     public float thickness = 4f;
@@ -36,9 +36,6 @@ public class BorderImage extends Image{
     @Override
     public void draw(){
         super.draw();
-
-        float scaleX = getScaleX();
-        float scaleY = getScaleY();
 
         Draw.color(borderColor);
         Draw.alpha(parentAlpha);

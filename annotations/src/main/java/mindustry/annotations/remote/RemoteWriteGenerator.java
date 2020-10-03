@@ -1,28 +1,26 @@
 package mindustry.annotations.remote;
 
+import arc.struct.*;
+import arc.util.io.*;
 import com.squareup.javapoet.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
-import mindustry.annotations.Annotations.Loc;
-import mindustry.annotations.remote.IOFinder.ClassSerializer;
+import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic.Kind;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
+import java.io.*;
 
 /** Generates code for writing remote invoke packets on the client and server. */
 public class RemoteWriteGenerator{
-    private final HashMap<String, ClassSerializer> serializers;
+    private final ClassSerializer serializers;
 
     /** Creates a write generator that uses the supplied serializer setup. */
-    public RemoteWriteGenerator(HashMap<String, ClassSerializer> serializers){
+    public RemoteWriteGenerator(ClassSerializer serializers){
         this.serializers = serializers;
     }
 
     /** Generates all classes in this list. */
-    public void generateFor(List<ClassEntry> entries, String packageName) throws IOException{
+    public void generateFor(Seq<ClassEntry> entries, String packageName) throws IOException{
 
         for(ClassEntry entry : entries){
             //create builder
@@ -30,8 +28,12 @@ public class RemoteWriteGenerator{
             classBuilder.addJavadoc(RemoteProcess.autogenWarning);
 
             //add temporary write buffer
-            classBuilder.addField(FieldSpec.builder(ByteBuffer.class, "TEMP_BUFFER", Modifier.STATIC, Modifier.PRIVATE, Modifier.FINAL)
-            .initializer("ByteBuffer.allocate($1L)", RemoteProcess.maxPacketSize).build());
+            classBuilder.addField(FieldSpec.builder(ReusableByteOutStream.class, "OUT", Modifier.STATIC, Modifier.PRIVATE, Modifier.FINAL)
+            .initializer("new ReusableByteOutStream($L)", RemoteProcess.maxPacketSize).build());
+
+            //add writer for that buffer
+            classBuilder.addField(FieldSpec.builder(Writes.class, "WRITE", Modifier.STATIC, Modifier.PRIVATE, Modifier.FINAL)
+            .initializer("new Writes(new $T(OUT))", DataOutputStream.class).build());
 
             //go through each method entry in this class
             for(MethodEntry methodEntry : entry.methods){
@@ -63,7 +65,7 @@ public class RemoteWriteGenerator{
 
         //create builder
         MethodSpec.Builder method = MethodSpec.methodBuilder(elem.getSimpleName().toString() + (forwarded ? "__forward" : "")) //add except suffix when forwarding
-        .addModifiers(Modifier.STATIC, Modifier.SYNCHRONIZED)
+        .addModifiers(Modifier.STATIC)
         .returns(void.class);
 
         //forwarded methods aren't intended for use, and are not public
@@ -74,12 +76,12 @@ public class RemoteWriteGenerator{
         //validate client methods to make sure
         if(methodEntry.where.isClient){
             if(elem.getParameters().isEmpty()){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Client invoke methods must have a first parameter of type Player.", elem);
+                BaseProcessor.err("Client invoke methods must have a first parameter of type Player", elem);
                 return;
             }
 
-            if(!elem.getParameters().get(0).asType().toString().equals("mindustry.entities.type.Player")){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "Client invoke methods should have a first parameter of type Player.", elem);
+            if(!elem.getParameters().get(0).asType().toString().contains("Player")){
+                BaseProcessor.err("Client invoke methods should have a first parameter of type Player", elem);
                 return;
             }
         }
@@ -129,14 +131,14 @@ public class RemoteWriteGenerator{
 
         //add statement to create packet from pool
         method.addStatement("$1N packet = $2N.obtain($1N.class, $1N::new)", "mindustry.net.Packets.InvokePacket", "arc.util.pooling.Pools");
-        //assign buffer
-        method.addStatement("packet.writeBuffer = TEMP_BUFFER");
         //assign priority
         method.addStatement("packet.priority = (byte)" + methodEntry.priority.ordinal());
         //assign method ID
         method.addStatement("packet.type = (byte)" + methodEntry.id);
-        //rewind buffer
-        method.addStatement("TEMP_BUFFER.position(0)");
+        //reset stream
+        method.addStatement("OUT.reset()");
+
+        method.addTypeVariables(Seq.with(elem.getTypeParameters()).map(BaseProcessor::getTVN));
 
         for(int i = 0; i < elem.getParameters().size(); i++){
             //first argument is skipped as it is always the player caller
@@ -146,8 +148,12 @@ public class RemoteWriteGenerator{
 
             VariableElement var = elem.getParameters().get(i);
 
-            //add parameter to method
-            method.addParameter(TypeName.get(var.asType()), var.getSimpleName().toString());
+            try{
+                //add parameter to method
+                method.addParameter(TypeName.get(var.asType()), var.getSimpleName().toString());
+            }catch(Throwable t){
+                throw new RuntimeException("Error parsing method " + methodEntry.targetMethod);
+            }
 
             //name of parameter
             String varName = var.getSimpleName().toString();
@@ -164,23 +170,18 @@ public class RemoteWriteGenerator{
             }
 
             if(BaseProcessor.isPrimitive(typeName)){ //check if it's a primitive, and if so write it
-                if(typeName.equals("boolean")){ //booleans are special
-                    method.addStatement("TEMP_BUFFER.put(" + varName + " ? (byte)1 : 0)");
-                }else{
-                    method.addStatement("TEMP_BUFFER.put" +
-                    capName + "(" + varName + ")");
-                }
+                method.addStatement("WRITE.$L($L)", typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "", varName);
             }else{
                 //else, try and find a serializer
-                ClassSerializer ser = serializers.get(typeName);
+                String ser = serializers.writers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(elem, var.asType(), true));
 
                 if(ser == null){ //make sure a serializer exists!
-                    BaseProcessor.messager.printMessage(Kind.ERROR, "No @WriteClass method to write class type: '" + typeName + "'", var);
+                    BaseProcessor.err("No @WriteClass method to write class type: '" + typeName + "'", var);
                     return;
                 }
 
                 //add statement for writing it
-                method.addStatement(ser.writeMethod + "(TEMP_BUFFER, " + varName + ")");
+                method.addStatement(ser + "(WRITE, " + varName + ")");
             }
 
             if(writePlayerSkipCheck){ //write end check
@@ -188,8 +189,10 @@ public class RemoteWriteGenerator{
             }
         }
 
+        //assign packet bytes
+        method.addStatement("packet.bytes = OUT.getBytes()");
         //assign packet length
-        method.addStatement("packet.writeLength = TEMP_BUFFER.position()");
+        method.addStatement("packet.length = OUT.size()");
 
         String sendString;
 

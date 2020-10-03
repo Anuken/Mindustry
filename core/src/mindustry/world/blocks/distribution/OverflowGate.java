@@ -1,15 +1,14 @@
 package mindustry.world.blocks.distribution;
 
-import arc.math.Mathf;
-import arc.util.Time;
-import mindustry.entities.type.*;
-import mindustry.type.Item;
+import arc.math.*;
+import arc.util.*;
+import arc.util.io.*;
+import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.meta.BlockGroup;
+import mindustry.world.meta.*;
 
-import java.io.*;
-
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class OverflowGate extends Block{
     public float speed = 1f;
@@ -21,8 +20,9 @@ public class OverflowGate extends Block{
         solid = true;
         update = true;
         group = BlockGroup.transportation;
+        instantTransfer = true;
         unloadable = false;
-        entityType = OverflowGateEntity::new;
+        canOverdrive = false;
     }
 
     @Override
@@ -30,100 +30,96 @@ public class OverflowGate extends Block{
         return true;
     }
 
-    @Override
-    public int acceptStack(Item item, int amount, Tile tile, Unit source){
-        return 0;
-    }
+    public class OverflowGateBuild extends Building{
+        public Item lastItem;
+        public Tile lastInput;
+        public float time;
 
-    @Override
-    public int removeStack(Tile tile, Item item, int amount){
-        OverflowGateEntity entity = tile.ent();
-        int result = super.removeStack(tile, item, amount);
-        if(result != 0 && item == entity.lastItem){
-            entity.lastItem = null;
-        }
-        return result;
-    }
-
-    @Override
-    public void update(Tile tile){
-        OverflowGateEntity entity = tile.ent();
-
-        if(entity.lastItem == null && entity.items.total() > 0){
-            entity.items.clear();
+        @Override
+        public int acceptStack(Item item, int amount, Teamc source){
+            return 0;
         }
 
-        if(entity.lastItem != null){
-            entity.time += 1f / speed * Time.delta();
-            Tile target = getTileTarget(tile, entity.lastItem, entity.lastInput, false);
-
-            if(target != null && (entity.time >= 1f)){
-                getTileTarget(tile, entity.lastItem, entity.lastInput, true);
-                target.block().handleItem(entity.lastItem, target, Edges.getFacingEdge(tile, target));
-                entity.items.remove(entity.lastItem, 1);
-                entity.lastItem = null;
+        @Override
+        public int removeStack(Item item, int amount){
+            int result = super.removeStack(item, amount);
+            if(result != 0 && item == lastItem){
+                lastItem = null;
             }
+            return result;
         }
-    }
 
-    @Override
-    public boolean acceptItem(Item item, Tile tile, Tile source){
-        OverflowGateEntity entity = tile.ent();
-
-        return tile.getTeam() == source.getTeam() && entity.lastItem == null && entity.items.total() == 0;
-    }
-
-    @Override
-    public void handleItem(Item item, Tile tile, Tile source){
-        OverflowGateEntity entity = tile.ent();
-        entity.items.add(item, 1);
-        entity.lastItem = item;
-        entity.time = 0f;
-        entity.lastInput = source;
-
-        update(tile);
-    }
-
-    public Tile getTileTarget(Tile tile, Item item, Tile src, boolean flip){
-        int from = tile.relativeTo(src.x, src.y);
-        if(from == -1) return null;
-        Tile to = tile.getNearby((from + 2) % 4);
-        if(to == null) return null;
-        Tile edge = Edges.getFacingEdge(tile, to);
-        boolean canForward = to.block().acceptItem(item, to, edge) && to.getTeam() == tile.getTeam() && !(to.block() instanceof OverflowGate);
-
-        if(!canForward || invert){
-            Tile a = tile.getNearby(Mathf.mod(from - 1, 4));
-            Tile b = tile.getNearby(Mathf.mod(from + 1, 4));
-            boolean ac = a != null && a.block().acceptItem(item, a, edge) && !(a.block() instanceof OverflowGate) && a.getTeam() == tile.getTeam();
-            boolean bc = b != null && b.block().acceptItem(item, b, edge) && !(b.block() instanceof OverflowGate) && b.getTeam() == tile.getTeam();
-
-            if(!ac && !bc){
-                return invert && canForward ? to : null;
+        @Override
+        public void updateTile(){
+            if(lastItem == null && items.total() > 0){
+                items.clear();
             }
 
-            if(ac && !bc){
-                to = a;
-            }else if(bc && !ac){
-                to = b;
-            }else{
-                if(tile.rotation() == 0){
-                    to = a;
-                    if(flip) tile.rotation((byte) 1);
-                }else{
-                    to = b;
-                    if(flip) tile.rotation((byte) 0);
+            if(lastItem != null){
+                if(lastInput == null){
+                    lastItem = null;
+                    return;
+                }
+
+                time += 1f / speed * Time.delta;
+                Building target = getTileTarget(lastItem, lastInput, false);
+
+                if(target != null && (time >= 1f)){
+                    getTileTarget(lastItem, lastInput, true);
+                    target.handleItem(this, lastItem);
+                    items.remove(lastItem, 1);
+                    lastItem = null;
                 }
             }
         }
 
-        return to;
-    }
+        @Override
+        public boolean acceptItem(Building source, Item item){
+            return team == source.team && lastItem == null && items.total() == 0;
+        }
 
-    public class OverflowGateEntity extends TileEntity{
-        Item lastItem;
-        Tile lastInput;
-        float time;
+        @Override
+        public void handleItem(Building source, Item item){
+            items.add(item, 1);
+            lastItem = item;
+            time = 0f;
+            lastInput = source.tile();
+        }
+
+        public @Nullable Building getTileTarget(Item item, Tile src, boolean flip){
+            int from = relativeToEdge(src);
+            if(from == -1) return null;
+            Building to = nearby((from + 2) % 4);
+            boolean canForward = to != null && to.acceptItem(this, item) && to.team == team && !(to.block instanceof OverflowGate);
+            boolean inv = invert == enabled;
+
+            if(!canForward || inv){
+                Building a = nearby(Mathf.mod(from - 1, 4));
+                Building b = nearby(Mathf.mod(from + 1, 4));
+                boolean ac = a != null && a.acceptItem(this, item) && !(a.block instanceof OverflowGate) && a.team == team;
+                boolean bc = b != null && b.acceptItem(this, item) && !(b.block instanceof OverflowGate) && b.team == team;
+
+                if(!ac && !bc){
+                    return inv && canForward ? to : null;
+                }
+
+                if(ac && !bc){
+                    to = a;
+                }else if(bc && !ac){
+                    to = b;
+                }else{
+                    if(rotation == 0){
+                        to = a;
+                        if(flip) rotation =1;
+                    }else{
+                        to = b;
+                        if(flip) rotation = 0;
+                    }
+                }
+            }
+
+            return to;
+        }
 
         @Override
         public byte version(){
@@ -131,19 +127,20 @@ public class OverflowGate extends Block{
         }
 
         @Override
-        public void write(DataOutput stream) throws IOException{
-            super.write(stream);
-            stream.writeInt(lastInput == null ? Pos.invalid : lastInput.pos());
+        public void write(Writes write){
+            super.write(write);
+
+            write.i(lastInput == null ? -1 : lastInput.pos());
         }
 
         @Override
-        public void read(DataInput stream, byte revision) throws IOException{
-            super.read(stream, revision);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
 
             if(revision == 1){
-                new DirectionalItemBuffer(25, 50f).read(stream);
+                new DirectionalItemBuffer(25).read(read);
             }else if(revision == 3){
-                lastInput = world.tile(stream.readInt());
+                lastInput = world.tile(read.i());
                 lastItem = items.first();
             }
         }

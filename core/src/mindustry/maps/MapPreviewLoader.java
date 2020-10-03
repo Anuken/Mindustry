@@ -3,12 +3,12 @@ package mindustry.maps;
 import arc.assets.*;
 import arc.assets.loaders.*;
 import arc.assets.loaders.resolvers.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.Content;
+import mindustry.ctype.*;
 
 public class MapPreviewLoader extends TextureLoader{
 
@@ -43,8 +43,8 @@ public class MapPreviewLoader extends TextureLoader{
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, Fi file, TextureParameter parameter){
-        return Array.with(new AssetDescriptor<>("contentcreate", Content.class));
+    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, TextureParameter parameter){
+        return Seq.with(new AssetDescriptor<>("contentcreate", Content.class));
     }
 
     public static class MapPreviewParameter extends TextureParameter{

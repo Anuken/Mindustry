@@ -1,96 +1,74 @@
 package mindustry.game;
 
 import arc.*;
-import arc.util.ArcAnnotate.*;
+import arc.scene.ui.layout.*;
+import mindustry.ctype.*;
 import mindustry.type.*;
-import mindustry.world.*;
 
 /** Holds objective classes. */
 public class Objectives{
 
-    //TODO
-    public static class Wave implements Objective{
-        public int wave;
+    public static class Research implements Objective{
+        public UnlockableContent content;
 
-        public Wave(int wave){
-            this.wave = wave;
+        public Research(UnlockableContent content){
+            this.content = content;
         }
 
-        protected Wave(){}
+        protected Research(){}
 
         @Override
         public boolean complete(){
-            return false;
+            return content.unlocked();
         }
 
         @Override
         public String display(){
-            //TODO
-            return null;
+            return Core.bundle.format("requirement.research", content.emoji() + " " + content.localizedName);
         }
     }
 
-    public static class Unlock implements Objective{
-        public @NonNull Block block;
+    public static class SectorComplete extends SectorObjective{
 
-        public Unlock(Block block){
-            this.block = block;
+        public SectorComplete(SectorPreset zone){
+            this.preset = zone;
         }
 
-        protected Unlock(){}
+        protected SectorComplete(){}
 
         @Override
         public boolean complete(){
-            return block.unlocked();
+            return preset.sector.isCaptured();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.unlock", block.localizedName);
+            return Core.bundle.format("requirement.capture", preset.localizedName);
         }
     }
 
-    public static class ZoneWave extends ZoneObjective{
-        public int wave;
-
-        public ZoneWave(Zone zone, int wave){
-            this.zone = zone;
-            this.wave = wave;
-        }
-
-        protected ZoneWave(){}
-
-        @Override
-        public boolean complete(){
-            return zone.bestWave() >= wave;
-        }
-
-        @Override
-        public String display(){
-            return Core.bundle.format("requirement.wave", wave, zone.localizedName);
-        }
+    //TODO merge
+    public abstract static class SectorObjective implements Objective{
+        public SectorPreset preset;
     }
 
-    public static class Launched extends ZoneObjective{
+    /** Defines a specific objective for a game. */
+    public interface Objective{
 
-        public Launched(Zone zone){
-            this.zone = zone;
+        /** @return whether this objective is met. */
+        boolean complete();
+
+        /** @return the string displayed when this objective is completed, in imperative form.
+         * e.g. when the objective is 'complete 10 waves', this would display "complete 10 waves". */
+        String display();
+
+        /** Build a display for this zone requirement.*/
+        default void build(Table table){
+
         }
 
-        protected Launched(){}
-
-        @Override
-        public boolean complete(){
-            return zone.hasLaunched();
+        default SectorPreset zone(){
+            return this instanceof SectorObjective ? ((SectorObjective)this).preset : null;
         }
-
-        @Override
-        public String display(){
-            return Core.bundle.format("requirement.core", zone.localizedName);
-        }
-    }
-
-    public abstract static class ZoneObjective implements Objective{
-        public @NonNull Zone zone;
     }
 }

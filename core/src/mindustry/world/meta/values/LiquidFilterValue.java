@@ -1,13 +1,13 @@
 package mindustry.world.meta.values;
 
-import arc.struct.Array;
-import arc.func.Boolf;
-import arc.scene.ui.layout.Table;
-import mindustry.type.Liquid;
-import mindustry.ui.LiquidDisplay;
-import mindustry.world.meta.StatValue;
+import arc.func.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class LiquidFilterValue implements StatValue{
     private final Boolf<Liquid> filter;
@@ -22,7 +22,7 @@ public class LiquidFilterValue implements StatValue{
 
     @Override
     public void display(Table table){
-        Array<Liquid> list = new Array<>();
+        Seq<Liquid> list = new Seq<>();
 
         for(Liquid item : content.liquids()){
             if(!item.isHidden() && filter.get(item)) list.add(item);

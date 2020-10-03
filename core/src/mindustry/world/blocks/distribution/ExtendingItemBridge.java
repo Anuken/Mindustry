@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import mindustry.graphics.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -15,51 +16,56 @@ public class ExtendingItemBridge extends ItemBridge{
         hasItems = true;
     }
 
-    @Override
-    public void drawLayer(Tile tile){
-        ItemBridgeEntity entity = tile.ent();
+    public class ExtendingItemBridgeBuild extends ItemBridgeBuild{
+        @Override
+        public void draw(){
+            Draw.rect(region, x, y);
 
-        Tile other = world.tile(entity.link);
-        if(!linkValid(tile, other)) return;
+            Draw.z(Layer.power);
 
-        int i = tile.absoluteRelativeTo(other.x, other.y);
+            Tile other = world.tile(link);
+            if(!linkValid(tile, other)) return;
 
-        float ex = other.worldx() - tile.worldx() - Geometry.d4[i].x * tilesize / 2f,
-        ey = other.worldy() - tile.worldy() - Geometry.d4[i].y * tilesize / 2f;
+            int i = tile.absoluteRelativeTo(other.x, other.y);
 
-        float uptime = state.isEditor() ? 1f : entity.uptime;
+            float ex = other.worldx() - x - Geometry.d4(i).x * tilesize / 2f,
+                ey = other.worldy() - y - Geometry.d4(i).y * tilesize / 2f;
 
-        ex *= uptime;
-        ey *= uptime;
+            float uptime = state.isEditor() ? 1f : this.uptime;
 
-        float opacity = Core.settings.getInt("bridgeopacity") / 100f;
-        if(Mathf.zero(opacity)) return;
-        Draw.alpha(opacity);
+            ex *= uptime;
+            ey *= uptime;
 
-        Lines.stroke(8f);
-        Lines.line(bridgeRegion,
-        tile.worldx() + Geometry.d4[i].x * tilesize / 2f,
-        tile.worldy() + Geometry.d4[i].y * tilesize / 2f,
-        tile.worldx() + ex,
-        tile.worldy() + ey, CapStyle.none, 0f);
+            float opacity = Core.settings.getInt("bridgeopacity") / 100f;
+            if(Mathf.zero(opacity)) return;
+            Draw.alpha(opacity);
 
-        Draw.rect(endRegion, tile.drawx(), tile.drawy(), i * 90 + 90);
-        Draw.rect(endRegion,
-        tile.worldx() + ex + Geometry.d4[i].x * tilesize / 2f,
-        tile.worldy() + ey + Geometry.d4[i].y * tilesize / 2f, i * 90 + 270);
+            Lines.stroke(8f);
+            Lines.line(bridgeRegion,
+            x + Geometry.d4(i).x * tilesize / 2f,
+            y + Geometry.d4(i).y * tilesize / 2f,
+            x + ex,
+            y + ey, false);
 
-        int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
+            Draw.rect(endRegion, x, y, i * 90 + 90);
+            Draw.rect(endRegion,
+            x + ex + Geometry.d4(i).x * tilesize / 2f,
+            y + ey + Geometry.d4(i).y * tilesize / 2f, i * 90 + 270);
 
-        int arrows = (dist) * tilesize / 6 - 1;
+            int dist = Math.max(Math.abs(other.x - tile.x), Math.abs(other.y - tile.y));
 
-        Draw.color();
+            int arrows = (dist) * tilesize / 6 - 1;
 
-        for(int a = 0; a < arrows; a++){
-            Draw.alpha(Mathf.absin(a / (float)arrows - entity.time / 100f, 0.1f, 1f) * uptime * opacity);
-            Draw.rect(arrowRegion,
-            tile.worldx() + Geometry.d4[i].x * (tilesize / 2f + a * 6f + 2) * uptime,
-            tile.worldy() + Geometry.d4[i].y * (tilesize / 2f + a * 6f + 2) * uptime, i * 90f);
+            Draw.color();
+
+            for(int a = 0; a < arrows; a++){
+                Draw.alpha(Mathf.absin(a / (float)arrows - time / 100f, 0.1f, 1f) * uptime * opacity);
+                Draw.rect(arrowRegion,
+                x + Geometry.d4(i).x * (tilesize / 2f + a * 6f + 2) * uptime,
+                y + Geometry.d4(i).y * (tilesize / 2f + a * 6f + 2) * uptime,
+                    i * 90f);
+            }
+            Draw.reset();
         }
-        Draw.reset();
     }
 }

@@ -1,16 +1,15 @@
 package mindustry.desktop.steam;
 
 import arc.*;
+import arc.func.*;
+import arc.struct.*;
+import arc.util.*;
+import arc.util.pooling.*;
 import com.codedisaster.steamworks.*;
 import com.codedisaster.steamworks.SteamFriends.*;
 import com.codedisaster.steamworks.SteamMatchmaking.*;
 import com.codedisaster.steamworks.SteamNetworking.*;
-import arc.struct.*;
-import arc.func.*;
-import arc.util.*;
-import arc.util.pooling.*;
-import mindustry.core.GameState.*;
-import mindustry.core.Version;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.net.ArcNetProvider.*;
@@ -68,7 +67,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                                     Connect c = new Connect();
                                     c.addressTCP = "steam:" + from.getAccountID();
 
-                                    Log.info("&bRecieved STEAM connection: {0}", c.addressTCP);
+                                    Log.info("&bReceived STEAM connection: @", c.addressTCP);
 
                                     steamConnections.put(from.getAccountID(), con);
                                     connections.add(con);
@@ -80,10 +79,14 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                                 Log.err(e);
                             }
                         }else if(currentServer != null && fromID == currentServer.getAccountID()){
-                            net.handleClientReceived(output);
+                            try{
+                                net.handleClientReceived(output);
+                            }catch(Throwable t){
+                                net.handleException(t);
+                            }
                         }
                     }catch(SteamException e){
-                        e.printStackTrace();
+                        Log.err(e);
                     }
                 }
             }
@@ -161,7 +164,9 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         smat.addRequestLobbyListResultCountFilter(32);
         smat.requestLobbyList();
         lobbyCallback = callback;
-        lobbyDoneCallback = done;
+
+        //after the steam lobby is done discovering, look for local network servers.
+        lobbyDoneCallback = () -> provider.discoverServers(callback, done);
     }
 
     @Override
@@ -174,7 +179,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         provider.hostServer(port);
         smat.createLobby(Core.settings.getBool("publichost") ? LobbyType.Public : LobbyType.FriendsOnly, Core.settings.getInt("playerlimit"));
 
-        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: {0}\nClient: {1}\nActive: {2}", net.server(), net.client(), net.active()))));
+        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
     }
 
     public void updateLobby(){
@@ -227,12 +232,12 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyInvite(SteamID steamIDUser, SteamID steamIDLobby, long gameID){
-        Log.info("onLobbyInvite {0} {1} {2}", steamIDLobby.getAccountID(), steamIDUser.getAccountID(), gameID);
+        Log.info("onLobbyInvite @ @ @", steamIDLobby.getAccountID(), steamIDUser.getAccountID(), gameID);
     }
 
     @Override
     public void onLobbyEnter(SteamID steamIDLobby, int chatPermissions, boolean blocked, ChatRoomEnterResponse response){
-        Log.info("enter lobby {0} {1}", steamIDLobby.getAccountID(), response);
+        Log.info("onLobbyEnter @ @", steamIDLobby.getAccountID(), response);
 
         if(response != ChatRoomEnterResponse.Success){
             ui.loadfrag.hide();
@@ -240,17 +245,24 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             return;
         }
 
-        if(net.active()){
-            net.disconnect();
-            net.closeServer();
-            logic.reset();
-            state.set(State.menu);
+        int version = Strings.parseInt(smat.getLobbyData(steamIDLobby, "version"), -1);
+
+        //check version
+        if(version != Version.build){
+            ui.loadfrag.hide();
+            ui.showInfo("[scarlet]" + (version > Version.build ? KickReason.clientOutdated : KickReason.serverOutdated).toString() + "\n[]" +
+                Core.bundle.format("server.versions", Version.build, version));
+            smat.leaveLobby(steamIDLobby);
+            return;
         }
+
+        logic.reset();
+        net.reset();
 
         currentLobby = steamIDLobby;
         currentServer = smat.getLobbyOwner(steamIDLobby);
 
-        Log.info("Connect to owner {0}: {1}", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
+        Log.info("Connect to owner @: @", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
 
         if(joinCallback != null){
             joinCallback.run();
@@ -263,7 +275,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         net.setClientConnected();
         net.handleClientReceived(con);
 
-        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: {0}\nClient: {1}\nActive: {2}", net.server(), net.client(), net.active()))));
+        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
     }
 
     @Override
@@ -273,7 +285,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyChatUpdate(SteamID lobby, SteamID who, SteamID changer, ChatMemberStateChange change){
-        Log.info("lobby {0}: {1} caused {2}'s change: {3}", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
+        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
             if(net.client()){
                 //host left, leave as well
@@ -300,14 +312,15 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyMatchList(int matches){
-        Log.info("found {0} matches {1}", matches, lobbyDoneCallback);
+        Log.info("found @ matches @", matches, lobbyDoneCallback);
 
         if(lobbyDoneCallback != null){
-            Array<Host> hosts = new Array<>();
+            Seq<Host> hosts = new Seq<>();
             for(int i = 0; i < matches; i++){
                 try{
                     SteamID lobby = smat.getLobbyByIndex(i);
                     Host out = new Host(
+                        -1, //invalid ping
                         smat.getLobbyData(lobby, "name"),
                         "steam:" + lobby.handle(),
                         smat.getLobbyData(lobby, "mapname"),
@@ -317,7 +330,8 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                         smat.getLobbyData(lobby, "versionType"),
                         Gamemode.valueOf(smat.getLobbyData(lobby, "gamemode")),
                         smat.getLobbyMemberLimit(lobby),
-                        ""
+                        "",
+                        null
                     );
                     hosts.add(out);
                 }catch(Exception e){
@@ -334,26 +348,26 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onLobbyKicked(SteamID steamID, SteamID steamID1, boolean b){
-        Log.info("Kicked: {0} {1} {2}", steamID, steamID1, b);
+        Log.info("Kicked: @ @ @", steamID, steamID1, b);
     }
 
     @Override
     public void onLobbyCreated(SteamResult result, SteamID steamID){
         if(!net.server()){
-            Log.info("Lobby created on server: {0}, ignoring.", steamID);
+            Log.info("Lobby created on server: @, ignoring.", steamID);
             return;
         }
 
-        Log.info("Lobby {1} created? {0}", result, steamID.getAccountID());
+        Log.info("Lobby @ created? @", result, steamID.getAccountID());
         if(result == SteamResult.OK){
             currentLobby = steamID;
 
             smat.setLobbyData(steamID, "name", player.name);
-            smat.setLobbyData(steamID, "mapname", world.getMap() == null ? "Unknown" : state.rules.zone == null ? world.getMap().name() : state.rules.zone.localizedName);
+            smat.setLobbyData(steamID, "mapname", state.map.name());
             smat.setLobbyData(steamID, "version", Version.build + "");
             smat.setLobbyData(steamID, "versionType", Version.type);
             smat.setLobbyData(steamID, "wave", state.wave + "");
-            smat.setLobbyData(steamID, "gamemode", Gamemode.bestFit(state.rules).name() + "");
+            smat.setLobbyData(steamID, "gamemode", state.rules.mode().name() + "");
         }
     }
 
@@ -372,17 +386,17 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public void onP2PSessionConnectFail(SteamID steamIDRemote, P2PSessionError sessionError){
         if(net.server()){
-            Log.info("{0} has disconnected: {1}", steamIDRemote.getAccountID(), sessionError);
+            Log.info("@ has disconnected: @", steamIDRemote.getAccountID(), sessionError);
             disconnectSteamUser(steamIDRemote);
         }else if(steamIDRemote.equals(currentServer)){
-            Log.info("Disconnected! {1}: {0}", steamIDRemote.getAccountID(), sessionError);
+            Log.info("Disconnected! @: @", steamIDRemote.getAccountID(), sessionError);
             net.handleClientReceived(new Disconnect());
         }
     }
 
     @Override
     public void onP2PSessionRequest(SteamID steamIDRemote){
-        Log.info("Connection request: {0}", steamIDRemote.getAccountID());
+        Log.info("Connection request: @", steamIDRemote.getAccountID());
         if(net.server()){
             Log.info("Am server, accepting request from " + steamIDRemote.getAccountID());
             snet.acceptP2PSessionWithUser(steamIDRemote);
@@ -406,7 +420,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onGameLobbyJoinRequested(SteamID lobby, SteamID steamIDFriend){
-        Log.info("onGameLobbyJoinRequested {0} {1}", lobby, steamIDFriend);
+        Log.info("onGameLobbyJoinRequested @ @", lobby, steamIDFriend);
         smat.joinLobby(lobby);
     }
 
@@ -422,7 +436,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
 
     @Override
     public void onGameRichPresenceJoinRequested(SteamID steamID, String connect){
-        Log.info("onGameRichPresenceJoinRequested {0} {1}", steamID, connect);
+        Log.info("onGameRichPresenceJoinRequested @ @", steamID, connect);
     }
 
     @Override
@@ -437,7 +451,7 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         public SteamConnection(SteamID sid){
             super(sid.getAccountID() + "");
             this.sid = sid;
-            Log.info("Create STEAM client {0}", sid.getAccountID());
+            Log.info("Create STEAM client @", sid.getAccountID());
         }
 
         @Override

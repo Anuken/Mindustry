@@ -1,5 +1,7 @@
 package mindustry.type;
 
+import mindustry.content.*;
+
 public class LiquidStack{
     public Liquid liquid;
     public float amount;
@@ -11,7 +13,7 @@ public class LiquidStack{
 
     /** serialization only*/
     protected LiquidStack(){
-
+        liquid = Liquids.water;
     }
 
     @Override

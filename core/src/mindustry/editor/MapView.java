@@ -1,28 +1,26 @@
 package mindustry.editor;
 
-import arc.Core;
-import arc.graphics.Color;
+import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.input.GestureDetector;
-import arc.input.GestureDetector.GestureListener;
-import arc.input.KeyCode;
-import arc.math.Mathf;
+import arc.input.*;
+import arc.input.GestureDetector.*;
+import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.Element;
+import arc.scene.*;
 import arc.scene.event.*;
-import arc.scene.ui.TextField;
-import arc.scene.ui.layout.Scl;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.graphics.Pal;
-import mindustry.input.Binding;
-import mindustry.ui.GridImage;
+import mindustry.graphics.*;
+import mindustry.input.*;
+import mindustry.ui.*;
 
-import static mindustry.Vars.mobile;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 public class MapView extends Element implements GestureListener{
     private MapEditor editor;
-    private EditorTool tool = EditorTool.pencil;
+    EditorTool tool = EditorTool.pencil;
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
@@ -31,11 +29,11 @@ public class MapView extends Element implements GestureListener{
     private Rect rect = new Rect();
     private Vec2[][] brushPolygons = new Vec2[MapEditor.brushSizes.length][0];
 
-    private boolean drawing;
-    private int lastx, lasty;
-    private int startx, starty;
-    private float mousex, mousey;
-    private EditorTool lastTool;
+    boolean drawing;
+    int lastx, lasty;
+    int startx, starty;
+    float mousex, mousey;
+    EditorTool lastTool;
 
     public MapView(MapEditor editor){
         this.editor = editor;
@@ -46,7 +44,7 @@ public class MapView extends Element implements GestureListener{
         }
 
         Core.input.getInputProcessors().insert(0, new GestureDetector(20, 0.5f, 2, 0.15f, this));
-        touchable(Touchable.enabled);
+        this.touchable = Touchable.enabled;
 
         Point2 firstTouch = new Point2();
 
@@ -72,11 +70,16 @@ public class MapView extends Element implements GestureListener{
                     return false;
                 }
 
-                if(!mobile && button != KeyCode.MOUSE_LEFT && button != KeyCode.MOUSE_MIDDLE){
+                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
                     return true;
                 }
+                
+                if(button == KeyCode.mouseRight){
+                    lastTool = tool;
+                    tool = EditorTool.eraser;
+                }
 
-                if(button == KeyCode.MOUSE_MIDDLE){
+                if(button == KeyCode.mouseMiddle){
                     lastTool = tool;
                     tool = EditorTool.zoom;
                 }
@@ -102,7 +105,7 @@ public class MapView extends Element implements GestureListener{
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
-                if(!mobile && button != KeyCode.MOUSE_LEFT && button != KeyCode.MOUSE_MIDDLE){
+                if(!mobile && button != KeyCode.mouseLeft && button != KeyCode.mouseMiddle && button != KeyCode.mouseRight){
                     return;
                 }
 
@@ -117,7 +120,7 @@ public class MapView extends Element implements GestureListener{
 
                 editor.flushOp();
 
-                if(button == KeyCode.MOUSE_MIDDLE && lastTool != null){
+                if((button == KeyCode.mouseMiddle || button == KeyCode.mouseRight) && lastTool != null){
                     tool = lastTool;
                     lastTool = null;
                 }
@@ -172,26 +175,26 @@ public class MapView extends Element implements GestureListener{
     public void act(float delta){
         super.act(delta);
 
-        if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) && !Core.input.keyDown(KeyCode.CONTROL_LEFT)){
+        if(Core.scene.getKeyboardFocus() == null || !(Core.scene.getKeyboardFocus() instanceof TextField) && !Core.input.keyDown(KeyCode.controlLeft)){
             float ax = Core.input.axis(Binding.move_x);
             float ay = Core.input.axis(Binding.move_y);
             offsetx -= ax * 15f / zoom;
             offsety -= ay * 15f / zoom;
         }
 
-        if(Core.input.keyTap(KeyCode.SHIFT_LEFT)){
+        if(Core.input.keyTap(KeyCode.shiftLeft)){
             lastTool = tool;
             tool = EditorTool.pick;
         }
 
-        if(Core.input.keyRelease(KeyCode.SHIFT_LEFT) && lastTool != null){
+        if(Core.input.keyRelease(KeyCode.shiftLeft) && lastTool != null){
             tool = lastTool;
             lastTool = null;
         }
 
         if(Core.scene.getScrollFocus() != this) return;
 
-        zoom += Core.input.axis(KeyCode.SCROLL) / 10f * zoom;
+        zoom += Core.input.axis(KeyCode.scroll) / 10f * zoom;
         clampZoom();
     }
 
@@ -199,7 +202,7 @@ public class MapView extends Element implements GestureListener{
         zoom = Mathf.clamp(zoom, 0.2f, 20f);
     }
 
-    private Point2 project(float x, float y){
+    Point2 project(float x, float y){
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
@@ -208,9 +211,9 @@ public class MapView extends Element implements GestureListener{
         y = (y - getHeight() / 2 + sclheight / 2 - offsety * zoom) / sclheight * editor.height();
 
         if(editor.drawBlock.size % 2 == 0 && tool != EditorTool.eraser){
-            return Tmp.g1.set((int)(x - 0.5f), (int)(y - 0.5f));
+            return Tmp.p1.set((int)(x - 0.5f), (int)(y - 0.5f));
         }else{
-            return Tmp.g1.set((int)x, (int)y);
+            return Tmp.p1.set((int)x, (int)y);
         }
     }
 
@@ -236,21 +239,27 @@ public class MapView extends Element implements GestureListener{
 
         image.setImageSize(editor.width(), editor.height());
 
-        if(!ScissorStack.pushScissors(rect.set(x, y, width, height))){
+        if(!ScissorStack.push(rect.set(x, y, width, height))){
             return;
         }
 
         Draw.color(Pal.remove);
         Lines.stroke(2f);
         Lines.rect(centerx - sclwidth / 2 - 1, centery - sclheight / 2 - 1, sclwidth + 2, sclheight + 2);
-        editor.renderer().draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
+        editor.renderer.draw(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
         Draw.reset();
 
         if(grid){
             Draw.color(Color.gray);
             image.setBounds(centerx - sclwidth / 2, centery - sclheight / 2, sclwidth, sclheight);
             image.draw();
-            Draw.color();
+
+            Lines.stroke(3f);
+            Draw.color(Pal.accent);
+            Lines.line(centerx - sclwidth/2f, centery, centerx + sclwidth/2f, centery);
+            Lines.line(centerx, centery - sclheight/2f, centerx, centery + sclheight/2f);
+
+            Draw.reset();
         }
 
         int index = 0;
@@ -304,7 +313,7 @@ public class MapView extends Element implements GestureListener{
         Lines.rect(x, y, width, height);
         Draw.reset();
 
-        ScissorStack.popScissors();
+        ScissorStack.pop();
     }
 
     private boolean active(){

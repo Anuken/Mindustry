@@ -1,19 +1,19 @@
 package mindustry.maps.filters;
 
-import mindustry.content.Blocks;
-import mindustry.maps.filters.FilterOption.BlockOption;
-import mindustry.maps.filters.FilterOption.SliderOption;
-import mindustry.world.Block;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.maps.filters.FilterOption.*;
+import mindustry.world.*;
 
-import static mindustry.maps.filters.FilterOption.floorsOnly;
-import static mindustry.maps.filters.FilterOption.wallsOnly;
+import static mindustry.maps.filters.FilterOption.*;
 
 public class RiverNoiseFilter extends GenerateFilter{
     float scl = 40, threshold = 0f, threshold2 = 0.1f;
-    Block floor = Blocks.water, floor2 = Blocks.deepwater, block = Blocks.sandRocks;
+    Block floor = Blocks.water, floor2 = Blocks.deepwater, block = Blocks.sandWall;
 
-    {
-        options(
+    @Override
+    public FilterOption[] options(){
+        return Structs.arr(
         new SliderOption("scale", () -> scl, f -> scl = f, 1f, 500f),
         new SliderOption("threshold", () -> threshold, f -> threshold = f, -1f, 0.3f),
         new SliderOption("threshold2", () -> threshold2, f -> threshold2 = f, -1f, 0.3f),

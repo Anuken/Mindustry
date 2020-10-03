@@ -1,22 +1,21 @@
 package mindustry.entities.bullet;
 
-import arc.math.geom.Rect;
-import arc.util.Time;
-import mindustry.content.Fx;
-import mindustry.entities.Units;
-import mindustry.entities.type.Bullet;
+import arc.util.*;
+import mindustry.content.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
 
 public class FlakBulletType extends BasicBulletType{
-    protected static Rect rect = new Rect();
-    protected float explodeRange = 30f;
+    public float explodeRange = 30f;
 
     public FlakBulletType(float speed, float damage){
         super(speed, damage, "shell");
         splashDamage = 15f;
         splashDamageRadius = 34f;
         hitEffect = Fx.flakExplosionBig;
-        bulletWidth = 8f;
-        bulletHeight = 10f;
+        width = 8f;
+        height = 10f;
+        collidesGround = false;
     }
 
     public FlakBulletType(){
@@ -26,16 +25,16 @@ public class FlakBulletType extends BasicBulletType{
     @Override
     public void update(Bullet b){
         super.update(b);
-        if(b.getData() instanceof Integer) return;
+        if(b.data() instanceof Integer) return;
 
-        if(b.timer.get(2, 6)){
-            Units.nearbyEnemies(b.getTeam(), rect.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
-                if(b.getData() instanceof Float) return;
+        if(b.timer(2, 6)){
+            Units.nearbyEnemies(b.team, Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
+                if(b.data() instanceof Float || !unit.checkTarget(collidesAir, collidesGround)) return;
 
                 if(unit.dst(b) < explodeRange){
-                    b.setData(0);
+                    b.data(0);
                     Time.run(5f, () -> {
-                        if(b.getData() instanceof Integer){
+                        if(b.data() instanceof Integer){
                             b.time(b.lifetime());
                         }
                     });

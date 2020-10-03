@@ -8,6 +8,7 @@ import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
+import mindustry.world.blocks.power.ItemLiquidGenerator.*;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
@@ -26,7 +27,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
     private ItemLiquidGenerator generator;
     private Tile tile;
-    private ItemLiquidGenerator.ItemLiquidGeneratorEntity entity;
+    private ItemLiquidGeneratorBuild entity;
     private final float fakeItemDuration = 60f; //ticks
     private final float maximumLiquidUsage = 0.5f;
 
@@ -38,6 +39,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
                 powerProduction = 0.1f;
                 itemDuration = fakeItemDuration;
                 maxLiquidGenerate = maximumLiquidUsage;
+                buildType = ItemLiquidGeneratorBuild::new;
             }
 
             @Override
@@ -52,7 +54,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         };
 
         tile = createFakeTile(0, 0, generator);
-        entity = tile.ent();
+        entity = tile.bc();
     }
 
     /** Tests the consumption and efficiency when being supplied with liquids. */
@@ -82,16 +84,16 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         final float baseEfficiency = liquid.flammability;
         final float expectedEfficiency = Math.min(1.0f, availableLiquidAmount / maximumLiquidUsage) * baseEfficiency;
         final float expectedConsumptionPerTick = Math.min(maximumLiquidUsage, availableLiquidAmount);
-        final float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick * Time.delta());
+        final float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick * Time.delta);
 
         createGenerator(inputType);
-        assertTrue(generator.acceptLiquid(tile, null, liquid, availableLiquidAmount), inputType + " | " + parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
+        assertTrue(entity.acceptLiquid(null, liquid, availableLiquidAmount), inputType + " | " + parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
         entity.liquids.add(liquid, availableLiquidAmount);
         entity.cons.update();
 
         // Perform an update on the generator once - This should use up any resource up to the maximum liquid usage
-        generator.update(tile);
+        entity.updateTile();
 
         assertEquals(expectedRemainingLiquidAmount, entity.liquids.get(liquid), inputType + " | " + parameterDescription + ": Remaining liquid amount mismatch.");
         assertEquals(expectedEfficiency, entity.productionEfficiency, inputType + " | " + parameterDescription + ": Efficiency mismatch.");
@@ -127,7 +129,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         final float expectedRemainingItemAmount = Math.max(0, amount - 1);
 
         createGenerator(inputType);
-        assertTrue(generator.acceptItem(item, tile, null), inputType + " | " + parameterDescription + ": Items which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
+        assertTrue(entity.acceptItem(null, item), inputType + " | " + parameterDescription + ": Items which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
         if(amount > 0){
             entity.items.add(item, amount);
@@ -136,7 +138,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
 
         // Perform an update on the generator once - This should use up one or zero items - dependent on if the item is accepted and available or not.
         try{
-            generator.update(tile);
+            entity.updateTile();
 
             assertEquals(expectedRemainingItemAmount, entity.items.get(item), inputType + " | " + parameterDescription + ": Remaining item amount mismatch.");
             assertEquals(expectedEfficiency, entity.productionEfficiency, inputType + " | " + parameterDescription + ": Efficiency mismatch.");
@@ -164,16 +166,16 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         // Burn a single coal and test for the duration
         entity.items.add(Items.coal, 1);
         entity.cons.update();
-        generator.update(tile);
+        entity.updateTile();
 
         float expectedEfficiency = entity.productionEfficiency;
 
         float currentDuration = 0.0f;
-        while((currentDuration += Time.delta()) <= fakeItemDuration){
-            generator.update(tile);
+        while((currentDuration += Time.delta) <= fakeItemDuration){
+            entity.updateTile();
             assertEquals(expectedEfficiency, entity.productionEfficiency, "Duration: " + currentDuration);
         }
-        generator.update(tile);
+        entity.updateTile();
         assertEquals(0.0f, entity.productionEfficiency, "Duration: " + currentDuration);
     }
 

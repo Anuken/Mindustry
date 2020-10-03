@@ -1,9 +1,11 @@
 package mindustry.net;
 
+import arc.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.core.*;
-import mindustry.entities.type.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.maps.Map;
 import mindustry.net.Administration.*;
@@ -20,13 +22,13 @@ public class NetworkIO{
 
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(JsonIO.write(state.rules));
-            SaveIO.getSaveWriter().writeStringMap(stream, world.getMap().tags);
+            SaveIO.getSaveWriter().writeStringMap(stream, state.map.tags);
 
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
 
             stream.writeInt(player.id);
-            player.write(stream);
+            player.write(Writes.get(stream));
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
@@ -40,16 +42,16 @@ public class NetworkIO{
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
-            world.setMap(new Map(SaveIO.getSaveWriter().readStringMap(stream)));
+            state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
 
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
 
-            entities.clear();
+            Groups.clear();
             int id = stream.readInt();
-            player.resetNoAdd();
-            player.read(stream);
-            player.resetID(id);
+            player.reset();
+            player.read(Reads.get(stream));
+            player.id = id;
             player.add();
 
             SaveIO.getSaveWriter().readContentHeader(stream);
@@ -64,26 +66,29 @@ public class NetworkIO{
     public static ByteBuffer writeServerData(){
         String name = (headless ? Config.name.string() : player.name);
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
-        String map = world.getMap() == null ? "None" : world.getMap().name();
+        String map = state.map.name();
 
-        ByteBuffer buffer = ByteBuffer.allocate(512);
+        ByteBuffer buffer = ByteBuffer.allocate(500);
 
         writeString(buffer, name, 100);
-        writeString(buffer, map);
+        writeString(buffer, map, 64);
 
-        buffer.putInt(playerGroup.size());
+        buffer.putInt(Core.settings.getInt("totalPlayers", Groups.player.size()));
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);
 
-        buffer.put((byte)Gamemode.bestFit(state.rules).ordinal());
+        buffer.put((byte)state.rules.mode().ordinal());
         buffer.putInt(netServer.admins.getPlayerLimit());
 
         writeString(buffer, description, 100);
+        if(state.rules.modeName != null){
+            writeString(buffer, state.rules.modeName, 50);
+        }
         return buffer;
     }
 
-    public static Host readServerData(String hostAddress, ByteBuffer buffer){
+    public static Host readServerData(int ping, String hostAddress, ByteBuffer buffer){
         String host = readString(buffer);
         String map = readString(buffer);
         int players = buffer.getInt();
@@ -93,8 +98,9 @@ public class NetworkIO{
         Gamemode gamemode = Gamemode.all[buffer.get()];
         int limit = buffer.getInt();
         String description = readString(buffer);
+        String modeName = readString(buffer);
 
-        return new Host(host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description);
+        return new Host(ping, host, hostAddress, map, wave, players, version, vertype, gamemode, limit, description, modeName.isEmpty() ? null : modeName);
     }
 
     private static void writeString(ByteBuffer buffer, String string, int maxlen){

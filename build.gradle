@@ -25,18 +25,18 @@ buildscript{
 }
 
 allprojects{
-    version = 'release'
     apply plugin: 'maven'
+    
+    version = 'release'
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '5'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        versionNumber = '6'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'alpha'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.8'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
+        rhinoVersion = '8437435dab9993769d72739608580d40c5343285'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -107,6 +107,7 @@ allprojects{
                 output += other.name.substring("bundle".length() + 1, other.name.lastIndexOf('.')) + "\n"
             }
             new File(project(':core').projectDir, 'assets/locales').text = output
+            new File(project(':core').projectDir, 'assets/basepartnames').text = new File(project(':core').projectDir, 'assets/baseparts/').list().join("\n")
         }
 
         writeVersion = {
@@ -146,6 +147,20 @@ allprojects{
 
             processorFile.text = text.toString().replace(".java", "").replace("/", ".").replace("\\", ".")
         }
+
+        writePlugins = {
+            new File(rootDir, "annotations/src/main/resources/META-INF/services/").mkdirs()
+            def processorFile = new File(rootDir, "annotations/src/main/resources/META-INF/services/com.sun.source.util.Plugin")
+            def text = new StringBuilder()
+            def files = new File(rootDir, "annotations/src/main/java")
+            files.eachFileRecurse(groovy.io.FileType.FILES){ file ->
+                if(file.name.endsWith(".java") && (file.text.contains(" implements Plugin"))){
+                    text.append(file.path.substring(files.path.length() + 1)).append("\n")
+                }
+            }
+
+            processorFile.text = text.toString().replace(".java", "").replace("/", ".").replace("\\", ".")
+        }
     }
 
     repositories{
@@ -157,24 +172,58 @@ allprojects{
         jcenter()
     }
 
-    tasks.withType(Javadoc).all{ enabled = false }
+    tasks.withType(JavaCompile){
+        targetCompatibility = 8
+        sourceCompatibility = 14
+        options.encoding = "UTF-8"
+        options.compilerArgs += ["-Xlint:deprecation"]
+    }
+}
+
+configure(project(":annotations")){
+    tasks.withType(JavaCompile){
+        targetCompatibility = 8
+        sourceCompatibility = 8
+    }
+}
+
+//compile with java 8 compatibility for everything except the annotation project
+configure(subprojects - project(":annotations")){
+    tasks.withType(JavaCompile){
+        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+            options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
+        }
+
+        doFirst{
+            options.compilerArgs = options.compilerArgs.findAll{it != '--enable-preview' }
+        }
+    }
+
+    tasks.withType(Javadoc){
+        options{
+            addStringOption('Xdoclint:none', '-quiet')
+            addBooleanOption('-enable-preview', true)
+            addStringOption('-release', '14')
+        }
+    }
 }
 
 project(":desktop"){
     apply plugin: "java"
 
+    compileJava.options.fork = true
+
     dependencies{
-        compile project(":core")
+        implementation project(":core")
+        implementation arcModule("natives:natives-desktop")
+        implementation arcModule("natives:natives-freetype-desktop")
+        implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
 
-        if(debugged()) compile project(":debug")
+        if(debugged()) implementation project(":debug")
 
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+        implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
-        compile "com.github.Anuken:steamworks4j:$steamworksVersion"
-
-        compile arcModule("backends:backend-sdl")
-        compile 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
+        implementation arcModule("backends:backend-sdl")
     }
 }
 
@@ -200,45 +249,42 @@ project(":ios"){
     }
 
     dependencies{
-        compile project(":core")
+        implementation project(":core")
+
+        implementation arcModule("natives:natives-ios")
+        implementation arcModule("natives:natives-freetype-ios")
+        implementation arcModule("backends:backend-robovm")
+
         compileOnly project(":annotations")
-
-        compile arcModule("backends:backend-robovm")
-
-        compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
-        compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios"
     }
 }
 
 project(":core"){
-    apply plugin: "java"
+    apply plugin: "java-library"
 
     task preGen{
         outputs.upToDateWhen{ false }
         generateLocales()
         writeVersion()
         writeProcessors()
+        writePlugins()
     }
 
     task copyChangelog{
         doLast{
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
-            def buildVersion = props["build"]
             def loglines = file("../changelog").text.split("\n")
             def maxLength = 460
 
             def androidLogList = loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
             def result = ""
-            androidLogList.forEach({line ->
+            androidLogList.forEach{line ->
                 if(result.length() + line.length() + 1 < maxLength){
                     result += line + "\n"
                 }
-            })
+            }
             def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
-            new File(changelogs, buildVersion + ".txt").text = (result)
             new File(changelogs, androidVersion + ".txt").text = (result)
         }
     }
@@ -246,15 +292,19 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        compile "org.lz4:lz4-java:1.4.1"
-        compile arcModule("arc-core")
-        compile arcModule("extensions:freetype")
-        compile arcModule("extensions:arcnet")
-        compile "org.mozilla:rhino:1.7.11"
-        if(localArc() && debugged()) compile arcModule("extensions:recorder")
+        api "org.lz4:lz4-java:1.4.1"
+        api arcModule("arc-core")
+        api arcModule("extensions:freetype")
+        api arcModule("extensions:g3d")
+        api arcModule("extensions:fx")
+        api arcModule("extensions:arcnet")
+        api "com.github.Anuken:rhino:$rhinoVersion"
+        if(localArc() && debugged()) api arcModule("extensions:recorder")
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
+        annotationProcessor 'com.github.Anuken:jabel:40eec868af'
+
     }
 }
 
@@ -262,8 +312,8 @@ project(":server"){
     apply plugin: "java"
 
     dependencies{
-        compile project(":core")
-        compile arcModule("backends:backend-headless")
+        implementation project(":core")
+        implementation arcModule("backends:backend-headless")
     }
 }
 
@@ -274,13 +324,17 @@ project(":tests"){
         testImplementation project(":core")
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
+        testImplementation arcModule("backends:backend-headless")
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
-        compile arcModule("backends:backend-headless")
     }
 
     test{
         useJUnitPlatform()
         workingDir = new File("../core/assets")
+        testLogging {
+            exceptionFormat = 'full'
+            showStandardStreams = true
+        }
     }
 }
 
@@ -288,30 +342,28 @@ project(":tools"){
     apply plugin: "java"
 
     dependencies{
-        compile project(":core")
+        implementation project(":core")
 
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        compile "org.reflections:reflections:0.9.12"
-
-        compile arcModule("backends:backend-sdl")
+        implementation arcModule("natives:natives-desktop")
+        implementation arcModule("natives:natives-freetype-desktop")
+        implementation arcModule("backends:backend-headless")
     }
 }
 
 project(":annotations"){
-    apply plugin: "java"
+    apply plugin: "java-library"
 
     dependencies{
-        compile 'com.squareup:javapoet:1.12.1'
-        compile "com.github.Anuken.Arc:arc-core:$arcHash"
-        compile files("${System.getProperty('java.home')}/../lib/tools.jar")
+        implementation 'com.squareup:javapoet:1.12.1'
+        implementation "com.github.Anuken.Arc:arc-core:$arcHash"
+        implementation files("${System.getProperty('java.home')}/../lib/tools.jar")
     }
 }
 
 task deployAll{
     task cleanDeployOutput{
         doFirst{
-            if("${getBuildVersion()}" == "custom build" || "${getBuildVersion()}" == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
+            if(getBuildVersion() == "custom build" || getBuildVersion() == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
             if(!project.hasProperty("release")) throw new IllegalArgumentException("----\n\nSET THE RELEASE PROJECT PROPERTY FIRST!\n\n----")
 
             delete{

@@ -1,14 +1,12 @@
 package mindustry.entities;
 
-import arc.struct.Array;
-import arc.math.Mathf;
+import arc.math.*;
 import arc.math.geom.*;
-import mindustry.entities.traits.Entity;
-import mindustry.entities.traits.SolidTrait;
-import mindustry.world.Tile;
+import arc.struct.*;
+import mindustry.gen.*;
+import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class EntityCollisions{
     //range for tile collision scanning
@@ -24,15 +22,26 @@ public class EntityCollisions{
     private Rect r2 = new Rect();
 
     //entity collisions
-    private Array<SolidTrait> arrOut = new Array<>();
+    private Seq<Hitboxc> arrOut = new Seq<>();
 
-    public void move(SolidTrait entity, float deltax, float deltay){
+    public void moveCheck(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
+        if(!solidCheck.solid(entity.tileX(), entity.tileY())){
+            move(entity, deltax, deltay, solidCheck);
+        }
+    }
+
+    public void move(Hitboxc entity, float deltax, float deltay){
+        move(entity, deltax, deltay, EntityCollisions::solid);
+    }
+
+    public void move(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
+        if(Math.abs(deltax) < 0.0001f & Math.abs(deltay)  < 0.0001f) return;
 
         boolean movedx = false;
 
         while(Math.abs(deltax) > 0 || !movedx){
             movedx = true;
-            moveDelta(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, true);
+            moveDelta(entity, Math.min(Math.abs(deltax), seg) * Mathf.sign(deltax), 0, true, solidCheck);
 
             if(Math.abs(deltax) >= seg){
                 deltax -= seg * Mathf.sign(deltax);
@@ -45,7 +54,7 @@ public class EntityCollisions{
 
         while(Math.abs(deltay) > 0 || !movedy){
             movedy = true;
-            moveDelta(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), false);
+            moveDelta(entity, 0, Math.min(Math.abs(deltay), seg) * Mathf.sign(deltay), false, solidCheck);
 
             if(Math.abs(deltay) >= seg){
                 deltay -= seg * Mathf.sign(deltay);
@@ -55,33 +64,30 @@ public class EntityCollisions{
         }
     }
 
-    public void moveDelta(SolidTrait entity, float deltax, float deltay, boolean x){
-
-        Rect rect = r1;
-        entity.hitboxTile(rect);
+    public void moveDelta(Hitboxc entity, float deltax, float deltay, boolean x, SolidPred solidCheck){
+        entity.hitboxTile(r1);
         entity.hitboxTile(r2);
-        rect.x += deltax;
-        rect.y += deltay;
+        r1.x += deltax;
+        r1.y += deltay;
 
-        int tilex = Math.round((rect.x + rect.width / 2) / tilesize), tiley = Math.round((rect.y + rect.height / 2) / tilesize);
+        int tilex = Math.round((r1.x + r1.width / 2) / tilesize), tiley = Math.round((r1.y + r1.height / 2) / tilesize);
 
         for(int dx = -r; dx <= r; dx++){
             for(int dy = -r; dy <= r; dy++){
                 int wx = dx + tilex, wy = dy + tiley;
-                if(solid(wx, wy) && entity.collidesGrid(wx, wy)){
+                if(solidCheck.solid(wx, wy)){
                     tmp.setSize(tilesize).setCenter(wx * tilesize, wy * tilesize);
 
-                    if(tmp.overlaps(rect)){
-                        Vec2 v = Geometry.overlap(rect, tmp, x);
-                        rect.x += v.x;
-                        rect.y += v.y;
+                    if(tmp.overlaps(r1)){
+                        Vec2 v = Geometry.overlap(r1, tmp, x);
+                        if(x) r1.x += v.x;
+                        if(!x) r1.y += v.y;
                     }
                 }
             }
         }
 
-        entity.setX(entity.getX() + rect.x - r2.x);
-        entity.setY(entity.getY() + rect.y - r2.y);
+        entity.trns(r1.x - r2.x, r1.y - r2.y);
     }
 
     public boolean overlapsTile(Rect rect){
@@ -108,44 +114,48 @@ public class EntityCollisions{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Entity> void updatePhysics(EntityGroup<T> group){
+    public <T extends Hitboxc> void updatePhysics(EntityGroup<T> group){
 
         QuadTree tree = group.tree();
         tree.clear();
 
-        for(Entity entity : group.all()){
-            if(entity instanceof SolidTrait){
-                SolidTrait s = (SolidTrait)entity;
-                s.lastPosition().set(s.getX(), s.getY());
-                tree.insert(s);
-            }
-        }
+        group.each(s -> {
+            s.updateLastPosition();
+            tree.insert(s);
+        });
     }
 
-    private static boolean solid(int x, int y){
+    public static boolean legsSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile != null && tile.solid();
+        return tile == null || tile.staticDarkness() >= 2;
     }
 
-    private void checkCollide(Entity entity, Entity other){
+    public static boolean waterSolid(int x, int y){
+        Tile tile = world.tile(x, y);
+        return tile == null || (tile.solid() || !tile.floor().isLiquid);
+    }
 
-        SolidTrait a = (SolidTrait)entity;
-        SolidTrait b = (SolidTrait)other;
+    public static boolean solid(int x, int y){
+        Tile tile = world.tile(x, y);
+        return tile == null || tile.solid();
+    }
+
+    private void checkCollide(Hitboxc a, Hitboxc b){
 
         a.hitbox(this.r1);
         b.hitbox(this.r2);
 
-        r1.x += (a.lastPosition().x - a.getX());
-        r1.y += (a.lastPosition().y - a.getY());
-        r2.x += (b.lastPosition().x - b.getX());
-        r2.y += (b.lastPosition().y - b.getY());
+        r1.x += (a.lastX() - a.getX());
+        r1.y += (a.lastY() - a.getY());
+        r2.x += (b.lastX() - b.getX());
+        r2.y += (b.lastY() - b.getY());
 
-        float vax = a.getX() - a.lastPosition().x;
-        float vay = a.getY() - a.lastPosition().y;
-        float vbx = b.getX() - b.lastPosition().x;
-        float vby = b.getY() - b.lastPosition().y;
+        float vax = a.getX() - a.lastX();
+        float vay = a.getY() - a.lastY();
+        float vbx = b.getX() - b.lastX();
+        float vby = b.getY() - b.lastY();
 
-        if(a != b && a.collides(b) && b.collides(a)){
+        if(a != b && a.collides(b)){
             l1.set(a.getX(), a.getY());
             boolean collide = r1.overlaps(r2) || collide(r1.x, r1.y, r1.width, r1.height, vax, vay,
             r2.x, r2.y, r2.width, r2.height, vbx, vby, l1);
@@ -207,30 +217,33 @@ public class EntityCollisions{
     }
 
     @SuppressWarnings("unchecked")
-    public void collideGroups(EntityGroup<?> groupa, EntityGroup<?> groupb){
+    public <T extends Hitboxc> void collide(EntityGroup<T> groupa){
 
-        for(Entity entity : groupa.all()){
-            if(!(entity instanceof SolidTrait))
-                continue;
-
-            SolidTrait solid = (SolidTrait)entity;
-
+        groupa.each(solid -> {
             solid.hitbox(r1);
-            r1.x += (solid.lastPosition().x - solid.getX());
-            r1.y += (solid.lastPosition().y - solid.getY());
+            r1.x += (solid.lastX() - solid.getX());
+            r1.y += (solid.lastY() - solid.getY());
 
             solid.hitbox(r2);
             r2.merge(r1);
 
             arrOut.clear();
-            groupb.tree().getIntersect(arrOut, r2);
 
-            for(SolidTrait sc : arrOut){
+            //get all targets based on what entity wants to collide with
+            solid.getCollisions(tree -> tree.intersect(r2, arrOut));
+
+            for(Hitboxc sc : arrOut){
                 sc.hitbox(r1);
                 if(r2.overlaps(r1)){
-                    checkCollide(entity, sc);
+                    checkCollide(solid, sc);
+                    //break out of loop when this object hits something
+                    if(!solid.isAdded()) return;
                 }
             }
-        }
+        });
+    }
+
+    public interface SolidPred{
+        boolean solid(int x, int y);
     }
 }

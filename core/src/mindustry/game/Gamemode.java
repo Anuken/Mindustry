@@ -11,26 +11,26 @@ public enum Gamemode{
     survival(rules -> {
         rules.waveTimer = true;
         rules.waves = true;
-        rules.unitDrops = true;
     }, map -> map.spawns > 0),
     sandbox(rules -> {
         rules.infiniteResources = true;
         rules.waves = true;
         rules.waveTimer = false;
-        rules.respawnTime = 0f;
     }),
     attack(rules -> {
-        rules.unitDrops = true;
         rules.attackMode = true;
-    }, map -> map.teams.contains((int)state.rules.waveTeam.id)),
+        rules.waves = true;
+        rules.waveTimer = true;
+
+        rules.waveSpacing /= 2f;
+        rules.teams.get(rules.waveTeam).ai = true;
+        rules.teams.get(rules.waveTeam).infiniteResources = true;
+    }, map -> map.teams.contains(state.rules.waveTeam.id)),
     pvp(rules -> {
         rules.pvp = true;
         rules.enemyCoreBuildRadius = 600f;
-        rules.respawnTime = 60 * 10;
         rules.buildCostMultiplier = 1f;
         rules.buildSpeedMultiplier = 1f;
-        rules.playerDamageMultiplier = 0.33f;
-        rules.playerHealthMultiplier = 0.5f;
         rules.unitBuildSpeedMultiplier = 2f;
         rules.unitHealthMultiplier = 3f;
         rules.attackMode = true;
@@ -41,7 +41,6 @@ public enum Gamemode{
         rules.waves = false;
         rules.enemyCoreBuildRadius = 0f;
         rules.waveTimer = false;
-        rules.respawnTime = 0f;
     });
 
     private final Cons<Rules> rules;
@@ -66,20 +65,6 @@ public enum Gamemode{
         this.rules = rules;
         this.hidden = hidden;
         this.validator = validator;
-    }
-
-    public static Gamemode bestFit(Rules rules){
-        if(rules.pvp){
-            return pvp;
-        }else if(rules.editor){
-            return editor;
-        }else if(rules.attackMode){
-            return attack;
-        }else if(rules.infiniteResources){
-            return sandbox;
-        }else{
-            return survival;
-        }
     }
 
     /** Applies this preset to this ruleset. */

@@ -1,8 +1,8 @@
 package mindustry.ui;
 
 import arc.scene.style.*;
-import arc.scene.ui.ImageButton;
-import arc.util.Align;
+import arc.scene.ui.*;
+import arc.util.*;
 
 public class MobileButton extends ImageButton{
 

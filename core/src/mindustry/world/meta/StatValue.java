@@ -1,6 +1,6 @@
 package mindustry.world.meta;
 
-import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.*;
 
 /**
  * A base interface for a value of a stat that is displayed.

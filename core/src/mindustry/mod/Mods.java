@@ -11,7 +11,6 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
@@ -21,12 +20,10 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
-import mindustry.plugin.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
-import java.net.*;
 
 import static mindustry.Vars.*;
 
@@ -34,19 +31,18 @@ public class Mods implements Loadable{
     private Json json = new Json();
     private @Nullable Scripts scripts;
     private ContentParser parser = new ContentParser();
-    private ObjectMap<String, Array<Fi>> bundles = new ObjectMap<>();
+    private ObjectMap<String, Seq<Fi>> bundles = new ObjectMap<>();
     private ObjectSet<String> specialFolders = ObjectSet.with("bundles", "sprites", "sprites-override");
 
     private int totalSprites;
     private MultiPacker packer;
 
-    private Array<LoadedMod> mods = new Array<>();
+    Seq<LoadedMod> mods = new Seq<>();
     private ObjectMap<Class<?>, ModMeta> metas = new ObjectMap<>();
     private boolean requiresReload, createdAtlas;
 
     public Mods(){
         Events.on(ClientLoadEvent.class, e -> Core.app.post(this::checkWarnings));
-        Events.on(ContentReloadEvent.class, e -> Core.app.post(this::checkWarnings));
     }
 
     /** Returns a file named 'config.json' in a special folder for the specified plugin.
@@ -71,14 +67,14 @@ public class Mods implements Loadable{
 
     /** @return the loaded mod found by class, or null if not found. */
     public @Nullable LoadedMod getMod(Class<? extends Mod> type){
-        return mods.find(m -> m.enabled() && m.main != null && m.main.getClass() == type);//loaded.find(l -> l.mod != null && l.mod.getClass() == type);
+        return mods.find(m -> m.enabled() && m.main != null && m.main.getClass() == type);
     }
 
     /** Imports an external mod file.*/
     public void importMod(Fi file) throws IOException{
         Fi dest = modDirectory.child(file.name());
         if(dest.exists()){
-            throw new IOException("A mod with the same filename already exists!");
+            throw new IOException("A file with the same name already exists in the mod folder!");
         }
 
         file.copyTo(dest);
@@ -104,27 +100,40 @@ public class Mods implements Loadable{
         packer = new MultiPacker();
 
         eachEnabled(mod -> {
-            Array<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
-            Array<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
+            Seq<Fi> sprites = mod.root.child("sprites").findAll(f -> f.extension().equals("png"));
+            Seq<Fi> overrides = mod.root.child("sprites-override").findAll(f -> f.extension().equals("png"));
             packSprites(sprites, mod, true);
             packSprites(overrides, mod, false);
-            Log.debug("Packed {0} images for mod '{1}'.", sprites.size + overrides.size, mod.meta.name);
+            Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites += sprites.size + overrides.size;
         });
 
-        Log.debug("Time to pack textures: {0}", Time.elapsed());
+        Log.debug("Time to pack textures: @", Time.elapsed());
     }
 
-    private void packSprites(Array<Fi> sprites, LoadedMod mod, boolean prefix){
+    private void loadIcons(){
+        for(LoadedMod mod : mods){
+            //try to load icon for each mod that can have one
+            if(mod.root.child("icon.png").exists()){
+                try{
+                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
+                }catch(Throwable t){
+                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
+                }
+            }
+        }
+    }
+
+    private void packSprites(Seq<Fi> sprites, LoadedMod mod, boolean prefix){
         for(Fi file : sprites){
             try(InputStream stream = file.read()){
-                byte[] bytes = Streams.copyStreamToByteArray(stream, Math.max((int)file.length(), 512));
+                byte[] bytes = Streams.copyBytes(stream, Math.max((int)file.length(), 512));
                 Pixmap pixmap = new Pixmap(bytes, 0, bytes.length);
                 packer.add(getPage(file), (prefix ? mod.name + "-" : "") + file.nameWithoutExtension(), new PixmapRegion(pixmap));
                 pixmap.dispose();
             }catch(IOException e){
                 Core.app.post(() -> {
-                    Log.err("Error packing images for mod: {0}", mod.meta.name);
+                    Log.err("Error packing images for mod: @", mod.meta.name);
                     e.printStackTrace();
                     if(!headless) ui.showException(e);
                 });
@@ -136,16 +145,7 @@ public class Mods implements Loadable{
 
     @Override
     public void loadSync(){
-        for(LoadedMod mod : mods){
-            //try to load icon for each mod that can have one
-            if(mod.root.child("icon.png").exists()){
-                try{
-                    mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                }catch(Throwable t){
-                    Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-                }
-            }
-        }
+        loadIcons();
 
         if(packer == null) return;
         Time.mark();
@@ -162,16 +162,17 @@ public class Mods implements Loadable{
                 }
             }
 
-            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest;
+            TextureFilter filter = Core.settings.getBool("linear") ? TextureFilter.linear : TextureFilter.nearest;
 
             //flush so generators can use these sprites
             packer.flush(filter, Core.atlas);
 
             //generate new icons
-            for(Array<Content> arr : content.getContentMap()){
+            for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
                     if(c instanceof UnlockableContent && c.minfo.mod != null){
                         UnlockableContent u = (UnlockableContent)c;
+                        u.load();
                         u.createIcons(packer);
                     }
                 });
@@ -179,21 +180,20 @@ public class Mods implements Loadable{
 
             Core.atlas = packer.flush(filter, new TextureAtlas());
             Core.atlas.setErrorRegion("error");
-            Log.debug("Total pages: {0}", Core.atlas.getTextures().size);
+            Log.debug("Total pages: @", Core.atlas.getTextures().size);
         }
 
         packer.dispose();
         packer = null;
-        Log.debug("Time to update textures: {0}", Time.elapsed());
+        Log.debug("Time to update textures: @", Time.elapsed());
     }
 
     private PageType getPage(AtlasRegion region){
         return
-            region.getTexture() == Core.atlas.find("white").getTexture() ? PageType.main :
-            region.getTexture() == Core.atlas.find("stone1").getTexture() ? PageType.environment :
-            region.getTexture() == Core.atlas.find("clear-editor").getTexture() ? PageType.editor :
-            region.getTexture() == Core.atlas.find("zone-groundZero").getTexture() ? PageType.zone :
-            region.getTexture() == Core.atlas.find("whiteui").getTexture() ? PageType.ui :
+            region.texture == Core.atlas.find("white").texture ? PageType.main :
+            region.texture == Core.atlas.find("stone1").texture ? PageType.environment :
+            region.texture == Core.atlas.find("clear-editor").texture ? PageType.editor :
+            region.texture == Core.atlas.find("whiteui").texture ? PageType.ui :
             PageType.main;
     }
 
@@ -202,7 +202,6 @@ public class Mods implements Loadable{
         return
             parent.equals("environment") ? PageType.environment :
             parent.equals("editor") ? PageType.editor :
-            parent.equals("zones") ? PageType.zone :
             parent.equals("ui") || file.parent().parent().name().equals("ui") ? PageType.ui :
             PageType.main;
     }
@@ -216,10 +215,11 @@ public class Mods implements Loadable{
         boolean deleted = mod.file.isDirectory() ? mod.file.deleteDirectory() : mod.file.delete();
 
         if(!deleted){
-            ui.showErrorMessage("$mod.delete.error");
+            ui.showErrorMessage("@mod.delete.error");
             return;
         }
         mods.remove(mod);
+        mod.dispose();
         requiresReload = true;
     }
 
@@ -242,13 +242,17 @@ public class Mods implements Loadable{
         for(Fi file : modDirectory.list()){
             if(!file.extension().equals("jar") && !file.extension().equals("zip") && !(file.isDirectory() && (file.child("mod.json").exists() || file.child("mod.hjson").exists()))) continue;
 
-            Log.debug("[Mods] Loading mod {0}", file);
+            Log.debug("[Mods] Loading mod @", file);
             try{
                 LoadedMod mod = loadMod(file);
                 mods.add(mod);
             }catch(Throwable e){
-                Log.err("Failed to load mod file {0}. Skipping.", file);
-                Log.err(e);
+                if(e instanceof ClassNotFoundException && e.getMessage().contains("mindustry.plugin.Plugin")){
+                    Log.info("Plugin @ is outdated and needs to be ported to 6.0! Update its main class to inherit from 'mindustry.mod.Plugin'.");
+                }else{
+                    Log.err("Failed to load mod file @. Skipping.", file);
+                    Log.err(e);
+                }
             }
         }
 
@@ -259,7 +263,7 @@ public class Mods implements Loadable{
                 mods.add(mod);
                 mod.addSteamID(file.name());
             }catch(Throwable e){
-                Log.err("Failed to load mod workshop file {0}. Skipping.", file);
+                Log.err("Failed to load mod workshop file @. Skipping.", file);
                 Log.err(e);
             }
         }
@@ -299,16 +303,16 @@ public class Mods implements Loadable{
         }
     }
 
-    private void topoSort(LoadedMod mod, Array<LoadedMod> stack, ObjectSet<LoadedMod> visited){
+    private void topoSort(LoadedMod mod, Seq<LoadedMod> stack, ObjectSet<LoadedMod> visited){
         visited.add(mod);
         mod.dependencies.each(m -> !visited.contains(m), m -> topoSort(m, stack, visited));
         stack.add(mod);
     }
 
     /** @return mods ordered in the correct way needed for dependencies. */
-    private Array<LoadedMod> orderedMods(){
+    private Seq<LoadedMod> orderedMods(){
         ObjectSet<LoadedMod> visited = new ObjectSet<>();
-        Array<LoadedMod> result = new Array<>();
+        Seq<LoadedMod> result = new Seq<>();
         eachEnabled(mod -> {
             if(!visited.contains(mod)){
                 topoSort(mod, result, visited);
@@ -328,7 +332,6 @@ public class Mods implements Loadable{
             for(Fi file : mod.root.list()){
                 //ignore special folders like bundles or sprites
                 if(file.isDirectory() && !specialFolders.contains(file.name())){
-                    //TODO calling child/parent on these files will give you gibberish; create wrapper class.
                     file.walk(f -> tree.addFile(mod.file.isDirectory() ? f.path().substring(1 + mod.file.path().length()) :
                         zipFolder ? f.path().substring(parentName.length() + 1) : f.path(), f));
                 }
@@ -340,7 +343,7 @@ public class Mods implements Loadable{
                 for(Fi file : folder.list()){
                     if(file.name().startsWith("bundle") && file.extension().equals("properties")){
                         String name = file.nameWithoutExtension();
-                        bundles.getOr(name, Array::new).add(file);
+                        bundles.get(name, Seq::new).add(file);
                     }
                 }
             }
@@ -351,7 +354,7 @@ public class Mods implements Loadable{
         while(bundle != null){
             String str = bundle.getLocale().toString();
             String locale = "bundle" + (str.isEmpty() ? "" : "_" + str);
-            for(Fi file : bundles.getOr(locale, Array::new)){
+            for(Fi file : bundles.get(locale, Seq::new)){
                 try{
                     PropertiesUtils.load(bundle.getProperties(), file.reader());
                 }catch(Throwable e){
@@ -366,7 +369,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           Core.settings.getBoolOnce("scripts-errored2", () -> ui.showErrorMessage("$mod.scripts.unsupported"));
+           ui.showErrorMessage("@mod.scripts.disable");
         }
 
         //show list of errored content
@@ -376,28 +379,28 @@ public class Mods implements Loadable{
 
                 setFillParent(true);
                 cont.margin(15);
-                cont.add("$error.title");
+                cont.add("@error.title");
                 cont.row();
-                cont.addImage().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
+                cont.image().width(300f).pad(2).colspan(2).height(4f).color(Color.scarlet);
                 cont.row();
-                cont.add("$mod.errors").wrap().growX().center().get().setAlignment(Align.center);
+                cont.add("@mod.errors").wrap().growX().center().get().setAlignment(Align.center);
                 cont.row();
                 cont.pane(p -> {
                     mods.each(m -> m.enabled() && m.hasContentErrors(), m -> {
                         p.add(m.name).color(Pal.accent).left();
                         p.row();
-                        p.addImage().fillX().pad(4).color(Pal.accent);
+                        p.image().fillX().pad(4).color(Pal.accent);
                         p.row();
                         p.table(d -> {
                             d.left().marginLeft(15f);
                             for(Content c : m.erroredContent){
                                 d.add(c.minfo.sourceFile.nameWithoutExtension()).left().padRight(10);
-                                d.addImageTextButton("$details", Icon.downOpen, Styles.transt, () -> {
+                                d.button("@details", Icon.downOpen, Styles.transt, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
-                                        cont.pane(e -> e.add(c.minfo.error)).grow();
+                                        cont.pane(e -> e.add(c.minfo.error).wrap().grow().labelAlign(Align.center, Align.left)).grow();
                                         cont.row();
-                                        cont.addImageTextButton("$ok", Icon.left, this::hide).size(240f, 60f);
+                                        cont.button("@ok", Icon.left, this::hide).size(240f, 60f);
                                     }}.show();
                                 }).size(190f, 50f).left().marginLeft(6);
                                 d.row();
@@ -408,77 +411,42 @@ public class Mods implements Loadable{
                 });
 
                 cont.row();
-                cont.addButton("$ok", this::hide).size(300, 50);
+                cont.button("@ok", this::hide).size(300, 50);
             }}.show();
         }
     }
 
     public boolean hasContentErrors(){
-        return mods.contains(LoadedMod::hasContentErrors);
-    }
-
-    /** Reloads all mod content. How does this even work? I refuse to believe that it functions correctly.*/
-    public void reloadContent(){
-        //epic memory leak
-        //TODO make it less epic
-        Core.atlas = new TextureAtlas(Core.files.internal("sprites/sprites.atlas"));
-        createdAtlas = true;
-
-        mods.each(LoadedMod::dispose);
-        mods.clear();
-        Core.bundle =  I18NBundle.createBundle(Core.files.internal("bundles/bundle"), Core.bundle.getLocale());
-        load();
-        Sounds.dispose();
-        Sounds.load();
-        Core.assets.finishLoading();
-        if(scripts != null){
-            scripts.dispose();
-            scripts = null;
-        }
-        content.clear();
-        content.createBaseContent();
-        content.loadColors();
-        loadScripts();
-        content.createModContent();
-        loadAsync();
-        loadSync();
-        content.init();
-        content.load();
-        content.loadColors();
-        data.load();
-        Core.atlas.getTextures().each(t -> t.setFilter(Core.settings.getBool("linear") ? TextureFilter.Linear : TextureFilter.Nearest));
-        requiresReload = false;
-
-        Events.fire(new ContentReloadEvent());
+        return mods.contains(LoadedMod::hasContentErrors) || (scripts != null && scripts.hasErrored());
     }
 
     /** This must be run on the main thread! */
     public void loadScripts(){
         Time.mark();
+        boolean[] any = {false};
 
         try{
             eachEnabled(mod -> {
                 if(mod.root.child("scripts").exists()){
                     content.setCurrentMod(mod);
                     //if there's only one script file, use it (for backwards compatibility); if there isn't, use "main.js"
-                    Array<Fi> allScripts = mod.root.child("scripts").findAll(f -> f.extEquals("js"));
+                    Seq<Fi> allScripts = mod.root.child("scripts").findAll(f -> f.extEquals("js"));
                     Fi main = allScripts.size == 1 ? allScripts.first() : mod.root.child("scripts").child("main.js");
                     if(main.exists() && !main.isDirectory()){
                         try{
                             if(scripts == null){
                                 scripts = platform.createScripts();
                             }
+                            any[0] = true;
                             scripts.run(mod, main);
                         }catch(Throwable e){
                             Core.app.post(() -> {
-                                Log.err("Error loading main script {0} for mod {1}.", main.name(), mod.meta.name);
-                                e.printStackTrace();
+                                Log.err("Error loading main script @ for mod @.", main.name(), mod.meta.name);
+                                Log.err(e);
                             });
                         }
                     }else{
-                        Core.app.post(() -> {
-                            Log.err("No main.js found for mod {0}.", mod.meta.name);
-                        });
+                        Core.app.post(() -> Log.err("No main.js found for mod @.", mod.meta.name));
                     }
                 }
             });
@@ -486,11 +454,24 @@ public class Mods implements Loadable{
             content.setCurrentMod(null);
         }
 
-        Log.debug("Time to initialize modded scripts: {0}", Time.elapsed());
+        if(any[0]){
+            Log.info("Time to initialize modded scripts: @", Time.elapsed());
+        }
     }
 
     /** Creates all the content found in mod files. */
     public void loadContent(){
+
+        //load class mod content first
+        for(LoadedMod mod : orderedMods()){
+            //hidden mods can't load content
+            if(mod.main != null && !mod.meta.hidden){
+                content.setCurrentMod(mod);
+                mod.main.loadContent();
+            }
+        }
+
+        content.setCurrentMod(null);
 
         class LoadRun implements Comparable<LoadRun>{
             final ContentType type;
@@ -511,7 +492,7 @@ public class Mods implements Loadable{
             }
         }
 
-        Array<LoadRun> runs = new Array<>();
+        Seq<LoadRun> runs = new Seq<>();
 
         for(LoadedMod mod : orderedMods()){
             if(mod.root.child("content").exists()){
@@ -534,7 +515,7 @@ public class Mods implements Loadable{
             try{
                 //this binds the content but does not load it entirely
                 Content loaded = parser.parse(l.mod, l.file.nameWithoutExtension(), l.file.readString("UTF-8"), l.file, l.type);
-                Log.debug("[{0}] Loaded '{1}'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
+                Log.debug("[@] Loaded '@'.", l.mod.meta.name, (loaded instanceof UnlockableContent ? ((UnlockableContent)loaded).localizedName : loaded));
             }catch(Throwable e){
                 if(current != content.getLastAdded() && content.getLastAdded() != null){
                     parser.markError(content.getLastAdded(), l.mod, l.file, e);
@@ -554,14 +535,14 @@ public class Mods implements Loadable{
     }
 
     /** @return a list of mods and versions, in the format name:version. */
-    public Array<String> getModStrings(){
+    public Seq<String> getModStrings(){
         return mods.select(l -> !l.meta.hidden && l.enabled()).map(l -> l.name + ":" + l.meta.version);
     }
 
     /** Makes a mod enabled or disabled. shifts it.*/
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
-            Core.settings.putSave("mod-" + mod.name + "-enabled", enabled);
+            Core.settings.put("mod-" + mod.name + "-enabled", enabled);
             requiresReload = true;
             mod.state = enabled ? ModState.enabled : ModState.disabled;
             mods.each(this::updateDependencies);
@@ -571,9 +552,9 @@ public class Mods implements Loadable{
 
     /** @return the mods that the client is missing.
      * The inputted array is changed to contain the extra mods that the client has but the server doesn't.*/
-    public Array<String> getIncompatibility(Array<String> out){
-        Array<String> mods = getModStrings();
-        Array<String> result = mods.copy();
+    public Seq<String> getIncompatibility(Seq<String> out){
+        Seq<String> mods = getModStrings();
+        Seq<String> result = mods.copy();
         for(String mod : mods){
             if(out.remove(mod)){
                 result.remove(mod);
@@ -582,7 +563,7 @@ public class Mods implements Loadable{
         return result;
     }
 
-    public Array<LoadedMod> list(){
+    public Seq<LoadedMod> list(){
         return mods;
     }
 
@@ -607,60 +588,79 @@ public class Mods implements Loadable{
     /** Loads a mod file+meta, but does not add it to the list.
      * Note that directories can be loaded as mods.*/
     private LoadedMod loadMod(Fi sourceFile) throws Exception{
-        Fi zip = sourceFile.isDirectory() ? sourceFile : new ZipFi(sourceFile);
-        if(zip.list().length == 1 && zip.list()[0].isDirectory()){
-            zip = zip.list()[0];
-        }
+        Time.mark();
 
-        Fi metaf = zip.child("mod.json").exists() ? zip.child("mod.json") : zip.child("mod.hjson").exists() ? zip.child("mod.hjson") : zip.child("plugin.json");
-        if(!metaf.exists()){
-            Log.warn("Mod {0} doesn't have a 'mod.json'/'mod.hjson'/'plugin.json' file, skipping.", sourceFile);
-            throw new IllegalArgumentException("No mod.json found.");
-        }
+        ZipFi rootZip = null;
 
-        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
-        String camelized = meta.name.replace(" ", "");
-        String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
-        String baseName = meta.name.toLowerCase().replace(" ", "-");
-
-        if(mods.contains(m -> m.name.equals(baseName))){
-            throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
-        }
-
-        Mod mainMod;
-
-        Fi mainFile = zip;
-        String[] path = (mainClass.replace('.', '/') + ".class").split("/");
-        for(String str : path){
-            if(!str.isEmpty()){
-                mainFile = mainFile.child(str);
-            }
-        }
-
-        //make sure the main class exists before loading it; if it doesn't just don't put it there
-        if(mainFile.exists()){
-            //other platforms don't have standard java class loaders
-            if(!headless && Version.build != -1){
-                throw new IllegalArgumentException("Java class mods are currently unsupported outside of custom builds.");
+        try{
+            Fi zip = sourceFile.isDirectory() ? sourceFile : (rootZip = new ZipFi(sourceFile));
+            if(zip.list().length == 1 && zip.list()[0].isDirectory()){
+                zip = zip.list()[0];
             }
 
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{sourceFile.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
-            Class<?> main = classLoader.loadClass(mainClass);
-            metas.put(main, meta);
-            mainMod = (Mod)main.getDeclaredConstructor().newInstance();
-        }else{
-            mainMod = null;
-        }
+            Fi metaf =
+                zip.child("mod.json").exists() ? zip.child("mod.json") :
+                zip.child("mod.hjson").exists() ? zip.child("mod.hjson") :
+                zip.child("plugin.json").exists() ? zip.child("plugin.json") :
+                zip.child("plugin.hjson");
 
-        //all plugins are hidden implicitly
-        if(mainMod instanceof Plugin){
-            meta.hidden = true;
-        }
+            if(!metaf.exists()){
+                Log.warn("Mod @ doesn't have a '[mod/plugin].[h]json' file, skipping.", sourceFile);
+                throw new IllegalArgumentException("Invalid file: No mod.json found.");
+            }
 
-        return new LoadedMod(sourceFile, zip, mainMod, meta);
+            ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaf.readString()).toString(Jformat.plain));
+            meta.cleanup();
+            String camelized = meta.name.replace(" ", "");
+            String mainClass = meta.main == null ? camelized.toLowerCase() + "." + camelized + "Mod" : meta.main;
+            String baseName = meta.name.toLowerCase().replace(" ", "-");
+
+            if(mods.contains(m -> m.name.equals(baseName))){
+                throw new IllegalArgumentException("A mod with the name '" + baseName + "' is already imported.");
+            }
+
+            Mod mainMod;
+
+            Fi mainFile = zip;
+            String[] path = (mainClass.replace('.', '/') + ".class").split("/");
+            for(String str : path){
+                if(!str.isEmpty()){
+                    mainFile = mainFile.child(str);
+                }
+            }
+
+            //make sure the main class exists before loading it; if it doesn't just don't put it there
+            if(mainFile.exists()){
+                //mobile versions don't support class mods
+                if(ios){
+                    throw new IllegalArgumentException("Java class mods are not supported on iOS.");
+                }
+
+                Class<?> main = platform.loadJar(sourceFile, mainClass);
+                metas.put(main, meta);
+                mainMod = (Mod)main.getDeclaredConstructor().newInstance();
+            }else{
+                mainMod = null;
+            }
+
+            //all plugins are hidden implicitly
+            if(mainMod instanceof Plugin){
+                meta.hidden = true;
+            }
+
+            if(!headless){
+                Log.info("Loaded mod '@' in @ms", meta.name, Time.elapsed());
+            }
+            return new LoadedMod(sourceFile, zip, mainMod, meta);
+
+        }catch(Exception e){
+            //delete root zip file so it can be closed on windows
+            if(rootZip != null) rootZip.delete();
+            throw e;
+        }
     }
 
-    /** Represents a plugin that has been loaded from a jar file.*/
+    /** Represents a mod's state. May be a jar file, folder or zip. */
     public static class LoadedMod implements Publishable, Disposable{
         /** The location of this mod's zip file/folder on the disk. */
         public final Fi file;
@@ -673,11 +673,11 @@ public class Mods implements Loadable{
         /** This mod's metadata. */
         public final ModMeta meta;
         /** This mod's dependencies as already-loaded mods. */
-        public Array<LoadedMod> dependencies = new Array<>();
+        public Seq<LoadedMod> dependencies = new Seq<>();
         /** All missing dependencies of this mod as strings. */
-        public Array<String> missingDependencies = new Array<>();
+        public Seq<String> missingDependencies = new Seq<>();
         /** Script files to run. */
-        public Array<Fi> scripts = new Array<>();
+        public Seq<Fi> scripts = new Seq<>();
         /** Content with intialization code. */
         public ObjectSet<Content> erroredContent = new ObjectSet<>();
         /** Current state of this mod. */
@@ -711,20 +711,56 @@ public class Mods implements Loadable{
 
         /** @return whether this mod is supported by the game verison */
         public boolean isSupported(){
-            if(Version.build <= 0 || meta.minGameVersion == null) return true;
-            if(meta.minGameVersion.contains(".")){
-                String[] split = meta.minGameVersion.split("\\.");
+            if(isOutdated()) return false;
+
+            int major = getMinMajor(), minor = getMinMinor();
+
+            if(Version.build <= 0) return true;
+
+            return Version.build >= major && Version.revision >= minor;
+        }
+
+        /** @return whether this mod is outdated, e.g. not compatible with v6. */
+        public boolean isOutdated(){
+            //must be at least 105 to indicate v6 compat
+            return getMinMajor() < 105;
+        }
+
+        public int getMinMajor(){
+            int major = 0;
+
+            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
+
+            if(ver.contains(".")){
+                String[] split = ver.split("\\.");
                 if(split.length == 2){
-                    return Version.build >= Strings.parseInt(split[0], 0) && Version.revision >= Strings.parseInt(split[1], 0);
+                    major = Strings.parseInt(split[0], 0);
+                }
+            }else{
+                major = Strings.parseInt(ver, 0);
+            }
+
+            return major;
+        }
+
+        public int getMinMinor(){
+            String ver = meta.minGameVersion == null ? "0" : meta.minGameVersion;
+
+            if(ver.contains(".")){
+                String[] split = ver.split("\\.");
+                if(split.length == 2){
+                    return Strings.parseInt(split[1], 0);
                 }
             }
-            return Version.build >= Strings.parseInt(meta.minGameVersion, 0);
+
+            return 0;
         }
 
         @Override
         public void dispose(){
             if(iconTexture != null){
                 iconTexture.dispose();
+                iconTexture = null;
             }
         }
 
@@ -736,13 +772,11 @@ public class Mods implements Loadable{
         @Override
         public void addSteamID(String id){
             Core.settings.put(name + "-steamid", id);
-            Core.settings.save();
         }
 
         @Override
         public void removeSteamID(){
             Core.settings.remove(name + "-steamid");
-            Core.settings.save();
         }
 
         @Override
@@ -773,12 +807,12 @@ public class Mods implements Loadable{
         @Override
         public boolean prePublish(){
             if(!file.isDirectory()){
-                ui.showErrorMessage("$mod.folder.missing");
+                ui.showErrorMessage("@mod.folder.missing");
                 return false;
             }
 
             if(!file.child("preview.png").exists()){
-                ui.showErrorMessage("$mod.preview.missing");
+                ui.showErrorMessage("@mod.preview.missing");
                 return false;
             }
 
@@ -795,15 +829,22 @@ public class Mods implements Loadable{
         }
     }
 
-    /** Plugin metadata information.*/
+    /** Mod metadata information.*/
     public static class ModMeta{
-        public String name, displayName, author, description, version, main, minGameVersion;
-        public Array<String> dependencies = Array.with();
+        public String name, displayName, author, description, version, main, minGameVersion = "0";
+        public Seq<String> dependencies = Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
 
         public String displayName(){
             return displayName == null ? name : displayName;
+        }
+
+        //removes all colors
+        public void cleanup(){
+            if(displayName != null) displayName = Strings.stripColors(displayName);
+            if(author != null) author = Strings.stripColors(author);
+            if(description != null) description = Strings.stripColors(description);
         }
     }
 

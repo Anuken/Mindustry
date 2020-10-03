@@ -16,7 +16,7 @@ import mindustry.net.*;
 
 import java.time.*;
 
-import static arc.util.Log.format;
+import static arc.util.Log.*;
 import static mindustry.Vars.*;
 import static mindustry.server.ServerControl.*;
 
@@ -64,9 +64,9 @@ public class ServerLauncher implements ApplicationListener{
             Log.err("Error occurred loading mod content:");
             for(LoadedMod mod : mods.list()){
                 if(mod.hasContentErrors()){
-                    Log.err("| &ly[{0}]", mod.name);
+                    Log.err("| &ly[@]", mod.name);
                     for(Content cont : mod.erroredContent){
-                        Log.err("| | &y{0}: &c{1}", cont.minfo.sourceFile.name(), Strings.getSimpleMessage(cont.minfo.baseError).replace("\n", " "));
+                        Log.err("| | &y@: &c@", cont.minfo.sourceFile.name(), Strings.getSimpleMessage(cont.minfo.baseError).replace("\n", " "));
                     }
                 }
             }
@@ -74,12 +74,17 @@ public class ServerLauncher implements ApplicationListener{
             System.exit(1);
         }
 
+        bases.load();
+
+        Core.app.addListener(new ApplicationListener(){public void update(){ asyncCore.begin(); }});
         Core.app.addListener(logic = new Logic());
         Core.app.addListener(netServer = new NetServer());
         Core.app.addListener(new ServerControl(args));
+        Core.app.addListener(new ApplicationListener(){public void update(){ asyncCore.end(); }});
 
         mods.eachClass(Mod::init);
 
         Events.fire(new ServerLoadEvent());
     }
+
 }

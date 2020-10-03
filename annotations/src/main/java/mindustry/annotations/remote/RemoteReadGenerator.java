@@ -1,24 +1,19 @@
 package mindustry.annotations.remote;
 
+import arc.struct.*;
+import arc.util.io.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.*;
-import mindustry.annotations.remote.IOFinder.ClassSerializer;
+import mindustry.annotations.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
-import javax.tools.Diagnostic.Kind;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
 
 /** Generates code for reading remote invoke packets on the client and server. */
 public class RemoteReadGenerator{
-    private final HashMap<String, ClassSerializer> serializers;
+    private final ClassSerializer serializers;
 
     /** Creates a read generator that uses the supplied serializer setup. */
-    public RemoteReadGenerator(HashMap<String, ClassSerializer> serializers){
+    public RemoteReadGenerator(ClassSerializer serializers){
         this.serializers = serializers;
     }
 
@@ -29,8 +24,7 @@ public class RemoteReadGenerator{
      * @param packageName Full target package name.
      * @param needsPlayer Whether this read method requires a reference to the player sender.
      */
-    public void generateFor(List<MethodEntry> entries, String className, String packageName, boolean needsPlayer)
-    throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException, IOException{
+    public void generateFor(Seq<MethodEntry> entries, String className, String packageName, boolean needsPlayer) throws Exception{
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC);
         classBuilder.addJavadoc(RemoteProcess.autogenWarning);
@@ -38,19 +32,13 @@ public class RemoteReadGenerator{
         //create main method builder
         MethodSpec.Builder readMethod = MethodSpec.methodBuilder("readPacket")
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-        .addParameter(ByteBuffer.class, "buffer") //buffer to read form
+        .addParameter(Reads.class, "read") //buffer to read form
         .addParameter(int.class, "id") //ID of method type to read
         .returns(void.class);
 
         if(needsPlayer){
-            //since the player type isn't loaded yet, creating a type def is necessary
-            //this requires reflection since the TypeName constructor is private for some reason
-            Constructor<TypeName> cons = TypeName.class.getDeclaredConstructor(String.class);
-            cons.setAccessible(true);
-
-            TypeName playerType = cons.newInstance("mindustry.entities.type.Player");
             //add player parameter
-            readMethod.addParameter(playerType, "player");
+            readMethod.addParameter(ClassName.get(packageName, "Player"), "player");
         }
 
         CodeBlock.Builder readBlock = CodeBlock.builder(); //start building block of code inside read method
@@ -80,26 +68,22 @@ public class RemoteReadGenerator{
                     //name of parameter
                     String varName = var.getSimpleName().toString();
                     //captialized version of type name for reading primitives
-                    String capName = typeName.equals("byte") ? "" : Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
+                    String pname = typeName.equals("boolean") ? "bool" : typeName.charAt(0) + "";
 
                     //write primitives automatically
                     if(BaseProcessor.isPrimitive(typeName)){
-                        if(typeName.equals("boolean")){
-                            readBlock.addStatement("boolean " + varName + " = buffer.get() == 1");
-                        }else{
-                            readBlock.addStatement(typeName + " " + varName + " = buffer.get" + capName + "()");
-                        }
+                        readBlock.addStatement("$L $L = read.$L()", typeName, varName, pname);
                     }else{
                         //else, try and find a serializer
-                        ClassSerializer ser = serializers.get(typeName);
+                        String ser = serializers.readers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(entry.element, var.asType(), false));
 
                         if(ser == null){ //make sure a serializer exists!
-                            BaseProcessor.messager.printMessage(Kind.ERROR, "No @ReadClass method to read class type: '" + typeName + "'", var);
+                            BaseProcessor.err("No read method to read class type '" + typeName + "' in method " + entry.targetMethod + "; " + serializers.readers, var);
                             return;
                         }
 
                         //add statement for reading it
-                        readBlock.addStatement(typeName + " " + varName + " = " + ser.readMethod + "(buffer)");
+                        readBlock.addStatement(typeName + " " + varName + " = " + ser + "(read)");
                     }
 
                     //append variable name to string builder

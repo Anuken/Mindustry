@@ -1,22 +1,18 @@
 package mindustry.world.consumers;
 
-import arc.struct.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
-import mindustry.entities.type.*;
+import arc.struct.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.Cicon;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
 public class ConsumeItemFilter extends Consume{
-    public final @NonNull
-    Boolf<Item> filter;
+    public final Boolf<Item> filter;
 
     public ConsumeItemFilter(Boolf<Item> item){
         this.filter = item;
@@ -33,9 +29,10 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void build(Tile tile, Table table){
+    public void build(Building tile, Table table){
         MultiReqImage image = new MultiReqImage();
-        content.items().each(i -> filter.get(i) && (!world.isZone() || data.isUnlocked(i)), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1), () -> tile.entity != null && tile.entity.items != null && tile.entity.items.has(item))));
+        content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium), 1),
+            () -> tile.items != null && tile.items.has(item))));
 
         table.add(image).size(8 * 4);
     }
@@ -46,12 +43,12 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void update(TileEntity entity){
+    public void update(Building entity){
 
     }
 
     @Override
-    public void trigger(TileEntity entity){
+    public void trigger(Building entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
             if(entity.items != null && entity.items.has(item) && this.filter.get(item)){
@@ -62,7 +59,7 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public boolean valid(TileEntity entity){
+    public boolean valid(Building entity){
         for(int i = 0; i < content.items().size; i++){
             Item item = content.item(i);
             if(entity.items != null && entity.items.has(item) && this.filter.get(item)){

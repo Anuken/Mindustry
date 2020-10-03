@@ -2,27 +2,19 @@ package mindustry.core;
 
 import arc.*;
 import arc.files.*;
-import arc.func.*;
+import arc.fx.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
-import mindustry.entities.*;
-import mindustry.entities.effect.*;
-import mindustry.entities.effect.GroundEffectEntity.*;
-import mindustry.entities.traits.*;
-import mindustry.entities.type.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.input.*;
+import mindustry.graphics.g3d.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.defense.ForceProjector.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -33,68 +25,34 @@ public class Renderer implements ApplicationListener{
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
+    public PlanetRenderer planets;
 
-    public FrameBuffer shieldBuffer = new FrameBuffer(2, 2);
+    public FrameBuffer effectBuffer = new FrameBuffer();
+    public float laserOpacity = 1f;
+
     private Bloom bloom;
-    private Color clearColor;
+    private FxProcessor fx = new FxProcessor();
+    private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float targetscale = Scl.scl(4);
     private float camerascale = targetscale;
-    private float landscale = 0f, landTime;
+    private float landscale = 0f, landTime, weatherAlpha;
     private float minZoomScl = Scl.scl(0.01f);
-    private Rect rect = new Rect(), rect2 = new Rect();
     private float shakeIntensity, shaketime;
 
     public Renderer(){
         camera = new Camera();
         Shaders.init();
+    }
 
-        Effects.setScreenShakeProvider((intensity, duration) -> {
-            shakeIntensity = Math.max(intensity, shakeIntensity);
-            shaketime = Math.max(shaketime, duration);
-        });
-
-        Effects.setEffectProvider((effect, color, x, y, rotation, data) -> {
-            if(effect == Fx.none) return;
-            if(Core.settings.getBool("effects")){
-                Rect view = camera.bounds(rect);
-                Rect pos = rect2.setSize(effect.size).setCenter(x, y);
-
-                if(view.overlaps(pos)){
-
-                    if(!(effect instanceof GroundEffect)){
-                        EffectEntity entity = Pools.obtain(EffectEntity.class, EffectEntity::new);
-                        entity.effect = effect;
-                        entity.color.set(color);
-                        entity.rotation = rotation;
-                        entity.data = data;
-                        entity.id++;
-                        entity.set(x, y);
-                        if(data instanceof Entity){
-                            entity.setParent((Entity)data);
-                        }
-                        effectGroup.add(entity);
-                    }else{
-                        GroundEffectEntity entity = Pools.obtain(GroundEffectEntity.class, GroundEffectEntity::new);
-                        entity.effect = effect;
-                        entity.color.set(color);
-                        entity.rotation = rotation;
-                        entity.id++;
-                        entity.data = data;
-                        entity.set(x, y);
-                        if(data instanceof Entity){
-                            entity.setParent((Entity)data);
-                        }
-                        groundEffectGroup.add(entity);
-                    }
-                }
-            }
-        });
-
-        clearColor = new Color(0f, 0f, 0f, 1f);
+    public void shake(float intensity, float duration){
+        shakeIntensity = Math.max(shakeIntensity, intensity);
+        shaketime = Math.max(shaketime, duration);
     }
 
     @Override
     public void init(){
+        planets = new PlanetRenderer();
+
         if(settings.getBool("bloom")){
             setupBloom();
         }
@@ -103,37 +61,27 @@ public class Renderer implements ApplicationListener{
     @Override
     public void update(){
         Color.white.set(1f, 1f, 1f, 1f);
+        Gl.clear(Gl.stencilBufferBit);
 
         camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
+        laserOpacity = Core.settings.getInt("lasersopacity") / 100f;
 
         if(landTime > 0){
-            landTime -= Time.delta();
-            landscale = Interpolation.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
+            landTime -= Time.delta;
+            landscale = Interp.pow5In.apply(minZoomScl, Scl.scl(4f), 1f - landTime / Fx.coreLand.lifetime);
             camerascale = landscale;
+            weatherAlpha = 0f;
+        }else{
+            weatherAlpha = Mathf.lerpDelta(weatherAlpha, 1f, 0.08f);
         }
 
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
 
-        if(state.is(State.menu)){
+        if(state.isMenu()){
             landTime = 0f;
             graphics.clear(Color.black);
         }else{
-            Vec2 position = Tmp.v3.set(player);
-
-            if(player.isDead()){
-                TileEntity core = player.getClosestCore();
-                if(core != null){
-                    if(player.spawner == null){
-                        camera.position.lerpDelta(core.x, core.y, 0.08f);
-                    }else{
-                        camera.position.lerpDelta(position, 0.08f);
-                    }
-                }
-            }else if(control.input instanceof DesktopInput && !state.isPaused()){
-                camera.position.lerpDelta(position, 0.08f);
-            }
-
             updateShake(0.75f);
             if(pixelator.enabled()){
                 pixelator.drawPixelate();
@@ -143,6 +91,14 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    public boolean isLanding(){
+        return landTime > 0;
+    }
+
+    public float weatherAlpha(){
+        return weatherAlpha;
+    }
+
     public float landScale(){
         return landTime > 0 ? landscale : 1f;
     }
@@ -150,8 +106,9 @@ public class Renderer implements ApplicationListener{
     @Override
     public void dispose(){
         minimap.dispose();
-        shieldBuffer.dispose();
+        effectBuffer.dispose();
         blocks.dispose();
+        planets.dispose();
         if(bloom != null){
             bloom.dispose();
             bloom = null;
@@ -164,6 +121,8 @@ public class Renderer implements ApplicationListener{
         if(settings.getBool("bloom")){
             setupBloom();
         }
+
+        fx.resize(width, height);
     }
 
     @Override
@@ -180,12 +139,10 @@ public class Renderer implements ApplicationListener{
                 bloom = null;
             }
             bloom = new Bloom(true);
-            bloom.setClearColor(0f, 0f, 0f, 0f);
-        }catch(Exception e){
+        }catch(Throwable e){
             e.printStackTrace();
             settings.put("bloom", false);
-            settings.save();
-            ui.showErrorMessage("$error.bloom");
+            ui.showErrorMessage("@error.bloom");
         }
     }
 
@@ -202,12 +159,29 @@ public class Renderer implements ApplicationListener{
         }
     }
 
+    void beginFx(){
+        if(!fx.hasEnabledEffects()) return;
+
+        Draw.flush();
+        fx.clear();
+        fx.begin();
+    }
+
+    void endFx(){
+        if(!fx.hasEnabledEffects()) return;
+
+        Draw.flush();
+        fx.end();
+        fx.applyEffects();
+        fx.render(0, 0, fx.getWidth(), fx.getHeight());
+    }
+
     void updateShake(float scale){
         if(shaketime > 0){
             float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
             camera.position.add(Mathf.range(intensity), Mathf.range(intensity));
-            shakeIntensity -= 0.25f * Time.delta();
-            shaketime -= Time.delta();
+            shakeIntensity -= 0.25f * Time.delta;
+            shaketime -= Time.delta;
             shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
         }else{
             shakeIntensity = 0f;
@@ -215,181 +189,122 @@ public class Renderer implements ApplicationListener{
     }
 
     public void draw(){
+        Events.fire(Trigger.preDraw);
+
         camera.update();
 
         if(Float.isNaN(camera.position.x) || Float.isNaN(camera.position.y)){
-            camera.position.x = player.x;
-            camera.position.y = player.y;
+            camera.position.set(player);
         }
 
         graphics.clear(clearColor);
+        Draw.reset();
 
-        if(!graphics.isHidden() && (Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")) && (shieldBuffer.getWidth() != graphics.getWidth() || shieldBuffer.getHeight() != graphics.getHeight())){
-            shieldBuffer.resize(graphics.getWidth(), graphics.getHeight());
+        if(Core.settings.getBool("animatedwater") || Core.settings.getBool("animatedshields")){
+            effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
-        Draw.proj(camera.projection());
+        Draw.proj(camera);
 
-        blocks.floor.drawFloor();
-
-        groundEffectGroup.draw(e -> e instanceof BelowLiquidTrait);
-        puddleGroup.draw();
-        groundEffectGroup.draw(e -> !(e instanceof BelowLiquidTrait));
-
+        blocks.floor.checkChanges();
         blocks.processBlocks();
 
-        blocks.drawShadows();
-        Draw.color();
+        Draw.sort(true);
 
-        blocks.floor.beginDraw();
-        blocks.floor.drawLayer(CacheLayer.walls);
-        blocks.floor.endDraw();
+        Events.fire(Trigger.draw);
 
-        blocks.drawBlocks(Layer.block);
-        blocks.drawFog();
-
-        blocks.drawDestroyed();
-
-        Draw.shader(Shaders.blockbuild, true);
-        blocks.drawBlocks(Layer.placement);
-        Draw.shader();
-
-        blocks.drawBlocks(Layer.overlay);
-
-        drawGroundShadows();
-
-        drawAllTeams(false);
-
-        blocks.drawBlocks(Layer.turret);
-
-        drawFlyerShadows();
-
-        blocks.drawBlocks(Layer.power);
-        blocks.drawBlocks(Layer.lights);
-
-        drawAllTeams(true);
-
-        Draw.flush();
-        if(bloom != null){
-            bloom.capture();
+        if(pixelator.enabled()){
+            pixelator.register();
         }
 
-        bulletGroup.draw();
-        effectGroup.draw();
+        Draw.draw(Layer.background, this::drawBackground);
+        Draw.draw(Layer.floor, blocks.floor::drawFloor);
+        Draw.draw(Layer.block - 1, blocks::drawShadows);
+        Draw.draw(Layer.block, () -> {
+            blocks.floor.beginDraw();
+            blocks.floor.drawLayer(CacheLayer.walls);
+            blocks.floor.endDraw();
+        });
 
-        Draw.flush();
-        if(bloom != null){
-            bloom.render();
-        }
-
-        overlays.drawBottom();
-        playerGroup.draw(p -> p.isLocal, Player::drawBuildRequests);
-
-        if(shieldGroup.countInBounds() > 0){
-            if(settings.getBool("animatedshields") && Shaders.shield != null){
-                Draw.flush();
-                shieldBuffer.begin();
-                graphics.clear(Color.clear);
-                shieldGroup.draw();
-                shieldGroup.draw(shield -> true, ShieldEntity::drawOver);
-                Draw.flush();
-                shieldBuffer.end();
-                Draw.shader(Shaders.shield);
-                Draw.color(Pal.accent);
-                Draw.rect(Draw.wrap(shieldBuffer.getTexture()), camera.position.x, camera.position.y, camera.width, -camera.height);
-                Draw.color();
-                Draw.shader();
-            }else{
-                shieldGroup.draw(shield -> true, ShieldEntity::drawSimple);
-            }
-        }
-
-        overlays.drawTop();
-
-        playerGroup.draw(p -> !p.isDead(), Player::drawName);
+        Draw.drawRange(Layer.blockBuilding, () -> Draw.shader(Shaders.blockbuild, true), Draw::shader);
 
         if(state.rules.lighting){
-            lights.draw();
+            Draw.draw(Layer.light, lights::draw);
         }
 
-        drawLanding();
+        if(enableDarkness){
+            Draw.draw(Layer.darkness, blocks::drawDarkness);
+        }
 
-        Draw.color();
+        if(bloom != null){
+            Draw.draw(Layer.bullet - 0.01f, bloom::capture);
+            Draw.draw(Layer.effect + 0.01f, bloom::render);
+        }
+
+        Draw.draw(Layer.plans, overlays::drawBottom);
+
+        if(settings.getBool("animatedshields") && Shaders.shield != null){
+            Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
+                effectBuffer.end();
+                effectBuffer.blit(Shaders.shield);
+            });
+        }
+
+        Draw.draw(Layer.overlayUI, overlays::drawTop);
+        Draw.draw(Layer.space, this::drawLanding);
+
+        blocks.drawBlocks();
+
+        Groups.draw.draw(Drawc::draw);
+
+        Draw.reset();
         Draw.flush();
+        Draw.sort(false);
+
+        Events.fire(Trigger.postDraw);
+    }
+
+    private void drawBackground(){
+
     }
 
     private void drawLanding(){
-        if(landTime > 0 && player.getClosestCore() != null){
+        if(landTime > 0 && player.closestCore() != null){
             float fract = landTime / Fx.coreLand.lifetime;
-            TileEntity entity = player.getClosestCore();
+            Building entity = player.closestCore();
 
             TextureRegion reg = entity.block.icon(Cicon.full);
             float scl = Scl.scl(4f) / camerascale;
-            float s = reg.getWidth() * Draw.scl * scl * 4f * fract;
+            float s = reg.width * Draw.scl * scl * 4f * fract;
 
             Draw.color(Pal.lightTrail);
-            Draw.rect("circle-shadow", entity.x, entity.y, s, s);
+            Draw.rect("circle-shadow", entity.getX(), entity.getY(), s, s);
 
             Angles.randLenVectors(1, (1f- fract), 100, 1000f * scl * (1f-fract), (x, y, fin, fout) -> {
                 Lines.stroke(scl * fin);
-                Lines.lineAngle(entity.x + x, entity.y + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
+                Lines.lineAngle(entity.getX() + x, entity.getY() + y, Mathf.angle(x, y), (fin * 20 + 1f) * scl);
             });
 
             Draw.color();
             Draw.mixcol(Color.white, fract);
-            Draw.rect(reg, entity.x, entity.y, reg.getWidth() * Draw.scl * scl, reg.getHeight() * Draw.scl * scl, fract * 135f);
+            Draw.rect(reg, entity.getX(), entity.getY(), reg.width * Draw.scl * scl, reg.height * Draw.scl * scl, fract * 135f);
 
             Draw.reset();
         }
     }
 
-    private void drawGroundShadows(){
-        Draw.color(0, 0, 0, 0.4f);
-        float rad = 1.6f;
-
-        Cons<Unit> draw = u -> {
-            float size = Math.max(u.getIconRegion().getWidth(), u.getIconRegion().getHeight()) * Draw.scl;
-            Draw.rect("circle-shadow", u.x, u.y, size * rad, size * rad);
-        };
-
-        unitGroup.draw(unit -> !unit.isDead(), draw::get);
-
-        if(!playerGroup.isEmpty()){
-            playerGroup.draw(unit -> !unit.isDead(), draw::get);
-        }
-
-        Draw.color();
-    }
-
-    private void drawFlyerShadows(){
-        float trnsX = -12, trnsY = -13;
-        Draw.color(0, 0, 0, 0.22f);
-
-        unitGroup.draw(unit -> unit.isFlying() && !unit.isDead(), baseUnit -> baseUnit.drawShadow(trnsX, trnsY));
-        playerGroup.draw(unit -> unit.isFlying() && !unit.isDead(), player -> player.drawShadow(trnsX, trnsY));
-
-        Draw.color();
-    }
-
-    private void drawAllTeams(boolean flying){
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawUnder);
-        playerGroup.draw(p -> p.isFlying() == flying && !p.isDead(), Unit::drawUnder);
-
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawAll);
-        playerGroup.draw(p -> p.isFlying() == flying, Unit::drawAll);
-
-        unitGroup.draw(u -> u.isFlying() == flying && !u.isDead(), Unit::drawOver);
-        playerGroup.draw(p -> p.isFlying() == flying, Unit::drawOver);
-    }
-
     public void scaleCamera(float amount){
-        targetscale += amount;
+        targetscale *= (amount / 4) + 1;
         clampScale();
     }
 
     public void clampScale(){
         float s = Scl.scl(1f);
-        targetscale = Mathf.clamp(targetscale, s * 1.5f, Math.round(s * 6));
+        targetscale = Mathf.clamp(targetscale, minScale(), Math.round(s * 6));
+    }
+
+    public float minScale(){
+        return Scl.scl(1.5f);
     }
 
     public float getScale(){
@@ -407,13 +322,11 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
-        drawGroundShadows();
-
         int w = world.width() * tilesize, h = world.height() * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
         if(memory >= 65){
-            ui.showInfo("$screenshot.invalid");
+            ui.showInfo("@screenshot.invalid");
             return;
         }
 
@@ -425,10 +338,8 @@ public class Renderer implements ApplicationListener{
         camera.height = h;
         camera.position.x = w / 2f + tilesize / 2f;
         camera.position.y = h / 2f + tilesize / 2f;
-        Draw.flush();
         buffer.begin();
         draw();
-        Draw.flush();
         buffer.end();
         disableUI = false;
         camera.width = vpW;
@@ -440,8 +351,8 @@ public class Renderer implements ApplicationListener{
             lines[i + 3] = (byte)255;
         }
         buffer.end();
-        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-        BufferUtils.copy(lines, 0, fullPixmap.getPixels(), lines.length);
+        Pixmap fullPixmap = new Pixmap(w, h, Pixmap.Format.rgba8888);
+        Buffers.copy(lines, 0, fullPixmap.getPixels(), lines.length);
         Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
         PixmapIO.writePNG(file, fullPixmap);
         fullPixmap.dispose();

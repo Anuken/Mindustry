@@ -1,17 +1,14 @@
 package mindustry.annotations.impl;
 
+import arc.struct.*;
 import com.squareup.javapoet.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
-import mindustry.annotations.Annotations.Struct;
-import mindustry.annotations.Annotations.StructField;
+import mindustry.annotations.util.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.util.ElementFilter;
-import javax.tools.Diagnostic.Kind;
-import java.util.List;
-import java.util.Set;
+import javax.lang.model.type.*;
 
 /**
  * Generates ""value types"" classes that are packed into integer primitives of the most aproppriate size.
@@ -24,28 +21,28 @@ public class StructProcess extends BaseProcessor{
 
     @Override
     public void process(RoundEnvironment env) throws Exception{
-        Set<TypeElement> elements = ElementFilter.typesIn(env.getElementsAnnotatedWith(Struct.class));
+        Seq<Stype> elements = types(Struct.class);
 
-        for(TypeElement elem : elements){
+        for(Stype elem : elements){
 
-            if(!elem.getSimpleName().toString().endsWith("Struct")){
-                BaseProcessor.messager.printMessage(Kind.ERROR, "All classes annotated with @Struct must have their class names end in 'Struct'.", elem);
+            if(!elem.name().endsWith("Struct")){
+                err("All classes annotated with @Struct must have their class names end in 'Struct'.", elem);
                 continue;
             }
 
-            String structName = elem.getSimpleName().toString().substring(0, elem.getSimpleName().toString().length() - "Struct".length());
+            String structName = elem.name().substring(0, elem.name().length() - "Struct".length());
             String structParam = structName.toLowerCase();
 
             TypeSpec.Builder classBuilder = TypeSpec.classBuilder(structName)
             .addModifiers(Modifier.FINAL, Modifier.PUBLIC);
 
             try{
-                List<VariableElement> variables = ElementFilter.fieldsIn(elem.getEnclosedElements());
-                int structSize = variables.stream().mapToInt(StructProcess::varSize).sum();
+                Seq<Svar> variables = elem.fields();
+                int structSize = variables.mapInt(StructProcess::varSize).sum();
                 int structTotalSize = (structSize <= 8 ? 8 : structSize <= 16 ? 16 : structSize <= 32 ? 32 : 64);
 
-                if(variables.size() == 0){
-                    BaseProcessor.messager.printMessage(Kind.ERROR, "making a struct with no fields is utterly pointles.", elem);
+                if(variables.size == 0){
+                    err("making a struct with no fields is utterly pointles.", elem);
                     continue;
                 }
 
@@ -62,21 +59,21 @@ public class StructProcess extends BaseProcessor{
                 doc.append("Bits used: ").append(structSize).append(" / ").append(structTotalSize).append("\n");
 
                 int offset = 0;
-                for(VariableElement var : variables){
+                for(Svar var : variables){
                     int size = varSize(var);
-                    TypeName varType = TypeName.get(var.asType());
-                    String varName = var.getSimpleName().toString();
+                    TypeName varType = var.tname();
+                    String varName = var.name();
 
                     //add val param to constructor
                     constructor.addParameter(varType, varName);
 
                     //[get] field(structType) : fieldType
-                    MethodSpec.Builder getter = MethodSpec.methodBuilder(var.getSimpleName().toString())
+                    MethodSpec.Builder getter = MethodSpec.methodBuilder(var.name().toString())
                     .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
                     .returns(varType)
                     .addParameter(structType, structParam);
                     //[set] field(structType, fieldType) : structType
-                    MethodSpec.Builder setter = MethodSpec.methodBuilder(var.getSimpleName().toString())
+                    MethodSpec.Builder setter = MethodSpec.methodBuilder(var.name().toString())
                     .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
                     .returns(structType)
                     .addParameter(structType, structParam).addParameter(varType, "value");
@@ -133,7 +130,7 @@ public class StructProcess extends BaseProcessor{
                 JavaFile.builder(packageName, classBuilder.build()).build().writeTo(BaseProcessor.filer);
             }catch(IllegalArgumentException e){
                 e.printStackTrace();
-                BaseProcessor.messager.printMessage(Kind.ERROR, e.getMessage(), elem);
+                err(e.getMessage(), elem);
             }
         }
 
@@ -154,21 +151,21 @@ public class StructProcess extends BaseProcessor{
         return "0b" + builder.reverse().toString() + "L";
     }
 
-    static int varSize(VariableElement var) throws IllegalArgumentException{
-        if(!var.asType().getKind().isPrimitive()){
+    static int varSize(Svar var) throws IllegalArgumentException{
+        if(!var.mirror().getKind().isPrimitive()){
             throw new IllegalArgumentException("All struct fields must be primitives: " + var);
         }
 
-        StructField an = var.getAnnotation(StructField.class);
-        if(var.asType().getKind() == TypeKind.BOOLEAN && an != null && an.value() != 1){
+        StructField an = var.annotation(StructField.class);
+        if(var.mirror().getKind() == TypeKind.BOOLEAN && an != null && an.value() != 1){
             throw new IllegalArgumentException("Booleans can only be one bit long... why would you do this?");
         }
 
-        if(var.asType().getKind() == TypeKind.FLOAT && an != null && an.value() != 32){
+        if(var.mirror().getKind() == TypeKind.FLOAT && an != null && an.value() != 32){
             throw new IllegalArgumentException("Float size can't be changed. Very sad.");
         }
 
-        return an == null ? typeSize(var.asType().getKind()) : an.value();
+        return an == null ? typeSize(var.mirror().getKind()) : an.value();
     }
 
     static Class<?> typeForSize(int size) throws IllegalArgumentException{

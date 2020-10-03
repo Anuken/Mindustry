@@ -1,11 +1,10 @@
 package mindustry.maps;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -80,7 +79,6 @@ public class Map implements Comparable<Map>, Publishable{
 
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension(), score);
-        Vars.data.modified();
     }
 
     /** Returns the result of applying this map's rules to the specified gamemode.*/
@@ -111,9 +109,9 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     /** Returns the generation filters that this map uses on load.*/
-    public Array<GenerateFilter> filters(){
+    public Seq<GenerateFilter> filters(){
         if(tags.getInt("build", -1) < 83 && tags.getInt("build", -1) != -1 && tags.get("genfilters", "").isEmpty()){
-            return Array.with();
+            return Seq.with();
         }
         return maps.readFilters(tags.get("genfilters", ""));
     }
@@ -131,7 +129,7 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public String tag(String name){
-        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name) : Core.bundle.get("unknown");
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name) : Core.bundle.get("unknown", "unknown");
     }
 
     public boolean hasTag(String name){
@@ -147,7 +145,7 @@ public class Map implements Comparable<Map>, Publishable{
     public void addSteamID(String id){
         tags.put("steamid", id);
 
-        ui.editor.editor.getTags().put("steamid", id);
+        ui.editor.editor.tags.put("steamid", id);
         try{
             ui.editor.save();
         }catch(Exception e){
@@ -160,7 +158,7 @@ public class Map implements Comparable<Map>, Publishable{
     public void removeSteamID(){
         tags.remove("steamid");
 
-        ui.editor.editor.getTags().remove("steamid");
+        ui.editor.editor.tags.remove("steamid");
         try{
             ui.editor.save();
         }catch(Exception e){
@@ -196,15 +194,15 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     @Override
-    public Array<String> extraTags(){
+    public Seq<String> extraTags(){
         Gamemode mode = Gamemode.attack.valid(this) ? Gamemode.attack : Gamemode.survival;
-        return Array.with(mode.name());
+        return Seq.with(mode.name());
     }
 
     @Override
     public boolean prePublish(){
         tags.put("author", player.name);
-        ui.editor.editor.getTags().put("author", tags.get("author"));
+        ui.editor.editor.tags.put("author", tags.get("author"));
         ui.editor.save();
 
         return true;
