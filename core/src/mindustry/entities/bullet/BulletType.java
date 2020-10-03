@@ -190,7 +190,7 @@ public abstract class BulletType extends Content{
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
 
-            if(effect == StatusEffects.burning) {
+            if(status == StatusEffects.burning) {
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != team, other -> {
                     Damage.createIncend(x, y, damage / 10f, (int)damage / 10);
                 });
