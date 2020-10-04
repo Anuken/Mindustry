@@ -129,7 +129,7 @@ public class SchematicsDialog extends BaseDialog{
                                     buttons.button("@cancel", this::hide);
 
                                     keyDown(KeyCode.enter, () -> {
-                                        if(!nameField.getText().isEmpty()){
+                                        if(!nameField.getText().isEmpty() && Core.scene.getKeyboardFocus() != descripionField){
                                             accept.run();
                                         }
                                     });
