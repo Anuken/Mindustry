@@ -176,6 +176,20 @@ public abstract class Turret extends Block{
         }
 
         @Override
+        public void control(LAccess type, Object p1, double p2, double p3, double p4){
+            if(type == LAccess.shootp && !unit.isPlayer()){
+                logicControlTime = logicControlCooldown;
+                logicShooting = !Mathf.zero(p2);
+
+                if(p1 instanceof Posc){
+                    targetPosition((Posc)p1);
+                }
+            }
+
+            super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
         public double sense(LAccess sensor){
             return switch(sensor){
                 case rotation -> rotation;
@@ -197,6 +211,18 @@ public abstract class Turret extends Block{
 
         public boolean isActive(){
             return target != null || (logicControlled() && logicShooting) || (isControlled() && unit.isShooting());
+        }
+
+        public void targetPosition(Posc pos){
+            BulletType bullet = peekAmmo();
+            float speed = bullet.speed;
+            //slow bullets never intersect
+            if(speed < 0.1f) speed = 9999999f;
+
+            targetPos.set(Predict.intercept(this, pos, speed));
+            if(targetPos.isZero()){
+                targetPos.set(target);
+            }
         }
 
         @Override
@@ -246,15 +272,7 @@ public abstract class Turret extends Block{
                     }else if(logicControlled()){ //logic behavior
                         canShoot = logicShooting;
                     }else{ //default AI behavior
-                        BulletType type = peekAmmo();
-                        float speed = type.speed;
-                        //slow bullets never intersect
-                        if(speed < 0.1f) speed = 9999999f;
-
-                        targetPos.set(Predict.intercept(this, target, speed));
-                        if(targetPos.isZero()){
-                            targetPos.set(target);
-                        }
+                        targetPosition(target);
 
                         if(Float.isNaN(rotation)){
                             rotation = 0;

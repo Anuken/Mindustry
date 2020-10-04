@@ -496,7 +496,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void transferLiquid(Building next, float amount, Liquid liquid){
-        float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f, amount);
+        float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
 
         if(next.acceptLiquid(self(), liquid, flow)){
             next.handleLiquid(self(), liquid, flow);
@@ -528,7 +528,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
             float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
             float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
-            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f);
+            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
 
             if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid, flow)){
                 next.handleLiquid(self(), liquid, flow);
@@ -1264,6 +1264,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             enabled = !Mathf.zero((float)p1);
             enabledControlTime = timeToUncontrol;
         }
+    }
+
+    @Override
+    public void control(LAccess type, Object p1, double p2, double p3, double p4){
+
     }
 
     @Override

@@ -30,10 +30,12 @@ public enum LAccess{
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
     shoot("x", "y", "shoot"),
+    shootp(true, "unit", "shoot")
 
     ;
 
     public final String[] parameters;
+    public final boolean isObj;
 
     public static final LAccess[]
         all = values(),
@@ -42,5 +44,11 @@ public enum LAccess{
 
     LAccess(String... parameters){
         this.parameters = parameters;
+        isObj = false;
+    }
+
+    LAccess(boolean obj, String... parameters){
+        this.parameters = parameters;
+        isObj = obj;
     }
 }

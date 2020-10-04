@@ -164,7 +164,11 @@ public class LExecutor{
             Object obj = exec.obj(target);
             if(obj instanceof Controllable){
                 Controllable cont = (Controllable)obj;
-                cont.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+                if(type.isObj){
+                    cont.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+                }else{
+                    cont.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+                }
             }
         }
     }
