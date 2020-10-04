@@ -465,8 +465,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return block.consumes.itemFilters.get(item.id) && items.get(item) < getMaximumAccepted(item);
     }
 
-    public boolean acceptLiquid(Building source, Liquid liquid, float amount){
-        return block.hasLiquids && liquids.get(liquid) + amount < block.liquidCapacity && block.consumes.liquidfilters.get(liquid.id);
+    public boolean acceptLiquid(Building source, Liquid liquid){
+        return block.hasLiquids && block.consumes.liquidfilters.get(liquid.id);
     }
 
     public void handleLiquid(Building source, Liquid liquid, float amount){
@@ -498,7 +498,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void transferLiquid(Building next, float amount, Liquid liquid){
         float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
 
-        if(next.acceptLiquid(self(), liquid, flow)){
+        if(next.acceptLiquid(self(), liquid)){
             next.handleLiquid(self(), liquid, flow);
             liquids.remove(liquid, flow);
         }
@@ -530,7 +530,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
             flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
 
-            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid, flow)){
+            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid)){
                 next.handleLiquid(self(), liquid, flow);
                 liquids.remove(liquid, flow);
                 return flow;
