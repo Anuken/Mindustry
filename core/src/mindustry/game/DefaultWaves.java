@@ -266,7 +266,30 @@ public class DefaultWaves{
             }
         }
 
+        int bossWave = Mathf.random(30, 60);
+        int bossSpacing = Mathf.random(30, 50);
 
+        //main boss progression
+        out.add(new SpawnGroup(Structs.random(species)[4]){{
+            unitAmount = 1;
+            begin = bossWave;
+            spacing = bossSpacing;
+            end = never;
+            max = 16;
+            unitScaling = bossSpacing;
+            shieldScaling = shieldsPerWave;
+        }});
+
+        //alt boss progression
+        out.add(new SpawnGroup(Structs.random(species)[4]){{
+            unitAmount = 1;
+            begin = bossWave + Mathf.random(4, 6) * bossSpacing;
+            spacing = bossSpacing;
+            end = never;
+            max = 16;
+            unitScaling = bossSpacing;
+            shieldScaling = shieldsPerWave;
+        }});
 
         return out;
     }
