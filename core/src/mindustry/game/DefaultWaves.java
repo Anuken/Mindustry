@@ -261,7 +261,7 @@ public class DefaultWaves{
             curTier = Math.min(curTier, 3);
 
             //small chance to switch species
-            if(Mathf.chance(0.2)){
+            if(Mathf.chance(0.3)){
                 curSpecies = Structs.random(species);
             }
         }

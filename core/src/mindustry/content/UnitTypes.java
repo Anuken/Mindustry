@@ -1314,6 +1314,7 @@ public class UnitTypes implements ContentList{
             buildSpeed = 4f;
             drawShields = false;
             commandLimit = 6;
+            lowAltitude = true;
 
             ammoCapacity = 1300;
             ammoResupplyAmount = 20;

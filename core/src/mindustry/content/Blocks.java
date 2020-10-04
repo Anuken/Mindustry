@@ -1731,7 +1731,7 @@ public class Blocks implements ContentList{
             health = 150 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
 
-            consumes.powerCond(10f, (TurretBuild entity) -> entity.target != null || (entity.logicControlled() && entity.logicShooting));
+            consumes.powerCond(10f, TurretBuild::isActive);
         }};
 
         spectre = new ItemTurret("spectre"){{

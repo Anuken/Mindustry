@@ -195,6 +195,10 @@ public abstract class Turret extends Block{
             return logicControlTime > 0;
         }
 
+        public boolean isActive(){
+            return target != null || (logicControlled() && logicShooting) || (isControlled() && unit.isShooting());
+        }
+
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
