@@ -164,7 +164,8 @@ public class TechTree implements ContentList{
                                                 node(plastaniumCompressor, () -> {
                            
                                                 node(plastaniumPolymerizer, () -> {
-                                                                                    });
+                                                
+                                                });
                                                     node(Items.phasefabric, with(Items.thorium, 15000, Items.sand, 30000, Items.silicon, 5000), () -> {
                                                         node(phaseWeaver, () -> {
 
