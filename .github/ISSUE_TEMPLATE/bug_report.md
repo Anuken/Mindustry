@@ -19,7 +19,7 @@ assignees: ''
 
 **Link(s) to mod(s) used**: *The mod repositories or zip files that are related to the issue, if applicable.*
 
-**Save file**: *The save file you were playing on when the bug happened. REQUIRED for any issue that happens in-game.*
+**Save file**: *The save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*
 
 **Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*
 
