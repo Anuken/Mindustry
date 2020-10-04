@@ -62,10 +62,10 @@ public class OverdriveProjector extends Block{
             float transparency = Time.time() %90f / 90f;
             
             //outside circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.5f);
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.25f);
             
             //expanding circle
-            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, Tmp.c1.set(baseColor).lerp(phaseColor, transparency), 1f - transparency);
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, baseColor.cpy().lerp(phaseColor, transparency), 1f - transparency);
             
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
