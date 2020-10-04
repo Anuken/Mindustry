@@ -547,13 +547,13 @@ public class Blocks implements ContentList{
             size = 3;
             hasPower = hasLiquids = true;
             drawer = new DrawGlow();
-            itemCapacity = 20;
+            itemCapacity = 25;
             boostScale = 0.20f;
-            liquidCapacity = 90f;
+            liquidCapacity = 135f;
             attribute = Attribute.water;
 
             consumes.items(new ItemStack(Items.titanium, 4), new ItemStack(Items.graphite, 2));
-            consumes.liquid(Liquids.oil, 0.50f);
+            consumes.liquid(Liquids.oil, 0.70f);
             consumes.power(4.5f);
             
         }};
