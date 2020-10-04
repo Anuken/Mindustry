@@ -43,7 +43,7 @@ public class Blocks implements ContentList{
 
     //ores
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
- 
+
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, plastaniumPolymerizer, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
