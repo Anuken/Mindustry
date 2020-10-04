@@ -45,7 +45,7 @@ public class Blocks implements ContentList{
     oreCopper, oreLead, oreScrap, oreCoal, oreTitanium, oreThorium,
 
     //crafting
-    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
+    siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer, cryofluidGrinder,
     melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge,
 
     //sandbox
@@ -610,6 +610,24 @@ public class Blocks implements ContentList{
             consumes.power(1f);
             consumes.item(Items.titanium);
             consumes.liquid(Liquids.water, 0.2f);
+        }};
+
+        cryofluidGrinder = new InertialLiquidConverter("cryofluid-grinder"){{
+            requirements(Category.crafting, with(Items.lead, 650, Items.silicon, 200, Items.plastanium, 150));
+            outputLiquid = new LiquidStack(Liquids.cryofluid, 0.9f);
+            craftTime = 30f;
+            size = 4;
+            hasPower = true;
+            hasItems = true;
+            hasLiquids = true;
+            rotate = false;
+            solid = true;
+            outputsLiquid = true;
+            drawer = new DrawMixer();
+
+            consumes.power(4f);
+            consumes.items(new ItemStack(Items.titanium, 2));
+            consumes.liquid(Liquids.water, 1f);
         }};
 
         blastMixer = new GenericCrafter("blast-mixer"){{
