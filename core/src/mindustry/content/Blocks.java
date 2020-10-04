@@ -551,11 +551,9 @@ public class Blocks implements ContentList{
             boostScale = 0.20f;
             liquidCapacity = 135f;
             attribute = Attribute.water;
-
             consumes.items(new ItemStack(Items.titanium, 4), new ItemStack(Items.graphite, 2));
             consumes.liquid(Liquids.oil, 0.70f);
             consumes.power(4.5f);
-            
         }};
 
         kiln = new GenericSmelter("kiln"){{
