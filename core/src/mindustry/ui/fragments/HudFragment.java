@@ -29,20 +29,20 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class HudFragment extends Fragment{
-    private static final float dsize = 65f;
+    public static final float dsize = 65f;
 
     public final PlacementFragment blockfrag = new PlacementFragment();
 
-    private ImageButton flip;
-    private Table lastUnlockTable;
-    private Table lastUnlockLayout;
-    private boolean shown = true;
-    private CoreItemsDisplay coreItems = new CoreItemsDisplay();
+    public ImageButton flip;
+    public Table lastUnlockTable;
+    public Table lastUnlockLayout;
+    public boolean shown = true;
+    public CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
-    private String hudText = "";
-    private boolean showHudText;
+    public String hudText = "";
+    public boolean showHudText;
 
-    private long lastToast;
+    public long lastToast;
 
     @Override
     public void build(Group parent){
@@ -377,7 +377,7 @@ public class HudFragment extends Fragment{
         showHudText = shown;
     }
 
-    private void scheduleToast(Runnable run){
+    public void scheduleToast(Runnable run){
         long duration = (int)(3.5 * 1000);
         long since = Time.timeSinceMillis(lastToast);
         if(since > duration){
@@ -550,7 +550,7 @@ public class HudFragment extends Fragment{
         Core.scene.add(image);
     }
 
-    private void toggleMenus(){
+    public void toggleMenus(){
         if(flip != null){
             flip.getStyle().imageUp = shown ? Icon.downOpen : Icon.upOpen;
         }
@@ -558,7 +558,7 @@ public class HudFragment extends Fragment{
         shown = !shown;
     }
 
-    private Table makeStatusTable(){
+    public Table makeStatusTable(){
         Button table = new Button(Styles.waveb);
 
         StringBuilder ibuild = new StringBuilder();
@@ -716,7 +716,7 @@ public class HudFragment extends Fragment{
         return table;
     }
 
-    private boolean canSkipWave(){
+    public boolean canSkipWave(){
         return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
     }
 
