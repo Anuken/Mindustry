@@ -109,12 +109,12 @@ public class SchematicsDialog extends BaseDialog{
                             buttons.button(Icon.pencil, style, () -> {
                                 new Dialog("@schematic.rename"){{
                                     cont.margin(30).add("@name").padRight(6f);
-                                    TextField nameField = cont.field(s.name(), null).size(330f, 50f).addInputDialog().get();
+                                    TextField nameField = cont.field(s.name(), null).size(400f, 55f).addInputDialog().get();
 
                                     cont.row();
 
                                     cont.margin(30).add("@editor.description").padRight(6f);
-                                    TextField descripionField = cont.field(s.description(), null).size(330f, 50f).addInputDialog().get();
+                                    TextField descripionField = cont.area(s.description(), Styles.areaField, t -> {}).size(400f, 140f).addInputDialog().get();
 
                                     Runnable accept = () -> {
                                         s.tags.put("name", nameField.getText());
