@@ -18,10 +18,10 @@ public class InertialLiquidConverter extends LiquidConverter{
     public @Load("@-bottom") TextureRegion bottomRegion;
     public @Load("@-liquid") TextureRegion liquidRegion;
     public @Load("@-top") TextureRegion topRegion;
-    
     public InertialLiquidConverter(String name){
         super(name);
     }
+
     @Override
     public void setBars(){
         super.setBars();
@@ -31,7 +31,8 @@ public class InertialLiquidConverter extends LiquidConverter{
         Strings.fixed(entity.use * entity.warmup * 60 * entity.timeScale() / Time.delta, 1)),
         () -> outputLiquid.liquid.barColor(),
         () -> entity.productionEfficiency));
-    }    
+    }
+
     public class InertialLiquidConverterBuild extends LiquidConverterBuild{
         public float spinRotation = 0.0f;
         public float warmup = 0.0f;
@@ -50,26 +51,26 @@ public class InertialLiquidConverter extends LiquidConverter{
             super.read(read, revision);
             productionEfficiency = read.f();
         }
-        
+
         @Override
         public void updateTile(){
             ConsumeLiquidBase cl = consumes.get(ConsumeType.liquid);
 
             if(cons.valid()){
                 use = Math.min(cl.amount * edelta(), liquidCapacity - liquids.get(outputLiquid.liquid));
-                
+
                 warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed);
                 if(Mathf.equal(warmup, 1f, 0.001f)){
                     warmup = 1f;
                 }
-                
+
                 progress += use / cl.amount * warmup;
                 liquids.add(outputLiquid.liquid, use * warmup);
                 if(progress >= craftTime){
                     consume();
                     progress %= craftTime;
                 }
-                
+
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.01f);
             }
@@ -77,19 +78,19 @@ public class InertialLiquidConverter extends LiquidConverter{
             productionEfficiency = Mathf.pow(warmup, 4f);
             dumpLiquid(outputLiquid.liquid);
         }
-        
+
         @Override
         public void draw() {
             Draw.rect(bottomRegion, x, y);
-            
+
             Draw.color(outputLiquid.liquid.color);
             Draw.alpha(liquids.get(outputLiquid.liquid) / liquidCapacity);
             Draw.rect(liquidRegion, x, y);
             Draw.color();
-            
+
             Draw.rect(region, x, y);
-            
-            spinRotation += Time.delta * warmup * warmup;
+
+            spinRotation += Time.delta * warmup * warmup * 4;
             Draw.rect(rotatorRegion, x, y, spinRotation);
             Draw.rect(topRegion, x, y);
         }
