@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -77,6 +78,8 @@ public abstract class BulletType extends Content{
     public boolean backMove = true;
     /** Bullet range override. */
     public float range = -1f;
+    /** Heal Bullet Percent **/
+    public float healPercent = 0f;
 
     //additional effects
 
@@ -139,11 +142,16 @@ public abstract class BulletType extends Content{
     }
 
     public boolean collides(Bullet bullet, Building tile){
-        return true;
+        return healPercent == 0f ? true : (tile.team != bullet.team || tile.healthf() < 1f);
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
         hit(b);
+
+        if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
+            tile.heal(healPercent / 100f * tile.maxHealth());
+        }
     }
 
     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
@@ -184,6 +192,13 @@ public abstract class BulletType extends Content{
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+            }
+
+            if(healPercent >= 0f) {
+                indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
+                    other.heal(healPercent / 100f * other.maxHealth());
+                });
             }
         }
 
