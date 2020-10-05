@@ -304,7 +304,7 @@ public class LogicBlock extends Block{
                         assemble.get(asm);
                     }
 
-                    asm.putConst("@this", this);
+                    asm.getVar("@this").value = this;
                     asm.putConst("@thisx", x);
                     asm.putConst("@thisy", y);
 

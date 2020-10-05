@@ -27,7 +27,8 @@ public class LExecutor{
     public static final int
         varCounter = 0,
         varTime = 1,
-        varUnit = 2;
+        varUnit = 2,
+        varThis = 3;
 
     public static final int
         maxGraphicsBuffer = 256,
@@ -215,6 +216,7 @@ public class LExecutor{
             if(unitObj instanceof Unit unit && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
                 if(!(unit.controller() instanceof LogicAI)){
                     unit.controller(new LogicAI());
+                    ((LogicAI)unit.controller()).controller = exec.building(varThis);
 
                     //clear old state
                     if(unit instanceof Minerc miner){
@@ -249,6 +251,9 @@ public class LExecutor{
                         if(type == LUnitControl.approach){
                             ai.moveRad = exec.numf(p3);
                         }
+                    }
+                    case pathfind -> {
+                        ai.control = type;
                     }
                     case target -> {
                         ai.posTarget.set(exec.numf(p1), exec.numf(p2));

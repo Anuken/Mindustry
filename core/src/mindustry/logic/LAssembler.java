@@ -27,6 +27,8 @@ public class LAssembler{
         putConst("@time", 0);
         //currently controlled unit
         putConst("@unit", null);
+        //reference to self
+        putConst("@this", null);
 
         //add default constants
         putConst("false", 0);

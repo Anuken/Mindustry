@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -65,6 +66,19 @@ public class AIController implements UnitController{
 
     protected boolean invalid(Teamc target){
         return Units.invalidateTarget(target, unit.team, unit.x, unit.y);
+    }
+
+
+    protected void pathfind(int pathTarget){
+        int costType = unit.pathType();
+
+        Tile tile = unit.tileOn();
+        if(tile == null) return;
+        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
+
+        if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
+
+        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }
 
     protected void updateWeapons(){
