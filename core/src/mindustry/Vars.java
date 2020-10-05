@@ -83,7 +83,7 @@ public class Vars implements Loadable{
     /** range for moving items */
     public static final float itemTransferRange = 220f;
     /** range for moving items for logic units */
-    public static final float logicItemTransferRange = 40f;
+    public static final float logicItemTransferRange = 45f;
     /** duration of time between turns in ticks */
     public static final float turnDuration = 20 * Time.toMinutes;
     /** turns needed to destroy a sector completely */

@@ -63,7 +63,9 @@ public class Renderer implements ApplicationListener{
         Color.white.set(1f, 1f, 1f, 1f);
         Gl.clear(Gl.stencilBufferBit);
 
-        camerascale = Mathf.lerpDelta(camerascale, targetscale, 0.1f);
+        float dest = Mathf.round(targetscale, 0.5f);
+        camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
+        if(Mathf.within(camerascale, dest, 0.001f)) camerascale = dest;
         laserOpacity = Core.settings.getInt("lasersopacity") / 100f;
 
         if(landTime > 0){
@@ -301,6 +303,10 @@ public class Renderer implements ApplicationListener{
     public void clampScale(){
         float s = Scl.scl(1f);
         targetscale = Mathf.clamp(targetscale, minScale(), Math.round(s * 6));
+    }
+
+    public float getDisplayScale(){
+        return camerascale;
     }
 
     public float minScale(){

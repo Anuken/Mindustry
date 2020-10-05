@@ -394,7 +394,7 @@ public class UnitTypes implements ContentList{
             engineSize = 6f;
             lowAltitude = true;
 
-            health = 6500f;
+            health = 7000f;
             armor = 7f;
             canBoost = true;
             landShake = 4f;

@@ -61,7 +61,7 @@ public class LogicAI extends AIController{
                 moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
             }
             case approach -> {
-                moveTo(Tmp.v1.set(moveX, moveY), moveRad, 10f);
+                moveTo(Tmp.v1.set(moveX, moveY), moveRad, 1f);
             }
             case pathfind -> {
                 Building core = unit.closestEnemyCore();
