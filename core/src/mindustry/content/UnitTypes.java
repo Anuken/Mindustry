@@ -1191,7 +1191,7 @@ public class UnitTypes implements ContentList{
                     smokeEffect = Fx.hitLaser;
                     frontColor = Color.white;
 
-                	healPercent = 5.5f;
+                    healPercent = 5.5f;
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
