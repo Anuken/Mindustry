@@ -591,8 +591,8 @@ public class Blocks implements ContentList{
             hasPower = true;
             drawer = new DrawWeave();
 
-            consumes.items(new ItemStack(Items.thorium, 7), new ItemStack(Items.sand, 8), new ItemStack(Items.plastanium, 4));
-            consumes.power(11.67f);
+            consumes.items(new ItemStack(Items.thorium, 10), new ItemStack(Items.sand, 18), new ItemStack(Items.plastanium, 4));
+            consumes.power(11.6666667f);
             itemCapacity = 20;
         }};
 
