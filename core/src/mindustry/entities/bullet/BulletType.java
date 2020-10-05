@@ -194,7 +194,7 @@ public abstract class BulletType extends Content{
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
 
-            if(healPercent >= 0f) {
+            if(healPercent > 0f) {
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
