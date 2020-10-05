@@ -558,6 +558,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //ignore off-screen taps
         if(cursor == null || Core.scene.hasMouse(x, y)) return false;
+
+        Call.tileTap(player, cursor);
+
         Tile linked = cursor.build == null ? cursor : cursor.build.tile;
 
         if(!player.dead()){
@@ -877,14 +880,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
             if(!movement.isZero() && legs){
-                unit.vel.rotateTo(movement.angle(), type.rotateSpeed * Time.delta);
+                unit.vel.rotateTo(movement.angle(), type.rotateSpeed);
             }
-        }
-
-        if(flying){
-            //hovering effect
-            unit.x += Mathf.sin(Time.time(), 25f, 0.08f);
-            unit.y += Mathf.cos(Time.time(), 25f, 0.08f);
         }
 
         //update shooting if not building + not mining

@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
@@ -31,7 +30,7 @@ import static mindustry.Vars.*;
 public class World{
     public final Context context = new Context();
 
-    public @NonNull Tiles tiles = new Tiles(0, 0);
+    public Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
@@ -86,13 +85,11 @@ public class World{
         return height()*tilesize;
     }
 
-    @NonNull
     public Floor floor(int x, int y){
         Tile tile = tile(x, y);
         return tile == null ? Blocks.air.asFloor() : tile.floor();
     }
 
-    @NonNull
     public Floor floorWorld(float x, float y){
         Tile tile = tileWorld(x, y);
         return tile == null ? Blocks.air.asFloor() : tile.floor();
@@ -132,7 +129,6 @@ public class World{
         return tile.build;
     }
 
-    @NonNull
     public Tile rawTile(int x, int y){
         return tiles.getn(x, y);
     }

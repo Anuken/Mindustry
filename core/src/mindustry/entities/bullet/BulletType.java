@@ -3,7 +3,6 @@ package mindustry.entities.bullet;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -71,6 +70,11 @@ public abstract class BulletType extends Content{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
+    /** Whether this projectile can be absorbed by shields. */
+    public boolean absorbable = true;
+    /** Whether to move the bullet back depending on delta to fix some delta-time realted issues.
+     * Do not change unless you know what you're doing. */
+    public boolean backMove = true;
     /** Bullet range override. */
     public float range = -1f;
 
@@ -80,7 +84,7 @@ public abstract class BulletType extends Content{
     public float fragAngle = 0f;
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
-    public BulletType fragBullet = null;
+    public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
     public Color trailColor = Pal.missileYellowBack;
@@ -212,7 +216,7 @@ public abstract class BulletType extends Content{
         }
 
         if(instantDisappear){
-            b.time(lifetime);
+            b.time = lifetime;
         }
     }
 
@@ -274,7 +278,11 @@ public abstract class BulletType extends Content{
         bullet.owner = owner;
         bullet.team = team;
         bullet.vel.trns(angle, speed * velocityScl);
-        bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        if(backMove){
+            bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
+        }else{
+            bullet.set(x, y);
+        }
         bullet.lifetime = lifetime * lifetimeScl;
         bullet.data = data;
         bullet.drag = drag;

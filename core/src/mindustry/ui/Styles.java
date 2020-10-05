@@ -1,7 +1,6 @@
 package mindustry.ui;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
@@ -16,6 +15,7 @@ import arc.scene.ui.ScrollPane.*;
 import arc.scene.ui.Slider.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.TextField.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 

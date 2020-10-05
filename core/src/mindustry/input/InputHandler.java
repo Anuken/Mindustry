@@ -12,7 +12,6 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.ai.formations.patterns.*;
 import mindustry.annotations.Annotations.*;
@@ -272,6 +271,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             !netServer.admins.allowAction(player, ActionType.configure, tile.tile, action -> action.config = value))) throw new ValidateException(player, "Player cannot configure a tile.");
         tile.configured(player == null || player.dead() ? null : player.unit(), value);
         Core.app.post(() -> Events.fire(new ConfigEvent(tile, player, value)));
+    }
+
+    //only useful for servers or local mods, and is not replicated across clients
+    //uses unreliable packets due to high frequency
+    @Remote(targets = Loc.both, called = Loc.both, unreliable = true)
+    public static void tileTap(@Nullable Player player, Tile tile){
+        if(tile == null) return;
+
+        Events.fire(new TapEvent(player, tile));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

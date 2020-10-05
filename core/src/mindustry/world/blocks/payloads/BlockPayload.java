@@ -8,7 +8,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class BlockPayload implements Payload{
     public Building entity;

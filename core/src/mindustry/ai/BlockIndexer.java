@@ -6,7 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.EnumSet;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -220,7 +220,7 @@ public class BlockIndexer{
 
     public void notifyTileDamaged(Building entity){
         if(damagedTiles[entity.team.id] == null){
-            damagedTiles[entity.team.id] = new ObjectSet<Building>();
+            damagedTiles[entity.team.id] = new ObjectSet<>();
         }
 
         damagedTiles[entity.team.id].add(entity);

@@ -1,8 +1,8 @@
 package mindustry.content;
 
-import arc.graphics.Color;
-import mindustry.ctype.ContentList;
-import mindustry.type.Liquid;
+import arc.graphics.*;
+import mindustry.ctype.*;
+import mindustry.type.*;
 
 public class Liquids implements ContentList{
     public static Liquid water, slag, oil, cryofluid;

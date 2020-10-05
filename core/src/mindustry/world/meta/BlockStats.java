@@ -1,7 +1,7 @@
 package mindustry.world.meta;
 
-import arc.struct.*;
 import arc.struct.ObjectMap.*;
+import arc.struct.*;
 import mindustry.*;
 import mindustry.type.*;
 import mindustry.world.*;

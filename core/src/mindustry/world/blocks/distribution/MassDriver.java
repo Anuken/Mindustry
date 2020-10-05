@@ -210,9 +210,9 @@ public class MassDriver extends Block{
             }
 
             if(linkValid()){
-                Tile target = world.tile(link);
-                Drawf.circles(target.drawx(), target.drawy(), (target.block().size / 2f + 1) * tilesize + sin - 2f, Pal.place);
-                Drawf.arrow(x, y, target.drawx(), target.drawy(), size * tilesize + sin, 4f + sin);
+                Building target = world.build(link);
+                Drawf.circles(target.x, target.y, (target.block().size / 2f + 1) * tilesize + sin - 2f, Pal.place);
+                Drawf.arrow(x, y, target.x, target.y, size * tilesize + sin, 4f + sin);
             }
 
             Drawf.dashCircle(x, y, range, Pal.accent);
@@ -251,7 +251,7 @@ public class MassDriver extends Block{
             data.to = target;
             int totalUsed = 0;
             for(int i = 0; i < content.items().size; i++){
-                int maxTransfer = Math.min(items.get(content.item(i)), ((MassDriver)tile.block()).itemCapacity - totalUsed);
+                int maxTransfer = Math.min(items.get(content.item(i)), tile.block().itemCapacity - totalUsed);
                 data.items[i] = maxTransfer;
                 totalUsed += maxTransfer;
                 items.remove(content.item(i), maxTransfer);
@@ -305,8 +305,8 @@ public class MassDriver extends Block{
 
         protected boolean linkValid(){
             if(link == -1) return false;
-            Tile link = world.tile(this.link);
-            return link != null && link.block() instanceof MassDriver && link.team() == tile.team() && tile.dst(link) <= range;
+            Building link = world.build(this.link);
+            return link instanceof MassDriverBuild && link.team == team && within(link, range);
         }
 
         @Override

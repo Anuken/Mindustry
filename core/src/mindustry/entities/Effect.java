@@ -8,7 +8,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;

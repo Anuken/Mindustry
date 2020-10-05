@@ -4,7 +4,7 @@ import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class StaticTree extends StaticWall{
 

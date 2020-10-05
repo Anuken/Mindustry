@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -14,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -27,6 +29,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public boolean splitOut = true;
+    /** (minimum) amount of loading docks needed to fill a line */
     public float recharge = 2f;
     public Effect loadEffect = Fx.plasticburn;
     public Effect unloadEffect = Fx.plasticburn;
@@ -197,11 +200,7 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
-                    if(front() != null
-                    && front().team == team
-                    && front().block instanceof StackConveyor){
-                        StackConveyorBuild e = (StackConveyorBuild)front();
-
+                    if(front() instanceof StackConveyorBuild e && e.team == team){
                         // sleep if its occupied
                         if(e.link == -1){
                             e.items.addAll(items);
@@ -215,6 +214,16 @@ public class StackConveyor extends Block implements Autotiler{
                             e.cooldown = 1;
                         }
                     }
+                }
+            }
+        }
+
+        @Override
+        public void overwrote(Seq<Building> builds){
+            if(builds.first() instanceof ConveyorBuild build){
+                Item item = build.items.first();
+                if(item != null){
+                    handleStack(item, build.items.get(item), null);
                 }
             }
         }

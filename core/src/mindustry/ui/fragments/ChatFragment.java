@@ -2,7 +2,6 @@ package mindustry.ui.fragments;
 
 import arc.*;
 import arc.Input.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -10,6 +9,7 @@ import arc.scene.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Label.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;

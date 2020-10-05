@@ -3,7 +3,6 @@ package mindustry.annotations.entity;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
@@ -77,9 +76,10 @@ public class EntityProcess extends BaseProcessor{
                     if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
                     //get all statements in the method, store them
                     methodBlocks.put(elem.descString(), elem.tree().getBody().toString()
-                        //replace all self() invocations with this
-                        .replaceAll("this\\.<(.*)>self\\(\\)", "this")
-                        .replaceAll("self\\(\\)", "this")
+                        .replaceAll("this\\.<(.*)>self\\(\\)", "this") //fix parameterized self() calls
+                        .replaceAll("self\\(\\)", "this") //fix self() calls
+                        .replaceAll(" yield ", "") //fix enchanced switch
+                        .replaceAll("\\/\\*missing\\*\\/", "var") //fix vars
                     );
                 }
             }

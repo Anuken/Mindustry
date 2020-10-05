@@ -13,7 +13,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
@@ -421,7 +420,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @param todump payload to dump.
      * @return whether the payload was moved successfully
      */
-    public boolean movePayload(@NonNull Payload todump){
+    public boolean movePayload(Payload todump){
         int trns = block.size/2 + 1;
         Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
@@ -438,7 +437,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * @param todump payload to dump.
      * @return whether the payload was moved successfully
      */
-    public boolean dumpPayload(@NonNull Payload todump){
+    public boolean dumpPayload(Payload todump){
         if(proximity.size == 0) return false;
 
         int dump = this.dump;
@@ -466,8 +465,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return block.consumes.itemFilters.get(item.id) && items.get(item) < getMaximumAccepted(item);
     }
 
-    public boolean acceptLiquid(Building source, Liquid liquid, float amount){
-        return block.hasLiquids && liquids.get(liquid) + amount < block.liquidCapacity && block.consumes.liquidfilters.get(liquid.id);
+    public boolean acceptLiquid(Building source, Liquid liquid){
+        return block.hasLiquids && block.consumes.liquidfilters.get(liquid.id);
     }
 
     public void handleLiquid(Building source, Liquid liquid, float amount){
@@ -497,9 +496,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void transferLiquid(Building next, float amount, Liquid liquid){
-        float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f, amount);
+        float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
 
-        if(next.acceptLiquid(self(), liquid, flow)){
+        if(next.acceptLiquid(self(), liquid)){
             next.handleLiquid(self(), liquid, flow);
             liquids.remove(liquid, flow);
         }
@@ -529,9 +528,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float ofract = next.liquids.get(liquid) / next.block.liquidCapacity;
             float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
             float flow = Math.min(Mathf.clamp((fract - ofract) * (1f)) * (block.liquidCapacity), liquids.get(liquid));
-            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid) - 0.001f);
+            flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
 
-            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid, flow)){
+            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid)){
                 next.handleLiquid(self(), liquid, flow);
                 liquids.remove(liquid, flow);
                 return flow;
@@ -847,6 +846,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 }
             }
         }
+    }
+
+    /**
+     * Called when a block is placed over some other blocks. This seq will always have at least one item.
+     * Should load some previous state, if necessary. */
+    public void overwrote(Seq<Building> previous){
+
     }
 
     public void onRemoved(){
@@ -1213,31 +1219,36 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.x) return x;
-        if(sensor == LAccess.y) return y;
-        if(sensor == LAccess.team) return team.id;
-        if(sensor == LAccess.health) return health;
-        if(sensor == LAccess.maxHealth) return maxHealth();
-        if(sensor == LAccess.efficiency) return efficiency();
-        if(sensor == LAccess.rotation) return rotation;
-        if(sensor == LAccess.totalItems && items != null) return items.total();
-        if(sensor == LAccess.totalLiquids && liquids != null) return liquids.total();
-        if(sensor == LAccess.totalPower && power != null && block.consumes.hasPower()) return power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-        if(sensor == LAccess.itemCapacity) return block.itemCapacity;
-        if(sensor == LAccess.liquidCapacity) return block.liquidCapacity;
-        if(sensor == LAccess.powerCapacity) return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
-        if(sensor == LAccess.powerNetIn && power != null) return power.graph.getLastScaledPowerIn() * 60;
-        if(sensor == LAccess.powerNetOut && power != null) return power.graph.getLastScaledPowerOut() * 60;
-        if(sensor == LAccess.powerNetStored && power != null) return power.graph.getLastPowerStored();
-        if(sensor == LAccess.powerNetCapacity && power != null) return power.graph.getLastCapacity();
-        return 0;
+        return switch(sensor){
+            case x -> x;
+            case y -> y;
+            case team -> team.id;
+            case health -> health;
+            case maxHealth -> maxHealth();
+            case efficiency -> efficiency();
+            case rotation -> rotation;
+            case totalItems -> items == null ? 0 : items.total();
+            case totalLiquids -> liquids == null ? 0 : liquids.total();
+            case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+            case itemCapacity -> block.itemCapacity;
+            case liquidCapacity -> block.liquidCapacity;
+            case powerCapacity -> block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
+            case powerNetIn -> power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
+            case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
+            case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
+            case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
+            case enabled -> enabled ? 1 : 0;
+            default -> 0;
+        };
     }
 
     @Override
     public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.type) return block;
+        return switch(sensor){
+            case type -> block;
+            default -> noSensed;
+        };
 
-        return noSensed;
     }
 
     @Override
@@ -1253,6 +1264,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             enabled = !Mathf.zero((float)p1);
             enabledControlTime = timeToUncontrol;
         }
+    }
+
+    @Override
+    public void control(LAccess type, Object p1, double p2, double p3, double p4){
+
     }
 
     @Override

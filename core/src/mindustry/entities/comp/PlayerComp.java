@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -33,7 +32,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Import float x, y;
 
-    @NonNull @ReadOnly Unit unit = Nulls.unit;
+    @ReadOnly Unit unit = Nulls.unit;
     transient private Unit lastReadUnit = Nulls.unit;
     transient @Nullable NetConnection con;
 

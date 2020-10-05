@@ -1,7 +1,7 @@
 package mindustry.ai.types;
 
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.Teams.*;
@@ -87,8 +87,8 @@ public class BuilderAI extends AIController{
             }
 
             //find new request
-            if(!unit.team().data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
-                Queue<BlockPlan> blocks = unit.team().data().blocks;
+            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
+                Queue<BlockPlan> blocks = unit.team.data().blocks;
                 BlockPlan block = blocks.first();
 
                 //check if it's already been placed

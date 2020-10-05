@@ -184,7 +184,6 @@ public class Damage{
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
                     tmpBuilding = tile;
-                    //TODO return tile
                     return true;
                 }
                 return false;

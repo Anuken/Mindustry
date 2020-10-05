@@ -3,18 +3,21 @@ package mindustry.world;
 import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
 public class Build{
+    private static final IntSet tmp = new IntSet();
 
     @Remote(called = Loc.server)
     public static void beginBreak(Team team, int x, int y){
@@ -36,7 +39,8 @@ public class Build{
 
         tile.setBlock(sub, team, rotation);
         tile.<ConstructBuild>bc().setDeconstruct(previous);
-        tile.build.health(tile.build.maxHealth() * prevPercent);
+        tile.build.health = tile.build.maxHealth * prevPercent;
+
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
@@ -55,11 +59,23 @@ public class Build{
 
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
+        Seq<Building> prevBuild = new Seq<>(9);
 
         result.beforePlaceBegan(tile, previous);
+        tmp.clear();
+
+        tile.getLinkedTilesAs(result, t -> {
+            if(t.build != null && t.build.team == team && tmp.add(t.build.id)){
+                prevBuild.add(t.build);
+            }
+        });
 
         tile.setBlock(sub, team, rotation);
-        tile.<ConstructBuild>bc().setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
+
+        ConstructBuild build = tile.bc();
+
+        build.setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
+        build.prevBuild = prevBuild;
 
         result.placeBegan(tile, previous);
 
@@ -110,7 +126,9 @@ public class Build{
             for(int dy = 0; dy < type.size; dy++){
                 int wx = dx + offsetx + tile.x, wy = dy + offsety + tile.y;
 
+
                 Tile check = world.tile(wx, wy);
+
                 if(
                 check == null || //nothing there
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water

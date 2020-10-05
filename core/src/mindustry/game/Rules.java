@@ -2,7 +2,7 @@ package mindustry.game;
 
 import arc.graphics.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;

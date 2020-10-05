@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;

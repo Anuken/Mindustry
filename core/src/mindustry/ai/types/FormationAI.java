@@ -2,7 +2,7 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;

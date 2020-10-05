@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -75,6 +74,8 @@ public class CoreBlock extends StorageBlock{
     @Override
     public void setStats(){
         super.setStats();
+
+        stats.add(BlockStat.buildTime, 0, StatUnit.seconds);
 
         bars.add("capacity", (CoreBuild e) ->
             new Bar(
@@ -154,7 +155,7 @@ public class CoreBlock extends StorageBlock{
     public class CoreBuild extends Building implements ControlBlock{
         public int storageCapacity;
         //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
-        public @NonNull BlockUnitc unit = Nulls.blockUnit;
+        public BlockUnitc unit = Nulls.blockUnit;
 
         @Override
         public void created(){

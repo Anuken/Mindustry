@@ -50,7 +50,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad;
 
     //air + building + payload + command
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, Commanderc.class}) UnitType oct;
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, Commanderc.class, AmmoDistributec.class}) UnitType oct;
 
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
@@ -446,7 +446,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             hitSize = 29f;
             itemCapacity = 80;
-            health = 19000f;
+            health = 18000f;
             buildSpeed = 1.7f;
             armor = 9f;
             landShake = 1.5f;
@@ -488,7 +488,7 @@ public class UnitTypes implements ContentList{
                 firstShotDelay = Fx.greenLaserCharge.lifetime;
 
                 bullet = new LaserBulletType(){{
-                    length = 500f;
+                    length = 460f;
                     damage = 550f;
                     width = 75f;
 
@@ -519,7 +519,7 @@ public class UnitTypes implements ContentList{
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
 
-            speed = 0.85f;
+            speed = 0.9f;
             hitSize = 8f;
             health = 180;
             mechSideSway = 0.25f;
@@ -536,7 +536,7 @@ public class UnitTypes implements ContentList{
                     speed = 1f;
                     splashDamageRadius = 55f;
                     instantDisappear = true;
-                    splashDamage = 55f;
+                    splashDamage = 60f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -1314,6 +1314,10 @@ public class UnitTypes implements ContentList{
             buildSpeed = 4f;
             drawShields = false;
             commandLimit = 6;
+            lowAltitude = true;
+
+            ammoCapacity = 1300;
+            ammoResupplyAmount = 20;
 
             abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
         }};

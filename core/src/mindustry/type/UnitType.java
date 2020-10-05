@@ -11,7 +11,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -39,8 +38,8 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
-    public @NonNull Prov<? extends Unit> constructor;
-    public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
+    public Prov<? extends Unit> constructor;
+    public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, armor = 0f;
@@ -65,6 +64,9 @@ public class UnitType extends UnlockableContent{
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
+
+    public int ammoResupplyAmount = 10;
+    public float ammoResupplyRange = 100f;
 
     public float mechSideSway = 0.54f, mechFrontSway = 0.1f;
     public float mechStride = -1f;
@@ -357,7 +359,6 @@ public class UnitType extends UnlockableContent{
             drawPayload((Unit & Payloadc)unit);
         }
 
-        //TODO
         drawOcclusion(unit);
 
         Draw.z(z - outlineSpace);
@@ -621,7 +622,6 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        //TODO should be below/above legs
         if(baseRegion.found()){
             Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
         }

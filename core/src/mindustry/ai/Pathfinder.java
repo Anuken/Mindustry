@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.annotations.Annotations.*;
@@ -51,7 +50,7 @@ public class Pathfinder implements Runnable{
             (PathTile.solid(tile) ? 5 : 0),
 
         //water
-        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 + //TODO cannot go through blocks - pathfinding isn't great
+        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? -1 : 0) +
             (PathTile.damages(tile) ? 35 : 0)
@@ -103,7 +102,6 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        //TODO nearGround is just the inverse of nearLiquid?
         boolean nearLiquid = false, nearSolid = false, nearGround = false;
 
         for(int i = 0; i < 4; i++){
@@ -188,6 +186,8 @@ public class Pathfinder implements Runnable{
                     for(Flowfield data : threadList){
                         updateFrontier(data, maxUpdate / threadList.size);
 
+                        //TODO implement timeouts... or don't
+                        /*
                         //remove flowfields that have 'timed out' so they can be garbage collected and no longer waste space
                         if(data.refreshRate > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
                             //make sure it doesn't get removed twice
@@ -196,12 +196,11 @@ public class Pathfinder implements Runnable{
                             Team team = data.team;
 
                             Core.app.post(() -> {
-                                //TODO ?????
                                 //remove its used state
-                                //if(fieldMap[team.id] != null){
-                                //    fieldMap[team.id].remove(data.target);
-                                //    fieldMapUsed[team.id].remove(data.target);
-                                //}
+                                if(fieldMap[team.id] != null){
+                                    fieldMap[team.id].remove(data.target);
+                                    fieldMapUsed[team.id].remove(data.target);
+                                }
                                 //remove from main thread list
                                 mainList.remove(data);
                             });
@@ -210,7 +209,7 @@ public class Pathfinder implements Runnable{
                                 //remove from this thread list with a delay
                                 threadList.remove(data);
                             });
-                        }
+                        }*/
                     }
                 }
 
@@ -469,7 +468,7 @@ public class Pathfinder implements Runnable{
         /** search frontier, these are Pos objects */
         IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */
-        IntSeq targets = new IntSeq();
+        final IntSeq targets = new IntSeq();
         /** current search ID */
         int search = 1;
         /** last updated time */

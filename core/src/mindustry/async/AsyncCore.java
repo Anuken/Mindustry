@@ -7,7 +7,7 @@ import mindustry.game.EventType.*;
 
 import java.util.concurrent.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class AsyncCore{
     //all processes to be executed each frame

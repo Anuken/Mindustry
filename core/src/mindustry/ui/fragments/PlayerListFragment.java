@@ -36,7 +36,7 @@ public class PlayerListFragment extends Fragment{
                     rebuild();
                     content.pack();
                     content.act(Core.graphics.getDeltaTime());
-                    //TODO hack
+                    //hacky
                     Core.scene.act(0f);
                 }
             });
@@ -115,13 +115,9 @@ public class PlayerListFragment extends Fragment{
                     t.defaults().size(bs);
 
                     t.button(Icon.hammer, Styles.clearPartiali,
-                    () -> {
-                        ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban));
-                    });
+                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban)));
                     t.button(Icon.cancel, Styles.clearPartiali,
-                    () -> {
-                        ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick));
-                    });
+                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick)));
 
                     t.row();
 

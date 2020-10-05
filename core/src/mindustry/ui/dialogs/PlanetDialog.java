@@ -13,7 +13,6 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -381,7 +380,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         //stored resources
-        if(sector.hasBase() && sector.save.meta.secinfo.coreItems.size > 0){
+        if(sector.hasBase() && sector.save.meta.secinfo.coreItems.total > 0){
             stable.add("@sectors.stored").row();
             stable.table(t -> {
                 t.left();

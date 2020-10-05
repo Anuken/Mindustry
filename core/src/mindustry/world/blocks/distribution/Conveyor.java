@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -124,7 +123,7 @@ public class Conveyor extends Block implements Autotiler{
                     int dir = rotation - i;
                     float rot = i == 0 ? rotation * 90 : (dir)*90;
 
-                    Draw.rect(sliced(regions[0][frame], i != 0 ? 1 : 2), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, rot);
+                    Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.bottom : SliceMode.top), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, rot);
                 }
             }
 
@@ -147,8 +146,22 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
+        public void overwrote(Seq<Building> builds){
+            if(builds.first() instanceof ConveyorBuild build){
+                ids = build.ids.clone();
+                xs = build.xs.clone();
+                ys = build.ys.clone();
+                len = build.len;
+                clogHeat = build.clogHeat;
+                lastInserted = build.lastInserted;
+                mid = build.mid;
+                minitem = build.minitem;
+            }
+        }
+
+        @Override
         public boolean shouldIdleSound(){
-            return clogHeat <= 0.5f ;
+            return clogHeat <= 0.5f;
         }
 
         @Override
@@ -161,11 +174,9 @@ public class Conveyor extends Block implements Autotiler{
             blendscly = bits[2];
             blending = bits[4];
 
-            if(front() != null && front() != null){
-                next = front();
-                nextc = next instanceof ConveyorBuild && next.team == team ? (ConveyorBuild)next : null;
-                aligned = nextc != null && rotation == next.rotation;
-            }
+            next = front();
+            nextc = next instanceof ConveyorBuild && next.team == team ? (ConveyorBuild)next : null;
+            aligned = nextc != null && rotation == next.rotation;
         }
 
         @Override
@@ -220,7 +231,7 @@ public class Conveyor extends Block implements Autotiler{
                 if(ys[i] > 0.5 && i > 0) mid = i - 1;
                 xs[i] = Mathf.approachDelta(xs[i], 0, speed*2);
 
-                if(ys[i] >= 1f && moveForward(ids[i])){
+                if(ys[i] >= 1f && pass(ids[i])){
                     //align X position if passing forwards
                     if(aligned){
                         nextc.xs[nextc.lastInserted] = xs[i];
@@ -240,6 +251,14 @@ public class Conveyor extends Block implements Autotiler{
             }
 
             noSleep();
+        }
+
+        public boolean pass(Item item) {
+            if(next != null && next.team == team && next.acceptItem(this, item)){
+                next.handleItem(this, item);
+                return true;
+            }
+            return false;
         }
 
         @Override
@@ -346,6 +365,9 @@ public class Conveyor extends Block implements Autotiler{
                     ys[i] = y;
                 }
             }
+
+            //this updates some state
+            updateTile();
         }
 
 

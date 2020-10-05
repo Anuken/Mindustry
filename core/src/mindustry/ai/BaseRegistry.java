@@ -3,7 +3,6 @@ package mindustry.ai;
 import arc.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -17,7 +16,7 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class BaseRegistry{
     public Seq<BasePart> cores = new Seq<>();

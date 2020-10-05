@@ -9,7 +9,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;

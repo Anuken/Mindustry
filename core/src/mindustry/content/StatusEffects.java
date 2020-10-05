@@ -2,10 +2,11 @@ package mindustry.content;
 
 import arc.*;
 import arc.graphics.*;
-import arc.math.Mathf;
-import mindustry.ctype.ContentList;
+import arc.math.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.type.StatusEffect;
+import mindustry.type.*;
+
 import static mindustry.Vars.*;
 
 public class StatusEffects implements ContentList{

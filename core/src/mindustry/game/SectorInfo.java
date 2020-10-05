@@ -2,7 +2,6 @@ package mindustry.game;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -24,7 +23,7 @@ public class SectorInfo{
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
     /** Items stored in all cores. */
-    public ObjectIntMap<Item> coreItems = new ObjectIntMap<>();
+    public ItemSeq coreItems = new ItemSeq();
     /** The best available core type. */
     public Block bestCoreType = Blocks.air;
     /** Max storage capacity. */
@@ -80,7 +79,7 @@ public class SectorInfo{
         if(entity != null){
             ItemModule items = entity.items;
             for(int i = 0; i < items.length(); i++){
-                coreItems.put(content.item(i), items.get(i));
+                coreItems.set(content.item(i), items.get(i));
             }
         }
 
@@ -88,7 +87,7 @@ public class SectorInfo{
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
 
-        //update sector's internal time spent counter1
+        //update sector's internal time spent counter
         state.rules.sector.setTimeSpent(internalTimeSpent);
     }
 
@@ -99,6 +98,12 @@ public class SectorInfo{
         if(net.client()) return;
 
         internalTimeSpent += Time.delta;
+
+        //autorun turns
+        if(internalTimeSpent >= turnDuration){
+            internalTimeSpent = 0;
+            universe.runTurn();
+        }
 
         //create last stored core items
         if(lastCoreItems == null){

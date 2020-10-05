@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
@@ -75,24 +74,28 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.totalItems) return stack().amount;
-        if(sensor == LAccess.rotation) return rotation;
-        if(sensor == LAccess.health) return health;
-        if(sensor == LAccess.maxHealth) return maxHealth;
-        if(sensor == LAccess.x) return x;
-        if(sensor == LAccess.y) return y;
-        if(sensor == LAccess.team) return team.id;
-        if(sensor == LAccess.shooting) return isShooting() ? 1 : 0;
-        if(sensor == LAccess.shootX) return aimX();
-        if(sensor == LAccess.shootY) return aimY();
-        return 0;
+        return switch(sensor){
+            case totalItems -> stack().amount;
+            case rotation -> rotation;
+            case health -> health;
+            case maxHealth -> maxHealth;
+            case x -> x;
+            case y -> y;
+            case team -> team.id;
+            case shooting -> isShooting() ? 1 : 0;
+            case shootX -> aimX();
+            case shootY -> aimY();
+            default -> 0;
+        };
     }
 
     @Override
     public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.type) return type;
+        return switch(sensor){
+            case type -> type;
+            default -> noSensed;
+        };
 
-        return noSensed;
     }
 
     @Override

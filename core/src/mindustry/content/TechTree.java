@@ -2,7 +2,7 @@ package mindustry.content;
 
 import arc.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
@@ -109,6 +109,9 @@ public class TechTree implements ContentList{
 
                 node(Items.coal, with(Items.lead, 3000), () -> {
                     node(Items.graphite, with(Items.coal, 1000), () -> {
+                        node(illuminator, () -> {
+                        });
+
                         node(graphitePress, () -> {
                             node(Items.titanium, with(Items.graphite, 6000, Items.copper, 10000, Items.lead, 10000), () -> {
                                 node(pneumaticDrill, () -> {
@@ -344,11 +347,17 @@ public class TechTree implements ContentList{
 
                                 });
                             });
+
+                            node(tsunami, () -> {
+
+                            });
                         });
 
                         node(lancer, () -> {
-                            node(meltdown, () -> {
+                            node(foreshadow, () -> {
+                                node(meltdown, () -> {
 
+                                });
                             });
 
                             node(shockMine, () -> {
@@ -562,7 +571,8 @@ public class TechTree implements ContentList{
         return node(block, () -> {});
     }
 
-    public static @Nullable TechNode get(UnlockableContent content){
+    public static @Nullable
+    TechNode get(UnlockableContent content){
         return map.get(content);
     }
 

@@ -6,9 +6,9 @@ import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.mock.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
@@ -36,8 +36,9 @@ import java.lang.reflect.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
+    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
 
-    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
+    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
@@ -440,6 +441,8 @@ public class ContentParser{
     }
 
     public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
+        Log.err("Error for @ / @:\n@\n", content, file, Strings.getStackTrace(error));
+
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
         content.minfo.error = makeError(error, file);
@@ -539,13 +542,13 @@ public class ContentParser{
     }
 
     void checkNullFields(Object object){
-        if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
+        if(object == null || object instanceof Number || object instanceof String || toBeParsed.contains(object) || object.getClass().getName().startsWith("arc.")) return;
 
         parser.getFields(object.getClass()).values().toSeq().each(field -> {
             try{
                 if(field.field.getType().isPrimitive()) return;
 
-                if(field.field.isAnnotationPresent(NonNull.class) && field.field.get(object) == null){
+                if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null && !implicitNullable.contains(field.field.getType())){
                     throw new RuntimeException("'" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
                 }
             }catch(Exception e){

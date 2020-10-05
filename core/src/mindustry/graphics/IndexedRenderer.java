@@ -7,7 +7,6 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 
-//TODO this class is a trainwreck, remove it
 public class IndexedRenderer implements Disposable{
     private static final int vsize = 5;
 

@@ -1,7 +1,6 @@
 package mindustry.logic;
 
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.*;
@@ -165,7 +164,11 @@ public class LExecutor{
             Object obj = exec.obj(target);
             if(obj instanceof Controllable){
                 Controllable cont = (Controllable)obj;
-                cont.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+                if(type.isObj){
+                    cont.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+                }else{
+                    cont.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+                }
             }
         }
     }
@@ -577,7 +580,7 @@ public class LExecutor{
             if(address != -1){
                 Var va = exec.vars[value];
                 Var vb = exec.vars[compare];
-                boolean cmp = false;
+                boolean cmp;
 
                 if(op.objFunction != null && (va.isobj || vb.isobj)){
                     //use object function if provided, and one of the variables is an object

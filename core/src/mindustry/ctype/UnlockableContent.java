@@ -4,7 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;

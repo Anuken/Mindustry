@@ -2,8 +2,8 @@ package mindustry.core;
 
 import arc.*;
 import arc.Files.*;
-import arc.struct.*;
 import arc.files.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 

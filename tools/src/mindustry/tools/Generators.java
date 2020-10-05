@@ -214,7 +214,7 @@ public class Generators{
                         }
 
                         //draw shard (default team top) on top of first sprite
-                        if(i == 1 && shardTeamTop != null){
+                        if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
                             image.draw(shardTeamTop);
                         }
                     }

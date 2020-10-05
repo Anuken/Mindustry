@@ -30,11 +30,11 @@ public class TeamIndexProcess implements AsyncProcess{
     }
 
     public void updateCount(Team team, UnitType type, int amount){
-        counts[team.id] += amount;
+        counts[team.id] = Math.max(amount + counts[team.id], 0);
         if(typeCounts[team.id].length <= type.id){
             typeCounts[team.id] = new int[Vars.content.units().size];
         }
-        typeCounts[team.id][type.id] += amount;
+        typeCounts[team.id][type.id] = Math.max(amount + typeCounts[team.id][type.id], 0);
     }
 
     private void count(Unit unit){

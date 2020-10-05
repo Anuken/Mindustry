@@ -10,7 +10,7 @@ import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class BlockLoader extends PayloadAcceptor{
     public final int timerLoad = timers++;

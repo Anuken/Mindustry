@@ -9,7 +9,6 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;

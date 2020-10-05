@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.player;
+import static mindustry.Vars.*;
 
 @Component
 @BaseComponent

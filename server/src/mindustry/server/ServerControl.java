@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.struct.*;
 import arc.struct.Seq.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.Timer;
 import arc.util.CommandHandler.*;
