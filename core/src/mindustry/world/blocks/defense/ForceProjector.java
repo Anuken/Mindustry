@@ -96,7 +96,7 @@ public class ForceProjector extends Block{
             Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, player.team().color, 0.25f);
             
             //expanding hexagon
-            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost, Tmp.c1.set(player.team().color).lerp(phaseColor, expandProgress), 1f - transparency);
+            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost, player.team().color.cpy().lerp(phaseColor, expandProgress), 1f - transparency);
 
             //arrows
             float sin = Mathf.absin(Time.time(), 6f, 1f);
