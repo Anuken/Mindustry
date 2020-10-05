@@ -142,7 +142,7 @@ public abstract class BulletType extends Content{
     }
 
     public boolean collides(Bullet bullet, Building tile){
-        return healPercent == 0f ? true : (tile.team != bullet.team || tile.healthf() < 1f);
+        return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
