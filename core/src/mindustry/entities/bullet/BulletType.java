@@ -146,6 +146,9 @@ public abstract class BulletType extends Content{
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
+        if(status == StatusEffects.burning) {
+            Fires.create(tile.tile);
+        }
         hit(b);
 
         if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
@@ -193,11 +196,16 @@ public abstract class BulletType extends Content{
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
-
+            
             if(healPercent > 0f) {
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
+            }
+
+            if(status == StatusEffects.burning) {
+                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
+                    Fires.create(other.tile);
                 });
             }
         }

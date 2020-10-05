@@ -67,10 +67,10 @@ public class SuicideAI extends GroundAI{
                 Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
 
                 if(target != null && !unit.within(target, 70f)){
-                    moveTo(Pathfinder.fieldRally);
+                    pathfind(Pathfinder.fieldRally);
                 }
             }else if(command() == UnitCommand.attack && core != null){
-                moveTo(Pathfinder.fieldCore);
+                pathfind(Pathfinder.fieldCore);
             }
 
             if(unit.moving()) unit.lookAt(unit.vel().angle());
