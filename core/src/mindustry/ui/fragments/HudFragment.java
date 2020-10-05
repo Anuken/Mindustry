@@ -32,16 +32,16 @@ public class HudFragment extends Fragment{
     private static final float dsize = 65f;
 
     public final PlacementFragment blockfrag = new PlacementFragment();
+    public boolean shown = true;
 
     private ImageButton flip;
-    private Table lastUnlockTable;
-    private Table lastUnlockLayout;
-    private boolean shown = true;
     private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
     private boolean showHudText;
 
+    private Table lastUnlockTable;
+    private Table lastUnlockLayout;
     private long lastToast;
 
     @Override
@@ -418,10 +418,6 @@ public class HudFragment extends Fragment{
             //nesting actions() calls is necessary so the right prefHeight() is used
             Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interp.fade), Actions.remove())));
         });
-    }
-
-    public boolean shown(){
-        return shown;
     }
 
     /** Show unlock notification for a new recipe. */

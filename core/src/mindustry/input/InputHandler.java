@@ -78,6 +78,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(called = Loc.server, unreliable = true)
+    public static void takeItems(Building build, Item item, int amount, Unit to){
+        if(to == null || build == null) return;
+
+        int removed = build.removeStack(item, Math.min(player.unit().maxAccepted(item), amount));
+        if(removed == 0) return;
+
+        to.addItem(item, removed);
+        for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
+            Time.run(j * 3f, () -> Call.transferItemEffect(item, build.x, build.y, to));
+        }
+    }
+
+    @Remote(called = Loc.server, unreliable = true)
     public static void transferItemToUnit(Item item, float x, float y, Itemsc to){
         if(to == null) return;
         createItemTransfer(item, 1, x, y, to, () -> to.addItem(item));
@@ -92,10 +105,43 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         build.items.add(item, amount);
     }
 
+    @Remote(called = Loc.server, unreliable = true)
+    public static void transferItemTo(Unit unit, Item item, int amount, float x, float y, Building build){
+        if(build == null || build.items == null) return;
+        unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
+        for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
+            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
+        }
+        build.handleStack(item, amount, unit);
+    }
+
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
         Fx.itemTransfer.at(x, y, amount, item.color, to);
         if(done != null){
             Time.run(Fx.itemTransfer.lifetime, done);
+        }
+    }
+
+    @Remote(called = Loc.server, targets = Loc.both, forward = true)
+    public static void requestItem(Player player, Building tile, Item item, int amount){
+        if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange)) return;
+        amount = Math.min(player.unit().maxAccepted(item), amount);
+        int fa = amount;
+
+        if(amount == 0) return;
+
+        if(net.server() && (!Units.canInteract(player, tile) ||
+        !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
+            action.item = item;
+            action.itemAmount = fa;
+        }))) throw new ValidateException(player, "Player cannot request items.");
+
+        int removed = tile.removeStack(item, amount);
+
+        player.unit().addItem(item, removed);
+        Events.fire(new WithdrawEvent(tile, player, item, amount));
+        for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
+            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x, tile.y, player.unit()));
         }
     }
 

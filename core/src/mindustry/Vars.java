@@ -82,6 +82,8 @@ public class Vars implements Loadable{
     public static final float buildingRange = 220f;
     /** range for moving items */
     public static final float itemTransferRange = 220f;
+    /** range for moving items for logic units */
+    public static final float logicItemTransferRange = 40f;
     /** duration of time between turns in ticks */
     public static final float turnDuration = 20 * Time.toMinutes;
     /** turns needed to destroy a sector completely */
@@ -188,7 +190,6 @@ public class Vars implements Loadable{
     public static Schematics schematics;
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
-    public static TeamIndexProcess teamIndex;
     public static BaseRegistry bases;
 
     public static Universe universe;

@@ -266,7 +266,6 @@ public class UnitTypes implements ContentList{
         //region ground support
 
         nova = new UnitType("nova"){{
-            itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
             speed = 0.55f;
@@ -293,7 +292,6 @@ public class UnitTypes implements ContentList{
         }};
 
         pulsar = new UnitType("pulsar"){{
-            itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
             speed = 0.65f;
@@ -340,7 +338,6 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             hitSize = 12f;
             boostMultiplier = 2f;
-            itemCapacity = 80;
             health = 650f;
             buildSpeed = 1.7f;
             canBoost = true;
@@ -445,7 +442,6 @@ public class UnitTypes implements ContentList{
         corvus = new UnitType("corvus"){{
             mineTier = 1;
             hitSize = 29f;
-            itemCapacity = 80;
             health = 18000f;
             buildSpeed = 1.7f;
             armor = 9f;
@@ -545,7 +541,6 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            itemCapacity = 80;
             speed = 0.5f;
             drag = 0.4f;
             hitSize = 10f;
@@ -1134,7 +1129,6 @@ public class UnitTypes implements ContentList{
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            itemCapacity = 30;
             range = 50f;
             isCounted = false;
 
@@ -1153,7 +1147,6 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 70f;
-            itemCapacity = 70;
             health = 400;
             buildSpeed = 0.5f;
             engineOffset = 6.5f;

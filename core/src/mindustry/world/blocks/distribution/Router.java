@@ -28,7 +28,7 @@ public class Router extends Block{
         @Override
         public void updateTile(){
             if(lastItem == null && items.any()){
-                items.clear();
+                lastItem = items.first();
             }
 
             if(lastItem != null){

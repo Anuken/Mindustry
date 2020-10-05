@@ -331,6 +331,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
+            executor.team = team;
 
             //check for previously invalid links to add after configuration
             boolean changed = false;

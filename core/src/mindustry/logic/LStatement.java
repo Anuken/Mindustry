@@ -31,6 +31,10 @@ public abstract class LStatement{
         return read.size == 0 ? null : read.first();
     }
 
+    public boolean hidden(){
+        return false;
+    }
+
     //protected methods are only for internal UI layout utilities
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
@@ -38,9 +42,9 @@ public abstract class LStatement{
             .size(144f, 40f).pad(2f).color(table.color).addInputDialog();
     }
 
-    protected void fields(Table table, String desc, String value, Cons<String> setter){
+    protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
         table.add(desc).padLeft(10).left();
-        field(table, value, setter).width(85f).padRight(10).left();
+        return field(table, value, setter).width(85f).padRight(10).left();
     }
 
     protected void fields(Table table, String value, Cons<String> setter){

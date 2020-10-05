@@ -63,6 +63,10 @@ public class AIController implements UnitController{
         }
     }
 
+    protected boolean invalid(Teamc target){
+        return Units.invalidateTarget(target, unit.team, unit.x, unit.y);
+    }
+
     protected void updateWeapons(){
         if(targets.length != unit.mounts.length) targets = new Teamc[unit.mounts.length];
 
@@ -73,7 +77,7 @@ public class AIController implements UnitController{
             target = findTarget(unit.x, unit.y, unit.range(), unit.type().targetAir, unit.type().targetGround);
         }
 
-        if(Units.invalidateTarget(target, unit.team, unit.x, unit.y)){
+        if(invalid(target)){
             target = null;
         }
 
@@ -99,18 +103,20 @@ public class AIController implements UnitController{
             boolean shoot = false;
 
             if(targets[i] != null){
-                shoot = targets[i].within(mountX, mountY, weapon.bullet.range());
+                shoot = targets[i].within(mountX, mountY, weapon.bullet.range()) && shouldShoot();
 
-                if(shoot){
-                    Vec2 to = Predict.intercept(unit, targets[i], weapon.bullet.speed);
-                    mount.aimX = to.x;
-                    mount.aimY = to.y;
-                }
+                Vec2 to = Predict.intercept(unit, targets[i], weapon.bullet.speed);
+                mount.aimX = to.x;
+                mount.aimY = to.y;
             }
 
             mount.shoot = shoot;
             mount.rotate = shoot;
         }
+    }
+
+    protected boolean shouldShoot(){
+        return true;
     }
 
     protected Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
@@ -157,11 +163,15 @@ public class AIController implements UnitController{
     }
 
     protected void moveTo(Position target, float circleLength){
+        moveTo(target, circleLength, 100f);
+    }
+
+    protected void moveTo(Position target, float circleLength, float smooth){
         if(target == null) return;
 
         vec.set(target).sub(unit);
 
-        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / 100f, -1f, 1f);
+        float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
         vec.setLength(unit.type().speed * length);
         if(length < -0.5f){
