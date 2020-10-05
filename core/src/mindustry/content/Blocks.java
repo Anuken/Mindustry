@@ -80,7 +80,7 @@ public class Blocks implements ContentList{
     commandCenter,
     groundFactory, airFactory, navalFactory,
     additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
-    repairPoint, resupplyPoint,
+    repairPoint, repairDome, resupplyPoint,
 
     //logic
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
@@ -1915,6 +1915,16 @@ public class Blocks implements ContentList{
             repairSpeed = 0.5f;
             repairRadius = 65f;
             powerUse = 1f;
+        }};
+
+        repairDome = new RepairPoint("repair-dome"){{
+            requirements(Category.units, with(Items.lead, 75, Items.silicon, 75, Items.plastanium, 50));
+            size = 2;
+            repairSpeed = 10f;
+            repairRadius = 140f;
+            powerUse = 5f;
+            hasLiquids = true;
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.5f)).update(false);
         }};
 
         resupplyPoint = new ResupplyPoint("resupply-point"){{

@@ -39,6 +39,7 @@ public enum BlockStat{
 
     speedIncrease(StatCategory.shooting),
     repairTime(StatCategory.shooting),
+    repairSpeed(StatCategory.shooting),
     range(StatCategory.shooting),
     shootRange(StatCategory.shooting),
     inaccuracy(StatCategory.shooting),

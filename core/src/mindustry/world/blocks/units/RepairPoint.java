@@ -11,7 +11,9 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
@@ -43,6 +45,7 @@ public class RepairPoint extends Block{
     public void setStats(){
         super.setStats();
         stats.add(BlockStat.range, repairRadius / tilesize, StatUnit.blocks);
+        stats.add(BlockStat.repairSpeed, repairSpeed * 60f, StatUnit.perSecond);
     }
 
     @Override
@@ -97,7 +100,14 @@ public class RepairPoint extends Block{
             if(target != null && (target.dead() || target.dst(tile) > repairRadius || target.health() >= target.maxHealth())){
                 target = null;
             }else if(target != null && consValid()){
-                target.heal(repairSpeed * Time.delta * strength * efficiency());
+                if(hasLiquids) {
+                    Liquid liquid = liquids.current();
+                    float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+
+                    float used = (cheating() ? maxUsed * Time.delta : Math.min(liquids.get(liquid), maxUsed * Time.delta)) * liquid.heatCapacity;
+                    liquids.remove(liquid, used);
+                }
+                target.heal(repairSpeed * Time.delta * strength * efficiency() * getLiquidEfficiency());
                 rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.5f);
                 targetIsBeingRepaired = true;
             }
@@ -110,6 +120,7 @@ public class RepairPoint extends Block{
 
             if(timer(timerTarget, 20)){
                 rect.setSize(repairRadius * 2).setCenter(x, y);
+
                 target = Units.closest(team, x, y, repairRadius, Unit::damaged);
             }
         }
@@ -117,6 +128,12 @@ public class RepairPoint extends Block{
         @Override
         public boolean shouldConsume(){
             return target != null && enabled;
+        }
+
+        public float getLiquidEfficiency(){
+            if(!hasLiquids) return 1f;
+            Liquid liquid = liquids.current();
+            return 1f + liquid.heatCapacity;
         }
     }
 }
