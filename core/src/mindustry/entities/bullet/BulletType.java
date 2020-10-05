@@ -143,6 +143,9 @@ public abstract class BulletType extends Content{
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
+        if(status == StatusEffects.burning) {
+            Fires.create(tile.tile);
+        }
         hit(b);
     }
 
@@ -184,6 +187,12 @@ public abstract class BulletType extends Content{
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+            }
+
+            if(status == StatusEffects.burning) {
+                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
+                    Fires.create(other.tile);
+                });
             }
         }
 
