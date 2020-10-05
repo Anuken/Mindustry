@@ -46,7 +46,7 @@ public class Blocks implements ContentList{
 
     //crafting
     siliconSmelter, siliconCrucible, kiln, graphitePress, plastaniumCompressor, multiPress, phaseWeaver, surgeSmelter, pyratiteMixer, blastMixer, cryofluidMixer,
-    melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge, phaseFabricator
+    melter, separator, disassembler, sporePress, pulverizer, incinerator, coalCentrifuge, phaseFabricator,
 
     //sandbox
     powerSource, powerVoid, itemSource, itemVoid, liquidSource, liquidVoid, illuminator,
@@ -582,7 +582,7 @@ public class Blocks implements ContentList{
             itemCapacity = 20;
         }};
         
-                phaseFabricator = new GenericCrafter("phase-fabricator"){{
+        phaseFabricator = new GenericCrafter("phase-fabricator"){{
             requirements(Category.crafting, with(Items.silicon, 300, Items.lead, 200, Items.surgealloy, 100, Items.thorium, 200, Items.plastanium, 250));
             craftEffect = Fx.smeltsmoke;
             outputItem = new ItemStack(Items.phasefabric, 4);
@@ -591,7 +591,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             drawer = new DrawWeave();
 
-            consumes.items(new ItemStack(Items.thorium, 7), new ItemStack(Items.sand, 8) new ItemStack(Items.plastanium, 4));
+            consumes.items(new ItemStack(Items.thorium, 7), new ItemStack(Items.sand, 8), new ItemStack(Items.plastanium, 4));
             consumes.power(11.67f);
             itemCapacity = 20;
         }};
