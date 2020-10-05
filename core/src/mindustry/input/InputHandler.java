@@ -81,7 +81,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void takeItems(Building build, Item item, int amount, Unit to){
         if(to == null || build == null) return;
 
-        int removed = build.removeStack(item, Math.min(player.unit().maxAccepted(item), amount));
+        int removed = build.removeStack(item, Math.min(to.maxAccepted(item), amount));
         if(removed == 0) return;
 
         to.addItem(item, removed);

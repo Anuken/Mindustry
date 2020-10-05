@@ -57,8 +57,9 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         each(Entityc::update);
     }
 
-    public void copy(Seq<T> arr){
+    public Seq<T> copy(Seq<T> arr){
         arr.addAll(array);
+        return arr;
     }
 
     public void each(Cons<T> cons){

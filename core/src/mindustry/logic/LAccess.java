@@ -5,6 +5,7 @@ import arc.struct.*;
 /** Setter/getter enum for logic-controlled objects. */
 public enum LAccess{
     totalItems,
+    firstItem,
     totalLiquids,
     totalPower,
     itemCapacity,

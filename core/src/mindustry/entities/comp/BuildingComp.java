@@ -1246,6 +1246,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public Object senseObject(LAccess sensor){
         return switch(sensor){
             case type -> block;
+            case firstItem -> items == null ? null : items.first();
+            case name -> block.name;
             default -> noSensed;
         };
 

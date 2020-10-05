@@ -709,7 +709,28 @@ public class LStatements{
         public void build(Table table){
             table.add(" type ");
 
-            field(table, type, str -> type = str);
+            TextField field = field(table, type, str -> type = str).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(UnitType item : Vars.content.units()){
+                            if(!item.unlockedNow() || item.isHidden()) continue;
+                            i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                type = "@" + item.name;
+                                field.setText(type);
+                                hide.run();
+                            }).size(40f);
+
+                            if(++c % 6 == 0) i.row();
+                        }
+                    }).colspan(3).width(240f).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
         }
 
         @Override

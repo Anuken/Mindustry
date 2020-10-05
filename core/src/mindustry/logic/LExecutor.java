@@ -194,6 +194,21 @@ public class LExecutor{
         }
     }
 
+    /** Binds the processor to a unit based on some filters. */
+    public static class UnitLocateI implements LInstruction{
+
+        @Override
+        public void run(LExecutor exec){
+            Object unitObj = exec.obj(varUnit);
+            LogicAI ai = UnitControlI.checkLogicAI(exec, unitObj);
+
+            if(unitObj instanceof Unit unit && ai != null){
+                ai.controlTimer = LogicAI.logicControlTimeout;
+
+            }
+        }
+    }
+
     /** Controls the unit based on some parameters. */
     public static class UnitControlI implements LInstruction{
         public LUnitControl type = LUnitControl.move;
