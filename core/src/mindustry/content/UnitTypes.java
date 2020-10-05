@@ -1192,9 +1192,9 @@ public class UnitTypes implements ContentList{
                     frontColor = Color.white;
 
                 	healPercent = 5.5f;
-        			collidesTeam = true;
-		        	backColor = Pal.heal;
-            		frontColor = Color.white;
+                    collidesTeam = true;
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
                     backColor = Pal.heal;
                     trailColor = Pal.heal;
                 }};
