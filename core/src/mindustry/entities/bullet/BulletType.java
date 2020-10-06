@@ -201,6 +201,7 @@ public abstract class BulletType extends Content{
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
+                });
             }
 
             if(status == StatusEffects.burning) {
