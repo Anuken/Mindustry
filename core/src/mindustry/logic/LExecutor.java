@@ -1,5 +1,6 @@
 package mindustry.logic;
 
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -14,6 +15,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
+import mindustry.world.blocks.payloads.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -117,6 +120,10 @@ public class LExecutor{
         return (int)num(index);
     }
 
+    public void setbool(int index, boolean value){
+        setnum(index, value ? 1 : 0);
+    }
+
     public void setnum(int index, double value){
         Var v = vars[index];
         if(v.constant) return;
@@ -194,8 +201,25 @@ public class LExecutor{
         }
     }
 
-    /** Binds the processor to a unit based on some filters. */
+    /** Uses a unit to find something that may not be in its range. */
     public static class UnitLocateI implements LInstruction{
+        public LLocate locate = LLocate.building;
+        public BlockFlag flag = BlockFlag.core;
+        public int enemy, ore;
+        public int outX, outY, outFound;
+
+        public UnitLocateI(LLocate locate, BlockFlag flag, int enemy, int ore, int outX, int outY, int outFound){
+            this.locate = locate;
+            this.flag = flag;
+            this.enemy = enemy;
+            this.ore = ore;
+            this.outX = outX;
+            this.outY = outY;
+            this.outFound = outFound;
+        }
+
+        public UnitLocateI(){
+        }
 
         @Override
         public void run(LExecutor exec){
@@ -205,7 +229,48 @@ public class LExecutor{
             if(unitObj instanceof Unit unit && ai != null){
                 ai.controlTimer = LogicAI.logicControlTimeout;
 
+                Cache cache = (Cache)ai.execCache.get(this, Cache::new);
+
+                if(ai.checkTargetTimer(this)){
+                    Tile res = null;
+                    boolean build = false;
+
+                    switch(locate){
+                        case ore -> {
+                            if(exec.obj(ore) instanceof Item item){
+                                res = indexer.findClosestOre(unit.x, unit.y, item);
+                            }
+                        }
+                        case building -> {
+                            res = Geometry.findClosest(unit.x, unit.y, exec.bool(enemy) ? indexer.getEnemy(unit.team, flag) : indexer.getAllied(unit.team, flag));
+                            build = true;
+                        }
+                        case spawn -> {
+                            res = Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
+                        }
+                    }
+
+                    if(res != null && (!build || res.build != null)){
+                        cache.found = true;
+                        //set result if found
+                        exec.setnum(outX, cache.x = build ? res.build.x : res.worldx());
+                        exec.setnum(outY, cache.y = build ? res.build.y : res.worldy());
+                        exec.setnum(outFound, 1);
+                    }else{
+                        cache.found = false;
+                        exec.setnum(outFound, 0);
+                    }
+                }else{
+                    exec.setbool(outFound, cache.found);
+                    exec.setnum(outX, cache.x);
+                    exec.setnum(outY, cache.y);
+                }
             }
+        }
+
+        static class Cache{
+            float x, y;
+            boolean found;
         }
     }
 
@@ -266,6 +331,19 @@ public class LExecutor{
                         if(type == LUnitControl.approach){
                             ai.moveRad = exec.numf(p3);
                         }
+
+                        //stop mining/building
+                        if(type == LUnitControl.stop){
+                            if(unit instanceof Minerc miner){
+                                miner.mineTile(null);
+                            }
+                            if(unit instanceof Builderc build){
+                                build.clearBuilding();
+                            }
+                        }
+                    }
+                    case within -> {
+                        exec.setnum(p4, unit.within(exec.numf(p1), exec.numf(p2), exec.numf(p3)) ? 1 : 0);
                     }
                     case pathfind -> {
                         ai.control = type;
@@ -281,13 +359,81 @@ public class LExecutor{
                         ai.mainTarget = exec.obj(p1) instanceof Teamc t ? t : null;
                         ai.shoot = exec.bool(p2);
                     }
+                    case boost -> {
+                        ai.boost = exec.bool(p1);
+                    }
                     case flag -> {
                         unit.flag = exec.num(p1);
                     }
                     case mine -> {
                         Tile tile = world.tileWorld(exec.numf(p1), exec.numf(p2));
                         if(unit instanceof Minerc miner){
-                            miner.mineTile(tile);
+                            miner.mineTile(miner.validMine(tile) ? tile : null);
+                        }
+                    }
+                    case payDrop -> {
+                        if(ai.payTimer > 0) return;
+
+                        if(unit instanceof Payloadc pay && pay.hasPayload()){
+                            Call.payloadDropped(unit, unit.x, unit.y);
+                            ai.payTimer = LogicAI.transferDelay;
+                        }
+                    }
+                    case payTake -> {
+                        if(ai.payTimer > 0) return;
+
+                        if(unit instanceof Payloadc pay){
+                            //units
+                            if(exec.bool(p1)){
+                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type().hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+
+                                Call.pickedUnitPayload(unit, result);
+                            }else{ //buildings
+                                Building tile = world.buildWorld(unit.x, unit.y);
+
+                                //TODO copy pasted code
+                                if(tile != null && tile.team == unit.team){
+                                    if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
+                                        Call.pickedBlockPayload(unit, tile, true);
+                                    }else{ //pick up block payload
+                                        Payload current = tile.getPayload();
+                                        if(current != null && pay.canPickupPayload(current)){
+                                            Call.pickedBlockPayload(unit, tile, false);
+                                        }
+                                    }
+                                }
+                            }
+                            ai.payTimer = LogicAI.transferDelay;
+                        }
+                    }
+                    case build -> {
+                        if(unit instanceof Builderc builder && exec.obj(p3) instanceof Block block){
+                            int x = world.toTile(exec.numf(p1)), y = world.toTile(exec.numf(p2));
+                            int rot = exec.numi(p4);
+
+                            //reset state of last request when necessary
+                            if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || builder.plans().isEmpty()){
+                                ai.plan.progress = 0;
+                                ai.plan.initialized = false;
+                                ai.plan.stuck = false;
+                            }
+
+                            ai.plan.set(x, y, rot, block);
+                            ai.plan.config = null;
+
+                            builder.clearBuilding();
+                            builder.updateBuilding(true);
+                            builder.addBuild(ai.plan);
+                        }
+                    }
+                    case getBlock -> {
+                        float x = exec.numf(p1), y = exec.numf(p2);
+                        if(unit.within(x, y, unit.range())){
+                            exec.setobj(p3, null);
+                        }else{
+                            Tile tile = world.tileWorld(x, y);
+                            Block block = tile == null || !tile.synthetic() ? null : tile.block();
+                            exec.setobj(p3, block);
                         }
                     }
                     case itemDrop -> {
