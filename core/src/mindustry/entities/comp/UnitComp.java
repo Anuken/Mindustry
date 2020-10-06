@@ -38,9 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private UnitController controller;
     private UnitType type;
     boolean spawnedByCore;
-
-    //TODO mark as non-transient when done
-    transient double flag;
+    double flag;
 
     transient Seq<Ability> abilities = new Seq<>(0);
     private transient float resupplyTime = Mathf.random(10f);
