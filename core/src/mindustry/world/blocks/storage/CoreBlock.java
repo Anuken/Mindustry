@@ -191,6 +191,13 @@ public class CoreBlock extends StorageBlock{
         public void drawLight(){
             Drawf.light(team, x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
         }
+        
+        public void drawTeamTop(){
+        if(block.teamRegion.found()){
+            if(block.teamRegions[team.id] == block.teamRegion) Draw.color(team.color.cpy().mul(1f + Mathf.absin(Time.time()/2, 1f, 0.1f));
+            Draw.rect(block.teamRegions[team.id], x, y);
+            Draw.color();
+        }
 
         @Override
         public boolean acceptItem(Building source, Item item){
