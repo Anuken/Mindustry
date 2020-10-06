@@ -1119,7 +1119,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.titanium, 7, Items.lead, 10, Items.silicon, 15, Items.surgealloy, 15));
             size = 2;
             maxNodes = 2;
-            laserRange = 30f;
+            laserRange = 40f;
         }};
 
         diode = new PowerDiode("diode"){{

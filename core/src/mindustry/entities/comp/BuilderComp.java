@@ -208,7 +208,7 @@ abstract class BuilderComp implements Unitc{
         BuildPlan plan = buildPlan();
         Tile tile = world.tile(plan.x, plan.y);
 
-        if(dst(tile) > buildingRange && !state.isEditor()){
+        if((dst(tile) > buildingRange && !state.isEditor()) || !plan.initialized){
             return;
         }
 

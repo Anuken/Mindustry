@@ -22,6 +22,7 @@ public class LogicAI extends AIController{
     public float moveX, moveY, moveRad;
     public float itemTimer, controlTimer = logicControlTimeout, targetTimer;
     public Building controller;
+    public BuildPlan plan = new BuildPlan();
 
     //special cache for instruction to store data
     public ObjectMap<Object, Object> execCache = new ObjectMap<>();
@@ -88,6 +89,11 @@ public class LogicAI extends AIController{
                     if(target != null && !unit.within(target, 70f)){
                         pathfind(Pathfinder.fieldRally);
                     }
+                }
+            }
+            case stop -> {
+                if(unit instanceof Builderc build){
+                    build.clearBuilding();
                 }
             }
         }

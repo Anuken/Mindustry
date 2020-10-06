@@ -330,6 +330,16 @@ public class LExecutor{
                         if(type == LUnitControl.approach){
                             ai.moveRad = exec.numf(p3);
                         }
+
+                        //stop mining/building
+                        if(type == LUnitControl.stop){
+                            if(unit instanceof Minerc miner){
+                                miner.mineTile(null);
+                            }
+                            if(unit instanceof Builderc build){
+                                build.clearBuilding();
+                            }
+                        }
                     }
                     case within -> {
                         exec.setnum(p4, unit.within(exec.numf(p1), exec.numf(p2), exec.numf(p3)) ? 1 : 0);
@@ -357,10 +367,38 @@ public class LExecutor{
                     case mine -> {
                         Tile tile = world.tileWorld(exec.numf(p1), exec.numf(p2));
                         if(unit instanceof Minerc miner){
-                            miner.mineTile(tile);
-                            if(tile != null && (!unit.acceptsItem(tile.drop()) || !miner.canMine(tile.drop()))){
-                                miner.mineTile(null);
+                            miner.mineTile(miner.validMine(tile) ? tile : null);
+                        }
+                    }
+                    case build -> {
+                        if(unit instanceof Builderc builder && exec.obj(p3) instanceof Block block){
+                            int x = world.toTile(exec.numf(p1)), y = world.toTile(exec.numf(p2));
+                            int rot = exec.numi(p4);
+
+                            //reset state if:
+                            //
+                            if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || builder.plans().isEmpty()){
+                                ai.plan.progress = 0;
+                                ai.plan.initialized = false;
+                                ai.plan.stuck = false;
                             }
+
+                            ai.plan.set(x, y, rot, block);
+                            ai.plan.config = null;
+
+                            builder.clearBuilding();
+                            builder.updateBuilding(true);
+                            builder.addBuild(ai.plan);
+                        }
+                    }
+                    case getBlock -> {
+                        float x = exec.numf(p1), y = exec.numf(p2);
+                        if(unit.within(x, y, unit.range())){
+                            exec.setobj(p3, null);
+                        }else{
+                            Tile tile = world.tileWorld(x, y);
+                            Block block = tile == null || !tile.synthetic() ? null : tile.block();
+                            exec.setobj(p3, block);
                         }
                     }
                     case itemDrop -> {

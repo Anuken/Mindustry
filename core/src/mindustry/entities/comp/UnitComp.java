@@ -104,7 +104,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public Object senseObject(LAccess sensor){
         return switch(sensor){
             case type -> type;
-            case name -> controller instanceof Player p ? p.name : type.name;
+            case name -> controller instanceof Player p ? p.name : null;
             case firstItem -> stack().amount == 0 ? null : item();
             default -> noSensed;
         };

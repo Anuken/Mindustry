@@ -1247,7 +1247,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return switch(sensor){
             case type -> block;
             case firstItem -> items == null ? null : items.first();
-            case name -> block.name;
+            case config -> block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
             default -> noSensed;
         };
 

@@ -35,6 +35,11 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         return mineTile != null && !(((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding());
     }
 
+    public boolean validMine(Tile tile){
+        return !(tile == null || tile.block() != Blocks.air || !within(tile.worldx(), tile.worldy(), miningRange)
+        || tile.drop() == null || !canMine(tile.drop()));
+    }
+
     @Override
     public void update(){
         Building core = closestCore();
@@ -49,8 +54,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             }
         }
 
-        if(mineTile == null || core == null || mineTile.block() != Blocks.air || dst(mineTile.worldx(), mineTile.worldy()) > miningRange
-        || mineTile.drop() == null || !canMine(mineTile.drop())){
+        if(core == null || !validMine(mineTile)){
             mineTile = null;
             mineTimer = 0f;
         }else if(mining()){
