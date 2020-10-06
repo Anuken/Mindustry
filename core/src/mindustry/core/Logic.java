@@ -283,6 +283,8 @@ public class Logic implements ApplicationListener{
             }
 
             if(!state.isPaused()){
+                state.teams.updateTeamStats();
+
                 if(state.isCampaign()){
                     state.secinfo.update();
                 }

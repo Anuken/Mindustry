@@ -192,7 +192,7 @@ public class PlacementFragment extends Fragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> ui.hudfrag.shown());
+            full.bottom().right().visible(() -> ui.hudfrag.shown);
 
             full.table(frame -> {
 

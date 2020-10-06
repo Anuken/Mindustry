@@ -4,10 +4,13 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
@@ -23,7 +26,9 @@ public class LExecutor{
     //special variables
     public static final int
         varCounter = 0,
-        varTime = 1;
+        varTime = 1,
+        varUnit = 2,
+        varThis = 3;
 
     public static final int
         maxGraphicsBuffer = 256,
@@ -36,6 +41,7 @@ public class LExecutor{
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
     public Building[] links = {};
+    public Team team = Team.derelict;
 
     public boolean initialized(){
         return instructions != null && vars != null && instructions.length > 0;
@@ -102,6 +108,11 @@ public class LExecutor{
         return v.isobj ? v.objval != null ? 1 : 0 : v.numval;
     }
 
+    public float numf(int index){
+        Var v = vars[index];
+        return v.isobj ? v.objval != null ? 1 : 0 : (float)v.numval;
+    }
+
     public int numi(int index){
         return (int)num(index);
     }
@@ -117,6 +128,12 @@ public class LExecutor{
     public void setobj(int index, Object value){
         Var v = vars[index];
         if(v.constant) return;
+        v.objval = value;
+        v.isobj = true;
+    }
+
+    public void setconst(int index, Object value){
+        Var v = vars[index];
         v.objval = value;
         v.isobj = true;
     }
@@ -140,6 +157,172 @@ public class LExecutor{
 
     public interface LInstruction{
         void run(LExecutor exec);
+    }
+
+    /** Binds the processor to a unit based on some filters. */
+    public static class UnitBindI implements LInstruction{
+        public int type;
+
+        //iteration index
+        private int index;
+
+        public UnitBindI(int type){
+            this.type = type;
+        }
+
+        public UnitBindI(){
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Object typeObj = exec.obj(type);
+            UnitType type = typeObj instanceof UnitType t ? t : null;
+
+            Seq<Unit> seq = type == null ? exec.team.data().units : exec.team.data().unitCache(type);
+
+            if(seq != null && seq.any()){
+                index %= seq.size;
+                if(index < seq.size){
+                    //bind to the next unit
+                    exec.setconst(varUnit, seq.get(index));
+                }
+                index ++;
+            }else{
+                //no units of this type found
+                exec.setconst(varUnit, null);
+            }
+        }
+    }
+
+    /** Binds the processor to a unit based on some filters. */
+    public static class UnitLocateI implements LInstruction{
+
+        @Override
+        public void run(LExecutor exec){
+            Object unitObj = exec.obj(varUnit);
+            LogicAI ai = UnitControlI.checkLogicAI(exec, unitObj);
+
+            if(unitObj instanceof Unit unit && ai != null){
+                ai.controlTimer = LogicAI.logicControlTimeout;
+
+            }
+        }
+    }
+
+    /** Controls the unit based on some parameters. */
+    public static class UnitControlI implements LInstruction{
+        public LUnitControl type = LUnitControl.move;
+        public int p1, p2, p3, p4;
+
+        public UnitControlI(LUnitControl type, int p1, int p2, int p3, int p4){
+            this.type = type;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.p3 = p3;
+            this.p4 = p4;
+        }
+
+        public UnitControlI(){
+        }
+
+        /** Checks is a unit is valid for logic AI control, and returns the controller. */
+        @Nullable
+        public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
+            if(unitObj instanceof Unit unit && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
+                if(!(unit.controller() instanceof LogicAI)){
+                    unit.controller(new LogicAI());
+                    ((LogicAI)unit.controller()).controller = exec.building(varThis);
+
+                    //clear old state
+                    if(unit instanceof Minerc miner){
+                        miner.mineTile(null);
+                    }
+
+                    if(unit instanceof Builderc builder){
+                        builder.clearBuilding();
+                    }
+
+                    return (LogicAI)unit.controller();
+                }
+                return (LogicAI)unit.controller();
+            }
+            return null;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            Object unitObj = exec.obj(varUnit);
+            LogicAI ai = checkLogicAI(exec, unitObj);
+
+            //only control standard AI units
+            if(unitObj instanceof Unit unit && ai != null){
+                ai.controlTimer = LogicAI.logicControlTimeout;
+
+                switch(type){
+                    case move, stop, approach -> {
+                        ai.control = type;
+                        ai.moveX = exec.numf(p1);
+                        ai.moveY = exec.numf(p2);
+                        if(type == LUnitControl.approach){
+                            ai.moveRad = exec.numf(p3);
+                        }
+                    }
+                    case pathfind -> {
+                        ai.control = type;
+                    }
+                    case target -> {
+                        ai.posTarget.set(exec.numf(p1), exec.numf(p2));
+                        ai.aimControl = type;
+                        ai.mainTarget = null;
+                        ai.shoot = exec.bool(p3);
+                    }
+                    case targetp -> {
+                        ai.aimControl = type;
+                        ai.mainTarget = exec.obj(p1) instanceof Teamc t ? t : null;
+                        ai.shoot = exec.bool(p2);
+                    }
+                    case flag -> {
+                        unit.flag = exec.num(p1);
+                    }
+                    case mine -> {
+                        Tile tile = world.tileWorld(exec.numf(p1), exec.numf(p2));
+                        if(unit instanceof Minerc miner){
+                            miner.mineTile(tile);
+                        }
+                    }
+                    case itemDrop -> {
+                        if(ai.itemTimer > 0) return;
+
+                        Building build = exec.building(p1);
+                        int amount = exec.numi(p2);
+                        int dropped = Math.min(unit.stack.amount, amount);
+                        if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange)){
+                            int accepted = build.acceptStack(unit.item(), dropped, unit);
+                            if(accepted > 0){
+                                Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
+                                ai.itemTimer = LogicAI.transferDelay;
+                            }
+                        }
+                    }
+                    case itemTake -> {
+                        if(ai.itemTimer > 0) return;
+
+                        Building build = exec.building(p1);
+                        int amount = exec.numi(p3);
+
+                        if(build != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange)){
+                            int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
+
+                            if(taken > 0){
+                                Call.takeItems(build, item, taken, unit);
+                                ai.itemTimer = LogicAI.transferDelay;
+                            }
+                        }
+                    }
+                    default -> {}
+                }
+            }
+        }
     }
 
     /** Controls a building's state. */
@@ -311,16 +494,20 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Building target = exec.building(radar);
+            Object base = exec.obj(radar);
 
             int sortDir = exec.bool(sortOrder) ? 1 : -1;
+            LogicAI ai = null;
 
-            if(target instanceof Ranged){
-                float range = ((Ranged)target).range();
+            if(base instanceof Ranged r && r.team() == exec.team &&
+                (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
+                float range = r.range();
 
                 Healthc targeted;
 
-                if(timer.get(30f)){
+                //timers update on a fixed 30 tick interval
+                //units update on a special timer per controller instance
+                if((base instanceof Building && timer.get(30f)) || (ai != null && ai.checkTargetTimer(this))){
                     //if any of the targets involve enemies
                     boolean enemies = target1 == RadarTarget.enemy || target2 == RadarTarget.enemy || target3 == RadarTarget.enemy;
 
@@ -328,11 +515,11 @@ public class LExecutor{
                     bestValue = 0;
 
                     if(enemies){
-                        for(Team enemy : state.teams.enemiesOf(target.team)){
-                            find(target, range, sortDir, enemy);
+                        for(Team enemy : state.teams.enemiesOf(r.team())){
+                            find(r, range, sortDir, enemy);
                         }
                     }else{
-                        find(target, range, sortDir, target.team);
+                        find(r, range, sortDir, r.team());
                     }
 
                     lastTarget = targeted = best;
@@ -346,14 +533,14 @@ public class LExecutor{
             }
         }
 
-        void find(Building b, float range, int sortDir, Team team){
-            Units.nearby(team, b.x, b.y, range, u -> {
+        void find(Ranged b, float range, int sortDir, Team team){
+            Units.nearby(team, b.x(), b.y(), range, u -> {
                 if(!u.within(b, range)) return;
 
                 boolean valid =
-                    target1.func.get(b.team, u) &&
-                    target2.func.get(b.team, u) &&
-                    target3.func.get(b.team, u);
+                    target1.func.get(b.team(), u) &&
+                    target2.func.get(b.team(), u) &&
+                    target3.func.get(b.team(), u);
 
                 if(!valid) return;
 

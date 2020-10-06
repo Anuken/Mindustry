@@ -5,6 +5,7 @@ import arc.struct.*;
 /** Setter/getter enum for logic-controlled objects. */
 public enum LAccess{
     totalItems,
+    firstItem,
     totalLiquids,
     totalPower,
     itemCapacity,
@@ -26,6 +27,8 @@ public enum LAccess{
     shooting,
     team,
     type,
+    flag,
+    name,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
@@ -34,21 +37,21 @@ public enum LAccess{
 
     ;
 
-    public final String[] parameters;
+    public final String[] params;
     public final boolean isObj;
 
     public static final LAccess[]
         all = values(),
-        senseable = Seq.select(all, t -> t.parameters.length <= 1).toArray(LAccess.class),
-        controls = Seq.select(all, t -> t.parameters.length > 0).toArray(LAccess.class);
+        senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
+        controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class);
 
-    LAccess(String... parameters){
-        this.parameters = parameters;
+    LAccess(String... params){
+        this.params = params;
         isObj = false;
     }
 
-    LAccess(boolean obj, String... parameters){
-        this.parameters = parameters;
+    LAccess(boolean obj, String... params){
+        this.params = params;
         isObj = obj;
     }
 }

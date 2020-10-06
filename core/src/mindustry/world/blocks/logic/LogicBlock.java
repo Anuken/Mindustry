@@ -304,7 +304,7 @@ public class LogicBlock extends Block{
                         assemble.get(asm);
                     }
 
-                    asm.putConst("@this", this);
+                    asm.getVar("@this").value = this;
                     asm.putConst("@thisx", x);
                     asm.putConst("@thisy", y);
 
@@ -331,6 +331,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
+            executor.team = team;
 
             //check for previously invalid links to add after configuration
             boolean changed = false;

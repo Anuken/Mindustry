@@ -347,9 +347,9 @@ public class LStatements{
             //Q: why don't you just use arrays for this?
             //A: arrays aren't as easy to serialize so the code generator doesn't handle them
             int c = 0;
-            for(int i = 0; i < type.parameters.length; i++){
+            for(int i = 0; i < type.params.length; i++){
 
-                fields(table, type.parameters[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
+                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
 
                 if(++c % 2 == 0) row(table);
             }
@@ -376,11 +376,13 @@ public class LStatements{
         public void build(Table table){
             table.defaults().left();
 
-            table.add(" from ");
+            if(buildFrom()){
+                table.add(" from ");
 
-            fields(table, radar, v -> radar = v);
+                fields(table, radar, v -> radar = v);
 
-            row(table);
+                row(table);
+            }
 
             for(int i = 0; i < 3; i++){
                 int fi = i;
@@ -418,6 +420,10 @@ public class LStatements{
             table.add(" output ");
 
             fields(table, output, v -> output = v);
+        }
+
+        public boolean buildFrom(){
+            return true;
         }
 
         @Override
@@ -692,6 +698,118 @@ public class LStatements{
         @Override
         public LCategory category(){
             return LCategory.control;
+        }
+    }
+
+    @RegisterStatement("ubind")
+    public static class UnitBindStatement extends LStatement{
+        public String type = "@mono";
+
+        @Override
+        public void build(Table table){
+            table.add(" type ");
+
+            TextField field = field(table, type, str -> type = str).get();
+
+            table.button(b -> {
+                b.image(Icon.pencilSmall);
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.row();
+                    t.table(i -> {
+                        i.left();
+                        int c = 0;
+                        for(UnitType item : Vars.content.units()){
+                            if(!item.unlockedNow() || item.isHidden()) continue;
+                            i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                type = "@" + item.name;
+                                field.setText(type);
+                                hide.run();
+                            }).size(40f);
+
+                            if(++c % 6 == 0) i.row();
+                        }
+                    }).colspan(3).width(240f).left();
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.units;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new UnitBindI(builder.var(type));
+        }
+    }
+
+    @RegisterStatement("ucontrol")
+    public static class UnitControlStatement extends LStatement{
+        public LUnitControl type = LUnitControl.move;
+        public String p1 = "0", p2 = "0", p3 = "0", p4 = "0";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.left();
+
+            table.add(" ");
+
+            table.button(b -> {
+                b.label(() -> type.name());
+                b.clicked(() -> showSelect(b, LUnitControl.all, type, t -> {
+                    type = t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(120, 50)));
+            }, Styles.logict, () -> {}).size(120, 40).color(table.color).left().padLeft(2);
+
+            row(table);
+
+            //Q: why don't you just use arrays for this?
+            //A: arrays aren't as easy to serialize so the code generator doesn't handle them
+            int c = 0;
+            for(int i = 0; i < type.params.length; i++){
+
+                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v).width(110f);
+
+                if(++c % 2 == 0) row(table);
+            }
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.units;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+        }
+    }
+
+    @RegisterStatement("uradar")
+    public static class UnitRadarStatement extends RadarStatement{
+
+        @Override
+        public boolean buildFrom(){
+            //do not build the "from" section
+            return false;
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.units;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(output));
         }
     }
 }
