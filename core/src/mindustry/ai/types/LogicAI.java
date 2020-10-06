@@ -20,7 +20,7 @@ public class LogicAI extends AIController{
 
     public LUnitControl control = LUnitControl.stop;
     public float moveX, moveY, moveRad;
-    public float itemTimer, controlTimer = logicControlTimeout, targetTimer;
+    public float itemTimer, payTimer, controlTimer = logicControlTimeout, targetTimer;
     public Building controller;
     public BuildPlan plan = new BuildPlan();
 
@@ -43,9 +43,8 @@ public class LogicAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(itemTimer > 0){
-            itemTimer -= Time.delta;
-        }
+        if(itemTimer > 0) itemTimer -= Time.delta;
+        if(payTimer > 0) payTimer -= Time.delta;
 
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
@@ -67,7 +66,7 @@ public class LogicAI extends AIController{
                 moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
             }
             case approach -> {
-                moveTo(Tmp.v1.set(moveX, moveY), moveRad, 1f);
+                moveTo(Tmp.v1.set(moveX, moveY), moveRad - 8f, 8f);
             }
             case pathfind -> {
                 Building core = unit.closestEnemyCore();

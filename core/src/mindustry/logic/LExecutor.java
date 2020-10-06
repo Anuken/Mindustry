@@ -15,6 +15,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -370,13 +371,47 @@ public class LExecutor{
                             miner.mineTile(miner.validMine(tile) ? tile : null);
                         }
                     }
+                    case payDrop -> {
+                        if(ai.payTimer > 0) return;
+
+                        if(unit instanceof Payloadc pay && pay.hasPayload()){
+                            Call.payloadDropped(unit, unit.x, unit.y);
+                            ai.payTimer = LogicAI.transferDelay;
+                        }
+                    }
+                    case payTake -> {
+                        if(ai.payTimer > 0) return;
+
+                        if(unit instanceof Payloadc pay){
+                            //units
+                            if(exec.bool(p1)){
+                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type().hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+
+                                Call.pickedUnitPayload(unit, result);
+                            }else{ //buildings
+                                Building tile = world.buildWorld(unit.x, unit.y);
+
+                                //TODO copy pasted code
+                                if(tile != null && tile.team == unit.team){
+                                    if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
+                                        Call.pickedBlockPayload(unit, tile, true);
+                                    }else{ //pick up block payload
+                                        Payload current = tile.getPayload();
+                                        if(current != null && pay.canPickupPayload(current)){
+                                            Call.pickedBlockPayload(unit, tile, false);
+                                        }
+                                    }
+                                }
+                            }
+                            ai.payTimer = LogicAI.transferDelay;
+                        }
+                    }
                     case build -> {
                         if(unit instanceof Builderc builder && exec.obj(p3) instanceof Block block){
                             int x = world.toTile(exec.numf(p1)), y = world.toTile(exec.numf(p2));
                             int rot = exec.numi(p4);
 
-                            //reset state if:
-                            //
+                            //reset state of last request when necessary
                             if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || builder.plans().isEmpty()){
                                 ai.plan.progress = 0;
                                 ai.plan.initialized = false;

@@ -23,6 +23,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 
@@ -96,6 +97,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case shootX -> aimX();
             case shootY -> aimY();
             case flag -> flag;
+            case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };
     }
@@ -106,6 +108,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case type -> type;
             case name -> controller instanceof Player p ? p.name : null;
             case firstItem -> stack().amount == 0 ? null : item();
+            case payloadType -> self() instanceof Payloadc pay ?
+                (pay.payloads().isEmpty() ? null :
+                pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type() :
+                pay.payloads().peek() instanceof BlockPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
 

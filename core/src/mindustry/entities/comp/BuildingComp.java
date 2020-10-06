@@ -46,7 +46,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final Seq<Tile> tempTiles = new Seq<>();
     static int sleepingEntities = 0;
     
-    @Import float x, y, health;
+    @Import float x, y, health, maxHealth;
     @Import Team team;
 
     transient Tile tile;
@@ -1224,7 +1224,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case y -> y;
             case team -> team.id;
             case health -> health;
-            case maxHealth -> maxHealth();
+            case maxHealth -> maxHealth;
             case efficiency -> efficiency();
             case rotation -> rotation;
             case totalItems -> items == null ? 0 : items.total();
@@ -1238,6 +1238,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
+            case payloadCount -> getPayload() != null ? 1 : 0;
             default -> 0;
         };
     }
@@ -1248,6 +1249,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case type -> block;
             case firstItem -> items == null ? null : items.first();
             case config -> block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
+            case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type() : getPayload() instanceof BlockPayload p2 ? p2.block() : null;
             default -> noSensed;
         };
 

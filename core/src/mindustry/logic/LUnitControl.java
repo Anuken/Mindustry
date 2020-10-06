@@ -10,6 +10,8 @@ public enum LUnitControl{
     targetp("unit", "shoot"),
     itemDrop("to", "amount"),
     itemTake("from", "item", "amount"),
+    payDrop,
+    payTake("takeUnits"),
     mine("x", "y"),
     flag("value"),
     build("x", "y", "block", "rotation"),
