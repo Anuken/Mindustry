@@ -1,11 +1,11 @@
 package mindustry.ai.types;
 
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.logic.LExecutor.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -23,9 +23,14 @@ public class LogicAI extends AIController{
     public float itemTimer, controlTimer = logicControlTimeout, targetTimer;
     public Building controller;
 
+    //special cache for instruction to store data
+    public ObjectMap<Object, Object> execCache = new ObjectMap<>();
+
     //type of aiming to use
     public LUnitControl aimControl = LUnitControl.stop;
 
+    //whether to use the boost (certain units only)
+    public boolean boost;
     //main target set for shootP
     public Teamc mainTarget;
     //whether to shoot at all
@@ -33,7 +38,7 @@ public class LogicAI extends AIController{
     //target shoot positions for manual aiming
     public PosTeam posTarget = PosTeam.create();
 
-    private ObjectSet<RadarI> radars = new ObjectSet<>();
+    private ObjectSet<Object> radars = new ObjectSet<>();
 
     @Override
     protected void updateMovement(){
@@ -45,7 +50,7 @@ public class LogicAI extends AIController{
             targetTimer -= Time.delta;
         }else{
             radars.clear();
-            targetTimer = 30f;
+            targetTimer = 40f;
         }
 
         //timeout when not controlled by logic for a while
@@ -87,6 +92,10 @@ public class LogicAI extends AIController{
             }
         }
 
+        if(unit.type().canBoost && !unit.type().flying){
+            unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid()), 0.08f);
+        }
+
         //look where moving if there's nothing to aim at
         if(!shoot){
             if(unit.moving()){
@@ -97,7 +106,7 @@ public class LogicAI extends AIController{
         }
     }
 
-    public boolean checkTargetTimer(RadarI radar){
+    public boolean checkTargetTimer(Object radar){
         return radars.add(radar);
     }
 
@@ -114,7 +123,7 @@ public class LogicAI extends AIController{
 
     @Override
     protected boolean shouldShoot(){
-        return shoot;
+        return shoot && !(unit.type().canBoost && boost);
     }
 
     //always aim for the main target

@@ -293,10 +293,10 @@ public class UnitTypes implements ContentList{
 
         pulsar = new UnitType("pulsar"){{
             canBoost = true;
-            boostMultiplier = 1.5f;
-            speed = 0.65f;
+            boostMultiplier = 1.6f;
+            speed = 0.7f;
             hitSize = 10f;
-            health = 320f;
+            health = 300f;
             buildSpeed = 0.9f;
             armor = 4f;
 
@@ -335,7 +335,7 @@ public class UnitTypes implements ContentList{
         }};
 
         quasar = new UnitType("quasar"){{
-            mineTier = 1;
+            mineTier = 3;
             hitSize = 12f;
             boostMultiplier = 2f;
             health = 650f;
@@ -351,8 +351,7 @@ public class UnitTypes implements ContentList{
             speed = 0.4f;
             hitSize = 10f;
 
-            mineTier = 2;
-            mineSpeed = 7f;
+            mineSpeed = 6f;
             drawShields = false;
 
             abilities.add(new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6));
@@ -515,7 +514,7 @@ public class UnitTypes implements ContentList{
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
 
-            speed = 0.9f;
+            speed = 0.92f;
             hitSize = 8f;
             health = 180;
             mechSideSway = 0.25f;
@@ -1182,6 +1181,7 @@ public class UnitTypes implements ContentList{
                     keepVelocity = false;
                     shootEffect = Fx.shootHeal;
                     smokeEffect = Fx.hitLaser;
+                    hitEffect = despawnEffect = Fx.hitLaser;
                     frontColor = Color.white;
 
                     healPercent = 5.5f;
@@ -1197,7 +1197,7 @@ public class UnitTypes implements ContentList{
         mega = new UnitType("mega"){{
             defaultController = RepairAI::new;
 
-            mineTier = 2;
+            mineTier = 3;
             health = 500;
             armor = 2f;
             armor = 5f;

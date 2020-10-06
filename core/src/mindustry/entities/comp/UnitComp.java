@@ -66,6 +66,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.hasWeapons();
     }
 
+    /** @return speed with boost multipliers factored in. */
+    public float realSpeed(){
+        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
+    }
+
     @Override
     public float range(){
         return type.range;

@@ -2,6 +2,7 @@ package mindustry.world.blocks.units;
 
 import arc.func.*;
 import arc.graphics.*;
+import arc.struct.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -9,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.AmmoTypes.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -24,6 +26,7 @@ public class ResupplyPoint extends Block{
         super(name);
         solid = update = true;
         hasItems = true;
+        flags = EnumSet.of(BlockFlag.resupply);
     }
 
     @Override

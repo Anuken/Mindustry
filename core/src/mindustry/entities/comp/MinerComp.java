@@ -62,7 +62,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
                 Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
             }
 
-            if(mineTimer >= 50f + item.hardness*10f){
+            if(mineTimer >= 50f + item.hardness*15f){
                 mineTimer = 0;
 
                 if(within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
