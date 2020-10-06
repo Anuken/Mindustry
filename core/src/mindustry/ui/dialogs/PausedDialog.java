@@ -67,6 +67,7 @@ public class PausedDialog extends BaseDialog{
                         }
                     }
                 }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
+                cont.button("?", () -> ui.showInfo("@host.info")).size(55f,55f);
             }
 
             cont.row();
@@ -106,6 +107,9 @@ public class PausedDialog extends BaseDialog{
                 s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit");
                 s.getLabelCell().growX().wrap();
             });
+
+            cont.row();
+            cont.button("?", () -> ui.showInfo("@host.info")).size(55f,55f).colspan(3);
         }
     }
 

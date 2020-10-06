@@ -50,8 +50,6 @@ public class HostDialog extends BaseDialog{
             runHost();
         }).width(w).height(70f);
 
-        cont.button("?", () -> ui.showInfo("@host.info")).size(65f, 70f).padLeft(6f);
-
         shown(() -> {
             if(!steam){
                 Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("@host.info")));
