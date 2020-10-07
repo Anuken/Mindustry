@@ -546,7 +546,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 manualShooting = true;
             }
 
-            if(!state.isPlaying()) Fx.select.at(pos);
+            if(!state.isPaused()) Fx.select.at(pos);
         }else{
 
             //ignore off-screen taps
