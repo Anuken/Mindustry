@@ -182,20 +182,23 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Object typeObj = exec.obj(type);
-            UnitType type = typeObj instanceof UnitType t ? t : null;
 
-            Seq<Unit> seq = type == null ? exec.team.data().units : exec.team.data().unitCache(type);
+            //binding to `null` was previously possible, but was too powerful and exploitable
+            if(exec.obj(type) instanceof UnitType type){
+                Seq<Unit> seq = exec.team.data().unitCache(type);
 
-            if(seq != null && seq.any()){
-                index %= seq.size;
-                if(index < seq.size){
-                    //bind to the next unit
-                    exec.setconst(varUnit, seq.get(index));
+                if(seq != null && seq.any()){
+                    index %= seq.size;
+                    if(index < seq.size){
+                        //bind to the next unit
+                        exec.setconst(varUnit, seq.get(index));
+                    }
+                    index ++;
+                }else{
+                    //no units of this type found
+                    exec.setconst(varUnit, null);
                 }
-                index ++;
             }else{
-                //no units of this type found
                 exec.setconst(varUnit, null);
             }
         }

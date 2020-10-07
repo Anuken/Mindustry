@@ -18,7 +18,6 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -297,14 +296,14 @@ public class UnitType extends UnlockableContent{
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor && Structs.contains(((Reconstructor)b).upgrades, u -> u[1] == this));
+        Block rec = content.blocks().find(b -> b instanceof Reconstructor && ((Reconstructor)b).upgrades.contains(u -> u[1] == this));
 
         if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems){
             stacks = ((ConsumeItems)rec.consumes.get(ConsumeType.item)).items;
         }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && Structs.contains(((UnitFactory)u).plans, p -> p.unit == this));
+            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && ((UnitFactory)u).plans.contains(p -> p.unit == this));
             if(factory != null){
-                stacks = Structs.find(factory.plans, p -> p.unit == this).requirements;
+                stacks = factory.plans.find(p -> p.unit == this).requirements;
             }
         }
 
