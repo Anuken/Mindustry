@@ -424,9 +424,11 @@ public class LExecutor{
                             ai.plan.set(x, y, rot, block);
                             ai.plan.config = null;
 
-                            builder.clearBuilding();
-                            builder.updateBuilding(true);
-                            builder.addBuild(ai.plan);
+                            if(ai.plan.tile() != null){
+                                builder.clearBuilding();
+                                builder.updateBuilding(true);
+                                builder.addBuild(ai.plan);
+                            }
                         }
                     }
                     case getBlock -> {

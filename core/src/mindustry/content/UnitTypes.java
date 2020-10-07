@@ -19,14 +19,14 @@ public class UnitTypes implements ContentList{
     //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
-    //mech + builder + miner + commander
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class, Commanderc.class}) UnitType nova, pulsar, quasar;
+    //mech + builder + miner
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class}) UnitType nova, pulsar, quasar;
 
-    //mech + commander
-    public static @EntityDef({Unitc.class, Mechc.class, Commanderc.class}) UnitType vela;
+    //mech
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType vela;
 
-    //legs + commander
-    public static @EntityDef({Unitc.class, Legsc.class, Commanderc.class}) UnitType corvus;
+    //legs
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus;
 
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
@@ -49,14 +49,14 @@ public class UnitTypes implements ContentList{
     //air + building + payload
     public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad;
 
-    //air + building + payload + command
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, Commanderc.class, AmmoDistributec.class}) UnitType oct;
+    //air + building + payload
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, AmmoDistributec.class}) UnitType oct;
 
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
 
-    //water + commander
-    public static @EntityDef({Unitc.class, WaterMovec.class, Commanderc.class}) UnitType risso, minke, bryde, sei, omura;
+    //water
+    public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType risso, minke, bryde, sei, omura;
 
     //special block unit type
     public static @EntityDef({Unitc.class, BlockUnitc.class}) UnitType block;
@@ -1660,6 +1660,7 @@ public class UnitTypes implements ContentList{
             health = 120f;
             engineOffset = 6f;
             hitSize = 8f;
+            commandLimit = 3;
 
             weapons.add(new Weapon("small-basic-weapon"){{
                 reload = 17f;
@@ -1696,6 +1697,7 @@ public class UnitTypes implements ContentList{
             hitSize = 9f;
             rotateShooting = false;
             lowAltitude = true;
+            commandLimit = 5;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
@@ -1734,6 +1736,7 @@ public class UnitTypes implements ContentList{
             health = 190f;
             engineOffset = 6f;
             hitSize = 10f;
+            commandLimit = 7;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;

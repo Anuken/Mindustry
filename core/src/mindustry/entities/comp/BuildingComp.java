@@ -215,9 +215,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return true;
     }
 
-    public void applyBoost(float intensity, float  duration){
+    public void applyBoost(float intensity, float duration){
+        //do not refresh time scale when getting a weaker intensity
+        if(intensity >= this.timeScale){
+            timeScaleDuration = Math.max(timeScaleDuration, duration);
+        }
         timeScale = Math.max(timeScale, intensity);
-        timeScaleDuration = Math.max(timeScaleDuration, duration);
     }
 
     public Building nearby(int dx, int dy){

@@ -365,7 +365,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //draw targeting crosshair
-        if(target != null && !state.isEditor()){
+        if(target != null && !state.isEditor() && !manualShooting){
             if(target != lastTarget){
                 crosshairScale = 0f;
                 lastTarget = target;
@@ -525,7 +525,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(mode == none){
             Vec2 pos = Core.input.mouseWorld(x, y);
 
-            //TODO find payload target
             if(player.unit() instanceof Payloadc pay){
                 Unit target = Units.closest(player.team(), pos.x, pos.y, 8f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(pos, u.hitSize + 8f));
                 if(target != null){
@@ -540,10 +539,12 @@ public class MobileInput extends InputHandler implements GestureListener{
                         payloadTarget = new Vec2(pos);
                     }else{
                         manualShooting = true;
+                        this.target = null;
                     }
                 }
             }else{
                 manualShooting = true;
+                this.target = null;
             }
 
             if(!state.isPaused()) Fx.select.at(pos);
@@ -610,10 +611,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //reset payload target
                 payloadTarget = null;
                 //apply command on double tap when own unit is tapped
-                if(Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize)){
-                    if(player.unit() instanceof Commanderc){
-                        Call.unitCommand(player);
-                    }
+                if(Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f)){
+                    Call.unitCommand(player);
                 }else{
                     //control a unit/block
                     Unit on = selectedUnit();
@@ -859,12 +858,12 @@ public class MobileInput extends InputHandler implements GestureListener{
         float baseSpeed = unit.type().speed;
 
         //limit speed to minimum formation speed to preserve formation
-        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+        if(unit.isCommanding()){
             //add a tiny multiplier to let units catch up just in case
-            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.98f;
+            baseSpeed = unit.minFormationSpeed * 0.98f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
@@ -946,6 +945,8 @@ public class MobileInput extends InputHandler implements GestureListener{
                         }
                     }
                 }
+
+                unit.aim(Tmp.v1.trns(unit.rotation, 1000f).add(unit));
             }else{
                 Vec2 intercept = Predict.intercept(unit, target, bulletSpeed);
 
@@ -955,7 +956,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 unit.aim(player.mouseX, player.mouseY);
             }
-
         }
 
         unit.controlWeapons(player.shooting && !boosted);

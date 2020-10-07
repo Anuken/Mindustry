@@ -606,12 +606,12 @@ public class DesktopInput extends InputHandler{
         float baseSpeed = unit.type().speed;
 
         //limit speed to minimum formation speed to preserve formation
-        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+        if(unit.isCommanding()){
             //add a tiny multiplier to let units catch up just in case
-            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.95f;
+            baseSpeed = unit.minFormationSpeed * 0.95f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -661,10 +661,8 @@ public class DesktopInput extends InputHandler{
         }
 
         //update commander inut
-        if(unit instanceof Commanderc){
-            if(Core.input.keyTap(Binding.command)){
-                Call.unitCommand(player);
-            }
+        if(Core.input.keyTap(Binding.command)){
+            Call.unitCommand(player);
         }
     }
 }

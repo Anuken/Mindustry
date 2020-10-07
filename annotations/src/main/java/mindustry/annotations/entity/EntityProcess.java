@@ -643,7 +643,7 @@ public class EntityProcess extends BaseProcessor{
             //assign IDs
             definitions.sort(Structs.comparing(t -> t.naming.toString()));
             for(EntityDefinition def : definitions){
-                String name = def.naming.fullName();
+                String name = def.name;
                 if(map.containsKey(name)){
                     def.classID = map.getInt(name);
                 }else{

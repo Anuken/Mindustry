@@ -69,10 +69,6 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public float formationSize(){
-        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
-            //TODO return formation size
-            //eturn ((Commanderc)unit).formation().
-        }
         return unit.hitSize * 1f;
     }
 

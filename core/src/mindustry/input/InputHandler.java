@@ -364,7 +364,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(commander.isCommanding()){
             commander.clearCommand();
-        }else{
+        }else if(player.unit().type().commandLimit > 0){
 
             //TODO try out some other formations
             commander.commandNearby(new CircleFormation());

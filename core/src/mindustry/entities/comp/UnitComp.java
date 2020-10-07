@@ -28,7 +28,7 @@ import mindustry.world.blocks.payloads.*;
 import static mindustry.Vars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, Ranged{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged{
 
     @Import boolean hovering, dead;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo;
