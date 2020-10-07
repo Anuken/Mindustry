@@ -65,7 +65,7 @@ public class Units{
 
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team, UnitType type){
-        return teamIndex.countType(team, type) < getCap(team);
+        return team.data().countType(type) < getCap(team);
     }
 
     public static int getCap(Team team){
@@ -284,7 +284,7 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        teamIndex.tree(team).intersect(x, y, width, height, cons);
+        team.data().tree().intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a circle around this position. */
@@ -316,7 +316,7 @@ public class Units{
             //inactive teams have no cache, check everything
             //TODO cache all teams with units OR blocks
             for(Team other : Team.all){
-                if(other != team && teamIndex.count(other) > 0){
+                if(other != team && other.data().unitCount > 0){
                     nearby(other, x, y, width, height, cons);
                 }
             }

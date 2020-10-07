@@ -36,7 +36,7 @@ import java.lang.reflect.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
-    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class);
+    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));

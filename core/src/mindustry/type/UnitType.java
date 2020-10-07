@@ -163,6 +163,11 @@ public class UnitType extends UnlockableContent{
                 bars.row();
             }
         }).growX();
+
+        if(unit.controller() instanceof LogicAI){
+            table.row();
+            table.add(Blocks.microProcessor.emoji() + " " + Core.bundle.get("units.processorcontrol")).growX().left();
+        }
         
         table.row();
     }
@@ -206,7 +211,7 @@ public class UnitType extends UnlockableContent{
         singleTarget = weapons.size <= 1;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round(hitSize * 7, 20), 20);
+            itemCapacity = Math.max(Mathf.round(hitSize * 4, 10), 10);
         }
 
         //set up default range
@@ -230,7 +235,7 @@ public class UnitType extends UnlockableContent{
             mechStepParticles = hitSize > 15f;
         }
 
-        canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
+        canHeal = weapons.contains(w -> w.bullet.healPercent > 0f);
 
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();

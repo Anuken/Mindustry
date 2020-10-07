@@ -379,12 +379,18 @@ public class Bullets implements ContentList{
         JsonIO.copy(damageLightning, damageLightningGround);
         damageLightningGround.collidesAir = false;
 
-        healBullet = new HealBulletType(5.2f, 13){{
+        healBullet = new LaserBoltBulletType(5.2f, 13){{
             healPercent = 3f;
+            collidesTeam = true;
+            backColor = Pal.heal;
+            frontColor = Color.white;
         }};
 
-        healBulletBig = new HealBulletType(5.2f, 15){{
+        healBulletBig = new LaserBoltBulletType(5.2f, 15){{
             healPercent = 5.5f;
+            collidesTeam = true;
+            backColor = Pal.heal;
+            frontColor = Color.white;
         }};
 
         fireball = new BulletType(1f, 4){

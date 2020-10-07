@@ -23,11 +23,12 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, Ranged{
 
     @Import boolean hovering, dead;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo;
@@ -37,6 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private UnitController controller;
     private UnitType type;
     boolean spawnedByCore;
+    double flag;
 
     transient Seq<Ability> abilities = new Seq<>(0);
     private transient float resupplyTime = Mathf.random(10f);
@@ -63,6 +65,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.hasWeapons();
     }
 
+    /** @return speed with boost multipliers factored in. */
+    public float realSpeed(){
+        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
+    }
+
+    @Override
     public float range(){
         return type.range;
     }
@@ -76,6 +84,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public double sense(LAccess sensor){
         return switch(sensor){
             case totalItems -> stack().amount;
+            case itemCapacity -> type.itemCapacity;
             case rotation -> rotation;
             case health -> health;
             case maxHealth -> maxHealth;
@@ -85,6 +94,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case shooting -> isShooting() ? 1 : 0;
             case shootX -> aimX();
             case shootY -> aimY();
+            case flag -> flag;
+            case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };
     }
@@ -93,6 +104,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public Object senseObject(LAccess sensor){
         return switch(sensor){
             case type -> type;
+            case name -> controller instanceof Player p ? p.name : null;
+            case firstItem -> stack().amount == 0 ? null : item();
+            case payloadType -> self() instanceof Payloadc pay ?
+                (pay.payloads().isEmpty() ? null :
+                pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type() :
+                pay.payloads().peek() instanceof BlockPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
 
@@ -182,7 +199,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public int count(){
-        return teamIndex.countType(team, type);
+        return team.data().countType(type);
     }
 
     public int cap(){
@@ -224,13 +241,13 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //check if over unit cap
         if(count() > cap() && !spawnedByCore && !dead){
             Call.unitCapDeath(self());
-            teamIndex.updateCount(team, type, -1);
+            team.data().updateCount(type, -1);
         }
     }
 
     @Override
     public void remove(){
-        teamIndex.updateCount(team, type, -1);
+        team.data().updateCount(type, -1);
         controller.removed(self());
     }
 

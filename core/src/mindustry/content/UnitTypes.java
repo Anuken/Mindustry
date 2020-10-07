@@ -266,7 +266,6 @@ public class UnitTypes implements ContentList{
         //region ground support
 
         nova = new UnitType("nova"){{
-            itemCapacity = 60;
             canBoost = true;
             boostMultiplier = 1.5f;
             speed = 0.55f;
@@ -293,12 +292,11 @@ public class UnitTypes implements ContentList{
         }};
 
         pulsar = new UnitType("pulsar"){{
-            itemCapacity = 60;
             canBoost = true;
-            boostMultiplier = 1.5f;
-            speed = 0.65f;
+            boostMultiplier = 1.6f;
+            speed = 0.7f;
             hitSize = 10f;
-            health = 320f;
+            health = 300f;
             buildSpeed = 0.9f;
             armor = 4f;
 
@@ -337,10 +335,9 @@ public class UnitTypes implements ContentList{
         }};
 
         quasar = new UnitType("quasar"){{
-            mineTier = 1;
+            mineTier = 3;
             hitSize = 12f;
             boostMultiplier = 2f;
-            itemCapacity = 80;
             health = 650f;
             buildSpeed = 1.7f;
             canBoost = true;
@@ -354,8 +351,7 @@ public class UnitTypes implements ContentList{
             speed = 0.4f;
             hitSize = 10f;
 
-            mineTier = 2;
-            mineSpeed = 7f;
+            mineSpeed = 6f;
             drawShields = false;
 
             abilities.add(new ForceFieldAbility(60f, 0.3f, 400f, 60f * 6));
@@ -397,7 +393,7 @@ public class UnitTypes implements ContentList{
             engineSize = 6f;
             lowAltitude = true;
 
-            health = 6500f;
+            health = 7000f;
             armor = 7f;
             canBoost = true;
             landShake = 4f;
@@ -445,7 +441,6 @@ public class UnitTypes implements ContentList{
         corvus = new UnitType("corvus"){{
             mineTier = 1;
             hitSize = 29f;
-            itemCapacity = 80;
             health = 18000f;
             buildSpeed = 1.7f;
             armor = 9f;
@@ -519,7 +514,7 @@ public class UnitTypes implements ContentList{
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
 
-            speed = 0.9f;
+            speed = 0.92f;
             hitSize = 8f;
             health = 180;
             mechSideSway = 0.25f;
@@ -545,7 +540,6 @@ public class UnitTypes implements ContentList{
         }};
 
         atrax = new UnitType("atrax"){{
-            itemCapacity = 80;
             speed = 0.5f;
             drag = 0.4f;
             hitSize = 10f;
@@ -1134,7 +1128,6 @@ public class UnitTypes implements ContentList{
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            itemCapacity = 30;
             range = 50f;
             isCounted = false;
 
@@ -1153,7 +1146,6 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 70f;
-            itemCapacity = 70;
             health = 400;
             buildSpeed = 0.5f;
             engineOffset = 6.5f;
@@ -1189,8 +1181,13 @@ public class UnitTypes implements ContentList{
                     keepVelocity = false;
                     shootEffect = Fx.shootHeal;
                     smokeEffect = Fx.hitLaser;
+                    hitEffect = despawnEffect = Fx.hitLaser;
                     frontColor = Color.white;
 
+                    healPercent = 5.5f;
+                    collidesTeam = true;
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
                     backColor = Pal.heal;
                     trailColor = Pal.heal;
                 }};
@@ -1200,7 +1197,7 @@ public class UnitTypes implements ContentList{
         mega = new UnitType("mega"){{
             defaultController = RepairAI::new;
 
-            mineTier = 2;
+            mineTier = 3;
             health = 500;
             armor = 2f;
             armor = 5f;
@@ -1292,6 +1289,7 @@ public class UnitTypes implements ContentList{
                     speed = 0.001f;
                     collides = false;
 
+                    healPercent = 10f;
                     splashDamage = 240f;
                     splashDamageRadius = 115f;
                 }};
@@ -1314,6 +1312,7 @@ public class UnitTypes implements ContentList{
             buildSpeed = 4f;
             drawShields = false;
             commandLimit = 6;
+            lowAltitude = true;
 
             ammoCapacity = 1300;
             ammoResupplyAmount = 20;
