@@ -129,8 +129,7 @@ public class LogicBlock extends Block{
 
     @Override
     public Object pointConfig(Object config, Cons<Point2> transformer){
-        if(config instanceof byte[]){
-            byte[] data = (byte[])config;
+        if(config instanceof byte[] data){
 
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
                 //discard version for now

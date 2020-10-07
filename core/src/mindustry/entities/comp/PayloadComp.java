@@ -25,11 +25,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     boolean canPickup(Unit unit){
-        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f;
+        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
     }
 
     boolean canPickup(Building build){
-        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f;
+        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f && build.canPickup();
     }
 
     boolean canPickupPayload(Payload pay){
@@ -55,7 +55,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
 
     void pickup(Building tile){
         tile.tile.remove();
-        payloads.add(new BlockPayload(tile));
+        payloads.add(new BuildPayload(tile));
         Fx.unitPickup.at(tile);
     }
 
@@ -86,8 +86,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             return true;
         }
 
-        if(payload instanceof BlockPayload){
-            return dropBlock((BlockPayload)payload);
+        if(payload instanceof BuildPayload){
+            return dropBlock((BuildPayload)payload);
         }else if(payload instanceof UnitPayload){
             return dropUnit((UnitPayload)payload);
         }
@@ -118,8 +118,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     /** @return whether the tile has been successfully placed. */
-    boolean dropBlock(BlockPayload payload){
-        Building tile = payload.entity;
+    boolean dropBlock(BuildPayload payload){
+        Building tile = payload.build;
         int tx = Vars.world.toTile(x - tile.block.offset), ty = Vars.world.toTile(y - tile.block.offset);
         Tile on = Vars.world.tile(tx, ty);
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){

@@ -249,8 +249,7 @@ public class NetServer implements ApplicationListener{
             }catch(ValidateException e){
                 Log.debug("Validation failed for '@': @", e.player, e.getMessage());
             }catch(RuntimeException e){
-                if(e.getCause() instanceof ValidateException){
-                    ValidateException v = (ValidateException)e.getCause();
+                if(e.getCause() instanceof ValidateException v){
                     Log.debug("Validation failed for '@': @", v.player, v.getMessage());
                 }else{
                     throw e;

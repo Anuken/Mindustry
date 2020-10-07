@@ -397,11 +397,11 @@ public class LExecutor{
                                 //TODO copy pasted code
                                 if(tile != null && tile.team == unit.team){
                                     if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
-                                        Call.pickedBlockPayload(unit, tile, true);
+                                        Call.pickedBuildPayload(unit, tile, true);
                                     }else{ //pick up block payload
                                         Payload current = tile.getPayload();
                                         if(current != null && pay.canPickupPayload(current)){
-                                            Call.pickedBlockPayload(unit, tile, false);
+                                            Call.pickedBuildPayload(unit, tile, false);
                                         }
                                     }
                                 }
@@ -494,8 +494,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Controllable){
-                Controllable cont = (Controllable)obj;
+            if(obj instanceof Controllable cont){
                 if(type.isObj){
                     cont.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
@@ -541,8 +540,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild){
-                MemoryBuild mem = (MemoryBuild)from;
+            if(from instanceof MemoryBuild mem){
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -566,8 +564,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild){
-                MemoryBuild mem = (MemoryBuild)from;
+            if(from instanceof MemoryBuild mem){
 
                 if(address >= 0 && address < mem.memory.length){
                     mem.memory[address] = exec.num(value);
@@ -594,8 +591,7 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
-            if(target instanceof Senseable){
-                Senseable se = (Senseable)target;
+            if(target instanceof Senseable se){
                 if(sense instanceof Content){
                     exec.setnum(to, se.sense(((Content)sense)));
                 }else if(sense instanceof LAccess){
@@ -823,8 +819,7 @@ public class LExecutor{
             if(Vars.headless) return;
 
             Building build = exec.building(target);
-            if(build instanceof LogicDisplayBuild){
-                LogicDisplayBuild d = (LogicDisplayBuild)build;
+            if(build instanceof LogicDisplayBuild d){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -886,8 +881,7 @@ public class LExecutor{
         public void run(LExecutor exec){
 
             Building build = exec.building(target);
-            if(build instanceof MessageBuild){
-                MessageBuild d = (MessageBuild)build;
+            if(build instanceof MessageBuild d){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));

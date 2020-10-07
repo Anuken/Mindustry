@@ -109,7 +109,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case payloadType -> self() instanceof Payloadc pay ?
                 (pay.payloads().isEmpty() ? null :
                 pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type() :
-                pay.payloads().peek() instanceof BlockPayload p2 ? p2.block() : null) : null;
+                pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
 

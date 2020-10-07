@@ -67,13 +67,11 @@ public class BuilderAI extends AIController{
                 Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
                     if(found) return;
 
-                    if(u instanceof Builderc && u != unit && ((Builderc)u).activelyBuilding()){
-                        Builderc b = (Builderc)u;
+                    if(u instanceof Builderc b && u != unit && ((Builderc)u).activelyBuilding()){
                         BuildPlan plan = b.buildPlan();
 
                         Building build = world.build(plan.x, plan.y);
-                        if(build instanceof ConstructBuild){
-                            ConstructBuild cons = (ConstructBuild)build;
+                        if(build instanceof ConstructBuild cons){
                             float dist = Math.min(cons.dst(unit) - buildingRange, 0);
 
                             //make sure you can reach the request in time

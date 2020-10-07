@@ -60,10 +60,15 @@ public class MobileInput extends InputHandler implements GestureListener{
     public Block lastBlock;
     /** Last placed request. Used for drawing block overlay. */
     public BuildPlan lastPlaced;
-    /** Down tracking for panning.*/
+    /** Down tracking for panning. */
     public boolean down = false;
+    /** Whether manual shooting (point with finger) is enabled. */
+    public boolean manualShooting = false;
 
-    public Teamc target, moveTarget;
+    /** Current thing being shot at. */
+    public Teamc target;
+    /** Payload target being moved to. Can be a position (for dropping), or a unit/block. */
+    public Position payloadTarget;
 
     //region utility methods
 
@@ -474,6 +479,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             down = false;
         }
 
+        manualShooting = false;
         selecting = false;
 
         //place down a line if in line mode
@@ -518,10 +524,26 @@ public class MobileInput extends InputHandler implements GestureListener{
         //handle long tap when player isn't building
         if(mode == none){
 
-            //control a unit/block
-            Unit on = selectedUnit();
-            if(on != null){
-                Call.unitControl(player, on);
+            //TODO find payload target
+            if(player.unit() instanceof Payloadc pay){
+                Vec2 pos = Core.input.mouseWorld(x, y);
+                Unit target = Units.closest(player.team(), pos.x, pos.y, 8f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(pos, u.hitSize + 8f));
+                if(target != null){
+                    payloadTarget = target;
+                }else{
+                    Building build = world.buildWorld(pos.x, pos.y);
+
+                    if(build != null && build.team == player.team() && pay.canPickup(build)){
+                        payloadTarget = build;
+                    }else if(pay.hasPayload()){
+                        //drop off at position
+                        payloadTarget = new Vec2(pos);
+                    }else{
+                        manualShooting = true;
+                    }
+                }
+            }else{
+                manualShooting = true;
             }
         }else{
 
@@ -581,17 +603,20 @@ public class MobileInput extends InputHandler implements GestureListener{
                 tryBeginMine(cursor);
             }
 
-            //apply command on double tap
-            if(count == 2 && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 2f)){
-                if(player.unit() instanceof Commanderc){
-                    Call.unitCommand(player);
-                }
-
-                if(player.unit() instanceof Payloadc){
-                    if(((Payloadc)player.unit()).hasPayload()){
-                        tryDropPayload();
-                    }else{
-                        tryPickupPayload();
+            //control units.
+            if(count == 2){
+                //reset payload target
+                payloadTarget = null;
+                //apply command on double tap when own unit is tapped
+                if(Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize)){
+                    if(player.unit() instanceof Commanderc){
+                        Call.unitCommand(player);
+                    }
+                }else{
+                    //control a unit/block
+                    Unit on = selectedUnit();
+                    if(on != null){
+                        Call.unitControl(player, on);
                     }
                 }
             }
@@ -608,10 +633,14 @@ public class MobileInput extends InputHandler implements GestureListener{
             selectRequests.clear();
             removals.clear();
             mode = none;
+            manualShooting = false;
+            payloadTarget = null;
         }
 
         if(player.dead()){
             mode = none;
+            manualShooting = false;
+            payloadTarget = null;
         }
 
         //zoom camera
@@ -752,7 +781,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             return false;
         }
 
-        if(!down) return false;
+        //do not pan with manual shooting enabled
+        if(!down || manualShooting) return false;
 
         if(selecting){ //pan all requests
             shiftDeltaX += deltaX;
@@ -806,7 +836,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         UnitType type = unit.type();
         if(type == null) return;
 
-        boolean flying = type.flying;
         boolean omni = unit.type().omniMovement;
         boolean legs = unit.isGrounded();
         boolean allowHealing = type.canHeal;
@@ -847,14 +876,26 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        if(moveTarget != null){
-            targetPos.set(moveTarget);
+        if(payloadTarget != null && unit instanceof Payloadc pay){
+            targetPos.set(payloadTarget);
             attractDst = 0f;
 
-            if(unit.within(moveTarget, 2f * Time.delta)){
-                handleTapTarget(moveTarget);
-                moveTarget = null;
+            if(unit.within(payloadTarget, 3f * Time.delta)){
+                if(payloadTarget instanceof Vec2 && pay.hasPayload()){
+                    //vec -> dropping something
+                    tryDropPayload();
+                }else if(payloadTarget instanceof Building build && pay.canPickup(build)){
+                    //building -> picking building up
+                    Call.requestBuildPayload(player, build);
+                }else if(payloadTarget instanceof Unit other && pay.canPickup(other)){
+                    //unit -> picking unit up
+                    Call.requestUnitPayload(player, other);
+                }
+
+                payloadTarget = null;
             }
+        }else{
+            payloadTarget = null;
         }
 
         movement.set(targetPos).sub(player).limit(speed);
@@ -887,8 +928,11 @@ public class MobileInput extends InputHandler implements GestureListener{
         //update shooting if not building + not mining
         if(!player.builder().isBuilding() && player.miner().mineTile() == null){
 
-            //autofire
-            if(target == null){
+            //autofire targeting
+            if(manualShooting){
+                player.shooting = !boosted;
+                unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
+            }else if(target == null){
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget")){
                     target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.team != Team.derelict, u -> u.team != Team.derelict);
@@ -898,10 +942,6 @@ public class MobileInput extends InputHandler implements GestureListener{
                         if(target != null && !unit.within(target, range)){
                             target = null;
                         }
-                    }
-
-                    if(target != null && player.isMiner()){
-                        player.miner().mineTile(null);
                     }
                 }
             }else{
@@ -917,11 +957,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         unit.controlWeapons(player.shooting && !boosted);
-    }
-
-
-    protected void handleTapTarget(Teamc target){
-
     }
 
     //endregion
