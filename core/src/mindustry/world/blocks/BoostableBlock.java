@@ -41,7 +41,6 @@ public abstract class BoostableBlock extends Block{
         super.setStats();
 
         if(acceptCoolant){
-            //TODO: better stats
             stats.add(BlockStat.booster, new BoosterListValue(1f, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
         }
     }
