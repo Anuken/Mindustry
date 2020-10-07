@@ -287,7 +287,7 @@ public class Blocks implements ContentList{
 
         salt = new Floor("salt"){{
             variants = 0;
-            attributes.set(Attribute.water, -0.25f);
+            attributes.set(Attribute.water, -0.3f);
             attributes.set(Attribute.oil, 0.3f);
         }};
 
@@ -718,7 +718,7 @@ public class Blocks implements ContentList{
             size = 2;
             hasPower = hasItems = hasLiquids = true;
 
-            consumes.liquid(Liquids.oil, 0.09f);
+            consumes.liquid(Liquids.oil, 0.1f);
             consumes.power(0.5f);
         }};
 
@@ -1119,7 +1119,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.titanium, 7, Items.lead, 10, Items.silicon, 15, Items.surgealloy, 15));
             size = 2;
             maxNodes = 2;
-            laserRange = 30f;
+            laserRange = 40f;
         }};
 
         diode = new PowerDiode("diode"){{

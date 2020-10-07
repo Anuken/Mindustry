@@ -12,6 +12,7 @@ import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.meta.*;
 
 import static mindustry.world.blocks.logic.LogicDisplay.*;
 
@@ -724,7 +725,7 @@ public class LStatements{
                                 type = "@" + item.name;
                                 field.setText(type);
                                 hide.run();
-                            }).size(40f);
+                            }).size(40f).get().resizeImage(Cicon.small.size);
 
                             if(++c % 6 == 0) i.row();
                         }
@@ -810,6 +811,111 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new RadarI(target1, target2, target3, sort, LExecutor.varUnit, builder.var(sortOrder), builder.var(output));
+        }
+    }
+
+    @RegisterStatement("ulocate")
+    public static class UnitLocateStatement extends LStatement{
+        public LLocate locate = LLocate.building;
+        public BlockFlag flag = BlockFlag.core;
+        public String enemy = "true", ore = "@copper";
+        public String outX = "outx", outY = "outy", outFound = "found";
+
+        @Override
+        public void build(Table table){
+            rebuild(table);
+        }
+
+        void rebuild(Table table){
+            table.clearChildren();
+
+            table.add(" find ").left();
+
+            table.button(b -> {
+                b.label(() -> locate.name());
+                b.clicked(() -> showSelect(b, LLocate.all, locate, t -> {
+                    locate = t;
+                    rebuild(table);
+                }, 2, cell -> cell.size(110, 50)));
+            }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
+
+            switch(locate){
+                case building -> {
+                    row(table);
+                    table.add(" type ").left();
+                    table.button(b -> {
+                        b.label(() -> flag.name());
+                        b.clicked(() -> showSelect(b, BlockFlag.all, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
+                    }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
+                    row(table);
+
+                    table.add(" enemy ").left();
+
+                    fields(table, enemy, str -> enemy = str);
+
+                    table.row();
+                }
+
+                case ore -> {
+                    table.add(" ore ").left();
+                    table.table(ts -> {
+                        ts.color.set(table.color);
+
+                        field(ts, ore, str -> ore = str);
+
+                        ts.button(b -> {
+                            b.image(Icon.pencilSmall);
+                            b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                                t.row();
+                                t.table(i -> {
+                                    i.left();
+                                    int c = 0;
+                                    for(Item item : Vars.content.items()){
+                                        if(!item.unlockedNow()) continue;
+                                        i.button(new TextureRegionDrawable(item.icon(Cicon.small)), Styles.cleari, () -> {
+                                            ore = "@" + item.name;
+                                            rebuild(table);
+                                            hide.run();
+                                        }).size(40f).get().resizeImage(Cicon.small.size);
+
+                                        if(++c % 6 == 0) i.row();
+                                    }
+                                }).colspan(3).width(240f).left();
+                            }));
+                        }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+                    });
+
+
+                    table.row();
+                }
+
+                case spawn -> {
+                    table.row();
+                }
+            }
+
+            table.add(" outX ").left();
+            fields(table, outX, str -> outX = str);
+
+            table.add(" outY ").left();
+            fields(table, outY, str -> outY = str);
+
+            row(table);
+
+            table.add(" found ").left();
+            fields(table, outFound, str -> outFound = str);
+
+
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.units;
+        }
+
+        @Override
+        public LInstruction build(LAssembler builder){
+            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound));
         }
     }
 }

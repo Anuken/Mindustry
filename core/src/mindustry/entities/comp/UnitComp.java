@@ -23,6 +23,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.payloads.*;
 
 import static mindustry.Vars.*;
 
@@ -37,9 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     private UnitController controller;
     private UnitType type;
     boolean spawnedByCore;
-
-    //TODO mark as non-transient when done
-    transient double flag;
+    double flag;
 
     transient Seq<Ability> abilities = new Seq<>(0);
     private transient float resupplyTime = Mathf.random(10f);
@@ -64,6 +63,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public boolean hasWeapons(){
         return type.hasWeapons();
+    }
+
+    /** @return speed with boost multipliers factored in. */
+    public float realSpeed(){
+        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
     }
 
     @Override
@@ -91,6 +95,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case shootX -> aimX();
             case shootY -> aimY();
             case flag -> flag;
+            case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };
     }
@@ -99,8 +104,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public Object senseObject(LAccess sensor){
         return switch(sensor){
             case type -> type;
-            case name -> controller instanceof Player p ? p.name : type.name;
+            case name -> controller instanceof Player p ? p.name : null;
             case firstItem -> stack().amount == 0 ? null : item();
+            case payloadType -> self() instanceof Payloadc pay ?
+                (pay.payloads().isEmpty() ? null :
+                pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type() :
+                pay.payloads().peek() instanceof BlockPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
 

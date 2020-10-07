@@ -52,7 +52,7 @@ abstract class PosComp implements Position{
 
     boolean onSolid(){
         Tile tile = tileOn();
-        return tile != null && tile.solid();
+        return tile == null || tile.solid();
     }
 
     @Nullable

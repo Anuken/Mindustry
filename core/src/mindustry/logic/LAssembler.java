@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
@@ -50,6 +51,8 @@ public class LAssembler{
                 putConst("@" + block.name, block);
             }
         }
+
+        putConst("@air", Blocks.air);
 
         for(UnitType type : Vars.content.units()){
             putConst("@" + type.name, type);
