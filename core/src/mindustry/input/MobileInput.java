@@ -523,10 +523,10 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         //handle long tap when player isn't building
         if(mode == none){
+            Vec2 pos = Core.input.mouseWorld(x, y);
 
             //TODO find payload target
             if(player.unit() instanceof Payloadc pay){
-                Vec2 pos = Core.input.mouseWorld(x, y);
                 Unit target = Units.closest(player.team(), pos.x, pos.y, 8f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(pos, u.hitSize + 8f));
                 if(target != null){
                     payloadTarget = target;
@@ -545,6 +545,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             }else{
                 manualShooting = true;
             }
+
+            if(!state.isPlaying()) Fx.select.at(pos);
         }else{
 
             //ignore off-screen taps
