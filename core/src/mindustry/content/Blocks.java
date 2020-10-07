@@ -890,7 +890,7 @@ public class Blocks implements ContentList{
             range = 200f;
             speedBoost = 2.5f;
             useTime = 300f;
-            hasBoost = false;
+            acceptItemBooster = false;
             consumes.items(with(Items.phasefabric, 1, Items.silicon, 1));
         }};
 
@@ -1221,7 +1221,8 @@ public class Blocks implements ContentList{
             drillTime = 600;
             size = 2;
             drawMineItem = true;
-            consumes.liquid(Liquids.water, 0.05f).boost();
+            coolantUse = 0.05f;
+            coolantMultiplier = 20f;
         }};
 
         pneumaticDrill = new Drill("pneumatic-drill"){{
@@ -1230,7 +1231,8 @@ public class Blocks implements ContentList{
             drillTime = 400;
             size = 2;
             drawMineItem = true;
-            consumes.liquid(Liquids.water, 0.06f).boost();
+            coolantUse = 0.06f;
+            coolantMultiplier = 20f;
         }};
 
         laserDrill = new Drill("laser-drill"){{
@@ -1241,9 +1243,10 @@ public class Blocks implements ContentList{
             tier = 4;
             updateEffect = Fx.pulverizeMedium;
             drillEffect = Fx.mineBig;
+            coolantUse = 0.1f;
+            coolantMultiplier = 20f;
 
             consumes.power(1.10f);
-            consumes.liquid(Liquids.water, 0.08f).boost();
         }};
 
         blastDrill = new Drill("blast-drill"){{
@@ -1258,12 +1261,12 @@ public class Blocks implements ContentList{
             drillEffect = Fx.mineHuge;
             rotateSpeed = 6f;
             warmupSpeed = 0.01f;
+            coolantUse = 0.2f;
 
             //more than the laser drill
-            liquidBoostIntensity = 1.8f;
+            coolantMultiplier = 25f;
 
             consumes.power(3f);
-            consumes.liquid(Liquids.water, 0.1f).boost();
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{

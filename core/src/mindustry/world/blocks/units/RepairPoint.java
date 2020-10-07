@@ -11,11 +11,12 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class RepairPoint extends Block{
+public class RepairPoint extends BoostableBlock{
     static final Rect rect = new Rect();
 
     public int timerTarget = timers++;
@@ -37,6 +38,8 @@ public class RepairPoint extends Block{
         flags = EnumSet.of(BlockFlag.repair);
         hasPower = true;
         outlineIcon = true;
+        acceptCoolant = true;
+        coolantMultiplier = 10f;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class RepairPoint extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    public class RepairPointBuild extends Building{
+    public class RepairPointBuild extends BoostableBlockBuild{
         public Unit target;
         public float strength, rotation = 90;
 
@@ -97,7 +100,8 @@ public class RepairPoint extends Block{
             if(target != null && (target.dead() || target.dst(tile) > repairRadius || target.health() >= target.maxHealth())){
                 target = null;
             }else if(target != null && consValid()){
-                target.heal(repairSpeed * Time.delta * strength * efficiency());
+                updateCooling();
+                target.heal(repairSpeed * Time.delta * strength * efficiency() * currentCoolantBoost);
                 rotation = Mathf.slerpDelta(rotation, angleTo(target), 0.5f);
                 targetIsBeingRepaired = true;
             }

@@ -28,7 +28,7 @@ import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
-public abstract class Turret extends Block{
+public abstract class Turret extends BoostableBlock{
     //after being logic-controlled and this amount of time passes, the turret will resume normal AI
     public final static float logicControlCooldown = 60 * 2;
 
@@ -62,11 +62,6 @@ public abstract class Turret extends Block{
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
-    public boolean acceptCoolant = true;
-    /** How much reload is lowered by for each unit of liquid of heat capacity. */
-    public float coolantMultiplier = 5f;
-    /** Effect displayed when coolant is used. */
-    public Effect coolEffect = Fx.fuelburn;
     public Sortf unitSort = Unit::dst2;
 
     protected Vec2 tr = new Vec2();
@@ -95,6 +90,7 @@ public abstract class Turret extends Block{
         flags = EnumSet.of(BlockFlag.turret);
         outlineIcon = true;
         liquidCapacity = 20f;
+        acceptCoolant = true;
     }
 
     @Override
@@ -111,20 +107,6 @@ public abstract class Turret extends Block{
         stats.add(BlockStat.reload, 60f / reloadTime * shots, StatUnit.none);
         stats.add(BlockStat.targetsAir, targetAir);
         stats.add(BlockStat.targetsGround, targetGround);
-
-        if(acceptCoolant){
-            stats.add(BlockStat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
-        }
-    }
-
-    @Override
-    public void init(){
-        if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
-            hasLiquids = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
-        }
-
-        super.init();
     }
 
     @Override
@@ -143,7 +125,7 @@ public abstract class Turret extends Block{
         public abstract BulletType type();
     }
 
-    public class TurretBuild extends Building implements ControlBlock, Ranged{
+    public class TurretBuild extends BoostableBlockBuild implements ControlBlock, Ranged{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float reload, rotation = 90, recoil, heat, logicControlTime = -1;
@@ -301,29 +283,6 @@ public abstract class Turret extends Block{
             Drawf.dashCircle(x, y, range, team.color);
         }
 
-        @Override
-        public void handleLiquid(Building source, Liquid liquid, float amount){
-            if(acceptCoolant && liquids.currentAmount() <= 0.001f){
-                Events.fire(Trigger.turretCool);
-            }
-
-            super.handleLiquid(source, liquid, amount);
-        }
-
-        protected void updateCooling(){
-            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
-
-            Liquid liquid = liquids.current();
-
-            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
-            reload += used * liquid.heatCapacity * coolantMultiplier;
-            liquids.remove(liquid, used);
-
-            if(Mathf.chance(0.06 * used)){
-                coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
-            }
-        }
-
         protected boolean validateTarget(){
             return !Units.invalidateTarget(target, team, x, y) || isControlled() || logicControlled();
         }
@@ -374,7 +333,7 @@ public abstract class Turret extends Block{
 
                 reload = 0f;
             }else{
-                reload += delta() * peekAmmo().reloadMultiplier * baseReloadSpeed();
+                reload += delta() * peekAmmo().reloadMultiplier * baseReloadSpeed() * currentCoolantBoost;
             }
         }
 

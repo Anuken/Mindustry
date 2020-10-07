@@ -16,11 +16,12 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class Drill extends Block{
+public class Drill extends BoostableBlock{
     public float hardnessDrillMultiplier = 50f;
 
     protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
@@ -30,8 +31,6 @@ public class Drill extends Block{
     public int tier;
     /** Base time to drill one ore, in frames. */
     public float drillTime = 300;
-    /** How many times faster the drill will progress when boosted by liquid. */
-    public float liquidBoostIntensity = 1.6f;
     /** Speed at which the drill speeds up. */
     public float warmupSpeed = 0.02f;
 
@@ -61,7 +60,7 @@ public class Drill extends Block{
         update = true;
         solid = true;
         group = BlockGroup.drills;
-        hasLiquids = true;
+        acceptCoolant = true;
         liquidCapacity = 5f;
         hasItems = true;
         idleSound = Sounds.drill;
@@ -156,9 +155,6 @@ public class Drill extends Block{
         });
 
         stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
-        if(liquidBoostIntensity != 1){
-            stats.add(BlockStat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
-        }
     }
 
     @Override
@@ -205,7 +201,7 @@ public class Drill extends Block{
         return drops != null && drops.hardness <= tier;
     }
 
-    public class DrillBuild extends Building{
+    public class DrillBuild extends BoostableBlockBuild{
         public float progress;
         public int index;
         public float warmup;
@@ -259,11 +255,8 @@ public class Drill extends Block{
 
                 float speed = 1f;
 
-                if(cons.optionalValid()){
-                    speed = liquidBoostIntensity;
-                }
-
-                speed *= efficiency(); // Drill slower when not at full power
+                updateCooling();
+                speed *= efficiency() * Math.sqrt(currentCoolantBoost); // Drill slower when not at full power
 
                 lastDrillSpeed = (speed * dominantItems * warmup) / (drillTime + hardnessDrillMultiplier * dominantItem.hardness);
                 warmup = Mathf.lerpDelta(warmup, speed, warmupSpeed);

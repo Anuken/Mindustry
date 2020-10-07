@@ -12,14 +12,14 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class BoosterListValue implements StatValue{
-    protected float reload, maxUsed, multiplier;
-    protected boolean baseReload;
+    protected float efficiency, maxUsed, multiplier;
+    protected boolean baseEfficiency;
     protected Boolf<Liquid> filter;
 
-    public BoosterListValue(float reload, float maxUsed, float multiplier, boolean baseReload, Boolf<Liquid> filter){
-        this.reload = reload;
+    public BoosterListValue(float efficiency, float maxUsed, float multiplier, boolean baseEfficiency, Boolf<Liquid> filter){
+        this.efficiency = efficiency;
         this.maxUsed = maxUsed;
-        this.baseReload = baseReload;
+        this.baseEfficiency = baseEfficiency;
         this.multiplier = multiplier;
         this.filter = filter;
     }
@@ -37,10 +37,10 @@ public class BoosterListValue implements StatValue{
                 c.table(Tex.underline, bt -> {
                     bt.left().defaults().padRight(3).left();
 
-                    float reloadRate = (baseReload ? 1f : 0f) + maxUsed * multiplier * liquid.heatCapacity;
-                    float standardReload = baseReload ? reload : reload / (maxUsed * multiplier * 0.4f);
-                    float result = standardReload / (reload / reloadRate);
-                    bt.add(Core.bundle.format("bullet.reload", Strings.fixed(result, 1)));
+                    float reloadRate = (baseEfficiency ? 1f : 0f) + maxUsed * multiplier * liquid.heatCapacity;
+                    float standardReload = baseEfficiency ? efficiency : efficiency / (maxUsed * multiplier * 0.4f);
+                    float result = standardReload / (efficiency / reloadRate);
+                    bt.add(Core.bundle.format("blocks.efficiency", Strings.fixed(result, 1)));
                 }).left().padTop(-9);
                 c.row();
             }

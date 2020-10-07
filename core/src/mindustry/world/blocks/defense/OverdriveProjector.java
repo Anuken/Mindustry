@@ -9,21 +9,18 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class OverdriveProjector extends Block{
-    public final int timerUse = timers++;
-
+public class OverdriveProjector extends BoostableBlock{
     public @Load("@-top") TextureRegion topRegion;
     public float reload = 60f;
     public float range = 80f;
     public float speedBoost = 1.5f;
     public float speedBoostPhase = 0.75f;
-    public float useTime = 400f;
     public float phaseRangeBoost = 20f;
-    public boolean hasBoost = true;
     public Color baseColor = Color.valueOf("feb380");
     public Color phaseColor = Color.valueOf("ffd59e");
 
@@ -34,6 +31,8 @@ public class OverdriveProjector extends Block{
         hasPower = true;
         hasItems = true;
         canOverdrive = false;
+        acceptItemBooster = true;
+        useTime = 400f;
     }
 
     @Override
@@ -54,16 +53,15 @@ public class OverdriveProjector extends Block{
         stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
         stats.add(BlockStat.productionTime, useTime / 60f, StatUnit.seconds);
 
-        if(hasBoost){
+        if(acceptItemBooster){
             stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
             stats.add(BlockStat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
         }
     }
 
-    public class OverdriveBuild extends Building{
+    public class OverdriveBuild extends BoostableBlockBuild{
         float heat;
         float charge = Mathf.random(reload);
-        float phaseHeat;
 
         @Override
         public void drawLight(){
@@ -72,20 +70,14 @@ public class OverdriveProjector extends Block{
 
         @Override
         public void updateTile(){
+            super.updateTile();
+
             heat = Mathf.lerpDelta(heat, consValid() ? 1f : 0f, 0.08f);
             charge += heat * Time.delta;
 
-            if(hasBoost){
-                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
-            }
-
-            if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
-                consume();
-            }
-
             if(charge >= reload){
-                float realRange = range + phaseHeat * phaseRangeBoost;
-                float realBoost = (speedBoost + phaseHeat * speedBoostPhase) * efficiency();
+                float realRange = range + currentItemBoost * phaseRangeBoost;
+                float realBoost = (speedBoost + currentItemBoost * speedBoostPhase) * efficiency();
 
                 charge = 0f;
                 indexer.eachBlock(this, realRange, other -> true, other -> other.applyBoost(realBoost, reload + 1f));
@@ -94,7 +86,7 @@ public class OverdriveProjector extends Block{
 
         @Override
         public void drawSelect(){
-            float realRange = range + phaseHeat * phaseRangeBoost;
+            float realRange = range + currentItemBoost * phaseRangeBoost;
 
             indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
 
@@ -107,7 +99,7 @@ public class OverdriveProjector extends Block{
 
             float f = 1f - (Time.time() / 100f) % 1f;
 
-            Draw.color(baseColor, phaseColor, phaseHeat);
+            Draw.color(baseColor, phaseColor, currentItemBoost);
             Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
             Draw.rect(topRegion, x, y);
             Draw.alpha(1f);
@@ -121,14 +113,14 @@ public class OverdriveProjector extends Block{
         public void write(Writes write){
             super.write(write);
             write.f(heat);
-            write.f(phaseHeat);
+            write.f(currentItemBoost);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             heat = read.f();
-            phaseHeat = read.f();
+            currentItemBoost = read.f();
         }
     }
 }

@@ -13,15 +13,13 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class ForceProjector extends Block{
-    public final int timerUse = timers++;
-    public float phaseUseTime = 350f;
-
+public class ForceProjector extends BoostableBlock{
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
@@ -48,7 +46,11 @@ public class ForceProjector extends Block{
         solid = true;
         hasPower = true;
         hasLiquids = true;
+        acceptCoolant = true;
+        coolantMultiplier = 10f;
         hasItems = true;
+        acceptItemBooster = true;
+        useTime = 400f;
         consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.1f)).boost().update(false);
     }
 
@@ -80,9 +82,9 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceBuild extends Building{
+    public class ForceBuild extends BoostableBlockBuild{
         public boolean broken = true;
-        public float buildup, radscl, hit, warmup, phaseHeat;
+        public float buildup, radscl, hit, warmup;
         public ForceDraw drawer;
 
         @Override
@@ -104,9 +106,7 @@ public class ForceProjector extends Block{
         public void updateTile(){
             boolean phaseValid = consumes.get(ConsumeType.item).valid(this);
 
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
-
-            if(phaseValid && !broken && timer(timerUse, phaseUseTime) && efficiency() > 0){
+            if(phaseValid && !broken && timer(timerUse, useTime) && efficiency() > 0){
                 consume();
             }
 
@@ -120,11 +120,9 @@ public class ForceProjector extends Block{
 
             if(buildup > 0){
                 float scale = !broken ? cooldownNormal : cooldownBrokenBase;
-                ConsumeLiquidFilter cons = consumes.get(ConsumeType.liquid);
-                if(cons.valid(this)){
-                    cons.update(this);
-                    scale *= (cooldownLiquid * (1f + (liquids.current().heatCapacity - 0.4f) * 0.9f));
-                }
+
+                updateCooling();
+                scale *= currentCoolantBoost;
 
                 buildup -= delta() * scale;
             }
@@ -133,7 +131,7 @@ public class ForceProjector extends Block{
                 broken = false;
             }
 
-            if(buildup >= breakage + phaseShieldBoost && !broken){
+            if(buildup >= breakage + (currentItemBoost * phaseShieldBoost) && !broken){
                 broken = true;
                 buildup = breakage;
                 Fx.shieldBreak.at(x, y, realRadius(), team.color);
@@ -152,7 +150,7 @@ public class ForceProjector extends Block{
         }
 
         public float realRadius(){
-            return (radius + phaseHeat * phaseRadiusBoost) * radscl;
+            return (radius + currentItemBoost * phaseRadiusBoost) * radscl;
         }
 
         @Override
@@ -202,7 +200,7 @@ public class ForceProjector extends Block{
             write.f(buildup);
             write.f(radscl);
             write.f(warmup);
-            write.f(phaseHeat);
+            write.f(currentItemBoost);
         }
 
         @Override
@@ -212,7 +210,7 @@ public class ForceProjector extends Block{
             buildup = read.f();
             radscl = read.f();
             warmup = read.f();
-            phaseHeat = read.f();
+            currentItemBoost = read.f();
         }
     }
 

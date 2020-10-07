@@ -10,11 +10,12 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class TractorBeamTurret extends Block{
+public class TractorBeamTurret extends BoostableBlock{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
@@ -38,6 +39,7 @@ public class TractorBeamTurret extends Block{
         update = true;
         solid = true;
         outlineIcon = true;
+        acceptCoolant = true;
     }
 
     @Override
@@ -60,7 +62,7 @@ public class TractorBeamTurret extends Block{
         stats.add(BlockStat.damage, damage * 60f, StatUnit.perSecond);
     }
 
-    public class TractorBeamBuild extends Building{
+    public class TractorBeamBuild extends BoostableBlockBuild{
         public float rotation = 90;
         public @Nullable Unit target;
         public float lastX, lastY, strength;
@@ -84,12 +86,13 @@ public class TractorBeamTurret extends Block{
                 strength = Mathf.lerpDelta(strength, 1f, 0.1f);
 
                 if(damage > 0){
-                    target.damageContinuous(damage * efficiency());
+                    target.damageContinuous(damage * efficiency() * currentCoolantBoost);
                 }
 
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
-                    target.impulse(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * efficiency() * timeScale));
+                    target.impulse(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * efficiency() * timeScale * currentCoolantBoost));
+                    updateCooling();
                 }
             }else{
                 target = null;

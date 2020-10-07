@@ -12,11 +12,12 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class PointDefenseTurret extends Block{
+public class PointDefenseTurret extends BoostableBlock{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
@@ -39,6 +40,7 @@ public class PointDefenseTurret extends Block{
 
         outlineIcon = true;
         update = true;
+        acceptCoolant = true;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class PointDefenseTurret extends Block{
         stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
     }
 
-    public class PointDefenseBuild extends Building{
+    public class PointDefenseBuild extends BoostableBlockBuild{
         public float rotation = 90, reload;
         public @Nullable Bullet target;
 
@@ -80,7 +82,7 @@ public class PointDefenseTurret extends Block{
             if(target != null && target.within(this, range) && target.team != team && target.type() != null && target.type().hittable){
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
-                reload -= edelta();
+                reload -= edelta() * currentCoolantBoost;
 
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone) && reload <= 0f){
@@ -97,6 +99,8 @@ public class PointDefenseTurret extends Block{
                     hitEffect.at(target.x, target.y, color);
                     reload = reloadTime;
                 }
+
+                updateCooling();
             }else{
                 target = null;
             }
