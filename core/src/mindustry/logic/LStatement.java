@@ -91,8 +91,8 @@ public abstract class LStatement{
 
         hitter.fillParent = true;
         hitter.tapped(hide);
-        Core.scene.add(hitter);
 
+        Core.scene.add(hitter);
         Core.scene.add(t);
 
         t.update(() -> {
@@ -106,6 +106,8 @@ public abstract class LStatement{
 
             b.localToStageCoordinates(Tmp.v1.set(b.getWidth()/2f, b.getHeight()/2f));
             t.setPosition(Tmp.v1.x, Tmp.v1.y, Align.center);
+            if(t.getWidth() > Core.scene.getWidth()) t.setWidth(Core.graphics.getWidth());
+            if(t.getHeight() > Core.scene.getHeight()) t.setHeight(Core.graphics.getHeight());
             t.keepInStage();
         });
         t.actions(Actions.alpha(0), Actions.fadeIn(0.3f, Interp.fade));
