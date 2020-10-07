@@ -378,7 +378,8 @@ public class EntityProcess extends BaseProcessor{
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
 
-                EntityIO io = new EntityIO(type.name(), builder, allFieldSpecs, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name));
+                Log.info("mv @ @", name, type.name());
+                EntityIO io = new EntityIO(type.name(), builder, allFieldSpecs, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(type.name()));
                 //entities with no sync comp and no serialization gen no code
                 boolean hasIO = ann.genio() && (components.contains(s -> s.name().contains("Sync")) || ann.serialize());
 
@@ -643,7 +644,7 @@ public class EntityProcess extends BaseProcessor{
             //assign IDs
             definitions.sort(Structs.comparing(t -> t.naming.toString()));
             for(EntityDefinition def : definitions){
-                String name = def.name;
+                String name = def.naming.fullName();
                 if(map.containsKey(name)){
                     def.classID = map.getInt(name);
                 }else{
