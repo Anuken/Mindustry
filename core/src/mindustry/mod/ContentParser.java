@@ -555,7 +555,7 @@ public class ContentParser{
         if(stripType) jsonMap.remove("type");
 
         if(object instanceof UnlockableContent unlock){
-            JsonValue research = jsonMap.getChild("research");
+            JsonValue research = jsonMap.remove("research");
             //add research tech node
             if(research != null){
                 String researchName;
