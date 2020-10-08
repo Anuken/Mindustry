@@ -26,7 +26,7 @@ public class EditorTile extends Tile{
 
         if(type instanceof OverlayFloor){
             //don't place on liquids
-            if(!floor.isLiquid){
+            if(floor.hasSurface()){
                 setOverlayID(type.id);
             }
             return;

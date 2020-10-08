@@ -417,7 +417,7 @@ public class MapGenerateDialog extends BaseDialog{
         public void set(Block floor, Block wall, Block ore, Team team){
             this.floor = floor.id;
             this.block = wall.id;
-            this.ore = floor.asFloor().isLiquid ? 0 : ore.id;
+            this.ore = !floor.asFloor().hasSurface() ? 0 : ore.id;
             this.team = (byte)team.id;
         }
 

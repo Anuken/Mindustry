@@ -188,12 +188,12 @@ public class BaseGenerator{
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
 
-                        if(!tiles.getn(ex, ey).floor().isLiquid){
+                        if(tiles.getn(ex, ey).floor().hasSurface()){
                             set(tiles.getn(ex, ey), item);
                         }
 
                         Tile rand = tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
-                        if(!rand.floor().isLiquid){
+                        if(rand.floor().hasSurface()){
                             //random ores nearby to make it look more natural
                             set(rand, item);
                         }

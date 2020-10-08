@@ -45,6 +45,10 @@ public class Puddles{
             return;
         }
 
+        if(tile.floor().solid){
+            return;
+        }
+
         Puddle p = map.get(tile.pos());
         if(p == null){
             Puddle puddle = Puddle.create();

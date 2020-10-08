@@ -236,7 +236,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         }
 
         pass((x, y) -> {
-            if(floor.asFloor().isLiquid) return;
+            if(!floor.asFloor().hasSurface()) return;
 
             int offsetX = x - 4, offsetY = y + 23;
             for(int i = ores.size - 1; i >= 0; i--){
@@ -292,7 +292,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     }
                 }
 
-                if(rand.chance(0.01) && !floor.asFloor().isLiquid && block == Blocks.air){
+                if(rand.chance(0.01) && floor.asFloor().hasSurface() && block == Blocks.air){
                     block = dec.get(floor, floor.asFloor().decoration);
                 }
             }
