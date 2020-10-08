@@ -361,8 +361,7 @@ public class ArcNetProvider implements NetProvider{
         }
 
         public void writeFramework(ByteBuffer buffer, FrameworkMessage message){
-            if(message instanceof Ping){
-                Ping p = (Ping)message;
+            if(message instanceof Ping p){
                 buffer.put((byte)0);
                 buffer.putInt(p.id);
                 buffer.put(p.isReply ? 1 : (byte)0);
@@ -370,12 +369,10 @@ public class ArcNetProvider implements NetProvider{
                 buffer.put((byte)1);
             }else if(message instanceof KeepAlive){
                 buffer.put((byte)2);
-            }else if(message instanceof RegisterUDP){
-                RegisterUDP p = (RegisterUDP)message;
+            }else if(message instanceof RegisterUDP p){
                 buffer.put((byte)3);
                 buffer.putInt(p.connectionID);
-            }else if(message instanceof RegisterTCP){
-                RegisterTCP p = (RegisterTCP)message;
+            }else if(message instanceof RegisterTCP p){
                 buffer.put((byte)4);
                 buffer.putInt(p.connectionID);
             }

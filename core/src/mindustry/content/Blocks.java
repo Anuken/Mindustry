@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.struct.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -287,7 +288,7 @@ public class Blocks implements ContentList{
 
         salt = new Floor("salt"){{
             variants = 0;
-            attributes.set(Attribute.water, -0.25f);
+            attributes.set(Attribute.water, -0.3f);
             attributes.set(Attribute.oil, 0.3f);
         }};
 
@@ -718,7 +719,7 @@ public class Blocks implements ContentList{
             size = 2;
             hasPower = hasItems = hasLiquids = true;
 
-            consumes.liquid(Liquids.oil, 0.09f);
+            consumes.liquid(Liquids.oil, 0.1f);
             consumes.power(0.5f);
         }};
 
@@ -1119,7 +1120,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.titanium, 7, Items.lead, 10, Items.silicon, 15, Items.surgealloy, 15));
             size = 2;
             maxNodes = 2;
-            laserRange = 30f;
+            laserRange = 40f;
         }};
 
         diode = new PowerDiode("diode"){{
@@ -1804,30 +1805,30 @@ public class Blocks implements ContentList{
 
         groundFactory = new UnitFactory("ground-factory"){{
             requirements(Category.units, with(Items.copper, 50, Items.lead, 120, Items.silicon, 80));
-            plans = new UnitPlan[]{
+            plans = Seq.with(
                 new UnitPlan(UnitTypes.dagger, 60f * 15, with(Items.silicon, 10, Items.lead, 10)),
                 new UnitPlan(UnitTypes.crawler, 60f * 12, with(Items.silicon, 10, Items.coal, 20)),
-                new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20)),
-            };
+                new UnitPlan(UnitTypes.nova, 60f * 40, with(Items.silicon, 30, Items.lead, 20, Items.titanium, 20))
+            );
             size = 3;
             consumes.power(1.2f);
         }};
 
         airFactory = new UnitFactory("air-factory"){{
             requirements(Category.units, with(Items.copper, 60, Items.lead, 70));
-            plans = new UnitPlan[]{
+            plans = Seq.with(
                 new UnitPlan(UnitTypes.flare, 60f * 15, with(Items.silicon, 15)),
-                new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15)),
-            };
+                new UnitPlan(UnitTypes.mono, 60f * 35, with(Items.silicon, 30, Items.lead, 15))
+            );
             size = 3;
             consumes.power(1.2f);
         }};
 
         navalFactory = new UnitFactory("naval-factory"){{
             requirements(Category.units, with(Items.copper, 150, Items.lead, 130, Items.metaglass, 120));
-            plans = new UnitPlan[]{
-                new UnitPlan(UnitTypes.risso, 60f * 45f, with(Items.silicon, 20, Items.metaglass, 35)),
-            };
+            plans = Seq.with(
+                new UnitPlan(UnitTypes.risso, 60f * 45f, with(Items.silicon, 20, Items.metaglass, 35))
+            );
             size = 3;
             consumes.power(1.2f);
             floating = true;
@@ -1842,14 +1843,14 @@ public class Blocks implements ContentList{
 
             constructTime = 60f * 10f;
 
-            upgrades = new UnitType[][]{
-                {UnitTypes.nova, UnitTypes.pulsar},
-                {UnitTypes.dagger, UnitTypes.mace},
-                {UnitTypes.crawler, UnitTypes.atrax},
-                {UnitTypes.flare, UnitTypes.horizon},
-                {UnitTypes.mono, UnitTypes.poly},
-                {UnitTypes.risso, UnitTypes.minke},
-            };
+            upgrades.addAll(
+                new UnitType[]{UnitTypes.nova, UnitTypes.pulsar},
+                new UnitType[]{UnitTypes.dagger, UnitTypes.mace},
+                new UnitType[]{UnitTypes.crawler, UnitTypes.atrax},
+                new UnitType[]{UnitTypes.flare, UnitTypes.horizon},
+                new UnitType[]{UnitTypes.mono, UnitTypes.poly},
+                new UnitType[]{UnitTypes.risso, UnitTypes.minke}
+            );
         }};
 
         multiplicativeReconstructor = new Reconstructor("multiplicative-reconstructor"){{
@@ -1861,14 +1862,14 @@ public class Blocks implements ContentList{
 
             constructTime = 60f * 30f;
 
-            upgrades = new UnitType[][]{
-                {UnitTypes.horizon, UnitTypes.zenith},
-                {UnitTypes.mace, UnitTypes.fortress},
-                {UnitTypes.poly, UnitTypes.mega},
-                {UnitTypes.minke, UnitTypes.bryde},
-                {UnitTypes.pulsar, UnitTypes.quasar},
-                {UnitTypes.atrax, UnitTypes.spiroct},
-            };
+            upgrades.addAll(
+                new UnitType[]{UnitTypes.horizon, UnitTypes.zenith},
+                new UnitType[]{UnitTypes.mace, UnitTypes.fortress},
+                new UnitType[]{UnitTypes.poly, UnitTypes.mega},
+                new UnitType[]{UnitTypes.minke, UnitTypes.bryde},
+                new UnitType[]{UnitTypes.pulsar, UnitTypes.quasar},
+                new UnitType[]{UnitTypes.atrax, UnitTypes.spiroct}
+            );
         }};
 
         exponentialReconstructor = new Reconstructor("exponential-reconstructor"){{
@@ -1882,14 +1883,14 @@ public class Blocks implements ContentList{
             constructTime = 60f * 60f * 1.5f;
             liquidCapacity = 60f;
 
-            upgrades = new UnitType[][]{
-                {UnitTypes.zenith, UnitTypes.antumbra},
-                {UnitTypes.spiroct, UnitTypes.arkyid},
-                {UnitTypes.fortress, UnitTypes.scepter},
-                {UnitTypes.bryde, UnitTypes.sei},
-                {UnitTypes.mega, UnitTypes.quad},
-                {UnitTypes.quasar, UnitTypes.vela},
-            };
+            upgrades.addAll(
+                new UnitType[]{UnitTypes.zenith, UnitTypes.antumbra},
+                new UnitType[]{UnitTypes.spiroct, UnitTypes.arkyid},
+                new UnitType[]{UnitTypes.fortress, UnitTypes.scepter},
+                new UnitType[]{UnitTypes.bryde, UnitTypes.sei},
+                new UnitType[]{UnitTypes.mega, UnitTypes.quad},
+                new UnitType[]{UnitTypes.quasar, UnitTypes.vela}
+            );
         }};
 
         tetrativeReconstructor = new Reconstructor("tetrative-reconstructor"){{
@@ -1903,14 +1904,14 @@ public class Blocks implements ContentList{
             constructTime = 60f * 60f * 4;
             liquidCapacity = 180f;
 
-            upgrades = new UnitType[][]{
-                {UnitTypes.antumbra, UnitTypes.eclipse},
-                {UnitTypes.arkyid, UnitTypes.toxopid},
-                {UnitTypes.scepter, UnitTypes.reign},
-                {UnitTypes.sei, UnitTypes.omura},
-                {UnitTypes.quad, UnitTypes.oct},
-                {UnitTypes.vela, UnitTypes.corvus}
-            };
+            upgrades.addAll(
+                new UnitType[]{UnitTypes.antumbra, UnitTypes.eclipse},
+                new UnitType[]{UnitTypes.arkyid, UnitTypes.toxopid},
+                new UnitType[]{UnitTypes.scepter, UnitTypes.reign},
+                new UnitType[] {UnitTypes.sei, UnitTypes.omura},
+                new UnitType[]{UnitTypes.quad, UnitTypes.oct},
+                new UnitType[]{UnitTypes.vela, UnitTypes.corvus}
+            );
         }};
 
         repairPoint = new RepairPoint("repair-point"){{

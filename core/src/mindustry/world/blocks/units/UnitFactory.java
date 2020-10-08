@@ -24,7 +24,7 @@ import mindustry.world.meta.*;
 public class UnitFactory extends UnitBlock{
     public int[] capacities;
 
-    public UnitPlan[] plans = new UnitPlan[0];
+    public Seq<UnitPlan> plans = new Seq<>(4);
 
     public UnitFactory(String name){
         super(name);
@@ -39,11 +39,11 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
-            tile.currentPlan = i < 0 || i >= plans.length ? -1 : i;
+            tile.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             tile.progress = 0;
         });
 
-        consumes.add(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans[e.currentPlan].requirements : ItemStack.empty));
+        consumes.add(new ConsumeItemDynamic((UnitFactoryBuild e) -> e.currentPlan != -1 ? plans.get(e.currentPlan).requirements : ItemStack.empty));
     }
 
     @Override
@@ -119,7 +119,7 @@ public class UnitFactory extends UnitBlock{
         public int currentPlan = -1;
 
         public float fraction(){
-            return currentPlan == -1 ? 0 : progress / plans[currentPlan].time;
+            return currentPlan == -1 ? 0 : progress / plans.get(currentPlan).time;
         }
 
         @Override
@@ -127,7 +127,7 @@ public class UnitFactory extends UnitBlock{
             Seq<UnitType> units = Seq.with(plans).map(u -> u.unit).filter(u -> u.unlockedNow());
 
             if(units.any()){
-                ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans[currentPlan].unit, unit -> configure(Structs.indexOf(plans, u -> u.unit == unit)));
+                ItemSelection.buildTable(table, units, () -> currentPlan == -1 ? null : plans.get(currentPlan).unit, unit -> configure(plans.indexOf(u -> u.unit == unit)));
             }else{
                 table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
             }
@@ -148,11 +148,11 @@ public class UnitFactory extends UnitBlock{
             table.table(t -> {
                 t.left();
                 t.image().update(i -> {
-                    i.setDrawable(currentPlan == -1 ? Icon.cancel : reg.set(plans[currentPlan].unit.icon(Cicon.medium)));
+                    i.setDrawable(currentPlan == -1 ? Icon.cancel : reg.set(plans.get(currentPlan).unit.icon(Cicon.medium)));
                     i.setScaling(Scaling.fit);
                     i.setColor(currentPlan == -1 ? Color.lightGray : Color.white);
                 }).size(32).padBottom(-4).padRight(2);
-                t.label(() -> currentPlan == -1 ? "@none" : plans[currentPlan].unit.localizedName).color(Color.lightGray);
+                t.label(() -> currentPlan == -1 ? "@none" : plans.get(currentPlan).unit.localizedName).color(Color.lightGray);
             }).left();
         }
 
@@ -167,7 +167,7 @@ public class UnitFactory extends UnitBlock{
             Draw.rect(outRegion, x, y, rotdeg());
 
             if(currentPlan != -1){
-                UnitPlan plan = plans[currentPlan];
+                UnitPlan plan = plans.get(currentPlan);
                 Draw.draw(Layer.blockOver, () -> Drawf.construct(this, plan.unit, rotdeg() - 90f, progress / plan.time, speedScl, time));
             }
 
@@ -183,7 +183,7 @@ public class UnitFactory extends UnitBlock{
 
         @Override
         public void updateTile(){
-            if(currentPlan < 0 || currentPlan >= plans.length){
+            if(currentPlan < 0 || currentPlan >= plans.size){
                 currentPlan = -1;
             }
 
@@ -198,7 +198,7 @@ public class UnitFactory extends UnitBlock{
             moveOutPayload();
 
             if(currentPlan != -1 && payload == null){
-                UnitPlan plan = plans[currentPlan];
+                UnitPlan plan = plans.get(currentPlan);
 
                 if(progress >= plan.time && consValid()){
                     progress = 0f;
@@ -228,11 +228,11 @@ public class UnitFactory extends UnitBlock{
         @Override
         public boolean acceptItem(Building source, Item item){
             return currentPlan != -1 && items.get(item) < getMaximumAccepted(item) &&
-                Structs.contains(plans[currentPlan].requirements, stack -> stack.item == item);
+                Structs.contains(plans.get(currentPlan).requirements, stack -> stack.item == item);
         }
 
         public @Nullable UnitType unit(){
-            return currentPlan == - 1 ? null : plans[currentPlan].unit;
+            return currentPlan == - 1 ? null : plans.get(currentPlan).unit;
         }
 
         @Override

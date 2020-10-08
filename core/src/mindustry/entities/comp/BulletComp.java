@@ -95,14 +95,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         type.hit(self(), x, y);
         float health = 0f;
 
-        if(other instanceof Healthc){
-            Healthc h = (Healthc)other;
+        if(other instanceof Healthc h){
             health = h.health();
             h.damage(damage);
         }
 
-        if(other instanceof Unit){
-            Unit unit = (Unit)other;
+        if(other instanceof Unit unit){
             unit.impulse(Tmp.v3.set(unit).sub(this.x, this.y).nor().scl(type.knockback * 80f));
             unit.apply(type.status, type.statusDuration);
         }

@@ -46,7 +46,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     static final Seq<Tile> tempTiles = new Seq<>();
     static int sleepingEntities = 0;
     
-    @Import float x, y, health;
+    @Import float x, y, health, maxHealth;
     @Import Team team;
 
     transient Tile tile;
@@ -215,9 +215,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return true;
     }
 
-    public void applyBoost(float intensity, float  duration){
+    public void applyBoost(float intensity, float duration){
+        //do not refresh time scale when getting a weaker intensity
+        if(intensity >= this.timeScale){
+            timeScaleDuration = Math.max(timeScaleDuration, duration);
+        }
         timeScale = Math.max(timeScale, intensity);
-        timeScaleDuration = Math.max(timeScaleDuration, duration);
     }
 
     public Building nearby(int dx, int dy){
@@ -1224,7 +1227,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case y -> y;
             case team -> team.id;
             case health -> health;
-            case maxHealth -> maxHealth();
+            case maxHealth -> maxHealth;
             case efficiency -> efficiency();
             case rotation -> rotation;
             case totalItems -> items == null ? 0 : items.total();
@@ -1238,6 +1241,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
+            case payloadCount -> getPayload() != null ? 1 : 0;
             default -> 0;
         };
     }
@@ -1247,7 +1251,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return switch(sensor){
             case type -> block;
             case firstItem -> items == null ? null : items.first();
-            case name -> block.name;
+            case config -> block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
+            case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type() : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
             default -> noSensed;
         };
 

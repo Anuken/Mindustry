@@ -29,8 +29,7 @@ public class SapBulletType extends BulletType{
 
     @Override
     public void draw(Bullet b){
-        if(b.data instanceof Position){
-            Position data = (Position)b.data;
+        if(b.data instanceof Position data){
             Tmp.v1.set(data).lerp(b, b.fin());
 
             Draw.color(color);
@@ -68,13 +67,11 @@ public class SapBulletType extends BulletType{
             }
         }
 
-        if(target instanceof Hitboxc){
-            Hitboxc hit = (Hitboxc)target;
+        if(target instanceof Hitboxc hit){
 
             hit.collision(b, hit.x(), hit.y());
             b.collision(hit, hit.x(), hit.y());
-        }else if(target instanceof Building){
-            Building tile = (Building)target;
+        }else if(target instanceof Building tile){
 
             if(tile.collide(b)){
                 tile.collision(b);
