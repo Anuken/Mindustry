@@ -29,9 +29,9 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     {Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.salt, Blocks.salt, Blocks.salt, Blocks.sand, Blocks.stone, Blocks.stone, Blocks.stone, Blocks.snow, Blocks.iceSnow, Blocks.ice},
     {Blocks.deepwater, Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.salt, Blocks.sand, Blocks.sand, Blocks.basalt, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice},
     {Blocks.deepwater, Blocks.water, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.iceSnow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.snow, Blocks.ice},
-    {Blocks.deepwater, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.snow, Blocks.ice},
-    {Blocks.taintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.darksand, Blocks.basalt, Blocks.moss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.snow, Blocks.ice, Blocks.ice},
-    {Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.moss, Blocks.sporeMoss, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice},
+    {Blocks.deepwater, Blocks.sandWater, Blocks.sand, Blocks.sand, Blocks.moss, Blocks.moss, Blocks.snow, Blocks.basalt, Blocks.basalt, Blocks.basalt, Blocks.ice, Blocks.snow, Blocks.ice},
+    {Blocks.taintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.darksand, Blocks.basalt, Blocks.moss, Blocks.basalt, Blocks.hotrock, Blocks.basalt, Blocks.ice, Blocks.snow, Blocks.ice, Blocks.ice},
+    {Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.darksand, Blocks.moss, Blocks.sporeMoss, Blocks.snow, Blocks.basalt, Blocks.basalt, Blocks.ice, Blocks.snow, Blocks.ice, Blocks.ice},
     {Blocks.darksandWater, Blocks.darksand, Blocks.darksand, Blocks.sporeMoss, Blocks.ice, Blocks.ice, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice},
     {Blocks.taintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.sporeMoss, Blocks.sporeMoss, Blocks.ice, Blocks.ice, Blocks.snow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice},
     {Blocks.darksandTaintedWater, Blocks.darksandTaintedWater, Blocks.darksand, Blocks.sporeMoss, Blocks.moss, Blocks.sporeMoss, Blocks.iceSnow, Blocks.snow, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice, Blocks.ice},
@@ -265,17 +265,36 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 floor = Blocks.moss;
             }
 
-            //random stuff
-
-            for(int i = 0; i < 4; i++){
-                Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
-                if(near != null && near.block() != Blocks.air){
-                    return;
+            if(floor == Blocks.hotrock){
+                if(rand.chance(0.3)){
+                    floor = Blocks.basalt;
+                }else{
+                    ore = Blocks.air;
+                    boolean all = true;
+                    for(Point2 p : Geometry.d4){
+                        Tile other = tiles.get(x + p.x, y + p.y);
+                        if(other == null || (other.floor() != Blocks.hotrock && other.floor() != Blocks.magmarock)){
+                            all = false;
+                        }
+                    }
+                    if(all){
+                        floor = Blocks.magmarock;
+                    }
                 }
             }
 
-            if(rand.chance(0.01) && !floor.asFloor().isLiquid && block == Blocks.air){
-                block = dec.get(floor, floor.asFloor().decoration);
+            //random stuff
+            dec: {
+                for(int i = 0; i < 4; i++){
+                    Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
+                    if(near != null && near.block() != Blocks.air){
+                        break dec;
+                    }
+                }
+
+                if(rand.chance(0.01) && !floor.asFloor().isLiquid && block == Blocks.air){
+                    block = dec.get(floor, floor.asFloor().decoration);
+                }
             }
         });
 

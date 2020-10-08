@@ -29,6 +29,9 @@ import static mindustry.graphics.g3d.PlanetRenderer.*;
 import static mindustry.ui.dialogs.PlanetDialog.Mode.*;
 
 public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
+    //if true, enables launching anywhere for testing
+    public static boolean debugSelect = false;
+
     final FrameBuffer buffer = new FrameBuffer(2, 2, true);
     final PlanetRenderer planets = renderer.planets;
     final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
@@ -149,27 +152,30 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public void renderSectors(Planet planet){
 
         //draw all sector stuff
-        for(Sector sec : planet.sectors){
+        if(!debugSelect){
+            for(Sector sec : planet.sectors){
 
-            if(selectAlpha > 0.01f){
-                if(canSelect(sec) || sec.unlocked()){
-                    if(sec.baseCoverage > 0){
-                        planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.5f * sec.baseCoverage * selectAlpha), -0.002f);
+                if(selectAlpha > 0.01f){
+                    if(canSelect(sec) || sec.unlocked()){
+                        if(sec.baseCoverage > 0){
+                            planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.5f * sec.baseCoverage * selectAlpha), -0.002f);
+                        }
+
+                        Color color =
+                        sec.hasBase() ? Team.sharded.color :
+                        sec.preset != null ? Team.derelict.color :
+                        sec.hasEnemyBase() ? Team.crux.color :
+                        null;
+
+                        if(color != null){
+                            planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
+                        }
+                    }else{
+                        planets.fill(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
                     }
-
-                    Color color =
-                    sec.hasBase() ? Team.sharded.color :
-                    sec.preset != null ? Team.derelict.color :
-                    sec.hasEnemyBase() ? Team.crux.color :
-                    null;
-
-                    if(color != null){
-                        planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
-                    }
-                }else{
-                    planets.fill(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
                 }
             }
+
         }
 
         if(launchSector != null){
@@ -240,7 +246,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 addListener(new ElementGestureListener(){
                     @Override
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
-                        if(hovered != null && (mode == launch ? canSelect(hovered) && hovered != launchSector : hovered.unlocked())){
+                        if(hovered != null && ((mode == launch ? canSelect(hovered) && hovered != launchSector : hovered.unlocked()) || debugSelect)){
                             selected = hovered;
                         }
 
@@ -403,7 +409,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         stable.row();
 
-        if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked)){
+        if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked) || debugSelect){
             stable.button(mode == select ? "@sectors.select" : sector.hasBase() ? "@sectors.resume" : "@sectors.launch", Styles.transt, () -> {
 
                 boolean shouldHide = true;
