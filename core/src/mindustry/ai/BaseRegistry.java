@@ -9,6 +9,7 @@ import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
@@ -19,9 +20,13 @@ import java.io.*;
 import static mindustry.Vars.*;
 
 public class BaseRegistry{
+    /** cores, sorted by tier */
     public Seq<BasePart> cores = new Seq<>();
+    /** parts with no requirement */
     public Seq<BasePart> parts = new Seq<>();
     public ObjectMap<Content, Seq<BasePart>> reqParts = new ObjectMap<>();
+    public ObjectMap<Item, OreBlock> ores = new ObjectMap<>();
+    public ObjectMap<Item, Floor> oreFloors = new ObjectMap<>();
 
     public Seq<BasePart> forResource(Content item){
         return reqParts.get(item, Seq::new);
@@ -31,6 +36,15 @@ public class BaseRegistry{
         cores.clear();
         parts.clear();
         reqParts.clear();
+
+        //load ore types and corresponding items
+        for(Block block : content.blocks()){
+            if(block instanceof OreBlock && block.asFloor().itemDrop != null){
+                ores.put(block.asFloor().itemDrop, (OreBlock)block);
+            }else if(block.isFloor() && block.asFloor().itemDrop != null && !oreFloors.containsKey(block.asFloor().itemDrop)){
+                oreFloors.put(block.asFloor().itemDrop, block.asFloor());
+            }
+        }
 
         String[] names = Core.files.internal("basepartnames").readString().split("\n");
 

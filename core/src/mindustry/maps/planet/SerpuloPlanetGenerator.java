@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ai.*;
+import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.maps.generators.*;
@@ -261,10 +262,21 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         tech();
 
         pass((x, y) -> {
+            //random moss
             if(floor == Blocks.sporeMoss && rand.chance(0.9)){
                 floor = Blocks.moss;
             }
 
+            //tar
+            if(floor == Blocks.darksand){
+                if(Math.abs(0.5f - noise(x - 40, y, 2, 0.7, 80)) > 0.25f &&
+                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f){
+                    floor = Blocks.tar;
+                    ore = Blocks.air;
+                }
+            }
+
+            //hotrock tweaks
             if(floor == Blocks.hotrock){
                 if(rand.chance(0.3)){
                     floor = Blocks.basalt;
@@ -298,9 +310,84 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
-
         float difficulty = sector.baseCoverage;
+        ints.clear();
+        ints.ensureCapacity(width * height / 4);
+
+        int ruinCount = rand.random(-2, 4);
+        if(ruinCount > 0){
+            int padding = 25;
+
+            //create list of potential positions
+            for(int x = padding; x < width - padding; x++){
+                for(int y = padding; y < height - padding; y++){
+                    Tile tile = tiles.getn(x, y);
+                    if(!tile.solid() && (tile.drop() != null || tile.floor().liquidDrop != null)){
+                        ints.add(tile.pos());
+                    }
+                }
+            }
+
+            ints.shuffle(rand);
+
+            int placed = 0;
+            float diffRange = 0.4f;
+            //try each position
+            for(int i = 0; i < ints.size && placed < ruinCount; i++){
+                int val = ints.items[i];
+                int x = Point2.x(val), y = Point2.y(val);
+
+                //do not overwrite player spawn
+                if(Mathf.within(x, y, spawn.x, spawn.y, 18f)){
+                    continue;
+                }
+
+                float range = difficulty + rand.random(diffRange);
+
+                Tile tile = tiles.getn(x, y);
+                BasePart part = null;
+                if(tile.overlay().itemDrop != null){
+                    part = bases.forResource(tile.drop()).getFrac(range);
+                }else if(tile.floor().liquidDrop != null && rand.chance(0.05)){
+                    part = bases.forResource(tile.floor().liquidDrop).getFrac(range);
+                }else if(rand.chance(0.05)){ //ore-less parts are less likely to occur.
+                    part = bases.parts.getFrac(range);
+                }
+
+                //actually place the part
+                if(part != null && BaseGenerator.tryPlace(part, x, y, Team.derelict, (cx, cy) -> {
+                    Tile other = tiles.getn(cx, cy);
+                    other.setOverlay(Blocks.oreScrap);
+                    for(int j = 1; j <= 2; j++){
+                        for(Point2 p : Geometry.d8){
+                            Tile t = tiles.get(cx + p.x*j, cy + p.y*j);
+                            if(t != null && t.floor().hasSurface() && rand.chance(j == 1 ? 0.4 : 0.2)){
+                                t.setOverlay(Blocks.oreScrap);
+                            }
+                        }
+                    }
+                })){
+                    placed ++;
+
+                    int debrisRadius = Math.max(part.schematic.width, part.schematic.height)/2 + 3;
+                    Geometry.circle(x, y, tiles.width, tiles.height, debrisRadius, (cx, cy) -> {
+                        float dst = Mathf.dst(cx, cy, x, y);
+                        float removeChance = Mathf.lerp(0.05f, 0.5f, dst / debrisRadius);
+
+                        Tile other = tiles.getn(cx, cy);
+                        if(other.build != null && other.isCenter()){
+                            if(other.team() == Team.derelict && rand.chance(removeChance)){
+                                other.remove();
+                            }else if(rand.chance(0.5)){
+                                other.build.health = other.build.health - rand.random(other.build.health * 0.9f);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);

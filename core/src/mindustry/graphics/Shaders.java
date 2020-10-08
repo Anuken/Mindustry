@@ -213,9 +213,9 @@ public class Shaders{
 
         @Override
         public void apply(){
-            setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
+            setUniformf("u_campos", Core.camera.position.x, Core.camera.position.y);
             setUniformf("u_ccampos", Core.camera.position);
-            setUniformf("u_resolution", Core.camera.width, Core.camera.height);
+            setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
             setUniformf("u_time", Time.time());
 
             texture.bind(1);

@@ -1,6 +1,6 @@
 #define HIGHP
-#define NSCALE 1800.0
-#define CAMSCALE (NSCALE*1.1)
+#define NSCALE 2700.0
+#define CAMSCALE (NSCALE*5)
 
 uniform sampler2D u_texture;
 uniform sampler2D u_stars;
@@ -14,10 +14,10 @@ varying vec2 v_texCoords;
 
 void main(){
     vec2 c = v_texCoords.xy;
-    vec2 coords = vec2(c.x * u_resolution.x + u_campos.x, c.y * u_resolution.y + u_campos.y);
+    vec2 coords = vec2(c.x * u_resolution.x, c.y * u_resolution.y);
 
     vec4 color = texture2D(u_texture, c);
-    color.rgb = texture2D(u_stars, coords / NSCALE + vec2(0.3, 0.3) - u_ccampos / CAMSCALE).rgb;
+    color.rgb = texture2D(u_stars, coords/NSCALE + vec2(-0.1, -0.1) + u_ccampos / CAMSCALE).rgb;
 
     gl_FragColor = color;
 }
