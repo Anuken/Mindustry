@@ -7,6 +7,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.type.*;
+import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
