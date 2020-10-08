@@ -2,6 +2,7 @@ package mindustry.world.blocks.storage;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -191,7 +192,9 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void drawTeamTop(){
             if(block.teamRegion.found()){
-                if(block.teamRegions[team.id] == block.teamRegion) Draw.color(team.color.cpy().mul(1f + Mathf.absin(Time.time()/2, 1f, 0.1f)));
+                if(block.teamRegions[team.id] == block.teamRegion){
+                    Draw.color(team.color.cpy().mul(1f + Mathf.absin(Time.time()/2, 1f, 0.1f)));
+                }
                 Draw.rect(block.teamRegions[team.id], x, y);
                 Draw.color();
             }
