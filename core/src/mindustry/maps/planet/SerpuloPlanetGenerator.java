@@ -394,13 +394,13 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             state.rules.attackMode = true;
         }else{
-            state.rules.winWave = 15 * (int)Math.max(difficulty * 5, 1);
+            state.rules.winWave = 15 * (int)Math.max(difficulty * 10, 1);
         }
 
         state.rules.waves = true;
 
         //TODO better waves
-        state.rules.spawns = defaultWaves.get();
+        state.rules.spawns = DefaultWaves.generate(difficulty);
     }
 
     @Override
