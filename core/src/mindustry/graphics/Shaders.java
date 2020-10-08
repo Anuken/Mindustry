@@ -19,7 +19,7 @@ public class Shaders{
     public static UnitBuild build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, mud, tar, slag;
+    public static SurfaceShader water, mud, tar, slag, space;
     public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
@@ -44,6 +44,7 @@ public class Shaders{
         mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
+        space = new SpaceShader("space");
         planet = new PlanetShader();
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
@@ -193,6 +194,33 @@ public class Shaders{
             Core.camera.position.y - Core.camera.height / 2);
             setUniformf("u_texsize", Core.camera.width, Core.camera.height);
             setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
+        }
+    }
+
+    public static class SpaceShader extends SurfaceShader{
+        Texture texture;
+
+        public SpaceShader(String frag){
+            super(frag);
+
+            Core.assets.load("cubemaps/stars/bottom.png", Texture.class).loaded = t -> {
+                texture = (Texture)t;
+                texture.setFilter(TextureFilter.linear);
+                texture.setWrap(TextureWrap.mirroredRepeat);
+            };
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
+            setUniformf("u_ccampos", Core.camera.position);
+            setUniformf("u_resolution", Core.camera.width, Core.camera.height);
+            setUniformf("u_time", Time.time());
+
+            texture.bind(1);
+            renderer.effectBuffer.getTexture().bind(0);
+
+            setUniformi("u_stars", 1);
         }
     }
 

@@ -35,7 +35,7 @@ public class Blocks implements ContentList{
     public static Block
 
     //environment
-    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater,
+    air, spawn, cliff, deepwater, water, taintedWater, tar, slag, stone, craters, charr, sand, darksand, dirt, mud, ice, snow, darksandTaintedWater, space,
     dacite, stoneWall, dirtWall, sporeWall, iceWall, daciteWall, sporePine, snowPine, pine, shrubs, whiteTree, whiteTreeDead, sporeCluster,
     iceSnow, sandWater, darksandWater, duneWall, sandWall, moss, sporeMoss, shale, shaleWall, shaleBoulder, sandBoulder, daciteBoulder, grass, salt,
     metalFloor, metalFloorDamaged, metalFloor2, metalFloor3, metalFloor5, basalt, magmarock, hotrock, snowWall, boulder, snowBoulder, saltWall,
@@ -214,6 +214,13 @@ public class Blocks implements ContentList{
             emitLight = true;
             lightRadius = 40f;
             lightColor = Color.orange.cpy().a(0.38f);
+        }};
+
+        space = new Floor("space"){{
+            cacheLayer = CacheLayer.space;
+            placeableOn = false;
+            solid = true;
+            variants = 0;
         }};
 
         stone = new Floor("stone");
