@@ -311,7 +311,7 @@ public abstract class BulletType extends Content{
         bullet.data = data;
         bullet.drag = drag;
         bullet.hitSize = hitSize;
-        bullet.damage = damage < 0 ? this.damage : damage;
+        bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         bullet.add();
 
         if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);

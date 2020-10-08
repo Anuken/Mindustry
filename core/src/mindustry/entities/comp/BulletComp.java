@@ -19,12 +19,11 @@ import static mindustry.Vars.*;
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
     @Import Entityc owner;
-    @Import float x,y;
+    @Import float x, y, damage;
 
     IntSeq collided = new IntSeq(6);
     Object data;
     BulletType type;
-    float damage;
     float fdata;
 
     @Override
@@ -74,11 +73,6 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Replace
     public float clipSize(){
         return type.drawSize;
-    }
-
-    @Override
-    public float damage(){
-        return damage * damageMultiplier();
     }
 
     @Replace
