@@ -97,7 +97,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
         if(other instanceof Healthc h){
             health = h.health();
-            h.damage(damage);
+            h.damage(damage());
         }
 
         if(other instanceof Unit unit){
