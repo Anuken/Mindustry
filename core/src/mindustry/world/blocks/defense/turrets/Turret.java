@@ -214,6 +214,7 @@ public abstract class Turret extends Block{
         }
 
         public void targetPosition(Posc pos){
+            if(!hasAmmo()) return;
             BulletType bullet = peekAmmo();
             float speed = bullet.speed;
             //slow bullets never intersect
