@@ -1527,9 +1527,9 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 4.5f;
+            force = 5f;
             scaledForce = 5.5f;
-            range = 110f;
+            range = 160f;
             damage = 0.4f;
             health = 160 * size * size;
             rotateSpeed = 10;

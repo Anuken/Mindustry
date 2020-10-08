@@ -53,7 +53,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient Block block;
     transient Seq<Building> proximity = new Seq<>(8);
     transient boolean updateFlow;
-    transient byte dump;
+    transient byte cdump;
     transient int rotation;
     transient boolean enabled = true;
     transient float enabledControlTime;
@@ -443,7 +443,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean dumpPayload(Payload todump){
         if(proximity.size == 0) return false;
 
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             Building other = proximity.get((i + dump) % proximity.size);
@@ -477,7 +477,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void dumpLiquid(Liquid liquid){
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -577,7 +577,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * containers, it gets added to the block's inventory.
      */
     public void offload(Item item){
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -595,7 +595,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * Tries to put this item into a nearby container. Returns success. Unlike #offload(), this method does not change the block inventory.
      */
     public boolean put(Item item){
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -621,7 +621,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean dump(Item todump){
         if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
-        int dump = this.dump;
+        int dump = this.cdump;
 
         if(proximity.size == 0) return false;
 
@@ -656,7 +656,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void incrementDump(int prox){
-        dump = (byte)((dump + 1) % prox);
+        cdump = (byte)((cdump + 1) % prox);
     }
 
     /** Used for dumping items. */
