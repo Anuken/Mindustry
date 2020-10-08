@@ -197,13 +197,14 @@ public class Shaders{
         }
     }
 
+    //seed: 8kmfuix03fw
     public static class SpaceShader extends SurfaceShader{
         Texture texture;
 
         public SpaceShader(String frag){
             super(frag);
 
-            Core.assets.load("cubemaps/stars/bottom.png", Texture.class).loaded = t -> {
+            Core.assets.load("sprites/space.png", Texture.class).loaded = t -> {
                 texture = (Texture)t;
                 texture.setFilter(TextureFilter.linear);
                 texture.setWrap(TextureWrap.mirroredRepeat);

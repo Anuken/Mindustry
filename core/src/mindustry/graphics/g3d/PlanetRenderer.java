@@ -23,10 +23,6 @@ public class PlanetRenderer implements Disposable{
         shadowColor = new Color(0, 0, 0, 0.7f);
 
     private static final Seq<Vec3> points = new Seq<>();
-    private static final PlanetInterfaceRenderer emptyRenderer = new PlanetInterfaceRenderer(){
-        @Override public void renderSectors(Planet planet){}
-        @Override public void renderProjections(){}
-    };
 
     /** Camera direction relative to the planet. Length is determined by zoom. */
     public final Vec3 camPos = new Vec3();
