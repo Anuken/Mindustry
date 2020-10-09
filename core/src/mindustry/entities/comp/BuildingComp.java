@@ -507,15 +507,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
-    public float moveLiquidForward(float leakResistance, Liquid liquid){
+    public float moveLiquidForward(boolean leaks, Liquid liquid){
         Tile next = tile.getNearby(rotation);
 
         if(next == null) return 0;
 
         if(next.build != null){
             return moveLiquid(next.build, liquid);
-        }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = liquids.get(liquid) / leakResistance;
+        }else if(leaks && !next.block().solid && !next.block().hasLiquids){
+            float leakAmount = liquids.get(liquid) / 1.5f;
             Puddles.deposit(next, tile, liquid, leakAmount);
             liquids.remove(liquid, leakAmount);
         }
