@@ -25,6 +25,7 @@ public abstract class BulletType extends Content{
     public float drawSize = 40f;
     public float drag = 0f;
     public boolean pierce, pierceBuilding;
+    public int pierceCap = 1;
     public Effect hitEffect, despawnEffect;
 
     /** Effect created when shooting. */
@@ -235,6 +236,11 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
+        if(pierceCap > 1) {
+            pierce = true;
+            /** pierceBuilding = true; should this be true or not? */
+        }
+
         if(killShooter && b.owner() instanceof Healthc){
             ((Healthc)b.owner()).kill();
         }

@@ -144,6 +144,10 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                 return false;
             });
         }
+
+        if(collided.size >= type.pierceCap) {
+            remove();
+        }
     }
 
     @Override
