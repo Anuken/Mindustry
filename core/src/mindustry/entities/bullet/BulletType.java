@@ -238,7 +238,7 @@ public abstract class BulletType extends Content{
     public void init(Bullet b){
         if(pierceCap > 1) {
             pierce = true;
-            /** pierceBuilding = true; should this be true or not? */
+            pierceBuilding = true;
         }
 
         if(killShooter && b.owner() instanceof Healthc){
