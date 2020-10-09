@@ -96,7 +96,14 @@ public class EditorTile extends Tile{
             super.recache();
         }
     }
-    
+
+    @Override
+    protected void changed(){
+        if(state.isGame()){
+            super.changed();
+        }
+    }
+
     @Override
     protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
         if(skip()){

@@ -51,6 +51,7 @@ public class SpawnGroup implements Serializable{
 
     /** Returns the amount of units spawned on a specific wave. */
     public int getUnitsSpawned(int wave){
+        if(spacing == 0) spacing = 1;
         if(wave < begin || wave > end || (wave - begin) % spacing != 0){
             return 0;
         }

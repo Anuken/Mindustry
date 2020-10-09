@@ -70,10 +70,12 @@ public class DefaultWaves{
                 shieldScaling = 20f;
             }},
 
-            new SpawnGroup(mace){{
+            new SpawnGroup(spiroct){{
                 begin = 45;
                 spacing = 3;
-                unitScaling = 2;
+                unitScaling = 1;
+                max = 10;
+                shieldScaling = 10f;
                 effect = StatusEffects.overdrive;
             }},
 
@@ -92,15 +94,16 @@ public class DefaultWaves{
                 shieldScaling = 20f;
             }},
 
-            new SpawnGroup(dagger){{
+            new SpawnGroup(quasar){{
                 begin = 82;
                 spacing = 3;
                 unitAmount = 4;
                 unitScaling = 3;
+                shieldScaling = 30f;
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(dagger){{
+            new SpawnGroup(pulsar){{
                 begin = 41;
                 spacing = 5;
                 unitAmount = 1;
@@ -146,6 +149,8 @@ public class DefaultWaves{
                 unitAmount = 4;
                 unitScaling = 3;
                 spacing = 5;
+                shields = 100f;
+                shieldScaling = 10f;
                 effect = StatusEffects.overdrive;
             }},
 
@@ -157,7 +162,7 @@ public class DefaultWaves{
                 max = 16;
             }},
 
-            new SpawnGroup(horizon){{
+            new SpawnGroup(nova){{
                 begin = 53;
                 unitAmount = 2;
                 unitScaling = 3;
@@ -176,6 +181,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 30;
+                shieldScaling = 10f;
             }},
 
             new SpawnGroup(reign){{
@@ -183,6 +189,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
+                shieldScaling = 10f;
             }},
 
             new SpawnGroup(antumbra){{
@@ -190,6 +197,15 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
+                shieldScaling = 10f;
+            }},
+
+            new SpawnGroup(vela){{
+                begin = 100;
+                unitAmount = 1;
+                unitScaling = 1;
+                spacing = 30;
+                shieldScaling = 20f;
             }},
 
             new SpawnGroup(horizon){{
@@ -197,6 +213,18 @@ public class DefaultWaves{
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
+                shields = 40f;
+                shieldScaling = 20f;
+
+            }},
+
+            new SpawnGroup(atrax){{
+                begin = 210;
+                unitAmount = 1;
+                unitScaling = 1;
+                spacing = 35;
+                shields = 1000;
+                shieldScaling = 35f;
             }}
             );
         }
@@ -234,6 +262,7 @@ public class DefaultWaves{
                 int next = Mathf.random(8, 16);
 
                 float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
+                int space = start == 0 ? 1 : Mathf.random(1, 2);
 
                 //main progression
                 out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
@@ -244,6 +273,7 @@ public class DefaultWaves{
                     unitScaling = Mathf.random(1f, 2f);
                     shields = shieldAmount;
                     shieldScaling = shieldsPerWave;
+                    spacing = space;
                 }});
 
                 //extra progression that tails out, blends in

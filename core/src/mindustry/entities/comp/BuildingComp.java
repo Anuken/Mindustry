@@ -1165,10 +1165,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             proximity.add(tile);
         }
 
-        for(Building other : tmpTiles){
-            other.onProximityUpdate();
-        }
-
         onProximityAdded();
         onProximityUpdate();
 
