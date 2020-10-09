@@ -38,6 +38,7 @@ public class DefaultWaves{
                 unitScaling = 1.7f;
                 spacing = 2;
                 max = 4;
+                shieldScaling = 15f;
             }},
 
             new SpawnGroup(pulsar){{
@@ -59,7 +60,8 @@ public class DefaultWaves{
                 unitScaling = 1;
                 unitAmount = 4;
                 spacing = 2;
-                shieldScaling = 10f;
+                shieldScaling = 15f;
+                max = 20;
             }},
 
             new SpawnGroup(mace){{
@@ -215,7 +217,6 @@ public class DefaultWaves{
                 spacing = 4;
                 shields = 40f;
                 shieldScaling = 20f;
-
             }},
 
             new SpawnGroup(atrax){{
