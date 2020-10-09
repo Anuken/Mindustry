@@ -1747,6 +1747,7 @@ public class Blocks implements ContentList{
             ammo(
             Items.graphite, Bullets.standardDenseBig,
             Items.pyratite, Bullets.standardIncendiaryBig,
+            Items.phasefabric, Bullets.standardPhaseBig,
             Items.thorium, Bullets.standardThoriumBig
             );
             reloadTime = 6f;
