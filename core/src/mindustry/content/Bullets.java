@@ -363,7 +363,7 @@ public class Bullets implements ContentList{
             backColor = Pal.lightishOrange;
             shootEffect = Fx.shootBig;
             ammoMultiplier = 3;
-            reloadMultiplier = 1.1;
+            reloadMultiplier = 1.1f;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
