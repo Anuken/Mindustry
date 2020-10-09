@@ -262,6 +262,7 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
+                if(!shown) return false;
                 if(state.isMenu() || !state.teams.get(player.team()).hasCore()){
                     coreAttackTime[0] = 0f;
                     return false;

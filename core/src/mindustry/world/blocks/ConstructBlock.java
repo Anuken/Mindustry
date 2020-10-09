@@ -180,7 +180,7 @@ public class ConstructBlock extends Block{
         public void onDestroyed(){
             Fx.blockExplosionSmoke.at(tile);
 
-            if(!tile.floor().solid && !tile.floor().isLiquid){
+            if(!tile.floor().solid && tile.floor().hasSurface()){
                 Effect.rubble(x, y, size);
             }
         }

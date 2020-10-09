@@ -156,6 +156,7 @@ public class Conveyor extends Block implements Autotiler{
                 lastInserted = build.lastInserted;
                 mid = build.mid;
                 minitem = build.minitem;
+                items.addAll(build.items);
             }
         }
 

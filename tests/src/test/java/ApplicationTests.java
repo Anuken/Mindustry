@@ -425,6 +425,15 @@ public class ApplicationTests{
     }
 
     @Test
+    void load108Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("108.msav"));
+
+        assertEquals(256, world.width());
+        assertEquals(256, world.height());
+    }
+
+    @Test
     void arrayIterators(){
         Seq<String> arr = Seq.with("a", "b" , "c", "d", "e", "f");
         Seq<String> results = new Seq<>();

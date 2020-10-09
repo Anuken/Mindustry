@@ -346,7 +346,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean solid(){
-        return block.solid || (build != null && build.checkSolid());
+        return block.solid || floor.solid || (build != null && build.checkSolid());
     }
 
     public boolean breakable(){
@@ -496,24 +496,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
         if(build != null){
-            int size = build.block.size;
             build.remove();
             build = null;
-
-            //update edge entities
-            tileSet.clear();
-
-            for(Point2 edge : Edges.getEdges(size)){
-                Building other = world.build(x + edge.x, y + edge.y);
-                if(other != null){
-                    tileSet.add(other);
-                }
-            }
-
-            //update proximity, since multiblock was just removed
-            for(Building t : tileSet){
-                t.updateProximity();
-            }
         }
 
         if(block.hasBuilding()){

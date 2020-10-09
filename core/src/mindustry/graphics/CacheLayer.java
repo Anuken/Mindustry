@@ -51,6 +51,17 @@ public enum CacheLayer{
             endShader(Shaders.slag);
         }
     },
+    space{
+        @Override
+        public void begin(){
+            beginShader();
+        }
+
+        @Override
+        public void end(){
+            endShader(Shaders.space);
+        }
+    },
     normal(5),
     walls(3);
 
