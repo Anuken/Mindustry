@@ -31,7 +31,7 @@ public class Bullets implements ContentList{
 
     //standard
     standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
-    standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
+    standardGlaive, standardDenseBig, standardThoriumBig, standardPhaseBig, standardIncendiaryBig,
 
     //liquid
     waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
@@ -354,6 +354,16 @@ public class Bullets implements ContentList{
             width = 16f;
             height = 23f;
             shootEffect = Fx.shootBig;
+        }};
+
+        standardPhaseBig = new BasicBulletType(8f, 45, "bullet"){{
+            width = 4f;
+            height = 28f;
+            pierce = true;
+            backColor = Pal.lightishOrange;
+            shootEffect = Fx.shootBig;
+            ammoMultiplier = 3;
+            reloadMultiplier = 1.1;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
