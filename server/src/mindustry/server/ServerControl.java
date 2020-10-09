@@ -55,6 +55,8 @@ public class ServerControl implements ApplicationListener{
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
 
+    private String yes;
+
     public ServerControl(String[] args){
         Core.settings.defaults(
             "bans", "",
@@ -907,6 +909,14 @@ public class ServerControl implements ApplicationListener{
             info("&ly@&lg MB collected. Memory usage now at &ly@&lg MB.", pre - post, post);
         });
 
+        handler.register("yes", "Run the above \"did you mean\" suggestion.", arg -> {
+            if(yes == null){
+                err("There is nothing to say yes to.");
+            }else{
+                handleCommandString(yes);
+            }
+        });
+
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
@@ -937,6 +947,7 @@ public class ServerControl implements ApplicationListener{
 
             if(closest != null){
                 err("Command not found. Did you mean \"" + closest.text + "\"?");
+                yes = line.replace(response.runCommand, closest.text);
             }else{
                 err("Invalid command. Type 'help' for help.");
             }
@@ -944,6 +955,8 @@ public class ServerControl implements ApplicationListener{
             err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
         }else if(response.type == ResponseType.manyArguments){
             err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+        }else if(response.type == ResponseType.valid){
+            yes = null;
         }
     }
 
