@@ -33,6 +33,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
+import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class ContentParser{
@@ -554,59 +555,59 @@ public class ContentParser{
     private void readFields(Object object, JsonValue jsonMap, boolean stripType){
         if(stripType) jsonMap.remove("type");
 
-        if(object instanceof UnlockableContent unlock){
-            JsonValue research = jsonMap.remove("research");
-            //add research tech node
-            if(research != null){
-                String researchName;
-                ItemStack[] customRequirements;
+        JsonValue research = jsonMap.remove("research");
 
-                //research can be a single string or an object with parent and requirements
-                if(research.isString()){
-                    researchName = research.asString();
-                    customRequirements = null;
-                }else{
-                    researchName = research.getString("parent");
-                    customRequirements = research.hasChild("requirements") ? parser.readValue(ItemStack[].class, research.getChild("requirements")) : null;
-                }
-
-                //remove old node
-                TechNode lastNode = TechTree.all.find(t -> t.content == unlock);
-                if(lastNode != null){
-                    lastNode.remove();
-                }
-
-                TechNode node = new TechNode(null, unlock, customRequirements == null ? unlock.researchRequirements() : customRequirements);
-                LoadedMod cur = currentMod;
-
-                postreads.add(() -> {
-                    currentContent = unlock;
-                    currentMod = cur;
-
-                    //remove old node from parent
-                    if(node.parent != null){
-                        node.parent.children.remove(node);
-                    }
-
-
-                    //find parent node.
-                    TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
-
-                    if(parent == null){
-                        throw new IllegalArgumentException("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
-                    }
-
-                    //add this node to the parent
-                    if(!parent.children.contains(node)){
-                        parent.children.add(node);
-                    }
-                    //reparent the node
-                    node.parent = parent;
-                });
-
-            }
-        }
         readFields(object, jsonMap);
+
+        if(object instanceof UnlockableContent unlock && research != null){
+
+            //add research tech node
+            String researchName;
+            ItemStack[] customRequirements;
+
+            //research can be a single string or an object with parent and requirements
+            if(research.isString()){
+                researchName = research.asString();
+                customRequirements = null;
+            }else{
+                researchName = research.getString("parent");
+                customRequirements = research.hasChild("requirements") ? parser.readValue(ItemStack[].class, research.getChild("requirements")) : null;
+            }
+
+            //remove old node
+            TechNode lastNode = TechTree.all.find(t -> t.content == unlock);
+            if(lastNode != null){
+                lastNode.remove();
+            }
+
+            TechNode node = new TechNode(null, unlock, customRequirements == null ? unlock.researchRequirements() : customRequirements);
+            LoadedMod cur = currentMod;
+
+            postreads.add(() -> {
+                currentContent = unlock;
+                currentMod = cur;
+
+                //remove old node from parent
+                if(node.parent != null){
+                    node.parent.children.remove(node);
+                }
+
+
+                //find parent node.
+                TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
+
+                if(parent == null){
+                    throw new IllegalArgumentException("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                }
+
+                //add this node to the parent
+                if(!parent.children.contains(node)){
+                    parent.children.add(node);
+                }
+                //reparent the node
+                node.parent = parent;
+            });
+        }
     }
 
     void readFields(Object object, JsonValue jsonMap){

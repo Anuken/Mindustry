@@ -110,8 +110,8 @@ android{
     }
 
     if(project.hasProperty("RELEASE_STORE_FILE") || System.getenv("CI") == "true"){
-        buildTypes {
-            release {
+        buildTypes{
+            release{
                 signingConfig signingConfigs.release
             }
         }
