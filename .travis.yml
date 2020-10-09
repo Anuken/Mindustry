@@ -5,18 +5,22 @@ android:
   components:
   - android-29
   - build-tools-29.0.3
-
 script:
 - git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
 - cd ../MindustryBuilds
 - echo ${TRAVIS_TAG}
-- if [ -n "$TRAVIS_TAG" ]; then echo versionName=5-fdroid-${TRAVIS_TAG:1}$'\n'versionCode=${TRAVIS_TAG:1} > version_fdroid.txt; git add .; git commit -m "Updating to build ${TRAVIS_TAG}"; fi
+- if [ -n "$TRAVIS_TAG" ]; then echo versionName=5-fdroid-${TRAVIS_TAG:1}$'\n'versionCode=${TRAVIS_TAG:1}
+  > version_fdroid.txt; git add .; git commit -m "Updating to build ${TRAVIS_TAG}";
+  fi
 - git tag ${TRAVIS_BUILD_NUMBER}
 - git config --global user.name "Build Uploader"
-- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds ${TRAVIS_BUILD_NUMBER}; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds; fi
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds
+  ${TRAVIS_BUILD_NUMBER}; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/MindustryBuilds;
+  fi
 - cd ../Mindustry
 - git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
-- if [ -n "$TRAVIS_TAG" ]; then cd ../Arc; git tag ${TRAVIS_TAG}; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/Arc ${TRAVIS_TAG}; cd ../Mindustry; fi
+- if [ -n "$TRAVIS_TAG" ]; then cd ../Arc; git tag ${TRAVIS_TAG}; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/Anuken/Arc
+  ${TRAVIS_TAG}; cd ../Mindustry; fi
 - "./gradlew test"
 - "./gradlew desktop:dist -Pbuildversion=${TRAVIS_TAG:1}"
 - "./gradlew server:dist -Pbuildversion=${TRAVIS_TAG:1}"
@@ -25,7 +29,8 @@ script:
 - git clone --depth=1 https://github.com/MindustryGame/docs.git
 - cp -a Mindustry/core/build/docs/javadoc/. docs/
 - cd docs
-- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add .; git commit -m "Update ${TRAVIS_BUILD_NUMBER}"; git push https://Anuken:${GH_PUSH_TOKEN}@github.com/MindustryGame/docs; fi
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add .; git commit -m "Update ${TRAVIS_BUILD_NUMBER}";
+  git push https://Anuken:${GH_PUSH_TOKEN}@github.com/MindustryGame/docs; fi
 - cd ../Mindustry
 deploy:
 - provider: releases
@@ -39,12 +44,10 @@ deploy:
   on:
     repo: Anuken/Mindustry
     tags: true
-#- provider: script
-#  script: bash update_wiki.sh
-#  on:
-#    repo: Anuken/Mindustry
-#    tags: true
 env:
   global:
   - secure: TqlUl/ojjkCMVOGbCTKz7Cnr4F08UyWzY/CiJ0vvUOGJGZ1qm7XavAlDf5XT0egU4mvr37THubFO8vojbqmrmy0oZnYh3njKFA8axgyZ8PyKkjGHOfd0i6qyEWsOr9H90/2X8r3LwEeLaDFyHpu3wljIGBjweg53g2qwmDwCFa9UR80FJZ+xDB+rD6B3cXT0DTEkCoLZXLqXm0Y3HvBdSuBL1LR/FNb2BSxNq+tNLGiz1kdQZV5erausbbZypBoGxzz63xAnyz2kkFz73A8xQYVTzGbFodTPz7HM13GVZ5s43I03Y+HYyHBgBaSLziO2hi2kzVJccOwzBp7wS4fs1MqsFY5+IeWJ9k+hm89NiYT7+6zlEgoUMlIniny1qLqWTzx7btUeuC/y/h5TVBNgaV+z0jmHycHfeSyq5I+vmX4J8qe3wmaN8TcdqYKU5nIznOTk3CM5Fzu0Bs9vkCkOxmormmcjMFW1RbdOLc/hpZWZggsBA88sNEAI8eq+r5QEeqzeCx8YKoZDjdrsqvgLMc3El3gS9oMGxkn0Y/TEcqs9Tc4BXtTkqIA68hD0DYzlAxYjVbbkAI9Hh9lHNvV3Dr/oCkGXQ/HflM143kj1L3tSBZpqeqQE2XhngB5nqpS3OZTmZbMTQ8qD2luU18yaTGMLF5tJS/fdKPRx0gQ1kL8=
   - secure: VEskj/0TVX2o7iUVXuVPysj/VSWmPhDl57SrT7/nBNN/P/8N5jFAvx8PMzG7qT0S5FzKxuV20psE4WylUGRKdeRtK7/QNBV7T3YqYYM6BUB1VeRpxe5hLxTeuBK3izglFO8DkdDqjUtzQSjzkoYT75ilROjhBrBUPhVek7UlbBHbaklPWYFXHnJmYS1FpZTdzqIj+Y0Gd1PSL2MzK4X74aAHl0qaDgsTwYwtKs7IAz+kFaTZBRpi9VjQHAFhDlkDR3jo9wQjH8/F6x0lCgV/FulSc37Okdb40sLFG98xcEA6gWh1NPMkz8CulUdVE7mj7SJNxLbNvoMNrWOVRjmEsn59p/9LiNC1F9ncFz9vjQjAmi7rMFFGHGxe5nn8cIAkpTvHQQkZoWHAA9SNJTDMMf09m2pRy/vvzx+a6NVxyC9iNrhLlnBg4gxAqRh0S6NU0uL+fuygKixn7rqlnb7KMT7bAbfcuV+dng6c8V7hYKDCh7sJbH8iJump1xkwoM7ecnU8fxJF/oKOr/fbk0Bfxu+Q9qYLrV1+DEdm93Vl2Thq+DBKmI66jRGSva6HeCLFo81PEiEjP1nLv75+kvVfOqVqJrZD1BrvoG2eWT/3hVLrN2kEIWWlpvQVC7FL11yWmYtAuOBh/vfhI76zKr+YTS6ccG9rqW4XeYjJytshe8M=
+before_install:
+- openssl aes-256-cbc -K $encrypted_05543ea905ba_key -iv $encrypted_05543ea905ba_iv
+  -in bekeystore.jks.enc -out bekeystore.jks -d
