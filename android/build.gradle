@@ -76,7 +76,7 @@ android{
         targetSdkVersion 29
         
         versionName versionNameResult
-        versionCode = (System.getenv("CI") == "true" ? System.getenv("TRAVIS_TAG").toInteger() : vcode)
+        versionCode = (System.getenv("CI") == "true" ? System.getenv("TRAVIS_BUILD_ID").toInteger() : vcode)
 
         if(project.hasProperty("release")){
             props['androidBuildCode'] = (vcode + 1).toString()
