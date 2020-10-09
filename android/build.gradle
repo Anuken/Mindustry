@@ -98,6 +98,11 @@ android{
                 storePassword RELEASE_STORE_PASSWORD
                 keyAlias RELEASE_KEY_ALIAS
                 keyPassword RELEASE_KEY_PASSWORD
+            }else if(System.getenv("CI") == "true"){
+                storeFile = file("../../bekeystore.jks")
+                storePassword = System.getenv("keystore_password")
+                keyAlias = System.getenv("keystore_alias")
+                keyPassword = System.getenv("keystore_alias_password")
             }else{
                 println("No keystore property found. Releases will be unsigned.")
             }
