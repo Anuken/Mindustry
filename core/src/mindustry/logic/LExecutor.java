@@ -390,7 +390,9 @@ public class LExecutor{
                             if(exec.bool(p1)){
                                 Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type().hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
 
-                                Call.pickedUnitPayload(unit, result);
+                                if(result != null){
+                                    Call.pickedUnitPayload(unit, result);
+                                }
                             }else{ //buildings
                                 Building tile = world.buildWorld(unit.x, unit.y);
 
