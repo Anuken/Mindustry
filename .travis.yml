@@ -39,7 +39,7 @@ deploy:
   on:
     repo: Anuken/Mindustry
     tags: true
-#- provider: script
+# - provider: script
 #  script: bash update_wiki.sh
 #  on:
 #    repo: Anuken/Mindustry
