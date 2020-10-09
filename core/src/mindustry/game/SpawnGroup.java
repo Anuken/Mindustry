@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
@@ -37,8 +38,10 @@ public class SpawnGroup implements Serializable{
     /** Amount of enemies spawned initially, with no scaling */
     public int unitAmount = 1;
     /** Status effect applied to the spawned unit. Null to disable. */
+    @Nullable
     public StatusEffect effect;
     /** Items this unit spawns with. Null to disable. */
+    @Nullable
     public ItemStack items;
 
     public SpawnGroup(UnitType type){
@@ -90,7 +93,7 @@ public class SpawnGroup implements Serializable{
         if(shields != 0) json.writeValue("shields", shields);
         if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
-        if(effect != null) json.writeValue("effect", effect.id);
+        if(effect != null) json.writeValue("effect", effect.name);
     }
 
     @Override
@@ -107,7 +110,7 @@ public class SpawnGroup implements Serializable{
         shields = data.getFloat("shields", 0);
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
-        effect = content.getByID(ContentType.status, data.getInt("effect", -1));
+        effect = content.getByName(ContentType.status, data.hasChild("effect") && data.getChild("effect").isString() ? data.getString("effect", "none") : "none");
     }
 
     @Override

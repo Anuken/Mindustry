@@ -56,11 +56,11 @@ public class DefaultWaves{
             }},
 
             new SpawnGroup(dagger){{
-                begin = 8;
+                begin = 12;
                 unitScaling = 1;
                 unitAmount = 4;
                 spacing = 2;
-                shieldScaling = 15f;
+                shieldScaling = 10f;
                 max = 20;
             }},
 
@@ -176,6 +176,7 @@ public class DefaultWaves{
                 unitAmount = 4;
                 unitScaling = 1;
                 spacing = 3;
+                shieldScaling = 5f;
             }},
 
             new SpawnGroup(scepter){{

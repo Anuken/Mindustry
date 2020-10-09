@@ -263,8 +263,10 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         pass((x, y) -> {
             //random moss
-            if(floor == Blocks.sporeMoss && rand.chance(0.9)){
-                floor = Blocks.moss;
+            if(floor == Blocks.sporeMoss){
+                if(Math.abs(0.5f - noise(x - 90, y, 4, 0.8, 65)) > 0.02){
+                    floor = Blocks.moss;
+                }
             }
 
             //tar
