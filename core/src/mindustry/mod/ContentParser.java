@@ -318,8 +318,8 @@ public class ContentParser{
     private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
             T item;
-            if(Vars.content.getByName(type, name) != null){
-                item = (T)Vars.content.getByName(type, name);
+            if(locate(type, name) != null){
+                item = (T)locate(type, name);
                 readBundle(type, name, value);
             }else{
                 readBundle(type, name, value);
