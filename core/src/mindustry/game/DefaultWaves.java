@@ -252,7 +252,7 @@ public class DefaultWaves{
         //max reasonable wave, after which everything gets boring
         int cap = 200;
 
-        float shieldStart = 30, shieldsPerWave = 12;
+        float shieldStart = 30, shieldsPerWave = 15 + difficulty*20f;
 
         Intc createProgression = start -> {
             //main sequence
@@ -271,7 +271,7 @@ public class DefaultWaves{
                     unitAmount = f == 0 ? 1 : 10;
                     begin = f;
                     end = f + next >= cap ? never : f + next;
-                    max = 16;
+                    max = 20;
                     unitScaling = Mathf.random(1f, 2f);
                     shields = shieldAmount;
                     shieldScaling = shieldsPerWave;
@@ -283,7 +283,7 @@ public class DefaultWaves{
                     unitAmount = 6;
                     begin = f + next;
                     end = f + next + Mathf.random(8, 12);
-                    max = 10;
+                    max = 14;
                     unitScaling = Mathf.random(2f);
                     spacing = Mathf.random(2, 3);
                     shields = shieldAmount;
