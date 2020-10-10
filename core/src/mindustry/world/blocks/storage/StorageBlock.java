@@ -5,15 +5,16 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
-public abstract class StorageBlock extends Block{
-
+public class StorageBlock extends Block{
     public StorageBlock(String name){
         super(name);
         hasItems = true;
         solid = true;
         update = false;
         destructible = true;
+        group = BlockGroup.storage;
     }
 
     @Override
