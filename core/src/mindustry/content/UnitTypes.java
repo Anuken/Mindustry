@@ -514,7 +514,7 @@ public class UnitTypes implements ContentList{
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
 
-            speed = 0.92f;
+            speed = 1f;
             hitSize = 8f;
             health = 180;
             mechSideSway = 0.25f;
@@ -529,9 +529,9 @@ public class UnitTypes implements ContentList{
                     hitEffect = Fx.pulverize;
                     lifetime = 10f;
                     speed = 1f;
-                    splashDamageRadius = 55f;
+                    splashDamageRadius = 70f;
                     instantDisappear = true;
-                    splashDamage = 60f;
+                    splashDamage = 80f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -1187,8 +1187,6 @@ public class UnitTypes implements ContentList{
                     healPercent = 5.5f;
                     collidesTeam = true;
                     backColor = Pal.heal;
-                    frontColor = Color.white;
-                    backColor = Pal.heal;
                     trailColor = Pal.heal;
                 }};
             }});
@@ -1233,7 +1231,7 @@ public class UnitTypes implements ContentList{
         }};
 
         quad = new UnitType("quad"){{
-            armor = 4f;
+            armor = 6f;
             health = 6000;
             speed = 1.2f;
             rotateSpeed = 2f;
@@ -1256,7 +1254,7 @@ public class UnitTypes implements ContentList{
             new Weapon(){{
                 x = y = 0f;
                 mirror = false;
-                reload = 60f;
+                reload = 55f;
                 minShootVelocity = 0.01f;
 
                 bullet = new BasicBulletType(){{
@@ -1289,9 +1287,9 @@ public class UnitTypes implements ContentList{
                     speed = 0.001f;
                     collides = false;
 
-                    healPercent = 10f;
-                    splashDamage = 240f;
-                    splashDamageRadius = 115f;
+                    healPercent = 15f;
+                    splashDamage = 320f;
+                    splashDamageRadius = 120f;
                 }};
             }});
         }};

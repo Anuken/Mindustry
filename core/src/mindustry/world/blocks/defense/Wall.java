@@ -34,7 +34,7 @@ public class Wall extends Block{
         solid = true;
         destructible = true;
         group = BlockGroup.walls;
-        buildCostMultiplier = 5f;
+        buildCostMultiplier = 6f;
         canOverdrive = false;
     }
 

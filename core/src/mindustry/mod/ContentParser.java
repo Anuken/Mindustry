@@ -603,7 +603,7 @@ public class ContentParser{
                 customRequirements = null;
             }else{
                 researchName = research.getString("parent");
-                customRequirements = research.hasChild("requirements") ? parser.readValue(ItemStack[].class, research.getChild("requirements")) : null;
+                customRequirements = research.has("requirements") ? parser.readValue(ItemStack[].class, research.get("requirements")) : null;
             }
 
             //remove old node
