@@ -348,6 +348,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region handler methods
 
+    /** Called when an unloader takes an item. */
+    public void itemTaken(Item item){
+
+    }
+
     /** Called when this block is dropped as a payload. */
     public void dropped(){
 

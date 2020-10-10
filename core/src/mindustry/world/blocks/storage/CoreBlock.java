@@ -157,6 +157,7 @@ public class CoreBlock extends StorageBlock{
         public int storageCapacity;
         //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
         public BlockUnitc unit = Nulls.blockUnit;
+        public boolean noEffect = false;
 
         @Override
         public void created(){
@@ -195,7 +196,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.get(item) < getMaximumAccepted(item);
+            return items.get(item) < getMaximumAccepted(item) || incinerate();
         }
 
         @Override
@@ -264,6 +265,10 @@ public class CoreBlock extends StorageBlock{
             return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == core || ((StorageBuild)tile).linkedCore == null);
         }
 
+        public boolean incinerate(){
+            return state.isCampaign();
+        }
+
         @Override
         public float handleDamage(float amount){
             if(player != null && team == player.team()){
@@ -298,6 +303,7 @@ public class CoreBlock extends StorageBlock{
             }
         }
 
+
         @Override
         public void placed(){
             super.placed();
@@ -305,9 +311,27 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void itemTaken(Item item){
+            if(state.isCampaign()){
+                //update item taken amount
+                state.secinfo.handleCoreItem(item, -1);
+            }
+        }
+
+        @Override
         public void handleItem(Building source, Item item){
             if(net.server() || !net.active()){
-                super.handleItem(source, item);
+
+                if(items.get(item) >= getMaximumAccepted(item)){
+                    //create item incineration effect at random intervals
+                    if(!noEffect){
+                        incinerateEffect(this, source);
+                    }
+                    noEffect = false;
+                }else{
+                    super.handleItem(source, item);
+                }
+
                 if(state.rules.tutorial){
                     Events.fire(new CoreItemDeliverEvent());
                 }
