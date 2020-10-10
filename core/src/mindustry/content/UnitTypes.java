@@ -1231,7 +1231,7 @@ public class UnitTypes implements ContentList{
         }};
 
         quad = new UnitType("quad"){{
-            armor = 6f;
+            armor = 8f;
             health = 6000;
             speed = 1.2f;
             rotateSpeed = 2f;

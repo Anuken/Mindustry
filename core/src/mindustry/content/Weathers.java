@@ -152,7 +152,7 @@ public class Weathers implements ContentList{
                         if(tile != null && tile.floor().liquidDrop == Liquids.water){
                             Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(1.5f).a(state.opacity()));
                             Draw.rect(splashes[(int)(life * (splashes.length - 1))], x, y);
-                        }else{
+                        }else if(tile != null && tile.floor().liquidDrop == null && !tile.floor().solid){
                             Draw.color(Color.royal, Color.white, 0.3f);
                             Draw.alpha(Mathf.slope(life) * state.opacity());
 
