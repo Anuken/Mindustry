@@ -311,7 +311,7 @@ public class DefaultWaves{
 
         while(step <= cap){
             createProgression.get(step);
-            step += (int)(Mathf.random(15, 30) * Mathf.lerp(1f, 0.4f, difficulty));
+            step += (int)(Mathf.random(12, 25) * Mathf.lerp(1f, 0.4f, difficulty));
         }
 
         int bossWave = Mathf.random(30, 60);
@@ -331,7 +331,7 @@ public class DefaultWaves{
         //alt boss progression
         out.add(new SpawnGroup(Structs.random(species)[4]){{
             unitAmount = 1;
-            begin = bossWave + Mathf.random(4, 6) * bossSpacing;
+            begin = bossWave + Mathf.random(3, 5) * bossSpacing;
             spacing = bossSpacing;
             end = never;
             max = 16;
