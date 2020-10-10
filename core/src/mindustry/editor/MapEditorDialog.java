@@ -560,8 +560,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 mid.row();
 
                 mid.table(t -> {
-                    t.button("@editor.center", () -> view.center()).growX();
-                }).pad(-5).style(Styles.squaret).growX().top();
+                    t.button("@editor.center", Icon.move, Styles.cleart, () -> view.center()).growX().margin(9f);
+                }).growX().top();
 
             }).margin(0).left().growY();
 
