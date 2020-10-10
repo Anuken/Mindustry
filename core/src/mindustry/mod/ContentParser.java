@@ -33,7 +33,6 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
-import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class ContentParser{
@@ -554,10 +553,43 @@ public class ContentParser{
 
     private void readFields(Object object, JsonValue jsonMap, boolean stripType){
         if(stripType) jsonMap.remove("type");
+        readFields(object, jsonMap);
+    }
 
+    void readFields(Object object, JsonValue jsonMap){
         JsonValue research = jsonMap.remove("research");
 
-        readFields(object, jsonMap);
+        toBeParsed.remove(object);
+        Class type = object.getClass();
+        ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
+        for(JsonValue child = jsonMap.child; child != null; child = child.next){
+            FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
+            if(metadata == null){
+                if(ignoreUnknownFields){
+                    Log.warn("@: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
+                    continue;
+                }else{
+                    SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");
+                    ex.addTrace(child.trace());
+                    throw ex;
+                }
+            }
+            Field field = metadata.field;
+            try{
+                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
+            }catch(IllegalAccessException ex){
+                throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
+            }catch(SerializationException ex){
+                ex.addTrace(field.getName() + " (" + type.getName() + ")");
+                throw ex;
+            }catch(RuntimeException runtimeEx){
+                SerializationException ex = new SerializationException(runtimeEx);
+                ex.addTrace(child.trace());
+                ex.addTrace(field.getName() + " (" + type.getName() + ")");
+                throw ex;
+            }
+        }
+
 
         if(object instanceof UnlockableContent unlock && research != null){
 
@@ -607,39 +639,6 @@ public class ContentParser{
                 //reparent the node
                 node.parent = parent;
             });
-        }
-    }
-
-    void readFields(Object object, JsonValue jsonMap){
-        toBeParsed.remove(object);
-        Class type = object.getClass();
-        ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
-        for(JsonValue child = jsonMap.child; child != null; child = child.next){
-            FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
-            if(metadata == null){
-                if(ignoreUnknownFields){
-                    Log.warn("@: Ignoring unknown field: " + child.name + " (" + type.getName() + ")", object);
-                    continue;
-                }else{
-                    SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");
-                    ex.addTrace(child.trace());
-                    throw ex;
-                }
-            }
-            Field field = metadata.field;
-            try{
-                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
-            }catch(IllegalAccessException ex){
-                throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
-            }catch(SerializationException ex){
-                ex.addTrace(field.getName() + " (" + type.getName() + ")");
-                throw ex;
-            }catch(RuntimeException runtimeEx){
-                SerializationException ex = new SerializationException(runtimeEx);
-                ex.addTrace(child.trace());
-                ex.addTrace(field.getName() + " (" + type.getName() + ")");
-                throw ex;
-            }
         }
     }
 
