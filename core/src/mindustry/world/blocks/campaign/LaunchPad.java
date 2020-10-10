@@ -98,7 +98,14 @@ public class LaunchPad extends Block{
             if(!state.isCampaign()) return;
 
             //launch when full and base conditions are met
-            if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
+            boolean launchable = true;
+            for(Item item : content.items()) {
+                if(state.secinfo.getRealDestination().save.meta.secinfo.coreItems.get(item) + items.get(item) > state.secinfo.getRealDestination().save.meta.secinfo.storageCapacity) {
+                    launchable = false;
+                }
+            }
+
+            if(launchable && items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
                 LaunchPayload entity = LaunchPayload.create();
                 items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
