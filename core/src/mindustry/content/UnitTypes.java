@@ -514,9 +514,9 @@ public class UnitTypes implements ContentList{
         crawler = new UnitType("crawler"){{
             defaultController = SuicideAI::new;
 
-            speed = 0.92f;
+            speed = 1.2f;
             hitSize = 8f;
-            health = 180;
+            health = 220;
             mechSideSway = 0.25f;
             range = 40f;
 
@@ -1234,8 +1234,8 @@ public class UnitTypes implements ContentList{
 
         quad = new UnitType("quad"){{
             armor = 4f;
-            health = 6000;
-            speed = 1.2f;
+            health = 6500;
+            speed = 1.5f;
             rotateSpeed = 2f;
             accel = 0.05f;
             drag = 0.017f;
@@ -1246,7 +1246,7 @@ public class UnitTypes implements ContentList{
             rotateShooting = false;
             hitSize = 32f;
             payloadCapacity = (3 * 3) * tilePayload;
-            buildSpeed = 2.5f;
+            buildSpeed = 3f;
             range = 140f;
             targetAir = false;
 
