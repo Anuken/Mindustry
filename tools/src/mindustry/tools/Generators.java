@@ -78,6 +78,79 @@ public class Generators{
             }
         });
 
+        ImagePacker.generate("cliffs", () -> {
+            int size = 64;
+            Color dark = new Color(0.5f, 0.5f, 0.6f, 1f).mul(0.98f);
+            Color mid = Color.lightGray;
+
+            Image[] images = new Image[8];
+            for(int i = 0; i < 8; i++){
+                images[i] = ImagePacker.get("cliff" + i);
+            }
+
+            for(int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++){
+                Image result = new Image(size, size);
+                byte[][] mask = new byte[size][size];
+
+                byte val = (byte)i;
+                //check each bit/direction
+                for(int j = 0; j < 8; j++){
+                    if((val & (1 << j)) != 0){
+                        if(j % 2 == 1 && (((val & (1 << (j + 1))) != 0) != ((val & (1 << (j - 1))) != 0))){
+                            continue;
+                        }
+
+                        Image image = images[j];
+                        image.each((x, y) -> {
+                            Color color = image.getColor(x, y);
+                            if(color.a > 0.1){
+                                //white -> bit 1 -> top
+                                //black -> bit 2 -> bottom
+                                mask[x][y] |= (color.r > 0.5f ? 1 : 2);
+                            }
+                        });
+                    }
+                }
+
+                result.each((x, y) -> {
+                    byte m = mask[x][y];
+                    if(m != 0){
+                        //mid
+                        if(m == 3){
+                            //find nearest non-mid color
+                            byte best = 0;
+                            float bestDst = 0;
+                            boolean found = false;
+                            //expand search range until found
+                            for(int rad = 9; rad < 64; rad += 7){
+                                for(int cx = Math.max(x - rad, 0); cx <= Math.min(x + rad, size - 1); cx++){
+                                    for(int cy = Math.max(y - rad, 0); cy <= Math.min(y + rad, size - 1); cy++){
+                                        byte nval = mask[cx][cy];
+                                        if(nval == 1 || nval == 2){
+                                            float dst2 = Mathf.dst2(cx, cy, x, y);
+                                            if(dst2 <= rad * rad && (!found || dst2 < bestDst)){
+                                                best = nval;
+                                                bestDst = dst2;
+                                                found = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(found){
+                                m = best;
+                            }
+                        }
+
+                        result.draw(x, y, m == 1 ? Color.white : m == 2 ? dark : mid);
+                    }
+                });
+
+                result.save("../blocks/environment/cliffmask" + (val & 0xff));
+            }
+        });
+
         ImagePacker.generate("cracks", () -> {
             RidgedPerlin r = new RidgedPerlin(1, 3);
             for(int size = 1; size <= Block.maxCrackSize; size++){
