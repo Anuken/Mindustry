@@ -26,10 +26,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType vela;
 
     //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus;
-
-    //legs
-    public static @EntityDef({Unitc.class, Legsc.class}) UnitType atrax;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax;
 
     //legs + building
     public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
