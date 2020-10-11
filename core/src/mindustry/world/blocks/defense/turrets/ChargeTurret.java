@@ -32,7 +32,7 @@ public class ChargeTurret extends PowerTurret{
 
             tr.trns(rotation, size * tilesize / 2f);
             chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
-            chargeSound.at(x + tr.x, y + tr.y, Mathf.random(0.8f, 1f));
+            chargeSound.at(x + tr.x, y + tr.y, 1);
             
             for(int i = 0; i < chargeEffects; i++){
                 Time.run(Mathf.random(chargeMaxDelay), () -> {
