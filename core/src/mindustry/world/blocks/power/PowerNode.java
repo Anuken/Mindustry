@@ -115,7 +115,7 @@ public class PowerNode extends PowerBlock{
 
         bars.add("connections", entity -> new Bar(() ->
         Core.bundle.format("bar.powerlines", entity.power.links.size, maxNodes),
-            () -> Pal.ammo,
+            () -> Pal.items,
             () -> (float)entity.power.links.size / (float)maxNodes
         ));
     }
