@@ -84,20 +84,6 @@ public class HudFragment extends Fragment{
             coreItems.clear();
         });
 
-        Events.on(TurnEvent.class, e -> {
-            Seq<Sector> attacked = universe.getAttacked(state.getSector().planet);
-
-            if(attacked.any()){
-
-                //TODO localize
-                String text = attacked.size > 1 ? attacked.size + " sectors attacked." : "Sector " + attacked.first().id + " under attack.";
-
-                showToast(Icon.warning, text);
-            }
-
-            //ui.announce("[accent][[ Turn " + universe.turn() + " ]\n[scarlet]" + attackedSectors.size + "[lightgray] sector(s) attacked.");
-        });
-
         //paused table
         parent.fill(t -> {
             t.name = "paused";
