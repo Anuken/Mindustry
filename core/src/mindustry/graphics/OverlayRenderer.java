@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -150,6 +151,14 @@ public class OverlayRenderer{
         }
 
         input.drawOverSelect();
+
+        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller instanceof Building build){
+            Draw.z(Layer.overlayUI);
+            Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
+            if(!unit.within(build, unit.hitSize * 2f)){
+                Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize *2f, 4f);
+            }
+        }
 
         //draw selection overlay when dropping item
         if(input.isDroppingItem()){

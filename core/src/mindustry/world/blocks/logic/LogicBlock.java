@@ -1,7 +1,6 @@
 package mindustry.world.blocks.logic;
 
 import arc.func.*;
-import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.Bits;
@@ -9,7 +8,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.ai.types.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -425,25 +423,11 @@ public class LogicBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-
             table.button(Icon.pencil, Styles.clearTransi, () -> {
                 Vars.ui.logic.show(code, code -> {
                     configure(compress(code, relativeConnections()));
                 });
             }).size(40);
-        }
-
-        @Override
-        public void draw(){
-            super.draw();
-
-            if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller == this){
-                Draw.z(Layer.overlayUI);
-                Drawf.square(x, y, size * tilesize/2f + 2f);
-                if(!unit.within(this, unit.hitSize * 2f)){
-                    Drawf.arrow(unit.x, unit.y, x, y, unit.hitSize *2f, 4f);
-                }
-            }
         }
 
         @Override
