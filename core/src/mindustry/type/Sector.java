@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
@@ -151,7 +152,9 @@ public class Sector{
     public void addItems(ItemSeq items){
         if(isBeingPlayed()){
             if(state.rules.defaultTeam.core() != null){
-                state.rules.defaultTeam.items().add(items);
+                ItemModule storage = state.rules.defaultTeam.items();
+                int cap = state.rules.defaultTeam.core().storageCapacity;
+                items.each((item, amount) -> storage.add(item, Math.min(cap - storage.get(item), amount)));
             }
         }else{
             ItemSeq recv = getExtraItems();
