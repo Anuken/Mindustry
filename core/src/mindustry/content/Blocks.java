@@ -994,7 +994,7 @@ public class Blocks implements ContentList{
 
         router = new Router("router"){{
             requirements(Category.distribution, with(Items.copper, 3));
-            buildCostMultiplier = 2f;
+            buildCostMultiplier = 4f;
         }};
 
         distributor = new Router("distributor"){{

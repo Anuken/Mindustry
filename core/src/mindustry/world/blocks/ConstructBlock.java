@@ -58,7 +58,7 @@ public class ConstructBlock extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void constructFinish(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
+    public static void constructFinish(Tile tile, Block block, @Nullable Unit builder, byte rotation, Team team, Object config){
         if(tile == null) return;
 
         float healthf = tile.build == null ? 1f : tile.build.healthf();
@@ -75,6 +75,10 @@ public class ConstructBlock extends Block{
 
             if(prev != null && prev.size > 0){
                 tile.build.overwrote(prev);
+            }
+
+            if(builder != null && builder.isPlayer()){
+                tile.build.lastAccessed = builder.getPlayer().name;
             }
         }
 

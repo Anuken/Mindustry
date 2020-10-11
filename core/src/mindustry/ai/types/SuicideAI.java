@@ -28,7 +28,7 @@ public class SuicideAI extends GroundAI{
 
         boolean rotate = false, shoot = false, moveToTarget = false;
 
-        if(!Units.invalidateTarget(target, unit, unit.range())){
+        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.hasWeapons()){
             rotate = true;
             shoot = unit.within(target, unit.type().weapons.first().bullet.range() +
                 (target instanceof Building ? ((Building)target).block.size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
@@ -38,7 +38,11 @@ public class SuicideAI extends GroundAI{
             }
 
             //do not move toward walls or transport blocks
-            if(!(target instanceof Building build && (build.block.group == BlockGroup.walls || build.block.group == BlockGroup.liquids || build.block.group == BlockGroup.transportation))){
+            if(!(target instanceof Building build && (
+                build.block.group == BlockGroup.walls ||
+                build.block.group == BlockGroup.liquids ||
+                build.block.group == BlockGroup.transportation
+            ))){
                 blockedByBlock = false;
 
                 //raycast for target

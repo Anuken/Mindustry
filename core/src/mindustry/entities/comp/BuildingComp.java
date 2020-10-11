@@ -57,6 +57,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient int rotation;
     transient boolean enabled = true;
     transient float enabledControlTime;
+    transient String lastAccessed;
 
     PowerModule power;
     ItemModule items;
@@ -879,6 +880,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         //null is of type void.class; anonymous classes use their superclass.
         Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
 
+        if(builder != null && builder.isPlayer()){
+            lastAccessed = builder.getPlayer().name;
+        }
+
         if(block.configurations.containsKey(type)){
             block.configurations.get(type).get(this, value);
         }
@@ -1041,6 +1046,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                         });
                     }).left();
                 }
+            }
+
+            if(net.active() && lastAccessed != null){
+                table.row();
+                table.add(Core.bundle.format("lastaccessed", lastAccessed)).growX().wrap().left();
             }
 
             table.marginBottom(-5);
