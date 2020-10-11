@@ -45,7 +45,7 @@ public class MenuFragment extends Fragment{
 
         parent.fill(c -> {
             container = c;
-			c.name = "menu container";
+            c.name = "menu container";
 
             if(!mobile){
                 buildDesktop();
@@ -94,7 +94,7 @@ public class MenuFragment extends Fragment{
 
     private void buildMobile(){
         container.clear();
-		container.name = "buttons";
+        container.name = "buttons";
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
         float size = 120f;
@@ -162,7 +162,7 @@ public class MenuFragment extends Fragment{
         container.add().width(Core.graphics.getWidth()/10f);
         container.table(background, t -> {
             t.defaults().width(width).height(70f);
-			t.name = "buttons";
+            t.name = "buttons";
 
             buttons(t,
                 new Buttoni("@play", Icon.play,
@@ -185,7 +185,7 @@ public class MenuFragment extends Fragment{
 
         container.table(background, t -> {
             submenu = t;
-			t.name = "submenu";
+            t.name = "submenu";
             t.color.a = 0f;
             t.top();
             t.defaults().width(width).height(70f);
