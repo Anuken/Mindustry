@@ -1341,6 +1341,7 @@ public class Blocks implements ContentList{
             size = 4;
 
             unitCapModifier = 14;
+            researchCostMultiplier = 0.04f;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -1352,6 +1353,7 @@ public class Blocks implements ContentList{
             size = 5;
 
             unitCapModifier = 20;
+            researchCostMultiplier = 0.06f;
         }};
 
         vault = new StorageBlock("vault"){{

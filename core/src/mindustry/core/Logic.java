@@ -9,7 +9,6 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
@@ -93,9 +92,10 @@ public class Logic implements ApplicationListener{
                 //apply fractional damage based on how many turns have passed for this sector
                 float turnsPassed = seconds / (turnDuration / 60f);
 
-                if(state.rules.sector.hasWaves() && turnsPassed > 0 && state.rules.sector.hasBase()){
-                    SectorDamage.apply(turnsPassed / sectorDestructionTurns);
-                }
+                //TODO sector damage disabled for now
+                //if(state.rules.sector.hasWaves() && turnsPassed > 0 && state.rules.sector.hasBase()){
+                //    SectorDamage.apply(turnsPassed / sectorDestructionTurns);
+                //}
 
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){

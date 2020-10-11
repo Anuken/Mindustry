@@ -140,8 +140,9 @@ public class Universe{
                     if(!sector.isBeingPlayed()){
                         sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
 
+                        //TODO sector damage disabled for now
                         //check if the sector has been attacked too many times...
-                        if(sector.hasBase() && sector.hasWaves() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                        /*if(sector.hasBase() && sector.hasWaves() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
                             //fire event for losing the sector
                             Events.fire(new SectorLoseEvent(sector));
 
@@ -151,7 +152,7 @@ public class Universe{
                             //clear recieved
                             sector.setExtraItems(new ItemSeq());
                             sector.save = null;
-                        }
+                        }*/
                     }
 
                     //export to another sector

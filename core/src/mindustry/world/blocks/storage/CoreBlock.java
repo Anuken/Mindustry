@@ -14,6 +14,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -158,6 +159,12 @@ public class CoreBlock extends StorageBlock{
         //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
         public BlockUnitc unit = Nulls.blockUnit;
         public boolean noEffect = false;
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.itemCapacity) return storageCapacity;
+            return super.sense(sensor);
+        }
 
         @Override
         public void created(){
