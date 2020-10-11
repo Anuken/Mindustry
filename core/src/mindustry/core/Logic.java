@@ -197,6 +197,8 @@ public class Logic implements ApplicationListener{
                 state.rules.waves = false;
             }
 
+            //TODO capturing is disabled
+            /*
             //if there's a "win" wave and no enemies are present, win automatically
             if(state.rules.waves && state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()){
                 //the sector has been conquered - waves get disabled
@@ -209,7 +211,7 @@ public class Logic implements ApplicationListener{
                 if(!headless){
                     control.saves.saveSector(state.rules.sector);
                 }
-            }
+            }*/
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
                 state.gameOver = true;

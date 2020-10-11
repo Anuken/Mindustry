@@ -15,6 +15,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -46,6 +47,26 @@ public class HudFragment extends Fragment{
 
     @Override
     public void build(Group parent){
+
+        //warn about guardian/boss waves
+        Events.on(WaveEvent.class, e -> {
+            int max = 10;
+            outer:
+            for(int i = state.wave - 1; i <= state.wave + max; i++){
+                for(SpawnGroup group : state.rules.spawns){
+                    if(group.effect == StatusEffects.boss && group.getUnitsSpawned(i) > 0){
+                        int diff = (i + 2) - state.wave;
+
+                        //increments at which to warn about incoming guardian
+                        if(diff == 1 || diff == 2 || diff == 5 || diff == 10){
+                            showToast(Icon.warning, Core.bundle.format("wave.guardianwarn" + (diff == 1 ? ".one" : ""), diff));
+                        }
+
+                        break outer;
+                    }
+                }
+            }
+        });
 
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{

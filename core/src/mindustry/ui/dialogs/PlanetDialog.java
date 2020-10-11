@@ -263,9 +263,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         },
         new Table(t -> {
+            t.touchable = Touchable.disabled;
             //TODO localize
             t.top();
-            t.label(() -> mode == select ? "@sectors.select" : mode == launch ? "Select Launch Sector" : "Turn " + universe.turn()).style(Styles.outlineLabel).color(Pal.accent);
+            t.label(() -> mode == select ? "@sectors.select" : mode == launch ? "Select Launch Sector" : "").style(Styles.outlineLabel).color(Pal.accent);
         })).grow();
 
     }
@@ -338,6 +339,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 
+        //TODO sector damage is disabled, remove when finalized
+        /*
         if(sector.hasBase() && sector.hasWaves()){
             //TODO localize when finalized
             //these mechanics are likely to change and as such are not added to the bundle
@@ -345,7 +348,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
             stable.add("[accent]" + Mathf.ceil(sectorDestructionTurns - (sector.getSecondsPassed() * 60) / turnDuration) + " turn(s)\nuntil destruction");
             stable.row();
-        }
+        }*/
 
         if(sector.save != null){
             stable.add("@sectors.resources").row();

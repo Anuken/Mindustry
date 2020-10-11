@@ -28,7 +28,7 @@ public class SpawnGroup implements Serializable{
     /** The spacing, in waves, of spawns. For example, 2 = spawns every other wave */
     public int spacing = 1;
     /** Maximum amount of units that spawn */
-    public int max = 100;
+    public int max = 40;
     /** How many waves need to pass before the amount of units spawned increases by 1 */
     public float unitScaling = never;
     /** Shield points that this unit has. */
@@ -88,7 +88,7 @@ public class SpawnGroup implements Serializable{
         if(begin != 0) json.writeValue("begin", begin);
         if(end != never) json.writeValue("end", end);
         if(spacing != 1) json.writeValue("spacing", spacing);
-        //if(max != 40) json.writeValue("max", max);
+        if(max != 40) json.writeValue("max", max);
         if(unitScaling != never) json.writeValue("scaling", unitScaling);
         if(shields != 0) json.writeValue("shields", shields);
         if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
@@ -105,12 +105,18 @@ public class SpawnGroup implements Serializable{
         begin = data.getInt("begin", 0);
         end = data.getInt("end", never);
         spacing = data.getInt("spacing", 1);
-        //max = data.getInt("max", 40);
+        max = data.getInt("max", 40);
         unitScaling = data.getFloat("scaling", never);
         shields = data.getFloat("shields", 0);
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
-        effect = content.getByName(ContentType.status, data.hasChild("effect") && data.getChild("effect").isString() ? data.getString("effect", "none") : "none");
+
+        //old boss effect ID
+        if(data.has("effect") && data.get("effect").isNumber() && data.getInt("effect", -1) == 8){
+            effect = StatusEffects.boss;
+        }else{
+            effect = content.getByName(ContentType.status, data.has("effect") && data.get("effect").isString() ? data.getString("effect", "none") : "none");
+        }
     }
 
     @Override
