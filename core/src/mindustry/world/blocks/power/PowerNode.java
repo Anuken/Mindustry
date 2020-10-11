@@ -112,6 +112,12 @@ public class PowerNode extends PowerBlock{
             (UI.formatAmount((int)entity.power.graph.getLastPowerStored())), UI.formatAmount((int)entity.power.graph.getLastCapacity())),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())));
+
+        bars.add("connections", entity -> new Bar(() ->
+        Core.bundle.format("bar.powerlines", entity.power.links.size, maxNodes),
+            () -> Pal.ammo,
+            () -> (float)entity.power.links.size / (float)maxNodes
+        ));
     }
 
     @Override
