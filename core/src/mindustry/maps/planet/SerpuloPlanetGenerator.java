@@ -252,10 +252,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        for(Room espawn : enemies){
-            tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
-        }
-
         trimDark();
 
         median(2);
@@ -273,7 +269,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             //tar
             if(floor == Blocks.darksand){
                 if(Math.abs(0.5f - noise(x - 40, y, 2, 0.7, 80)) > 0.25f &&
-                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f){
+                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f && !(enemies.contains(r -> Mathf.within(x, y, r.x, r.y, 15)))){
                     floor = Blocks.tar;
                     ore = Blocks.air;
                 }
@@ -295,6 +291,23 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     if(all){
                         floor = Blocks.magmarock;
                     }
+                }
+            }
+
+            if(rand.chance(0.0075)){
+                //random spore trees
+                boolean any = false;
+                boolean all = true;
+                for(Point2 p : Geometry.d4){
+                    Tile other = tiles.get(x + p.x, y + p.y);
+                    if(other != null && other.block() == Blocks.air){
+                        any = true;
+                    }else{
+                        all = false;
+                    }
+                }
+                if(any && ((block == Blocks.snowWall || block == Blocks.iceWall) || (all && block == Blocks.air && floor == Blocks.snow && rand.chance(0.03)))){
+                    block = rand.chance(0.5) ? Blocks.whiteTree : Blocks.whiteTreeDead;
                 }
             }
 
@@ -391,6 +404,10 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         }
 
         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
+
+        for(Room espawn : enemies){
+            tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
+        }
 
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);

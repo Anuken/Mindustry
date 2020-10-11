@@ -88,6 +88,8 @@ public class Logic implements ApplicationListener{
             if(state.isCampaign()){
                 long seconds = state.rules.sector.getSecondsPassed();
                 CoreBuild core = state.rules.defaultTeam.core();
+                //THE WAVES NEVER END
+                state.rules.waves = true;
 
                 //apply fractional damage based on how many turns have passed for this sector
                 float turnsPassed = seconds / (turnDuration / 60f);
