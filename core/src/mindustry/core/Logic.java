@@ -92,7 +92,7 @@ public class Logic implements ApplicationListener{
                 state.rules.waves = true;
 
                 //apply fractional damage based on how many turns have passed for this sector
-                float turnsPassed = seconds / (turnDuration / 60f);
+                //float turnsPassed = seconds / (turnDuration / 60f);
 
                 //TODO sector damage disabled for now
                 //if(state.rules.sector.hasWaves() && turnsPassed > 0 && state.rules.sector.hasBase()){

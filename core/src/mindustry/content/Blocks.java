@@ -702,7 +702,7 @@ public class Blocks implements ContentList{
             drawer = new DrawAnimation();
 
             consumes.item(Items.sporePod, 1);
-            consumes.power(0.60f);
+            consumes.power(0.7f);
         }};
 
         pulverizer = new GenericCrafter("pulverizer"){{
@@ -727,7 +727,7 @@ public class Blocks implements ContentList{
             hasPower = hasItems = hasLiquids = true;
 
             consumes.liquid(Liquids.oil, 0.1f);
-            consumes.power(0.5f);
+            consumes.power(0.7f);
         }};
 
         incinerator = new Incinerator("incinerator"){{
@@ -1287,7 +1287,7 @@ public class Blocks implements ContentList{
         }};
 
         cultivator = new Cultivator("cultivator"){{
-            requirements(Category.production, with(Items.copper, 10, Items.lead, 25, Items.silicon, 10));
+            requirements(Category.production, with(Items.copper, 25, Items.lead, 25, Items.silicon, 10));
             outputItem = new ItemStack(Items.sporePod, 1);
             craftTime = 140;
             size = 2;
@@ -1295,7 +1295,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             hasItems = true;
 
-            consumes.power(0.80f);
+            consumes.power(0.9f);
             consumes.liquid(Liquids.water, 0.2f);
         }};
 
