@@ -829,27 +829,27 @@ public class Blocks implements ContentList{
         }};
 
         scrapWall = new Wall("scrap-wall"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 6));
             health = 60 * wallHealthMultiplier;
             variants = 5;
         }};
 
         scrapWallLarge = new Wall("scrap-wall-large"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 4));
             health = 60 * 4 * wallHealthMultiplier;
             size = 2;
             variants = 4;
         }};
 
         scrapWallHuge = new Wall("scrap-wall-huge"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 9));
             health = 60 * 9 * wallHealthMultiplier;
             size = 3;
             variants = 3;
         }};
 
         scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 16));
             health = 60 * 16 * wallHealthMultiplier;
             size = 4;
         }};
