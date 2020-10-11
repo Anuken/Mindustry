@@ -32,18 +32,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     //if true, enables launching anywhere for testing
     public static boolean debugSelect = false;
 
-    final FrameBuffer buffer = new FrameBuffer(2, 2, true);
-    final PlanetRenderer planets = renderer.planets;
-    final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
-    final Table stable  = new Table().background(Styles.black3);
+    public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    public final PlanetRenderer planets = renderer.planets;
+    public final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
+    public final Table stable  = new Table().background(Styles.black3);
 
-    int launchRange;
-    float zoom = 1f, selectAlpha = 1f;
-    @Nullable Sector selected, hovered, launchSector;
-    CoreBuild launcher;
-    Mode mode = look;
-    boolean launching;
-    Cons<Sector> listener = s -> {};
+    public int launchRange;
+    public float zoom = 1f, selectAlpha = 1f;
+    public @Nullable Sector selected, hovered, launchSector;
+    public CoreBuild launcher;
+    public Mode mode = look;
+    public boolean launching;
+    public Cons<Sector> listener = s -> {};
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -236,7 +236,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         cont.clear();
         titleTable.remove();
-
 
         cont.stack(
         new Element(){
@@ -468,7 +467,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.act(0f);
     }
 
-    enum Mode{
+    public enum Mode{
         /** Look around for existing sectors. Can only deploy. */
         look,
         /** Launch to a new location. */
