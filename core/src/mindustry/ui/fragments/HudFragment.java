@@ -205,7 +205,7 @@ public class HudFragment extends Fragment{
             editorMain.name = "editor";
             editorMain.table(Tex.buttonEdge4, t -> {
                 //t.margin(0f);
-                t.name("teams");
+                t.name = "teams";
                 t.add("@editor.teams").growX().left();
                 t.row();
                 t.table(teams -> {
