@@ -51,9 +51,9 @@ public interface Payload{
         byte type = read.b();
         if(type == payloadBlock){
             Block block = content.block(read.s());
-            BlockPayload payload = new BlockPayload(block, Team.derelict);
+            BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
-            payload.entity.readAll(read, version);
+            payload.build.readAll(read, version);
             return (T)payload;
         }else if(type == payloadUnit){
             byte id = read.b();

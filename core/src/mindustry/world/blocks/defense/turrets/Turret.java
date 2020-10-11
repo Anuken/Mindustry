@@ -214,6 +214,7 @@ public abstract class Turret extends Block{
         }
 
         public void targetPosition(Posc pos){
+            if(!hasAmmo()) return;
             BulletType bullet = peekAmmo();
             float speed = bullet.speed;
             //slow bullets never intersect
@@ -350,8 +351,9 @@ public abstract class Turret extends Block{
 
             AmmoEntry entry = ammo.peek();
             entry.amount -= ammoPerShot;
-            if(entry.amount == 0) ammo.pop();
+            if(entry.amount <= 0) ammo.pop();
             totalAmmo -= ammoPerShot;
+            totalAmmo = Math.max(totalAmmo, 0);
             Time.run(reloadTime / 2f, this::ejectEffects);
             return entry.type();
         }
@@ -363,7 +365,7 @@ public abstract class Turret extends Block{
 
         /** @return  whether the turret has ammo. */
         public boolean hasAmmo(){
-            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
+            return ammo.size > 0 && ammo.peek().amount >= 1;
         }
 
         protected void updateShooting(){

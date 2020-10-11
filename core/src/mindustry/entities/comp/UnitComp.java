@@ -28,7 +28,7 @@ import mindustry.world.blocks.payloads.*;
 import static mindustry.Vars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, Ranged{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged{
 
     @Import boolean hovering, dead;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo;
@@ -109,7 +109,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case payloadType -> self() instanceof Payloadc pay ?
                 (pay.payloads().isEmpty() ? null :
                 pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type() :
-                pay.payloads().peek() instanceof BlockPayload p2 ? p2.block() : null) : null;
+                pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
 

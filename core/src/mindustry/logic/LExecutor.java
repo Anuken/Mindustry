@@ -182,20 +182,23 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Object typeObj = exec.obj(type);
-            UnitType type = typeObj instanceof UnitType t ? t : null;
 
-            Seq<Unit> seq = type == null ? exec.team.data().units : exec.team.data().unitCache(type);
+            //binding to `null` was previously possible, but was too powerful and exploitable
+            if(exec.obj(type) instanceof UnitType type){
+                Seq<Unit> seq = exec.team.data().unitCache(type);
 
-            if(seq != null && seq.any()){
-                index %= seq.size;
-                if(index < seq.size){
-                    //bind to the next unit
-                    exec.setconst(varUnit, seq.get(index));
+                if(seq != null && seq.any()){
+                    index %= seq.size;
+                    if(index < seq.size){
+                        //bind to the next unit
+                        exec.setconst(varUnit, seq.get(index));
+                    }
+                    index ++;
+                }else{
+                    //no units of this type found
+                    exec.setconst(varUnit, null);
                 }
-                index ++;
             }else{
-                //no units of this type found
                 exec.setconst(varUnit, null);
             }
         }
@@ -387,18 +390,20 @@ public class LExecutor{
                             if(exec.bool(p1)){
                                 Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type().hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
 
-                                Call.pickedUnitPayload(unit, result);
+                                if(result != null){
+                                    Call.pickedUnitPayload(unit, result);
+                                }
                             }else{ //buildings
                                 Building tile = world.buildWorld(unit.x, unit.y);
 
                                 //TODO copy pasted code
                                 if(tile != null && tile.team == unit.team){
                                     if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
-                                        Call.pickedBlockPayload(unit, tile, true);
+                                        Call.pickedBuildPayload(unit, tile, true);
                                     }else{ //pick up block payload
                                         Payload current = tile.getPayload();
                                         if(current != null && pay.canPickupPayload(current)){
-                                            Call.pickedBlockPayload(unit, tile, false);
+                                            Call.pickedBuildPayload(unit, tile, false);
                                         }
                                     }
                                 }
@@ -421,9 +426,11 @@ public class LExecutor{
                             ai.plan.set(x, y, rot, block);
                             ai.plan.config = null;
 
-                            builder.clearBuilding();
-                            builder.updateBuilding(true);
-                            builder.addBuild(ai.plan);
+                            if(ai.plan.tile() != null){
+                                builder.clearBuilding();
+                                builder.updateBuilding(true);
+                                builder.addBuild(ai.plan);
+                            }
                         }
                     }
                     case getBlock -> {
@@ -491,8 +498,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Controllable){
-                Controllable cont = (Controllable)obj;
+            if(obj instanceof Controllable cont){
                 if(type.isObj){
                     cont.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
@@ -538,8 +544,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild){
-                MemoryBuild mem = (MemoryBuild)from;
+            if(from instanceof MemoryBuild mem){
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -563,8 +568,7 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild){
-                MemoryBuild mem = (MemoryBuild)from;
+            if(from instanceof MemoryBuild mem){
 
                 if(address >= 0 && address < mem.memory.length){
                     mem.memory[address] = exec.num(value);
@@ -591,8 +595,7 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
-            if(target instanceof Senseable){
-                Senseable se = (Senseable)target;
+            if(target instanceof Senseable se){
                 if(sense instanceof Content){
                     exec.setnum(to, se.sense(((Content)sense)));
                 }else if(sense instanceof LAccess){
@@ -820,8 +823,7 @@ public class LExecutor{
             if(Vars.headless) return;
 
             Building build = exec.building(target);
-            if(build instanceof LogicDisplayBuild){
-                LogicDisplayBuild d = (LogicDisplayBuild)build;
+            if(build instanceof LogicDisplayBuild d){
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -883,8 +885,7 @@ public class LExecutor{
         public void run(LExecutor exec){
 
             Building build = exec.building(target);
-            if(build instanceof MessageBuild){
-                MessageBuild d = (MessageBuild)build;
+            if(build instanceof MessageBuild d){
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));

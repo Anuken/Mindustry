@@ -346,7 +346,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean solid(){
-        return block.solid || (build != null && build.checkSolid());
+        return block.solid || floor.solid || (build != null && build.checkSolid());
     }
 
     public boolean breakable(){

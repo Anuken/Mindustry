@@ -557,6 +557,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     t.add(slider).width(size * 3f - 20).padTop(4f);
                 }).padTop(5).growX().top();
 
+                mid.row();
+
+                mid.table(t -> {
+                    t.button("@editor.center", Icon.move, Styles.cleart, () -> view.center()).growX().margin(9f);
+                }).growX().top();
+
             }).margin(0).left().growY();
 
 

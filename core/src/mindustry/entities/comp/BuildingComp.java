@@ -53,7 +53,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     transient Block block;
     transient Seq<Building> proximity = new Seq<>(8);
     transient boolean updateFlow;
-    transient byte dump;
+    transient byte cdump;
     transient int rotation;
     transient boolean enabled = true;
     transient float enabledControlTime;
@@ -215,9 +215,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return true;
     }
 
-    public void applyBoost(float intensity, float  duration){
+    public void applyBoost(float intensity, float duration){
+        //do not refresh time scale when getting a weaker intensity
+        if(intensity >= this.timeScale){
+            timeScaleDuration = Math.max(timeScaleDuration, duration);
+        }
         timeScale = Math.max(timeScale, intensity);
-        timeScaleDuration = Math.max(timeScaleDuration, duration);
     }
 
     public Building nearby(int dx, int dy){
@@ -345,6 +348,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //endregion
     //region handler methods
 
+    /** Called when an unloader takes an item. */
+    public void itemTaken(Item item){
+
+    }
+
     /** Called when this block is dropped as a payload. */
     public void dropped(){
 
@@ -440,7 +448,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean dumpPayload(Payload todump){
         if(proximity.size == 0) return false;
 
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             Building other = proximity.get((i + dump) % proximity.size);
@@ -474,7 +482,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void dumpLiquid(Liquid liquid){
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -504,15 +512,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
     }
 
-    public float moveLiquidForward(float leakResistance, Liquid liquid){
+    public float moveLiquidForward(boolean leaks, Liquid liquid){
         Tile next = tile.getNearby(rotation);
 
         if(next == null) return 0;
 
         if(next.build != null){
             return moveLiquid(next.build, liquid);
-        }else if(leakResistance != 100f && !next.block().solid && !next.block().hasLiquids){
-            float leakAmount = liquids.get(liquid) / leakResistance;
+        }else if(leaks && !next.block().solid && !next.block().hasLiquids){
+            float leakAmount = liquids.get(liquid) / 1.5f;
             Puddles.deposit(next, tile, liquid, leakAmount);
             liquids.remove(liquid, leakAmount);
         }
@@ -574,7 +582,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * containers, it gets added to the block's inventory.
      */
     public void offload(Item item){
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -592,7 +600,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      * Tries to put this item into a nearby container. Returns success. Unlike #offload(), this method does not change the block inventory.
      */
     public boolean put(Item item){
-        int dump = this.dump;
+        int dump = this.cdump;
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -618,7 +626,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public boolean dump(Item todump){
         if(!block.hasItems || items.total() == 0 || (todump != null && !items.has(todump))) return false;
 
-        int dump = this.dump;
+        int dump = this.cdump;
 
         if(proximity.size == 0) return false;
 
@@ -653,7 +661,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void incrementDump(int prox){
-        dump = (byte)((dump + 1) % prox);
+        cdump = (byte)((cdump + 1) % prox);
     }
 
     /** Used for dumping items. */
@@ -1162,10 +1170,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             proximity.add(tile);
         }
 
-        for(Building other : tmpTiles){
-            other.onProximityUpdate();
-        }
-
         onProximityAdded();
         onProximityUpdate();
 
@@ -1249,7 +1253,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case type -> block;
             case firstItem -> items == null ? null : items.first();
             case config -> block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
-            case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type() : getPayload() instanceof BlockPayload p2 ? p2.block() : null;
+            case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type() : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
             default -> noSensed;
         };
 

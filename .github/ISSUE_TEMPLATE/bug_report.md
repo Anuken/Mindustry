@@ -11,7 +11,7 @@ assignees: ''
 
 **Platform**: *Android/iOS/Mac/Windows/Linux*
 
-**Build**: *The build number under the title in the main menu. Required.*
+**Build**: *The build number under the title in the main menu. Required. "LATEST" IS NOT A VERSION, I NEED THE EXACT BUILD NUMBER OF YOUR GAME.*
 
 **Issue**: *Explain your issue in detail.*
 

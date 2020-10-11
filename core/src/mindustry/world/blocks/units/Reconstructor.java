@@ -3,6 +3,7 @@ package mindustry.world.blocks.units;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -21,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class Reconstructor extends UnitBlock{
     public float constructTime = 60 * 2;
-    public UnitType[][] upgrades = {};
+    public Seq<UnitType[]> upgrades = new Seq<>();
     public int[] capacities;
 
     public Reconstructor(String name){
@@ -181,7 +182,7 @@ public class Reconstructor extends UnitBlock{
         }
 
         public UnitType upgrade(UnitType type){
-            UnitType[] r =  Structs.find(upgrades, arr -> arr[0] == type);
+            UnitType[] r =  upgrades.find(u -> u[0] == type);
             return r == null ? null : r[1];
         }
 

@@ -66,6 +66,7 @@ public class Unloader extends Block{
                             }else{
                                 other.items.remove(item, 1);
                             }
+                            other.itemTaken(item);
                         }
                     }
                 }

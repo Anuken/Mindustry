@@ -65,6 +65,11 @@ public class World{
         return tile == null || tile.block().solid;
     }
 
+    public boolean wallSolidFull(int x, int y){
+        Tile tile = tile(x, y);
+        return tile == null || (tile.block().solid && tile.block().fillsTile);
+    }
+
     public boolean isAccessible(int x, int y){
         return !wallSolid(x, y - 1) || !wallSolid(x, y + 1) || !wallSolid(x - 1, y) || !wallSolid(x + 1, y);
     }

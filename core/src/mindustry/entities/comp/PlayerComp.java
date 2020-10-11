@@ -188,6 +188,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             if(unit.isRemote()){
                 unit.snapInterpolation();
             }
+
+            //reset selected block when switching units
+            if(!headless && isLocal()){
+                control.input.block = null;
+            }
         }
 
         Events.fire(new UnitChangeEvent(self(), unit));

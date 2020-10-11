@@ -170,8 +170,7 @@ public class Mods implements Loadable{
             //generate new icons
             for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
-                    if(c instanceof UnlockableContent && c.minfo.mod != null){
-                        UnlockableContent u = (UnlockableContent)c;
+                    if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
                         u.createIcons(packer);
                     }

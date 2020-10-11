@@ -143,9 +143,15 @@ public class Sector{
     }
 
     public void removeItem(Item item, int amount){
+        ItemSeq seq = new ItemSeq();
+        seq.add(item, -amount);
+        addItems(seq);
+    }
+
+    public void addItems(ItemSeq items){
         if(isBeingPlayed()){
             if(state.rules.defaultTeam.core() != null){
-                state.rules.defaultTeam.items().remove(item, amount);
+                state.rules.defaultTeam.items().add(items);
             }
         }else{
             ItemSeq recv = getExtraItems();
@@ -170,7 +176,7 @@ public class Sector{
                 });
             }
 
-            recv.remove(item, amount);
+            recv.add(items);
 
             setExtraItems(recv);
         }

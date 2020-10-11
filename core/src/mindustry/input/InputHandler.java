@@ -10,6 +10,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
+import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -124,7 +125,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Building tile, Item item, int amount){
-        if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange)) return;
+        if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange) || player.dead()) return;
         amount = Math.min(player.unit().maxAccepted(item), amount);
         int fa = amount;
 
@@ -164,7 +165,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
-    public static void requestBlockPayload(Player player, Building tile){
+    public static void requestBuildPayload(Player player, Building tile){
         if(player == null) return;
 
         Unit unit = player.unit();
@@ -174,11 +175,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         && unit.within(tile, tilesize * tile.block.size * 1.2f + tilesize * 5f)){
             //pick up block directly
             if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
-                Call.pickedBlockPayload(unit, tile, true);
+                Call.pickedBuildPayload(unit, tile, true);
             }else{ //pick up block payload
                 Payload current = tile.getPayload();
                 if(current != null && pay.canPickupPayload(current)){
-                    Call.pickedBlockPayload(unit, tile, false);
+                    Call.pickedBuildPayload(unit, tile, false);
                 }
             }
         }
@@ -194,7 +195,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.server, called = Loc.server)
-    public static void pickedBlockPayload(Unit unit, Building tile, boolean onGround){
+    public static void pickedBuildPayload(Unit unit, Building tile, boolean onGround){
         if(tile != null && unit instanceof Payloadc pay){
             if(onGround){
                 if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
@@ -271,7 +272,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, forward = true, called = Loc.server)
     public static void transferInventory(Player player, Building tile){
-        if(player == null || tile == null || !player.within(tile, buildingRange) || tile.items == null) return;
+        if(player == null || tile == null || !player.within(tile, buildingRange) || tile.items == null || player.dead()) return;
 
         if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
             !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile, action -> {
@@ -360,13 +361,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitCommand(Player player){
-        if(player == null || player.dead() || !(player.unit() instanceof Commanderc)) return;
-
-        Commanderc commander = (Commanderc)player.unit();
+        if(player == null || player.dead() || !(player.unit() instanceof Commanderc commander)) return;
 
         if(commander.isCommanding()){
             commander.clearCommand();
-        }else{
+        }else if(player.unit().type().commandLimit > 0){
 
             //TODO try out some other formations
             commander.commandNearby(new CircleFormation());
@@ -436,8 +435,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void tryPickupPayload(){
         Unit unit = player.unit();
-        if(!(unit instanceof Payloadc)) return;
-        Payloadc pay = (Payloadc)unit;
+        if(!(unit instanceof Payloadc pay)) return;
 
         Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type().hitSize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
         if(target != null){
@@ -446,7 +444,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Building tile = world.buildWorld(pay.x(), pay.y());
 
             if(tile != null && tile.team == unit.team){
-                Call.requestBlockPayload(player, tile);
+                Call.requestBuildPayload(player, tile);
             }
         }
     }
@@ -534,6 +532,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 });
             }else{
                 lastSchematic.tags.put("name", text);
+                lastSchematic.tags.put("description", "");
                 schematics.add(lastSchematic);
                 ui.showInfoFade("@schematic.saved");
                 ui.schematics.showInfo(lastSchematic);

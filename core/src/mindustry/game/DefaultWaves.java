@@ -1,5 +1,6 @@
 package mindustry.game;
 
+import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -37,6 +38,7 @@ public class DefaultWaves{
                 unitScaling = 1.7f;
                 spacing = 2;
                 max = 4;
+                shieldScaling = 15f;
             }},
 
             new SpawnGroup(pulsar){{
@@ -54,10 +56,12 @@ public class DefaultWaves{
             }},
 
             new SpawnGroup(dagger){{
-                begin = 8;
+                begin = 12;
                 unitScaling = 1;
                 unitAmount = 4;
                 spacing = 2;
+                shieldScaling = 10f;
+                max = 20;
             }},
 
             new SpawnGroup(mace){{
@@ -65,12 +69,15 @@ public class DefaultWaves{
                 spacing = 3;
                 unitScaling = 1;
                 end = 40;
+                shieldScaling = 20f;
             }},
 
-            new SpawnGroup(mace){{
+            new SpawnGroup(spiroct){{
                 begin = 45;
                 spacing = 3;
-                unitScaling = 2;
+                unitScaling = 1;
+                max = 10;
+                shieldScaling = 10f;
                 effect = StatusEffects.overdrive;
             }},
 
@@ -86,17 +93,19 @@ public class DefaultWaves{
                 begin = 16;
                 unitScaling = 1;
                 spacing = 2;
+                shieldScaling = 20f;
             }},
 
-            new SpawnGroup(dagger){{
+            new SpawnGroup(quasar){{
                 begin = 82;
                 spacing = 3;
                 unitAmount = 4;
                 unitScaling = 3;
+                shieldScaling = 30f;
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(dagger){{
+            new SpawnGroup(pulsar){{
                 begin = 41;
                 spacing = 5;
                 unitAmount = 1;
@@ -142,6 +151,8 @@ public class DefaultWaves{
                 unitAmount = 4;
                 unitScaling = 3;
                 spacing = 5;
+                shields = 100f;
+                shieldScaling = 10f;
                 effect = StatusEffects.overdrive;
             }},
 
@@ -153,7 +164,7 @@ public class DefaultWaves{
                 max = 16;
             }},
 
-            new SpawnGroup(horizon){{
+            new SpawnGroup(nova){{
                 begin = 53;
                 unitAmount = 2;
                 unitScaling = 3;
@@ -165,6 +176,7 @@ public class DefaultWaves{
                 unitAmount = 4;
                 unitScaling = 1;
                 spacing = 3;
+                shieldScaling = 5f;
             }},
 
             new SpawnGroup(scepter){{
@@ -172,6 +184,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 30;
+                shieldScaling = 10f;
             }},
 
             new SpawnGroup(reign){{
@@ -179,6 +192,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
+                shieldScaling = 10f;
             }},
 
             new SpawnGroup(antumbra){{
@@ -186,6 +200,15 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
+                shieldScaling = 10f;
+            }},
+
+            new SpawnGroup(vela){{
+                begin = 100;
+                unitAmount = 1;
+                unitScaling = 1;
+                spacing = 30;
+                shieldScaling = 20f;
             }},
 
             new SpawnGroup(horizon){{
@@ -193,6 +216,17 @@ public class DefaultWaves{
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
+                shields = 40f;
+                shieldScaling = 20f;
+            }},
+
+            new SpawnGroup(atrax){{
+                begin = 210;
+                unitAmount = 1;
+                unitScaling = 1;
+                spacing = 35;
+                shields = 1000;
+                shieldScaling = 35f;
             }}
             );
         }
@@ -200,7 +234,7 @@ public class DefaultWaves{
     }
 
     //TODO move elsewhere
-    public static Seq<SpawnGroup> generate(){
+    public static Seq<SpawnGroup> generate(float difficulty){
         UnitType[][] species = {
         {dagger, mace, fortress, scepter, reign},
         {nova, pulsar, quasar, vela, corvus},
@@ -216,54 +250,68 @@ public class DefaultWaves{
         Seq<SpawnGroup> out = new Seq<>();
 
         //max reasonable wave, after which everything gets boring
-        int cap = 400;
+        int cap = 200;
 
-        //main sequence
-        float shieldStart = 30, shieldsPerWave = 12;
-        UnitType[] curSpecies = Structs.random(species);
-        int curTier = 0;
+        float shieldStart = 30, shieldsPerWave = 15 + difficulty*20f;
 
-        for(int i = 0; i < cap;){
-            int f = i;
-            int next = Mathf.random(15, 25);
+        Intc createProgression = start -> {
+            //main sequence
+            UnitType[] curSpecies = Structs.random(species);
+            int curTier = 0;
 
-            float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
+            for(int i = start; i < cap;){
+                int f = i;
+                int next = Mathf.random(8, 16);
 
-            //main progression
-            out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
-                unitAmount = f == 0 ? 1 : 10;
-                begin = f;
-                end = f + next >= cap ? never : f + next;
-                max = 16;
-                unitScaling = Mathf.random(1f, 2f);
-                shields = shieldAmount;
-                shieldScaling = shieldsPerWave;
-            }});
+                float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
+                int space = start == 0 ? 1 : Mathf.random(1, 2);
 
-            //extra progression that tails out, blends in
-            out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
-                unitAmount = 6;
-                begin = f + next;
-                end = f + next + Mathf.random(8, 12);
-                max = 10;
-                unitScaling = Mathf.random(2f);
-                spacing = Mathf.random(2, 3);
-                shields = shieldAmount;
-                shieldScaling = shieldsPerWave;
-            }});
+                //main progression
+                out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
+                    unitAmount = f == 0 ? 1 : 10;
+                    begin = f;
+                    end = f + next >= cap ? never : f + next;
+                    max = 20;
+                    unitScaling = Mathf.random(1f, 2f);
+                    shields = shieldAmount;
+                    shieldScaling = shieldsPerWave;
+                    spacing = space;
+                }});
 
-            i += next;
-            if(curTier < 3 || Mathf.chance(0.2)){
-                curTier ++;
+                //extra progression that tails out, blends in
+                out.add(new SpawnGroup(curSpecies[Math.min(curTier, curSpecies.length - 1)]){{
+                    unitAmount = 6;
+                    begin = f + next;
+                    end = f + next + Mathf.random(8, 12);
+                    max = 14;
+                    unitScaling = Mathf.random(2f);
+                    spacing = Mathf.random(2, 3);
+                    shields = shieldAmount;
+                    shieldScaling = shieldsPerWave;
+                }});
+
+                i += next;
+                if(curTier < 3 || Mathf.chance(0.2)){
+                    curTier ++;
+                }
+
+                //do not spawn bosses
+                curTier = Math.min(curTier, 3);
+
+                //small chance to switch species
+                if(Mathf.chance(0.3)){
+                    curSpecies = Structs.random(species);
+                }
             }
+        };
 
-            //do not spawn bosses
-            curTier = Math.min(curTier, 3);
+        createProgression.get(0);
 
-            //small chance to switch species
-            if(Mathf.chance(0.3)){
-                curSpecies = Structs.random(species);
-            }
+        int step = 5 + Mathf.random(3);
+
+        while(step <= cap){
+            createProgression.get(step);
+            step += (int)(Mathf.random(12, 25) * Mathf.lerp(1f, 0.4f, difficulty));
         }
 
         int bossWave = Mathf.random(30, 60);
@@ -283,7 +331,7 @@ public class DefaultWaves{
         //alt boss progression
         out.add(new SpawnGroup(Structs.random(species)[4]){{
             unitAmount = 1;
-            begin = bossWave + Mathf.random(4, 6) * bossSpacing;
+            begin = bossWave + Mathf.random(3, 5) * bossSpacing;
             spacing = bossSpacing;
             end = never;
             max = 16;

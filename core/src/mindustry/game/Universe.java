@@ -158,10 +158,10 @@ public class Universe{
                     if(sector.save != null && sector.save.meta != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.destination != null){
                         Sector to = sector.save.meta.secinfo.destination;
                         if(to.save != null){
-                            ItemSeq items = to.getExtraItems();
+                            ItemSeq items = new ItemSeq();
                             //calculated exported items to this sector
                             sector.save.meta.secinfo.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed)));
-                            to.setExtraItems(items);
+                            to.addItems(items);
                         }
                     }
 
