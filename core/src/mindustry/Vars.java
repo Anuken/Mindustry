@@ -184,7 +184,7 @@ public class Vars implements Loadable{
     public static GameState state;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
-    public static mindustry.audio.LoopControl loops;
+    public static LoopControl loops;
     public static Platform platform = new Platform(){};
     public static Mods mods;
     public static Schematics schematics;
