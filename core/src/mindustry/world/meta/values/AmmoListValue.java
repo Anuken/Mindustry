@@ -50,6 +50,10 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.knockback", Strings.fixed(type.knockback, 1)));
                 }
 
+                if(type.pierce){
+                    sep(bt, Core.bundle.format("bullet.pierce", type.pierceCap == -1 ? "infinite" : type.pierceCap));
+                }
+
                 if((type.status == StatusEffects.burning || type.status == StatusEffects.melting) || type.incendAmount > 0){
                     sep(bt, "@bullet.incendiary");
                 }
