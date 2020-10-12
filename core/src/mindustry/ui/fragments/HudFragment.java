@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.input.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
@@ -16,6 +15,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -26,7 +26,6 @@ import mindustry.input.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.ui.dialogs.*;
 
 import static mindustry.Vars.*;
 
@@ -34,24 +33,40 @@ public class HudFragment extends Fragment{
     private static final float dsize = 65f;
 
     public final PlacementFragment blockfrag = new PlacementFragment();
-
-    //TODO localize
-    public String sectorText = "Out of sector time.";
-    public Seq<Sector> attackedSectors = new Seq<>();
+    public boolean shown = true;
 
     private ImageButton flip;
-    private Table lastUnlockTable;
-    private Table lastUnlockLayout;
-    private boolean shown = true;
     private CoreItemsDisplay coreItems = new CoreItemsDisplay();
 
     private String hudText = "";
     private boolean showHudText;
 
+    private Table lastUnlockTable;
+    private Table lastUnlockLayout;
     private long lastToast;
 
     @Override
     public void build(Group parent){
+
+        //warn about guardian/boss waves
+        Events.on(WaveEvent.class, e -> {
+            int max = 10;
+            outer:
+            for(int i = state.wave - 1; i <= state.wave + max; i++){
+                for(SpawnGroup group : state.rules.spawns){
+                    if(group.effect == StatusEffects.boss && group.getUnitsSpawned(i) > 0){
+                        int diff = (i + 2) - state.wave;
+
+                        //increments at which to warn about incoming guardian
+                        if(diff == 1 || diff == 2 || diff == 5 || diff == 10){
+                            showToast(Icon.warning, Core.bundle.format("wave.guardianwarn" + (diff == 1 ? ".one" : ""), diff));
+                        }
+
+                        break outer;
+                    }
+                }
+            }
+        });
 
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
@@ -64,7 +79,6 @@ public class HudFragment extends Fragment{
             showToast(Icon.warning, "Sector " + e.sector.id + " [scarlet]lost!");
         });
 
-        //TODO full implementation
         Events.on(ResetEvent.class, e -> {
             coreItems.resetUsed();
             coreItems.clear();
@@ -72,20 +86,23 @@ public class HudFragment extends Fragment{
 
         //paused table
         parent.fill(t -> {
-            t.top().visible(() -> state.isPaused() && !state.isOutOfTime()).touchable = Touchable.disabled;
+            t.name = "paused";
+            t.top().visible(() -> state.isPaused()).touchable = Touchable.disabled;
             t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
         //minimap + position
         parent.fill(t -> {
+            t.name = "minimap/position";
             t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
             //minimap
-            t.add(new Minimap());
+            t.add(new Minimap()).name("minimap");
             t.row();
             //position
             t.label(() -> player.tileX() + "," + player.tileY())
             .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
-            .touchable(Touchable.disabled);
+            .touchable(Touchable.disabled)
+            .name("position");
             t.top().right();
         });
 
@@ -97,15 +114,18 @@ public class HudFragment extends Fragment{
 
             if(mobile){
                 cont.table(select -> {
+                    select.name = "mobile buttons";
                     select.left();
                     select.defaults().size(dsize).left();
 
                     ImageButtonStyle style = Styles.clearTransi;
 
-                    select.button(Icon.menu, style, ui.paused::show);
+                    select.button(Icon.menu, style, ui.paused::show).name("menu");
                     flip = select.button(Icon.upOpen, style, this::toggleMenus).get();
+                    flip.name = "flip";
 
-                    select.button(Icon.paste, style, ui.schematics::show);
+                    select.button(Icon.paste, style, ui.schematics::show)
+                    .name("schematics");
 
                     select.button(Icon.pause, style, () -> {
                         if(net.active()){
@@ -134,7 +154,7 @@ public class HudFragment extends Fragment{
                         }else{
                             ui.database.show();
                         }
-                    }).update(i -> {
+                    }).name("chat").update(i -> {
                         if(net.active() && mobile){
                             i.getStyle().imageUp = Icon.chat;
                         }else if(state.isCampaign()){
@@ -160,36 +180,39 @@ public class HudFragment extends Fragment{
 
             Table wavesMain, editorMain;
 
-            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight());
+            cont.stack(wavesMain = new Table(), editorMain = new Table()).height(wavesMain.getPrefHeight())
+            .name("waves/editor");
 
             wavesMain.visible(() -> shown && !state.isEditor());
-            wavesMain.top().left();
+            wavesMain.top().left().name = "waves";
 
             wavesMain.table(s -> {
                 //wave info button with text
-                s.add(makeStatusTable()).grow();
+                s.add(makeStatusTable()).grow().name("status");
 
                 //table with button to skip wave
                 s.button(Icon.play, Styles.righti, 30f, () -> {
                     if(net.client() && player.admin){
                         Call.adminRequest(player, AdminAction.wave);
-                    }else if(inLaunchWave()){
-                        ui.showConfirm("@confirm", "@launch.skip.confirm", () -> !canSkipWave(), () -> logic.skipWave());
                     }else{
                         logic.skipWave();
                     }
-                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).visible(() -> state.rules.waves);
+                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave())
+                .visible(() -> state.rules.waves).name("skip");
             }).width(dsize * 5 + 4f);
 
             wavesMain.row();
 
             wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
-            .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get();
+            .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get()
+            .name = "boss";
 
             wavesMain.row();
 
+            editorMain.name = "editor";
             editorMain.table(Tex.buttonEdge4, t -> {
                 //t.margin(0f);
+                t.name = "teams";
                 t.add("@editor.teams").growX().left();
                 t.row();
                 t.table(teams -> {
@@ -210,29 +233,33 @@ public class HudFragment extends Fragment{
             }).width(dsize * 5 + 4f);
             editorMain.visible(() -> shown && state.isEditor());
 
-
             //fps display
             cont.table(info -> {
+                info.name = "fps/ping";
                 info.touchable = Touchable.disabled;
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
                 info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
 
-                info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left().style(Styles.outlineLabel);
+                info.label(() -> fps.get(Core.graphics.getFramesPerSecond())).left()
+                .style(Styles.outlineLabel).name("fps");
                 info.row();
-                info.label(() -> ping.get(netClient.getPing())).visible(net::client).left().style(Styles.outlineLabel);
+                info.label(() -> ping.get(netClient.getPing())).visible(net::client).left()
+                .style(Styles.outlineLabel).name("ping");
             }).top().left();
         });
 
         //core items
         parent.fill(t -> {
+            t.name = "coreitems";
             t.top().add(coreItems);
             t.visible(() -> Core.settings.getBool("coreitems") && !mobile && !state.isPaused() && shown);
         });
 
         //spawner warning
         parent.fill(t -> {
+            t.name = "nearpoint";
             t.touchable = Touchable.disabled;
             t.table(Styles.black, c -> c.add("@nearpoint")
             .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time(), 10f, 1f))))
@@ -241,12 +268,14 @@ public class HudFragment extends Fragment{
         });
 
         parent.fill(t -> {
+            t.name = "waiting";
             t.visible(() -> netServer.isWaitingForPlayers());
             t.table(Tex.button, c -> c.add("@waiting.players"));
         });
 
         //'core is under attack' table
         parent.fill(t -> {
+            t.name = "coreattack";
             t.touchable = Touchable.disabled;
             float notifDuration = 240f;
             float[] coreAttackTime = {0};
@@ -257,6 +286,7 @@ public class HudFragment extends Fragment{
             });
 
             t.top().visible(() -> {
+                if(!shown) return false;
                 if(state.isMenu() || !state.teams.get(player.team()).hasCore()){
                     coreAttackTime[0] = 0f;
                     return false;
@@ -277,39 +307,9 @@ public class HudFragment extends Fragment{
             .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
-        //paused table for when the player is out of time
-        parent.fill(t -> {
-            t.top().visible(() -> state.isOutOfTime());
-            t.table(Styles.black5, top -> {
-                //TODO localize
-                top.add(sectorText).style(Styles.outlineLabel).color(Pal.accent).update(l -> {
-                    l.color.a = Mathf.absin(Time.globalTime(), 7f, 1f);
-                    l.setText(sectorText);
-                }).colspan(2);
-                top.row();
-
-                top.defaults().pad(2).size(150f, 54f);
-                //TODO localize
-                top.button("Skip", () -> {
-                    universe.runTurn();
-                    state.set(State.playing);
-
-                    //announce turn info only when something is skipped.
-                    ui.announce("[accent][[ Turn " + universe.turn() + " ]\n[scarlet]" + attackedSectors.size + "[lightgray] sector(s) attacked.");
-                });
-
-                //TODO localize
-                top.button("Switch Sectors", () -> {
-                    ui.paused.runExitSave();
-
-                    //switch to first attacked sector
-                    control.playSector(attackedSectors.first());
-                }).disabled(b -> attackedSectors.isEmpty());
-            }).margin(8).growX();
-        });
-
         //tutorial text
         parent.fill(t -> {
+            t.name = "tutorial";
             Runnable resize = () -> {
                 t.clearChildren();
                 t.top().right().visible(() -> state.rules.tutorial);
@@ -332,11 +332,13 @@ public class HudFragment extends Fragment{
 
         //'saving' indicator
         parent.fill(t -> {
+            t.name = "saving";
             t.bottom().visible(() -> control.saves.isSaving());
             t.add("@saving").style(Styles.outlineLabel);
         });
 
         parent.fill(p -> {
+            p.name = "hudtext";
             p.top().table(Styles.black3, t -> t.margin(4).label(() -> hudText)
             .style(Styles.outlineLabel)).padTop(10).visible(p.color.a >= 0.001f);
             p.update(() -> {
@@ -352,6 +354,7 @@ public class HudFragment extends Fragment{
         //TODO DEBUG: rate table
         if(false)
         parent.fill(t -> {
+            t.name = "rates";
             t.bottom().left();
             t.table(Styles.black6, c -> {
                 Bits used = new Bits(content.items().size);
@@ -444,10 +447,6 @@ public class HudFragment extends Fragment{
             //nesting actions() calls is necessary so the right prefHeight() is used
             Actions.run(() -> container.actions(Actions.translateBy(0, table.getPrefHeight(), 1f, Interp.fade), Actions.remove())));
         });
-    }
-
-    public boolean shown(){
-        return shown;
     }
 
     /** Show unlock notification for a new recipe. */
@@ -574,40 +573,6 @@ public class HudFragment extends Fragment{
             }
         });
         Core.scene.add(image);
-    }
-
-    private void showLaunchConfirm(){
-        BaseDialog dialog = new BaseDialog("@launch");
-        dialog.update(() -> {
-            if(!inLaunchWave()){
-                dialog.hide();
-            }
-        });
-        dialog.cont.add("@launch.confirm").width(500f).wrap().pad(4f).get().setAlignment(Align.center, Align.center);
-        dialog.buttons.defaults().size(200f, 54f).pad(2f);
-        dialog.setFillParent(false);
-        dialog.buttons.button("@cancel", dialog::hide);
-        dialog.buttons.button("@ok", () -> {
-            dialog.hide();
-            Call.launchZone();
-        });
-        dialog.keyDown(KeyCode.escape, dialog::hide);
-        dialog.keyDown(KeyCode.back, dialog::hide);
-        dialog.show();
-    }
-
-    //TODO launching is disabled, possibly forever
-    private boolean inLaunchWave(){
-        return false;
-        /*
-        return state.hasSector() &&
-            state.getSector().metCondition() &&
-            !net.client() &&
-            state.wave % state.getSector().launchPeriod == 0 && !spawner.isSpawning();*/
-    }
-
-    private boolean canLaunch(){
-        return inLaunchWave() && state.enemies <= 0;
     }
 
     private void toggleMenus(){
@@ -741,7 +706,7 @@ public class HudFragment extends Fragment{
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? Pal.ammo : Pal.health);
+                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type().ammoType.color : Pal.health);
             });
 
             t.getChildren().get(1).toFront();
@@ -751,22 +716,6 @@ public class HudFragment extends Fragment{
             builder.setLength(0);
             builder.append(wavef.get(state.wave));
             builder.append("\n");
-
-            if(inLaunchWave()){
-                builder.append("[#");
-                Tmp.c1.set(Color.white).lerp(state.enemies > 0 ? Color.white : Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)).toString(builder);
-                builder.append("]");
-
-                if(!canLaunch()){
-                    builder.append(Core.bundle.get("launch.unable2"));
-                }else{
-                    builder.append(Core.bundle.get("launch"));
-                    builder.append("\n");
-                    builder.append(Core.bundle.format("launch.next", state.wave + state.getSector().launchPeriod));
-                    builder.append("\n");
-                }
-                builder.append("[]\n");
-            }
 
             if(state.enemies > 0){
                 if(state.enemies == 1){
@@ -786,13 +735,8 @@ public class HudFragment extends Fragment{
             return builder;
         }).growX().pad(8f);
 
-        table.setDisabled(() -> !canLaunch());
+        table.setDisabled(true);
         table.visible(() -> state.rules.waves);
-        table.clicked(() -> {
-            if(canLaunch()){
-                showLaunchConfirm();
-            }
-        });
 
         return table;
     }

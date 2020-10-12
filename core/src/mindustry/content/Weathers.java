@@ -152,7 +152,7 @@ public class Weathers implements ContentList{
                         if(tile != null && tile.floor().liquidDrop == Liquids.water){
                             Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(1.5f).a(state.opacity()));
                             Draw.rect(splashes[(int)(life * (splashes.length - 1))], x, y);
-                        }else{
+                        }else if(tile != null && tile.floor().liquidDrop == null && !tile.floor().solid){
                             Draw.color(Color.royal, Color.white, 0.3f);
                             Draw.alpha(Mathf.slope(life) * state.opacity());
 
@@ -170,12 +170,13 @@ public class Weathers implements ContentList{
         sandstorm = new Weather("sandstorm"){
             TextureRegion region;
             float size = 140f, padding = size, invDensity = 1500f, baseSpeed = 6.1f;
-            float force = 0.45f;
+            float force = 0.4f * 0;
             Color color = Color.valueOf("f7cba4");
             Texture noise;
 
             {
                 attrs.set(Attribute.light, -0.1f);
+                opacityMultiplier = 0.8f;
             }
 
             @Override
@@ -250,7 +251,7 @@ public class Weathers implements ContentList{
 
         sporestorm = new Weather("sporestorm"){
             TextureRegion region;
-            float size = 5f, padding = size, invDensity = 2000f, baseSpeed = 4.3f, force = 0.28f;
+            float size = 5f, padding = size, invDensity = 2000f, baseSpeed = 4.3f, force = 0.28f * 0;
             Color color = Color.valueOf("7457ce");
             Texture noise;
 
@@ -259,6 +260,7 @@ public class Weathers implements ContentList{
                 attrs.set(Attribute.light, -0.15f);
                 status = StatusEffects.sporeSlowed;
                 statusGround = false;
+                opacityMultiplier = 0.85f;
             }
 
             @Override

@@ -21,14 +21,14 @@ public class ForceFieldAbility extends Ability{
     /** Cooldown after the shield is broken, in ticks. */
     public float cooldown = 60f * 5;
 
-    /** State: radius scaling. */
-    protected float radiusScale;
+    /** State. */
+    protected float radiusScale, alpha;
 
     private static float realRad;
     private static Unit paramUnit;
     private static ForceFieldAbility paramField;
-    private static final Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramUnit.team && Intersector.isInsideHexagon(paramUnit.x, paramUnit.y, realRad * 2f, trait.x(), trait.y()) && paramUnit.shield > 0){
+    private static final Cons<Bullet> shieldConsumer = trait -> {
+        if(trait.team != paramUnit.team && trait.type.absorbable && Intersector.isInsideHexagon(paramUnit.x, paramUnit.y, realRad * 2f, trait.x(), trait.y()) && paramUnit.shield > 0){
             trait.absorb();
             Fx.absorb.at(trait);
 
@@ -40,7 +40,7 @@ public class ForceFieldAbility extends Ability{
             }
 
             paramUnit.shield -= trait.damage();
-            paramUnit.shieldAlpha = 1f;
+            paramField.alpha = 1f;
         }
     };
 
@@ -58,6 +58,8 @@ public class ForceFieldAbility extends Ability{
         if(unit.shield < max){
             unit.shield += Time.delta * regen;
         }
+
+        alpha = Math.max(alpha - Time.delta/10f, 0f);
 
         if(unit.shield > 0){
             radiusScale = Mathf.lerpDelta(radiusScale, 1f, 0.06f);
@@ -78,7 +80,7 @@ public class ForceFieldAbility extends Ability{
         if(unit.shield > 0){
             Draw.z(Layer.shields);
 
-            Draw.color(unit.team.color, Color.white, Mathf.clamp(unit.shieldAlpha));
+            Draw.color(unit.team.color, Color.white, Mathf.clamp(alpha));
 
             if(Core.settings.getBool("animatedshields")){
                 Fill.poly(unit.x, unit.y, 6, realRad);

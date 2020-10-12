@@ -2,11 +2,10 @@ package mindustry.game;
 
 import arc.*;
 import arc.assets.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.async.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
@@ -61,6 +60,9 @@ public class Saves{
         //automatically assign sector save slots
         for(SaveSlot slot : saves){
             if(slot.getSector() != null){
+                if(slot.getSector().save != null){
+                    Log.warn("Sector @ has two corresponding saves: @ and @", slot.getSector(), slot.getSector().save.file, slot.file);
+                }
                 slot.getSector().save = slot;
             }
         }
@@ -75,7 +77,6 @@ public class Saves{
     }
 
     public void update(){
-        SaveSlot current = this.current;
 
         if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
@@ -90,14 +91,13 @@ public class Saves{
             if(time > Core.settings.getInt("saveinterval") * 60){
                 saving = true;
 
-                Time.runTask(2f, () -> {
-                    try{
-                        current.save();
-                    }catch(Throwable e){
-                        e.printStackTrace();
-                    }
-                    saving = false;
-                });
+                try{
+                    current.save();
+                }catch(Throwable e){
+                    e.printStackTrace();
+                }
+
+                Time.runTask(3f, () -> saving = false);
 
                 time = 0;
             }

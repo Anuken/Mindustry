@@ -39,7 +39,6 @@ public class ScriptConsoleFragment extends Table{
     };
 
     public ScriptConsoleFragment(){
-
         setFillParent(true);
         font = Fonts.def;
 

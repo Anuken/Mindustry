@@ -1,5 +1,7 @@
 package mindustry.entities.units;
 
+import arc.util.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 public class WeaponMount{
@@ -21,6 +23,8 @@ public class WeaponMount{
     public boolean rotate = false;
     /** extra state for alternating weapons */
     public boolean side;
+    /** current bullet for continuous weapons */
+    public @Nullable Bullet bullet;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

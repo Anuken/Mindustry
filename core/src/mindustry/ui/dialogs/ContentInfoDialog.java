@@ -1,8 +1,8 @@
 package mindustry.ui.dialogs;
 
-import arc.scene.ui.ScrollPane;
-import arc.scene.ui.layout.Table;
-import mindustry.ctype.UnlockableContent;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import mindustry.ctype.*;
 
 public class ContentInfoDialog extends BaseDialog{
 

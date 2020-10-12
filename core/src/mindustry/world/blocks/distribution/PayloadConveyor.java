@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -17,10 +16,11 @@ import mindustry.world.blocks.production.*;
 import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
-    public float moveTime = 50f;
+    public float moveTime = 40f, moveForce = 201f;
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
+    public float payloadLimit = 2.5f;
 
     public PayloadConveyor(String name){
         super(name);
@@ -53,6 +53,7 @@ public class PayloadConveyor extends Block{
     public class PayloadConveyorBuild extends Building{
         public @Nullable Payload item;
         public float progress, itemRotation, animation;
+        public float curInterp, lastInterp;
         public @Nullable Building next;
         public boolean blocked;
         public int step = -1, stepAccepted = -1;
@@ -99,6 +100,10 @@ public class PayloadConveyor extends Block{
         public void updateTile(){
             if(!enabled) return;
 
+            lastInterp = curInterp;
+            curInterp = fract();
+            //rollover skip
+            if(lastInterp > curInterp) lastInterp = 0f;
             progress = time() % moveTime;
 
             updatePayload();
@@ -202,12 +207,20 @@ public class PayloadConveyor extends Block{
         }
 
         @Override
+        public void unitOn(Unit unit){
+            //calculate derivative of units moved last frame
+            float delta = (curInterp - lastInterp) * size * tilesize;
+            Tmp.v1.trns(rotdeg(), delta * moveForce).scl(1f / Math.max(unit.mass(), 201f));
+            unit.move(Tmp.v1.x, Tmp.v1.y);
+        }
+
+        @Override
         public boolean acceptPayload(Building source, Payload payload){
             if(source == this){
-                return this.item == null && payload.fits();
+                return this.item == null && payload.fits(payloadLimit);
             }
             //accepting payloads from units isn't supported
-            return this.item == null && progress <= 5f && payload.fits();
+            return this.item == null && progress <= 5f && payload.fits(payloadLimit);
         }
 
         @Override

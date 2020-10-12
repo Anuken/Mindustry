@@ -45,6 +45,8 @@ task run(dependsOn: classes, type: JavaExec){
         jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
     }
 
+    jvmArgs += "-XX:+ShowCodeDetailsInExceptionMessages"
+
     /*spriteHashFile.parentFile.mkdirs()
     String spriteHash = hashDirectory()
     if(spriteHashFile.exists() && spriteHashFile.text != spriteHash){

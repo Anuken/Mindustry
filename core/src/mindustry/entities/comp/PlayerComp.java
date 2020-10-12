@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -33,7 +32,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Import float x, y;
 
-    @NonNull @ReadOnly Unit unit = Nulls.unit;
+    @ReadOnly Unit unit = Nulls.unit;
     transient private Unit lastReadUnit = Nulls.unit;
     transient @Nullable NetConnection con;
 
@@ -92,7 +91,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return unit.isNull() ? 20 : unit.type().hitsize * 2f;
+        return unit.isNull() ? 20 : unit.type().hitSize * 2f;
     }
 
     @Override
@@ -188,6 +187,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             //this player just became remote, snap the interpolation so it doesn't go wild
             if(unit.isRemote()){
                 unit.snapInterpolation();
+            }
+
+            //reset selected block when switching units
+            if(!headless && isLocal()){
+                control.input.block = null;
             }
         }
 

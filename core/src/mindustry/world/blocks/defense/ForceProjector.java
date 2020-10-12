@@ -33,8 +33,8 @@ public class ForceProjector extends Block{
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
-    static final Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramEntity.team && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
+    static final Cons<Bullet> shieldConsumer = trait -> {
+        if(trait.team != paramEntity.team && trait.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;

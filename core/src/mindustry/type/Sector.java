@@ -3,13 +3,12 @@ package mindustry.type;
 import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
-import arc.struct.ObjectIntMap.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
@@ -30,9 +29,6 @@ public class Sector{
     /** Number 0-1 indicating the difficulty based on nearby bases. */
     public float baseCoverage;
     public boolean generateEnemyBase;
-
-    //TODO implement a dynamic launch period
-    public int launchPeriod = 10;
 
     public Sector(Planet planet, Ptile tile){
         this.planet = planet;
@@ -100,7 +96,7 @@ public class Sector{
 
     public boolean isBeingPlayed(){
         //after the launch dialog, a sector is no longer considered being played
-        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.launched && !Vars.state.gameOver;
+        return Vars.state.isGame() && Vars.state.rules.sector == this && !Vars.state.gameOver;
     }
 
     public boolean isCaptured(){
@@ -134,16 +130,6 @@ public class Sector{
         return res % 2 == 0 ? res : res + 1;
     }
 
-    //TODO implement
-    public boolean isLaunchWave(int wave){
-        return metCondition() && wave % launchPeriod == 0;
-    }
-
-    public boolean metCondition(){
-        //TODO implement
-        return false;
-    }
-
     //TODO this should be stored in a more efficient structure, and be updated each turn
     public ItemSeq getExtraItems(){
         return Core.settings.getJson(key("extra-items"), ItemSeq.class, ItemSeq::new);
@@ -158,14 +144,42 @@ public class Sector{
     }
 
     public void removeItem(Item item, int amount){
+        ItemSeq seq = new ItemSeq();
+        seq.add(item, -amount);
+        addItems(seq);
+    }
+
+    public void addItems(ItemSeq items){
         if(isBeingPlayed()){
             if(state.rules.defaultTeam.core() != null){
-                state.rules.defaultTeam.items().remove(item, amount);
+                ItemModule storage = state.rules.defaultTeam.items();
+                int cap = state.rules.defaultTeam.core().storageCapacity;
+                items.each((item, amount) -> storage.add(item, Math.min(cap - storage.get(item), amount)));
             }
         }else{
             ItemSeq recv = getExtraItems();
 
-            recv.remove(item, amount);
+            if(save != null){
+                //"shave off" extra items
+
+                ItemSeq count = new ItemSeq();
+
+                //add items already present
+                count.add(save.meta.secinfo.coreItems);
+
+                count.add(calculateReceivedItems());
+
+                int capacity = save.meta.secinfo.storageCapacity;
+
+                //when over capacity, add that to the extra items
+                count.each((i, a) -> {
+                    if(a > capacity){
+                        recv.remove(i, (a - capacity));
+                    }
+                });
+            }
+
+            recv.add(items);
 
             setExtraItems(recv);
         }
@@ -179,21 +193,19 @@ public class Sector{
             count.add(state.rules.defaultTeam.items());
         }else if(save != null){
             //add items already present
-            for(Entry<Item> ent : save.meta.secinfo.coreItems){
-                count.add(ent.key, ent.value);
-            }
+            count.add(save.meta.secinfo.coreItems);
 
             count.add(calculateReceivedItems());
 
             int capacity = save.meta.secinfo.storageCapacity;
 
             //validation
-            for(Item item : content.items()){
+            count.each((item, amount) -> {
                 //ensure positive items
-                if(count.get(item) < 0) count.set(item, 0);
+                if(amount < 0) count.set(item, 0);
                 //cap the items
-                if(count.get(item) > capacity) count.set(item, capacity);
-            }
+                if(amount > capacity) count.set(item, capacity);
+            });
         }
 
         return count;
@@ -209,7 +221,7 @@ public class Sector{
             save.meta.secinfo.production.each((item, stat) -> count.add(item, (int)(stat.mean * seconds)));
 
             //add received items
-            getExtraItems().each(count::add);
+            count.add(getExtraItems());
         }
 
         return count;
@@ -257,14 +269,14 @@ public class Sector{
         return Core.settings.getFloat(key("time-spent"));
     }
 
-    public void setSecondsPassed(long number){
-        put("seconds-passed", number);
+    public void setSecondsPassed(int number){
+        put("secondsi-passed", number);
     }
 
     /** @return how much time has passed in this sector without the player resuming here.
      * Used for resource production calculations. */
-    public long getSecondsPassed(){
-        return Core.settings.getLong(key("seconds-passed"));
+    public int getSecondsPassed(){
+        return Core.settings.getInt(key("secondsi-passed"));
     }
 
     private String key(String key){
@@ -273,6 +285,10 @@ public class Sector{
 
     private void put(String key, Object value){
         Core.settings.put(key(key), value);
+    }
+
+    public String toString(){
+        return planet.name + "#" + id;
     }
 
     /** Projects this sector onto a 4-corner square for use in map gen.

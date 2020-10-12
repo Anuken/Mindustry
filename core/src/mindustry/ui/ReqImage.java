@@ -1,12 +1,11 @@
 package mindustry.ui;
 
-import arc.func.Boolp;
+import arc.func.*;
 import arc.graphics.g2d.*;
-import arc.scene.Element;
-import arc.scene.ui.Image;
-import arc.scene.ui.layout.Stack;
-import arc.scene.ui.layout.Scl;
-import mindustry.graphics.Pal;
+import arc.scene.*;
+import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
+import mindustry.graphics.*;
 
 public class ReqImage extends Stack{
     private final Boolp valid;

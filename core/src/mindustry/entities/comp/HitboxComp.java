@@ -2,8 +2,8 @@ package mindustry.entities.comp;
 
 import arc.func.*;
 import arc.math.*;
-import arc.math.geom.QuadTree.*;
 import arc.math.geom.*;
+import arc.math.geom.QuadTree.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 

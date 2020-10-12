@@ -173,23 +173,38 @@ allprojects{
     }
 
     tasks.withType(JavaCompile){
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        targetCompatibility = 8
+        sourceCompatibility = 14
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
     }
 }
 
-//compile with java 8 compatibility for everything except the annotati project
+configure(project(":annotations")){
+    tasks.withType(JavaCompile){
+        targetCompatibility = 8
+        sourceCompatibility = 8
+    }
+}
+
+//compile with java 8 compatibility for everything except the annotation project
 configure(subprojects - project(":annotations")){
     tasks.withType(JavaCompile){
         if(JavaVersion.current() != JavaVersion.VERSION_1_8){
-            options.compilerArgs.addAll(['--release', '8'])
+            options.compilerArgs.addAll(['--release', '8', '--enable-preview'])
+        }
+
+        doFirst{
+            options.compilerArgs = options.compilerArgs.findAll{it != '--enable-preview' }
         }
     }
 
     tasks.withType(Javadoc){
-       options.addStringOption('Xdoclint:none', '-quiet')
+        options{
+            addStringOption('Xdoclint:none', '-quiet')
+            addBooleanOption('-enable-preview', true)
+            addStringOption('-release', '14')
+        }
     }
 }
 
@@ -200,7 +215,6 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
         implementation 'com.github.MinnDevelopment:java-discord-rpc:v2.0.1'
@@ -239,7 +253,6 @@ project(":ios"){
 
         implementation arcModule("natives:natives-ios")
         implementation arcModule("natives:natives-freetype-ios")
-        implementation arcModule("natives:natives-box2d-ios")
         implementation arcModule("backends:backend-robovm")
 
         compileOnly project(":annotations")
@@ -282,7 +295,6 @@ project(":core"){
         api "org.lz4:lz4-java:1.4.1"
         api arcModule("arc-core")
         api arcModule("extensions:freetype")
-        api arcModule("extensions:box2d")
         api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
@@ -291,6 +303,8 @@ project(":core"){
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
+        annotationProcessor 'com.github.Anuken:jabel:40eec868af'
+
     }
 }
 
@@ -299,7 +313,6 @@ project(":server"){
 
     dependencies{
         implementation project(":core")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
     }
 }
@@ -312,7 +325,6 @@ project(":tests"){
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.3.1"
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.1"
         testImplementation arcModule("backends:backend-headless")
-        testImplementation arcModule("natives:natives-box2d-desktop")
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.3.1"
     }
 
@@ -334,7 +346,6 @@ project(":tools"){
 
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
-        implementation arcModule("natives:natives-box2d-desktop")
         implementation arcModule("backends:backend-headless")
     }
 }

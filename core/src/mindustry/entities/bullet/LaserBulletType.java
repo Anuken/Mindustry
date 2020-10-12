@@ -8,18 +8,17 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
 
 public class LaserBulletType extends BulletType{
-    protected static Tile furthest;
-
-    protected Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
-    protected Effect laserEffect = Fx.lancerLaserShootSmoke;
-    protected float length = 160f;
-    protected float width = 15f;
-    protected float lengthFalloff = 0.5f;
-    protected float sideLength = 29f, sideWidth = 0.7f;
-    protected float sideAngle = 90f;
+    public Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+    public Effect laserEffect = Fx.lancerLaserShootSmoke;
+    public float length = 160f;
+    public float width = 15f;
+    public float lengthFalloff = 0.5f;
+    public float sideLength = 29f, sideWidth = 0.7f;
+    public float sideAngle = 90f;
+    public float lightningSpacing = -1, lightningDelay = 0.1f, lightningAngleRand;
+    public boolean largeHit = false;
 
     public LaserBulletType(float damage){
         super(0.01f, damage);
@@ -41,14 +40,43 @@ public class LaserBulletType extends BulletType{
     }
 
     @Override
+    public void init(){
+        super.init();
+
+        drawSize = Math.max(drawSize, length*2f);
+    }
+
+    @Override
     public float range(){
         return length;
     }
 
     @Override
     public void init(Bullet b){
-        float resultLength = Damage.collideLaser(b, length);
-        laserEffect.at(b.x, b.y, b.rotation(), resultLength * 0.75f);
+        float resultLength = Damage.collideLaser(b, length, largeHit), rot = b.rotation();
+
+        laserEffect.at(b.x, b.y, rot, resultLength * 0.75f);
+
+        if(lightningSpacing > 0){
+            int idx = 0;
+            for(float i = 0; i <= resultLength; i += lightningSpacing){
+                float cx = b.x + Angles.trnsx(rot,  i),
+                    cy = b.y + Angles.trnsy(rot, i);
+
+                int f = idx++;
+
+                for(int s : Mathf.signs){
+                    Time.run(f * lightningDelay, () -> {
+                        if(b.isAdded() && b.type == this){
+                            Lightning.create(b, lightningColor,
+                                lightningDamage < 0 ? damage : lightningDamage,
+                                cx, cy, rot + 90*s + Mathf.range(lightningAngleRand),
+                                lightningLength + Mathf.random(lightningLengthRand));
+                        }
+                    });
+                }
+            }
+        }
     }
 
     @Override

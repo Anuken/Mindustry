@@ -61,7 +61,7 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         net.handleClientReceived(object);
                     }catch(Throwable e){
-                        handleException(e);
+                        net.handleException(e);
                     }
                 });
 
@@ -144,14 +144,14 @@ public class ArcNetProvider implements NetProvider{
                     try{
                         client.run();
                     }catch(Exception e){
-                        if(!(e instanceof ClosedSelectorException)) handleException(e);
+                        if(!(e instanceof ClosedSelectorException)) net.handleException(e);
                     }
                 });
 
                 client.connect(5000, ip, port, port);
                 success.run();
             }catch(Exception e){
-                handleException(e);
+                net.handleException(e);
             }
         });
     }
@@ -269,16 +269,6 @@ public class ArcNetProvider implements NetProvider{
         return null;
     }
 
-    void handleException(Throwable e){
-        if(e instanceof ArcNetException){
-            Core.app.post(() -> net.showError(new IOException("mismatch")));
-        }else if(e instanceof ClosedChannelException){
-            Core.app.post(() -> net.showError(new IOException("alreadyconnected")));
-        }else{
-            Core.app.post(() -> net.showError(e));
-        }
-    }
-
     class ArcConnection extends NetConnection{
         public final Connection connection;
 
@@ -371,8 +361,7 @@ public class ArcNetProvider implements NetProvider{
         }
 
         public void writeFramework(ByteBuffer buffer, FrameworkMessage message){
-            if(message instanceof Ping){
-                Ping p = (Ping)message;
+            if(message instanceof Ping p){
                 buffer.put((byte)0);
                 buffer.putInt(p.id);
                 buffer.put(p.isReply ? 1 : (byte)0);
@@ -380,12 +369,10 @@ public class ArcNetProvider implements NetProvider{
                 buffer.put((byte)1);
             }else if(message instanceof KeepAlive){
                 buffer.put((byte)2);
-            }else if(message instanceof RegisterUDP){
-                RegisterUDP p = (RegisterUDP)message;
+            }else if(message instanceof RegisterUDP p){
                 buffer.put((byte)3);
                 buffer.putInt(p.connectionID);
-            }else if(message instanceof RegisterTCP){
-                RegisterTCP p = (RegisterTCP)message;
+            }else if(message instanceof RegisterTCP p){
                 buffer.put((byte)4);
                 buffer.putInt(p.connectionID);
             }

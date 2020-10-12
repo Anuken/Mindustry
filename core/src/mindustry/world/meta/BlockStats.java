@@ -1,7 +1,7 @@
 package mindustry.world.meta;
 
-import arc.struct.*;
 import arc.struct.ObjectMap.*;
+import arc.struct.*;
 import mindustry.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -38,12 +38,20 @@ public class BlockStats{
     }
 
     public void add(BlockStat stat, Attribute attr){
-        add(stat, attr, 1f);
+        add(stat, attr, false, 1f);
     }
 
     public void add(BlockStat stat, Attribute attr, float scale){
+        add(stat, attr, false, scale);
+    }
+
+    public void add(BlockStat stat, Attribute attr, boolean floating){
+        add(stat, attr, floating, 1f);
+    }
+
+    public void add(BlockStat stat, Attribute attr, boolean floating, float scale){
         for(Block block : Vars.content.blocks()){
-            if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0) continue;
+            if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0 || (block.asFloor().isLiquid && !floating)) continue;
             add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr) * scale));
         }
     }

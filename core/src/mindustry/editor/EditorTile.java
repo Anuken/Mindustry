@@ -1,7 +1,6 @@
 package mindustry.editor;
 
 import arc.func.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
 import mindustry.game.*;
@@ -19,7 +18,7 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    public void setFloor(@NonNull Floor type){
+    public void setFloor(Floor type){
         if(skip()){
             super.setFloor(type);
             return;
@@ -27,7 +26,7 @@ public class EditorTile extends Tile{
 
         if(type instanceof OverlayFloor){
             //don't place on liquids
-            if(!floor.isLiquid){
+            if(floor.hasSurface()){
                 setOverlayID(type.id);
             }
             return;
@@ -97,7 +96,14 @@ public class EditorTile extends Tile{
             super.recache();
         }
     }
-    
+
+    @Override
+    protected void changed(){
+        if(state.isGame()){
+            super.changed();
+        }
+    }
+
     @Override
     protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
         if(skip()){
@@ -112,7 +118,7 @@ public class EditorTile extends Tile{
         
         Block block = block();
 
-        if(block.hasEntity()){
+        if(block.hasBuilding()){
             build = entityprov.get().init(this, team, false, rotation);
             build.cons = new ConsumeModule(build);
             if(block.hasItems) build.items = new ItemModule();

@@ -127,8 +127,7 @@ public class LogicBlock extends Block{
 
     @Override
     public Object pointConfig(Object config, Cons<Point2> transformer){
-        if(config instanceof byte[]){
-            byte[] data = (byte[])config;
+        if(config instanceof byte[] data){
 
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
                 //discard version for now
@@ -304,7 +303,7 @@ public class LogicBlock extends Block{
                         assemble.get(asm);
                     }
 
-                    asm.putConst("@this", this);
+                    asm.getVar("@this").value = this;
                     asm.putConst("@thisx", x);
                     asm.putConst("@thisy", y);
 
@@ -331,6 +330,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
+            executor.team = team;
 
             //check for previously invalid links to add after configuration
             boolean changed = false;
@@ -421,24 +421,13 @@ public class LogicBlock extends Block{
             return other != null && other.isValid() && other.team == team && other.within(this, range + other.block.size*tilesize/2f) && !(other instanceof ConstructBuild);
         }
 
-
-
         @Override
         public void buildConfiguration(Table table){
-            Table cont = new Table();
-            cont.defaults().size(40);
-
-            cont.button(Icon.pencil, Styles.clearTransi, () -> {
+            table.button(Icon.pencil, Styles.clearTransi, () -> {
                 Vars.ui.logic.show(code, code -> {
                     configure(compress(code, relativeConnections()));
                 });
-            });
-
-            //cont.button(Icon.refreshSmall, Styles.clearTransi, () -> {
-
-            //});
-
-            table.add(cont);
+            }).size(40);
         }
 
         @Override

@@ -2,14 +2,13 @@ package mindustry.world.modules;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.type.*;
 
 import java.util.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class ItemModule extends BlockModule{
     public static final ItemModule empty = new ItemModule();
@@ -135,6 +134,15 @@ public class ItemModule extends BlockModule{
         return true;
     }
 
+    public boolean has(ItemSeq items){
+        for(Item item : content.items()){
+            if(!has(item, items.get(item))){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean has(Iterable<ItemStack> stacks){
         for(ItemStack stack : stacks){
             if(!has(stack.item, stack.amount)) return false;
@@ -171,6 +179,7 @@ public class ItemModule extends BlockModule{
         return total > 0;
     }
 
+    @Nullable
     public Item first(){
         for(int i = 0; i < items.length; i++){
             if(items[i] > 0){
@@ -180,6 +189,7 @@ public class ItemModule extends BlockModule{
         return null;
     }
 
+    @Nullable
     public Item take(){
         for(int i = 0; i < items.length; i++){
             int index = (i + takeRotation);
@@ -195,6 +205,7 @@ public class ItemModule extends BlockModule{
     }
 
     /** Begins a speculative take operation. This returns the item that would be returned by #take(), but does not change state. */
+    @Nullable
     public Item beginTake(){
         for(int i = 0; i < items.length; i++){
             int index = (i + takeRotation);
@@ -244,6 +255,12 @@ public class ItemModule extends BlockModule{
         }
     }
 
+    public void undoFlow(Item item){
+        if(flow != null){
+            cacheSums[item.id] -= 1;
+        }
+    }
+
     public void addAll(ItemModule items){
         for(int i = 0; i < items.items.length; i++){
             add(i, items.items[i]);
@@ -259,6 +276,10 @@ public class ItemModule extends BlockModule{
 
     public void remove(ItemStack[] stacks){
         for(ItemStack stack : stacks) remove(stack.item, stack.amount);
+    }
+
+    public void remove(ItemSeq stacks){
+        stacks.each(this::remove);
     }
 
     public void remove(Iterable<ItemStack> stacks){

@@ -78,6 +78,79 @@ public class Generators{
             }
         });
 
+        ImagePacker.generate("cliffs", () -> {
+            int size = 64;
+            Color dark = new Color(0.5f, 0.5f, 0.6f, 1f).mul(0.98f);
+            Color mid = Color.lightGray;
+
+            Image[] images = new Image[8];
+            for(int i = 0; i < 8; i++){
+                images[i] = ImagePacker.get("cliff" + i);
+            }
+
+            for(int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++){
+                Image result = new Image(size, size);
+                byte[][] mask = new byte[size][size];
+
+                byte val = (byte)i;
+                //check each bit/direction
+                for(int j = 0; j < 8; j++){
+                    if((val & (1 << j)) != 0){
+                        if(j % 2 == 1 && (((val & (1 << (j + 1))) != 0) != ((val & (1 << (j - 1))) != 0))){
+                            continue;
+                        }
+
+                        Image image = images[j];
+                        image.each((x, y) -> {
+                            Color color = image.getColor(x, y);
+                            if(color.a > 0.1){
+                                //white -> bit 1 -> top
+                                //black -> bit 2 -> bottom
+                                mask[x][y] |= (color.r > 0.5f ? 1 : 2);
+                            }
+                        });
+                    }
+                }
+
+                result.each((x, y) -> {
+                    byte m = mask[x][y];
+                    if(m != 0){
+                        //mid
+                        if(m == 3){
+                            //find nearest non-mid color
+                            byte best = 0;
+                            float bestDst = 0;
+                            boolean found = false;
+                            //expand search range until found
+                            for(int rad = 9; rad < 64; rad += 7){
+                                for(int cx = Math.max(x - rad, 0); cx <= Math.min(x + rad, size - 1); cx++){
+                                    for(int cy = Math.max(y - rad, 0); cy <= Math.min(y + rad, size - 1); cy++){
+                                        byte nval = mask[cx][cy];
+                                        if(nval == 1 || nval == 2){
+                                            float dst2 = Mathf.dst2(cx, cy, x, y);
+                                            if(dst2 <= rad * rad && (!found || dst2 < bestDst)){
+                                                best = nval;
+                                                bestDst = dst2;
+                                                found = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(found){
+                                m = best;
+                            }
+                        }
+
+                        result.draw(x, y, m == 1 ? Color.white : m == 2 ? dark : mid);
+                    }
+                });
+
+                result.save("../blocks/environment/cliffmask" + (val & 0xff));
+            }
+        });
+
         ImagePacker.generate("cracks", () -> {
             RidgedPerlin r = new RidgedPerlin(1, 3);
             for(int size = 1; size <= Block.maxCrackSize; size++){
@@ -214,7 +287,7 @@ public class Generators{
                         }
 
                         //draw shard (default team top) on top of first sprite
-                        if(i == 1 && shardTeamTop != null){
+                        if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
                             image.draw(shardTeamTop);
                         }
                     }
@@ -314,8 +387,7 @@ public class Generators{
                 type.init();
 
                 Color outc = Pal.darkerMetal;
-                //Func<Image, Image> outlineS = i -> i.shadow(0.8f, 9);
-                Func<Image, Image> outline = i -> i.outline(4, outc);
+                Func<Image, Image> outline = i -> i.outline(3, outc);
                 Cons<TextureRegion> outliner = t -> {
                     if(t != null && t.found()){
                         ImagePacker.replace(t, outline.get(ImagePacker.get(t)));
@@ -325,14 +397,8 @@ public class Generators{
                 for(Weapon weapon : type.weapons){
                     if(outlined.add(weapon.name) && ImagePacker.has(weapon.name)){
                         outline.get(ImagePacker.get(weapon.name)).save(weapon.name + "-outline");
-
-                        //old outline
-                        //ImagePacker.get(weapon.name).outline(4, Pal.darkerMetal).save(weapon.name);
                     }
                 }
-
-                //baseRegion, legRegion, region, shadowRegion, cellRegion,
-                //        occlusionRegion, jointRegion, footRegion, legBaseRegion, baseJointRegion, outlineRegion;
 
                 outliner.get(type.jointRegion);
                 outliner.get(type.footRegion);
@@ -340,17 +406,30 @@ public class Generators{
                 outliner.get(type.baseJointRegion);
                 if(type.constructor.get() instanceof Legsc) outliner.get(type.legRegion);
 
-                Image image = ImagePacker.get(type.region);
+                Image image = outline.get(ImagePacker.get(type.region));
 
-                outline.get(image).save(type.name + "-outline");
-                //ImagePacker.replace(type.region, outline.get(image));
+                image.save(type.name + "-outline");
 
+                //draw mech parts
                 if(type.constructor.get() instanceof Mechc){
                     image.drawCenter(type.baseRegion);
                     image.drawCenter(type.legRegion);
                     image.drawCenter(type.legRegion, true, false);
                     image.draw(type.region);
                 }
+
+                //draw outlines
+                for(Weapon weapon : type.weapons){
+                    weapon.load();
+
+                    image.draw(outline.get(ImagePacker.get(weapon.region)),
+                    (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
+                    (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
+                    weapon.flipSprite, false);
+                }
+
+                //draw base region on top to mask weapons
+                image.draw(type.region);
 
                 Image baseCell = ImagePacker.get(type.cellRegion);
                 Image cell = new Image(type.cellRegion.width, type.cellRegion.height);
@@ -361,7 +440,7 @@ public class Generators{
                 for(Weapon weapon : type.weapons){
                     weapon.load();
 
-                    image.draw(weapon.region,
+                    image.draw(weapon.top ? outline.get(ImagePacker.get(weapon.region)) : ImagePacker.get(weapon.region),
                     (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
                     (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
                     weapon.flipSprite, false);

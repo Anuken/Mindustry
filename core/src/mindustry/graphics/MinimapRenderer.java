@@ -9,7 +9,6 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -122,7 +121,7 @@ public class MinimapRenderer implements Disposable{
         float dy = (Core.camera.position.y / tilesize);
         dx = Mathf.clamp(dx, sz, world.width() - sz);
         dy = Mathf.clamp(dy, sz, world.height() - sz);
-        float invTexWidth = 1f / texture.getWidth();
+        float invTexWidth = 1f / texture.width;
         float invTexHeight = 1f / texture.height;
         float x = dx - sz, y = world.height() - dy - sz, width = sz * 2, height = sz * 2;
         region.set(x * invTexWidth, y * invTexHeight, (x + width) * invTexWidth, (y + height) * invTexHeight);

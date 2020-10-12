@@ -20,7 +20,7 @@ public abstract class GenerateFilter{
             apply();
 
             tile.setFloor(in.floor.asFloor());
-            tile.setOverlay(in.floor.asFloor().isLiquid ? Blocks.air : in.ore);
+            tile.setOverlay(!in.floor.asFloor().hasSurface() ? Blocks.air : in.ore);
 
             if(!tile.block().synthetic() && !in.block.synthetic()){
                 tile.setBlock(in.block);

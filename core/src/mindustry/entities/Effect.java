@@ -8,7 +8,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -40,7 +39,7 @@ public class Effect{
     }
 
     public Effect(float life, Cons<EffectContainer> renderer){
-        this(life, 32f, renderer);
+        this(life,50f, renderer);
     }
 
     public Effect ground(){
@@ -147,7 +146,7 @@ public class Effect{
         if(headless || region == null || !Core.atlas.isFound(region)) return;
 
         Tile tile = world.tileWorld(x, y);
-        if(tile == null || tile.floor().isLiquid) return;
+        if(tile == null || !tile.floor().hasSurface()) return;
 
         Decal decal = Decal.create();
         decal.set(x, y);

@@ -276,7 +276,10 @@ public class ItemBridge extends Block{
                     cycleSpeed = Mathf.lerpDelta(cycleSpeed, 4f, 0.05f); //TODO this is kinda broken, because lerping only happens on a timer
                 }else{
                     cycleSpeed = Mathf.lerpDelta(cycleSpeed, 1f, 0.01f);
-                    if(item != null) items.add(item, 1);
+                    if(item != null){
+                        items.add(item, 1);
+                        items.undoFlow(item);
+                    }
                 }
             }
         }
@@ -351,7 +354,7 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid){
             if(team != source.team || !hasLiquids) return false;
 
             Tile other = world.tile(link);
@@ -365,7 +368,7 @@ public class ItemBridge extends Block{
                 return false;
             }
 
-            return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
+            return (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
         }
 
         protected boolean linked(Building source){

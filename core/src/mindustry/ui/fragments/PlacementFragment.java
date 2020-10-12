@@ -10,7 +10,6 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -31,6 +30,7 @@ public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
     public Category currentCategory = Category.distribution;
+
     Seq<Block> returnArray = new Seq<>(), returnArray2 = new Seq<>();
     Seq<Category> returnCatArray = new Seq<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
@@ -81,6 +81,10 @@ public class PlacementFragment extends Fragment{
         });
     }
 
+    public Displayable hover(){
+        return hover;
+    }
+
     void rebuild(){
         currentCategory = Category.turret;
         Group group = toggler.parent;
@@ -124,18 +128,17 @@ public class PlacementFragment extends Fragment{
                     for(int j = 0; j < blocks.size; j++){
                         if(blocks.get(j) == currentBlock){
                             switch(i){
-                                case 10: //left
-                                    j = (j - 1 + blocks.size) % blocks.size;
-                                    break;
-                                case 11: //right
-                                    j = (j + 1) % blocks.size;
-                                    break;
-                                case 12: //up
+                                //left
+                                case 10 -> j = (j - 1 + blocks.size) % blocks.size;
+                                //right
+                                case 11 -> j = (j + 1) % blocks.size;
+                                //up
+                                case 12 -> {
                                     j = (j > 3 ? j - 4 : blocks.size - blocks.size % 4 + j);
                                     j -= (j < blocks.size ? 0 : 4);
-                                    break;
-                                case 13: //down
-                                    j = (j < blocks.size - 4 ? j + 4 : j % 4);
+                                }
+                                //down
+                                case 13 -> j = (j < blocks.size - 4 ? j + 4 : j % 4);
                             }
                             input.block = blocks.get(j);
                             selectedBlocks.put(currentCategory, input.block);
@@ -194,7 +197,7 @@ public class PlacementFragment extends Fragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> ui.hudfrag.shown());
+            full.bottom().right().visible(() -> ui.hudfrag.shown);
 
             full.table(frame -> {
 

@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -191,10 +190,6 @@ public class Control implements ApplicationListener, Loadable{
 
     }
 
-    void resetCamera(){
-
-    }
-
     @Override
     public void loadAsync(){
         Draw.scl = 1f / Core.atlas.find("scale_marker").width;
@@ -322,10 +317,12 @@ public class Control implements ApplicationListener, Loadable{
             }else{
                 net.reset();
                 logic.reset();
+                sector.setSecondsPassed(0);
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching
                 state.secinfo.origin = origin;
+                state.secinfo.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);
@@ -484,7 +481,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void update(){
-        //TODO find out why this happens on Android
+        //this happens on Android and nobody knows why
         if(assets == null) return;
 
         saves.update();
@@ -522,7 +519,7 @@ public class Control implements ApplicationListener, Loadable{
                 platform.updateRPC();
             }
 
-            if(Core.input.keyTap(Binding.pause) && !state.isOutOfTime() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 

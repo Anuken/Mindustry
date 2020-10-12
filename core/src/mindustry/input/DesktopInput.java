@@ -10,7 +10,6 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
@@ -49,7 +48,7 @@ public class DesktopInput extends InputHandler{
     public void buildUI(Group group){
 
         group.fill(t -> {
-            t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown() && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
+            t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -177,7 +176,7 @@ public class DesktopInput extends InputHandler{
     public void update(){
         super.update();
 
-        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content))){
+        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content) || scene.getKeyboardFocus().isDescendantOf(ui.minimapfrag.elem))){
             ui.listfrag.toggle();
         }
 
@@ -200,7 +199,7 @@ public class DesktopInput extends InputHandler{
             }
             panning = false;
 
-            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(Time.delta * camSpeed));
+            Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.move_x), Core.input.axis(Binding.move_y)).nor().scl(camSpeed));
         }else if(!player.dead() && !panning){
             Core.camera.position.lerpDelta(player, Core.settings.getBool("smoothcamera") ? 0.08f : 1f);
         }
@@ -354,7 +353,7 @@ public class DesktopInput extends InputHandler{
         }).visible(() -> state.isCampaign()).tooltip("@planetmap");
 
         table.button(Icon.up, Styles.clearPartiali, () -> {
-            ui.planet.show(state.getSector(), player.team().core());
+            ui.planet.showLaunch(state.getSector(), player.team().core());
         }).visible(() -> state.isCampaign()).tooltip("@launchcore").disabled(b -> player.team().core() == null);
     }
 
@@ -459,6 +458,10 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
+            if(selected != null){
+                Call.tileTap(player, selected);
+            }
+
             BuildPlan req = getRequest(cursorX, cursorY);
 
             if(Core.input.keyDown(Binding.break_block)){
@@ -596,19 +599,19 @@ public class DesktopInput extends InputHandler{
     }
 
     protected void updateMovement(Unit unit){
-        boolean omni = !(unit instanceof WaterMovec);
+        boolean omni = unit.type().omniMovement;
         boolean ground = unit.isGrounded();
 
         float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
         float baseSpeed = unit.type().speed;
 
         //limit speed to minimum formation speed to preserve formation
-        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+        if(unit.isCommanding()){
             //add a tiny multiplier to let units catch up just in case
-            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.95f;
+            baseSpeed = unit.minFormationSpeed * 0.95f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -658,10 +661,8 @@ public class DesktopInput extends InputHandler{
         }
 
         //update commander inut
-        if(unit instanceof Commanderc){
-            if(Core.input.keyTap(Binding.command)){
-                Call.unitCommand(player);
-            }
+        if(Core.input.keyTap(Binding.command)){
+            Call.unitCommand(player);
         }
     }
 }

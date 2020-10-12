@@ -4,7 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
 
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 
 public enum CacheLayer{
     water{
@@ -49,6 +49,17 @@ public enum CacheLayer{
         @Override
         public void end(){
             endShader(Shaders.slag);
+        }
+    },
+    space{
+        @Override
+        public void begin(){
+            beginShader();
+        }
+
+        @Override
+        public void end(){
+            endShader(Shaders.space);
         }
     },
     normal(5),

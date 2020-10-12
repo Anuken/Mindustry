@@ -7,11 +7,10 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 
-//TODO this class is a trainwreck, remove it
 public class IndexedRenderer implements Disposable{
     private static final int vsize = 5;
 
-    private Shader program = new Shader(
+    private final Shader program = new Shader(
     "attribute vec4 a_position;\n" +
     "attribute vec4 a_color;\n" +
     "attribute vec2 a_texCoord0;\n" +

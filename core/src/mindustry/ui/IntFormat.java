@@ -1,8 +1,8 @@
 package mindustry.ui;
 
 
-import arc.Core;
-import arc.func.Func;
+import arc.*;
+import arc.func.*;
 
 /**
  * A low-garbage way to format bundle strings.

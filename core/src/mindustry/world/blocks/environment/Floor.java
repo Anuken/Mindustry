@@ -7,7 +7,7 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
@@ -37,7 +37,7 @@ public class Floor extends Block{
     /** Effect displayed when drowning on this floor. */
     public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
-    public @NonNull StatusEffect status = StatusEffects.none;
+    public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
     /** liquids that drop from this block, used for pumps */
@@ -164,6 +164,11 @@ public class Floor extends Block{
     @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
+    }
+
+    /** @return whether this floor has a valid surface on which to place things, e.g. scorch marks. */
+    public boolean hasSurface(){
+        return !isLiquid && !solid;
     }
 
     public boolean isDeep(){

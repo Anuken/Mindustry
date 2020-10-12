@@ -1,6 +1,6 @@
 package mindustry.game;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
@@ -40,7 +40,6 @@ public class EventType{
 
     public static class WinEvent{}
     public static class LoseEvent{}
-    public static class LaunchEvent{}
     public static class ResizeEvent{}
     public static class MapMakeEvent{}
     public static class MapPublishEvent{}
@@ -149,7 +148,7 @@ public class EventType{
         }
     }
 
-    /** Called when the configures sets a specific block. */
+    /** Called when the player configures a specific building. */
     public static class ConfigEvent{
         public final Building tile;
         public final Player player;
@@ -159,6 +158,17 @@ public class EventType{
             this.tile = tile;
             this.player = player;
             this.value = value;
+        }
+    }
+
+    /** Called when a player taps any tile. */
+    public static class TapEvent{
+        public final Player player;
+        public final Tile tile;
+
+        public TapEvent(Player player, Tile tile){
+            this.tile = tile;
+            this.player = player;
         }
     }
 
@@ -267,6 +277,14 @@ public class EventType{
         public final Unit unit;
 
         public UnitDestroyEvent(Unit unit){
+            this.unit = unit;
+        }
+    }
+
+    public static class UnitDrownEvent{
+        public final Unit unit;
+
+        public UnitDrownEvent(Unit unit){
             this.unit = unit;
         }
     }

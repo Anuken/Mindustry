@@ -3,7 +3,6 @@ package mindustry.net;
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
@@ -24,6 +23,7 @@ public class Administration{
     public Seq<ChatFilter> chatFilters = new Seq<>();
     public Seq<ActionFilter> actionFilters = new Seq<>();
     public Seq<String> subnetBans = new Seq<>();
+    public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
@@ -84,6 +84,20 @@ public class Administration{
             }
             return true;
         });
+    }
+
+    /** @return time at which a player would be pardoned for a kick (0 means they were never kicked) */
+    public long getKickTime(String uuid, String ip){
+        return Math.max(getInfo(uuid).lastKicked, kickedIPs.get(ip, 0L));
+    }
+
+    /** Sets up kick duration for a player. */
+    public void handleKicked(String uuid, String ip, long duration){
+        kickedIPs.put(ip, Math.max(kickedIPs.get(ip, 0L), Time.millis() + duration));
+
+        PlayerInfo info = getInfo(uuid);
+        info.timesKicked++;
+        info.lastKicked = Math.max(Time.millis() + duration, info.lastKicked);
     }
 
     public Seq<String> getSubnetBans(){
@@ -680,9 +694,9 @@ public class Administration{
     /** Defines a (potentially dangerous) action that a player has done in the world.
      * These objects are pooled; do not cache them! */
     public static class PlayerAction implements Poolable{
-        public @NonNull Player player;
-        public @NonNull ActionType type;
-        public @NonNull Tile tile;
+        public Player player;
+        public ActionType type;
+        public Tile tile;
 
         /** valid for block placement events only */
         public @Nullable Block block;
