@@ -21,7 +21,7 @@ public class SpawnGroup implements Serializable{
 
     /** The unit type spawned */
     public UnitType type = UnitTypes.dagger;
-    /** Payload loaded units*/
+    /** Payload Seq*/
     public Seq<UnitType> payloads;
     /** When this spawn should end */
     public int end = never;
@@ -75,9 +75,9 @@ public class SpawnGroup implements Serializable{
             unit.addItem(items.item, items.amount);
         }
 
-        if(payloads != null && unit instanceof Payloadc){
+        if(payloads != null){
             for(UnitType unitType : payloads){
-                Unit payload = unitType.create(team);
+                Unit payload = unitType.create(unit.team);
                 ((Payloadc) unit).pickup(payload);
             }
         }
