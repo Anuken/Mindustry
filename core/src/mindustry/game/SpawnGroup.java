@@ -1,6 +1,7 @@
 package mindustry.game;
 
-import arc.util.*;
+import arc.struct.*;
+import arc.util.Log;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
@@ -8,6 +9,7 @@ import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.io.legacy.*;
 import mindustry.type.*;
+import mindustry.world.blocks.payloads.Payload;
 
 import static mindustry.Vars.*;
 
@@ -21,6 +23,8 @@ public class SpawnGroup implements Serializable{
 
     /** The unit type spawned */
     public UnitType type = UnitTypes.dagger;
+    /** Payload loaded units*/
+    public Seq<UnitType> payloads;
     /** When this spawn should end */
     public int end = never;
     /** When this spawn should start */
@@ -28,7 +32,7 @@ public class SpawnGroup implements Serializable{
     /** The spacing, in waves, of spawns. For example, 2 = spawns every other wave */
     public int spacing = 1;
     /** Maximum amount of units that spawn */
-    public int max = 40;
+    public int max = 100;
     /** How many waves need to pass before the amount of units spawned increases by 1 */
     public float unitScaling = never;
     /** Shield points that this unit has. */
@@ -38,10 +42,8 @@ public class SpawnGroup implements Serializable{
     /** Amount of enemies spawned initially, with no scaling */
     public int unitAmount = 1;
     /** Status effect applied to the spawned unit. Null to disable. */
-    @Nullable
     public StatusEffect effect;
     /** Items this unit spawns with. Null to disable. */
-    @Nullable
     public ItemStack items;
 
     public SpawnGroup(UnitType type){
@@ -54,7 +56,6 @@ public class SpawnGroup implements Serializable{
 
     /** Returns the amount of units spawned on a specific wave. */
     public int getUnitsSpawned(int wave){
-        if(spacing == 0) spacing = 1;
         if(wave < begin || wave > end || (wave - begin) % spacing != 0){
             return 0;
         }
@@ -76,6 +77,13 @@ public class SpawnGroup implements Serializable{
             unit.addItem(items.item, items.amount);
         }
 
+        if(payloads != null && unit instanceof Payloadc){
+            for(UnitType unitType : payloads){
+                Unit payload = unitType.create(team);
+                ((Payloadc) unit).pickup(payload);
+            }
+        }
+
         unit.shield(Math.max(shields + shieldScaling*(wave - begin), 0));
 
         return unit;
@@ -88,12 +96,12 @@ public class SpawnGroup implements Serializable{
         if(begin != 0) json.writeValue("begin", begin);
         if(end != never) json.writeValue("end", end);
         if(spacing != 1) json.writeValue("spacing", spacing);
-        if(max != 40) json.writeValue("max", max);
+        //if(max != 40) json.writeValue("max", max);
         if(unitScaling != never) json.writeValue("scaling", unitScaling);
         if(shields != 0) json.writeValue("shields", shields);
         if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
-        if(effect != null) json.writeValue("effect", effect.name);
+        if(effect != null) json.writeValue("effect", effect.id);
     }
 
     @Override
@@ -105,18 +113,12 @@ public class SpawnGroup implements Serializable{
         begin = data.getInt("begin", 0);
         end = data.getInt("end", never);
         spacing = data.getInt("spacing", 1);
-        max = data.getInt("max", 40);
+        //max = data.getInt("max", 40);
         unitScaling = data.getFloat("scaling", never);
         shields = data.getFloat("shields", 0);
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
-
-        //old boss effect ID
-        if(data.has("effect") && data.get("effect").isNumber() && data.getInt("effect", -1) == 8){
-            effect = StatusEffects.boss;
-        }else{
-            effect = content.getByName(ContentType.status, data.has("effect") && data.get("effect").isString() ? data.getString("effect", "none") : "none");
-        }
+        effect = content.getByID(ContentType.status, data.getInt("effect", -1));
     }
 
     @Override
