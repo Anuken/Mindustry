@@ -3,12 +3,14 @@ package mindustry.game;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -23,7 +25,7 @@ public class SectorInfo{
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
     /** Items stored in all cores. */
-    public ObjectIntMap<Item> coreItems = new ObjectIntMap<>();
+    public ItemSeq coreItems = new ItemSeq();
     /** The best available core type. */
     public Block bestCoreType = Blocks.air;
     /** Max storage capacity. */
@@ -32,13 +34,31 @@ public class SectorInfo{
     public boolean hasCore = true;
     /** Sector that was launched from. */
     public @Nullable Sector origin;
+    /** Launch destination. */
+    public @Nullable Sector destination;
+    /** Resources known to occur at this sector. */
+    public Seq<UnlockableContent> resources = new Seq<>();
     /** Time spent at this sector. Do not use unless you know what you're doing. */
     public transient float internalTimeSpent;
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
     /** Core item storage to prevent spoofing. */
-    private transient int[] lastCoreItems;
+    private transient int[] coreItemCounts;
+
+    /** Handles core item changes. */
+    public void handleCoreItem(Item item, int amount){
+        if(coreItemCounts == null){
+            coreItemCounts = new int[content.items().size];
+        }
+        coreItemCounts[item.id] += amount;
+    }
+
+    /** @return the real location items go when launched on this sector */
+    public Sector getRealDestination(){
+        //on multiplayer the destination is, by default, the first captured sector (basically random)
+        return !net.client() || destination != null ? destination : state.rules.sector.planet.sectors.find(Sector::hasBase);
+    }
 
     /** Updates export statistics. */
     public void handleItemExport(ItemStack stack){
@@ -69,7 +89,7 @@ public class SectorInfo{
         if(entity != null){
             ItemModule items = entity.items;
             for(int i = 0; i < items.length(); i++){
-                coreItems.put(content.item(i), items.get(i));
+                coreItems.set(content.item(i), items.get(i));
             }
         }
 
@@ -77,24 +97,22 @@ public class SectorInfo{
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
 
-        //update sector's internal time spent counter1
+        //update sector's internal time spent counter
         state.rules.sector.setTimeSpent(internalTimeSpent);
     }
 
     /** Update averages of various stats, updates some special sector logic.
      * Called every frame. */
     public void update(){
+        //updating in multiplayer as a client doesn't make sense
+        if(net.client()) return;
+
         internalTimeSpent += Time.delta;
 
-        //time spent exceeds turn duration!
-        if(internalTimeSpent >= turnDuration && internalTimeSpent - Time.delta < turnDuration){
-            universe.displayTimeEnd();
-        }
-
-        //create last stored core items
-        if(lastCoreItems == null){
-            lastCoreItems = new int[content.items().size];
-            updateCoreDeltas();
+        //autorun turns
+        if(internalTimeSpent >= turnDuration){
+            internalTimeSpent = 0;
+            universe.runTurn();
         }
 
         CoreBuild ent = state.rules.defaultTeam.core();
@@ -110,14 +128,15 @@ public class SectorInfo{
                     stat.loaded = true;
                 }
 
-                //how the resources changed - only interested in negative deltas, since that's what happens during spoofing
-                int coreDelta = Math.min(ent == null ? 0 : ent.items.get(item) - lastCoreItems[item.id], 0);
-
                 //add counter, subtract how many items were taken from the core during this time
-                stat.means.add(Math.max(stat.counter + coreDelta, 0));
+                stat.means.add(Math.max(stat.counter, 0));
                 stat.counter = 0;
                 stat.mean = stat.means.rawMean();
             });
+
+            if(coreItemCounts == null){
+                coreItemCounts = new int[content.items().size];
+            }
 
             //refresh core items
             for(Item item : content.items()){
@@ -129,21 +148,14 @@ public class SectorInfo{
 
                 //get item delta
                 //TODO is preventing negative production a good idea?
-                int delta = Math.max((ent == null ? 0 : ent.items.get(item)) - lastCoreItems[item.id], 0);
+                int delta = Math.max(ent == null ? 0 : coreItemCounts[item.id], 0);
 
                 //store means
                 stat.means.add(delta);
                 stat.mean = stat.means.rawMean();
             }
 
-            updateCoreDeltas();
-        }
-    }
-
-    private void updateCoreDeltas(){
-        CoreBuild ent = state.rules.defaultTeam.core();
-        for(int i = 0; i < lastCoreItems.length; i++){
-            lastCoreItems[i] = ent == null ? 0 : ent.items.get(i);
+            Arrays.fill(coreItemCounts, 0);
         }
     }
 

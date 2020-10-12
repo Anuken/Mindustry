@@ -1,7 +1,7 @@
 package mindustry.world.consumers;
 
-import arc.math.Mathf;
-import arc.scene.ui.layout.Table;
+import arc.math.*;
+import arc.scene.ui.layout.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 

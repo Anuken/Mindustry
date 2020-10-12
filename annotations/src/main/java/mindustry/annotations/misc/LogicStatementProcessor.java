@@ -43,9 +43,9 @@ public class LogicStatementProcessor extends BaseProcessor{
             String name = c.annotation(RegisterStatement.class).value();
 
             if(beganWrite){
-                writer.nextControlFlow("else if(obj instanceof $T)", c.mirror());
+                writer.nextControlFlow("else if(obj.getClass() == $T.class)", c.mirror());
             }else{
-                writer.beginControlFlow("if(obj instanceof $T)", c.mirror());
+                writer.beginControlFlow("if(obj.getClass() == $T.class)", c.mirror());
                 beganWrite = true;
             }
 
@@ -53,6 +53,7 @@ public class LogicStatementProcessor extends BaseProcessor{
             writer.addStatement("out.append($S)", name);
 
             Seq<Svar> fields = c.fields();
+            fields.addAll(c.superclass().fields());
 
             String readSt = "if(tokens[0].equals($S))";
             if(beganRead){
@@ -67,7 +68,7 @@ public class LogicStatementProcessor extends BaseProcessor{
             int index = 0;
 
             for(Svar field : fields){
-                if(field.is(Modifier.TRANSIENT)) continue;
+                if(field.isAny(Modifier.TRANSIENT, Modifier.STATIC)) continue;
 
                 writer.addStatement("out.append(\" \")");
                 writer.addStatement("out.append((($T)obj).$L$L)", c.mirror(), field.name(),

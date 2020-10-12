@@ -23,6 +23,7 @@ public class ForceProjector extends Block{
     public float phaseUseTime = 350f;
 
     public float phaseRadiusBoost = 80f;
+    public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
     public float breakage = 550f;
     public float cooldownNormal = 1.75f;
@@ -32,8 +33,8 @@ public class ForceProjector extends Block{
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
-    static final Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramEntity.team && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
+    static final Cons<Bullet> shieldConsumer = trait -> {
+        if(trait.team != paramEntity.team && trait.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
@@ -59,9 +60,11 @@ public class ForceProjector extends Block{
     @Override
     public void setStats(){
         super.setStats();
-
+        stats.add(BlockStat.shieldHealth, breakage, StatUnit.none);
+        stats.add(BlockStat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
         stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+        stats.add(BlockStat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
     }
 
     @Override
@@ -70,10 +73,10 @@ public class ForceProjector extends Block{
 
         Draw.color(Pal.gray);
         Lines.stroke(3f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color(player.team().color);
         Lines.stroke(1f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color();
     }
 
@@ -83,8 +86,8 @@ public class ForceProjector extends Block{
         public ForceDraw drawer;
 
         @Override
-        public void add(){
-            super.add();
+        public void created(){
+            super.created();
             drawer = ForceDraw.create();
             drawer.build = this;
             drawer.set(x, y);
@@ -92,8 +95,8 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public void remove(){
-            super.remove();
+        public void onRemoved(){
+            super.onRemoved();
             drawer.remove();
         }
 
@@ -130,7 +133,7 @@ public class ForceProjector extends Block{
                 broken = false;
             }
 
-            if(buildup >= breakage && !broken){
+            if(buildup >= breakage + phaseShieldBoost && !broken){
                 broken = true;
                 buildup = breakage;
                 Fx.shieldBreak.at(x, y, realRadius(), team.color);
@@ -156,7 +159,9 @@ public class ForceProjector extends Block{
         public void draw(){
             super.draw();
 
-            drawer.set(x, y);
+            if(drawer != null){
+                drawer.set(x, y);
+            }
 
             if(buildup > 0f){
                 Draw.alpha(buildup / breakage * 0.75f);

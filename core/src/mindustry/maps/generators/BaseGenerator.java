@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -12,7 +13,6 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
-import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
@@ -26,8 +26,6 @@ public class BaseGenerator{
 
     private Tiles tiles;
     private Team team;
-    private ObjectMap<Item, OreBlock> ores = new ObjectMap<>();
-    private ObjectMap<Item, Floor> oreFloors = new ObjectMap<>();
     private Seq<Tile> cores;
 
     public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector, float difficulty){
@@ -39,14 +37,6 @@ public class BaseGenerator{
         if(bases.cores.isEmpty()) return;
 
         Mathf.rand.setSeed(sector.id);
-
-        for(Block block : content.blocks()){
-            if(block instanceof OreBlock && block.asFloor().itemDrop != null){
-                ores.put(block.asFloor().itemDrop, (OreBlock)block);
-            }else if(block.isFloor() && block.asFloor().itemDrop != null && !oreFloors.containsKey(block.asFloor().itemDrop)){
-                oreFloors.put(block.asFloor().itemDrop, block.asFloor());
-            }
-        }
 
         //TODO limit base size
         float costBudget = 1000;
@@ -70,12 +60,12 @@ public class BaseGenerator{
 
         for(Tile tile : cores){
             tile.clearOverlay();
-            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? ores.get((Item)coreschem.required) : Blocks.oreCopper);
+            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? bases.ores.get((Item)coreschem.required) : Blocks.oreCopper);
 
             //fill core with every type of item (even non-material)
             Building entity = tile.build;
             for(Item item : content.items()){
-                entity.items.add(item, entity.block().itemCapacity);
+                entity.items.add(item, entity.block.itemCapacity);
             }
         }
 
@@ -87,10 +77,10 @@ public class BaseGenerator{
                 || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
                 Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
                 if(!parts.isEmpty()){
-                    tryPlace(parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y);
+                    tryPlace(parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y, team);
                 }
             }else if(Mathf.chance(nonResourceChance)){
-                tryPlace(bases.parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y);
+                tryPlace(bases.parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y, team);
             }
         });
 
@@ -164,7 +154,19 @@ public class BaseGenerator{
         core.circle(range, (x, y) -> cons.get(tiles.getn(x, y)));
     }
 
-    boolean tryPlace(BasePart part, int x, int y){
+    /**
+     * Tries to place a base part at a certain location with a certain team.
+     * @return success state
+     * */
+    public static boolean tryPlace(BasePart part, int x, int y, Team team){
+        return tryPlace(part, x, y, team, null);
+    }
+
+    /**
+     * Tries to place a base part at a certain location with a certain team.
+     * @return success state
+     * */
+    public static boolean tryPlace(BasePart part, int x, int y, Team team, @Nullable Intc2 posc){
         int rotation = Mathf.range(2);
         axis.set((int)(part.schematic.width / 2f), (int)(part.schematic.height / 2f));
         Schematic result = Schematics.rotate(part.schematic, rotation);
@@ -180,21 +182,24 @@ public class BaseGenerator{
             if(isTaken(tile.block, realX, realY)){
                 return false;
             }
+
+            if(posc != null){
+                posc.get(realX, realY);
+            }
         }
 
-        if(part.required instanceof Item){
-            Item item = (Item)part.required;
+        if(part.required instanceof Item item){
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
 
-                        if(!tiles.getn(ex, ey).floor().isLiquid){
-                            set(tiles.getn(ex, ey), item);
+                        if(world.tiles.getn(ex, ey).floor().hasSurface()){
+                            set(world.tiles.getn(ex, ey), item);
                         }
 
-                        Tile rand = tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
-                        if(!rand.floor().isLiquid){
+                        Tile rand = world.tiles.getc(ex + Mathf.range(1), ey + Mathf.range(1));
+                        if(rand.floor().hasSurface()){
                             //random ores nearby to make it look more natural
                             set(rand, item);
                         }
@@ -206,8 +211,7 @@ public class BaseGenerator{
         Schematics.place(result, cx + result.width/2, cy + result.height/2, team);
 
         //fill drills with items after placing
-        if(part.required instanceof Item){
-            Item item = (Item)part.required;
+        if(part.required instanceof Item item){
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 
@@ -223,15 +227,15 @@ public class BaseGenerator{
         return true;
     }
 
-    void set(Tile tile, Item item){
-        if(ores.containsKey(item)){
-            tile.setOverlay(ores.get(item));
-        }else if(oreFloors.containsKey(item)){
-            tile.setFloor(oreFloors.get(item));
+    static void set(Tile tile, Item item){
+        if(bases.ores.containsKey(item)){
+            tile.setOverlay(bases.ores.get(item));
+        }else if(bases.oreFloors.containsKey(item)){
+            tile.setFloor(bases.oreFloors.get(item));
         }
     }
 
-    boolean isTaken(Block block, int x, int y){
+    static boolean isTaken(Block block, int x, int y){
         int offsetx = -(block.size - 1) / 2;
         int offsety = -(block.size - 1) / 2;
         int pad = 1;
@@ -247,8 +251,8 @@ public class BaseGenerator{
         return false;
     }
 
-    boolean overlaps(int x, int y){
-        Tile tile = tiles.get(x, y);
+    static boolean overlaps(int x, int y){
+        Tile tile = world.tiles.get(x, y);
 
         return tile == null || !tile.block().alwaysReplace || world.getDarkness(x, y) > 0;
     }

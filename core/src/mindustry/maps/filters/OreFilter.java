@@ -1,12 +1,11 @@
 package mindustry.maps.filters;
 
 import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.maps.filters.FilterOption.SliderOption;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.maps.filters.FilterOption.*;
+import mindustry.world.*;
 
-import static mindustry.maps.filters.FilterOption.BlockOption;
-import static mindustry.maps.filters.FilterOption.oresOnly;
+import static mindustry.maps.filters.FilterOption.*;
 
 public class OreFilter extends GenerateFilter{
     public float scl = 23, threshold = 0.81f, octaves = 2f, falloff = 0.3f;

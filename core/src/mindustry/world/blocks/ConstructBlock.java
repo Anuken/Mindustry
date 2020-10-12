@@ -5,7 +5,7 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -58,10 +58,11 @@ public class ConstructBlock extends Block{
     }
 
     @Remote(called = Loc.server)
-    public static void constructFinish(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
+    public static void constructFinish(Tile tile, Block block, @Nullable Unit builder, byte rotation, Team team, Object config){
         if(tile == null) return;
 
         float healthf = tile.build == null ? 1f : tile.build.healthf();
+        Seq<Building> prev = tile.build instanceof ConstructBuild ? ((ConstructBuild)tile.build).prevBuild : null;
 
         tile.setBlock(block, team, rotation);
 
@@ -71,11 +72,19 @@ public class ConstructBlock extends Block{
             if(config != null){
                 tile.build.configured(builder, config);
             }
+
+            if(prev != null && prev.size > 0){
+                tile.build.overwrote(prev);
+            }
+
+            if(builder != null && builder.isPlayer()){
+                tile.build.lastAccessed = builder.getPlayer().name;
+            }
         }
 
         //last builder was this local client player, call placed()
         if(tile.build != null && !headless && builder == player.unit()){
-            tile.build.playerPlaced();
+            tile.build.playerPlaced(config);
         }
 
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
@@ -107,7 +116,9 @@ public class ConstructBlock extends Block{
 
     public static void constructed(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
         Call.constructFinish(tile, block, builder, rotation, team, config);
-        tile.build.placed();
+        if(tile.build != null){
+            tile.build.placed();
+        }
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
         if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
@@ -124,6 +135,7 @@ public class ConstructBlock extends Block{
          * If there is no recipe for this block, as is the case with rocks, 'previous' is used.
          */
         public @Nullable Block cblock;
+        public @Nullable Seq<Building> prevBuild;
 
         public float progress = 0;
         public float buildCost;
@@ -133,6 +145,9 @@ public class ConstructBlock extends Block{
          */
         public Block previous;
         public Object lastConfig;
+
+        @Nullable
+        public Unit lastBuilder;
 
         private float[] accumulator;
         private float[] totalAccumulator;
@@ -172,7 +187,7 @@ public class ConstructBlock extends Block{
         public void onDestroyed(){
             Fx.blockExplosionSmoke.at(tile);
 
-            if(!tile.floor().solid && !tile.floor().isLiquid){
+            if(!tile.floor().solid && tile.floor().hasSurface()){
                 Effect.rubble(x, y, size);
             }
         }
@@ -206,6 +221,10 @@ public class ConstructBlock extends Block{
                 return;
             }
 
+            if(builder.isPlayer()){
+                lastBuilder = builder;
+            }
+
             lastConfig = config;
 
             if(cblock.requirements.length != accumulator.length || totalAccumulator.length != cblock.requirements.length){
@@ -225,12 +244,17 @@ public class ConstructBlock extends Block{
             progress = Mathf.clamp(progress + maxProgress);
 
             if(progress >= 1f || state.rules.infiniteResources){
-                constructed(tile, cblock, builder, (byte)rotation, builder.team, config);
+                if(lastBuilder == null) lastBuilder = builder;
+                constructed(tile, cblock, lastBuilder, (byte)rotation, builder.team, config);
             }
         }
 
         public void deconstruct(Unit builder, @Nullable Building core, float amount){
             float deconstructMultiplier = state.rules.deconstructRefundMultiplier;
+
+            if(builder.isPlayer()){
+                lastBuilder = builder;
+            }
 
             if(cblock != null){
                 ItemStack[] requirements = cblock.requirements;
@@ -263,7 +287,8 @@ public class ConstructBlock extends Block{
             progress = Mathf.clamp(progress - amount);
 
             if(progress <= 0 || state.rules.infiniteResources){
-                Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, builder);
+                if(lastBuilder == null) lastBuilder = builder;
+                Call.deconstructFinish(tile, this.cblock == null ? previous : this.cblock, lastBuilder);
             }
         }
 

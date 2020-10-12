@@ -51,7 +51,7 @@ public class Unloader extends Block{
         public void updateTile(){
             if(timer(timerUnload, speed / timeScale())){
                 for(Building other : proximity){
-                    if(other.interactable(team) && other.block().unloadable && other.block().hasItems
+                    if(other.interactable(team) && other.block.unloadable && other.block.hasItems
                         && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
                         //make sure the item can't be dumped back into this block
                         dumpingTo = other;
@@ -66,6 +66,7 @@ public class Unloader extends Block{
                             }else{
                                 other.items.remove(item, 1);
                             }
+                            other.itemTaken(item);
                         }
                     }
                 }
@@ -99,7 +100,7 @@ public class Unloader extends Block{
 
         @Override
         public boolean canDump(Building to, Item item){
-            return !(to.block() instanceof StorageBlock) && to != dumpingTo;
+            return !(to.block instanceof StorageBlock) && to != dumpingTo;
         }
 
         @Override

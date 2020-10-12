@@ -3,6 +3,7 @@ package mindustry.world.blocks.units;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -21,7 +22,7 @@ import static mindustry.Vars.*;
 
 public class Reconstructor extends UnitBlock{
     public float constructTime = 60 * 2;
-    public UnitType[][] upgrades = {};
+    public Seq<UnitType[]> upgrades = new Seq<>();
     public int[] capacities;
 
     public Reconstructor(String name){
@@ -50,11 +51,11 @@ public class Reconstructor extends UnitBlock{
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",
                 Fonts.getUnicodeStr(e.unit().name),
-                teamIndex.countType(e.team, e.unit()),
+                e.team.data().countType(e.unit()),
                 Units.getCap(e.team)
             ),
             () -> Pal.power,
-            () -> e.unit() == null ? 0f : (float)teamIndex.countType(e.team, e.unit()) / Units.getCap(e.team)
+            () -> e.unit() == null ? 0f : (float)e.team.data().countType(e.unit()) / Units.getCap(e.team)
         ));
     }
 
@@ -140,7 +141,7 @@ public class Reconstructor extends UnitBlock{
                     if(moveInPayload()){
                         if(consValid()){
                             valid = true;
-                            progress += edelta();
+                            progress += edelta() * state.rules.unitBuildSpeedMultiplier;
                         }
 
                         //upgrade the unit
@@ -161,11 +162,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            //do not consume when cap reached
-            if(constructing()){
-                return Units.canCreate(team, upgrade(payload.unit.type()));
-            }
-            return false;
+            return constructing();
         }
 
         public UnitType unit(){
@@ -185,7 +182,7 @@ public class Reconstructor extends UnitBlock{
         }
 
         public UnitType upgrade(UnitType type){
-            UnitType[] r =  Structs.find(upgrades, arr -> arr[0] == type);
+            UnitType[] r =  upgrades.find(u -> u[0] == type);
             return r == null ? null : r[1];
         }
 

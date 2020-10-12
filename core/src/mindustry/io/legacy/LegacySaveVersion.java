@@ -9,7 +9,7 @@ import mindustry.world.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public abstract class LegacySaveVersion extends SaveVersion{
 
@@ -54,14 +54,14 @@ public abstract class LegacySaveVersion extends SaveVersion{
                 if(block == null) block = Blocks.air;
 
                 //occupied by multiblock part
-                boolean occupied = tile.build != null && !tile.isCenter() && (tile.build.block() == block || block == Blocks.air);
+                boolean occupied = tile.build != null && !tile.isCenter() && (tile.build.block == block || block == Blocks.air);
 
                 //do not override occupied cells
                 if(!occupied){
                     tile.setBlock(block);
                 }
 
-                if(block.hasEntity()){
+                if(block.hasBuilding()){
                     try{
                         readChunk(stream, true, in -> {
                             byte version = in.readByte();

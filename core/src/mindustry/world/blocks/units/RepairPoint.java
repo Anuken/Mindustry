@@ -70,10 +70,11 @@ public class RepairPoint extends Block{
             Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.turret);
+            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
 
             if(target != null && Angles.angleDist(angleTo(target), rotation) < 30f){
-                Draw.z(Layer.power);
+                Draw.z(Layer.flyingUnit + 1); //above all units
                 float ang = angleTo(target);
                 float len = 5f;
 

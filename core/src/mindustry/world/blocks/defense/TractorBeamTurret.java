@@ -3,7 +3,6 @@ package mindustry.world.blocks.defense;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -106,6 +105,7 @@ public class TractorBeamTurret extends Block{
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
+            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
 
             //draw laser if applicable

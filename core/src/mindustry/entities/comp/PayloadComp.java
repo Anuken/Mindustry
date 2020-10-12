@@ -25,15 +25,15 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     boolean canPickup(Unit unit){
-        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity;
+        return payloadUsed() + unit.hitSize * unit.hitSize <= type.payloadCapacity + 0.001f && unit.team == team() && unit.isAI();
     }
 
     boolean canPickup(Building build){
-        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity;
+        return payloadUsed() + build.block.size * build.block.size * Vars.tilesize * Vars.tilesize <= type.payloadCapacity + 0.001f && build.canPickup();
     }
 
     boolean canPickupPayload(Payload pay){
-        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity;
+        return payloadUsed() + pay.size()*pay.size() <= type.payloadCapacity + 0.001f;
     }
 
     boolean hasPayload(){
@@ -48,11 +48,14 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         unit.remove();
         payloads.add(new UnitPayload(unit));
         Fx.unitPickup.at(unit);
+        if(Vars.net.client()){
+            Vars.netClient.clearRemovedEntity(unit.id);
+        }
     }
 
     void pickup(Building tile){
-        tile.tile().remove();
-        payloads.add(new BlockPayload(tile));
+        tile.tile.remove();
+        payloads.add(new BuildPayload(tile));
         Fx.unitPickup.at(tile);
     }
 
@@ -71,6 +74,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     boolean tryDropPayload(Payload payload){
         Tile on = tileOn();
 
+        //clear removed state of unit so it can be synced
+        if(Vars.net.client() && payload instanceof UnitPayload){
+            Vars.netClient.clearRemovedEntity(((UnitPayload)payload).unit.id);
+        }
+
         //drop off payload on an acceptor if possible
         if(on != null && on.build != null && on.build.acceptPayload(on.build, payload)){
             Fx.unitDrop.at(on.build);
@@ -78,10 +86,10 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             return true;
         }
 
-        if(payload instanceof BlockPayload){
-            return dropBlock((BlockPayload)payload);
-        }else if(payload instanceof UnitPayload){
-            return dropUnit((UnitPayload)payload);
+        if(payload instanceof BuildPayload b){
+            return dropBlock(b);
+        }else if(payload instanceof UnitPayload p){
+            return dropUnit(p);
         }
         return false;
     }
@@ -90,7 +98,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         Unit u = payload.unit;
 
         //can't drop ground units
-        if(((tileOn() == null || tileOn().solid()) && u.elevation < 0.1f) || (!floorOn().isLiquid && u instanceof WaterMovec)){
+        if(!u.canPass(tileX(), tileY())){
             return false;
         }
 
@@ -110,13 +118,15 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     }
 
     /** @return whether the tile has been successfully placed. */
-    boolean dropBlock(BlockPayload payload){
-        Building tile = payload.entity;
-        int tx = Vars.world.toTile(x - tile.block().offset), ty = Vars.world.toTile(y - tile.block().offset);
+    boolean dropBlock(BuildPayload payload){
+        Building tile = payload.build;
+        int tx = Vars.world.toTile(x - tile.block.offset), ty = Vars.world.toTile(y - tile.block.offset);
         Tile on = Vars.world.tile(tx, ty);
-        if(on != null && Build.validPlace(tile.block(), tile.team, tx, ty, tile.rotation)){
+        if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
+
+            if(isPlayer()) payload.build.lastAccessed = getPlayer().name;
 
             Fx.unitDrop.at(tile);
             Fx.placeBlock.at(on.drawx(), on.drawy(), on.block().size);

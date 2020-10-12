@@ -1,7 +1,6 @@
 package mindustry.ui;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
@@ -16,6 +15,7 @@ import arc.scene.ui.ScrollPane.*;
 import arc.scene.ui.Slider.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.TextField.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -54,9 +54,9 @@ public class Styles{
         }};
         
         waveb = new ButtonStyle(){{
-            up = buttonEdge4;
-            over = buttonEdgeOver4;
-            disabled = buttonEdge4;
+            up = wavepane;
+            over = wavepane; //TODO wrong
+            disabled = wavepane;
         }};
 
         defaultt = new TextButtonStyle(){{
@@ -183,6 +183,9 @@ public class Styles{
             over = buttonRightOver;
             down = buttonRightDown;
             up = buttonRight;
+            disabled = buttonRightDisabled;
+            imageDisabledColor = Color.clear;
+            imageUpColor = Color.white;
         }};
         emptyi = new ImageButtonStyle(){{
             imageDownColor = Pal.accent;

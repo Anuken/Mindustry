@@ -11,11 +11,14 @@ import mindustry.world.modules.ItemModule.*;
 import java.util.*;
 
 public class ItemSeq implements Iterable<ItemStack>, Serializable{
-    protected final int[] values;
+    protected final int[] values = new int[Vars.content.items().size];
     public int total;
 
     public ItemSeq(){
-        values = new int[Vars.content.items().size];
+    }
+
+    public ItemSeq(Seq<ItemStack> stacks){
+        stacks.each(this::add);
     }
 
     public void each(ItemConsumer cons){
@@ -24,6 +27,11 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
                 cons.accept(Vars.content.item(i), values[i]);
             }
         }
+    }
+
+    public void clear(){
+        total = 0;
+        Arrays.fill(values, 0);
     }
 
     public Seq<ItemStack> toSeq(){
@@ -90,8 +98,10 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
 
     @Override
     public void read(Json json, JsonValue jsonData){
+        total = 0;
         for(Item item : Vars.content.items()){
             values[item.id] = jsonData.getInt(item.name, 0);
+            total += values[item.id];
         }
     }
 

@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.Queue;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -71,7 +70,7 @@ abstract class BuilderComp implements Unitc{
         Tile tile = world.tile(current.x, current.y);
 
         if(within(tile, finalPlaceDst)){
-            rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
+            lookAt(angleTo(tile));
         }
 
         if(!(tile.block() instanceof ConstructBlock)){
@@ -108,15 +107,14 @@ abstract class BuilderComp implements Unitc{
         ConstructBuild entity = tile.bc();
 
         if(current.breaking){
-            entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            entity.construct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.config);
+            entity.construct(self(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.config);
         }
 
         current.stuck = Mathf.equal(current.progress, entity.progress);
         current.progress = entity.progress;
     }
-
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     void drawBuildRequests(){
@@ -209,7 +207,7 @@ abstract class BuilderComp implements Unitc{
         BuildPlan plan = buildPlan();
         Tile tile = world.tile(plan.x, plan.y);
 
-        if(dst(tile) > buildingRange && !state.isEditor()){
+        if((!within(tile, buildingRange) && !state.isEditor()) || tile == null){
             return;
         }
 

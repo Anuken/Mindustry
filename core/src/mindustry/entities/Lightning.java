@@ -24,17 +24,15 @@ public class Lightning{
 
     /** Create a lighting branch at a location. Use Team.derelict to damage everyone. */
     public static void create(Team team, Color color, float damage, float x, float y, float targetAngle, int length){
-        createLightingInternal(null, lastSeed++, team, color, damage, x, y, targetAngle, length);
+        createLightningInternal(null, lastSeed++, team, color, damage, x, y, targetAngle, length);
     }
 
     /** Create a lighting branch at a location. Uses bullet parameters. */
     public static void create(Bullet bullet, Color color, float damage, float x, float y, float targetAngle, int length){
-        createLightingInternal(bullet, lastSeed++, bullet.team, color, damage, x, y, targetAngle, length);
+        createLightningInternal(bullet, lastSeed++, bullet.team, color, damage, x, y, targetAngle, length);
     }
 
-    //TODO remote method
-    //@Remote(called = Loc.server, unreliable = true)
-    private static void createLightingInternal(Bullet hitter, int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
+    private static void createLightningInternal(Bullet hitter, int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
         random.setSeed(seed);
         hit.clear();
 

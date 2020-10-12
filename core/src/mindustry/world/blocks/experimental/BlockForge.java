@@ -4,7 +4,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -51,7 +50,7 @@ public class BlockForge extends PayloadAcceptor{
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
     }
 
-    public class BlockForgeBuild extends PayloadAcceptorBuild<BlockPayload>{
+    public class BlockForgeBuild extends PayloadAcceptorBuild<BuildPayload>{
         public @Nullable Block recipe;
         public float progress, time, heat;
 
@@ -83,7 +82,7 @@ public class BlockForge extends PayloadAcceptor{
 
                 if(progress >= recipe.buildCost){
                     consume();
-                    payload = new BlockPayload(recipe, team);
+                    payload = new BuildPayload(recipe, team);
                     progress = 0f;
                 }
             }else{

@@ -16,6 +16,7 @@ public class LoadoutDialog extends BaseDialog{
     private Runnable hider;
     private Runnable resetter;
     private Runnable updater;
+    //TODO use itemseqs
     private Seq<ItemStack> stacks = new Seq<>();
     private Seq<ItemStack> originalStacks = new Seq<>();
     private Boolf<Item> validator = i -> true;

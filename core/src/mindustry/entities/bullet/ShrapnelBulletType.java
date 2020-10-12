@@ -13,6 +13,7 @@ public class ShrapnelBulletType extends BulletType{
     public float length = 100f;
     public float width = 20f;
     public Color fromColor = Color.white, toColor = Pal.lancerLaser;
+    public boolean hitLarge = false;
 
     public int serrations = 7;
     public float serrationLenScl = 10f, serrationWidth = 4f, serrationSpacing = 8f, serrationSpaceOffset = 80f, serrationFadeOffset = 0.5f;
@@ -25,11 +26,19 @@ public class ShrapnelBulletType extends BulletType{
         despawnEffect = Fx.none;
         pierce = true;
         keepVelocity = false;
+        hittable = false;
     }
 
     @Override
     public void init(Bullet b){
-        Damage.collideLaser(b, length);
+        Damage.collideLaser(b, length, hitLarge);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        drawSize = Math.max(drawSize, length*2f);
     }
 
     @Override

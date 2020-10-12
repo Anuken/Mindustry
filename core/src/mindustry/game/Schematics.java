@@ -9,7 +9,6 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.io.Streams.*;
@@ -28,6 +27,7 @@ import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
@@ -346,9 +346,9 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
 
-                if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof ConstructBlock)){
-                    int top = linked.block().size/2;
-                    int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
+                if(linked != null && linked.block.isVisible() && !(linked.block instanceof ConstructBlock)){
+                    int top = linked.block.size/2;
+                    int bot = linked.block.size % 2 == 1 ? -linked.block.size/2 : -(linked.block.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
                     miny = Math.min(linked.tileY() + bot, miny);
                     maxx = Math.max(linked.tileX() + top, maxx);
@@ -374,11 +374,11 @@ public class Schematics implements Loadable{
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
 
-                if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof ConstructBlock)
-                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
+                if(tile != null && !counted.contains(tile.pos()) && !(tile.block instanceof ConstructBlock)
+                    && (tile.block.isVisible() || (tile.block instanceof CoreBlock))){
                     Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
+                    tiles.add(new Stile(tile.block, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }
@@ -486,8 +486,9 @@ public class Schematics implements Loadable{
             IntMap<Block> blocks = new IntMap<>();
             byte length = stream.readByte();
             for(int i = 0; i < length; i++){
-                Block block = Vars.content.getByName(ContentType.block, stream.readUTF());
-                blocks.put(i, block == null ? Blocks.air : block);
+                String name = stream.readUTF();
+                Block block = Vars.content.getByName(ContentType.block, SaveFileReader.fallback.get(name, name));
+                blocks.put(i, block == null || block instanceof LegacyBlock ? Blocks.air : block);
             }
 
             int total = stream.readInt();

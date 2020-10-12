@@ -3,7 +3,6 @@ package mindustry.type;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -11,9 +10,9 @@ import mindustry.maps.generators.*;
 import mindustry.ui.*;
 
 public class SectorPreset extends UnlockableContent{
-    public @NonNull FileMapGenerator generator;
-    public @NonNull Planet planet;
-    public @NonNull Sector sector;
+    public FileMapGenerator generator;
+    public Planet planet;
+    public Sector sector;
 
     public int captureWave = 0;
     public Cons<Rules> rules = rules -> rules.winWave = captureWave;

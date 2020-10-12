@@ -1,13 +1,13 @@
 package mindustry.type;
 
-import arc.struct.*;
 import arc.graphics.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import mindustry.ctype.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Item extends UnlockableContent{
     public final Color color;

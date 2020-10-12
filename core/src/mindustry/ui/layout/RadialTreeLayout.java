@@ -1,7 +1,7 @@
 package mindustry.ui.layout;
 
-import arc.struct.*;
 import arc.math.*;
+import arc.struct.*;
 
 public class RadialTreeLayout implements TreeLayout{
     private static ObjectSet<TreeNode> visited = new ObjectSet<>();

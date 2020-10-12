@@ -1,6 +1,6 @@
 package mindustry.net;
 
-import arc.Core;
+import arc.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.core.*;

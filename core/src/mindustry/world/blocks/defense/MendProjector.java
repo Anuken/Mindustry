@@ -77,7 +77,7 @@ public class MendProjector extends Block{
 
                 indexer.eachBlock(this, realRange, other -> other.damaged(), other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
-                    Fx.healBlockFull.at(other.x, other.y, other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
                 });
             }
         }
@@ -100,10 +100,9 @@ public class MendProjector extends Block{
             Draw.color(baseColor, phaseColor, phaseHeat);
             Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
             Draw.rect(topRegion, x, y);
-
             Draw.alpha(1f);
             Lines.stroke((2f * f + 0.2f) * heat);
-            Lines.square(x, y, ((1f - f) * 8f) * size / 2f);
+            Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
 
             Draw.reset();
         }

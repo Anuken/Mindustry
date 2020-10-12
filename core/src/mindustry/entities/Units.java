@@ -1,5 +1,6 @@
 package mindustry.entities;
 
+import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
@@ -19,6 +20,15 @@ public class Units{
     private static boolean boolResult;
 
     @Remote(called = Loc.server)
+    public static void unitCapDeath(Unit unit){
+        if(unit != null){
+            unit.dead = true;
+            Fx.unitCapKill.at(unit);
+            Core.app.post(() -> Call.unitDestroy(unit.id));
+        }
+    }
+
+    @Remote(called = Loc.server)
     public static void unitDeath(int uid){
         Unit unit = Groups.unit.getByID(uid);
 
@@ -32,6 +42,21 @@ public class Units{
         }
     }
 
+    //destroys immediately
+    @Remote(called = Loc.server)
+    public static void unitDestroy(int uid){
+        Unit unit = Groups.unit.getByID(uid);
+
+        //if there's no unit don't add it later and get it stuck as a ghost
+        if(netClient != null){
+            netClient.addRemovedEntity(uid);
+        }
+
+        if(unit != null){
+            unit.destroy();
+        }
+    }
+
     @Remote(called = Loc.server)
     public static void unitDespawn(Unit unit){
         Fx.unitDespawn.at(unit.x, unit.y, 0, unit);
@@ -40,7 +65,7 @@ public class Units{
 
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team, UnitType type){
-        return teamIndex.countType(team, type) < getCap(team);
+        return team.data().countType(type) < getCap(team);
     }
 
     public static int getCap(Team team){
@@ -99,7 +124,7 @@ public class Units{
 
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
-            if(unit.isGrounded() == ground){
+            if((unit.isGrounded() && !unit.type().hovering) == ground){
                 unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){
@@ -150,6 +175,18 @@ public class Units{
         }
     }
 
+    /** Returns the closest target enemy. First, units are checked, then tile entities. */
+    public static Teamc bestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Building> tilePred, Sortf sort){
+        if(team == Team.derelict) return null;
+
+        Unit unit = bestEnemy(team, x, y, range, unitPred, sort);
+        if(unit != null){
+            return unit;
+        }else{
+            return findEnemyTile(team, x, y, range, tilePred);
+        }
+    }
+
     /** Returns the closest enemy of this team. Filter by predicate. */
     public static Unit closestEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate){
         if(team == Team.derelict) return null;
@@ -164,6 +201,26 @@ public class Units{
             if(dst2 < range*range && (result == null || dst2 < cdist)){
                 result = e;
                 cdist = dst2;
+            }
+        });
+
+        return result;
+    }
+
+    /** Returns the closest enemy of this team using a custom comparison function. Filter by predicate. */
+    public static Unit bestEnemy(Team team, float x, float y, float range, Boolf<Unit> predicate, Sortf sort){
+        if(team == Team.derelict) return null;
+
+        result = null;
+        cdist = 0f;
+
+        nearbyEnemies(team, x - range, y - range, range*2f, range*2f, e -> {
+            if(e.dead() || !predicate.get(e) || !e.within(x, y, range)) return;
+
+            float cost = sort.cost(e, x, y);
+            if(result == null || cost < cdist){
+                result = e;
+                cdist = cost;
             }
         });
 
@@ -227,7 +284,7 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        teamIndex.tree(team).intersect(x, y, width, height, cons);
+        team.data().tree().intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a circle around this position. */
@@ -259,7 +316,7 @@ public class Units{
             //inactive teams have no cache, check everything
             //TODO cache all teams with units OR blocks
             for(Team other : Team.all){
-                if(other != team && teamIndex.count(other) > 0){
+                if(other != team && other.data().unitCount > 0){
                     nearby(other, x, y, width, height, cons);
                 }
             }
@@ -272,4 +329,7 @@ public class Units{
         nearbyEnemies(team, rect.x, rect.y, rect.width, rect.height, cons);
     }
 
+    public interface Sortf{
+        float cost(Unit unit, float x, float y);
+    }
 }

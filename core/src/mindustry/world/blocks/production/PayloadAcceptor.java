@@ -3,7 +3,7 @@ package mindustry.world.blocks.production;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
@@ -11,7 +11,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class PayloadAcceptor extends Block{
     public float payloadSpeed = 0.5f;
@@ -28,22 +28,22 @@ public class PayloadAcceptor extends Block{
     }
 
     public static boolean blends(Building tile, int direction){
-        int size = tile.block().size;
+        int size = tile.block.size;
         Building accept = tile.nearby(Geometry.d4(direction).x * size, Geometry.d4(direction).y * size);
         return accept != null &&
-            accept.block().outputsPayload &&
+            accept.block.outputsPayload &&
 
             //if size is the same, block must either be facing this one, or not be rotating
-            ((accept.block().size == size &&
+            ((accept.block.size == size &&
             ((accept.tileX() + Geometry.d4(accept.rotation).x * size == tile.tileX() && accept.tileY() + Geometry.d4(accept.rotation).y * size == tile.tileY())
-            || !accept.block().rotate  || (accept.block().rotate && !accept.block().outputFacing))) ||
+            || !accept.block.rotate  || (accept.block.rotate && !accept.block.outputFacing))) ||
 
             //if the other block is smaller, check alignment
-            (accept.block().size < size &&
+            (accept.block.size < size &&
             (accept.rotation % 2 == 0 ? //check orientation; make sure it's aligned properly with this block.
-                Math.abs(accept.y - tile.y) <= (size * tilesize - accept.block().size * tilesize)/2f : //check Y alignment
-                Math.abs(accept.x - tile.x) <= (size * tilesize - accept.block().size * tilesize)/2f   //check X alignment
-                )) && (!accept.block().rotate || accept.front() == tile || !accept.block().outputFacing) //make sure it's facing this block
+                Math.abs(accept.y - tile.y) <= (size * tilesize - accept.block.size * tilesize)/2f : //check Y alignment
+                Math.abs(accept.x - tile.x) <= (size * tilesize - accept.block.size * tilesize)/2f   //check X alignment
+                )) && (!accept.block.rotate || accept.front() == tile || !accept.block.outputFacing) //make sure it's facing this block
             );
     }
 
@@ -112,7 +112,7 @@ public class PayloadAcceptor extends Block{
                 payVector.clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
 
                 Building front = front();
-                if(front != null && front.block().outputsPayload){
+                if(front != null && front.block.outputsPayload){
                     if(movePayload(payload)){
                         payload = null;
                     }

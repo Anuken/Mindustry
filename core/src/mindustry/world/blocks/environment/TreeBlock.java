@@ -1,13 +1,12 @@
 package mindustry.world.blocks.environment;
 
 import arc.graphics.g2d.*;
-import arc.math.Mathf;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.graphics.Layer;
-import mindustry.world.Block;
-import mindustry.world.Tile;
+import mindustry.graphics.*;
+import mindustry.world.*;
 
 public class TreeBlock extends Block{
     public @Load("@-shadow") TextureRegion shadow;
@@ -24,7 +23,7 @@ public class TreeBlock extends Block{
 
         float x = tile.worldx(), y = tile.worldy();
         float rot = Mathf.randomSeed(tile.pos(), 0, 4) * 90 + Mathf.sin(Time.time() + x, 50f, 0.5f) + Mathf.sin(Time.time() - y, 65f, 0.9f) + Mathf.sin(Time.time() + y - x, 85f, 0.9f);
-        float w = region.getWidth() * Draw.scl, h = region.getHeight() * Draw.scl;
+        float w = region.width * Draw.scl, h = region.height * Draw.scl;
         float scl = 30f, mag = 0.2f;
 
         if(shadow.found()){

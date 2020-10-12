@@ -2,14 +2,13 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class OverflowGate extends Block{
     public float speed = 1f;
@@ -24,6 +23,7 @@ public class OverflowGate extends Block{
         instantTransfer = true;
         unloadable = false;
         canOverdrive = false;
+        itemCapacity = 1;
     }
 
     @Override
@@ -91,14 +91,14 @@ public class OverflowGate extends Block{
             int from = relativeToEdge(src);
             if(from == -1) return null;
             Building to = nearby((from + 2) % 4);
-            boolean canForward = to != null && to.acceptItem(this, item) && to.team == team && !(to.block() instanceof OverflowGate);
+            boolean canForward = to != null && to.acceptItem(this, item) && to.team == team && !(to.block instanceof OverflowGate);
             boolean inv = invert == enabled;
 
             if(!canForward || inv){
                 Building a = nearby(Mathf.mod(from - 1, 4));
                 Building b = nearby(Mathf.mod(from + 1, 4));
-                boolean ac = a != null && a.acceptItem(this, item) && !(a.block() instanceof OverflowGate) && a.team == team;
-                boolean bc = b != null && b.acceptItem(this, item) && !(b.block() instanceof OverflowGate) && b.team == team;
+                boolean ac = a != null && a.acceptItem(this, item) && !(a.block instanceof OverflowGate) && a.team == team;
+                boolean bc = b != null && b.acceptItem(this, item) && !(b.block instanceof OverflowGate) && b.team == team;
 
                 if(!ac && !bc){
                     return inv && canForward ? to : null;

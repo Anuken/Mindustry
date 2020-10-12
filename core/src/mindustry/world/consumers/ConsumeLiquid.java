@@ -1,15 +1,14 @@
 package mindustry.world.consumers;
 
-import arc.struct.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 public class ConsumeLiquid extends ConsumeLiquidBase{
-    public final @NonNull Liquid liquid;
+    public final Liquid liquid;
 
     public ConsumeLiquid(Liquid liquid, float amount){
         super(amount);

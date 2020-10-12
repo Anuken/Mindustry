@@ -9,8 +9,8 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class LogicDisplay extends Block{
     public static final byte
@@ -34,11 +34,18 @@ public class LogicDisplay extends Block{
         solid = true;
     }
 
+    @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(BlockStat.displaySize, "@x@", displaySize, displaySize);
+    }
+
     public class LogicDisplayBuild extends Building{
         public FrameBuffer buffer;
         public float color = Color.whiteFloatBits;
         public float stroke = 1f;
-        public LongQueue commands = new LongQueue(LExecutor.maxDisplayBuffer);
+        public LongQueue commands = new LongQueue(256);
 
         @Override
         public void draw(){
@@ -60,7 +67,6 @@ public class LogicDisplay extends Block{
                     buffer.begin();
                     Draw.color(color);
                     Lines.stroke(stroke);
-                    Lines.precise(true);
 
                     while(!commands.isEmpty()){
                         long c = commands.removeFirst();
@@ -69,19 +75,17 @@ public class LogicDisplay extends Block{
                         p1 = DisplayCmd.p1(c), p2 = DisplayCmd.p2(c), p3 = DisplayCmd.p3(c), p4 = DisplayCmd.p4(c);
 
                         switch(type){
-                            case commandClear: Core.graphics.clear(x/255f, y/255f, p1/255f, 1f); break;
-                            case commandLine: Lines.line(x, y, p1, p2); break;
-                            case commandRect: Fill.crect(x, y, p1, p2); break;
-                            case commandLineRect: Lines.rect(x, y, p1, p2); break;
-                            case commandPoly: Fill.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
-                            case commandLinePoly: Lines.poly(x, y, Math.min(p1, maxSides), p2, p3); break;
-                            case commandTriangle: Fill.tri(x, y, p1, p2, p3, p4); break;
-                            case commandColor: this.color = Color.toFloatBits(x, y, p1, p2); Draw.color(this.color); break;
-                            case commandStroke: this.stroke = x; Lines.stroke(x); break;
+                            case commandClear -> Core.graphics.clear(x / 255f, y / 255f, p1 / 255f, 1f);
+                            case commandLine -> Lines.line(x, y, p1, p2);
+                            case commandRect -> Fill.crect(x, y, p1, p2);
+                            case commandLineRect -> Lines.rect(x, y, p1, p2);
+                            case commandPoly -> Fill.poly(x, y, Math.min(p1, maxSides), p2, p3);
+                            case commandLinePoly -> Lines.poly(x, y, Math.min(p1, maxSides), p2, p3);
+                            case commandTriangle -> Fill.tri(x, y, p1, p2, p3, p4);
+                            case commandColor -> Draw.color(this.color = Color.toFloatBits(x, y, p1, p2));
+                            case commandStroke -> Lines.stroke(this.stroke = x);
                         }
                     }
-
-                    Lines.precise(false);
 
                     buffer.end();
                     Draw.proj(Tmp.m1);

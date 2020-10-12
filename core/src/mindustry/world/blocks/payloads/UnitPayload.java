@@ -1,15 +1,23 @@
 package mindustry.world.blocks.payloads;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.entities.EntityCollisions.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
 public class UnitPayload implements Payload{
+    public static final float deactiveDuration = 40f;
+
     public Unit unit;
+    public float deactiveTime = 0f;
 
     public UnitPayload(Unit unit){
         this.unit = unit;
@@ -35,6 +43,24 @@ public class UnitPayload implements Payload{
 
     @Override
     public boolean dump(){
+        if(!Units.canCreate(unit.team, unit.type())){
+            deactiveTime = 1f;
+            return false;
+        }
+
+        //check if unit can be dumped here
+        SolidPred solid = unit.solidity();
+        if(solid != null){
+            int tx = unit.tileX(), ty = unit.tileY();
+            boolean nearEmpty = !solid.solid(tx, ty);
+            for(Point2 p : Geometry.d4){
+                nearEmpty |= !solid.solid(tx + p.x, ty + p.y);
+            }
+
+            //cannot dump on solid blocks
+            if(!nearEmpty) return false;
+        }
+
         //no client dumping
         if(Vars.net.client()) return true;
 
@@ -49,5 +75,18 @@ public class UnitPayload implements Payload{
     public void draw(){
         Drawf.shadow(unit.x, unit.y, 20);
         Draw.rect(unit.type().icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
+
+        //draw warning
+        if(deactiveTime > 0){
+            Draw.color(Color.scarlet);
+            Draw.alpha(0.8f * Interp.exp5Out.apply(deactiveTime));
+
+            float size = 8f;
+            Draw.rect(Icon.warning.getRegion(), unit.x, unit.y, size, size);
+
+            Draw.reset();
+
+            deactiveTime = Math.max(deactiveTime - Time.delta/deactiveDuration, 0f);
+        }
     }
 }
