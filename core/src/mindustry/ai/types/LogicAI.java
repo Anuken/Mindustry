@@ -21,6 +21,7 @@ public class LogicAI extends AIController{
     public LUnitControl control = LUnitControl.stop;
     public float moveX, moveY, moveRad;
     public float itemTimer, payTimer, controlTimer = logicControlTimeout, targetTimer;
+    @Nullable
     public Building controller;
     public BuildPlan plan = new BuildPlan();
 

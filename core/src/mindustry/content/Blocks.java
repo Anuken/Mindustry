@@ -702,7 +702,7 @@ public class Blocks implements ContentList{
             drawer = new DrawAnimation();
 
             consumes.item(Items.sporePod, 1);
-            consumes.power(0.60f);
+            consumes.power(0.7f);
         }};
 
         pulverizer = new GenericCrafter("pulverizer"){{
@@ -727,7 +727,7 @@ public class Blocks implements ContentList{
             hasPower = hasItems = hasLiquids = true;
 
             consumes.liquid(Liquids.oil, 0.1f);
-            consumes.power(0.5f);
+            consumes.power(0.7f);
         }};
 
         incinerator = new Incinerator("incinerator"){{
@@ -829,27 +829,27 @@ public class Blocks implements ContentList{
         }};
 
         scrapWall = new Wall("scrap-wall"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with(Items.scrap, 6));
             health = 60 * wallHealthMultiplier;
             variants = 5;
         }};
 
         scrapWallLarge = new Wall("scrap-wall-large"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 4));
             health = 60 * 4 * wallHealthMultiplier;
             size = 2;
             variants = 4;
         }};
 
         scrapWallHuge = new Wall("scrap-wall-huge"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 9));
             health = 60 * 9 * wallHealthMultiplier;
             size = 3;
             variants = 3;
         }};
 
         scrapWallGigantic = new Wall("scrap-wall-gigantic"){{
-            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            requirements(Category.defense, BuildVisibility.sandboxOnly, ItemStack.mult(scrapWall.requirements, 16));
             health = 60 * 16 * wallHealthMultiplier;
             size = 4;
         }};
@@ -994,7 +994,7 @@ public class Blocks implements ContentList{
 
         router = new Router("router"){{
             requirements(Category.distribution, with(Items.copper, 3));
-            buildCostMultiplier = 2f;
+            buildCostMultiplier = 4f;
         }};
 
         distributor = new Router("distributor"){{
@@ -1287,7 +1287,7 @@ public class Blocks implements ContentList{
         }};
 
         cultivator = new Cultivator("cultivator"){{
-            requirements(Category.production, with(Items.copper, 10, Items.lead, 25, Items.silicon, 10));
+            requirements(Category.production, with(Items.copper, 25, Items.lead, 25, Items.silicon, 10));
             outputItem = new ItemStack(Items.sporePod, 1);
             craftTime = 140;
             size = 2;
@@ -1295,7 +1295,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             hasItems = true;
 
-            consumes.power(0.80f);
+            consumes.power(0.9f);
             consumes.liquid(Liquids.water, 0.2f);
         }};
 
@@ -1341,6 +1341,7 @@ public class Blocks implements ContentList{
             size = 4;
 
             unitCapModifier = 14;
+            researchCostMultiplier = 0.04f;
         }};
 
         coreNucleus = new CoreBlock("core-nucleus"){{
@@ -1352,6 +1353,7 @@ public class Blocks implements ContentList{
             size = 5;
 
             unitCapModifier = 20;
+            researchCostMultiplier = 0.06f;
         }};
 
         vault = new StorageBlock("vault"){{

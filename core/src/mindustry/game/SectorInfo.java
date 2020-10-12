@@ -10,6 +10,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.modules.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class SectorInfo{
@@ -42,7 +44,15 @@ public class SectorInfo{
     /** Counter refresh state. */
     private transient Interval time = new Interval();
     /** Core item storage to prevent spoofing. */
-    private transient int[] lastCoreItems;
+    private transient int[] coreItemCounts;
+
+    /** Handles core item changes. */
+    public void handleCoreItem(Item item, int amount){
+        if(coreItemCounts == null){
+            coreItemCounts = new int[content.items().size];
+        }
+        coreItemCounts[item.id] += amount;
+    }
 
     /** @return the real location items go when launched on this sector */
     public Sector getRealDestination(){
@@ -105,12 +115,6 @@ public class SectorInfo{
             universe.runTurn();
         }
 
-        //create last stored core items
-        if(lastCoreItems == null){
-            lastCoreItems = new int[content.items().size];
-            updateCoreDeltas();
-        }
-
         CoreBuild ent = state.rules.defaultTeam.core();
 
         //refresh throughput
@@ -124,14 +128,15 @@ public class SectorInfo{
                     stat.loaded = true;
                 }
 
-                //how the resources changed - only interested in negative deltas, since that's what happens during spoofing
-                int coreDelta = Math.min(ent == null ? 0 : ent.items.get(item) - lastCoreItems[item.id], 0);
-
                 //add counter, subtract how many items were taken from the core during this time
-                stat.means.add(Math.max(stat.counter + coreDelta, 0));
+                stat.means.add(Math.max(stat.counter, 0));
                 stat.counter = 0;
                 stat.mean = stat.means.rawMean();
             });
+
+            if(coreItemCounts == null){
+                coreItemCounts = new int[content.items().size];
+            }
 
             //refresh core items
             for(Item item : content.items()){
@@ -143,21 +148,14 @@ public class SectorInfo{
 
                 //get item delta
                 //TODO is preventing negative production a good idea?
-                int delta = Math.max((ent == null ? 0 : ent.items.get(item)) - lastCoreItems[item.id], 0);
+                int delta = Math.max(ent == null ? 0 : coreItemCounts[item.id], 0);
 
                 //store means
                 stat.means.add(delta);
                 stat.mean = stat.means.rawMean();
             }
 
-            updateCoreDeltas();
-        }
-    }
-
-    private void updateCoreDeltas(){
-        CoreBuild ent = state.rules.defaultTeam.core();
-        for(int i = 0; i < lastCoreItems.length; i++){
-            lastCoreItems[i] = ent == null ? 0 : ent.items.get(i);
+            Arrays.fill(coreItemCounts, 0);
         }
     }
 

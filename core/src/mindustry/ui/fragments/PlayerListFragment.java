@@ -24,7 +24,9 @@ public class PlayerListFragment extends Fragment{
 
     @Override
     public void build(Group parent){
+        content.name = "players";
         parent.fill(cont -> {
+            cont.name = "playerlist";
             cont.visible(() -> visible);
             cont.update(() -> {
                 if(!(net.active() && state.isGame())){
@@ -47,6 +49,7 @@ public class PlayerListFragment extends Fragment{
                 sField = pane.field(null, text -> {
                     rebuild();
                 }).grow().pad(8).get();
+                sField.name = "search";
                 sField.setMaxLength(maxNameLength);
                 sField.setMessageText(Core.bundle.format("players.search"));
 
@@ -56,6 +59,7 @@ public class PlayerListFragment extends Fragment{
 
                 pane.table(menu -> {
                     menu.defaults().growX().height(50f).fillY();
+                    menu.name = "menu";
 
                     menu.button("@server.bans", ui.bans::show).disabled(b -> net.client());
                     menu.button("@server.admins", ui.admins::show).disabled(b -> net.client());
@@ -99,6 +103,7 @@ public class PlayerListFragment extends Fragment{
             };
             table.margin(8);
             table.add(new Image(user.icon()).setScaling(Scaling.bounded)).grow();
+            table.name = user.name();
 
             button.add(table).size(h);
             button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);

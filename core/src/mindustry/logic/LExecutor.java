@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ai.types.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -251,6 +252,11 @@ public class LExecutor{
                         case spawn -> {
                             res = Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
                         }
+                        case damaged -> {
+                            Building b = Units.findDamagedTile(unit.team, unit.x, unit.y);
+                            res = b == null ? null : b.tile;
+                            build = true;
+                        }
                     }
 
                     if(res != null && (!build || res.build != null)){
@@ -435,12 +441,16 @@ public class LExecutor{
                     }
                     case getBlock -> {
                         float x = exec.numf(p1), y = exec.numf(p2);
-                        if(unit.within(x, y, unit.range())){
+                        float range = Math.max(unit.range(), buildingRange);
+                        if(!unit.within(x, y, range)){
                             exec.setobj(p3, null);
+                            exec.setnum(p4, 0);
                         }else{
                             Tile tile = world.tileWorld(x, y);
-                            Block block = tile == null || !tile.synthetic() ? null : tile.block();
+                            //any environmental solid block is returned as StoneWall, aka "@solid"
+                            Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
                             exec.setobj(p3, block);
+                            exec.setnum(p4, tile != null && tile.build != null ? tile.build.rotation : 0);
                         }
                     }
                     case itemDrop -> {

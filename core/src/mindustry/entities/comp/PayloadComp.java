@@ -86,10 +86,10 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             return true;
         }
 
-        if(payload instanceof BuildPayload){
-            return dropBlock((BuildPayload)payload);
-        }else if(payload instanceof UnitPayload){
-            return dropUnit((UnitPayload)payload);
+        if(payload instanceof BuildPayload b){
+            return dropBlock(b);
+        }else if(payload instanceof UnitPayload p){
+            return dropUnit(p);
         }
         return false;
     }
@@ -125,6 +125,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
             int rot = (int)((rotation + 45f) / 90f) % 4;
             payload.place(on, rot);
+
+            if(isPlayer()) payload.build.lastAccessed = getPlayer().name;
 
             Fx.unitDrop.at(tile);
             Fx.placeBlock.at(on.drawx(), on.drawy(), on.block().size);

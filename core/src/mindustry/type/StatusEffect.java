@@ -13,8 +13,8 @@ import mindustry.gen.*;
 public class StatusEffect extends MappableContent{
     /** Damage dealt by the unit with the effect. */
     public float damageMultiplier = 1f;
-    /** Unit armor multiplier. */
-    public float armorMultiplier = 1f;
+    /** Unit health multiplier. */
+    public float healthMultiplier = 1f;
     /** Unit speed multiplier */
     public float speedMultiplier = 1f;
     /** Unit speed multiplier */

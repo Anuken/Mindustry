@@ -256,7 +256,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true, unreliable = true)
-    public static void rotateBlock(Player player, Building tile, boolean direction){
+    public static void rotateBlock(@Nullable Player player, Building tile, boolean direction){
         if(tile == null) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
@@ -264,6 +264,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             throw new ValidateException(player, "Player cannot rotate a block.");
         }
 
+        if(player != null) tile.lastAccessed = player.name;
         tile.rotation = Mathf.mod(tile.rotation + Mathf.sign(direction), 4);
         tile.updateProximity();
         tile.noSleep();
@@ -531,6 +532,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 });
             }else{
                 lastSchematic.tags.put("name", text);
+                lastSchematic.tags.put("description", "");
                 schematics.add(lastSchematic);
                 ui.showInfoFade("@schematic.saved");
                 ui.schematics.showInfo(lastSchematic);
