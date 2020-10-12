@@ -30,6 +30,8 @@ public class WaveInfoDialog extends BaseDialog{
     private UnitType lastType = UnitTypes.dagger;
     private float updateTimer, updatePeriod = 1f;
     private WaveGraph graph = new WaveGraph();
+    private Table payloadTable;
+    private float payloadAmount = 0;
 
     public WaveInfoDialog(MapEditor editor){
         super("@waves.title");
@@ -247,7 +249,7 @@ public class WaveInfoDialog extends BaseDialog{
                     if(group.type.create(Team.sharded) instanceof Payloadc) {
                         t.row();
                         t.button(b -> {
-                            b.add(group.type.localizedName);
+                            b.add("@payload.editor");
                         }, () -> {
                             updatePayload(group);
                         }).height(46f).pad(-6f).padBottom(0f);
@@ -288,22 +290,25 @@ public class WaveInfoDialog extends BaseDialog{
 
     void updatePayload(SpawnGroup group){
         BaseDialog dialog = new BaseDialog("");
+
         if(group.payloads != null){
             dialog.cont.pane(p -> {
+                payloadTable = p;
                 for(UnitType payload : group.payloads){
-                    p.button(b -> {
-                        b.left();
-                        b.image(payload.icon(mindustry.ui.Cicon.medium)).size(32f).padRight(3);
-                        b.add(payload.localizedName).color(Pal.accent);
+                    p.table(t -> {
+                        t.table(Tex.button, b -> {
+                            b.left();
+                            b.image(payload.icon(mindustry.ui.Cicon.medium)).size(32f).padRight(3);
+                            b.add(payload.localizedName).color(Pal.accent);
 
-                        b.add().growX();
+                            b.add().growX();
 
-                        b.button(Icon.cancel, () -> {
-                            group.payloads.remove(e -> e.name.equals(payload.name));
-                            dialog.hide();
-                        }).pad(-6).size(46f).padRight(-12f);
-                    }, () -> {
-                    }).height(46f).width(400f).pad(-6f).padBottom(0f);
+                            b.button(Icon.cancel, () -> {
+                                group.payloads.remove(e -> e.name.equals(payload.name));
+                                t.remove();
+                            }).pad(-6).size(46f).padRight(-12f);
+                        }).height(46f).width(300f).pad(1f).padBottom(0f);
+                    });
                     p.row();
                 }
             });
@@ -312,19 +317,46 @@ public class WaveInfoDialog extends BaseDialog{
         dialog.cont.pane(p -> {
             int i = 0;
             for(UnitType type : content.units()){
-                if(type.isHidden()) continue;
+                if(type.isHidden() || type.flying || (type.hitSize * type.hitSize >= (group.type.payloadCapacity + 0.001f))) continue;
                 p.button(t -> {
                     t.left();
                     t.image(type.icon(Cicon.medium)).size(40f).padRight(2f);
                     t.add(type.localizedName);
                 }, () -> {
-                    if(group.payloads == null){
-                        group.payloads = Seq.with(type);
-                    } else {
-                        group.payloads.add(type);
+                    if(group.payloads != null){
+                        payloadAmount = 0;
+                        for(UnitType unit : group.payloads){
+                            payloadAmount += (unit.hitSize * unit.hitSize);
+                        }
                     }
-                    dialog.hide();
-                    buildGroups();
+                    if((type.hitSize * type.hitSize) + payloadAmount <= (group.type.payloadCapacity + 0.001f)) {
+                        if (group.payloads == null) {
+                            group.payloads = Seq.with(type);
+                        } else {
+                            group.payloads.add(type);
+                        }
+
+                        payloadTable.table(t -> {
+                            t.table(Tex.button, b -> {
+                                b.left();
+                                b.image(type.icon(mindustry.ui.Cicon.medium)).size(32f).padRight(3);
+                                b.add(type.localizedName).color(Pal.accent);
+
+                                b.add().growX();
+
+                                b.button(Icon.cancel, () -> {
+                                    group.payloads.remove(e -> e.name.equals(type.name));
+                                    t.remove();
+                                }).pad(-6).size(46f).padRight(-12f);
+                            }).height(46f).width(300f).pad(1f).padBottom(0f);
+                        });
+
+                        payloadTable.row();
+
+                        buildGroups();
+                    } else {
+                        ui.showOkText("Maximum Capacity", "The maximum payload capacity in the unit " + group.type.localizedName + " has been used up.", () -> {});
+                    }
                 }).pad(2).margin(12f).fillX();
                 if(++i % 3 == 0) p.row();
             }
