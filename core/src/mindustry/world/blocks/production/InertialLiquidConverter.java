@@ -75,7 +75,7 @@ public class InertialLiquidConverter extends LiquidConverter{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.01f);
             }
 
-            productionEfficiency = Mathf.pow(warmup, 4f);
+            productionEfficiency = warmup;
             dumpLiquid(outputLiquid.liquid);
         }
 
@@ -90,7 +90,7 @@ public class InertialLiquidConverter extends LiquidConverter{
 
             Draw.rect(region, x, y);
 
-            spinRotation += Time.delta * warmup * warmup * 4;
+            spinRotation += Time.delta * warmup * warmup * 8;
             Draw.rect(rotatorRegion, x, y, spinRotation);
             Draw.rect(topRegion, x, y);
         }
