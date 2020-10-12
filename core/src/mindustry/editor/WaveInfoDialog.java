@@ -1,9 +1,11 @@
 package mindustry.editor;
 
 import arc.*;
+import arc.func.Boolf;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.event.*;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
@@ -242,6 +244,16 @@ public class WaveInfoDialog extends BaseDialog{
 
                     t.row();
                     t.check("@waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
+
+
+                    if(group.type.create(Team.sharded) instanceof Payloadc) {
+                        t.row();
+                        t.button(b -> {
+                            b.add(group.type.localizedName);
+                        }, () -> {
+                            updatePayload(group);
+                        }).height(46f).pad(-6f).padBottom(0f);
+                    }
                 }).width(340f).pad(8);
 
                 table.row();
@@ -273,6 +285,53 @@ public class WaveInfoDialog extends BaseDialog{
                 if(++i % 3 == 0) p.row();
             }
         });
+        dialog.show();
+    }
+
+    void updatePayload(SpawnGroup group){
+        BaseDialog dialog = new BaseDialog("");
+        if(group.payloads != null){
+            dialog.cont.pane(p -> {
+                for(UnitType payload : group.payloads){
+                    p.button(b -> {
+                        b.left();
+                        b.image(payload.icon(mindustry.ui.Cicon.medium)).size(32f).padRight(3);
+                        b.add(payload.localizedName).color(Pal.accent);
+
+                        b.add().growX();
+
+                        b.button(Icon.cancel, () -> {
+                            group.payloads.remove(e -> e.name.equals(payload.name));
+                            dialog.hide();
+                        }).pad(-6).size(46f).padRight(-12f);
+                    }, () -> {
+                    }).height(46f).width(400f).pad(-6f).padBottom(0f);
+                    p.row();
+                }
+            });
+        }
+        dialog.setFillParent(true);
+        dialog.cont.pane(p -> {
+            int i = 0;
+            for(UnitType type : content.units()){
+                if(type.isHidden()) continue;
+                p.button(t -> {
+                    t.left();
+                    t.image(type.icon(Cicon.medium)).size(40f).padRight(2f);
+                    t.add(type.localizedName);
+                }, () -> {
+                    if(group.payloads == null){
+                        group.payloads = Seq.with(type);
+                    } else {
+                        group.payloads.add(type);
+                    }
+                    dialog.hide();
+                    buildGroups();
+                }).pad(2).margin(12f).fillX();
+                if(++i % 3 == 0) p.row();
+            }
+        });
+        dialog.addCloseButton();
         dialog.show();
     }
 
