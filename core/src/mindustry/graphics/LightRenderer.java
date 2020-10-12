@@ -10,7 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 /** Renders overlay lights. Client only. */
 public class LightRenderer{
@@ -58,10 +58,10 @@ public class LightRenderer{
             TextureRegion ledge = Core.atlas.find("circle-end"), lmid = Core.atlas.find("circle-mid");
 
             float color = Draw.getColor().toFloatBits();
-            float u = lmid.getU();
-            float v = lmid.getV2();
-            float u2 = lmid.getU2();
-            float v2 = lmid.getV();
+            float u = lmid.u;
+            float v = lmid.v2;
+            float u2 = lmid.u2;
+            float v2 = lmid.v;
 
 
             Vec2 v1 = Tmp.v1.trnsExact(rot + 90f, stroke);
@@ -98,15 +98,15 @@ public class LightRenderer{
             vertices[22] = v;
             vertices[23] = 0;
 
-            Draw.vert(ledge.getTexture(), vertices, 0, vertices.length);
+            Draw.vert(ledge.texture, vertices, 0, vertices.length);
 
 
             Vec2 v3 = Tmp.v2.trnsExact(rot, stroke);
 
-            u = ledge.getU();
-            v = ledge.getV2();
-            u2 = ledge.getU2();
-            v2 = ledge.getV();
+            u = ledge.u;
+            v = ledge.v2;
+            u2 = ledge.u2;
+            v2 = ledge.v;
 
             vertices[0] = lx4;
             vertices[1] = ly4;
@@ -136,7 +136,7 @@ public class LightRenderer{
             vertices[22] = v;
             vertices[23] = 0;
 
-            Draw.vert(ledge.getTexture(), vertices, 0, vertices.length);
+            Draw.vert(ledge.texture, vertices, 0, vertices.length);
 
             vertices[0] = lx2;
             vertices[1] = ly2;
@@ -166,7 +166,7 @@ public class LightRenderer{
             vertices[22] = v;
             vertices[23] = 0;
 
-            Draw.vert(ledge.getTexture(), vertices, 0, vertices.length);
+            Draw.vert(ledge.texture, vertices, 0, vertices.length);
         });
     }
 

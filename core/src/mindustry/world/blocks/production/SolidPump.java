@@ -3,7 +3,6 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -87,10 +86,7 @@ public class SolidPump extends Pump{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
-            Draw.color(liquids.current().color);
-            Draw.alpha(liquids.total() / liquidCapacity);
-            Draw.rect(liquidRegion, x, y);
-            Draw.color();
+            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
             Draw.rect(rotatorRegion, x, y, pumpTime * rotateSpeed);
             Draw.rect(topRegion, x, y);
         }

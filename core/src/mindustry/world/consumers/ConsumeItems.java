@@ -1,9 +1,7 @@
 package mindustry.world.consumers;
 
-import arc.math.*;
-import arc.struct.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -11,7 +9,7 @@ import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
 public class ConsumeItems extends Consume{
-    public final @NonNull ItemStack[] items;
+    public final ItemStack[] items;
 
     public ConsumeItems(ItemStack[] items){
         this.items = items;
@@ -38,7 +36,7 @@ public class ConsumeItems extends Consume{
     public void build(Building tile, Table table){
         for(ItemStack stack : items){
             table.add(new ReqImage(new ItemImage(stack.item.icon(Cicon.medium), stack.amount),
-                () -> tile.items != null && tile.items.has(stack.item, stack.amount))).size(8 * 4).padRight(Mathf.digits(stack.amount) * 6);
+                () -> tile.items != null && tile.items.has(stack.item, stack.amount))).padRight(8);
         }
     }
 

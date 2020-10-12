@@ -1,8 +1,6 @@
 package mindustry.net;
 
-import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -12,15 +10,13 @@ import mindustry.net.Packets.*;
 
 import java.io.*;
 
-import static mindustry.Vars.netServer;
+import static mindustry.Vars.*;
 
 public abstract class NetConnection{
     public final String address;
     public String uuid = "AAAAAAAA", usid = uuid;
     public boolean mobile, modclient;
     public @Nullable Player player;
-    public @Nullable Unitc lastUnit;
-    public Vec2 lastPosition = new Vec2();
     public boolean kicked = false;
 
     /** ID of last received client snapshot. */
@@ -68,9 +64,7 @@ public abstract class NetConnection{
 
         Log.info("Kicking connection @; Reason: @", address, reason.replace("\n", " "));
 
-        PlayerInfo info = netServer.admins.getInfo(uuid);
-        info.timesKicked++;
-        info.lastKicked = Math.max(Time.millis() + kickDuration, info.lastKicked);
+        netServer.admins.handleKicked(uuid, address, kickDuration);
 
         Call.kick(this, reason);
 

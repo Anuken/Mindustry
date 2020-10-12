@@ -2,13 +2,12 @@ package mindustry.world.modules;
 
 import arc.math.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.type.*;
 
 import java.util.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class LiquidModule extends BlockModule{
     private static final int windowSize = 3, updateInterval = 60;
@@ -20,6 +19,7 @@ public class LiquidModule extends BlockModule{
     private Liquid current = content.liquid(0);
     private float smoothLiquid;
 
+    private boolean hadFlow;
     private @Nullable WindowedMean flow;
     private float lastAdded, currentFlowRate;
 
@@ -29,6 +29,8 @@ public class LiquidModule extends BlockModule{
             if(flowTimer.get(1, pollScl)){
 
                 if(flow == null) flow = new WindowedMean(windowSize);
+                if(lastAdded > 0.0001f) hadFlow = true;
+
                 flow.add(lastAdded);
                 lastAdded = 0;
                 if(currentFlowRate < 0 || flowTimer.get(updateInterval)){
@@ -38,12 +40,17 @@ public class LiquidModule extends BlockModule{
         }else{
             currentFlowRate = -1f;
             flow = null;
+            hadFlow = false;
         }
     }
 
     /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
     public float getFlowRate(){
         return currentFlowRate * 60;
+    }
+
+    public boolean hadFlow(){
+        return hadFlow;
     }
 
     public float smoothAmount(){

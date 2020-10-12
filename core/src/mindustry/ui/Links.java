@@ -1,11 +1,11 @@
 package mindustry.ui;
 
-import arc.Core;
+import arc.*;
+import arc.graphics.*;
 import arc.scene.style.*;
-import arc.util.Strings;
-import arc.graphics.Color;
+import arc.util.*;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 
 public class Links{
     private static LinkEntry[] links;

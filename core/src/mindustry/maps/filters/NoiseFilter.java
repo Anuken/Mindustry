@@ -1,17 +1,15 @@
 package mindustry.maps.filters;
 
 import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.maps.filters.FilterOption.BlockOption;
-import mindustry.maps.filters.FilterOption.SliderOption;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.maps.filters.FilterOption.*;
+import mindustry.world.*;
 
-import static mindustry.maps.filters.FilterOption.floorsOnly;
-import static mindustry.maps.filters.FilterOption.wallsOnly;
+import static mindustry.maps.filters.FilterOption.*;
 
 public class NoiseFilter extends GenerateFilter{
     float scl = 40, threshold = 0.5f, octaves = 3f, falloff = 0.5f;
-    Block floor = Blocks.stone, block = Blocks.rocks;
+    Block floor = Blocks.stone, block = Blocks.stoneWall;
 
     @Override
     public FilterOption[] options(){

@@ -12,6 +12,10 @@ public enum BlockFlag{
     repair,
     /** Rally point. */
     rally,
+    /** Block that stored power for resupply. */
+    powerRes,
+    /** Block used for resupply. */
+    resupply,
     /** Any block that boosts unit capacity. */
     unitModifier;
 

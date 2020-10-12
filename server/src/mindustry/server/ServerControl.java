@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.struct.*;
 import arc.struct.Seq.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.Timer;
 import arc.util.CommandHandler.*;
@@ -55,6 +54,8 @@ public class ServerControl implements ApplicationListener{
     private Thread socketThread;
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
+
+    private String yes;
 
     public ServerControl(String[] args){
         Core.settings.defaults(
@@ -491,7 +492,7 @@ public class ServerControl implements ApplicationListener{
             }
 
             for(Item item : content.items()){
-                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block().itemCapacity);
+                state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().block.itemCapacity);
             }
 
             info("Core filled.");
@@ -749,7 +750,7 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+            Player playert = Groups.player.find(p -> p.name.equalsIgnoreCase(arg[1]));
             if(playert != null){
                 target = playert.getInfo();
             }else{
@@ -763,7 +764,7 @@ public class ServerControl implements ApplicationListener{
                 }else{
                     netServer.admins.unAdminPlayer(target.id);
                 }
-                if(playert != null) playert.admin(add);
+                if(playert != null) playert.admin = add;
                 info("Changed admin status of player: &ly@", target.lastName);
             }else{
                 err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
@@ -908,6 +909,14 @@ public class ServerControl implements ApplicationListener{
             info("&ly@&lg MB collected. Memory usage now at &ly@&lg MB.", pre - post, post);
         });
 
+        handler.register("yes", "Run the above \"did you mean\" suggestion.", arg -> {
+            if(yes == null){
+                err("There is nothing to say yes to.");
+            }else{
+                handleCommandString(yes);
+            }
+        });
+
         mods.eachClass(p -> p.registerServerCommands(handler));
     }
 
@@ -938,6 +947,7 @@ public class ServerControl implements ApplicationListener{
 
             if(closest != null){
                 err("Command not found. Did you mean \"" + closest.text + "\"?");
+                yes = line.replace(response.runCommand, closest.text);
             }else{
                 err("Invalid command. Type 'help' for help.");
             }
@@ -945,6 +955,8 @@ public class ServerControl implements ApplicationListener{
             err("Too few command arguments. Usage: " + response.command.text + " " + response.command.paramText);
         }else if(response.type == ResponseType.manyArguments){
             err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
+        }else if(response.type == ResponseType.valid){
+            yes = null;
         }
     }
 
@@ -967,7 +979,9 @@ public class ServerControl implements ApplicationListener{
             for(Player p : players){
                 if(p.con == null) continue;
 
+                boolean wasAdmin = p.admin;
                 p.reset();
+                p.admin = wasAdmin;
                 if(state.rules.pvp){
                     p.team(netServer.assignTeam(p, new SeqIterable<>(players)));
                 }

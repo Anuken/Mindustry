@@ -35,17 +35,18 @@ public class PausedDialog extends BaseDialog{
 
         if(!mobile){
             //TODO localize
-            cont.label(() -> state.getSector() == null ? "" :
-            ("[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining() +
-                (state.rules.winWave > 0 && !state.getSector().isCaptured() ? "\n[lightgray]Reach wave[accent] " + state.rules.winWave + "[] to capture" : "")))
-            .visible(() -> state.getSector() != null).colspan(2);
+            //TODO capturing is disabled, remove?
+            //cont.label(() -> state.getSector() == null ? "" :
+            //("[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining() +
+            //    (state.rules.winWave > 0 && !state.getSector().isCaptured() ? "\n[lightgray]Reach wave[accent] " + state.rules.winWave + "[] to capture" : "")))
+           // .visible(() -> state.getSector() != null).colspan(2);
             cont.row();
 
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
-            cont.button("@back", Icon.left, this::hide);
-            cont.button("@settings", Icon.settings, ui.settings::show);
+            cont.button("@back", Icon.left, this::hide).name("back");
+            cont.button("@settings", Icon.settings, ui.settings::show).name("settings");
 
             if(!state.rules.tutorial){
                 if(!state.isCampaign() && !state.isEditor()){
@@ -87,8 +88,8 @@ public class PausedDialog extends BaseDialog{
             }else if(state.isCampaign()){
                 cont.buttonRow("@launchcore", Icon.up, () -> {
                     hide();
-                    ui.planet.show(state.getSector(), player.team().core());
-                }).disabled(b -> player.team().core() == null || !player.team().core().items.has(player.team().core().block.requirements));
+                    ui.planet.showLaunch(state.getSector(), player.team().core());
+                }).disabled(b -> player.team().core() == null);
 
                 cont.row();
 

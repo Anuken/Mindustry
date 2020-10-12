@@ -8,7 +8,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -40,7 +39,7 @@ public class Effect{
     }
 
     public Effect(float life, Cons<EffectContainer> renderer){
-        this(life, 28f, renderer);
+        this(life,50f, renderer);
     }
 
     public Effect ground(){
@@ -86,11 +85,14 @@ public class Effect{
         create(this, x, y, rotation, Color.white, data);
     }
 
-    public void render(int id, Color color, float life, float rotation, float x, float y, Object data){
+    public float render(int id, Color color, float life, float lifetime, float rotation, float x, float y, Object data){
         container.set(id, color, life, lifetime, rotation, x, y, data);
         Draw.z(ground ? Layer.debris : Layer.effect);
+        Draw.reset();
         renderer.get(container);
         Draw.reset();
+
+        return container.lifetime;
     }
 
     public static @Nullable Effect get(int id){
@@ -124,13 +126,13 @@ public class Effect{
 
             if(view.overlaps(pos)){
                 EffectState entity = EffectState.create();
-                entity.effect(effect);
-                entity.rotation(rotation);
-                entity.data(data);
-                entity.lifetime(effect.lifetime);
+                entity.effect = effect;
+                entity.rotation = rotation;
+                entity.data = (data);
+                entity.lifetime = (effect.lifetime);
                 entity.set(x, y);
-                entity.color().set(color);
-                if(data instanceof Posc) entity.parent((Posc)data);
+                entity.color.set(color);
+                if(data instanceof Posc) entity.parent = ((Posc)data);
                 entity.add();
             }
         }
@@ -144,7 +146,7 @@ public class Effect{
         if(headless || region == null || !Core.atlas.isFound(region)) return;
 
         Tile tile = world.tileWorld(x, y);
-        if(tile == null || tile.floor().isLiquid) return;
+        if(tile == null || !tile.floor().hasSurface()) return;
 
         Decal decal = Decal.create();
         decal.set(x, y);

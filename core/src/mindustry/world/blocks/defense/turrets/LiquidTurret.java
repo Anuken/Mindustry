@@ -1,22 +1,23 @@
 package mindustry.world.blocks.defense.turrets;
 
-import arc.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
     public @Load("@-liquid") TextureRegion liquidRegion;
+    public @Load("@-top") TextureRegion topRegion;
 
     public LiquidTurret(String name){
         super(name);
@@ -54,22 +55,26 @@ public class LiquidTurret extends Turret{
     }
 
     public class LiquidTurretBuild extends TurretBuild{
-
         @Override
         public void draw(){
             super.draw();
             
-            if(Core.atlas.isFound(liquidRegion)){
-                Draw.color(liquids.current().color);
-                Draw.alpha(liquids.total() / liquidCapacity);
-                Draw.rect(liquidRegion, x + tr2.x, y + tr2.y, rotation - 90);
-                Draw.color();
+            if(liquidRegion.found()){
+                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
             }
+            if(topRegion.found()) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
         }
 
         @Override
         public boolean shouldActiveSound(){
             return target != null && hasAmmo();
+        }
+
+        @Override
+        public void updateTile(){
+            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
+
+            super.updateTile();
         }
 
         @Override
@@ -108,7 +113,7 @@ public class LiquidTurret extends Turret{
         public BulletType useAmmo(){
             if(cheating()) return ammoTypes.get(liquids.current());
             BulletType type = ammoTypes.get(liquids.current());
-            liquids.remove(liquids.current(), type.ammoMultiplier);
+            liquids.remove(liquids.current(), 1f / type.ammoMultiplier);
             return type;
         }
 
@@ -119,7 +124,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
-            return ammoTypes.get(liquids.current()) != null && liquids.total() >= ammoTypes.get(liquids.current()).ammoMultiplier;
+            return ammoTypes.get(liquids.current()) != null && liquids.total() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
         }
 
         @Override
@@ -128,10 +133,10 @@ public class LiquidTurret extends Turret{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null
                 && (liquids.current() == liquid || (ammoTypes.containsKey(liquids.current())
-                && liquids.get(liquids.current()) <= ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f));
+                && liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f));
         }
     }
 }

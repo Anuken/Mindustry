@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.Queue;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -16,7 +15,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.BuildBlock.*;
+import mindustry.world.blocks.ConstructBlock.*;
 
 import java.util.*;
 
@@ -71,10 +70,10 @@ abstract class BuilderComp implements Unitc{
         Tile tile = world.tile(current.x, current.y);
 
         if(within(tile, finalPlaceDst)){
-            rotation = Mathf.slerpDelta(rotation, angleTo(tile), 0.4f);
+            lookAt(angleTo(tile));
         }
 
-        if(!(tile.block() instanceof BuildBlock)){
+        if(!(tile.block() instanceof ConstructBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
                 boolean hasAll = infinite || !Structs.contains(current.block.requirements, i -> core != null && !core.items.has(i.item));
 
@@ -94,33 +93,28 @@ abstract class BuilderComp implements Unitc{
             return;
         }
 
-        if(tile.build instanceof BuildEntity && !current.initialized){
+        if(tile.build instanceof ConstructBuild && !current.initialized){
             Core.app.post(() -> Events.fire(new BuildSelectEvent(tile, team(), (Builderc)this, current.breaking)));
             current.initialized = true;
         }
 
         //if there is no core to build with or no build entity, stop building!
-        if((core == null && !infinite) || !(tile.build instanceof BuildEntity)){
+        if((core == null && !infinite) || !(tile.build instanceof ConstructBuild)){
             return;
         }
 
         //otherwise, update it.
-        BuildEntity entity = tile.bc();
+        ConstructBuild entity = tile.bc();
 
         if(current.breaking){
-            entity.deconstruct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            if(entity.construct(base(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.hasConfig)){
-                if(current.hasConfig){
-                    Call.tileConfig(null, tile.build, current.config);
-                }
-            }
+            entity.construct(self(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.config);
         }
 
         current.stuck = Mathf.equal(current.progress, entity.progress);
         current.progress = entity.progress;
     }
-
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     void drawBuildRequests(){
@@ -183,8 +177,8 @@ abstract class BuilderComp implements Unitc{
             plans.remove(replace);
         }
         Tile tile = world.tile(place.x, place.y);
-        if(tile != null && tile.build instanceof BuildEntity){
-            place.progress = tile.<BuildEntity>bc().progress;
+        if(tile != null && tile.build instanceof ConstructBuild){
+            place.progress = tile.<ConstructBuild>bc().progress;
         }
         if(tail){
             plans.addLast(place);
@@ -213,7 +207,7 @@ abstract class BuilderComp implements Unitc{
         BuildPlan plan = buildPlan();
         Tile tile = world.tile(plan.x, plan.y);
 
-        if(dst(tile) > buildingRange && !state.isEditor()){
+        if((!within(tile, buildingRange) && !state.isEditor()) || tile == null){
             return;
         }
 

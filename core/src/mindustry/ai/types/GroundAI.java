@@ -1,10 +1,9 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import mindustry.ai.Pathfinder.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -35,24 +34,24 @@ public class GroundAI extends AIController{
                 if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
             }
 
-            if(move) moveToCore(FlagTarget.enemyCores);
+            if(move) pathfind(Pathfinder.fieldCore);
         }
 
         if(command() == UnitCommand.rally){
             Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
 
             if(target != null && !unit.within(target, 70f)){
-                moveToCore(FlagTarget.rallyPoints);
+                pathfind(Pathfinder.fieldRally);
             }
         }
 
-        if(unit.type().canBoost){
+        if(unit.type().canBoost && !unit.onSolid()){
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
-        if(!Units.invalidateTarget(target, unit, unit.range())){
+        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type().rotateShooting){
             if(unit.type().hasWeapons()){
-                unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
+                unit.lookAt(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
             unit.lookAt(unit.vel().angle());
@@ -72,43 +71,5 @@ public class GroundAI extends AIController{
                 }
             }
         }*/
-    }
-
-    protected void moveToCore(FlagTarget path){
-        Tile tile = unit.tileOn();
-        if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, unit.team, path);
-
-        if(tile == targetTile) return;
-
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
-    }
-
-    protected void moveAwayFromCore(){
-        Team enemy = null;
-        for(Team team : unit.team().enemies()){
-            if(team.active()){
-                enemy = team;
-                break;
-            }
-        }
-
-        if(enemy == null){
-            for(Team team : unit.team().enemies()){
-                enemy = team;
-                break;
-            }
-        }
-
-        if(enemy == null) return;
-
-        Tile tile = unit.tileOn();
-        if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, enemy, FlagTarget.enemyCores);
-        Building core = unit.closestCore();
-
-        if(tile == targetTile || core == null || unit.within(core, 120f)) return;
-
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }
 }

@@ -35,7 +35,8 @@ public class SectorDamage{
         if(core != null && !frontier.isEmpty()){
             for(Tile spawner : frontier){
                 //find path from spawn to core
-                Seq<Tile> path = Astar.pathfind(spawner, core.tile, t -> t.cost, t -> !(t.block().isStatic() && t.solid()));
+                //TODO this is broken
+                Seq<Tile> path = Astar.pathfind(spawner, core.tile, SectorDamage::cost, t -> !(t.block().isStatic() && t.solid()));
                 int amount = (int)(path.size * fraction);
                 for(int i = 0; i < amount; i++){
                     Tile t = path.get(i);
@@ -104,8 +105,12 @@ public class SectorDamage{
                 }
             }
         }
+    }
 
-
-
+    static float cost(Tile tile){
+        return 1f +
+            (tile.block().isStatic() && tile.solid() ? 200f : 0f) +
+            (tile.build != null ? tile.build.health / 40f : 0f) +
+            (tile.floor().isLiquid ? 10f : 0f);
     }
 }

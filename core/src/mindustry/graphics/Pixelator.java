@@ -8,7 +8,7 @@ import arc.graphics.gl.*;
 import arc.util.*;
 
 import static arc.Core.*;
-import static mindustry.Vars.renderer;
+import static mindustry.Vars.*;
 
 public class Pixelator implements Disposable{
     private FrameBuffer buffer = new FrameBuffer();

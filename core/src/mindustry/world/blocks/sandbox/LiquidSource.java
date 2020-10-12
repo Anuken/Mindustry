@@ -2,7 +2,6 @@ package mindustry.world.blocks.sandbox;
 
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -11,7 +10,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class LiquidSource extends Block{
 
@@ -25,6 +24,7 @@ public class LiquidSource extends Block{
         outputsLiquid = true;
         saveConfig = true;
         noUpdateDisabled = true;
+        displayFlow = false;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
         configClear((LiquidSourceBuild tile) -> tile.source = null);
@@ -59,7 +59,9 @@ public class LiquidSource extends Block{
         public void draw(){
             super.draw();
 
-            if(source != null){
+            if(source == null){
+                Draw.rect("cross", x, y);
+            }else{
                 Draw.color(source.color);
                 Draw.rect("center", x, y);
                 Draw.color();

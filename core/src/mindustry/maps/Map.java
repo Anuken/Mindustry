@@ -1,11 +1,10 @@
 package mindustry.maps;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -99,7 +98,9 @@ public class Map implements Comparable<Map>, Publishable{
 
     public Rules rules(Rules base){
         try{
-            Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}"));
+            //this replacement is a MASSIVE hack but it fixes some incorrect overwriting of team-specific rules.
+            //may need to be tweaked later
+            Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}").replace("teams:{2:{infiniteAmmo:true}},", ""));
             if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
             return result;
         }catch(Exception e){
@@ -130,7 +131,7 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public String tag(String name){
-        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name) : Core.bundle.get("unknown");
+        return tags.containsKey(name) && !tags.get(name).trim().isEmpty() ? tags.get(name) : Core.bundle.get("unknown", "unknown");
     }
 
     public boolean hasTag(String name){
@@ -146,7 +147,7 @@ public class Map implements Comparable<Map>, Publishable{
     public void addSteamID(String id){
         tags.put("steamid", id);
 
-        ui.editor.editor.getTags().put("steamid", id);
+        ui.editor.editor.tags.put("steamid", id);
         try{
             ui.editor.save();
         }catch(Exception e){
@@ -159,7 +160,7 @@ public class Map implements Comparable<Map>, Publishable{
     public void removeSteamID(){
         tags.remove("steamid");
 
-        ui.editor.editor.getTags().remove("steamid");
+        ui.editor.editor.tags.remove("steamid");
         try{
             ui.editor.save();
         }catch(Exception e){
@@ -203,7 +204,7 @@ public class Map implements Comparable<Map>, Publishable{
     @Override
     public boolean prePublish(){
         tags.put("author", player.name);
-        ui.editor.editor.getTags().put("author", tags.get("author"));
+        ui.editor.editor.tags.put("author", tags.get("author"));
         ui.editor.save();
 
         return true;

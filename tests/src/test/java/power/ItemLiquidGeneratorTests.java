@@ -39,7 +39,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
                 powerProduction = 0.1f;
                 itemDuration = fakeItemDuration;
                 maxLiquidGenerate = maximumLiquidUsage;
-                entityType = ItemLiquidGeneratorBuild::new;
+                buildType = ItemLiquidGeneratorBuild::new;
             }
 
             @Override
@@ -87,7 +87,7 @@ public class ItemLiquidGeneratorTests extends PowerTestFixture{
         final float expectedRemainingLiquidAmount = Math.max(0.0f, availableLiquidAmount - expectedConsumptionPerTick * Time.delta);
 
         createGenerator(inputType);
-        assertTrue(entity.acceptLiquid(null, liquid, availableLiquidAmount), inputType + " | " + parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
+        assertTrue(entity.acceptLiquid(null, liquid), inputType + " | " + parameterDescription + ": Liquids which will be declined by the generator don't need to be tested - The code won't be called for those cases.");
 
         entity.liquids.add(liquid, availableLiquidAmount);
         entity.cons.update();

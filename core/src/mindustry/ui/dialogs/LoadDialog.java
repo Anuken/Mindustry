@@ -104,7 +104,7 @@ public class LoadDialog extends BaseDialog{
 
             button.left().add(new BorderImage(def, 4f)).update(im -> {
                 TextureRegionDrawable draw = (TextureRegionDrawable)im.getDrawable();
-                if(draw.getRegion().getTexture().isDisposed()){
+                if(draw.getRegion().texture.isDisposed()){
                     draw.setRegion(def);
                 }
 

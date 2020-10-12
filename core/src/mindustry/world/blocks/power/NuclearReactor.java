@@ -70,7 +70,7 @@ public class NuclearReactor extends PowerGenerator{
         @Override
         public void updateTile(){
             ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
-            Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
+            Item item = consumes.getItem().items[0].item;
 
             int fuel = items.get(item);
             float fullness = (float)fuel / itemCapacity;

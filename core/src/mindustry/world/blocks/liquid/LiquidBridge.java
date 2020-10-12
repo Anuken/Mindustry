@@ -6,7 +6,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class LiquidBridge extends ItemBridge{
 
@@ -15,6 +15,7 @@ public class LiquidBridge extends ItemBridge{
         hasItems = false;
         hasLiquids = true;
         outputsLiquid = true;
+        canOverdrive = false;
         group = BlockGroup.liquids;
     }
 

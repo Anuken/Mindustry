@@ -1,17 +1,17 @@
 package mindustry.game;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.gen.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -250,7 +250,7 @@ public class Tutorial{
             Building core = state.teams.playerCores().first();
 
             for(int i = 0; i < blocksToBreak; i++){
-                if(world.tile(core.tile().x + blockOffset, core.tile().y + i).block() == Blocks.scrapWall){
+                if(world.tile(core.tile.x + blockOffset, core.tile.y + i).block() == Blocks.scrapWall){
                     return false;
                 }
             }

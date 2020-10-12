@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -17,10 +18,8 @@ import static mindustry.Vars.*;
 /** Dialog for selecting loadout at sector launch. */
 public class LaunchLoadoutDialog extends BaseDialog{
     LoadoutDialog loadout = new LoadoutDialog();
-    //total as a map
-    ObjectIntMap<Item> totalMap = new ObjectIntMap<>();
     //total required items
-    Seq<ItemStack> total = new Seq<>();
+    ItemSeq total = new ItemSeq();
     //currently selected schematic
     Schematic selected;
     //validity of loadout items
@@ -33,21 +32,14 @@ public class LaunchLoadoutDialog extends BaseDialog{
     public void show(CoreBlock core, Building build, Runnable confirm){
         cont.clear();
         buttons.clear();
-        totalMap.clear();
-
-        Seq<ItemStack> stacks = universe.getLaunchResources();
 
         addCloseButton();
 
         //updates sum requirements
         Runnable update = () -> {
-            totalMap.clear();
             total.clear();
-            selected.requirements().each(i -> totalMap.increment(i.item, i.amount));
-            universe.getLaunchResources().each(i -> totalMap.increment(i.item, i.amount));
-            for(Item item : content.items()){
-                if(totalMap.containsKey(item)) total.add(new ItemStack(item, totalMap.get(item)));
-            }
+            selected.requirements().each(total::add);
+            universe.getLaunchResources().each(total::add);
             valid = build.items.has(total);
         };
 
@@ -55,10 +47,18 @@ public class LaunchLoadoutDialog extends BaseDialog{
             table.clearChildren();
             int i = 0;
 
+            ItemSeq schems = selected.requirements();
+            ItemSeq launches = universe.getLaunchResources();
+
             for(ItemStack s : total){
                 table.image(s.item.icon(Cicon.small)).left();
-                table.add((build.items.has(s.item, s.amount)) ? "[lightgray]" + s.amount + "" :
-                "[scarlet]" + (Math.min(build.items.get(s.item), s.amount) + "[lightgray]/" + s.amount)).padLeft(2).left().padRight(4);
+                int as = schems.get(s.item), al = launches.get(s.item);
+
+                String amountStr = "[lightgray]" + (al + " + [accent]" + as + "[lightgray]");
+
+                table.add(
+                    build.items.has(s.item, s.amount) ? amountStr :
+                    "[scarlet]" + (Math.min(build.items.get(s.item), s.amount) + "[lightgray]/" + amountStr)).padLeft(2).left().padRight(4);
 
                 if(++i % 4 == 0){
                     table.row();
@@ -71,8 +71,11 @@ public class LaunchLoadoutDialog extends BaseDialog{
         Runnable rebuildItems = () -> rebuild.get(items);
 
         buttons.button("@resources", Icon.terrain, () -> {
-            loadout.show(core.itemCapacity, stacks, stacks::clear, () -> {}, () -> {
-                universe.updateLaunchResources(stacks);
+            ItemSeq stacks = universe.getLaunchResources();
+            Seq<ItemStack> out = stacks.toSeq();
+
+            loadout.show(core.itemCapacity, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+                universe.updateLaunchResources(new ItemSeq(out));
                 update.run();
                 rebuildItems.run();
             });

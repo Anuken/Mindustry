@@ -5,12 +5,13 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-public class HealFieldAbility implements Ability{
+public class HealFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal;
-    public Effect activeEffect = Fx.healWave;
+    public Effect activeEffect = Fx.healWaveDynamic;
 
-    private boolean wasHealed = false;
+    protected float timer;
+    protected boolean wasHealed = false;
 
     HealFieldAbility(){}
 
@@ -22,9 +23,9 @@ public class HealFieldAbility implements Ability{
 
     @Override
     public void update(Unit unit){
-        unit.timer1 += Time.delta;
+        timer += Time.delta;
 
-        if(unit.timer1 >= reload){
+        if(timer >= reload){
             wasHealed = false;
 
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
@@ -36,10 +37,10 @@ public class HealFieldAbility implements Ability{
             });
 
             if(wasHealed){
-                activeEffect.at(unit);
+                activeEffect.at(unit, range);
             }
 
-            unit.timer1 = 0f;
+            timer = 0f;
         }
     }
 }

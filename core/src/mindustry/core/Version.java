@@ -2,8 +2,8 @@ package mindustry.core;
 
 import arc.*;
 import arc.Files.*;
-import arc.struct.*;
 import arc.files.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 
@@ -44,5 +44,13 @@ public class Version{
         }else{
             build = Strings.canParseInt(map.get("build")) ? Integer.parseInt(map.get("build")) : -1;
         }
+    }
+
+    /** get menu version without colors */
+    public static String combined(){
+        if(build == -1){
+            return "custom build";
+        }
+        return (type.equals("official") ? modifier : type) + " build " + build + (revision == 0 ? "" : "." + revision);
     }
 }

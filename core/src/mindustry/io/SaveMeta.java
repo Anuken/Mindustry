@@ -4,7 +4,7 @@ import arc.struct.*;
 import mindustry.game.*;
 import mindustry.maps.*;
 
-import static mindustry.Vars.maps;
+import static mindustry.Vars.*;
 
 public class SaveMeta{
     public int version;

@@ -2,6 +2,7 @@ package mindustry.world.blocks.defense;
 
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -23,6 +24,7 @@ public class Door extends Wall{
     public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;
     public Effect closefx = Fx.doorclose;
+    public Sound doorSound = Sounds.door;
     public @Load("@-open") TextureRegion openRegion;
 
     public Door(String name){
@@ -32,7 +34,7 @@ public class Door extends Wall{
         consumesTap = true;
 
         config(Boolean.class, (DoorBuild base, Boolean open) -> {
-            Sounds.door.at(base);
+            doorSound.at(base);
 
             for(DoorBuild entity : base.chained){
                 //skip doors with things in them

@@ -377,7 +377,7 @@ public class ApplicationTests{
         world.tile(length + 1, 0).setBlock(new Block("___"){{
             hasItems = true;
             destructible = true;
-            entityType = () -> new Building(){
+            buildType = () -> new Building(){
                 @Override
                 public void handleItem(Building source, Item item){
                     itemsa[0] ++;
@@ -422,6 +422,15 @@ public class ApplicationTests{
 
         assertEquals(250, world.width());
         assertEquals(300, world.height());
+    }
+
+    @Test
+    void load108Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("108.msav"));
+
+        assertEquals(256, world.width());
+        assertEquals(256, world.height());
     }
 
     @Test
@@ -574,7 +583,7 @@ public class ApplicationTests{
                     }catch(Throwable t){
                         fail("Failed to update block '" + tile.block() + "'.", t);
                     }
-                    assertEquals(tile.block(), tile.build.block());
+                    assertEquals(tile.block(), tile.build.block);
                     assertEquals(tile.block().health, tile.build.health());
                 }
             }

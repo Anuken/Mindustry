@@ -1,8 +1,5 @@
 [
   {
-    "address": "mindustry.us.to"
-  },
-  {
     "address": "mindustry.indielm.com:1101"
   },
   {
@@ -10,15 +7,6 @@
   },
   {
     "address": "mindustry.nydus.app:1337"
-  },
-  {
-    "address": "mindustry.ecansol.com:6597"
-  },
-  {
-    "address": "mindustry.ecansol.com:6499"
-  },
-  {
-    "address": "mindustry.ecansol.com:6599"
   },
   {
     "address": "mindustry.ru"
@@ -43,6 +31,15 @@
   },
   {
     "address": "aamindustry.play.ai"
+  },
+  {
+    "address": "aamindustry.play.ai:6568"
+  },
+  {
+    "address": "aamindustry.play.ai:6569"
+  },
+  {
+    "address": "aamindustry.play.ai:6570"
   },
   {
     "address": "mindustry.atannergaming.com"
@@ -76,5 +73,11 @@
   },
   {
     "address": "Chaotic-Neutral.ddns.net:3333"
+  },
+  {
+    "address": "pandorum.su:9999"
+  },
+  {
+    "address": "mindustryranked.ddns.net"
   }
 ]

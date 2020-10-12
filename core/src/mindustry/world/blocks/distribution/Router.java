@@ -28,14 +28,14 @@ public class Router extends Block{
         @Override
         public void updateTile(){
             if(lastItem == null && items.any()){
-                items.clear();
+                lastItem = items.first();
             }
 
             if(lastItem != null){
                 time += 1f / speed * delta();
                 Building target = getTileTarget(lastItem, lastInput, false);
 
-                if(target != null && (time >= 1f || !(target.block() instanceof Router || target.block().instantTransfer))){
+                if(target != null && (time >= 1f || !(target.block instanceof Router || target.block.instantTransfer))){
                     getTileTarget(lastItem, lastInput, true);
                     target.handleItem(this, lastItem);
                     items.remove(lastItem, 1);

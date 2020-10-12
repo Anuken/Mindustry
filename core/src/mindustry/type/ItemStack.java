@@ -1,7 +1,7 @@
 package mindustry.type;
 
-import arc.struct.Seq;
-import mindustry.content.Items;
+import arc.struct.*;
+import mindustry.content.*;
 
 public class ItemStack implements Comparable<ItemStack>{
     public static final ItemStack[] empty = {};

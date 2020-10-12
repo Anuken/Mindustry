@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -182,7 +181,7 @@ public class Control implements ApplicationListener, Loadable{
 
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
-            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block()));
+            app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effect.shake(5f, 5f, core);
@@ -193,7 +192,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void loadAsync(){
-        Draw.scl = 1f / Core.atlas.find("scale_marker").getWidth();
+        Draw.scl = 1f / Core.atlas.find("scale_marker").width;
 
         Core.input.setCatch(KeyCode.back, true);
 
@@ -280,6 +279,7 @@ public class Control implements ApplicationListener, Loadable{
                 try{
                     net.reset();
                     slot.load();
+                    slot.setAutosave(true);
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
@@ -317,10 +317,12 @@ public class Control implements ApplicationListener, Loadable{
             }else{
                 net.reset();
                 logic.reset();
+                sector.setSecondsPassed(0);
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching
                 state.secinfo.origin = origin;
+                state.secinfo.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);
@@ -329,6 +331,7 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playTutorial(){
+        ui.showInfo("@indev.notready");
         //TODO implement
         //ui.showInfo("death");
         /*
@@ -428,19 +431,12 @@ public class Control implements ApplicationListener, Loadable{
         //just a regular reminder
         if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
             app.post(() -> app.post(() -> {
-                ui.showStartupInfo("[accent]v6[] is currently in [accent]pre-alpha[].\n" +
-                "[lightgray]This means:[]\n" +
-                "- Content is missing\n" +
-                "- [scarlet]Mobile[] is not supported.\n" +
-                "- Most [scarlet]Unit AI[] does not work\n" +
-                "- Many units are [scarlet]missing[] or unfinished\n" +
-                "- The campaign is completely unfinished\n" +
-                "- Everything you see is subject to change or removal." +
-                "\n\nReport bugs or crashes on [accent]Github[].");
+                ui.showStartupInfo("@indev.popup");
             }));
         }
 
-        //play tutorial on stop
+        //play tutorial on start
+        //TODO no tutorial right now
         if(!settings.getBool("playedtutorial", false)){
             //Core.app.post(() -> Core.app.post(this::playTutorial));
         }
@@ -485,7 +481,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void update(){
-        //TODO find out why this happens on Android
+        //this happens on Android and nobody knows why
         if(assets == null) return;
 
         saves.update();
@@ -523,7 +519,7 @@ public class Control implements ApplicationListener, Loadable{
                 platform.updateRPC();
             }
 
-            if(Core.input.keyTap(Binding.pause) && !state.isOutOfTime() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 

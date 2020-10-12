@@ -4,14 +4,15 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -64,8 +65,12 @@ public class SchematicsDialog extends BaseDialog{
 
             t.update(() -> {
                 if(Core.input.keyTap(Binding.chat) && Core.scene.getKeyboardFocus() == searchField && firstSchematic != null){
-                    control.input.useSchematic(firstSchematic);
-                    hide();
+                    if(!Vars.state.rules.schematicsAllowed){
+                        ui.showInfo("@schematic.disabled");
+                    }else{
+                        control.input.useSchematic(firstSchematic);
+                        hide();
+                    }
                 }
             });
 
@@ -102,18 +107,36 @@ public class SchematicsDialog extends BaseDialog{
                             });
 
                             buttons.button(Icon.pencil, style, () -> {
-                                ui.showTextInput("@schematic.rename", "@name", s.name(), res -> {
-                                    Schematic replacement = schematics.all().find(other -> other.name().equals(res) && other != s);
-                                    if(replacement != null){
-                                        //renaming to an existing schematic is not allowed, as it is not clear how the tags would be merged, and which one should be removed
-                                        ui.showErrorMessage("@schematic.exists");
-                                        return;
-                                    }
+                                new Dialog("@schematic.rename"){{
+                                    cont.margin(30).add("@name").padRight(6f);
+                                    TextField nameField = cont.field(s.name(), null).size(400f, 55f).addInputDialog().get();
 
-                                    s.tags.put("name", res);
-                                    s.save();
-                                    rebuildPane[0].run();
-                                });
+                                    cont.row();
+
+                                    cont.margin(30).add("@editor.description").padRight(6f);
+                                    TextField descripionField = cont.area(s.description(), Styles.areaField, t -> {}).size(400f, 140f).addInputDialog().get();
+
+                                    Runnable accept = () -> {
+                                        s.tags.put("name", nameField.getText());
+                                        s.tags.put("description", descripionField.getText());
+                                        s.save();
+                                        hide();
+                                        rebuildPane[0].run();
+                                    };
+
+                                    buttons.defaults().size(120, 54).pad(4);
+                                    buttons.button("@ok", accept).disabled(b -> nameField.getText().isEmpty());
+                                    buttons.button("@cancel", this::hide);
+
+                                    keyDown(KeyCode.enter, () -> {
+                                        if(!nameField.getText().isEmpty() && Core.scene.getKeyboardFocus() != descripionField){
+                                            accept.run();
+                                        }
+                                    });
+                                    keyDown(KeyCode.escape, this::hide);
+                                    keyDown(KeyCode.back, this::hide);
+                                    show();
+                                }};
                             });
 
                             if(s.hasSteamID()){
@@ -146,8 +169,12 @@ public class SchematicsDialog extends BaseDialog{
                         if(state.isMenu()){
                             showInfo(s);
                         }else{
-                            control.input.useSchematic(s);
-                            hide();
+                            if(!Vars.state.rules.schematicsAllowed){
+                                ui.showInfo("@schematic.disabled");
+                            }else{
+                                control.input.useSchematic(s);
+                                hide();
+                            }
                         }
                     }).pad(4).style(Styles.cleari).get();
 
@@ -333,7 +360,7 @@ public class SchematicsDialog extends BaseDialog{
             cont.add(new SchematicImage(schem)).maxSize(800f);
             cont.row();
 
-            Seq<ItemStack> arr = schem.requirements();
+            ItemSeq arr = schem.requirements();
             cont.table(r -> {
                 int i = 0;
                 for(ItemStack s : arr){

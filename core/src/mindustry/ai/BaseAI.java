@@ -44,7 +44,7 @@ public class BaseAI{
             CoreBlock block = (CoreBlock)data.core().block;
 
             //create AI core unit
-            if(!Groups.unit.contains(u -> u.team() == data.team && u.type() == block.unitType)){
+            if(!state.isEditor() && !Groups.unit.contains(u -> u.team() == data.team && u.type() == block.unitType)){
                 Unit unit = block.unitType.create(data.team);
                 unit.set(data.core());
                 unit.add();

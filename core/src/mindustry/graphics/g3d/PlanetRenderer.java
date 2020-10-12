@@ -23,10 +23,6 @@ public class PlanetRenderer implements Disposable{
         shadowColor = new Color(0, 0, 0, 0.7f);
 
     private static final Seq<Vec3> points = new Seq<>();
-    private static final PlanetInterfaceRenderer emptyRenderer = new PlanetInterfaceRenderer(){
-        @Override public void renderSectors(Planet planet){}
-        @Override public void renderProjections(){}
-    };
 
     /** Camera direction relative to the planet. Length is determined by zoom. */
     public final Vec3 camPos = new Vec3();
@@ -37,7 +33,7 @@ public class PlanetRenderer implements Disposable{
     /** Camera used for rendering. */
     public Camera3D cam = new Camera3D();
     /** Raw vertex batch. */
-    public final VertexBatch3D batch = new VertexBatch3D(10000, false, true, 0);
+    public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
 
     public float zoom = 1f;
 
