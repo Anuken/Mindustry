@@ -354,6 +354,8 @@ public class Bullets implements ContentList{
             width = 16f;
             height = 23f;
             shootEffect = Fx.shootBig;
+            pierceCap = 2;
+            pierceBuilding = true;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
@@ -363,6 +365,8 @@ public class Bullets implements ContentList{
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
             shootEffect = Fx.shootBig;
+            pierceCap = 2;
+            pierceBuilding = true;
         }};
 
         damageLightning = new BulletType(0.0001f, 0f){{

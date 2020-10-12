@@ -889,7 +889,7 @@ public class LStatements{
                     table.row();
                 }
 
-                case spawn -> {
+                case spawn, damaged -> {
                     table.row();
                 }
             }

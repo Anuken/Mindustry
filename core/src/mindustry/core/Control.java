@@ -317,6 +317,7 @@ public class Control implements ApplicationListener, Loadable{
             }else{
                 net.reset();
                 logic.reset();
+                sector.setSecondsPassed(0);
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching

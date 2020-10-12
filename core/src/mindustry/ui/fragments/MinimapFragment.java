@@ -18,7 +18,7 @@ public class MinimapFragment extends Fragment{
     private boolean shown;
     float panx, pany, zoom = 1f, lastZoom = -1;
     private float baseSize = Scl.scl(5f);
-    private Element elem;
+    public Element elem;
 
     @Override
     public void build(Group parent){
