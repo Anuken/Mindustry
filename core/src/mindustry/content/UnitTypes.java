@@ -1544,7 +1544,7 @@ public class UnitTypes implements ContentList{
                 xRand = 8f;
                 shotDelay = 1f;
 
-                bullet = new MissileBulletType(4.2f, 25){{
+                bullet = new MissileBulletType(4.2f, 30){{
                     homingPower = 0.12f;
                     width = 8f;
                     height = 8f;
@@ -1552,8 +1552,8 @@ public class UnitTypes implements ContentList{
                     drag = -0.003f;
                     homingRange = 80f;
                     keepVelocity = false;
-                    splashDamageRadius = 25f;
-                    splashDamage = 25f;
+                    splashDamageRadius = 30f;
+                    splashDamage = 35f;
                     lifetime = 56f;
                     trailColor = Pal.bulletYellowBack;
                     backColor = Pal.bulletYellowBack;

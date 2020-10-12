@@ -339,6 +339,14 @@ public class DefaultWaves{
             shieldScaling = shieldsPerWave;
         }});
 
+        //shift back waves on higher difficulty for a harder start
+        int shift = Math.max((int)(difficulty * 15 - 5), 0);
+
+        for(SpawnGroup group : out){
+            group.begin -= shift;
+            group.end -= shift;
+        }
+
         return out;
     }
 }

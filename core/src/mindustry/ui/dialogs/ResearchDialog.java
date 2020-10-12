@@ -400,7 +400,8 @@ public class ResearchDialog extends BaseDialog{
                 }
             }
 
-            return false;
+            //can always spend when locked
+            return node.content.locked();
         }
 
         void spend(TechNode node){
@@ -414,7 +415,7 @@ public class ResearchDialog extends BaseDialog{
                 ItemStack completed = node.finishedRequirements[i];
 
                 //amount actually taken from inventory
-                int used = Math.min(req.amount - completed.amount, items.get(req.item));
+                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0);
                 items.remove(req.item, used);
                 completed.amount += used;
 
