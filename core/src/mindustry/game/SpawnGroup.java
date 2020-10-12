@@ -1,7 +1,6 @@
 package mindustry.game;
 
 import arc.struct.*;
-import arc.util.Log;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
@@ -9,7 +8,6 @@ import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.io.legacy.*;
 import mindustry.type.*;
-import mindustry.world.blocks.payloads.Payload;
 
 import static mindustry.Vars.*;
 
