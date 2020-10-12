@@ -1,11 +1,9 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.func.Boolf;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.event.*;
-import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
