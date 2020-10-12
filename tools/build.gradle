@@ -6,7 +6,7 @@ import arc.packer.*
 import arc.util.*
 
 import javax.imageio.*
-import java.awt.*
+import java.awt.Graphics2D
 import java.awt.image.*
 import java.util.concurrent.*
 
