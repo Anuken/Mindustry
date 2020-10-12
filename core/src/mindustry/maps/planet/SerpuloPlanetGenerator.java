@@ -145,7 +145,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         float constraint = 1.3f;
         float radius = width / 2f / Mathf.sqrt3;
         int rooms = rand.random(2, 5);
-        Seq<Room> array = new Seq<>();
+        Seq<Room> roomseq = new Seq<>();
 
         for(int i = 0; i < rooms; i++){
             Tmp.v1.trns(rand.random(360f), rand.random(radius / constraint));
@@ -153,7 +153,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             float ry = (height/2f + Tmp.v1.y);
             float maxrad = radius - Tmp.v1.len();
             float rrad = Math.min(rand.random(9f, maxrad / 2f), 30f);
-            array.add(new Room((int)rx, (int)ry, (int)rrad));
+            roomseq.add(new Room((int)rx, (int)ry, (int)rrad));
         }
 
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
@@ -182,13 +182,13 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
 
             if(waterTiles <= 4 || (i + angleStep >= 360)){
-                array.add(spawn = new Room(cx, cy, rand.random(8, 15)));
+                roomseq.add(spawn = new Room(cx, cy, rand.random(8, 15)));
 
                 for(int j = 0; j < enemySpawns; j++){
                     float enemyOffset = rand.range(60f);
                     Tmp.v1.set(cx - width/2, cy - height/2).rotate(180f + enemyOffset).add(width/2, height/2);
                     Room espawn = new Room((int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(8, 15));
-                    array.add(espawn);
+                    roomseq.add(espawn);
                     enemies.add(espawn);
                 }
 
@@ -196,16 +196,16 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        for(Room room : array){
+        for(Room room : roomseq){
             erase(room.x, room.y, room.radius);
         }
 
         int connections = rand.random(Math.max(rooms - 1, 1), rooms + 3);
         for(int i = 0; i < connections; i++){
-            array.random(rand).connect(array.random(rand));
+            roomseq.random(rand).connect(roomseq.random(rand));
         }
 
-        for(Room room : array){
+        for(Room room : roomseq){
             spawn.connect(room);
         }
 
@@ -269,7 +269,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             //tar
             if(floor == Blocks.darksand){
                 if(Math.abs(0.5f - noise(x - 40, y, 2, 0.7, 80)) > 0.25f &&
-                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f && !(enemies.contains(r -> Mathf.within(x, y, r.x, r.y, 15)))){
+                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f && !(roomseq.contains(r -> Mathf.within(x, y, r.x, r.y, 15)))){
                     floor = Blocks.tar;
                     ore = Blocks.air;
                 }
