@@ -119,6 +119,7 @@ public class DefaultWaves{
                 unitAmount = 2;
                 unitScaling = 2;
                 max = 20;
+                shieldScaling = 30;
             }},
 
             new SpawnGroup(dagger){{
@@ -144,6 +145,7 @@ public class DefaultWaves{
                 unitAmount = 2;
                 spacing = 2;
                 unitScaling = 2;
+                shieldScaling = 20;
             }},
 
             new SpawnGroup(flare){{
@@ -162,6 +164,7 @@ public class DefaultWaves{
                 unitScaling = 3;
                 spacing = 5;
                 max = 16;
+                shieldScaling = 30;
             }},
 
             new SpawnGroup(nova){{
@@ -169,6 +172,7 @@ public class DefaultWaves{
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
+                shieldScaling = 20;
             }},
 
             new SpawnGroup(atrax){{
@@ -192,15 +196,15 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
-                shieldScaling = 10f;
+                shieldScaling = 20f;
             }},
 
             new SpawnGroup(antumbra){{
-                begin = 131;
+                begin = 120;
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
-                shieldScaling = 10f;
+                shieldScaling = 20f;
             }},
 
             new SpawnGroup(vela){{
@@ -209,6 +213,15 @@ public class DefaultWaves{
                 unitScaling = 1;
                 spacing = 30;
                 shieldScaling = 20f;
+            }},
+
+            new SpawnGroup(corvus){{
+                begin = 145;
+                unitAmount = 1;
+                unitScaling = 1;
+                spacing = 35;
+                shieldScaling = 30f;
+                shields = 100;
             }},
 
             new SpawnGroup(horizon){{
@@ -252,7 +265,7 @@ public class DefaultWaves{
         //max reasonable wave, after which everything gets boring
         int cap = 200;
 
-        float shieldStart = 30, shieldsPerWave = 15 + difficulty*20f;
+        float shieldStart = 30, shieldsPerWave = 20 + difficulty*30f;
 
         Intc createProgression = start -> {
             //main sequence
@@ -314,8 +327,8 @@ public class DefaultWaves{
             step += (int)(Mathf.random(12, 25) * Mathf.lerp(1f, 0.4f, difficulty));
         }
 
-        int bossWave = Mathf.random(30, 60);
-        int bossSpacing = Mathf.random(30, 50);
+        int bossWave = (int)(Mathf.random(30, 60) * Mathf.lerp(1f, 0.7f, difficulty));
+        int bossSpacing = (int)(Mathf.random(25, 40) * Mathf.lerp(1f, 0.6f, difficulty));
 
         //main boss progression
         out.add(new SpawnGroup(Structs.random(species)[4]){{

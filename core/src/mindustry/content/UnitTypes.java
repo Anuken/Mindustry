@@ -1145,7 +1145,7 @@ public class UnitTypes implements ContentList{
             speed = 1.9f;
             rotateSpeed = 15f;
             accel = 0.1f;
-            range = 70f;
+            range = 130f;
             health = 400;
             buildSpeed = 0.5f;
             engineOffset = 6.5f;

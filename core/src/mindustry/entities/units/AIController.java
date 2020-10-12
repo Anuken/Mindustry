@@ -21,6 +21,7 @@ public class AIController implements UnitController{
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
+    protected AIController fallback;
 
     /** main target that is being faced */
     protected Teamc target;
@@ -34,9 +35,25 @@ public class AIController implements UnitController{
 
     @Override
     public void updateUnit(){
+        //use fallback AI when possible
+        if(useFallback() && (fallback != null || (fallback = fallback()) != null)){
+            if(fallback.unit != unit) fallback.unit(unit);
+            fallback.updateUnit();
+            return;
+        }
+
         updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    @Nullable
+    protected AIController fallback(){
+        return null;
+    }
+
+    protected boolean useFallback(){
+        return false;
     }
 
     protected UnitCommand command(){
