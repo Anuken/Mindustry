@@ -266,6 +266,27 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             //TODO localize
             t.top();
             t.label(() -> mode == select ? "@sectors.select" : mode == launch ? "Select Launch Sector" : "").style(Styles.outlineLabel).color(Pal.accent);
+        }),
+        new Table(t -> {
+            t.right();
+            if(content.planets().count(p -> p.accessible) > 1) {
+                t.table(Styles.black6, pt -> {
+                    //TODO localize
+                    pt.add("[accent]Planets[]");
+                    pt.row();
+                    pt.image().growX().height(4f).pad(6f).color(Pal.accent);
+                    pt.row();
+                    for(int i = 0; i < content.planets().size; i++){
+                        Planet planet = content.planets().get(i);
+                        if(planet.accessible){
+                            pt.button(planet.localizedName, Styles.clearTogglet, () -> {
+                                renderer.planets.planet = planet;
+                            }).width(200).height(40).growX().update(bb -> bb.setChecked(renderer.planets.planet == planet));
+                            pt.row();
+                        }
+                    }
+                });
+            }
         })).grow();
 
     }
