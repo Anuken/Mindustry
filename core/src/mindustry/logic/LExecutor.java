@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -674,8 +675,11 @@ public class LExecutor{
                     bestValue = 0;
 
                     if(enemies){
-                        for(Team enemy : state.teams.enemiesOf(r.team())){
-                            find(r, range, sortDir, enemy);
+                        Seq<TeamData> data = state.teams.present;
+                        for(int i = 0; i < data.size; i++){
+                            if(data.items[i].team != r.team()){
+                                find(r, range, sortDir, data.items[i].team);
+                            }
                         }
                     }else{
                         find(r, range, sortDir, r.team());

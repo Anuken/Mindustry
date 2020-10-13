@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -205,13 +206,14 @@ public class BlockIndexer{
     /** Get all enemy blocks with a flag. */
     public Seq<Tile> getEnemy(Team team, BlockFlag type){
         returnArray.clear();
-        for(Team enemy : team.enemies()){
-            if(state.teams.isActive(enemy)){
-                TileArray set = getFlagged(enemy)[type.ordinal()];
-                if(set != null){
-                    for(Tile tile : set){
-                        returnArray.add(tile);
-                    }
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            Team enemy = data.items[i].team;
+            if(enemy == team) continue;
+            TileArray set = getFlagged(enemy)[type.ordinal()];
+            if(set != null){
+                for(Tile tile : set){
+                    returnArray.add(tile);
                 }
             }
         }

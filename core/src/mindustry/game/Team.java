@@ -83,9 +83,9 @@ public class Team implements Comparable<Team>{
         return state.rules.teams.get(this);
     }
 
-    public Team[] enemies(){
-        return state.teams.enemiesOf(this);
-    }
+    //public Team[] enemies(){
+    //    return state.teams.enemiesOf(this);
+    //}
 
     public TeamData data(){
         return state.teams.get(this);
