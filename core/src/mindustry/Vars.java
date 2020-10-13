@@ -82,10 +82,12 @@ public class Vars implements Loadable{
     public static final float buildingRange = 220f;
     /** range for moving items */
     public static final float itemTransferRange = 220f;
+    /** range for moving items for logic units */
+    public static final float logicItemTransferRange = 45f;
     /** duration of time between turns in ticks */
-    public static final float turnDuration = 20 * Time.toMinutes;
+    public static final float turnDuration = 2 * Time.toMinutes;
     /** turns needed to destroy a sector completely */
-    public static final float sectorDestructionTurns = 3f;
+    public static final float sectorDestructionTurns = 2f;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
     /** launch animation duration */
@@ -182,13 +184,12 @@ public class Vars implements Loadable{
     public static GameState state;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
-    public static mindustry.audio.LoopControl loops;
+    public static LoopControl loops;
     public static Platform platform = new Platform(){};
     public static Mods mods;
     public static Schematics schematics;
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
-    public static TeamIndexProcess teamIndex;
     public static BaseRegistry bases;
 
     public static Universe universe;

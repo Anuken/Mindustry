@@ -9,7 +9,6 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
@@ -89,13 +88,16 @@ public class Logic implements ApplicationListener{
             if(state.isCampaign()){
                 long seconds = state.rules.sector.getSecondsPassed();
                 CoreBuild core = state.rules.defaultTeam.core();
+                //THE WAVES NEVER END
+                state.rules.waves = true;
 
                 //apply fractional damage based on how many turns have passed for this sector
-                float turnsPassed = seconds / (turnDuration / 60f);
+                //float turnsPassed = seconds / (turnDuration / 60f);
 
-                if(state.rules.sector.hasWaves() && turnsPassed > 0 && state.rules.sector.hasBase()){
-                    SectorDamage.apply(turnsPassed / sectorDestructionTurns);
-                }
+                //TODO sector damage disabled for now
+                //if(state.rules.sector.hasWaves() && turnsPassed > 0 && state.rules.sector.hasBase()){
+                //    SectorDamage.apply(turnsPassed / sectorDestructionTurns);
+                //}
 
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){
@@ -197,6 +199,8 @@ public class Logic implements ApplicationListener{
                 state.rules.waves = false;
             }
 
+            //TODO capturing is disabled
+            /*
             //if there's a "win" wave and no enemies are present, win automatically
             if(state.rules.waves && state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()){
                 //the sector has been conquered - waves get disabled
@@ -209,7 +213,7 @@ public class Logic implements ApplicationListener{
                 if(!headless){
                     control.saves.saveSector(state.rules.sector);
                 }
-            }
+            }*/
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
                 state.gameOver = true;
@@ -282,19 +286,9 @@ public class Logic implements ApplicationListener{
                 state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
             }
 
-            //force pausing when the player is out of sector time
-            if(state.isOutOfTime()){
-                if(!state.wasTimeout){
-                    universe.displayTimeEnd();
-                    state.wasTimeout = true;
-                }
-                //if no turn was run.
-                if(state.isOutOfTime()){
-                    state.set(State.paused);
-                }
-            }
-
             if(!state.isPaused()){
+                state.teams.updateTeamStats();
+
                 if(state.isCampaign()){
                     state.secinfo.update();
                 }

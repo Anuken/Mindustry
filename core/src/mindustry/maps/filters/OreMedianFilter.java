@@ -1,7 +1,7 @@
 package mindustry.maps.filters;
 
-import arc.struct.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;

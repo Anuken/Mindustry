@@ -1,14 +1,14 @@
 package mindustry.entities.comp;
 
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 @Component
 abstract class PosComp implements Position{
@@ -52,10 +52,11 @@ abstract class PosComp implements Position{
 
     boolean onSolid(){
         Tile tile = tileOn();
-        return tile != null && tile.solid();
+        return tile == null || tile.solid();
     }
 
-    @Nullable Tile tileOn(){
+    @Nullable
+    Tile tileOn(){
         return world.tileWorld(x, y);
     }
 

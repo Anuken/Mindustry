@@ -4,7 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -22,7 +22,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
     /** Icons by Cicon ID.*/
-    protected TextureRegion[] cicons = new TextureRegion[mindustry.ui.Cicon.all.length];
+    protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
     protected boolean unlocked;
 

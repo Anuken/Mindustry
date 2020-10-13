@@ -12,7 +12,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
@@ -194,10 +193,14 @@ public class Block extends UnlockableContent{
     public BuildPlaceability buildPlaceability = BuildPlaceability.always;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
+    /** Multiplier for cost of research in tech tree. */
+    public float researchCostMultiplier = 1;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     /** Whether you can rotate this block with Keybind rotateplaced + Scroll Wheel. */
     public boolean quickRotate = true;
+    /** Main subclass. Non-anonymous. */
+    public @Nullable Class<?> subclass;
 
     public Prov<Building> buildType = null; //initialized later
     public ObjectMap<Class<?>, Cons2> configurations = new ObjectMap<>();
@@ -371,7 +374,7 @@ public class Block extends UnlockableContent{
 
     public boolean canReplace(Block other){
         if(other.alwaysReplace) return true;
-        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && size == other.size;
+        return (other != this || rotate) && this.group != BlockGroup.none && other.group == this.group && (size == other.size || (size >= other.size && subclass != null && subclass == other.subclass));
     }
 
     /** @return a possible replacement for this block when placed in a line by the player. */
@@ -465,8 +468,7 @@ public class Block extends UnlockableContent{
 
     /** Never use outside of the editor! */
     public TextureRegion editorIcon(){
-        if(editorIcon == null) editorIcon = Core.atlas.find(name + "-icon-editor");
-        return editorIcon;
+        return editorIcon == null ? (editorIcon = Core.atlas.find(name + "-icon-editor")) : editorIcon;
     }
 
     /** Never use outside of the editor! */
@@ -483,21 +485,16 @@ public class Block extends UnlockableContent{
     }
 
     protected TextureRegion[] icons(){
-        return new TextureRegion[]{region};
+        //use team region in vanilla team blocks
+        return teamRegion.found() && minfo.mod == null ? new TextureRegion[]{region, teamRegions[Team.sharded.id]} : new TextureRegion[]{region};
     }
 
     public TextureRegion[] getGeneratedIcons(){
-        if(generatedIcons == null){
-            generatedIcons = icons();
-        }
-        return generatedIcons;
+        return generatedIcons == null ? (generatedIcons = icons()) : generatedIcons;
     }
 
     public TextureRegion[] variantRegions(){
-        if(variantRegions == null){
-            variantRegions = new TextureRegion[]{icon(Cicon.full)};
-        }
-        return variantRegions;
+        return variantRegions == null ? (variantRegions = new TextureRegion[]{icon(Cicon.full)}) : variantRegions;
     }
 
     public boolean hasBuilding(){
@@ -590,6 +587,8 @@ public class Block extends UnlockableContent{
                 current = current.getSuperclass();
             }
 
+            subclass = current;
+
             while(buildType == null && Block.class.isAssignableFrom(current)){
                 //first class that is subclass of Building
                 Class<?> type = Structs.find(current.getDeclaredClasses(), t -> Building.class.isAssignableFrom(t) && !t.isInterface());
@@ -622,7 +621,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20, 10);
+            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }

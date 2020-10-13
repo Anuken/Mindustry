@@ -200,7 +200,11 @@ configure(subprojects - project(":annotations")){
     }
 
     tasks.withType(Javadoc){
-       options.addStringOption('Xdoclint:none', '-quiet')
+        options{
+            addStringOption('Xdoclint:none', '-quiet')
+            addBooleanOption('-enable-preview', true)
+            addStringOption('-release', '14')
+        }
     }
 }
 

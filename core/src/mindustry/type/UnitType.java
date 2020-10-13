@@ -11,7 +11,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -19,7 +18,6 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -39,8 +37,8 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
-    public @NonNull Prov<? extends Unit> constructor;
-    public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
+    public Prov<? extends Unit> constructor;
+    public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
     public float health = 200f, range = -1, armor = 0f;
@@ -52,7 +50,7 @@ public class UnitType extends UnlockableContent{
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
     public float aimDst = -1f;
-    public int commandLimit = 24;
+    public int commandLimit = 8;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
     public boolean hovering = false;
@@ -65,6 +63,9 @@ public class UnitType extends UnlockableContent{
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
+
+    public int ammoResupplyAmount = 10;
+    public float ammoResupplyRange = 100f;
 
     public float mechSideSway = 0.54f, mechFrontSway = 0.1f;
     public float mechStride = -1f;
@@ -161,6 +162,11 @@ public class UnitType extends UnlockableContent{
                 bars.row();
             }
         }).growX();
+
+        if(unit.controller() instanceof LogicAI){
+            table.row();
+            table.add(Blocks.microProcessor.emoji() + " " + Core.bundle.get("units.processorcontrol")).growX().left();
+        }
         
         table.row();
     }
@@ -169,8 +175,7 @@ public class UnitType extends UnlockableContent{
     public void getDependencies(Cons<UnlockableContent> cons){
         //units require reconstructors being researched
         for(Block block : content.blocks()){
-            if(block instanceof Reconstructor){
-                Reconstructor r = (Reconstructor)block;
+            if(block instanceof Reconstructor r){
                 for(UnitType[] recipe : r.upgrades){
                     //result of reconstruction is this, so it must be a dependency
                     if(recipe[1] == this){
@@ -204,7 +209,7 @@ public class UnitType extends UnlockableContent{
         singleTarget = weapons.size <= 1;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round(hitSize * 7, 20), 20);
+            itemCapacity = Math.max(Mathf.round(hitSize * 4, 10), 10);
         }
 
         //set up default range
@@ -228,7 +233,7 @@ public class UnitType extends UnlockableContent{
             mechStepParticles = hitSize > 15f;
         }
 
-        canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
+        canHeal = weapons.contains(w -> w.bullet.healPercent > 0f);
 
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
@@ -290,14 +295,14 @@ public class UnitType extends UnlockableContent{
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor && Structs.contains(((Reconstructor)b).upgrades, u -> u[1] == this));
+        Block rec = content.blocks().find(b -> b instanceof Reconstructor && ((Reconstructor)b).upgrades.contains(u -> u[1] == this));
 
         if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems){
             stacks = ((ConsumeItems)rec.consumes.get(ConsumeType.item)).items;
         }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && Structs.contains(((UnitFactory)u).plans, p -> p.unit == this));
+            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && ((UnitFactory)u).plans.contains(p -> p.unit == this));
             if(factory != null){
-                stacks = Structs.find(factory.plans, p -> p.unit == this).requirements;
+                stacks = factory.plans.find(p -> p.unit == this).requirements;
             }
         }
 
@@ -357,7 +362,6 @@ public class UnitType extends UnlockableContent{
             drawPayload((Unit & Payloadc)unit);
         }
 
-        //TODO
         drawOcclusion(unit);
 
         Draw.z(z - outlineSpace);
@@ -621,7 +625,6 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        //TODO should be below/above legs
         if(baseRegion.found()){
             Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
         }

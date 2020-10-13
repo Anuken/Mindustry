@@ -98,8 +98,10 @@ public class ItemSeq implements Iterable<ItemStack>, Serializable{
 
     @Override
     public void read(Json json, JsonValue jsonData){
+        total = 0;
         for(Item item : Vars.content.items()){
             values[item.id] = jsonData.getInt(item.name, 0);
+            total += values[item.id];
         }
     }
 

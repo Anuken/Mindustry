@@ -1,7 +1,6 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -14,8 +13,8 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -557,6 +556,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     t.row();
                     t.add(slider).width(size * 3f - 20).padTop(4f);
                 }).padTop(5).growX().top();
+
+                mid.row();
+
+                mid.table(t -> {
+                    t.button("@editor.center", Icon.move, Styles.cleart, () -> view.center()).growX().margin(9f);
+                }).growX().top();
 
             }).margin(0).left().growY();
 

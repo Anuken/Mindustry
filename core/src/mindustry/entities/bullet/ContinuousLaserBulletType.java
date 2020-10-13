@@ -37,6 +37,7 @@ public class ContinuousLaserBulletType extends BulletType{
         incendSpread = 5;
         incendChance = 0.4f;
         lightColor = Color.orange;
+        absorbable = false;
     }
 
     protected ContinuousLaserBulletType(){
@@ -57,7 +58,6 @@ public class ContinuousLaserBulletType extends BulletType{
 
     @Override
     public void update(Bullet b){
-        //TODO possible laser absorption from blocks
 
         //damage every 5 ticks
         if(b.timer(1, 5f)){

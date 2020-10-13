@@ -8,7 +8,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -158,7 +157,7 @@ public abstract class Turret extends Block{
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
-        public @NonNull BlockUnitc unit = Nulls.blockUnit;
+        public BlockUnitc unit = Nulls.blockUnit;
 
         @Override
         public float range(){
@@ -183,13 +182,28 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.rotation) return rotation;
-            if(sensor == LAccess.shootX) return targetPos.x;
-            if(sensor == LAccess.shootY) return targetPos.y;
-            if(sensor == LAccess.shooting) return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+        public void control(LAccess type, Object p1, double p2, double p3, double p4){
+            if(type == LAccess.shootp && !unit.isPlayer()){
+                logicControlTime = logicControlCooldown;
+                logicShooting = !Mathf.zero(p2);
 
-            return super.sense(sensor);
+                if(p1 instanceof Posc){
+                    targetPosition((Posc)p1);
+                }
+            }
+
+            super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case rotation -> rotation;
+                case shootX -> targetPos.x;
+                case shootY -> targetPos.y;
+                case shooting -> (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+                default -> super.sense(sensor);
+            };
         }
 
         @Override
@@ -199,6 +213,23 @@ public abstract class Turret extends Block{
 
         public boolean logicControlled(){
             return logicControlTime > 0;
+        }
+
+        public boolean isActive(){
+            return target != null || (logicControlled() && logicShooting) || (isControlled() && unit.isShooting());
+        }
+
+        public void targetPosition(Posc pos){
+            if(!hasAmmo()) return;
+            BulletType bullet = peekAmmo();
+            float speed = bullet.speed;
+            //slow bullets never intersect
+            if(speed < 0.1f) speed = 9999999f;
+
+            targetPos.set(Predict.intercept(this, pos, speed));
+            if(targetPos.isZero()){
+                targetPos.set(target);
+            }
         }
 
         @Override
@@ -248,15 +279,7 @@ public abstract class Turret extends Block{
                     }else if(logicControlled()){ //logic behavior
                         canShoot = logicShooting;
                     }else{ //default AI behavior
-                        BulletType type = peekAmmo();
-                        float speed = type.speed;
-                        //slow bullets never intersect
-                        if(speed < 0.1f) speed = 9999999f;
-
-                        targetPos.set(Predict.intercept(this, target, speed));
-                        if(targetPos.isZero()){
-                            targetPos.set(target);
-                        }
+                        targetPosition(target);
 
                         if(Float.isNaN(rotation)){
                             rotation = 0;
@@ -334,8 +357,9 @@ public abstract class Turret extends Block{
 
             AmmoEntry entry = ammo.peek();
             entry.amount -= ammoPerShot;
-            if(entry.amount == 0) ammo.pop();
+            if(entry.amount <= 0) ammo.pop();
             totalAmmo -= ammoPerShot;
+            totalAmmo = Math.max(totalAmmo, 0);
             Time.run(reloadTime / 2f, this::ejectEffects);
             return entry.type();
         }
@@ -347,7 +371,7 @@ public abstract class Turret extends Block{
 
         /** @return  whether the turret has ammo. */
         public boolean hasAmmo(){
-            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
+            return ammo.size > 0 && ammo.peek().amount >= 1;
         }
 
         protected void updateShooting(){
@@ -404,7 +428,7 @@ public abstract class Turret extends Block{
 
             fshootEffect.at(x + tr.x, y + tr.y, rotation);
             fsmokeEffect.at(x + tr.x, y + tr.y, rotation);
-            shootSound.at(tile, Mathf.random(0.9f, 1.1f));
+            shootSound.at(x + tr.x, y + tr.y, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){
                 Effect.shake(shootShake, shootShake, this);

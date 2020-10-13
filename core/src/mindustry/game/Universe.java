@@ -5,7 +5,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -54,25 +53,9 @@ public class Universe{
         }
     }
 
-    public void displayTimeEnd(){
-        if(!headless){
-            //check if any sectors are under attack to display this
-            Seq<Sector> attacked = state.getSector().planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed() && s.getSecondsPassed() > 1);
-
-            if(attacked.any()){
-                state.set(State.paused);
-
-                //TODO localize
-                String text = attacked.size > 1 ? attacked.size + " sectors attacked." : "Sector " + attacked.first().id + " under attack.";
-
-                ui.hudfrag.sectorText = text;
-                ui.hudfrag.attackedSectors = attacked;
-                ui.announce(text);
-            }else{
-                //autorun next turn
-                universe.runTurn();
-            }
-        }
+    /** @return sectors attacked on the current planet, minus the ones that are being played on right now. */
+    public Seq<Sector> getAttacked(Planet planet){
+        return planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed() && s.getSecondsPassed() > 1);
     }
 
     /** Update planet rotations, global time and relevant state. */
@@ -157,8 +140,9 @@ public class Universe{
                     if(!sector.isBeingPlayed()){
                         sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
 
+                        //TODO sector damage disabled for now
                         //check if the sector has been attacked too many times...
-                        if(sector.hasBase() && sector.hasWaves() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                        /*if(sector.hasBase() && sector.hasWaves() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
                             //fire event for losing the sector
                             Events.fire(new SectorLoseEvent(sector));
 
@@ -168,17 +152,17 @@ public class Universe{
                             //clear recieved
                             sector.setExtraItems(new ItemSeq());
                             sector.save = null;
-                        }
+                        }*/
                     }
 
                     //export to another sector
                     if(sector.save != null && sector.save.meta != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.destination != null){
                         Sector to = sector.save.meta.secinfo.destination;
                         if(to.save != null){
-                            ItemSeq items = to.getExtraItems();
+                            ItemSeq items = new ItemSeq();
                             //calculated exported items to this sector
                             sector.save.meta.secinfo.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed)));
-                            to.setExtraItems(items);
+                            to.addItems(items);
                         }
                     }
 
@@ -187,7 +171,6 @@ public class Universe{
                 }
             }
         }
-        //TODO events
 
         Events.fire(new TurnEvent());
 

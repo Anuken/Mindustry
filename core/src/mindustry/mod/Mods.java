@@ -11,7 +11,6 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
@@ -171,8 +170,7 @@ public class Mods implements Loadable{
             //generate new icons
             for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
-                    if(c instanceof UnlockableContent && c.minfo.mod != null){
-                        UnlockableContent u = (UnlockableContent)c;
+                    if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
                         u.createIcons(packer);
                     }
@@ -399,7 +397,7 @@ public class Mods implements Loadable{
                                 d.button("@details", Icon.downOpen, Styles.transt, () -> {
                                     new Dialog(""){{
                                         setFillParent(true);
-                                        cont.pane(e -> e.add(c.minfo.error).wrap().grow()).grow();
+                                        cont.pane(e -> e.add(c.minfo.error).wrap().grow().labelAlign(Align.center, Align.left)).grow();
                                         cont.row();
                                         cont.button("@ok", Icon.left, this::hide).size(240f, 60f);
                                     }}.show();

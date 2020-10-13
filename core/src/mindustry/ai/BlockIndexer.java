@@ -6,7 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.EnumSet;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -192,7 +192,7 @@ public class BlockIndexer{
 
                 if(other == null) continue;
 
-                if(other.team == team && pred.get(other) && intSet.add(other.pos())){
+                if((team == null || other.team == team) && pred.get(other) && intSet.add(other.pos())){
                     cons.get(other);
                     any = true;
                 }

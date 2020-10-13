@@ -16,7 +16,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 
-import static arc.Core.camera;
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class BlockRenderer implements Disposable{

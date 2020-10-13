@@ -1,7 +1,7 @@
 package mindustry.ai.types;
 
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.Teams.*;
@@ -17,11 +17,15 @@ public class BuilderAI extends AIController{
     @Nullable Builderc following;
 
     @Override
-    public void updateUnit(){
+    public void updateMovement(){
         Builderc builder = (Builderc)unit;
 
         if(builder.moving()){
             builder.lookAt(builder.vel().angle());
+        }
+
+        if(target != null && shouldShoot()){
+            unit.lookAt(target);
         }
 
         builder.updateBuilding(true);
@@ -67,13 +71,11 @@ public class BuilderAI extends AIController{
                 Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
                     if(found) return;
 
-                    if(u instanceof Builderc && u != unit && ((Builderc)u).activelyBuilding()){
-                        Builderc b = (Builderc)u;
+                    if(u instanceof Builderc b && u != unit && ((Builderc)u).activelyBuilding()){
                         BuildPlan plan = b.buildPlan();
 
                         Building build = world.build(plan.x, plan.y);
-                        if(build instanceof ConstructBuild){
-                            ConstructBuild cons = (ConstructBuild)build;
+                        if(build instanceof ConstructBuild cons){
                             float dist = Math.min(cons.dst(unit) - buildingRange, 0);
 
                             //make sure you can reach the request in time
@@ -87,8 +89,8 @@ public class BuilderAI extends AIController{
             }
 
             //find new request
-            if(!unit.team().data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
-                Queue<BlockPlan> blocks = unit.team().data().blocks;
+            if(!unit.team.data().blocks.isEmpty() && following == null && timer.get(timerTarget3, 60 * 2f)){
+                Queue<BlockPlan> blocks = unit.team.data().blocks;
                 BlockPlan block = blocks.first();
 
                 //check if it's already been placed
@@ -97,13 +99,29 @@ public class BuilderAI extends AIController{
                 }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid.
                     //add build request.
                     builder.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
+                    //shift build plan to tail so next unit builds something else.
+                    blocks.addLast(blocks.removeFirst());
                 }else{
                     //shift head of queue to tail, try something else next time
                     blocks.removeFirst();
                     blocks.addLast(block);
                 }
             }
-
         }
+    }
+
+    @Override
+    public AIController fallback(){
+        return unit.type().flying ? new FlyingAI() : new GroundAI();
+    }
+
+    @Override
+    public boolean useFallback(){
+        return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().ai;
+    }
+    
+    @Override
+    public boolean shouldShoot(){
+        return !((Builderc)unit).isBuilding();
     }
 }

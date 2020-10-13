@@ -4,7 +4,6 @@ import arc.graphics.g2d.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
-import mindustry.logic.*;
 import mindustry.world.*;
 
 public class SwitchBlock extends Block{
@@ -21,12 +20,6 @@ public class SwitchBlock extends Block{
     }
 
     public class SwitchBuild extends Building{
-
-        @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.enabled) return enabled ? 1 : 0;
-            return super.sense(sensor);
-        }
 
         @Override
         public boolean configTapped(){

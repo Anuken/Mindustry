@@ -9,7 +9,6 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.io.Streams.*;

@@ -3,7 +3,6 @@ package mindustry.annotations.entity;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
@@ -379,7 +378,7 @@ public class EntityProcess extends BaseProcessor{
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
 
-                EntityIO io = new EntityIO(type.name(), builder, allFieldSpecs, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name));
+                EntityIO io = new EntityIO(type.name(), builder, allFieldSpecs, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(type.name()));
                 //entities with no sync comp and no serialization gen no code
                 boolean hasIO = ann.genio() && (components.contains(s -> s.name().contains("Sync")) || ann.serialize());
 

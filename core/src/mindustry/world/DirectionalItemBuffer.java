@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class DirectionalItemBuffer{
     public final long[][] buffers;

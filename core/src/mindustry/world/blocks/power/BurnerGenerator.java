@@ -1,8 +1,8 @@
 package mindustry.world.blocks.power;
 
 import arc.graphics.g2d.*;
-import mindustry.graphics.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 
 public class BurnerGenerator extends ItemLiquidGenerator{

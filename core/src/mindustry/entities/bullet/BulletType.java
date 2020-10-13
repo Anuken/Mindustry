@@ -3,7 +3,6 @@ package mindustry.entities.bullet;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -14,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -25,6 +25,7 @@ public abstract class BulletType extends Content{
     public float drawSize = 40f;
     public float drag = 0f;
     public boolean pierce, pierceBuilding;
+    public int pierceCap = -1;
     public Effect hitEffect, despawnEffect;
 
     /** Effect created when shooting. */
@@ -71,11 +72,15 @@ public abstract class BulletType extends Content{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
+    /** Whether this projectile can be absorbed by shields. */
+    public boolean absorbable = true;
     /** Whether to move the bullet back depending on delta to fix some delta-time realted issues.
      * Do not change unless you know what you're doing. */
     public boolean backMove = true;
     /** Bullet range override. */
     public float range = -1f;
+    /** Heal Bullet Percent **/
+    public float healPercent = 0f;
 
     //additional effects
 
@@ -83,7 +88,7 @@ public abstract class BulletType extends Content{
     public float fragAngle = 0f;
     public int fragBullets = 9;
     public float fragVelocityMin = 0.2f, fragVelocityMax = 1f, fragLifeMin = 1f, fragLifeMax = 1f;
-    public BulletType fragBullet = null;
+    public @Nullable BulletType fragBullet = null;
     public Color hitColor = Color.white;
 
     public Color trailColor = Pal.missileYellowBack;
@@ -138,11 +143,19 @@ public abstract class BulletType extends Content{
     }
 
     public boolean collides(Bullet bullet, Building tile){
-        return true;
+        return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
+        if(status == StatusEffects.burning) {
+            Fires.create(tile.tile);
+        }
         hit(b);
+
+        if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
+            tile.heal(healPercent / 100f * tile.maxHealth());
+        }
     }
 
     public void hitEntity(Bullet b, Hitboxc other, float initialHealth){
@@ -184,6 +197,19 @@ public abstract class BulletType extends Content{
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
+            
+            if(healPercent > 0f) {
+                indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
+                    other.heal(healPercent / 100f * other.maxHealth());
+                });
+            }
+
+            if(status == StatusEffects.burning) {
+                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
+                    Fires.create(other.tile);
+                });
+            }
         }
 
         for(int i = 0; i < lightning; i++){
@@ -210,6 +236,11 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
+        if(pierceCap >= 1) {
+            pierce = true;
+            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
+        }
+
         if(killShooter && b.owner() instanceof Healthc){
             ((Healthc)b.owner()).kill();
         }
@@ -286,7 +317,7 @@ public abstract class BulletType extends Content{
         bullet.data = data;
         bullet.drag = drag;
         bullet.hitSize = hitSize;
-        bullet.damage = damage < 0 ? this.damage : damage;
+        bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         bullet.add();
 
         if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);

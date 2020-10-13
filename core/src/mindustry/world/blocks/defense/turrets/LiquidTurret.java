@@ -6,8 +6,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -133,7 +133,7 @@ public class LiquidTurret extends Turret{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null
                 && (liquids.current() == liquid || (ammoTypes.containsKey(liquids.current())
                 && liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f));

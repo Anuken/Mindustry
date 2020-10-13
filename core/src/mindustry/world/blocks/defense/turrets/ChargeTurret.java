@@ -1,12 +1,15 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.audio.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.type.*;
+import mindustry.gen.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class ChargeTurret extends PowerTurret{
     public float chargeTime = 30f;
@@ -14,6 +17,7 @@ public class ChargeTurret extends PowerTurret{
     public float chargeMaxDelay = 10f;
     public Effect chargeEffect = Fx.none;
     public Effect chargeBeginEffect = Fx.none;
+    public Sound chargeSound = Sounds.none;
 
     public ChargeTurret(String name){
         super(name);
@@ -26,12 +30,12 @@ public class ChargeTurret extends PowerTurret{
         @Override
         public void shoot(BulletType ammo){
             useAmmo();
-            
             for(int i = 0; i < shots; i++){
                 final int indexC = i;
                 Time.run(burstSpacing * i, () -> {
                     tr.trns(rotation, size * tilesize / 2f + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][1] : 0f), (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][0] : 0f));
                     chargeBeginEffect.at(x + tr.x, y + tr.y, rotation + (barrelPos.length != 0f ? barrelPos[chargeCounter % barrels][2] : 0f) + (barrelBurst ? (indexC - (int)(shots / 2f)) * spread : 0));
+                    chargeSound.at(x + tr.x, y + tr.y, 1);
                     
                     for(int j = 0; j < chargeEffects; j++){
                         Time.run(Mathf.random(chargeMaxDelay), () -> {

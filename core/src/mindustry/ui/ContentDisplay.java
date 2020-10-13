@@ -1,9 +1,9 @@
 package mindustry.ui;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
