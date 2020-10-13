@@ -17,7 +17,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
-import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 

@@ -12,7 +12,6 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
-import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 
