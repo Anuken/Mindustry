@@ -45,10 +45,6 @@ public class Teams{
         return Geometry.findClosest(x, y, get(team).cores);
     }
 
-    //public Team[] enemiesOf(Team team){
-    //    return get(team).enemies;
-    //}
-
     public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
         for(TeamData data : active){
             if(areEnemies(team, data.team)){
