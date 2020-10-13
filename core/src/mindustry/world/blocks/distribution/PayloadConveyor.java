@@ -12,12 +12,13 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
     public float moveTime = 40f, moveForce = 201f;
-    public @Load("@-top") TextureRegion topRegion;
+    public @Load("@-arrow") TextureRegion arrowRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
     public float payloadLimit = 2.5f;
@@ -165,14 +166,14 @@ public class PayloadConveyor extends Block{
 
             float trnext = fract() * size * tilesize, trprev = size * tilesize * (fract() - 1), rot = rotdeg();
 
-            TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), topRegion);
+            TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), arrowRegion);
             float s = tilesize * size;
 
             //next
             Tmp.v1.set((s- clipped.width *Draw.scl) + clipped.width /2f*Draw.scl - s/2f, s- clipped.height *Draw.scl + clipped.height /2f*Draw.scl - s/2f).rotate(rot);
             Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, rot);
 
-            clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trprev, 0), topRegion);
+            clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trprev, 0), arrowRegion);
 
             //prev
             Tmp.v1.set(- s/2f + clipped.width /2f*Draw.scl,  - s/2f + clipped.height /2f*Draw.scl).rotate(rot);

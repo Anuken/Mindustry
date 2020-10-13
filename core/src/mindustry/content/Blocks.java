@@ -58,8 +58,8 @@ public class Blocks implements ContentList{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
-    conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
-    overflowGate, underflowGate, massDriver, payloadConveyor, payloadRouter,
+    conveyor, titaniumConveyor, plastaniumConveyor, coveredConveryor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
+    overflowGate, underflowGate, massDriver, payloadConveyor, payloadCoveredConveyor, payloadRouter,
 
     //liquid
     mechanicalPump, rotaryPump, thermalPump, conduit, pulseConduit, platedConduit, liquidRouter, liquidTank, liquidJunction, bridgeConduit, phaseConduit,
@@ -951,6 +951,13 @@ public class Blocks implements ContentList{
             itemCapacity = 10;
         }};
 
+        coveredConveryor = new CoveredConveyor("covered-conveyor"){{
+            requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.metaglass, 1));
+            health = 70;
+            speed = 0.08f;
+            displayedSpeed = 11f;
+        }};
+
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 180;
@@ -1024,6 +1031,11 @@ public class Blocks implements ContentList{
 
         payloadConveyor = new PayloadConveyor("payload-conveyor"){{
             requirements(Category.distribution, with(Items.graphite, 10, Items.copper, 20));
+            canOverdrive = false;
+        }};
+
+        payloadCoveredConveyor = new PayloadCoveredConveyor("payload-covered-conveyor"){{
+            requirements(Category.distribution, with(Items.graphite, 10, Items.copper, 25, Items.metaglass, 5));
             canOverdrive = false;
         }};
 
