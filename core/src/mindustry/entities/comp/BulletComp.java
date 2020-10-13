@@ -32,7 +32,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
             if(data.items[i].team != team){
-                consumer.get(data.items[i].tree);
+                consumer.get(data.items[i].tree());
             }
         }
     }
