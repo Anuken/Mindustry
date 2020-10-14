@@ -58,7 +58,7 @@ public class Blocks implements ContentList{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //transport
-    conveyor, titaniumConveyor, plastaniumConveyor, coveredConveryor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
+    conveyor, titaniumConveyor, plastaniumConveyor, coveredConveyor, armoredConveyor, distributor, junction, itemBridge, phaseConveyor, sorter, invertedSorter, router,
     overflowGate, underflowGate, massDriver, payloadConveyor, payloadCoveredConveyor, payloadRouter,
 
     //liquid
@@ -951,7 +951,7 @@ public class Blocks implements ContentList{
             itemCapacity = 10;
         }};
 
-        coveredConveryor = new CoveredConveyor("covered-conveyor"){{
+        coveredConveyor = new CoveredConveyor("covered-conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.metaglass, 1));
             health = 70;
             speed = 0.08f;
