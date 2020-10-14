@@ -1,56 +1,38 @@
 package mindustry.ai.types;
 
-import arc.math.Angles;
-import arc.math.Mathf;
-import mindustry.*;
-import mindustry.ai.*;
+import arc.math.geom.*;
 import mindustry.entities.*;
-import mindustry.entities.units.*;
+import mindustry.entities.units.UnitCommand;
 import mindustry.gen.*;
-import mindustry.world.*;
-import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.liquid.*;
-import mindustry.world.meta.*;
-
-import static mindustry.Vars.state;
+import mindustry.world.blocks.*;
 
 public class PayloadAI extends FlyingAI{
 
     @Override
     public void updateMovement(){
-        if(command() == UnitCommand.attack){
-            if(target != null) {
-                moveTo(target, unit.range() * 0.8f);
-                unit.lookAt(target);
+        if(target instanceof Building){
+            Vec2 unitPos = new Vec2(unit.x, unit.y);
+            Vec2 targetPos = new Vec2(((Building) target).x, ((Building) target).y);
+            if(unitPos.dst(targetPos) <= (unit.type().range < (Float.MAX_VALUE * 0.96f) ? unit.type().range * 0.45f : 10f)) {
+                ((Payloadc) unit).dropLastPayload();
             }
         }
 
-        if(command() == UnitCommand.rally){
-            moveTo(targetFlag(unit.x, unit.y, BlockFlag.rally, false), 60f);
+        if(target != null){
+            moveTo(target, 10f);
+
+            unit.lookAt(target);
         }
     }
 
     @Override
-    protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        Teamc result = target(x, y, range, false, true);
-        if(result != null) return result;
+    protected void updateTargeting(){
+        target = Units.findEnemyTile(unit.team, unit.x, unit.y, unit.type().range * 10, b -> b.health > 0);
 
-        result = targetFlag(x, y, BlockFlag.repair, true);
-        if(result != null) return result;
+        if(target instanceof ConstructBlock.ConstructBuild) target = null;
 
-        result = targetFlag(x, y, BlockFlag.producer, true);
-        if(result != null) return result;
-
-        result = targetFlag(x, y, BlockFlag.turret, true);
-        if(result != null) return result;
-
-        return null;
-    }
-
-    public void updateUnit(){
-        if(target != null){
-            ((Payloadc) unit).dropLastPayload();
+        if(unit.hasWeapons()){
+            updateWeapons();
         }
-        updateMovement();
     }
 }
