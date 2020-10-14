@@ -331,10 +331,9 @@ public class WaveInfoDialog extends BaseDialog{
                     }
                     if((type.hitSize * type.hitSize) + payloadAmount <= (group.type.payloadCapacity + 0.001f)) {
                         if (group.payloads == null) {
-                            group.payloads = Seq.with(type);
-                        } else {
-                            group.payloads.add(type);
+                            group.payloads = new Seq<UnitType>();
                         }
+                        group.payloads.add(type);
 
                         payloadTable.table(t -> {
                             t.table(Tex.button, b -> {
