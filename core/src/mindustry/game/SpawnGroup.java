@@ -22,8 +22,9 @@ public class SpawnGroup implements Serializable{
 
     /** The unit type spawned */
     public UnitType type = UnitTypes.dagger;
-    /** Payload Seq */
-    public Seq<UnitType> payloads;
+    /** Payload Seq, by default one dagger */
+    public Seq<UnitType> payloads = new Seq<UnitType>();
+    public Seq payloadStrings = new Seq<String>();
     /** When this spawn should end */
     public int end = never;
     /** When this spawn should start */
@@ -78,8 +79,8 @@ public class SpawnGroup implements Serializable{
         if(items != null){
             unit.addItem(items.item, items.amount);
         }
-        
-        if(payloads != null){
+
+        if(payloads != null && payloads.size > 0 && unit instanceof Payloadc){
             for(UnitType unitType : payloads){
                 Unit payload = unitType.create(unit.team);
                 ((Payloadc) unit).pickup(payload);
@@ -104,6 +105,13 @@ public class SpawnGroup implements Serializable{
         if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.name);
+        if(payloads != null && payloads.size > 0) {
+            payloadStrings = new Seq<String>();
+            for(UnitType unitType : payloads){
+                payloadStrings.add(unitType.name);
+            }
+            json.writeValue("payloads", payloadStrings);
+        }
     }
 
     @Override
@@ -120,6 +128,16 @@ public class SpawnGroup implements Serializable{
         shields = data.getFloat("shields", 0);
         shieldScaling = data.getFloat("shieldScaling", 0);
         unitAmount = data.getInt("amount", 1);
+        if(data.has("payloads")){
+            payloads = new Seq<UnitType>();
+            payloadStrings = json.readValue(Seq.class, String.class, data.get("payloads"));
+
+            for(String name : (Seq<String>) payloadStrings){
+                payloads.add(content.getByName(ContentType.unit, name));
+            }
+            /*payloads = (Seq<UnitType>) json.readValue(Seq.class, UnitType.class, data.get("payloads"));*/
+        }
+
 
         //old boss effect ID
         if(data.has("effect") && data.get("effect").isNumber() && data.getInt("effect", -1) == 8){
