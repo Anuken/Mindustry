@@ -123,7 +123,7 @@ public class Conveyor extends Block implements Autotiler{
 
     /** Whether the second build plan is "in front" of the first. */
     public boolean inFront(int x, int y, int rotation, BuildPlan other) {
-        return (other.x - x) == Geometry.d4x(rotation) * Math.abs(other.x - x) && (other.y - y) == Geometry.d4y(rotation) * Math.abs(other.y - y); 
+        return !(other.x == x && other.y == y) && (other.x - x) == Geometry.d4x(rotation) * Math.abs(other.x - x) && (other.y - y) == Geometry.d4y(rotation) * Math.abs(other.y - y); 
     }
 
     /** Returns the tile in front of this one. */
