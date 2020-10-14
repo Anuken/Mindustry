@@ -98,12 +98,9 @@ public class Conveyor extends Block implements Autotiler{
             return Blocks.junction;
         }
 
-        /* TODO:
-         * optomize?
-        */
-
         int ogRot = req.rotation;
         for(int i = 0;i < 2;i ++) {
+            //TODO: automatically generate bridges?
             Block[] bridges = {Blocks.itemBridge, Blocks.phaseConveyor};
             for(int j = 0;j < bridges.length;j ++) {
                 final int distance = ((ItemBridge)bridges[j]).range;
