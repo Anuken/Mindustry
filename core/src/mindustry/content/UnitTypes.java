@@ -1231,6 +1231,8 @@ public class UnitTypes implements ContentList{
         }};
 
         quad = new UnitType("quad"){{
+            defaultController = PayloadAI::new;
+            
             armor = 8f;
             health = 6000;
             speed = 1.2f;
