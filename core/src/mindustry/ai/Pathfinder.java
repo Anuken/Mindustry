@@ -86,7 +86,7 @@ public class Pathfinder implements Runnable{
             }
 
             //special preset which may help speed things up; this is optional
-            preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
+            //preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
 
             start();
         });
