@@ -26,6 +26,7 @@ public class StackConveyor extends Block implements Autotiler{
     public @Load(value = "@-#", length = 3) TextureRegion[] regions;
     public @Load("@-edge") TextureRegion edgeRegion;
     public @Load("@-stack") TextureRegion stackRegion;
+    public @Load("@-stack-cell") TextureRegion cellRegion;
 
     public float speed = 0f;
     public boolean splitOut = true;
@@ -136,7 +137,11 @@ public class StackConveyor extends Block implements Autotiler{
             if((fromRot%4) == 0 && (rotation%4) == 3) a =  4 * 90;
 
             //stack
-            Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
+            float lerp = Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f)));
+            Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, lerp);
+            Draw.color(team.color);
+            Draw.rect(cellRegion, Tmp.v1.x, Tmp.v1.y, lerp);
+            Draw.color();
 
             //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
