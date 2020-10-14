@@ -78,45 +78,48 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
+    public boolean canReplace(Block other){
+        return super.canReplace(other) && !(other instanceof StackConveyor);
+    }
+
+    @Override
     public boolean isAccessible(){
         return true;
     }
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> requests){
-        Block replacement;
-
-        //replacable with junction?
         Boolf<Point2> cont = p -> requests.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && o.rotation == req.rotation && (req.block instanceof Conveyor || req.block instanceof Junction));
-        replacement = cont.get(Geometry.d4(req.rotation)) &&
+        if(cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conveyor &&
-            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? Blocks.junction : this;
+            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1) {
+            return Blocks.junction;
+        }
 
         /* TODO:
          * unspaghetify?
          * optomize?
          * support phase conveyors?
         */
-        //replacable with bridge?
         if(req.block instanceof Conveyor) {
             if(!thisPlaceableOn(frontTile(req.x, req.y, req.rotation)) && requests.contains(o -> 
                 (o.block instanceof Conveyor || o.block instanceof ItemBridge) && 
                 !thisPlaceableOn(frontTile(o.x, o.y, (o.rotation + 2) % 4)) && 
                 inFront(req.x, req.y, req.rotation, o))) {
-                replacement = Blocks.itemBridge;
+                return Blocks.itemBridge;
             }
 
             if(!thisPlaceableOn(frontTile(req.x, req.y, (req.rotation + 2) % 4)) && requests.contains(o -> 
                 (o.block instanceof Conveyor || o.block instanceof ItemBridge) && 
                 !thisPlaceableOn(frontTile(o.x, o.y, o.rotation)) && 
                 inFront(req.x, req.y, (req.rotation + 2) % 4, o))) {
-                replacement = Blocks.itemBridge;
+                return Blocks.itemBridge;
             }
         }
 
-        return replacement;
+        return this;
     }
 
     /** Whether the second build plan is "in front" of the first. */
@@ -131,7 +134,7 @@ public class Conveyor extends Block implements Autotiler{
 
     /** Whether this block can be placed on this tile. */
     public boolean thisPlaceableOn(Tile tile) {
-        return (tile.block().group == group || tile.block() == Blocks.air) && !tile.floor().isDeep();
+        return (tile.block() instanceof Conveyor || tile.block() == Blocks.air) && !tile.floor().isDeep();
     }
 
     public class ConveyorBuild extends Building{
