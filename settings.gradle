@@ -1,4 +1,4 @@
-if(JavaVersion.current().ordinal() < JavaVersion.VERSION_14.ordinal() && System.getenv("JITPACK") != "true"){
+if(JavaVersion.current().ordinal() < JavaVersion.VERSION_14.ordinal()){
     throw new GradleException("!!! YOU MUST USE JAVA 14 OR ABOVE TO COMPILE AND RUN MINDUSTRY !!! Read the README. Your version: ${System.properties["java.version"]}")
 }
 
