@@ -1193,7 +1193,7 @@ public class UnitTypes implements ContentList{
         }};
 
         mega = new UnitType("mega"){{
-            defaultController = RepairAI::new;
+            defaultController = PayloadAI::new;
 
             mineTier = 3;
             health = 500;
@@ -1209,6 +1209,7 @@ public class UnitTypes implements ContentList{
             hitSize = 15f;
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
+            payloadHeal = true;
             buildSpeed = 2.5f;
 
             ammoType = AmmoTypes.power;
