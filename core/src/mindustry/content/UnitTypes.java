@@ -322,7 +322,7 @@ public class UnitTypes implements ContentList{
                 spacing = 0f;
                 ejectEffect = Fx.none;
                 recoil = 2.5f;
-                shootSound = Sounds.pew;
+                shootSound = Sounds.spark;
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
@@ -411,7 +411,7 @@ public class UnitTypes implements ContentList{
 
                 reload = 320f;
                 recoil = 0f;
-                shootSound = Sounds.laser;
+                shootSound = Sounds.laserbig;
                 continuous = true;
                 cooldownTime = 200f;
 
@@ -474,7 +474,7 @@ public class UnitTypes implements ContentList{
                 x = y = 0;
                 reload = 350f;
                 recoil = 0f;
-                shootSound = Sounds.laser;
+                shootSound = Sounds.laserstrong;
 
                 cooldownTime = 350f;
 
@@ -693,6 +693,7 @@ public class UnitTypes implements ContentList{
                 x = 4f;
                 y = 8f;
                 rotate = true;
+                shootSound = Sounds.flame;
                 bullet = sapper;
             }},
             new Weapon("spiroct-weapon"){{
@@ -700,6 +701,7 @@ public class UnitTypes implements ContentList{
                 x = 9f;
                 y = 6f;
                 rotate = true;
+                shootSound = Sounds.flame;
                 bullet = sapper;
             }},
             new Weapon("spiroct-weapon"){{
@@ -707,6 +709,7 @@ public class UnitTypes implements ContentList{
                 x = 14f;
                 y = 0f;
                 rotate = true;
+                shootSound = Sounds.flame;
                 bullet = sapper;
             }},
             new Weapon("large-purple-mount"){{
@@ -783,7 +786,7 @@ public class UnitTypes implements ContentList{
                 shake = 4f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.shellEjectSmall;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.shotgun;
                 rotate = true;
                 occlusion = 12f;
                 recoil = 3f;
@@ -815,7 +818,7 @@ public class UnitTypes implements ContentList{
                 recoil = 10f;
                 rotateSpeed = 1f;
                 ejectEffect = Fx.shellEjectBig;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.artillery;
                 rotate = true;
                 occlusion = 30f;
 
@@ -908,7 +911,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 inaccuracy = 15f;
                 ignoreRotation = true;
-                shootSound = Sounds.none;
+                shootSound = Sounds.artillery;
                 bullet = new BombBulletType(28f, 25f){{
                     width = 10f;
                     height = 14f;
@@ -944,6 +947,7 @@ public class UnitTypes implements ContentList{
                 shots = 2;
                 inaccuracy = 5f;
                 velocityRnd = 0.2f;
+                shootSound = Sounds.missile;
 
                 bullet = new MissileBulletType(3f, 12){{
                     width = 8f;
@@ -1108,7 +1112,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectSmall;
                 rotateSpeed = 7f;
                 shake = 1f;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.shootSnap;
                 rotate = true;
                 occlusion = 12f;
                 bullet = fragBullet;
@@ -1167,7 +1171,7 @@ public class UnitTypes implements ContentList{
                 reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                shootSound = Sounds.pew;
+                shootSound = Sounds.missile;
                 shots = 1;
                 velocityRnd = 0.5f;
                 inaccuracy = 15f;
@@ -1256,6 +1260,7 @@ public class UnitTypes implements ContentList{
                 mirror = false;
                 reload = 55f;
                 minShootVelocity = 0.01f;
+                shootSound = Sounds.artillery;
 
                 bullet = new BasicBulletType(){{
                     sprite = "large-bomb";
@@ -1350,6 +1355,7 @@ public class UnitTypes implements ContentList{
                 y = -5f;
                 rotate = true;
                 ejectEffect = Fx.shellEjectSmall;
+                shootSound = Sounds.missile;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
                     width = 8f;
                     height = 8f;
@@ -1407,6 +1413,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 2f;
                 rotateSpeed = 2f;
                 shake = 1.5f;
+                shootSound = Sounds.missile;
                 ejectEffect = Fx.shellEjectMedium;
                 bullet = Bullets.artilleryIncendiary;
             }});
@@ -1444,6 +1451,7 @@ public class UnitTypes implements ContentList{
                 shots = 1;
                 inaccuracy = 3f;
                 ejectEffect = Fx.shellEjectBig;
+                shootSound = Sounds.artillery;
 
                 bullet = new ArtilleryBulletType(3.2f, 12){{
                     trailMult = 0.8f;
@@ -1482,6 +1490,7 @@ public class UnitTypes implements ContentList{
                 shotDelay = 3f;
                 inaccuracy = 5f;
                 velocityRnd = 0.1f;
+                shootSound = Sounds.missile;
 
                 ejectEffect = Fx.none;
                 bullet = new MissileBulletType(2.7f, 12){{
@@ -1540,7 +1549,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 7f;
                 ejectEffect = Fx.none;
                 shake = 3f;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.artillery;
                 xRand = 8f;
                 shotDelay = 1f;
 
@@ -1577,6 +1586,7 @@ public class UnitTypes implements ContentList{
                 recoil = 3f;
                 occlusion = 12f;
                 ejectEffect = Fx.shellEjectBig;
+                shootSound = Sounds.shootBig;
 
                 shots = 3;
                 shotDelay = 4f;
@@ -1621,6 +1631,7 @@ public class UnitTypes implements ContentList{
                 shake = 6f;
                 recoil = 10.5f;
                 occlusion = 50f;
+                shootSound = Sounds.shotgun;
 
                 shots = 1;
                 ejectEffect = Fx.none;
