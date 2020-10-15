@@ -318,8 +318,8 @@ public class ContentParser{
     private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
             T item;
-            if(Vars.content.getByName(type, name) != null){
-                item = (T)Vars.content.getByName(type, name);
+            if(locate(type, name) != null){
+                item = (T)locate(type, name);
                 readBundle(type, name, value);
             }else{
                 readBundle(type, name, value);
@@ -553,63 +553,12 @@ public class ContentParser{
 
     private void readFields(Object object, JsonValue jsonMap, boolean stripType){
         if(stripType) jsonMap.remove("type");
-
-        if(object instanceof UnlockableContent unlock){
-            JsonValue research = jsonMap.remove("research");
-            //add research tech node
-            if(research != null){
-                String researchName;
-                ItemStack[] customRequirements;
-
-                //research can be a single string or an object with parent and requirements
-                if(research.isString()){
-                    researchName = research.asString();
-                    customRequirements = null;
-                }else{
-                    researchName = research.getString("parent");
-                    customRequirements = research.hasChild("requirements") ? parser.readValue(ItemStack[].class, research.getChild("requirements")) : null;
-                }
-
-                //remove old node
-                TechNode lastNode = TechTree.all.find(t -> t.content == unlock);
-                if(lastNode != null){
-                    lastNode.remove();
-                }
-
-                TechNode node = new TechNode(null, unlock, customRequirements == null ? unlock.researchRequirements() : customRequirements);
-                LoadedMod cur = currentMod;
-
-                postreads.add(() -> {
-                    currentContent = unlock;
-                    currentMod = cur;
-
-                    //remove old node from parent
-                    if(node.parent != null){
-                        node.parent.children.remove(node);
-                    }
-
-
-                    //find parent node.
-                    TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
-
-                    if(parent == null){
-                        throw new IllegalArgumentException("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
-                    }
-
-                    //add this node to the parent
-                    if(!parent.children.contains(node)){
-                        parent.children.add(node);
-                    }
-                    //reparent the node
-                    node.parent = parent;
-                });
-
-            }
-        }
         readFields(object, jsonMap);
     }
 
     void readFields(Object object, JsonValue jsonMap){
+        JsonValue research = jsonMap.remove("research");
+
         toBeParsed.remove(object);
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
@@ -639,6 +588,57 @@ public class ContentParser{
                 ex.addTrace(field.getName() + " (" + type.getName() + ")");
                 throw ex;
             }
+        }
+
+
+        if(object instanceof UnlockableContent unlock && research != null){
+
+            //add research tech node
+            String researchName;
+            ItemStack[] customRequirements;
+
+            //research can be a single string or an object with parent and requirements
+            if(research.isString()){
+                researchName = research.asString();
+                customRequirements = null;
+            }else{
+                researchName = research.getString("parent");
+                customRequirements = research.has("requirements") ? parser.readValue(ItemStack[].class, research.get("requirements")) : null;
+            }
+
+            //remove old node
+            TechNode lastNode = TechTree.all.find(t -> t.content == unlock);
+            if(lastNode != null){
+                lastNode.remove();
+            }
+
+            TechNode node = new TechNode(null, unlock, customRequirements == null ? unlock.researchRequirements() : customRequirements);
+            LoadedMod cur = currentMod;
+
+            postreads.add(() -> {
+                currentContent = unlock;
+                currentMod = cur;
+
+                //remove old node from parent
+                if(node.parent != null){
+                    node.parent.children.remove(node);
+                }
+
+
+                //find parent node.
+                TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
+
+                if(parent == null){
+                    throw new IllegalArgumentException("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                }
+
+                //add this node to the parent
+                if(!parent.children.contains(node)){
+                    parent.children.add(node);
+                }
+                //reparent the node
+                node.parent = parent;
+            });
         }
     }
 

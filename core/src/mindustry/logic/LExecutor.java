@@ -6,9 +6,11 @@ import arc.util.*;
 import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ai.types.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -251,6 +253,11 @@ public class LExecutor{
                         case spawn -> {
                             res = Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
                         }
+                        case damaged -> {
+                            Building b = Units.findDamagedTile(unit.team, unit.x, unit.y);
+                            res = b == null ? null : b.tile;
+                            build = true;
+                        }
                     }
 
                     if(res != null && (!build || res.build != null)){
@@ -390,7 +397,9 @@ public class LExecutor{
                             if(exec.bool(p1)){
                                 Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type().hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
 
-                                Call.pickedUnitPayload(unit, result);
+                                if(result != null){
+                                    Call.pickedUnitPayload(unit, result);
+                                }
                             }else{ //buildings
                                 Building tile = world.buildWorld(unit.x, unit.y);
 
@@ -433,12 +442,16 @@ public class LExecutor{
                     }
                     case getBlock -> {
                         float x = exec.numf(p1), y = exec.numf(p2);
-                        if(unit.within(x, y, unit.range())){
+                        float range = Math.max(unit.range(), buildingRange);
+                        if(!unit.within(x, y, range)){
                             exec.setobj(p3, null);
+                            exec.setnum(p4, 0);
                         }else{
                             Tile tile = world.tileWorld(x, y);
-                            Block block = tile == null || !tile.synthetic() ? null : tile.block();
+                            //any environmental solid block is returned as StoneWall, aka "@solid"
+                            Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
                             exec.setobj(p3, block);
+                            exec.setnum(p4, tile != null && tile.build != null ? tile.build.rotation : 0);
                         }
                     }
                     case itemDrop -> {
@@ -662,8 +675,11 @@ public class LExecutor{
                     bestValue = 0;
 
                     if(enemies){
-                        for(Team enemy : state.teams.enemiesOf(r.team())){
-                            find(r, range, sortDir, enemy);
+                        Seq<TeamData> data = state.teams.present;
+                        for(int i = 0; i < data.size; i++){
+                            if(data.items[i].team != r.team()){
+                                find(r, range, sortDir, data.items[i].team);
+                            }
                         }
                     }else{
                         find(r, range, sortDir, r.team());

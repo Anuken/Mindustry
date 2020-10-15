@@ -116,7 +116,6 @@ abstract class BuilderComp implements Unitc{
         current.progress = entity.progress;
     }
 
-
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     void drawBuildRequests(){
 

@@ -32,18 +32,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     //if true, enables launching anywhere for testing
     public static boolean debugSelect = false;
 
-    final FrameBuffer buffer = new FrameBuffer(2, 2, true);
-    final PlanetRenderer planets = renderer.planets;
-    final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
-    final Table stable  = new Table().background(Styles.black3);
+    public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    public final PlanetRenderer planets = renderer.planets;
+    public final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
+    public final Table stable  = new Table().background(Styles.black3);
 
-    int launchRange;
-    float zoom = 1f, selectAlpha = 1f;
-    @Nullable Sector selected, hovered, launchSector;
-    CoreBuild launcher;
-    Mode mode = look;
-    boolean launching;
-    Cons<Sector> listener = s -> {};
+    public int launchRange;
+    public float zoom = 1f, selectAlpha = 1f;
+    public @Nullable Sector selected, hovered, launchSector;
+    public CoreBuild launcher;
+    public Mode mode = look;
+    public boolean launching;
+    public Cons<Sector> listener = s -> {};
 
     public PlanetDialog(){
         super("", Styles.fullDialog);
@@ -237,7 +237,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         cont.clear();
         titleTable.remove();
 
-
         cont.stack(
         new Element(){
             {
@@ -263,9 +262,31 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         },
         new Table(t -> {
+            t.touchable = Touchable.disabled;
             //TODO localize
             t.top();
-            t.label(() -> mode == select ? "@sectors.select" : mode == launch ? "Select Launch Sector" : "Turn " + universe.turn()).style(Styles.outlineLabel).color(Pal.accent);
+            t.label(() -> mode == select ? "@sectors.select" : mode == launch ? "Select Launch Sector" : "").style(Styles.outlineLabel).color(Pal.accent);
+        }),
+        new Table(t -> {
+            t.right();
+            if(content.planets().count(p -> p.accessible) > 1) {
+                t.table(Styles.black6, pt -> {
+                    //TODO localize
+                    pt.add("[accent]Planets[]");
+                    pt.row();
+                    pt.image().growX().height(4f).pad(6f).color(Pal.accent);
+                    pt.row();
+                    for(int i = 0; i < content.planets().size; i++){
+                        Planet planet = content.planets().get(i);
+                        if(planet.accessible){
+                            pt.button(planet.localizedName, Styles.clearTogglet, () -> {
+                                renderer.planets.planet = planet;
+                            }).width(200).height(40).growX().update(bb -> bb.setChecked(renderer.planets.planet == planet));
+                            pt.row();
+                        }
+                    }
+                });
+            }
         })).grow();
 
     }
@@ -338,6 +359,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 
+        //TODO sector damage is disabled, remove when finalized
+        /*
         if(sector.hasBase() && sector.hasWaves()){
             //TODO localize when finalized
             //these mechanics are likely to change and as such are not added to the bundle
@@ -345,7 +368,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
             stable.add("[accent]" + Mathf.ceil(sectorDestructionTurns - (sector.getSecondsPassed() * 60) / turnDuration) + " turn(s)\nuntil destruction");
             stable.row();
-        }
+        }*/
 
         if(sector.save != null){
             stable.add("@sectors.resources").row();
@@ -468,7 +491,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.act(0f);
     }
 
-    enum Mode{
+    public enum Mode{
         /** Look around for existing sectors. Can only deploy. */
         look,
         /** Launch to a new location. */

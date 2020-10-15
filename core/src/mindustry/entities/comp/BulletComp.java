@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -28,15 +29,10 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
-        if(team.active()){
-            for(Team team : team.enemies()){
-                consumer.get(team.data().tree());
-            }
-        }else{
-            for(Team other : Team.all){
-                if(other != team && team.data().unitCount > 0){
-                    consumer.get(team.data().tree());
-                }
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            if(data.items[i].team != team){
+                consumer.get(data.items[i].tree());
             }
         }
     }

@@ -52,6 +52,9 @@ public class LAssembler{
             }
         }
 
+        //used as a special value for any environmental solid block
+        putConst("@solid", Blocks.stoneWall);
+
         putConst("@air", Blocks.air);
 
         for(UnitType type : Vars.content.units()){

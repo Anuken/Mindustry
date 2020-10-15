@@ -290,12 +290,15 @@ public class TypeIO{
 
     public static void writeController(Writes write, UnitController control){
         //no real unit controller state is written, only the type
-        if(control instanceof Player){
+        if(control instanceof Player p){
             write.b(0);
-            write.i(((Player)control).id);
-        }else if(control instanceof FormationAI){
+            write.i(p.id);
+        }else if(control instanceof FormationAI form){
             write.b(1);
-            write.i(((FormationAI)control).leader.id);
+            write.i(form.leader.id);
+        }else if(control instanceof LogicAI logic && logic.controller != null){
+            write.b(3);
+            write.i(logic.controller.pos());
         }else{
             write.b(2);
         }
@@ -312,6 +315,19 @@ public class TypeIO{
         }else if(type == 1){ //formation controller
             int id = read.i();
             return prev instanceof FormationAI ? prev : new FormationAI(Groups.unit.getByID(id), null);
+        }else if(type == 3){
+            int pos = read.i();
+            if(prev instanceof LogicAI pai){
+                pai.controller = world.build(pos);
+                return pai;
+            }else{
+                //create new AI for assignment
+                LogicAI out = new LogicAI();
+                //instantly time out when updated.
+                out.controlTimer = LogicAI.logicControlTimeout;
+                out.controller = world.build(pos);
+                return out;
+            }
         }else{
             //there are two cases here:
             //1: prev controller was not a player, carry on

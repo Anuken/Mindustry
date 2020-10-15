@@ -254,7 +254,7 @@ public class Shaders{
     public static class LoadShader extends Shader{
 
         public LoadShader(String frag, String vert){
-            super(Core.files.internal("shaders/" + vert + ".vert").readString(), Core.files.internal("shaders/" + frag + ".frag").readString());
+            super(Core.files.internal("shaders/" + vert + ".vert"), Core.files.internal("shaders/" + frag + ".frag"));
         }
     }
 }
