@@ -279,12 +279,7 @@ public abstract class Turret extends Block{
         public void drawSelect(){
             Drawf.dashCircle(x, y, range, team.color);
             if(target != null && Core.settings.getBool("blockstatus")){
-                float time = Time.time();
-                Lines.stroke(3f, Pal.gray);
-                Lines.square(target.getX(), target.getY(), 8 + 1f + Mathf.sinDeg(time*2), 45+time);
-                Lines.stroke(1f, Team.crux.color);
-                Lines.square(target.getX(), target.getY(), 8 + 1f + Mathf.sinDeg(time*2), 45+time);
-                Draw.reset();
+                Drawf.target(target.getX(), target.getY(), 7f + Mathf.sinDeg(Time.time() * 2), Pal.remove);
             }
         }
 

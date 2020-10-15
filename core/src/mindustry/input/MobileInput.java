@@ -368,13 +368,9 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             crosshairScale = Mathf.lerpDelta(crosshairScale, 1f, 0.2f);
 
-            Draw.color(Pal.remove);
-            Lines.stroke(1f);
-
             float radius = Interp.swingIn.apply(crosshairScale);
 
-            Lines.poly(target.getX(), target.getY(), 4, 7f * radius, Time.time() * 1.5f);
-            Lines.spikes(target.getX(), target.getY(), 3f * radius, 6f * radius, 4, Time.time() * 1.5f);
+            Drawf.target(target.getX(), target.getY(), 7f * radius, Pal.remove);
         }
 
         Draw.reset();
