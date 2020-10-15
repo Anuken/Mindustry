@@ -93,8 +93,7 @@ public class Drawf{
     }
 
     public static void shadow(TextureRegion region, float x, float y, Color color, float alpha, float rotation){
-        Draw.color(color);
-        Draw.alpha(color.a * alpha * (1f - state.rules.ambientLight.a));
+        Draw.color(color, color.a * alpha * (1f - state.rules.ambientLight.a));
         Draw.rect(region, x, y, rotation);
         Draw.color();
     }
