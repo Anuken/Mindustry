@@ -115,6 +115,22 @@ public class Drawf{
         Lines.dashCircle(x, y, rad);
         Draw.reset();
     }
+    
+    public static void target(float x, float y, float rad, Color color){
+        target(x, y, rad, 1, color);
+    }
+    
+    public static void target(float x, float y, float rad, float alpha, Color color){
+        Lines.stroke(3f);
+        Draw.color(Pal.gray, alpha);
+        Lines.poly(x, y, 4, rad, Time.time() * 1.5f);
+        Lines.spikes(x, y, 3f/7f * rad, 6f/7f * rad, 4, Time.time() * 1.5f);
+        Lines.stroke(1f);
+        Draw.color(color, alpha);
+        Lines.poly(x, y, 4, rad, Time.time() * 1.5f);
+        Lines.spikes(x, y, 3f/7f * rad, 6f/7f * rad, 4, Time.time() * 1.5f);
+        Draw.reset();
+    }
 
     public static void circles(float x, float y, float rad){
         circles(x, y, rad, Pal.accent);
