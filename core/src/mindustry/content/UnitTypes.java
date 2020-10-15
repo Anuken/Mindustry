@@ -474,7 +474,7 @@ public class UnitTypes implements ContentList{
                 x = y = 0;
                 reload = 350f;
                 recoil = 0f;
-                shootSound = Sounds.laserstrong;
+                shootSound = Sounds.laserbeam;
 
                 cooldownTime = 350f;
 
