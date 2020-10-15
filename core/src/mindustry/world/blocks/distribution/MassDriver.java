@@ -31,7 +31,7 @@ public class MassDriver extends Block{
     public Effect shootEffect = Fx.shootBig2;
     public Effect smokeEffect = Fx.shootBigSmoke2;
     public Effect receiveEffect = Fx.mineBig;
-    public Sound shootSound = Sounds.bang;
+    public Sound shootSound = Sounds.artillery;
     public float shake = 3f;
     public @Load("@-base") TextureRegion baseRegion;
 

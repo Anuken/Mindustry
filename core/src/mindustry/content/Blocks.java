@@ -1419,7 +1419,7 @@ public class Blocks implements ContentList{
             shootCone = 35f;
 
             health = 200 * size * size;
-            shootSound = Sounds.shootSnap;
+            shootSound = Sounds.shoot;
         }};
 
         scorch = new ItemTurret("scorch"){{
@@ -1695,7 +1695,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 10f;
             inaccuracy = 10f;
             shootCone = 30f;
-            shootSound = Sounds.shootSnap;
+            shootSound = Sounds.shoot;
 
             health = 145 * size * size;
         }};
