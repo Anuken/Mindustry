@@ -1278,7 +1278,8 @@ public class UnitTypes implements ContentList{
 
                     shootCone = 180f;
                     ejectEffect = Fx.none;
-                    shootSound = Sounds.none;
+                    hitSound = Sounds.explosionbig;
+                    
                     despawnShake = 4f;
 
                     collidesAir = false;
