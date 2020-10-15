@@ -160,9 +160,7 @@ public class Control implements ApplicationListener, Loadable{
 
                 //delete the save, it is gone.
                 if(saves.getCurrent() != null && !state.rules.tutorial){
-                    Sector sector = state.getSector();
-                    sector.save = null;
-                    saves.getCurrent().delete();
+                    saves.getCurrent().save();
                 }
             }
         });
@@ -283,18 +281,16 @@ public class Control implements ApplicationListener, Loadable{
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
-                    //TODO this is broken?
                     if(state.rules.defaultTeam.cores().isEmpty()){
+                        //reset wave so things are more fair
+                        state.wave = 1;
 
-                        //kill all friendly units, since they should be dead anwyay
+                        //kill all units, since they should be dead anwyay
                         for(Unit unit : Groups.unit){
-                            if(unit.team() == state.rules.defaultTeam){
-                                unit.remove();
-                            }
+                            unit.remove();
                         }
 
                         Tile spawn = world.tile(sector.getSpawnPosition());
-                        //TODO PLACE CORRECT LOADOUT
                         Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
 
                         //set up camera/player locations

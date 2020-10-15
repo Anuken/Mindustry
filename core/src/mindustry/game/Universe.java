@@ -161,17 +161,14 @@ public class Universe{
 
                             //if so, just delete the save for now. it's lost.
                             //TODO don't delete it later maybe
-                            sector.save.delete();
-                            //clear recieved
                             sector.setExtraItems(new ItemSeq());
-                            sector.save = null;
-                            sector.setDamage(0f);
+                            sector.setDamage(1.01f);
                         }else if(attacked && wavesPassed > 0 && sector.save.meta.wave + wavesPassed >= sector.save.meta.rules.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.setUnderAttack(false);
 
                             //fire the event
-                            Events.fire(new SectorCaptureEvent(state.rules.sector));
+                            Events.fire(new SectorCaptureEvent(sector));
                         }
                     }
 
@@ -179,9 +176,10 @@ public class Universe{
                     if(sector.save != null && sector.save.meta != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.destination != null){
                         Sector to = sector.save.meta.secinfo.destination;
                         if(to.save != null){
+                            float scl = Math.max(1f - sector.getDamage(), 0);
                             ItemSeq items = new ItemSeq();
                             //calculated exported items to this sector
-                            sector.save.meta.secinfo.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed)));
+                            sector.save.meta.secinfo.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed * scl)));
                             to.addItems(items);
                         }
                     }

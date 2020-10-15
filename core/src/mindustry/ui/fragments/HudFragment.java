@@ -71,7 +71,7 @@ public class HudFragment extends Fragment{
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
             //TODO localize
-            showToast("Sector[accent] captured[]!");
+            showToast("Sector [accent]" + (e.sector.isBeingPlayed() ? "" : e.sector.id + " ") + "[]captured!");
         });
 
         //TODO localize

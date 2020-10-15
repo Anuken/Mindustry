@@ -86,7 +86,7 @@ public class Sector{
 
     /** @return whether the player has a base here. */
     public boolean hasBase(){
-        return save != null && !save.meta.tags.getBool("nocores");
+        return save != null && !save.meta.tags.getBool("nocores") && getDamage() < 1f;
     }
 
     /** @return whether the enemy has a generated base here. */
@@ -229,9 +229,10 @@ public class Sector{
 
         if(save != null){
             long seconds = getSecondsPassed();
+            float scl = Math.max(1f - getDamage(), 0);
 
             //add produced items
-            save.meta.secinfo.production.each((item, stat) -> count.add(item, (int)(stat.mean * seconds)));
+            save.meta.secinfo.production.each((item, stat) -> count.add(item, (int)(stat.mean * seconds * scl)));
 
             //add received items
             count.add(getExtraItems());
@@ -253,6 +254,8 @@ public class Sector{
 
     /** @return sector damage from enemy, 0 to 1 */
     public float getDamage(){
+        //dead sector
+        if(save != null & save.meta.tags.getBool("nocores")) return 1.01f;
         return Core.settings.getFloat(key("damage"), 0f);
     }
 

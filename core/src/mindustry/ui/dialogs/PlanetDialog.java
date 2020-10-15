@@ -394,8 +394,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.table(t -> {
                 t.left();
 
+                float scl = Math.max(1f - sector.getDamage(), 0);
+
                 sector.save.meta.secinfo.production.each((item, stat) -> {
-                    int total = (int)(stat.mean * 60);
+                    int total = (int)(stat.mean * 60 * scl);
                     if(total > 1){
                         t.image(item.icon(Cicon.small)).padRight(3);
                         t.add(UI.formatAmount(total) + " " + Core.bundle.get("unit.perminute")).color(Color.lightGray);

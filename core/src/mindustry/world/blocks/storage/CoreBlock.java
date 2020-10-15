@@ -311,23 +311,6 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void onDestroyed(){
-            super.onDestroyed();
-
-            if(state.isCampaign() && team == state.rules.waveTeam){
-                //do not recache
-                world.setGenerating(true);
-                tile.setOverlay(Blocks.spawn);
-                world.setGenerating(false);
-
-                if(!spawner.getSpawns().contains(tile)){
-                    spawner.getSpawns().add(tile);
-                }
-                spawner.doShockwave(x, y);
-            }
-        }
-
-        @Override
         public void placed(){
             super.placed();
             state.teams.registerCore(this);

@@ -28,7 +28,6 @@ public class Objectives{
         }
     }
 
-    //TODO fix
     public static class SectorComplete extends SectorObjective{
 
         public SectorComplete(SectorPreset zone){
@@ -39,12 +38,12 @@ public class Objectives{
 
         @Override
         public boolean complete(){
-            return preset.sector.save != null && preset.sector.save.meta.wave >= preset.sector.save.meta.rules.winWave;
+            return preset.sector.save != null && preset.sector.save.meta.wave >= preset.captureWave;
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.wave", preset.sector.save == null ? "<unknown>" : preset.sector.save.meta.rules.winWave, preset.localizedName);
+            return Core.bundle.format("requirement.capture", preset.localizedName);
         }
     }
 

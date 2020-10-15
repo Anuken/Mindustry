@@ -120,7 +120,7 @@ public class Logic implements ApplicationListener{
                 }
 
                 //waves depend on attack status.
-                state.rules.waves = state.rules.sector.isUnderAttack();
+                state.rules.waves = state.rules.sector.isUnderAttack() || !state.rules.sector.hasBase();
 
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){

@@ -360,6 +360,13 @@ public class SectorDamage{
             }
         }
 
+        //kill every core if damage is maximum
+        if(damage >= 1){
+            for(Building c : state.rules.defaultTeam.cores().copy()){
+                c.tile.remove();
+            }
+        }
+
         float falloff = (damage) / (Math.max(tiles.width, tiles.height) * Mathf.sqrt2);
         int peak = 0;
 
