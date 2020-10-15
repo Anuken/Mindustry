@@ -26,6 +26,7 @@ public class PointDefenseTurret extends Block{
     public Effect beamEffect = Fx.pointBeam;
     public Effect hitEffect = Fx.pointHit;
     public Effect shootEffect = Fx.sparkShoot;
+    public Sound shootSound = Sounds.laser;
 
     public float range = 80f;
     public float reloadTime = 30f;
@@ -94,6 +95,7 @@ public class PointDefenseTurret extends Block{
 
                     beamEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color, new Vec2().set(target));
                     shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
+                    shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f))
                     hitEffect.at(target.x, target.y, color);
                     reload = reloadTime;
                 }
