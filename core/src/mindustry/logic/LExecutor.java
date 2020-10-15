@@ -129,7 +129,7 @@ public class LExecutor{
     public void setnum(int index, double value){
         Var v = vars[index];
         if(v.constant) return;
-        v.numval = Double.isNaN(value) || Double.isInfinite(value) ? 0 : 0;
+        v.numval = Double.isNaN(value) || Double.isInfinite(value) ? 0 : value;
         v.objval = null;
         v.isobj = false;
     }

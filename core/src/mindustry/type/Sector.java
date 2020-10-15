@@ -304,10 +304,12 @@ public class Sector{
         return Core.settings.getInt(key("secondsi-passed"));
     }
 
+    //TODO this is terrible
     private String key(String key){
         return planet.name + "-s-" + id + "-" + key;
     }
 
+    //TODO this is terrible
     private void put(String key, Object value){
         Core.settings.put(key(key), value);
     }
