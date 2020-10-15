@@ -23,9 +23,19 @@ public class WaveSpawner{
     private Seq<Tile> spawns = new Seq<>();
     private boolean spawning = false;
     private boolean any = false;
+    private Tile firstSpawn = null;
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, e -> reset());
+    }
+
+    @Nullable
+    public Tile getFirstSpawn(){
+        firstSpawn = null;
+        eachGroundSpawn((cx, cy) -> {
+            firstSpawn = world.tile(cx, cy);
+        });
+        return firstSpawn;
     }
 
     public int countSpawns(){
@@ -47,7 +57,7 @@ public class WaveSpawner{
         for(SpawnGroup group : state.rules.spawns){
             if(group.type == null) continue;
 
-            int spawned = group.getUnitsSpawned(state.wave - 1);
+            int spawned = group.getSpawned(state.wave - 1);
 
             if(group.type.flying){
                 float spread = margin / 1.5f;
@@ -87,6 +97,10 @@ public class WaveSpawner{
     public void doShockwave(float x, float y){
         Time.run(20f, () -> Fx.spawnShockwave.at(x, y, state.rules.dropZoneRadius));
         Time.run(40f, () -> Damage.damage(state.rules.waveTeam, x, y, state.rules.dropZoneRadius, 99999999f, true));
+    }
+
+    public void eachGroundSpawn(Intc2 cons){
+        eachGroundSpawn((x, y, shock) -> cons.get(world.toTile(x), world.toTile(y)));
     }
 
     private void eachGroundSpawn(SpawnConsumer cons){

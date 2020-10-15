@@ -88,6 +88,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case rotation -> rotation;
             case health -> health;
             case maxHealth -> maxHealth;
+            case ammo -> state.rules.unitAmmo ? type.ammoCapacity : ammo;
+            case ammoCapacity -> type.ammoCapacity;
             case x -> x;
             case y -> y;
             case team -> team.id;

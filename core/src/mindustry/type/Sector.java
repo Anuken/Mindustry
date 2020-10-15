@@ -103,9 +103,22 @@ public class Sector{
         return save != null && !save.meta.rules.waves;
     }
 
-    /** @return whether waves are present - if true, any bases here will be attacked. */
-    public boolean hasWaves(){
-        return save != null && save.meta.rules.waves;
+    /** @return whether waves are present - if true, any bases here will be attacked.
+     * only applicable to sectors with active player bases. */
+    public boolean isUnderAttack(){
+        return hasBase() && Core.settings.getBool(key("under-attack"), true);
+    }
+
+    public void setUnderAttack(boolean underAttack){
+        Core.settings.put(key("under-attack"), underAttack);
+    }
+
+    public void setWavesPassed(int waves){
+        put("waves-passed", waves);
+    }
+
+    public int getWavesPassed(){
+        return Core.settings.getInt(key("waves-passed"), 0);
     }
 
     public boolean hasSave(){
@@ -236,6 +249,15 @@ public class Sector{
     //TODO move to sector data?
     public int getSpawnPosition(){
         return Core.settings.getInt(key("spawn-position"), Point2.pack(world.width() / 2, world.height() / 2));
+    }
+
+    /** @return sector damage from enemy, 0 to 1 */
+    public float getDamage(){
+        return Core.settings.getFloat(key("damage"), 0f);
+    }
+
+    public void setDamage(float damage){
+        put("damage", damage);
     }
 
     /** @return time spent in this sector this turn in ticks. */

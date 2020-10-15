@@ -164,13 +164,10 @@ public class ResearchDialog extends BaseDialog{
 
     @Override
     public Dialog show(){
-        Core.app.post(() -> {
-            if(net.client()){
-                //TODO make this not display every time
-                //TODO rework this in the future
-                ui.showInfo("@campaign.multiplayer");
-            }
-        });
+        if(net.client()){
+            ui.showInfo("@research.multiplayer");
+            return null;
+        }
 
         return super.show();
     }

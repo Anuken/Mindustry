@@ -86,8 +86,6 @@ public class Vars implements Loadable{
     public static final float logicItemTransferRange = 45f;
     /** duration of time between turns in ticks */
     public static final float turnDuration = 2 * Time.toMinutes;
-    /** turns needed to destroy a sector completely */
-    public static final float sectorDestructionTurns = 2f;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
     /** launch animation duration */

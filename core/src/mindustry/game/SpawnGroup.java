@@ -52,13 +52,18 @@ public class SpawnGroup implements Serializable{
         //serialization use only
     }
 
-    /** Returns the amount of units spawned on a specific wave. */
-    public int getUnitsSpawned(int wave){
+    /** @return amount of units spawned on a specific wave. */
+    public int getSpawned(int wave){
         if(spacing == 0) spacing = 1;
         if(wave < begin || wave > end || (wave - begin) % spacing != 0){
             return 0;
         }
         return Math.min(unitAmount + (int)(((wave - begin) / spacing) / unitScaling), max);
+    }
+
+    /** @return amount of shields each unit has at a specific wave. */
+    public float getShield(int wave){
+        return Math.max(shields + shieldScaling*(wave - begin), 0);
     }
 
     /**
@@ -76,7 +81,7 @@ public class SpawnGroup implements Serializable{
             unit.addItem(items.item, items.amount);
         }
 
-        unit.shield(Math.max(shields + shieldScaling*(wave - begin), 0));
+        unit.shield = getShield(wave);
 
         return unit;
     }

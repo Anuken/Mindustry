@@ -5,10 +5,12 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
@@ -84,20 +86,41 @@ public class Logic implements ApplicationListener{
         Events.on(LaunchItemEvent.class, e -> state.secinfo.handleItemExport(e.stack));
 
         //when loading a 'damaged' sector, propagate the damage
-        Events.on(WorldLoadEvent.class, e -> {
+        Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
-                long seconds = state.rules.sector.getSecondsPassed();
                 CoreBuild core = state.rules.defaultTeam.core();
-                //THE WAVES NEVER END
-                state.rules.waves = true;
 
-                //apply fractional damage based on how many turns have passed for this sector
-                //float turnsPassed = seconds / (turnDuration / 60f);
+                //how much wave time has passed
+                int wavesPassed = state.rules.sector.getWavesPassed();
 
-                //TODO sector damage disabled for now
-                //if(state.rules.sector.hasWaves() && turnsPassed > 0 && state.rules.sector.hasBase()){
-                //    SectorDamage.apply(turnsPassed / sectorDestructionTurns);
-                //}
+                //reset passed waves
+                state.rules.sector.setWavesPassed(0);
+
+                //wave has passed, remove all enemies, they are assumed to be dead
+                if(wavesPassed > 0){
+                    Groups.unit.each(u -> {
+                        if(u.team == state.rules.waveTeam){
+                            u.remove();
+                        }
+                    });
+                }
+
+                if(wavesPassed > 0){
+                    //simulate wave counter moving forward
+                    state.wave += wavesPassed;
+                    state.wavetime = state.rules.waveSpacing;
+                }
+
+                //reset damage display
+                state.rules.sector.setDamage(0f);
+
+                //simulate damage if applicable
+                if(wavesPassed > 0){
+                    SectorDamage.applyCalculatedDamage(wavesPassed);
+                }
+
+                //waves depend on attack status.
+                state.rules.waves = state.rules.sector.isUnderAttack();
 
                 //add resources based on turns passed
                 if(state.rules.sector.save != null && core != null){
@@ -121,12 +144,21 @@ public class Logic implements ApplicationListener{
 
                 state.rules.sector.setSecondsPassed(0);
             }
+        });
 
+        Events.on(WorldLoadEvent.class, e -> {
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
 
             //save settings
             Core.settings.manualSave();
+        });
+
+        //sync research
+        Events.on(ResearchEvent.class, e -> {
+            if(net.server()){
+                Call.researched(e.content);
+            }
         });
 
     }
@@ -199,8 +231,6 @@ public class Logic implements ApplicationListener{
                 state.rules.waves = false;
             }
 
-            //TODO capturing is disabled
-            /*
             //if there's a "win" wave and no enemies are present, win automatically
             if(state.rules.waves && state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()){
                 //the sector has been conquered - waves get disabled
@@ -213,7 +243,7 @@ public class Logic implements ApplicationListener{
                 if(!headless){
                     control.saves.saveSector(state.rules.sector);
                 }
-            }*/
+            }
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
                 state.gameOver = true;
@@ -264,6 +294,15 @@ public class Logic implements ApplicationListener{
         state.stats.wavesLasted = state.wave;
         ui.restart.show(winner);
         netClient.setQuiet();
+    }
+
+    //called when the remote server researches something
+    @Remote
+    public static void researched(Content content){
+        if(!(content instanceof UnlockableContent u)) return;
+
+        state.rules.researched.add(u.name);
+        ui.hudfrag.showUnlock(u);
     }
 
     @Override

@@ -15,6 +15,8 @@ public enum LAccess{
     powerNetCapacity,
     powerNetIn,
     powerNetOut,
+    ammo,
+    ammoCapacity,
     health,
     maxHealth,
     heat,

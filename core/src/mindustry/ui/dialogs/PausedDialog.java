@@ -34,12 +34,11 @@ public class PausedDialog extends BaseDialog{
         });
 
         if(!mobile){
-            //TODO localize
-            //TODO capturing is disabled, remove?
-            //cont.label(() -> state.getSector() == null ? "" :
-            //("[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining() +
-            //    (state.rules.winWave > 0 && !state.getSector().isCaptured() ? "\n[lightgray]Reach wave[accent] " + state.rules.winWave + "[] to capture" : "")))
-           // .visible(() -> state.getSector() != null).colspan(2);
+            //TODO localize + move to other wave menu
+            cont.label(() -> state.getSector() == null || state.rules.winWave <= 0 || state.getSector().isCaptured()  ? "" :
+                (state.rules.winWave > 0 && !state.getSector().isCaptured() ?
+                (state.wave >= state.rules.winWave ? "\n[lightgray]Defeat remaining enemies to capture" : "\n[lightgray]Reach wave[accent] " + state.rules.winWave + "[] to capture") : ""))
+            .visible(() -> state.getSector() != null).colspan(2);
             cont.row();
 
             float dw = 220f;
@@ -89,7 +88,7 @@ public class PausedDialog extends BaseDialog{
                 cont.buttonRow("@launchcore", Icon.up, () -> {
                     hide();
                     ui.planet.showLaunch(state.getSector(), player.team().core());
-                }).disabled(b -> player.team().core() == null);
+                }).disabled(b -> player.team().core() == null || net.client());
 
                 cont.row();
 
@@ -101,7 +100,11 @@ public class PausedDialog extends BaseDialog{
                 cont.row();
             }
 
-            cont.buttonRow("@hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
+            if(state.isCampaign() && net.active()){
+                cont.buttonRow("@research", Icon.tree, ui.research::show);
+            }else{
+                cont.buttonRow("@hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
+            }
 
             cont.buttonRow("@quit", Icon.exit, this::showQuitConfirm).update(s -> {
                 s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit");

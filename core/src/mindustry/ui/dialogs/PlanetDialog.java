@@ -217,9 +217,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public void renderProjections(){
         if(hovered != null){
             planets.drawPlane(hovered, () -> {
-                Draw.color(Color.white, Pal.accent, Mathf.absin(5f, 1f));
+                Draw.color(hovered.isUnderAttack() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
 
-                TextureRegion icon = hovered.locked() && !canSelect(hovered) ? Icon.lock.getRegion() : null;
+                TextureRegion icon = hovered.locked() && !canSelect(hovered) ? Icon.lock.getRegion() : hovered.isUnderAttack() ? Icon.warning.getRegion() : null;
 
                 if(icon != null){
                     Draw.rect(icon, 0, 0);
@@ -355,20 +355,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.add("[accent]" + (sector.preset == null ? sector.id : sector.preset.localizedName)).row();
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(sector.save != null ? sector.save.getPlayTime() : "@sectors.unexplored").row();
-        if(sector.hasWaves() || sector.hasEnemyBase()){
+        if(sector.isUnderAttack() || sector.hasEnemyBase()){
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 
-        //TODO sector damage is disabled, remove when finalized
-        /*
-        if(sector.hasBase() && sector.hasWaves()){
+        if(sector.isUnderAttack()){
             //TODO localize when finalized
             //these mechanics are likely to change and as such are not added to the bundle
             stable.add("[scarlet]Under attack!");
             stable.row();
-            stable.add("[accent]" + Mathf.ceil(sectorDestructionTurns - (sector.getSecondsPassed() * 60) / turnDuration) + " turn(s)\nuntil destruction");
+            stable.add("[accent]" + (int)(sector.getDamage() * 100) + "% damaged");
             stable.row();
-        }*/
+        }
 
         if(sector.save != null){
             stable.add("@sectors.resources").row();

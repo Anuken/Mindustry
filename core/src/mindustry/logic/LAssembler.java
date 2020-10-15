@@ -191,6 +191,7 @@ public class LAssembler{
 
         try{
             double value = Double.parseDouble(symbol);
+            if(Double.isNaN(value) || Double.isInfinite(value)) value = 0;
             //this creates a hidden const variable with the specified value
             String key = "___" + value;
             return putConst(key, value).id;

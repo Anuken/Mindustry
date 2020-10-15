@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
 
@@ -55,7 +56,7 @@ public class Universe{
 
     /** @return sectors attacked on the current planet, minus the ones that are being played on right now. */
     public Seq<Sector> getAttacked(Planet planet){
-        return planet.sectors.select(s -> s.hasWaves() && s.hasBase() && !s.isBeingPlayed() && s.getSecondsPassed() > 1);
+        return planet.sectors.select(s -> s.isUnderAttack() && s.hasBase() && !s.isBeingPlayed() && s.getWavesPassed() > 0);
     }
 
     /** Update planet rotations, global time and relevant state. */
@@ -138,11 +139,23 @@ public class Universe{
 
                     //increment seconds passed for this sector by the time that just passed with this turn
                     if(!sector.isBeingPlayed()){
-                        sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
+                        int secPassed = sector.getSecondsPassed() + actuallyPassed;
 
-                        //TODO sector damage disabled for now
+                        sector.setSecondsPassed(secPassed);
+
+                        boolean attacked = sector.isUnderAttack();
+
+                        int wavesPassed = (int)(secPassed*60f / sector.save.meta.rules.waveSpacing);
+                        float damage = attacked ? SectorDamage.getDamage(sector.save.meta.secinfo, sector.save.meta.rules.waveSpacing, sector.save.meta.wave, wavesPassed) : 0f;
+
+                        if(attacked){
+                            sector.setWavesPassed(wavesPassed);
+                        }
+
+                        sector.setDamage(damage);
+
                         //check if the sector has been attacked too many times...
-                        /*if(sector.hasBase() && sector.hasWaves() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                        if(attacked && damage >= 0.999f){
                             //fire event for losing the sector
                             Events.fire(new SectorLoseEvent(sector));
 
@@ -152,7 +165,14 @@ public class Universe{
                             //clear recieved
                             sector.setExtraItems(new ItemSeq());
                             sector.save = null;
-                        }*/
+                            sector.setDamage(0f);
+                        }else if(attacked && wavesPassed > 0 && sector.save.meta.wave + wavesPassed >= sector.save.meta.rules.winWave && !sector.hasEnemyBase()){
+                            //autocapture the sector
+                            sector.setUnderAttack(false);
+
+                            //fire the event
+                            Events.fire(new SectorCaptureEvent(state.rules.sector));
+                        }
                     }
 
                     //export to another sector

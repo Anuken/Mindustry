@@ -450,6 +450,16 @@ public class TypeIO{
         return color.set(read.i());
     }
 
+    public static void writeContent(Writes write, Content cont){
+        write.b(cont.getContentType().ordinal());
+        write.s(cont.id);
+    }
+
+    public static Content readContent(Reads read){
+        byte id = read.b();
+        return content.getByID(ContentType.all[id], read.s());
+    }
+
     public static void writeLiquid(Writes write, Liquid liquid){
         write.s(liquid == null ? -1 : liquid.id);
     }

@@ -54,7 +54,7 @@ public class HudFragment extends Fragment{
             outer:
             for(int i = state.wave - 1; i <= state.wave + max; i++){
                 for(SpawnGroup group : state.rules.spawns){
-                    if(group.effect == StatusEffects.boss && group.getUnitsSpawned(i) > 0){
+                    if(group.effect == StatusEffects.boss && group.getSpawned(i) > 0){
                         int diff = (i + 2) - state.wave;
 
                         //increments at which to warn about incoming guardian

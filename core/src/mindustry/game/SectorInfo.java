@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -38,6 +39,10 @@ public class SectorInfo{
     public @Nullable Sector destination;
     /** Resources known to occur at this sector. */
     public Seq<UnlockableContent> resources = new Seq<>();
+
+    /** Special variables for simulation. */
+    public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;
+
     /** Time spent at this sector. Do not use unless you know what you're doing. */
     public transient float internalTimeSpent;
 
@@ -99,6 +104,9 @@ public class SectorInfo{
 
         //update sector's internal time spent counter
         state.rules.sector.setTimeSpent(internalTimeSpent);
+        state.rules.sector.setUnderAttack(state.rules.waves);
+
+        SectorDamage.writeParameters(this);
     }
 
     /** Update averages of various stats, updates some special sector logic.

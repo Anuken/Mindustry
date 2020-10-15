@@ -110,12 +110,12 @@ public class LExecutor{
 
     public double num(int index){
         Var v = vars[index];
-        return v.isobj ? v.objval != null ? 1 : 0 : v.numval;
+        return v.isobj ? v.objval != null ? 1 : 0 : Double.isNaN(v.numval) || Double.isInfinite(v.numval) ? 0 : v.numval;
     }
 
     public float numf(int index){
         Var v = vars[index];
-        return v.isobj ? v.objval != null ? 1 : 0 : (float)v.numval;
+        return v.isobj ? v.objval != null ? 1 : 0 : Double.isNaN(v.numval) || Double.isInfinite(v.numval) ? 0 : (float)v.numval;
     }
 
     public int numi(int index){
@@ -129,7 +129,7 @@ public class LExecutor{
     public void setnum(int index, double value){
         Var v = vars[index];
         if(v.constant) return;
-        v.numval = value;
+        v.numval = Double.isNaN(value) || Double.isInfinite(value) ? 0 : 0;
         v.objval = null;
         v.isobj = false;
     }
@@ -737,7 +737,7 @@ public class LExecutor{
                     v.objval = f.objval;
                     v.isobj = true;
                 }else{
-                    v.numval = f.numval;
+                    v.numval = Double.isNaN(f.numval) || Double.isInfinite(f.numval) ? 0 : f.numval;
                     v.isobj = false;
                 }
             }

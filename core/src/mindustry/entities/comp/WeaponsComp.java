@@ -166,7 +166,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         Weapon weapon = mount.weapon;
 
         float baseX = this.x, baseY = this.y;
-        boolean delay = weapon.firstShotDelay > 0f;
+        boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
 
         (delay ? weapon.chargeSound : weapon.shootSound).at(x, y, Mathf.random(0.8f, 1.0f));
 

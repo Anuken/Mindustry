@@ -41,6 +41,7 @@ public abstract class Turret extends Block{
     public Effect ammoUseEffect = Fx.none;
     public Sound shootSound = Sounds.shoot;
 
+    public int maxAmmo = 30;
     public int ammoPerShot = 1;
     public float ammoEjectBack = 1f;
     public float range = 50f;
@@ -192,6 +193,8 @@ public abstract class Turret extends Block{
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
+                case ammo -> totalAmmo;
+                case ammoCapacity -> maxAmmo;
                 case rotation -> rotation;
                 case shootX -> targetPos.x;
                 case shootY -> targetPos.y;

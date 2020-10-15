@@ -450,7 +450,7 @@ public class Pathfinder implements Runnable{
      * Data for a flow field to some set of destinations.
      * Concrete subclasses must specify a way to fetch costs and destinations.
      * */
-    static abstract class Flowfield{
+    public static abstract class Flowfield{
         /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
         protected int refreshRate;
         /** Team this path is for. Set before using. */
@@ -459,7 +459,7 @@ public class Pathfinder implements Runnable{
         protected PathCost cost = costTypes.get(costGround);
 
         /** costs of getting to a specific tile */
-        int[][] weights;
+        public int[][] weights;
         /** search IDs of each position - the highest, most recent search is prioritized and overwritten */
         int[][] searches;
         /** search frontier, these are Pos objects */
