@@ -1635,7 +1635,7 @@ public class UnitTypes implements ContentList{
                 shake = 6f;
                 recoil = 10.5f;
                 occlusion = 50f;
-                shootSound = Sounds.shotgun;
+                shootSound = Sounds.railgun;
 
                 shots = 1;
                 ejectEffect = Fx.none;
