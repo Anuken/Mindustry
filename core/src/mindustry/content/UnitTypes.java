@@ -520,7 +520,8 @@ public class UnitTypes implements ContentList{
             mechSideSway = 0.25f;
             range = 40f;
 
-            weapons.add(new Weapon(){{
+            weapons.add(
+            new Weapon(){{
                 reload = 12f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
@@ -879,7 +880,8 @@ public class UnitTypes implements ContentList{
             engineOffset = 5.5f;
             range = 140f;
 
-            weapons.add(new Weapon(){{
+            weapons.add(
+            new Weapon(){{
                 y = 0f;
                 x = 2f;
                 reload = 13f;
@@ -902,7 +904,8 @@ public class UnitTypes implements ContentList{
             faceTarget = false;
             armor = 4f;
 
-            weapons.add(new Weapon(){{
+            weapons.add(
+            new Weapon(){{
                 minShootVelocity = 0.75f;
                 x = 3f;
                 shootY = 0f;
