@@ -95,7 +95,7 @@ public class PointDefenseTurret extends Block{
 
                     beamEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color, new Vec2().set(target));
                     shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
-                    shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f))
+                    shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f));
                     hitEffect.at(target.x, target.y, color);
                     reload = reloadTime;
                 }
