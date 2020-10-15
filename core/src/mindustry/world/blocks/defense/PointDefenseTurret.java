@@ -25,7 +25,7 @@ public class PointDefenseTurret extends Block{
     public Color color = Color.white;
     public Effect beamEffect = Fx.pointBeam;
     public Effect hitEffect = Fx.pointHit;
-    public Effect shootEffect = Fx.spark;
+    public Effect shootEffect = Fx.sparkShoot;
 
     public float range = 80f;
     public float reloadTime = 30f;
