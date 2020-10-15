@@ -182,8 +182,7 @@ public class LaunchPad extends Block{
             Tmp.v1.trns(225f, fin(Interp.pow3In) * 250f);
 
             Draw.z(Layer.flyingUnit + 1);
-            Draw.color(0, 0, 0, 0.22f * alpha);
-            Draw.rect(region, cx + Tmp.v1.x, cy + Tmp.v1.y, rw, rh, rotation);
+            Drawf.shadow(region, cx + Tmp.v1.x, cy + Tmp.v1.y, rw, rh, Color.black, 0.22f * alpha, rotation);
 
             Draw.reset();
         }

@@ -418,10 +418,8 @@ public class UnitType extends UnlockableContent{
     }
 
     public void drawShadow(Unit unit){
-        Draw.color(Pal.shadow);
         float e = Math.max(unit.elevation, visualElevation);
-        Draw.rect(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
-        Draw.color();
+        Drawf.shadow(shadowRegion, unit.x + shadowTX * e, unit.y + shadowTY * e, unit.rotation - 90);
     }
 
     public void drawOcclusion(Unit unit){

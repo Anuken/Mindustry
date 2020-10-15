@@ -84,15 +84,25 @@ public class Drawf{
         Draw.color();
     }
 
+    public static void shadow(TextureRegion region, float x, float y){
+        shadow(region, x, y, 0f);
+    }
+
     public static void shadow(TextureRegion region, float x, float y, float rotation){
-        Draw.color(Pal.shadow);
+        shadow(region, x, y, Pal.shadow, 1f, rotation);
+    }
+
+    public static void shadow(TextureRegion region, float x, float y, Color color, float alpha, float rotation){
+        Draw.color(color);
+        Draw.alpha(color.a * alpha * (1f - state.rules.ambientLight.a));
         Draw.rect(region, x, y, rotation);
         Draw.color();
     }
 
-    public static void shadow(TextureRegion region, float x, float y){
-        Draw.color(Pal.shadow);
-        Draw.rect(region, x, y);
+    public static void shadow(TextureRegion region, float x, float y, float w, float h, Color color, float alpha, float rotation){
+        Draw.color(color);
+        Draw.alpha(color.a * alpha * (1f - state.rules.ambientLight.a));
+        Draw.rect(region, x, y, w, h, rotation);
         Draw.color();
     }
 
