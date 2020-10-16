@@ -221,12 +221,12 @@ public class PlanetGrid{
     }
 
     public static class Ptile{
-        public final int id;
-        public final int edgeCount;
+        public int id;
+        public int edgeCount;
 
-        public final Ptile[] tiles;
-        public final Corner[] corners;
-        public final Edge[] edges;
+        public Ptile[] tiles;
+        public Corner[] corners;
+        public Edge[] edges;
 
         public Vec3 v = new Vec3();
 
@@ -241,11 +241,11 @@ public class PlanetGrid{
     }
 
     public static class Corner{
-        public final int id;
-        public final Ptile[] tiles = new Ptile[3];
-        public final Corner[] corners = new Corner[3];
-        public final Edge[] edges = new Edge[3];
-        public final Vec3 v = new Vec3();
+        public int id;
+        public Ptile[] tiles = new Ptile[3];
+        public Corner[] corners = new Corner[3];
+        public Edge[] edges = new Edge[3];
+        public Vec3 v = new Vec3();
 
         public Corner(int id){
             this.id = id;
@@ -253,9 +253,9 @@ public class PlanetGrid{
     }
 
     public static class Edge{
-        public final int id;
-        public final Ptile[] tiles = new Ptile[2];
-        public final Corner[] corners = new Corner[2];
+        public int id;
+        public Ptile[] tiles = new Ptile[2];
+        public Corner[] corners = new Corner[2];
 
         public Edge(int id){
             this.id = id;
