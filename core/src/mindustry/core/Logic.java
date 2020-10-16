@@ -16,7 +16,6 @@ import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.util.*;
 
@@ -88,13 +87,10 @@ public class Logic implements ApplicationListener{
         //when loading a 'damaged' sector, propagate the damage
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
-                CoreBuild core = state.rules.defaultTeam.core();
+                state.secinfo.write();
 
                 //how much wave time has passed
-                int wavesPassed = state.rules.sector.getWavesPassed();
-
-                //reset passed waves
-                state.rules.sector.setWavesPassed(0);
+                int wavesPassed = state.secinfo.wavesPassed;
 
                 //wave has passed, remove all enemies, they are assumed to be dead
                 if(wavesPassed > 0){
@@ -105,44 +101,22 @@ public class Logic implements ApplicationListener{
                     });
                 }
 
+                //simulate passing of waves
                 if(wavesPassed > 0){
                     //simulate wave counter moving forward
                     state.wave += wavesPassed;
                     state.wavetime = state.rules.waveSpacing;
+
+                    SectorDamage.applyCalculatedDamage();
                 }
 
-                //reset damage display
-                state.rules.sector.setDamage(0f);
+                //reset values
+                state.secinfo.damage = 0f;
+                state.secinfo.wavesPassed = 0;
+                state.secinfo.hasCore = true;
+                state.secinfo.secondsPassed = 0;
 
-                //simulate damage if applicable
-                if(wavesPassed > 0){
-                    SectorDamage.applyCalculatedDamage(wavesPassed);
-                }
-
-                //waves depend on attack status.
-                state.rules.waves = state.rules.sector.isUnderAttack() || !state.rules.sector.hasBase();
-
-                //add resources based on turns passed
-                if(state.rules.sector.save != null && core != null){
-                    //update correct storage capacity
-                    state.rules.sector.save.meta.secinfo.storageCapacity = core.storageCapacity;
-
-                    //add new items received
-                    state.rules.sector.calculateReceivedItems().each((item, amount) -> core.items.add(item, amount));
-
-                    //clear received items
-                    state.rules.sector.setExtraItems(new ItemSeq());
-
-                    //validation
-                    for(Item item : content.items()){
-                        //ensure positive items
-                        if(core.items.get(item) < 0) core.items.set(item, 0);
-                        //cap the items
-                        if(core.items.get(item) > core.storageCapacity) core.items.set(item, core.storageCapacity);
-                    }
-                }
-
-                state.rules.sector.setSecondsPassed(0);
+                state.rules.sector.saveInfo();
             }
         });
 
@@ -200,11 +174,6 @@ public class Logic implements ApplicationListener{
     }
 
     public void skipWave(){
-        if(state.isCampaign()){
-            //warp time spent forward because the wave was just skipped.
-            state.secinfo.internalTimeSpent += state.wavetime;
-        }
-
         state.wavetime = 0;
     }
 

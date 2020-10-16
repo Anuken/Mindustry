@@ -279,6 +279,7 @@ public class Control implements ApplicationListener, Loadable{
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
+                    state.secinfo = state.rules.sector.info;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty()){
@@ -286,11 +287,9 @@ public class Control implements ApplicationListener, Loadable{
                         state.wave = 1;
 
                         //kill all units, since they should be dead anwyay
-                        for(Unit unit : Groups.unit){
-                            unit.remove();
-                        }
+                        Groups.unit.clear();
 
-                        Tile spawn = world.tile(sector.getSpawnPosition());
+                        Tile spawn = world.tile(sector.info.spawnPosition);
                         Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
 
                         //set up camera/player locations
@@ -313,7 +312,6 @@ public class Control implements ApplicationListener, Loadable{
             }else{
                 net.reset();
                 logic.reset();
-                sector.setSecondsPassed(0);
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching

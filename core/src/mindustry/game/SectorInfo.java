@@ -26,7 +26,7 @@ public class SectorInfo{
     /** Export statistics. */
     public ObjectMap<Item, ExportStat> export = new ObjectMap<>();
     /** Items stored in all cores. */
-    public ItemSeq coreItems = new ItemSeq();
+    public ItemSeq items = new ItemSeq();
     /** The best available core type. */
     public Block bestCoreType = Blocks.air;
     /** Max storage capacity. */
@@ -39,12 +39,25 @@ public class SectorInfo{
     public @Nullable Sector destination;
     /** Resources known to occur at this sector. */
     public Seq<UnlockableContent> resources = new Seq<>();
+    /** Whether waves are enabled here. */
+    public boolean waves = true;
+    /** Wave # from state */
+    public int wave = 1, winWave = -1;
+    /** Time between waves. */
+    public float waveSpacing = 60 * 60 * 2;
+    /** Damage dealt to sector. */
+    public float damage;
+    /** How many waves have passed while the player was away. */
+    public int wavesPassed;
+    /** Packed core spawn position. */
+    public int spawnPosition;
+    /** How long the player has been playing elsewhere. */
+    public float secondsPassed;
+    /** Display name. */
+    public @Nullable String name;
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;
-
-    /** Time spent at this sector. Do not use unless you know what you're doing. */
-    public transient float internalTimeSpent;
 
     /** Counter refresh state. */
     private transient Interval time = new Interval();
@@ -84,27 +97,55 @@ public class SectorInfo{
         return export.get(item, ExportStat::new).mean;
     }
 
+    /** Write contents of meta into main storage. */
+    public void write(){
+        state.wave = wave;
+        state.rules.waves = waves;
+        state.rules.waveSpacing = waveSpacing;
+        state.rules.winWave = winWave;
+
+        CoreBuild entity = state.rules.defaultTeam.core();
+        if(entity != null){
+            entity.items.clear();
+            entity.items.add(items);
+            //ensure capacity.
+            entity.items.each((i, a) -> entity.items.set(i, Math.min(a, entity.block.itemCapacity)));
+        }
+
+        //TODO write items.
+    }
+
     /** Prepare data for writing to a save. */
     public void prepare(){
         //update core items
-        coreItems.clear();
+        items.clear();
 
         CoreBuild entity = state.rules.defaultTeam.core();
 
         if(entity != null){
             ItemModule items = entity.items;
             for(int i = 0; i < items.length(); i++){
-                coreItems.set(content.item(i), items.get(i));
+                this.items.set(content.item(i), items.get(i));
             }
+
+            spawnPosition = entity.pos();
         }
 
+        waveSpacing = state.rules.waveSpacing;
+        wave = state.wave;
+        winWave = state.rules.winWave;
+        waves = state.rules.waves;
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
+        secondsPassed = 0;
+        wavesPassed = 0;
+        damage = 0;
 
-        //update sector's internal time spent counter
-        state.rules.sector.setTimeSpent(internalTimeSpent);
-        state.rules.sector.setUnderAttack(state.rules.waves);
+        if(state.rules.sector != null){
+            state.rules.sector.info = this;
+            state.rules.sector.saveInfo();
+        }
 
         SectorDamage.writeParameters(this);
     }
@@ -114,14 +155,6 @@ public class SectorInfo{
     public void update(){
         //updating in multiplayer as a client doesn't make sense
         if(net.client()) return;
-
-        internalTimeSpent += Time.delta;
-
-        //autorun turns
-        if(internalTimeSpent >= turnDuration){
-            internalTimeSpent = 0;
-            universe.runTurn();
-        }
 
         CoreBuild ent = state.rules.defaultTeam.core();
 

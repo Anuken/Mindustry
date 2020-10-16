@@ -71,12 +71,17 @@ public class HudFragment extends Fragment{
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
             //TODO localize
-            showToast("Sector [accent]" + (e.sector.isBeingPlayed() ? "" : e.sector.id + " ") + "[]captured!");
+            showToast("Sector [accent]" + (e.sector.isBeingPlayed() ? "" : e.sector.name() + " ") + "[white]captured!");
         });
 
         //TODO localize
         Events.on(SectorLoseEvent.class, e -> {
-            showToast(Icon.warning, "Sector " + e.sector.id + " [scarlet]lost!");
+            showToast(Icon.warning, "Sector [accent]" + e.sector.name() + "[white] lost!");
+        });
+
+        //TODO localize
+        Events.on(SectorInvasionEvent.class, e -> {
+            showToast(Icon.warning, "Sector [accent]" + e.sector.name() + "[white] under attack!");
         });
 
         Events.on(ResetEvent.class, e -> {
@@ -589,6 +594,7 @@ public class HudFragment extends Fragment{
         StringBuilder ibuild = new StringBuilder();
 
         IntFormat wavef = new IntFormat("wave");
+        IntFormat wavefc = new IntFormat("wave.cap");
         IntFormat enemyf = new IntFormat("wave.enemy");
         IntFormat enemiesf = new IntFormat("wave.enemies");
         IntFormat waitingf = new IntFormat("wave.waiting", i -> {
@@ -714,7 +720,11 @@ public class HudFragment extends Fragment{
 
         table.labelWrap(() -> {
             builder.setLength(0);
-            builder.append(wavef.get(state.wave));
+            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave && state.isCampaign()){
+                builder.append(wavefc.get(state.wave, state.rules.winWave));
+            }else{
+                builder.append(wavef.get(state.wave));
+            }
             builder.append("\n");
 
             if(state.enemies > 0){
@@ -727,7 +737,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((logic.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
+                builder.append((logic.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : (waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

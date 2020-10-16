@@ -34,13 +34,6 @@ public class PausedDialog extends BaseDialog{
         });
 
         if(!mobile){
-            //TODO localize + move to other wave menu
-            cont.label(() -> state.getSector() == null || state.rules.winWave <= 0 || state.getSector().isCaptured()  ? "" :
-                (state.rules.winWave > 0 && !state.getSector().isCaptured() ?
-                (state.wave >= state.rules.winWave ? "\n[lightgray]Defeat remaining enemies to capture" : "\n[lightgray]Reach wave[accent] " + state.rules.winWave + "[] to capture") : ""))
-            .visible(() -> state.getSector() != null).colspan(2);
-            cont.row();
-
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
