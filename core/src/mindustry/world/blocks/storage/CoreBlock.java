@@ -197,6 +197,21 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void onDestroyed(){
+            super.onDestroyed();
+
+            //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
+            if(state.isCampaign() && team == state.rules.waveTeam){
+                //do not recache
+                tile.setOverlayQuiet(Blocks.spawn);
+
+                if(!spawner.getSpawns().contains(tile)){
+                    spawner.getSpawns().add(tile);
+                }
+            }
+        }
+
+        @Override
         public void drawLight(){
             Drawf.light(team, x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
         }
