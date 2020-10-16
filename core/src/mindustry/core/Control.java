@@ -283,6 +283,17 @@ public class Control implements ApplicationListener, Loadable{
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty()){
+
+                        //no spawn set -> delete the sector save
+                        if(sector.info.spawnPosition == 0){
+                            //delete old save
+                            sector.save = null;
+                            slot.delete();
+                            //play again
+                            playSector(origin, sector);
+                            return;
+                        }
+
                         //reset wave so things are more fair
                         state.wave = 1;
 

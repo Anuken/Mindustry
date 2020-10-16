@@ -165,7 +165,7 @@ public class Universe{
                             sector.info.damage = 1f;
                             sector.info.hasCore = false;
                             sector.info.production.clear();
-                        }else if(attacked && wavesPassed > 0 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
+                        }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
 
