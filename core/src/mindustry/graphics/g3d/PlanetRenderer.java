@@ -110,8 +110,10 @@ public class PlanetRenderer implements Disposable{
     }
 
     private void renderPlanet(Planet planet){
+        if(!planet.visible()) return;
+
         //render planet at offsetted position in the world
-        planet.mesh.render(cam.combined, planet.getTransform(mat));
+        planet.render(cam.combined, planet.getTransform(mat));
 
         renderOrbit(planet);
 
