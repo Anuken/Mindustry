@@ -820,6 +820,7 @@ public class LStatements{
         public BlockFlag flag = BlockFlag.core;
         public String enemy = "true", ore = "@copper";
         public String outX = "outx", outY = "outy", outFound = "found";
+        public String getOut = "out";
 
         @Override
         public void build(Table table){
@@ -903,8 +904,14 @@ public class LStatements{
             row(table);
 
             table.add(" found ").left();
-            fields(table, outFound, str -> outFound = str);
+            fields(table, outFound, str -> outFound = str)
 
+            if(locate == building) {
+                row(table);
+
+                table.add(" outGet ").left();
+                fields(table, getOut, str -> getOut = str);
+            }
 
         }
 
