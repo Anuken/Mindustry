@@ -161,11 +161,12 @@ public abstract class BulletType extends Content{
         if(status == StatusEffects.burning) {
             Fires.create(tile.tile);
         }
-        hit(b);
-
+        
         if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
             Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
             tile.heal(healPercent / 100f * tile.maxHealth());
+        } else {
+            hit(b);
         }
     }
 
