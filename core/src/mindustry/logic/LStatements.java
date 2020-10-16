@@ -904,7 +904,7 @@ public class LStatements{
             row(table);
 
             table.add(" found ").left();
-            fields(table, outFound, str -> outFound = str)
+            fields(table, outFound, str -> outFound = str);
 
             if(locate == building) {
                 row(table);
