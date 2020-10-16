@@ -22,15 +22,16 @@ public class PlanetGrid{
     {5, 3, 10, 1, 4}, {2, 5, 4, 0, 11}, {3, 7, 6, 1, 8}, {7, 2, 9, 0, 6}
     };
 
-    public final int size;
-    public final Ptile[] tiles;
-    public final Corner[] corners;
-    public final Edge[] edges;
+    public int size;
+    public Ptile[] tiles;
+    public Corner[] corners;
+    public Edge[] edges;
 
-    PlanetGrid(int size){
+    //this is protected so if you want to make strange grids you should know what you're doing.
+    protected PlanetGrid(int size){
         this.size = size;
 
-        tiles = new Ptile[Buildingount(size)];
+        tiles = new Ptile[tileCount(size)];
         for(int i = 0; i < tiles.length; i++){
             tiles[i] = new Ptile(i, i < 12 ? 5 : 6);
         }
@@ -67,7 +68,7 @@ public class PlanetGrid{
         return result;
     }
 
-    static PlanetGrid initialGrid(){
+    public static PlanetGrid initialGrid(){
         PlanetGrid grid = new PlanetGrid(0);
 
         for(Ptile t : grid.tiles){
@@ -111,7 +112,7 @@ public class PlanetGrid{
         return grid;
     }
 
-    static PlanetGrid subdividedGrid(PlanetGrid prev){
+    public static PlanetGrid subdividedGrid(PlanetGrid prev){
         PlanetGrid grid = new PlanetGrid(prev.size + 1);
 
         int prevTiles = prev.tiles.length;
@@ -162,7 +163,7 @@ public class PlanetGrid{
         return grid;
     }
 
-    static void addCorner(int id, PlanetGrid grid, int t1, int t2, int t3){
+    public static void addCorner(int id, PlanetGrid grid, int t1, int t2, int t3){
         Corner c = grid.corners[id];
         Ptile[] t = {grid.tiles[t1], grid.tiles[t2], grid.tiles[t3]};
         c.v.set(t[0].v).add(t[1].v).add(t[2].v).nor();
@@ -172,7 +173,7 @@ public class PlanetGrid{
         }
     }
 
-    static void addEdge(int id, PlanetGrid grid, int t1, int t2){
+    public static void addEdge(int id, PlanetGrid grid, int t1, int t2){
         Edge e = grid.edges[id];
         Ptile[] t = {grid.tiles[t1], grid.tiles[t2]};
         Corner[] c = {
@@ -186,36 +187,36 @@ public class PlanetGrid{
         }
     }
 
-    static int pos(Ptile t, Ptile n){
+    public static int pos(Ptile t, Ptile n){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.tiles[i] == n)
                 return i;
         return -1;
     }
 
-    static int pos(Ptile t, Corner c){
+    public static int pos(Ptile t, Corner c){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.corners[i] == c)
                 return i;
         return -1;
     }
 
-    static int pos(Corner c, Corner n){
+    public static int pos(Corner c, Corner n){
         for(int i = 0; i < 3; i++)
             if(c.corners[i] == n)
                 return i;
         return -1;
     }
 
-    static int Buildingount(int size){
+    public static int tileCount(int size){
         return 10 * Mathf.pow(3, size) + 2;
     }
 
-    static int cornerCount(int size){
+    public static int cornerCount(int size){
         return 20 * Mathf.pow(3, size);
     }
 
-    static int edgeCount(int size){
+    public static int edgeCount(int size){
         return 30 * Mathf.pow(3, size);
     }
 
