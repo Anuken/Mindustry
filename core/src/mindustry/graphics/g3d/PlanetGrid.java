@@ -187,36 +187,36 @@ public class PlanetGrid{
         }
     }
 
-    public static int pos(Ptile t, Ptile n){
+    static int pos(Ptile t, Ptile n){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.tiles[i] == n)
                 return i;
         return -1;
     }
 
-    public static int pos(Ptile t, Corner c){
+    static int pos(Ptile t, Corner c){
         for(int i = 0; i < t.edgeCount; i++)
             if(t.corners[i] == c)
                 return i;
         return -1;
     }
 
-    public static int pos(Corner c, Corner n){
+    static int pos(Corner c, Corner n){
         for(int i = 0; i < 3; i++)
             if(c.corners[i] == n)
                 return i;
         return -1;
     }
 
-    public static int tileCount(int size){
+    static int tileCount(int size){
         return 10 * Mathf.pow(3, size) + 2;
     }
 
-    public static int cornerCount(int size){
+    static int cornerCount(int size){
         return 20 * Mathf.pow(3, size);
     }
 
-    public static int edgeCount(int size){
+    static int edgeCount(int size){
         return 30 * Mathf.pow(3, size);
     }
 
