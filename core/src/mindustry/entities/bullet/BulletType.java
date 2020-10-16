@@ -112,6 +112,8 @@ public abstract class BulletType extends Content{
     public float lightningDamage = -1;
     public float lightningCone = 360f;
     public float lightningAngle = 0f;
+    /** The lighting "hitter"; Use when trying to implement special lightning. */
+    public BulletType lightningHitter;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;

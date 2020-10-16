@@ -330,6 +330,17 @@ public class UnitTypes implements ContentList{
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
+
+                    lightningHitter = new BulletType(0.0001f, 0f){{
+                        lifetime = Fx.lightning.lifetime;
+                        hitEffect = Fx.hitLancer;
+                        despawnEffect = Fx.none;
+                        status = StatusEffects.shocked;
+                        statusDuration = 10f;
+                        hittable = false;
+                        healPercent = 5f;
+                        collidesTeam = true;
+                    }};
                 }};
             }});
         }};
@@ -371,6 +382,8 @@ public class UnitTypes implements ContentList{
                     sideAngle = 45f;
                     sideWidth = 1f;
                     sideLength = 70f;
+                    healPercent = 10f;
+                    collidesTeam = true;
                     colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                 }};
             }});
@@ -429,6 +442,10 @@ public class UnitTypes implements ContentList{
                     incendChance = 0.05f;
                     incendSpread = 5f;
                     incendAmount = 1;
+
+                    //constant healing
+                    healPercent = 0.5f;
+                    collidesTeam = true;
 
                     colors = new Color[]{Pal.heal.cpy().a(.2f), Pal.heal.cpy().a(.5f), Pal.heal.cpy().mul(1.2f), Color.white};
                 }};
@@ -499,6 +516,9 @@ public class UnitTypes implements ContentList{
                     lightColor = lightningColor = Pal.heal;
 
                     shootEffect = Fx.greenLaserCharge;
+
+                    healPercent = 20f;
+                    collidesTeam = true;
 
                     sideAngle = 15f;
                     sideWidth = 0f;

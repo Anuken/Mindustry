@@ -36,7 +36,13 @@ public class Lightning{
         random.setSeed(seed);
         hit.clear();
 
-        BulletType bulletType = hitter != null && !hitter.type.collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
+        BulletType bulletType;
+        if(hitter != null && hitter.type.lightningHitter != null) {
+            bulletType = hitter.type.lightningHitter;
+        } else {
+            bulletType = hitter != null && !hitter.type.collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
+        }
+
         Seq<Vec2> lines = new Seq<>();
         bhit = false;
 
