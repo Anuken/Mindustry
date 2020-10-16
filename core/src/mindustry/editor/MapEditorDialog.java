@@ -385,7 +385,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void build(){
-        float size = 60f;
+        float size = 58f;
 
         clearChildren();
         table(cont -> {
@@ -559,10 +559,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 mid.row();
 
-                mid.table(t -> {
-                    t.button("@editor.center", Icon.move, Styles.cleart, () -> view.center()).growX().margin(9f);
-                }).growX().top();
-
+                if(!mobile){
+                    mid.table(t -> {
+                        t.button("@editor.center", Icon.move, Styles.cleart, () -> view.center()).growX().margin(9f);
+                    }).growX().top();
+                }
             }).margin(0).left().growY();
 
 

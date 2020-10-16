@@ -21,12 +21,14 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
@@ -190,6 +192,36 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //endregion
     //region utility methods
+
+    public void addPlan(boolean checkPrevious){
+        if(!block.rebuildable) return;
+
+        if(self() instanceof ConstructBuild entity){
+            //update block to reflect the fact that something was being constructed
+            if(entity.cblock != null && entity.cblock.synthetic()){
+                block = entity.cblock;
+            }else{
+                //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
+                return;
+            }
+        }
+
+        TeamData data = state.teams.get(team);
+
+        if(checkPrevious){
+            //remove existing blocks that have been placed here.
+            //painful O(n) iteration + copy
+            for(int i = 0; i < data.blocks.size; i++){
+                BlockPlan b = data.blocks.get(i);
+                if(b.x == tile.x && b.y == tile.y){
+                    data.blocks.removeIndex(i);
+                    break;
+                }
+            }
+        }
+
+        data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, block.id, config()));
+    }
 
     /** Configure with the current, local player. */
     public void configure(Object value){

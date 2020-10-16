@@ -328,7 +328,7 @@ public class SectorDamage{
                 int radius = 3;
 
                 //only penetrate a certain % by health, not by distance
-                float totalHealth = path.sumf(t -> {
+                float totalHealth = damage >= 1f ? 1f : path.sumf(t -> {
                     float s = 0;
                     for(int dx = -radius; dx <= radius; dx++){
                         for(int dy = -radius; dy <= radius; dy++){
@@ -345,7 +345,7 @@ public class SectorDamage{
                 float healthCount = 0;
 
                 out:
-                for(int i = 0; i < path.size && healthCount < targetHealth; i++){
+                for(int i = 0; i < path.size && (healthCount < targetHealth || damage >= 1f); i++){
                     Tile t = path.get(i);
 
                     for(int dx = -radius; dx <= radius; dx++){
@@ -365,7 +365,7 @@ public class SectorDamage{
 
                                     removal.add(other.build);
 
-                                    if(healthCount >= targetHealth){
+                                    if(healthCount >= targetHealth && damage < 0.999f){
                                         break out;
                                     }
                                 }
@@ -376,6 +376,7 @@ public class SectorDamage{
 
                 for(Building r : removal){
                     if(r.tile.build == r){
+                        r.addPlan(false);
                         r.tile.remove();
                     }
                 }
@@ -424,6 +425,7 @@ public class SectorDamage{
                                     Effect.rubble(other.build.x, other.build.y, other.block().size);
                                 }
 
+                                other.build.addPlan(false);
                                 other.remove();
                             }
                         }

@@ -14,8 +14,6 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
-import mindustry.world.blocks.ConstructBlock.*;
 
 import java.util.*;
 
@@ -40,32 +38,7 @@ public class Logic implements ApplicationListener{
             //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
             if(tile.build == null || !tile.block().rebuildable || net.client()) return;
 
-            if(block instanceof ConstructBlock){
-
-                ConstructBuild entity = tile.bc();
-
-                //update block to reflect the fact that something was being constructed
-                if(entity.cblock != null && entity.cblock.synthetic()){
-                    block = entity.cblock;
-                }else{
-                    //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
-                    return;
-                }
-            }
-
-            TeamData data = state.teams.get(tile.team());
-
-            //remove existing blocks that have been placed here.
-            //painful O(n) iteration + copy
-            for(int i = 0; i < data.blocks.size; i++){
-                BlockPlan b = data.blocks.get(i);
-                if(b.x == tile.x && b.y == tile.y){
-                    data.blocks.removeIndex(i);
-                    break;
-                }
-            }
-
-            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)tile.build.rotation, block.id, tile.build.config()));
+            tile.build.addPlan(true);
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {

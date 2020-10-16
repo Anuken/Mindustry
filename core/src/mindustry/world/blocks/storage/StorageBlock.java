@@ -46,7 +46,9 @@ public class StorageBlock extends Block{
         @Override
         public void handleItem(Building source, Item item){
             if(linkedCore != null){
-                incinerateEffect(this, source);
+                if(linkedCore.items.get(item) >= ((CoreBuild)linkedCore).storageCapacity){
+                    incinerateEffect(this, source);
+                }
                 ((CoreBuild)linkedCore).noEffect = true;
                 linkedCore.handleItem(source, item);
             }else{
