@@ -35,7 +35,7 @@ public class StatusEffects implements ContentList{
         }};
 
         freezing = new StatusEffect("freezing"){{
-            color = Liquids.cryofluid.color;
+            color = Color.valueOf("6ecdec");
             speedMultiplier = 0.6f;
             healthMultiplier = 0.8f;
             effect = Fx.freezing;
@@ -86,7 +86,7 @@ public class StatusEffects implements ContentList{
         }};
 
         melting = new StatusEffect("melting"){{
-            color = Liquids.slag.color;
+            color = Color.valueOf("ffa166");
             speedMultiplier = 0.8f;
             healthMultiplier = 0.8f;
             damage = 0.3f;
@@ -114,7 +114,7 @@ public class StatusEffects implements ContentList{
         }};
 
         tarred = new StatusEffect("tarred"){{
-            color = Liquids.oil.color;
+            color = Color.valueOf("313131");
             speedMultiplier = 0.6f;
             effect = Fx.oily;
 
@@ -160,7 +160,7 @@ public class StatusEffects implements ContentList{
         }};
 
         blasted = new StatusEffect("blasted"){{
-            color = Items.blastCompound.color;
+            color = Color.valueOf("ff795e");
         }};
 
         corroded = new StatusEffect("corroded"){{
