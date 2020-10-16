@@ -268,7 +268,7 @@ public class LExecutor{
                         exec.setnum(outX, cache.x = build ? res.build.x : res.worldx());
                         exec.setnum(outY, cache.y = build ? res.build.y : res.worldy());
                         exec.setnum(outFound, 1);
-                        //access result building
+                        //access result building to use as variable
                         exec.building(getOut);
                     }else{
                         cache.found = false;
