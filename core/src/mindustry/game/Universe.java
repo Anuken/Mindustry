@@ -196,18 +196,15 @@ public class Universe{
                     if(!sector.isAttacked() && turn > invasionGracePeriod){
                         //TODO use factors like difficulty for better invasion chance
                         if(sector.near().contains(Sector::hasEnemyBase) && Mathf.chance(baseInvasionChance)){
-                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : 0) + Mathf.random(2, 4) * 5;
-                            float waveSpace = Math.max(sector.info.waveSpacing - Mathf.random(1, 4) * 5 * 60, 40 * 60);
+                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : 0) + Mathf.random(2, 5) * 5;
 
                             //assign invasion-related things
                             if(sector.isBeingPlayed()){
                                 state.rules.winWave = waveMax;
                                 state.rules.waves = true;
-                                state.rules.waveSpacing = waveSpace;
                             }else{
                                 sector.info.winWave = waveMax;
                                 sector.info.waves = true;
-                                sector.info.waveSpacing = waveSpace;
                                 sector.saveInfo();
                             }
 

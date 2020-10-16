@@ -342,6 +342,7 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void handleItem(Building source, Item item){
             if(net.server() || !net.active()){
+                state.secinfo.handleCoreItem(item, 1);
 
                 if(items.get(item) >= getMaximumAccepted(item)){
                     //create item incineration effect at random intervals

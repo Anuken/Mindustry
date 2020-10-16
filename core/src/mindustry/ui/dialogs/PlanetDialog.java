@@ -380,19 +380,15 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
         }
 
-        if(sector.save != null){
+        if(sector.save != null && sector.info.resources.any()){
             stable.add("@sectors.resources").row();
             stable.table(t -> {
-                if(sector.info.resources.any()){
-                    t.left();
-                    int idx = 0;
-                    int max = 5;
-                    for(UnlockableContent c : sector.info.resources){
-                        t.image(c.icon(Cicon.small)).padRight(3);
-                        if(++idx % max == 0) t.row();
-                    }
-                }else{
-                    t.add("@unknown").color(Color.lightGray);
+                t.left();
+                int idx = 0;
+                int max = 5;
+                for(UnlockableContent c : sector.info.resources){
+                    t.image(c.icon(Cicon.small)).padRight(3);
+                    if(++idx % max == 0) t.row();
                 }
             }).fillX().row();
         }
@@ -414,7 +410,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
             if(t.getChildren().any()){
                 stable.add("@sectors.production").row();
-                stable.add(t);
+                stable.add(t).row();
             }
         }
 
