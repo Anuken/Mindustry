@@ -163,7 +163,7 @@ public class PlanetGrid{
         return grid;
     }
 
-    public static void addCorner(int id, PlanetGrid grid, int t1, int t2, int t3){
+    static void addCorner(int id, PlanetGrid grid, int t1, int t2, int t3){
         Corner c = grid.corners[id];
         Ptile[] t = {grid.tiles[t1], grid.tiles[t2], grid.tiles[t3]};
         c.v.set(t[0].v).add(t[1].v).add(t[2].v).nor();
@@ -173,7 +173,7 @@ public class PlanetGrid{
         }
     }
 
-    public static void addEdge(int id, PlanetGrid grid, int t1, int t2){
+    static void addEdge(int id, PlanetGrid grid, int t1, int t2){
         Edge e = grid.edges[id];
         Ptile[] t = {grid.tiles[t1], grid.tiles[t2]};
         Corner[] c = {
