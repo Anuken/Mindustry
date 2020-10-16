@@ -160,9 +160,7 @@ public class Control implements ApplicationListener, Loadable{
 
                 //delete the save, it is gone.
                 if(saves.getCurrent() != null && !state.rules.tutorial){
-                    Sector sector = state.getSector();
-                    sector.save = null;
-                    saves.getCurrent().delete();
+                    saves.getCurrent().save();
                 }
             }
         });
@@ -281,20 +279,17 @@ public class Control implements ApplicationListener, Loadable{
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
+                    state.secinfo = state.rules.sector.info;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
-                    //TODO this is broken?
                     if(state.rules.defaultTeam.cores().isEmpty()){
+                        //reset wave so things are more fair
+                        state.wave = 1;
 
-                        //kill all friendly units, since they should be dead anwyay
-                        for(Unit unit : Groups.unit){
-                            if(unit.team() == state.rules.defaultTeam){
-                                unit.remove();
-                            }
-                        }
+                        //kill all units, since they should be dead anwyay
+                        Groups.unit.clear();
 
-                        Tile spawn = world.tile(sector.getSpawnPosition());
-                        //TODO PLACE CORRECT LOADOUT
+                        Tile spawn = world.tile(sector.info.spawnPosition);
                         Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
 
                         //set up camera/player locations
@@ -317,7 +312,6 @@ public class Control implements ApplicationListener, Loadable{
             }else{
                 net.reset();
                 logic.reset();
-                sector.setSecondsPassed(0);
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching

@@ -88,6 +88,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case rotation -> rotation;
             case health -> health;
             case maxHealth -> maxHealth;
+            case ammo -> state.rules.unitAmmo ? type.ammoCapacity : ammo;
+            case ammoCapacity -> type.ammoCapacity;
             case x -> x;
             case y -> y;
             case team -> team.id;
@@ -284,7 +286,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
 
         //apply knockback based on spawns
-        if(team != state.rules.waveTeam){
+        if(team != state.rules.waveTeam && state.rules.waves){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){

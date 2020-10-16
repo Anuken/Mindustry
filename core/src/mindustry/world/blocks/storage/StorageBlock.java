@@ -70,7 +70,7 @@ public class StorageBlock extends Block{
         public void overwrote(Seq<Building> previous){
             for(Building other : previous){
                 if(other.items != null){
-                    items.addAll(other.items);
+                    items.add(other.items);
                 }
             }
 

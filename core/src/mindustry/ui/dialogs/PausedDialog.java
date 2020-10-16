@@ -34,14 +34,6 @@ public class PausedDialog extends BaseDialog{
         });
 
         if(!mobile){
-            //TODO localize
-            //TODO capturing is disabled, remove?
-            //cont.label(() -> state.getSector() == null ? "" :
-            //("[lightgray]Next turn in [accent]" + state.getSector().displayTimeRemaining() +
-            //    (state.rules.winWave > 0 && !state.getSector().isCaptured() ? "\n[lightgray]Reach wave[accent] " + state.rules.winWave + "[] to capture" : "")))
-           // .visible(() -> state.getSector() != null).colspan(2);
-            cont.row();
-
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
@@ -89,7 +81,7 @@ public class PausedDialog extends BaseDialog{
                 cont.buttonRow("@launchcore", Icon.up, () -> {
                     hide();
                     ui.planet.showLaunch(state.getSector(), player.team().core());
-                }).disabled(b -> player.team().core() == null);
+                }).disabled(b -> player.team().core() == null || net.client());
 
                 cont.row();
 
@@ -101,7 +93,11 @@ public class PausedDialog extends BaseDialog{
                 cont.row();
             }
 
-            cont.buttonRow("@hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
+            if(state.isCampaign() && net.active()){
+                cont.buttonRow("@research", Icon.tree, ui.research::show);
+            }else{
+                cont.buttonRow("@hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
+            }
 
             cont.buttonRow("@quit", Icon.exit, this::showQuitConfirm).update(s -> {
                 s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit");

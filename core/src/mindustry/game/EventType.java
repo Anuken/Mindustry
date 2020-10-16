@@ -73,6 +73,15 @@ public class EventType{
         }
     }
 
+    /** Called when a sector is destroyed by waves when you're not there. */
+    public static class SectorInvasionEvent{
+        public final Sector sector;
+
+        public SectorInvasionEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
     public static class LaunchItemEvent{
         public final ItemStack stack;
 

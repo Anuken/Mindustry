@@ -20,11 +20,14 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class BlockRenderer implements Disposable{
+    public static final int crackRegions = 8, maxCrackSize = 9;
+
     private static final int initialRequests = 32 * 32;
     private static final int expandr = 9;
     private static final Color shadowColor = new Color(0, 0, 0, 0.71f);
 
     public final FloorRenderer floor = new FloorRenderer();
+    public TextureRegion[][] cracks;
 
     private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
     private Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
@@ -39,6 +42,15 @@ public class BlockRenderer implements Disposable{
     private boolean displayStatus = false;
 
     public BlockRenderer(){
+
+        Events.on(ClientLoadEvent.class, e -> {
+            cracks = new TextureRegion[maxCrackSize][crackRegions];
+            for(int size = 1; size <= maxCrackSize; size++){
+                for(int i = 0; i < crackRegions; i++){
+                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
+                }
+            }
+        });
 
         Events.on(WorldLoadEvent.class, event -> {
             shadowEvents.clear();

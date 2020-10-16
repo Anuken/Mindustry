@@ -290,7 +290,7 @@ public class DefaultWaves{
                     begin = f;
                     end = f + next >= cap ? never : f + next;
                     max = 14;
-                    unitScaling = rand.random(1f, 2f);
+                    unitScaling = rand.random(1f, 3f);
                     shields = shieldAmount;
                     shieldScaling = shieldsPerWave;
                     spacing = space;
@@ -329,7 +329,7 @@ public class DefaultWaves{
 
         while(step <= cap){
             createProgression.get(step);
-            step += (int)(rand.random(12, 25) * Mathf.lerp(1f, 0.4f, difficulty));
+            step += (int)(rand.random(13, 25) * Mathf.lerp(1f, 0.5f, difficulty));
         }
 
         int bossWave = (int)(rand.random(30, 60) * Mathf.lerp(1f, 0.7f, difficulty));

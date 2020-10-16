@@ -79,6 +79,8 @@ public class UnitType extends UnlockableContent{
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
+    /** This is a VERY ROUGH estimate of unit DPS. */
+    public float dpsEstimate = -1;
     public float clipSize = -1;
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
@@ -266,6 +268,17 @@ public class UnitType extends UnlockableContent{
 
             ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }
+
+        //calculate estimated DPS for one target based on weapons
+        if(dpsEstimate < 0){
+            dpsEstimate = weapons.sumf(w -> (w.bullet.estimateDPS() / w.reload) * w.shots * 60f);
+
+            //suicide enemy
+            if(weapons.contains(w -> w.bullet.killShooter)){
+                //scale down DPS to be insignificant
+                dpsEstimate /= 100f;
+            }
+        }
     }
 
     @CallSuper
@@ -436,7 +449,7 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         //draw back items
-        if(unit.hasItem() && unit.itemTime > 0.01f){
+        if(unit.item() != null && unit.itemTime > 0.01f){
             float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime;
 
             Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));

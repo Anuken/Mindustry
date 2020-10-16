@@ -139,6 +139,15 @@ public abstract class BulletType extends Content{
         this(1f, 1f);
     }
 
+    /** @return estimated damage per shot. this can be very inaccurate. */
+    public float estimateDPS(){
+        float sum = damage + splashDamage*0.75f;
+        if(fragBullet != null && fragBullet != this){
+            sum += fragBullet.estimateDPS() * fragBullets / 2f;
+        }
+        return sum;
+    }
+
     /** Returns maximum distance the bullet this bullet type has can travel. */
     public float range(){
         return Math.max(speed * lifetime * (1f - drag), range);

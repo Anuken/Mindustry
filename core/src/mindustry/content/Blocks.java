@@ -1713,7 +1713,7 @@ public class Blocks implements ContentList{
                 despawnEffect = Fx.instBomb;
                 trailSpacing = 20f;
                 damage = 1350;
-                tileDamageMultiplier = 0.5f;
+                tileDamageMultiplier = 0.3f;
                 speed = brange;
                 hitShake = 6f;
                 ammoMultiplier = 1f;

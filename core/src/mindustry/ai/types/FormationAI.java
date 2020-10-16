@@ -7,6 +7,7 @@ import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 public class FormationAI extends AIController implements FormationMember{
     public Unit leader;
@@ -56,6 +57,30 @@ public class FormationAI extends AIController implements FormationMember{
             unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
         }else{
             unit.moveAt(realtarget.sub(unit).limit(type.speed));
+        }
+
+        if(unit instanceof Minerc mine && leader instanceof Minerc com){
+            if(mine.validMine(com.mineTile())){
+                mine.mineTile(com.mineTile());
+
+                CoreBuild core = unit.team.core();
+
+                if(core != null && com.mineTile().drop() != null && unit.within(core, unit.type().range) && !unit.acceptsItem(com.mineTile().drop())){
+                    if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
+                        Call.transferItemTo(unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
+
+                        unit.clearItem();
+                    }
+                }
+            }else{
+                mine.mineTile(null);
+            }
+
+        }
+
+        if(unit instanceof Builderc build && leader instanceof Builderc com && com.activelyBuilding()){
+            build.clearBuilding();
+            build.addBuild(com.buildPlan());
         }
     }
 

@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -60,10 +61,15 @@ public class OverdriveProjector extends Block{
         }
     }
 
-    public class OverdriveBuild extends Building{
+    public class OverdriveBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void drawLight(){
