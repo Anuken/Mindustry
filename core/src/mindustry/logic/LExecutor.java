@@ -212,8 +212,9 @@ public class LExecutor{
         public BlockFlag flag = BlockFlag.core;
         public int enemy, ore;
         public int outX, outY, outFound;
+        public Object getOut;
 
-        public UnitLocateI(LLocate locate, BlockFlag flag, int enemy, int ore, int outX, int outY, int outFound){
+        public UnitLocateI(LLocate locate, BlockFlag flag, int enemy, int ore, int outX, int outY, int outFound, Object getOut){
             this.locate = locate;
             this.flag = flag;
             this.enemy = enemy;
@@ -221,6 +222,7 @@ public class LExecutor{
             this.outX = outX;
             this.outY = outY;
             this.outFound = outFound;
+            this.getOut = getOut;
         }
 
         public UnitLocateI(){
@@ -266,6 +268,7 @@ public class LExecutor{
                         exec.setnum(outX, cache.x = build ? res.build.x : res.worldx());
                         exec.setnum(outY, cache.y = build ? res.build.y : res.worldy());
                         exec.setnum(outFound, 1);
+                        exec.obj(getOut);
                     }else{
                         cache.found = false;
                         exec.setnum(outFound, 0);
