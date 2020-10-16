@@ -114,7 +114,7 @@ public class StatusEffects implements ContentList{
         }};
 
         tarred = new StatusEffect("tarred"){{
-            color = Liquids.tar.color;
+            color = Liquids.oil.color;
             speedMultiplier = 0.6f;
             effect = Fx.oily;
 
@@ -157,9 +157,11 @@ public class StatusEffects implements ContentList{
 
         shocked = new StatusEffect("shocked"){{
             color = Pal.lancerLaser;
-	}};
+        }};
 
-        blasted = new StatusEffect("blasted");
+        blasted = new StatusEffect("blasted"){{
+            color = Items.blastCompound.color;
+        }};
 
         corroded = new StatusEffect("corroded"){{
             color = Pal.plastanium;
