@@ -269,7 +269,7 @@ public class Planet extends UnlockableContent{
         return true;
     }
 
-    public void draw(Mat3D projection, Mat3D Transform){
+    public void draw(Mat3D projection, Mat3D transform){
         mesh.render(projection, transform);
     }
 }
