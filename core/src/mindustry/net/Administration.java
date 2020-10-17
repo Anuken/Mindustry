@@ -35,7 +35,7 @@ public class Administration{
         addChatFilter((player, message) -> {
             long resetTime = Config.messageRateLimit.num() * 1000;
             if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
-                //prevent people from spamming messages quickly
+                //prevent people from spamming messages too quickly
                 if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
                     //supress message
                     player.sendMessage("[scarlet]You may only send messages every " + Config.messageRateLimit.num() + " seconds.");
