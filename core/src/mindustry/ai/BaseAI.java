@@ -7,6 +7,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.game.Teams.*;
@@ -68,7 +69,7 @@ public class BaseAI{
                 if(pos == null) return;
 
                 Tmp.v1.rnd(Mathf.random(range));
-                int wx = (int)(world.toTile(pos.getX()) + Tmp.v1.x), wy = (int)(world.toTile(pos.getY()) + Tmp.v1.y);
+                int wx = (int)(World.toTile(pos.getX()) + Tmp.v1.x), wy = (int)(World.toTile(pos.getY()) + Tmp.v1.y);
                 Tile tile = world.tiles.getc(wx, wy);
 
                 Seq<BasePart> parts = null;

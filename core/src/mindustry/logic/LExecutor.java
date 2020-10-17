@@ -7,6 +7,7 @@ import arc.util.noise.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -263,8 +264,8 @@ public class LExecutor{
                     if(res != null && (!build || res.build != null)){
                         cache.found = true;
                         //set result if found
-                        exec.setnum(outX, cache.x = build ? res.build.x : res.worldx());
-                        exec.setnum(outY, cache.y = build ? res.build.y : res.worldy());
+                        exec.setnum(outX, cache.x = World.conv(build ? res.build.x : res.worldx()));
+                        exec.setnum(outY, cache.y = World.conv(build ? res.build.y : res.worldy()));
                         exec.setnum(outFound, 1);
                     }else{
                         cache.found = false;
@@ -332,14 +333,15 @@ public class LExecutor{
             //only control standard AI units
             if(unitObj instanceof Unit unit && ai != null){
                 ai.controlTimer = LogicAI.logicControlTimeout;
+                float x1 = World.unconv(exec.numf(p1)), y1 = World.unconv(exec.numf(p2)), d1 = World.unconv(exec.numf(p3));
 
                 switch(type){
                     case move, stop, approach -> {
                         ai.control = type;
-                        ai.moveX = exec.numf(p1);
-                        ai.moveY = exec.numf(p2);
+                        ai.moveX = x1;
+                        ai.moveY = y1;
                         if(type == LUnitControl.approach){
-                            ai.moveRad = exec.numf(p3);
+                            ai.moveRad = d1;
                         }
 
                         //stop mining/building
@@ -353,13 +355,13 @@ public class LExecutor{
                         }
                     }
                     case within -> {
-                        exec.setnum(p4, unit.within(exec.numf(p1), exec.numf(p2), exec.numf(p3)) ? 1 : 0);
+                        exec.setnum(p4, unit.within(x1, y1, d1) ? 1 : 0);
                     }
                     case pathfind -> {
                         ai.control = type;
                     }
                     case target -> {
-                        ai.posTarget.set(exec.numf(p1), exec.numf(p2));
+                        ai.posTarget.set(x1, y1);
                         ai.aimControl = type;
                         ai.mainTarget = null;
                         ai.shoot = exec.bool(p3);
@@ -376,7 +378,7 @@ public class LExecutor{
                         unit.flag = exec.num(p1);
                     }
                     case mine -> {
-                        Tile tile = world.tileWorld(exec.numf(p1), exec.numf(p2));
+                        Tile tile = world.tileWorld(x1, y1);
                         if(unit instanceof Minerc miner){
                             miner.mineTile(miner.validMine(tile) ? tile : null);
                         }
@@ -420,7 +422,7 @@ public class LExecutor{
                     }
                     case build -> {
                         if(unit instanceof Builderc builder && exec.obj(p3) instanceof Block block){
-                            int x = world.toTile(exec.numf(p1)), y = world.toTile(exec.numf(p2));
+                            int x = World.toTile(x1), y = World.toTile(y1);
                             int rot = exec.numi(p4);
 
                             //reset state of last request when necessary
@@ -441,13 +443,12 @@ public class LExecutor{
                         }
                     }
                     case getBlock -> {
-                        float x = exec.numf(p1), y = exec.numf(p2);
                         float range = Math.max(unit.range(), buildingRange);
-                        if(!unit.within(x, y, range)){
+                        if(!unit.within(x1, y1, range)){
                             exec.setobj(p3, null);
                             exec.setnum(p4, 0);
                         }else{
-                            Tile tile = world.tileWorld(x, y);
+                            Tile tile = world.tileWorld(x1, y1);
                             //any environmental solid block is returned as StoneWall, aka "@solid"
                             Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
                             exec.setobj(p3, block);

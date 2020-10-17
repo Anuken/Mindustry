@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -100,7 +101,7 @@ public class WaveSpawner{
     }
 
     public void eachGroundSpawn(Intc2 cons){
-        eachGroundSpawn((x, y, shock) -> cons.get(world.toTile(x), world.toTile(y)));
+        eachGroundSpawn((x, y, shock) -> cons.get(World.toTile(x), World.toTile(y)));
     }
 
     private void eachGroundSpawn(SpawnConsumer cons){
@@ -118,7 +119,7 @@ public class WaveSpawner{
 
                 //keep moving forward until the max step amount is reached
                 while(steps++ < maxSteps){
-                    int tx = world.toTile(core.x + Tmp.v1.x), ty = world.toTile(core.y + Tmp.v1.y);
+                    int tx = World.toTile(core.x + Tmp.v1.x), ty = World.toTile(core.y + Tmp.v1.y);
                     any = false;
                     Geometry.circle(tx, ty, world.width(), world.height(), 3, (x, y) -> {
                         if(world.solid(x, y)){

@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -441,7 +442,7 @@ public class Pathfinder implements Runnable{
 
         @Override
         public void getPositions(IntSeq out){
-            out.add(Point2.pack(world.toTile(position.getX()), world.toTile(position.getY())));
+            out.add(Point2.pack(World.toTile(position.getX()), World.toTile(position.getY())));
         }
 
     }

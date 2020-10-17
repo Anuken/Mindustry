@@ -17,6 +17,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -1266,8 +1267,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public double sense(LAccess sensor){
         return switch(sensor){
-            case x -> x;
-            case y -> y;
+            case x -> World.conv(x);
+            case y -> World.conv(y);
             case team -> team.id;
             case health -> health;
             case maxHealth -> maxHealth;

@@ -148,7 +148,17 @@ public class World{
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    public int toTile(float coord){
+    /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */
+    public static float conv(float coord){
+        return coord / tilesize;
+    }
+
+    /** Convert from tile to world coordinates. */
+    public static float unconv(float coord){
+        return coord * tilesize;
+    }
+
+    public static int toTile(float coord){
         return Math.round(coord / tilesize);
     }
 

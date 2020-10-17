@@ -14,6 +14,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -405,14 +406,14 @@ public class MobileInput extends InputHandler implements GestureListener{
     protected int schemOriginX(){
         Tmp.v1.setZero();
         selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
+        return World.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
     }
 
     @Override
     protected int schemOriginY(){
         Tmp.v1.setZero();
         selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
+        return World.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
     }
 
     @Override
