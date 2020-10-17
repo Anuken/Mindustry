@@ -52,6 +52,9 @@ public class LAssembler{
             }
         }
 
+        //used as a special value for any environmental solid block
+        putConst("@solid", Blocks.stoneWall);
+
         putConst("@air", Blocks.air);
 
         for(UnitType type : Vars.content.units()){
@@ -188,6 +191,7 @@ public class LAssembler{
 
         try{
             double value = Double.parseDouble(symbol);
+            if(Double.isNaN(value) || Double.isInfinite(value)) value = 0;
             //this creates a hidden const variable with the specified value
             String key = "___" + value;
             return putConst(key, value).id;

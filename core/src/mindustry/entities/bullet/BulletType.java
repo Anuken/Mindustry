@@ -25,6 +25,7 @@ public abstract class BulletType extends Content{
     public float drawSize = 40f;
     public float drag = 0f;
     public boolean pierce, pierceBuilding;
+    public int pierceCap = -1;
     public Effect hitEffect, despawnEffect;
 
     /** Effect created when shooting. */
@@ -103,6 +104,8 @@ public abstract class BulletType extends Content{
     public float incendChance = 1f;
     public float homingPower = 0f;
     public float homingRange = 50f;
+    /** Use a negative value to disable homing delay. */
+    public float homingDelay = -1f;
 
     public Color lightningColor = Pal.surge;
     public int lightning;
@@ -134,6 +137,15 @@ public abstract class BulletType extends Content{
 
     public BulletType(){
         this(1f, 1f);
+    }
+
+    /** @return estimated damage per shot. this can be very inaccurate. */
+    public float estimateDPS(){
+        float sum = damage + splashDamage*0.75f;
+        if(fragBullet != null && fragBullet != this){
+            sum += fragBullet.estimateDPS() * fragBullets / 2f;
+        }
+        return sum;
     }
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
@@ -235,6 +247,11 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
+        if(pierceCap >= 1) {
+            pierce = true;
+            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
+        }
+
         if(killShooter && b.owner() instanceof Healthc){
             ((Healthc)b.owner()).kill();
         }
@@ -245,7 +262,7 @@ public abstract class BulletType extends Content{
     }
 
     public void update(Bullet b){
-        if(homingPower > 0.0001f){
+        if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
                 b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));
@@ -311,7 +328,7 @@ public abstract class BulletType extends Content{
         bullet.data = data;
         bullet.drag = drag;
         bullet.hitSize = hitSize;
-        bullet.damage = damage < 0 ? this.damage : damage;
+        bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
         bullet.add();
 
         if(keepVelocity && owner instanceof Velc) bullet.vel.add(((Velc)owner).vel().x, ((Velc)owner).vel().y);

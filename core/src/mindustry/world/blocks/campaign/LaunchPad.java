@@ -115,15 +115,15 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
+            if(!state.isCampaign()) return;
+
             table.row();
             table.label(() -> {
                 Sector dest = state.secinfo.getRealDestination();
 
                 return Core.bundle.format("launch.destination",
                     dest == null ? Core.bundle.get("sectors.nonelaunch") :
-                    dest.preset == null ?
-                        "[accent]Sector " + dest.id :
-                        "[accent]" + dest.preset.localizedName);
+                    "[accent]" + dest.name());
             }).pad(4);
         }
 
@@ -213,7 +213,7 @@ public class LaunchPad extends Block{
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam){
                 if(destsec != null && (destsec != state.rules.sector || net.client())){
-                    ItemSeq dest = destsec.getExtraItems();
+                    ItemSeq dest = new ItemSeq();
 
                     for(ItemStack stack : stacks){
                         dest.add(stack);
@@ -223,7 +223,7 @@ public class LaunchPad extends Block{
                         Events.fire(new LaunchItemEvent(stack));
                     }
 
-                    destsec.setExtraItems(dest);
+                    destsec.addItems(dest);
                 }
             }
         }

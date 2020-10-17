@@ -12,6 +12,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -176,7 +177,7 @@ public class DesktopInput extends InputHandler{
     public void update(){
         super.update();
 
-        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content))){
+        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content) || scene.getKeyboardFocus().isDescendantOf(ui.minimapfrag.elem))){
             ui.listfrag.toggle();
         }
 
@@ -363,7 +364,7 @@ public class DesktopInput extends InputHandler{
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
-        int rawCursorX = world.toTile(Core.input.mouseWorld().x), rawCursorY = world.toTile(Core.input.mouseWorld().y);
+        int rawCursorX = World.toTile(Core.input.mouseWorld().x), rawCursorY = World.toTile(Core.input.mouseWorld().y);
 
         // automatically pause building if the current build queue is empty
         if(Core.settings.getBool("buildautopause") && isBuilding && !player.builder().isBuilding()){
@@ -599,11 +600,11 @@ public class DesktopInput extends InputHandler{
     }
 
     protected void updateMovement(Unit unit){
-        boolean omni = unit.type().omniMovement;
+        boolean omni = unit.type.omniMovement;
         boolean ground = unit.isGrounded();
 
-        float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
-        float baseSpeed = unit.type().speed;
+        float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type.strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
+        float baseSpeed = unit.type.speed;
 
         //limit speed to minimum formation speed to preserve formation
         if(unit.isCommanding()){
@@ -611,7 +612,7 @@ public class DesktopInput extends InputHandler{
             baseSpeed = unit.minFormationSpeed * 0.95f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : unit.type.canBoost ? unit.type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -622,7 +623,7 @@ public class DesktopInput extends InputHandler{
         }
 
         float mouseAngle = Angles.mouseAngle(unit.x, unit.y);
-        boolean aimCursor = omni && player.shooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
+        boolean aimCursor = omni && player.shooting && unit.type.hasWeapons() && unit.type.faceTarget && !boosted && unit.type.rotateShooting;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
@@ -637,11 +638,11 @@ public class DesktopInput extends InputHandler{
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
             if(!movement.isZero() && ground){
-                unit.vel.rotateTo(movement.angle(), unit.type().rotateSpeed);
+                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed);
             }
         }
 
-        unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
+        unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);
 
         player.boosting = Core.input.keyDown(Binding.boost) && !movement.isZero();

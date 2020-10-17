@@ -35,8 +35,6 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
-    public static final int crackRegions = 8, maxCrackSize = 9;
-
     public boolean hasItems;
     public boolean hasLiquids;
     public boolean hasPower;
@@ -193,6 +191,8 @@ public class Block extends UnlockableContent{
     public BuildPlaceability buildPlaceability = BuildPlaceability.always;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
+    /** Multiplier for cost of research in tech tree. */
+    public float researchCostMultiplier = 1;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
     /** Whether you can rotate this block with Keybind rotateplaced + Scroll Wheel. */
@@ -210,8 +210,6 @@ public class Block extends UnlockableContent{
     public @Load("@-team") TextureRegion teamRegion;
     public TextureRegion[] teamRegions;
 
-    //TODO make this not static
-    public static TextureRegion[][] cracks;
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempTileEnts = new Seq<>();
 
@@ -619,7 +617,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20, 10);
+            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
@@ -684,15 +682,6 @@ public class Block extends UnlockableContent{
     @Override
     public void load(){
         region = Core.atlas.find(name);
-
-        if(cracks == null || (cracks[0][0].texture != null && cracks[0][0].texture.isDisposed())){
-            cracks = new TextureRegion[maxCrackSize][crackRegions];
-            for(int size = 1; size <= maxCrackSize; size++){
-                for(int i = 0; i < crackRegions; i++){
-                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
-                }
-            }
-        }
 
         ContentRegions.loadRegions(this);
 

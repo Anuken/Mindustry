@@ -57,7 +57,7 @@ public class PhysicsProcess implements AsyncProcess{
             PhysicRef ref = entity.physref();
 
             ref.body.layer =
-                entity.type().allowLegStep ? layerLegs :
+                entity.type.allowLegStep ? layerLegs :
                 entity.isGrounded() ? layerGround : layerFlying;
             ref.x = entity.x();
             ref.y = entity.y();

@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
@@ -62,6 +63,11 @@ public class OverdriveProjector extends BoostableBlock{
     public class OverdriveBuild extends BoostableBlockBuild{
         float heat;
         float charge = Mathf.random(reload);
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void drawLight(){

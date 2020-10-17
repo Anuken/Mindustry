@@ -2,6 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.func.*;
+import arc.input.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -33,7 +34,14 @@ public class LaunchLoadoutDialog extends BaseDialog{
         cont.clear();
         buttons.clear();
 
-        addCloseButton();
+        buttons.defaults().size(160f, 64f);
+        buttons.button("@back", Icon.left, this::hide);
+
+        keyDown(key -> {
+            if(key == KeyCode.escape || key == KeyCode.back){
+                Core.app.post(this::hide);
+            }
+        });
 
         //updates sum requirements
         Runnable update = () -> {
@@ -79,7 +87,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 update.run();
                 rebuildItems.run();
             });
-        });
+        }).width(204);
 
         buttons.button("@launch.text", Icon.ok, () -> {
             universe.updateLoadout(core, selected);

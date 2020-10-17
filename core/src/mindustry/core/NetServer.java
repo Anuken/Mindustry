@@ -329,8 +329,8 @@ public class NetServer implements ApplicationListener{
                 votes += d;
                 voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
 
-                Call.sendMessage(Strings.format("[lightgray]A player has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
-                            target.name, votes, votesRequired()));
+                Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                    player.name, target.name, votes, votesRequired()));
 
                 checkPass();
             }
@@ -575,7 +575,7 @@ public class NetServer implements ApplicationListener{
             shooting = false;
         }
 
-        if(!player.dead() && (player.unit().type().flying || !player.unit().type().canBoost)){
+        if(!player.dead() && (player.unit().type.flying || !player.unit().type.canBoost)){
             boosting = false;
         }
 
@@ -629,7 +629,7 @@ public class NetServer implements ApplicationListener{
             Unit unit = player.unit();
 
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
-            float maxSpeed = ((player.unit().type().canBoost && player.unit().isFlying()) ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
+            float maxSpeed = ((player.unit().type.canBoost && player.unit().isFlying()) ? player.unit().type.boostMultiplier : 1f) * player.unit().type.speed;
             if(unit.isGrounded()){
                 maxSpeed *= unit.floorSpeedMultiplier();
             }

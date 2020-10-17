@@ -267,6 +267,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         Geometry.circle(x, y, world.width(), world.height(), radius, cons);
     }
 
+    public void circle(int radius, Cons<Tile> cons){
+        circle(radius, (x, y) -> cons.get(world.rawTile(x, y)));
+    }
+
     public void recache(){
         if(!headless && !world.isGenerating()){
             renderer.blocks.floor.recacheTile(this);
@@ -332,6 +336,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         recache();
     }
 
+    /** Sets the overlay without a recache. */
+    public void setOverlayQuiet(Block block){
+        this.overlay = (Floor)block;
+    }
+
     public void clearOverlay(){
         setOverlayID((short)0);
     }
@@ -346,7 +355,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean solid(){
-        return block.solid || (build != null && build.checkSolid());
+        return block.solid || floor.solid || (build != null && build.checkSolid());
     }
 
     public boolean breakable(){

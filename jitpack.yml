@@ -1,0 +1,4 @@
+before_install:
+  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
+  - source install-jdk.sh --feature 14
+  - jshell --version

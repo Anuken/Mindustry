@@ -77,7 +77,7 @@ public class TractorBeamTurret extends BoostableBlock{
             }
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().flying && efficiency() > 0.01f){
+            if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.01f){
                 any = true;
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());

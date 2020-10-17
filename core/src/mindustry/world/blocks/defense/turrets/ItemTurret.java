@@ -19,7 +19,6 @@ import mindustry.world.meta.values.*;
 import static mindustry.Vars.*;
 
 public class ItemTurret extends Turret{
-    public int maxAmmo = 30;
     public ObjectMap<Item, BulletType> ammoTypes = new ObjectMap<>();
 
     public ItemTurret(String name){

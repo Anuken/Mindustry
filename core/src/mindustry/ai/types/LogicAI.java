@@ -14,13 +14,14 @@ import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
-    public static final float transferDelay = 60f * 2f;
+    public static final float transferDelay = 60f * 3f;
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
     public static final float logicControlTimeout = 10f * 60f;
 
     public LUnitControl control = LUnitControl.stop;
     public float moveX, moveY, moveRad;
     public float itemTimer, payTimer, controlTimer = logicControlTimeout, targetTimer;
+    @Nullable
     public Building controller;
     public BuildPlan plan = new BuildPlan();
 
@@ -97,7 +98,7 @@ public class LogicAI extends AIController{
             }
         }
 
-        if(unit.type().canBoost && !unit.type().flying){
+        if(unit.type.canBoost && !unit.type.flying){
             unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid()), 0.08f);
         }
 
@@ -128,7 +129,7 @@ public class LogicAI extends AIController{
 
     @Override
     protected boolean shouldShoot(){
-        return shoot && !(unit.type().canBoost && boost);
+        return shoot && !(unit.type.canBoost && boost);
     }
 
     //always aim for the main target

@@ -69,7 +69,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     public void ores(Seq<Block> ores){
         pass((x, y) -> {
-            if(floor.asFloor().isLiquid) return;
+            if(!floor.asFloor().hasSurface()) return;
 
             int offsetX = x - 4, offsetY = y + 23;
             for(int i = ores.size - 1; i >= 0; i--){
@@ -124,7 +124,7 @@ public abstract class BasicGenerator implements WorldGenerator{
         Block[] blocks = {Blocks.darkPanel3};
         int secSize = 20;
         pass((x, y) -> {
-            if(floor.asFloor().isLiquid) return;
+            if(!floor.asFloor().hasSurface()) return;
 
             int mx = x % secSize, my = y % secSize;
             int sclx = x / secSize, scly = y / secSize;

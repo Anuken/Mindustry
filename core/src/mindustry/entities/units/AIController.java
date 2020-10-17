@@ -21,6 +21,7 @@ public class AIController implements UnitController{
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
+    protected AIController fallback;
 
     /** main target that is being faced */
     protected Teamc target;
@@ -34,9 +35,25 @@ public class AIController implements UnitController{
 
     @Override
     public void updateUnit(){
+        //use fallback AI when possible
+        if(useFallback() && (fallback != null || (fallback = fallback()) != null)){
+            if(fallback.unit != unit) fallback.unit(unit);
+            fallback.updateUnit();
+            return;
+        }
+
         updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    @Nullable
+    protected AIController fallback(){
+        return null;
+    }
+
+    protected boolean useFallback(){
+        return false;
     }
 
     protected UnitCommand command(){
@@ -78,7 +95,7 @@ public class AIController implements UnitController{
 
         if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
+        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type.speed));
     }
 
     protected void updateWeapons(){
@@ -88,7 +105,7 @@ public class AIController implements UnitController{
         boolean ret = retarget();
 
         if(ret){
-            target = findTarget(unit.x, unit.y, unit.range(), unit.type().targetAir, unit.type().targetGround);
+            target = findTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
         }
 
         if(invalid(target)){
@@ -102,7 +119,7 @@ public class AIController implements UnitController{
             float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                 mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 
-            if(unit.type().singleTarget){
+            if(unit.type.singleTarget){
                 targets[i] = target;
             }else{
                 if(ret){
@@ -159,7 +176,7 @@ public class AIController implements UnitController{
     }
 
     protected void circle(Position target, float circleLength){
-        circle(target, circleLength, unit.type().speed);
+        circle(target, circleLength, unit.type.speed);
     }
 
     protected void circle(Position target, float circleLength, float speed){
