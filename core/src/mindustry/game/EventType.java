@@ -35,7 +35,10 @@ public class EventType{
         preDraw,
         postDraw,
         uiDrawBegin,
-        uiDrawEnd
+        uiDrawEnd,
+        //before/after bloom used, skybox or planets drawn - use Vars.renderer.planets
+        universeDrawBegin,
+        universeDrawEnd
     }
 
     public static class WinEvent{}
