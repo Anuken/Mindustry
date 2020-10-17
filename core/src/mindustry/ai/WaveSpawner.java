@@ -175,7 +175,7 @@ public class WaveSpawner{
     }
 
     private void spawnEffect(Unit unit){
-        Call.spawnEffect(unit.x, unit.y, unit.type());
+        Call.spawnEffect(unit.x, unit.y, unit.type);
         Time.run(30f, unit::add);
     }
 

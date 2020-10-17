@@ -85,7 +85,7 @@ public class OverlayRenderer{
                 //special selection for block "units"
                 Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block.size * tilesize/2f);
             }else{
-                Draw.rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+                Draw.rect(select.type.icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
             }
 
             Lines.stroke(unitFade);

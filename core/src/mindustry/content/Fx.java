@@ -56,7 +56,7 @@ public class Fx{
 
         mixcol(Pal.accent, 1f);
         alpha(e.fout());
-        rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type().icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
+        rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type.icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
         Lines.stroke(e.fslope() * 1f);
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);
@@ -66,7 +66,7 @@ public class Fx{
     }),
 
     unitDespawn = new Effect(100f, e -> {
-        if(!(e.data instanceof Unit) || e.<Unit>data().type() == null) return;
+        if(!(e.data instanceof Unit) || e.<Unit>data().type == null) return;
 
         Unit select = e.data();
         float scl = e.fout(Interp.pow2Out);
@@ -74,7 +74,7 @@ public class Fx{
         Draw.scl *= scl;
 
         mixcol(Pal.accent, 1f);
-        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
+        rect(select.type.icon(Cicon.full), select.x, select.y, select.rotation - 90f);
         reset();
 
         Draw.scl = p;

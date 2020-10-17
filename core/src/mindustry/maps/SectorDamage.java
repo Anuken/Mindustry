@@ -257,12 +257,12 @@ public class SectorDamage{
                 float healthMult = 1f + Mathf.clamp(unit.armor / 20f);
 
                 sumHealth += unit.health*healthMult + unit.shield;
-                sumDps += unit.type().dpsEstimate;
+                sumDps += unit.type.dpsEstimate;
                 if(unit.abilities.find(a -> a instanceof HealFieldAbility) instanceof HealFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{
-                curEnemyDps += unit.type().dpsEstimate;
+                curEnemyDps += unit.type.dpsEstimate;
                 curEnemyHealth += unit.health;
             }
         }

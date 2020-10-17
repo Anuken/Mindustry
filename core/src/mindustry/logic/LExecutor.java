@@ -395,7 +395,7 @@ public class LExecutor{
                         if(unit instanceof Payloadc pay){
                             //units
                             if(exec.bool(p1)){
-                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type().hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
+                                Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
 
                                 if(result != null){
                                     Call.pickedUnitPayload(unit, result);

@@ -60,7 +60,7 @@ public class SStats implements SteamUserStatsCallback{
            //     active10Phantoms.complete();
             //}
 
-            if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
+            if(Groups.unit.count(u -> u.type == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
