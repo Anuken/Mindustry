@@ -89,6 +89,8 @@ public class PlanetRenderer implements Disposable{
 
         skybox.render(cam.combined);
 
+        Events.fire(Trigger.universeDraw);
+
         renderPlanet(solarSystem);
 
         endBloom();

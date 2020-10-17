@@ -36,8 +36,11 @@ public class EventType{
         postDraw,
         uiDrawBegin,
         uiDrawEnd,
-        //before/after bloom used, skybox or planets drawn - use Vars.renderer.planets
+        //before/after bloom used, skybox or planets drawn
         universeDrawBegin,
+        //skybox drawn and bloom is enabled - use Vars.renderer.planets
+        universeDraw,
+        //planets drawn and bloom disabled
         universeDrawEnd
     }
 
