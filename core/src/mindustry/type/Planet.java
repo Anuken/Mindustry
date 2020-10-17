@@ -268,4 +268,12 @@ public class Planet extends UnlockableContent{
     public ContentType getContentType(){
         return ContentType.planet;
     }
+
+    public boolean visible(){
+        return true;
+    }
+
+    public void draw(Mat3D projection, Mat3D transform){
+        mesh.render(projection, transform);
+    }
 }

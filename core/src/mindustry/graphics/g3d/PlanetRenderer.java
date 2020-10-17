@@ -116,9 +116,12 @@ public class PlanetRenderer implements Disposable{
         bloom.render();
     }
 
+
     public void renderPlanet(Planet planet){
+        if(!planet.visible()) return;
+      
         //render planet at offsetted position in the world
-        planet.mesh.render(cam.combined, planet.getTransform(mat));
+        planet.draw(cam.combined, planet.getTransform(mat));
 
         renderOrbit(planet);
 
@@ -145,7 +148,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void renderOrbit(Planet planet){
-        if(planet.parent == null) return;
+        if(planet.parent == null || !planet.visible()) return;
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
