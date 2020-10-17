@@ -41,6 +41,9 @@ public class GameState{
     }
 
     public void set(State astate){
+        //cannot pause when in multiplayer
+        if(astate == State.paused && net.active()) return;
+
         Events.fire(new StateChangeEvent(state, astate));
         state = astate;
     }
@@ -68,7 +71,7 @@ public class GameState{
     }
 
     public boolean isPlaying(){
-        return state == State.playing;
+        return (state == State.playing) || (state == State.paused && !isPaused());
     }
 
     /** @return whether the current state is *not* the menu. */

@@ -124,7 +124,7 @@ public class LaunchPad extends Block{
                 return Core.bundle.format("launch.destination",
                     dest == null ? Core.bundle.get("sectors.nonelaunch") :
                     "[accent]" + dest.name());
-            }).pad(4);
+            }).pad(4).wrap().width(200f).left();
         }
 
         @Override
