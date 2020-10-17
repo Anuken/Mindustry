@@ -140,7 +140,7 @@ public class PlanetRenderer implements Disposable{
     }
 
     private void renderOrbit(Planet planet){
-        if(planet.parent == null) return;
+        if(planet.parent == null || !planet.visible()) return;
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
