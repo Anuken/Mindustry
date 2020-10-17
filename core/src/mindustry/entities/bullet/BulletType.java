@@ -104,6 +104,8 @@ public abstract class BulletType extends Content{
     public float incendChance = 1f;
     public float homingPower = 0f;
     public float homingRange = 50f;
+    /** Use a negative value to disable homing delay. */
+    public float homingDelay = -1f;
 
     public Color lightningColor = Pal.surge;
     public int lightning;
@@ -260,7 +262,7 @@ public abstract class BulletType extends Content{
     }
 
     public void update(Bullet b){
-        if(homingPower > 0.0001f){
+        if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
                 b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));

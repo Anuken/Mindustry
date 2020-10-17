@@ -85,7 +85,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(tile != null && player.team().isEnemy(tile.team)){
                 player.miner().mineTile(null);
                 target = tile;
-            }else if(tile != null && player.unit().type().canHeal && tile.team == player.team() && tile.damaged()){
+            }else if(tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged()){
                 player.miner().mineTile(null);
                 target = tile;
             }
@@ -834,10 +834,10 @@ public class MobileInput extends InputHandler implements GestureListener{
     protected void updateMovement(Unit unit){
         Rect rect = Tmp.r3;
 
-        UnitType type = unit.type();
+        UnitType type = unit.type;
         if(type == null) return;
 
-        boolean omni = unit.type().omniMovement;
+        boolean omni = unit.type.omniMovement;
         boolean legs = unit.isGrounded();
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&
@@ -855,7 +855,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         float attractDst = 15f;
         float strafePenalty = legs ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(unit.vel.angle(), unit.rotation) / 180f);
 
-        float baseSpeed = unit.type().speed;
+        float baseSpeed = unit.type.speed;
 
         //limit speed to minimum formation speed to preserve formation
         if(unit.isCommanding()){

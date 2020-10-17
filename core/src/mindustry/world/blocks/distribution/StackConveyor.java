@@ -203,7 +203,7 @@ public class StackConveyor extends Block implements Autotiler{
                     if(front() instanceof StackConveyorBuild e && e.team == team){
                         // sleep if its occupied
                         if(e.link == -1){
-                            e.items.addAll(items);
+                            e.items.add(items);
                             e.lastItem = lastItem;
                             e.link = tile.pos();
                             // ▲ to | from ▼

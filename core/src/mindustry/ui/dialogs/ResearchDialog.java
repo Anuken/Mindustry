@@ -60,7 +60,7 @@ public class ResearchDialog extends BaseDialog{
                     for(Planet planet : content.planets()){
                         for(Sector sector : planet.sectors){
                             if(sector.hasSave()){
-                                ItemSeq cached = sector.calculateItems();
+                                ItemSeq cached = sector.items();
                                 add(cached);
                                 cache.put(sector, cached);
                             }

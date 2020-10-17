@@ -279,19 +279,29 @@ public class Control implements ApplicationListener, Loadable{
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
+                    state.secinfo = state.rules.sector.info;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty()){
+
+                        //no spawn set -> delete the sector save
+                        if(sector.info.spawnPosition == 0){
+                            //delete old save
+                            sector.save = null;
+                            slot.delete();
+                            //play again
+                            playSector(origin, sector);
+                            return;
+                        }
+
                         //reset wave so things are more fair
                         state.wave = 1;
 
                         //kill all units, since they should be dead anwyay
-                        for(Unit unit : Groups.unit){
-                            unit.remove();
-                        }
+                        Groups.unit.clear();
 
-                        Tile spawn = world.tile(sector.getSpawnPosition());
-                        Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
+                        Tile spawn = world.tile(sector.info.spawnPosition);
+                        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations
                         player.set(spawn.x * tilesize, spawn.y * tilesize);
@@ -313,7 +323,6 @@ public class Control implements ApplicationListener, Loadable{
             }else{
                 net.reset();
                 logic.reset();
-                sector.setSecondsPassed(0);
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching

@@ -217,9 +217,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public void renderProjections(){
         if(hovered != null){
             planets.drawPlane(hovered, () -> {
-                Draw.color(hovered.isUnderAttack() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
+                Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
 
-                TextureRegion icon = hovered.locked() && !canSelect(hovered) ? Icon.lock.getRegion() : hovered.isUnderAttack() ? Icon.warning.getRegion() : null;
+                TextureRegion icon = hovered.locked() && !canSelect(hovered) ? Icon.lock.getRegion() : hovered.isAttacked() ? Icon.warning.getRegion() : null;
 
                 if(icon != null){
                     Draw.rect(icon, 0, 0);
@@ -352,69 +352,76 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.clear();
         stable.background(Styles.black6);
 
-        stable.add("[accent]" + (sector.preset == null ? sector.id : sector.preset.localizedName)).row();
+        stable.table(title -> {
+            title.add("[accent]" + sector.name());
+            if(sector.preset == null){
+                title.button(Icon.pencilSmall, Styles.clearPartiali, () -> {
+                   ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
+                       sector.setName(v);
+                       updateSelected();
+                   });
+                }).size(40f).padLeft(4);
+            }
+        }).row();
+
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(sector.save != null ? sector.save.getPlayTime() : "@sectors.unexplored").row();
-        if(sector.isUnderAttack() || sector.hasEnemyBase()){
+
+        if(sector.isAttacked() || sector.hasEnemyBase()){
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 
-        if(sector.isUnderAttack()){
+        if(sector.isAttacked()){
             //TODO localize when finalized
             //these mechanics are likely to change and as such are not added to the bundle
             stable.add("[scarlet]Under attack!");
             stable.row();
-            stable.add("[accent]" + (int)(sector.getDamage() * 100) + "% damaged");
+            stable.add("[accent]" + (int)(sector.info.damage * 100) + "% damaged");
             stable.row();
         }
 
-        if(sector.save != null){
+        if(sector.save != null && sector.info.resources.any()){
             stable.add("@sectors.resources").row();
             stable.table(t -> {
-
-                if(sector.save != null && sector.save.meta.secinfo != null && sector.save.meta.secinfo.resources.any()){
-                    t.left();
-                    int idx = 0;
-                    int max = 5;
-                    for(UnlockableContent c : sector.save.meta.secinfo.resources){
-                        t.image(c.icon(Cicon.small)).padRight(3);
-                        if(++idx % max == 0) t.row();
-                    }
-                }else{
-                    t.add("@unknown").color(Color.lightGray);
+                t.left();
+                int idx = 0;
+                int max = 5;
+                for(UnlockableContent c : sector.info.resources){
+                    t.image(c.icon(Cicon.small)).padRight(3);
+                    if(++idx % max == 0) t.row();
                 }
-
-
             }).fillX().row();
         }
 
         //production
-        if(sector.hasBase() && sector.save.meta.hasProduction){
-            stable.add("@sectors.production").row();
-            stable.table(t -> {
-                t.left();
+        if(sector.hasBase()){
+            Table t = new Table().left();
 
-                float scl = Math.max(1f - sector.getDamage(), 0);
+            float scl = sector.getProductionScale();
 
-                sector.save.meta.secinfo.production.each((item, stat) -> {
-                    int total = (int)(stat.mean * 60 * scl);
-                    if(total > 1){
-                        t.image(item.icon(Cicon.small)).padRight(3);
-                        t.add(UI.formatAmount(total) + " " + Core.bundle.get("unit.perminute")).color(Color.lightGray);
-                        t.row();
-                    }
-                });
-            }).row();
+            sector.info.production.each((item, stat) -> {
+                int total = (int)(stat.mean * 60 * scl);
+                if(total > 1){
+                    t.image(item.icon(Cicon.small)).padRight(3);
+                    t.add(UI.formatAmount(total) + " " + Core.bundle.get("unit.perminute")).color(Color.lightGray);
+                    t.row();
+                }
+            });
+
+            if(t.getChildren().any()){
+                stable.add("@sectors.production").row();
+                stable.add(t).row();
+            }
         }
 
         //stored resources
-        if(sector.hasBase() && sector.save.meta.secinfo.coreItems.total > 0){
+        if(sector.hasBase() && sector.info.items.total > 0){
             stable.add("@sectors.stored").row();
             stable.table(t -> {
                 t.left();
 
                 t.table(res -> {
-                    ItemSeq items = sector.calculateItems();
+                    ItemSeq items = sector.items();
 
                     int i = 0;
                     for(ItemStack stack : items){

@@ -339,9 +339,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
-        if(!mobile){
-            graphics.checkPref("blockselectkeys", true);
-        }
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", true);
