@@ -49,7 +49,7 @@ public class WaveSpawner{
 
     /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
-        return state.rules.waves && !player.dead() && spawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
+        return state.hasSpawns() && !player.dead() && spawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
     }
 
     public void spawnEnemies(){
@@ -105,8 +105,10 @@ public class WaveSpawner{
     }
 
     private void eachGroundSpawn(SpawnConsumer cons){
-        for(Tile spawn : spawns){
-            cons.accept(spawn.worldx(), spawn.worldy(), true);
+        if(state.hasSpawns()){
+            for(Tile spawn : spawns){
+                cons.accept(spawn.worldx(), spawn.worldy(), true);
+            }
         }
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){

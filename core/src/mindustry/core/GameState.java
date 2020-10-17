@@ -48,6 +48,10 @@ public class GameState{
         state = astate;
     }
 
+    public boolean hasSpawns(){
+        return rules.waves && !(isCampaign() && rules.attackMode);
+    }
+
     /** Note that being in a campaign does not necessarily mean having a sector. */
     public boolean isCampaign(){
         return rules.sector != null;
