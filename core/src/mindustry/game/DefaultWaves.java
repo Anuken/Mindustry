@@ -18,6 +18,7 @@ public class DefaultWaves{
             new SpawnGroup(dagger){{
                 end = 10;
                 unitScaling = 2f;
+                max = 30;
             }},
 
             new SpawnGroup(crawler){{
@@ -45,6 +46,7 @@ public class DefaultWaves{
                 begin = 13;
                 spacing = 3;
                 unitScaling = 0.5f;
+                max = 25;
             }},
 
             new SpawnGroup(mace){{
@@ -61,7 +63,7 @@ public class DefaultWaves{
                 unitAmount = 4;
                 spacing = 2;
                 shieldScaling = 10f;
-                max = 20;
+                max = 14;
             }},
 
             new SpawnGroup(mace){{
@@ -94,6 +96,7 @@ public class DefaultWaves{
                 unitScaling = 1;
                 spacing = 2;
                 shieldScaling = 20f;
+                max = 20;
             }},
 
             new SpawnGroup(quasar){{
@@ -111,6 +114,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 3;
                 effect = StatusEffects.shielded;
+                max = 25;
             }},
 
             new SpawnGroup(fortress){{
@@ -138,6 +142,7 @@ public class DefaultWaves{
                 effect = StatusEffects.overdrive;
                 items = new ItemStack(Items.pyratite, 100);
                 end = 130;
+                max = 30;
             }},
 
             new SpawnGroup(horizon){{
@@ -156,6 +161,7 @@ public class DefaultWaves{
                 shields = 100f;
                 shieldScaling = 10f;
                 effect = StatusEffects.overdrive;
+                max = 20;
             }},
 
             new SpawnGroup(zenith){{

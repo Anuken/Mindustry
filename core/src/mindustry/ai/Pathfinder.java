@@ -112,7 +112,7 @@ public class Pathfinder implements Runnable{
         }
 
         return PathTile.get(
-            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 80),
+            tile.build == null || !tile.solid() ? 0 : Math.min((int)(tile.build.health / 40), 80),
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,

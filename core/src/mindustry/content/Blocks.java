@@ -919,8 +919,8 @@ public class Blocks implements ContentList{
         shockMine = new ShockMine("shock-mine"){{
             requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
             hasShadow = false;
-            health = 40;
-            damage = 23;
+            health = 50;
+            damage = 25;
             tileDamage = 7f;
             length = 10;
             tendrils = 4;
