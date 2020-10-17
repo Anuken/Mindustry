@@ -81,7 +81,7 @@ public class DefaultWaves{
                 effect = StatusEffects.overdrive;
             }},
 
-            new SpawnGroup(mace){{
+            new SpawnGroup(pulsar){{
                 begin = 120;
                 spacing = 2;
                 unitScaling = 3;
@@ -122,7 +122,7 @@ public class DefaultWaves{
                 shieldScaling = 30;
             }},
 
-            new SpawnGroup(dagger){{
+            new SpawnGroup(nova){{
                 begin = 35;
                 spacing = 3;
                 unitAmount = 4;
@@ -233,7 +233,7 @@ public class DefaultWaves{
                 shieldScaling = 20f;
             }},
 
-            new SpawnGroup(atrax){{
+            new SpawnGroup(toxopid){{
                 begin = 210;
                 unitAmount = 1;
                 unitScaling = 1;
@@ -258,7 +258,7 @@ public class DefaultWaves{
         {nova, pulsar, quasar, vela, corvus},
         {crawler, atrax, spiroct, arkyid, toxopid},
         //{risso, minke, bryde, sei, omura}, //questionable choices
-        //{mono, poly, mega, quad, oct}, //do not attack
+        {poly, poly, mega, quad, quad},
         {flare, horizon, zenith, antumbra, eclipse}
         };
 

@@ -11,6 +11,7 @@ import mindustry.entities.abilities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -252,7 +253,10 @@ public class SectorDamage{
             if(unit.isPlayer()) continue;
 
             if(unit.team == state.rules.defaultTeam){
-                sumHealth += unit.health + unit.shield;
+                //scale health based on armor - yes, this is inaccurate, but better than nothing
+                float healthMult = 1f + Mathf.clamp(unit.armor / 20f);
+
+                sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type().dpsEstimate;
                 if(unit.abilities.find(a -> a instanceof HealFieldAbility) instanceof HealFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
@@ -277,10 +281,12 @@ public class SectorDamage{
             }
 
             for(SpawnGroup group : state.rules.spawns){
+                float healthMult = 1f + Mathf.clamp(group.type.armor / 20f);
+                StatusEffect effect = (group.effect == null ? StatusEffects.none : group.effect);
                 int spawned = group.getSpawned(wave);
                 if(spawned <= 0) continue;
-                sumWaveHealth += spawned * (group.getShield(wave) + group.type.health);
-                sumWaveDps +=  spawned * group.type.dpsEstimate;
+                sumWaveHealth += spawned * (group.getShield(wave) + group.type.health * effect.healthMultiplier * healthMult);
+                sumWaveDps += spawned * group.type.dpsEstimate * effect.damageMultiplier;
             }
             waveDps.add(new Vec2(wave, sumWaveDps));
             waveHealth.add(new Vec2(wave, sumWaveHealth));
@@ -295,7 +301,8 @@ public class SectorDamage{
         info.waveDpsBase = reg.intercept;
         info.waveDpsSlope = reg.slope;
 
-        info.sumHealth = sumHealth;
+        //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
+        info.sumHealth = sumHealth * 1.2f;
         info.sumDps = sumDps;
         info.sumRps = sumRps;
 

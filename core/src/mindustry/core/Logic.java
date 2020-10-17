@@ -96,6 +96,11 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
+            if(state.isCampaign()){
+                //enable building AI
+                state.rules.waveTeam.rules().ai = true;
+                state.rules.waveTeam.rules().infiniteResources = true;
+            }
 
             //save settings
             Core.settings.manualSave();
@@ -174,9 +179,12 @@ public class Logic implements ApplicationListener{
             }
 
             //if there's a "win" wave and no enemies are present, win automatically
-            if(state.rules.waves && state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()){
+            if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
+                (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
                 //the sector has been conquered - waves get disabled
                 state.rules.waves = false;
+                //disable attack mode
+                state.rules.attackMode = false;
 
                 //fire capture event
                 Events.fire(new SectorCaptureEvent(state.rules.sector));

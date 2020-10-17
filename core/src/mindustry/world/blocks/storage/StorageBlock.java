@@ -26,7 +26,7 @@ public class StorageBlock extends Block{
     }
 
     public static void incinerateEffect(Building self, Building source){
-        if(Mathf.chance(0.1)){
+        if(Mathf.chance(0.3)){
             Tile edge = Edges.getFacingEdge(source, self);
             Tile edge2 = Edges.getFacingEdge(self, source);
             if(edge != null && edge2 != null){
