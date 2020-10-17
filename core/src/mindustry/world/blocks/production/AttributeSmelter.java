@@ -37,7 +37,7 @@ public class AttributeSmelter extends GenericSmelter{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.affinities, attribute, boostScale);
+        stats.add(BlockStat.affinities, attribute, floating, boostScale);
     }
 
     public class AttributeSmelterBuild extends SmelterBuild{
