@@ -40,7 +40,7 @@ public class BaseAI{
     }
 
     public void update(){
-        if(timer.get(timerSpawn, 60) && data.hasCore()){
+        if(data.team.rules().aiCoreSpawn && timer.get(timerSpawn, 60 * 2.5f) && data.hasCore()){
             CoreBlock block = (CoreBlock)data.core().block;
 
             //create AI core unit

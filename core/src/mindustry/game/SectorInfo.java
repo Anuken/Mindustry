@@ -101,6 +101,17 @@ public class SectorInfo{
 
     /** Write contents of meta into main storage. */
     public void write(){
+        //enable attack mode when there's a core.
+        if(state.rules.waveTeam.core() != null){
+            attack = true;
+            winWave = 0;
+        }
+
+        //if there are infinite waves and no win wave, add a win wave.
+        if(waves && winWave <= 0 && !attack){
+            winWave = 30;
+        }
+
         state.wave = wave;
         state.rules.waves = waves;
         state.rules.waveSpacing = waveSpacing;
@@ -114,8 +125,6 @@ public class SectorInfo{
             //ensure capacity.
             entity.items.each((i, a) -> entity.items.set(i, Math.min(a, entity.storageCapacity)));
         }
-
-        //TODO write items.
     }
 
     /** Prepare data for writing to a save. */
