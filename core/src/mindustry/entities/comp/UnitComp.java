@@ -36,7 +36,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import int id;
 
     private UnitController controller;
-    private UnitType type;
+    UnitType type;
     boolean spawnedByCore;
     double flag;
 
@@ -110,7 +110,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case firstItem -> stack().amount == 0 ? null : item();
             case payloadType -> self() instanceof Payloadc pay ?
                 (pay.payloads().isEmpty() ? null :
-                pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type() :
+                pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
                 pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
@@ -163,20 +163,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void set(UnitType def, UnitController controller){
-        type(type);
+        if(this.type != def){
+            setType(def);
+        }
         controller(controller);
-    }
-
-    @Override
-    public void type(UnitType type){
-        if(this.type == type) return;
-
-        setStats(type);
-    }
-
-    @Override
-    public UnitType type(){
-        return type;
     }
 
     /** @return pathfinder path type for calculating costs */
@@ -208,7 +198,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return Units.getCap(team);
     }
 
-    public void setStats(UnitType type){
+    public void setType(UnitType type){
         this.type = type;
         this.maxHealth = type.health;
         this.drag = type.drag;
@@ -226,7 +216,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void afterSync(){
         //set up type info after reading
-        setStats(this.type);
+        setType(this.type);
         controller.unit(self());
     }
 

@@ -41,6 +41,8 @@ public class SectorInfo{
     public Seq<UnlockableContent> resources = new Seq<>();
     /** Whether waves are enabled here. */
     public boolean waves = true;
+    /** Whether attack mode is enabled here. */
+    public boolean attack = false;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
     /** Time between waves. */
@@ -99,20 +101,30 @@ public class SectorInfo{
 
     /** Write contents of meta into main storage. */
     public void write(){
+        //enable attack mode when there's a core.
+        if(state.rules.waveTeam.core() != null){
+            attack = true;
+            winWave = 0;
+        }
+
+        //if there are infinite waves and no win wave, add a win wave.
+        if(waves && winWave <= 0 && !attack){
+            winWave = 30;
+        }
+
         state.wave = wave;
         state.rules.waves = waves;
         state.rules.waveSpacing = waveSpacing;
         state.rules.winWave = winWave;
+        state.rules.attackMode = attack;
 
         CoreBuild entity = state.rules.defaultTeam.core();
         if(entity != null){
             entity.items.clear();
             entity.items.add(items);
             //ensure capacity.
-            entity.items.each((i, a) -> entity.items.set(i, Math.min(a, entity.block.itemCapacity)));
+            entity.items.each((i, a) -> entity.items.set(i, Math.min(a, entity.storageCapacity)));
         }
-
-        //TODO write items.
     }
 
     /** Prepare data for writing to a save. */
@@ -135,6 +147,7 @@ public class SectorInfo{
         wave = state.wave;
         winWave = state.rules.winWave;
         waves = state.rules.waves;
+        attack = state.rules.attackMode;
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;

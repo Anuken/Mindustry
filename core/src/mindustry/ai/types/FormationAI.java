@@ -27,14 +27,14 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public void updateUnit(){
-        UnitType type = unit.type();
+        UnitType type = unit.type;
 
         if(leader.dead){
             unit.resetController();
             return;
         }
 
-        if(unit.type().canBoost && unit.canPassOn()){
+        if(unit.type.canBoost && unit.canPassOn()){
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
@@ -43,7 +43,7 @@ public class FormationAI extends AIController implements FormationMember{
 
         unit.aim(leader.aimX(), leader.aimY());
 
-        if(unit.type().rotateShooting){
+        if(unit.type.rotateShooting){
             unit.lookAt(leader.aimX(), leader.aimY());
         }else if(unit.moving()){
             unit.lookAt(unit.vel.angle());
@@ -65,7 +65,7 @@ public class FormationAI extends AIController implements FormationMember{
 
                 CoreBuild core = unit.team.core();
 
-                if(core != null && com.mineTile().drop() != null && unit.within(core, unit.type().range) && !unit.acceptsItem(com.mineTile().drop())){
+                if(core != null && com.mineTile().drop() != null && unit.within(core, unit.type.range) && !unit.acceptsItem(com.mineTile().drop())){
                     if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
                         Call.transferItemTo(unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
 

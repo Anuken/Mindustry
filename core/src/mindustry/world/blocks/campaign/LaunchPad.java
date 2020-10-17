@@ -115,6 +115,8 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
+            if(!state.isCampaign()) return;
+
             table.row();
             table.label(() -> {
                 Sector dest = state.secinfo.getRealDestination();

@@ -301,7 +301,7 @@ public class Control implements ApplicationListener, Loadable{
                         Groups.unit.clear();
 
                         Tile spawn = world.tile(sector.info.spawnPosition);
-                        Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
+                        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations
                         player.set(spawn.x * tilesize, spawn.y * tilesize);

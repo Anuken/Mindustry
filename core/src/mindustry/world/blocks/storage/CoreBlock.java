@@ -333,7 +333,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void itemTaken(Item item){
-            if(state.isCampaign()){
+            if(state.isCampaign() && team == state.rules.defaultTeam){
                 //update item taken amount
                 state.secinfo.handleCoreItem(item, -1);
             }
@@ -342,7 +342,9 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void handleItem(Building source, Item item){
             if(net.server() || !net.active()){
-                state.secinfo.handleCoreItem(item, 1);
+                if(team == state.rules.defaultTeam){
+                    state.secinfo.handleCoreItem(item, 1);
+                }
 
                 if(items.get(item) >= getMaximumAccepted(item)){
                     //create item incineration effect at random intervals

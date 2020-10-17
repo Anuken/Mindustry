@@ -872,7 +872,6 @@ public class UnitTypes implements ContentList{
             drag = 0.01f;
             flying = true;
             health = 75;
-            faceTarget = false;
             engineOffset = 5.5f;
             range = 140f;
 
@@ -1449,13 +1448,13 @@ public class UnitTypes implements ContentList{
                     trailMult = 0.8f;
                     hitEffect = Fx.massiveExplosion;
                     knockback = 1.5f;
-                    lifetime = 140f;
+                    lifetime = 100f;
                     height = 15.5f;
                     width = 15f;
                     collidesTiles = false;
                     ammoMultiplier = 4f;
                     splashDamageRadius = 60f;
-                    splashDamage = 85f;
+                    splashDamage = 80f;
                     backColor = Pal.missileYellowBack;
                     frontColor = Pal.missileYellow;
                     trailEffect = Fx.artilleryTrail;

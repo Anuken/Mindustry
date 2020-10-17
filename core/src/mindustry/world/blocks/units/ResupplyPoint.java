@@ -65,10 +65,10 @@ public class ResupplyPoint extends Block{
     public static boolean resupply(Team team, float x, float y, float range, float ammoAmount, Color ammoColor, Boolf<Unit> valid){
         if(!state.rules.unitAmmo) return false;
 
-        Unit unit = Units.closest(team, x, y, range, u -> u.type().ammoType instanceof ItemAmmoType && u.ammo <= u.type().ammoCapacity - ammoAmount && valid.get(u));
+        Unit unit = Units.closest(team, x, y, range, u -> u.type.ammoType instanceof ItemAmmoType && u.ammo <= u.type.ammoCapacity - ammoAmount && valid.get(u));
         if(unit != null){
             Fx.itemTransfer.at(x, y, ammoAmount / 2f, ammoColor, unit);
-            unit.ammo = Math.min(unit.ammo + ammoAmount, unit.type().ammoCapacity);
+            unit.ammo = Math.min(unit.ammo + ammoAmount, unit.type.ammoCapacity);
             return true;
         }
 
