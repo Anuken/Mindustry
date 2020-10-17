@@ -288,7 +288,8 @@ public class ContentParser{
 
                 //read extra default waves
                 if(value.has("waves")){
-                    SpawnGroup[] groups = parser.readValue(SpawnGroup[].class, value.get("waves"));
+                    JsonValue waves = value.remove("waves");
+                    SpawnGroup[] groups = parser.readValue(SpawnGroup[].class, waves);
                     for(SpawnGroup group : groups){
                         group.type = unit;
                     }
