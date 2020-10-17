@@ -540,6 +540,7 @@ public class Blocks implements ContentList{
             flameColor = Color.valueOf("ffef99");
             itemCapacity = 30;
             boostScale = 0.15f;
+            floating = true;
 
             consumes.items(new ItemStack(Items.coal, 4), new ItemStack(Items.sand, 6), new ItemStack(Items.pyratite, 1));
             consumes.power(4f);
