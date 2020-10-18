@@ -64,6 +64,22 @@ public class Reconstructor extends UnitBlock{
         super.setStats();
 
         stats.add(BlockStat.productionTime, constructTime / 60f, StatUnit.seconds);
+        stats.add(BlockStat.output, table -> {
+            table.row();
+            for(var upgrade : upgrades){
+                float size = 8*3;
+                if(upgrade[0].unlockedNow() && upgrade[1].unlockedNow()){
+                    table.image(upgrade[0].icon(Cicon.small)).size(size).padRight(4).padLeft(10).scaling(Scaling.fit).right();
+                    table.add(upgrade[0].localizedName).left();
+
+                    table.add("[lightgray] -> ");
+
+                    table.image(upgrade[1].icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
+                    table.add(upgrade[1].localizedName).left();
+                    table.row();
+                }
+            }
+        });
     }
 
     @Override

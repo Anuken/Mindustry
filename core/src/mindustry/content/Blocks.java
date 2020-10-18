@@ -1353,7 +1353,7 @@ public class Blocks implements ContentList{
             size = 5;
 
             unitCapModifier = 20;
-            researchCostMultiplier = 0.06f;
+            researchCostMultiplier = 0.05f;
         }};
 
         vault = new StorageBlock("vault"){{

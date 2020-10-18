@@ -305,7 +305,7 @@ project(":core"){
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
-        annotationProcessor 'com.github.Anuken:jabel:40eec868af'
+        annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
 
     }
 }
