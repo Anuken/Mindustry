@@ -4,7 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
@@ -22,7 +22,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
     /** Icons by Cicon ID.*/
-    protected TextureRegion[] cicons = new TextureRegion[mindustry.ui.Cicon.all.length];
+    protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
     protected boolean unlocked;
 
@@ -95,16 +95,17 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
-    public final boolean unlocked(){
+    public boolean unlocked(){
+        if(net.client()) return state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
     }
 
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
-    public final boolean unlockedNow(){
-        return unlocked || alwaysUnlocked || !state.isCampaign();
+    public boolean unlockedNow(){
+        return unlocked() || !state.isCampaign();
     }
 
-    public final boolean locked(){
+    public boolean locked(){
         return !unlocked();
     }
 }

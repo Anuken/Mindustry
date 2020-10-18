@@ -1,8 +1,8 @@
 package mindustry.world.meta;
 
-import arc.Core;
+import arc.*;
 
-import java.util.Locale;
+import java.util.*;
 
 /** Describes one type of stat for a block. */
 public enum BlockStat{

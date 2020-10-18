@@ -2,7 +2,7 @@ package mindustry.game;
 
 import arc.files.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
@@ -21,7 +21,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     /** Associated mod. If null, no mod is associated with this schematic. */
     public @Nullable LoadedMod mod;
 
-    public Schematic(Seq<Stile> tiles, @NonNull StringMap tags, int width, int height){
+    public Schematic(Seq<Stile> tiles, StringMap tags, int width, int height){
         this.tiles = tiles;
         this.tags = tags;
         this.width = width;
@@ -52,7 +52,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         return tiles.contains(s -> s.block instanceof CoreBlock);
     }
 
-    public @NonNull CoreBlock findCore(){
+    public CoreBlock findCore(){
         Stile tile = tiles.find(s -> s.block instanceof CoreBlock);
         if(tile == null) throw new IllegalArgumentException("Schematic is missing a core!");
         return (CoreBlock)tile.block;
@@ -60,6 +60,10 @@ public class Schematic implements Publishable, Comparable<Schematic>{
 
     public String name(){
         return tags.get("name", "unknown");
+    }
+
+    public String description(){
+        return tags.get("description", "");
     }
 
     public void save(){
@@ -90,7 +94,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
 
     @Override
     public String steamDescription(){
-        return null;
+        return description();
     }
 
     @Override
@@ -118,7 +122,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     public static class Stile{
-        public @NonNull Block block;
+        public Block block;
         public short x, y;
         public Object config;
         public byte rotation;

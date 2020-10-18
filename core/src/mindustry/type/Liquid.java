@@ -2,14 +2,14 @@ package mindustry.type;
 
 import arc.graphics.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.ui.*;
 
 public class Liquid extends UnlockableContent{
     /** Color used in pipes and on the ground. */
-    public final @NonNull Color color;
+    public final Color color;
     /** Color used in bars. */
     public @Nullable Color barColor;
     /** Color used to draw lights. Note that the alpha channel is used to dictate brightness. */

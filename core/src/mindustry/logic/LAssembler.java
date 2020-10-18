@@ -2,8 +2,9 @@ package mindustry.logic;
 
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
@@ -21,8 +22,14 @@ public class LAssembler{
     LInstruction[] instructions;
 
     public LAssembler(){
+        //instruction counter
         putVar("@counter").value = 0;
+        //unix timestamp
         putConst("@time", 0);
+        //currently controlled unit
+        putConst("@unit", null);
+        //reference to self
+        putConst("@this", null);
 
         //add default constants
         putConst("false", 0);
@@ -43,6 +50,15 @@ public class LAssembler{
             if(block.synthetic()){
                 putConst("@" + block.name, block);
             }
+        }
+
+        //used as a special value for any environmental solid block
+        putConst("@solid", Blocks.stoneWall);
+
+        putConst("@air", Blocks.air);
+
+        for(UnitType type : Vars.content.units()){
+            putConst("@" + type.name, type);
         }
 
         //store sensor constants
@@ -175,6 +191,7 @@ public class LAssembler{
 
         try{
             double value = Double.parseDouble(symbol);
+            if(Double.isNaN(value) || Double.isInfinite(value)) value = 0;
             //this creates a hidden const variable with the specified value
             String key = "___" + value;
             return putConst(key, value).id;
@@ -202,7 +219,8 @@ public class LAssembler{
         }
     }
 
-    public @Nullable BVar getVar(String name){
+    @Nullable
+    public BVar getVar(String name){
         return vars.get(name);
     }
 

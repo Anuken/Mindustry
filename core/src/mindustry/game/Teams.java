@@ -2,14 +2,19 @@ package mindustry.game;
 
 import arc.func.*;
 import arc.math.geom.*;
+import arc.struct.Queue;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
+import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -18,26 +23,26 @@ public class Teams{
     /** Maps team IDs to team data. */
     private TeamData[] map = new TeamData[256];
     /** Active teams. */
-    private Seq<TeamData> active = new Seq<>();
+    public Seq<TeamData> active = new Seq<>();
+    /** Teams with block or unit presence. */
+    public Seq<TeamData> present = new Seq<>(TeamData.class);
 
     public Teams(){
         active.add(get(Team.crux));
     }
 
-    public @Nullable CoreBuild closestEnemyCore(float x, float y, Team team){
-        for(Team enemy : team.enemies()){
+    @Nullable
+    public CoreBuild closestEnemyCore(float x, float y, Team team){
+        for(Team enemy : team.data().coreEnemies){
             CoreBuild tile = Geometry.findClosest(x, y, enemy.cores());
             if(tile != null) return tile;
         }
         return null;
     }
 
-    public @Nullable CoreBuild closestCore(float x, float y, Team team){
+    @Nullable
+    public CoreBuild closestCore(float x, float y, Team team){
         return Geometry.findClosest(x, y, get(team).cores);
-    }
-
-    public Team[] enemiesOf(Team team){
-        return get(team).enemies;
     }
 
     public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
@@ -65,9 +70,7 @@ public class Teams{
 
     /** Returns team data by type. */
     public TeamData get(Team team){
-        if(map[team.id] == null){
-            map[team.id] = new TeamData(team);
-        }
+        if(map[team.id] == null) map[team.id] = new TeamData(team);
         return map[team.id];
     }
 
@@ -127,6 +130,77 @@ public class Teams{
         }
     }
 
+    private void count(Unit unit){
+        unit.team.data().updateCount(unit.type, 1);
+
+        if(unit instanceof Payloadc){
+            ((Payloadc)unit).payloads().each(p -> {
+                if(p instanceof UnitPayload){
+                    count(((UnitPayload)p).unit);
+                }
+            });
+        }
+    }
+
+    public void updateTeamStats(){
+        present.clear();
+
+        for(Team team : Team.all){
+            TeamData data = team.data();
+
+            data.presentFlag = false;
+            data.unitCount = 0;
+            data.units.clear();
+            if(data.tree != null){
+                data.tree.clear();
+            }
+
+            if(data.typeCounts != null){
+                Arrays.fill(data.typeCounts, 0);
+            }
+
+            //clear old unit records
+            if(data.unitsByType != null){
+                for(int i = 0; i < data.unitsByType.length; i++){
+                    if(data.unitsByType[i] != null){
+                        data.unitsByType[i].clear();
+                    }
+                }
+            }
+        }
+
+        //update presence flag.
+        Groups.build.each( b -> b.team.data().presentFlag = true);
+
+        for(Unit unit : Groups.unit){
+            TeamData data = unit.team.data();
+            data.tree().insert(unit);
+            data.units.add(unit);
+            data.presentFlag = true;
+
+            if(data.unitsByType == null || data.unitsByType.length <= unit.type.id){
+                data.unitsByType = new Seq[content.units().size];
+            }
+
+            if(data.unitsByType[unit.type.id] == null){
+                data.unitsByType[unit.type.id] = new Seq<>();
+            }
+
+            data.unitsByType[unit.type.id].add(unit);
+
+            count(unit);
+        }
+
+        //update presence of each team.
+        for(Team team : Team.all){
+            TeamData data = team.data();
+
+            if(data.presentFlag || data.active()){
+                present.add(data);
+            }
+        }
+    }
+
     private void updateEnemies(){
         if(state.rules.waves && !active.contains(get(state.rules.waveTeam))){
             active.add(get(state.rules.waveTeam));
@@ -141,16 +215,19 @@ public class Teams{
                 }
             }
 
-            data.enemies = enemies.toArray(Team.class);
+            data.coreEnemies = enemies.toArray(Team.class);
         }
     }
 
-    public class TeamData{
+    public static class TeamData{
         public final Seq<CoreBuild> cores = new Seq<>();
         public final Team team;
         public final BaseAI ai;
 
-        public Team[] enemies = {};
+        private boolean presentFlag;
+
+        /** Enemies with cores or spawn points. */
+        public Team[] coreEnemies = {};
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
         public Queue<BlockPlan> blocks = new Queue<>();
         /** The current command for units to follow. */
@@ -158,9 +235,46 @@ public class Teams{
         /** Target items to mine. */
         public Seq<Item> mineItems = Seq.with(Items.copper, Items.lead, Items.titanium, Items.thorium);
 
+        /** Total unit count. */
+        public int unitCount;
+        /** Counts for each type of unit. Do not access directly. */
+        @Nullable
+        public int[] typeCounts;
+        /** Quadtree for units of this type. Do not access directly. */
+        @Nullable
+        public QuadTree<Unit> tree;
+        /** Units of this team. Updated each frame. */
+        public Seq<Unit> units = new Seq<>();
+        /** Units of this team by type. Updated each frame. */
+        @Nullable
+        public Seq<Unit>[] unitsByType;
+
         public TeamData(Team team){
             this.team = team;
             this.ai = new BaseAI(this);
+        }
+
+        @Nullable
+        public Seq<Unit> unitCache(UnitType type){
+            if(unitsByType == null || unitsByType.length <= type.id || unitsByType[type.id] == null) return null;
+            return unitsByType[type.id];
+        }
+
+        public void updateCount(UnitType type, int amount){
+            unitCount = Math.max(amount + unitCount, 0);
+            if(typeCounts == null || typeCounts.length <= type.id){
+                typeCounts  = new int[Vars.content.units().size];
+            }
+            typeCounts [type.id] = Math.max(amount + typeCounts [type.id], 0);
+        }
+
+        public QuadTree<Unit> tree(){
+            if(tree == null) tree = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
+            return tree;
+        }
+
+        public int countType(UnitType type){
+            return typeCounts == null || typeCounts.length <= type.id ? 0 : typeCounts[type.id];
         }
 
         public boolean active(){
@@ -175,7 +289,8 @@ public class Teams{
             return cores.isEmpty();
         }
 
-        public @Nullable CoreBuild core(){
+        @Nullable
+        public CoreBuild core(){
             return cores.isEmpty() ? null : cores.first();
         }
 

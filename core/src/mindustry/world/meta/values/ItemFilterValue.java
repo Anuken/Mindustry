@@ -1,13 +1,13 @@
 package mindustry.world.meta.values;
 
-import arc.struct.Seq;
-import arc.func.Boolf;
-import arc.scene.ui.layout.Table;
-import mindustry.type.Item;
-import mindustry.ui.ItemDisplay;
-import mindustry.world.meta.StatValue;
+import arc.func.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class ItemFilterValue implements StatValue{
     private final Boolf<Item> filter;

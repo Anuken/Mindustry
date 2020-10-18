@@ -107,11 +107,13 @@ public class ModsDialog extends BaseDialog{
                             Core.settings.put("lastmod", text);
 
                             ui.loadfrag.show();
-                            // Try to download the 6.0 branch first, but if it doesnt exist try master.
+                            //Try to download the 6.0 branch first, but if it doesn't exist try master.
                             githubImport("6.0", text, e1 -> {
                                 githubImport("master", text, e2 -> {
-                                    ui.showErrorMessage(Core.bundle.format("connectfail", e2));
-                                    ui.loadfrag.hide();
+                                    githubImport("main", text, e3 -> {
+                                        ui.showErrorMessage(Core.bundle.format("connectfail", e2));
+                                        ui.loadfrag.hide();
+                                    });
                                 });
                             });
                         });

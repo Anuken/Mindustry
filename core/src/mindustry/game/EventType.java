@@ -1,6 +1,6 @@
 package mindustry.game;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
@@ -35,7 +35,13 @@ public class EventType{
         preDraw,
         postDraw,
         uiDrawBegin,
-        uiDrawEnd
+        uiDrawEnd,
+        //before/after bloom used, skybox or planets drawn
+        universeDrawBegin,
+        //skybox drawn and bloom is enabled - use Vars.renderer.planets
+        universeDraw,
+        //planets drawn and bloom disabled
+        universeDrawEnd
     }
 
     public static class WinEvent{}
@@ -69,6 +75,15 @@ public class EventType{
         public final Sector sector;
 
         public SectorLoseEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
+    /** Called when a sector is destroyed by waves when you're not there. */
+    public static class SectorInvasionEvent{
+        public final Sector sector;
+
+        public SectorInvasionEvent(Sector sector){
             this.sector = sector;
         }
     }

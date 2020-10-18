@@ -354,7 +354,7 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid){
             if(team != source.team || !hasLiquids) return false;
 
             Tile other = world.tile(link);
@@ -368,7 +368,7 @@ public class ItemBridge extends Block{
                 return false;
             }
 
-            return liquids.get(liquid) + amount < liquidCapacity && (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
+            return (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
         }
 
         protected boolean linked(Building source){

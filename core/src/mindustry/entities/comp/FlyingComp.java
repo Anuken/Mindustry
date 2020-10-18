@@ -10,7 +10,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.net;
+import static mindustry.Vars.*;
 
 @Component
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{

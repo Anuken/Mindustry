@@ -10,7 +10,6 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.core.*;
 import mindustry.entities.*;
@@ -31,6 +30,7 @@ public class PlacementFragment extends Fragment{
     final int rowWidth = 4;
 
     public Category currentCategory = Category.distribution;
+
     Seq<Block> returnArray = new Seq<>(), returnArray2 = new Seq<>();
     Seq<Category> returnCatArray = new Seq<>();
     boolean[] categoryEmpty = new boolean[Category.all.length];
@@ -79,6 +79,10 @@ public class PlacementFragment extends Fragment{
         Events.on(ResetEvent.class, event -> {
             selectedBlocks.clear();
         });
+    }
+
+    public Displayable hover(){
+        return hover;
     }
 
     void rebuild(){
@@ -193,7 +197,7 @@ public class PlacementFragment extends Fragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> ui.hudfrag.shown());
+            full.bottom().right().visible(() -> ui.hudfrag.shown);
 
             full.table(frame -> {
 
@@ -285,7 +289,7 @@ public class PlacementFragment extends Fragment{
 
                             topTable.table(header -> {
                                 String keyCombo = "";
-                                if(!mobile && Core.settings.getBool("blockselectkeys")){
+                                if(!mobile){
                                     Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == displayBlock && (i + 1) / 10 - 1 < blockSelect.length){

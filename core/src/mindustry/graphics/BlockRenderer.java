@@ -16,15 +16,18 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 
-import static arc.Core.camera;
+import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class BlockRenderer implements Disposable{
+    public static final int crackRegions = 8, maxCrackSize = 9;
+
     private static final int initialRequests = 32 * 32;
     private static final int expandr = 9;
     private static final Color shadowColor = new Color(0, 0, 0, 0.71f);
 
     public final FloorRenderer floor = new FloorRenderer();
+    public TextureRegion[][] cracks;
 
     private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
     private Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
@@ -35,10 +38,19 @@ public class BlockRenderer implements Disposable{
     private FrameBuffer dark = new FrameBuffer();
     private Seq<Building> outArray2 = new Seq<>();
     private Seq<Tile> shadowEvents = new Seq<>();
-    private IntSet processedEntities = new IntSet(), processedLinks = new IntSet();
+    private IntSet procEntities = new IntSet(), procLinks = new IntSet(), procLights = new IntSet();
     private boolean displayStatus = false;
 
     public BlockRenderer(){
+
+        Events.on(ClientLoadEvent.class, e -> {
+            cracks = new TextureRegion[maxCrackSize][crackRegions];
+            for(int size = 1; size <= maxCrackSize; size++){
+                for(int i = 0; i < crackRegions; i++){
+                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
+                }
+            }
+        });
 
         Events.on(WorldLoadEvent.class, event -> {
             shadowEvents.clear();
@@ -179,8 +191,9 @@ public class BlockRenderer implements Disposable{
 
         tileview.clear();
         lightview.clear();
-        processedEntities.clear();
-        processedLinks.clear();
+        procEntities.clear();
+        procLinks.clear();
+        procLights.clear();
 
         int minx = Math.max(avgx - rangex - expandr, 0);
         int miny = Math.max(avgy - rangey - expandr, 0);
@@ -197,25 +210,25 @@ public class BlockRenderer implements Disposable{
                     tile = tile.build.tile;
                 }
 
-                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal && (tile.build == null || !processedEntities.contains(tile.build.id))){
+                if(block != Blocks.air && block.cacheLayer == CacheLayer.normal && (tile.build == null || !procEntities.contains(tile.build.id))){
                     if(block.expanded || !expanded){
-                        if(tile.build == null || processedLinks.add(tile.build.id)){
+                        if(tile.build == null || procLinks.add(tile.build.id)){
                             tileview.add(tile);
                             if(tile.build != null){
-                                processedEntities.add(tile.build.id);
-                                processedLinks.add(tile.build.id);
+                                procEntities.add(tile.build.id);
+                                procLinks.add(tile.build.id);
                             }
                         }
                     }
 
                     //lights are drawn even in the expanded range
-                    if(tile.build != null || tile.block().emitLight){
+                    if(((tile.build != null && procLights.add(tile.build.pos())) || tile.block().emitLight)){
                         lightview.add(tile);
                     }
 
                     if(tile.build != null && tile.build.power != null && tile.build.power.links.size > 0){
                         for(Building other : tile.build.getPowerConnections(outArray2)){
-                            if(other.block instanceof PowerNode && processedLinks.add(other.id)){ //TODO need a generic way to render connections!
+                            if(other.block instanceof PowerNode && procLinks.add(other.id)){ //TODO need a generic way to render connections!
                                 tileview.add(other.tile);
                             }
                         }
@@ -223,7 +236,7 @@ public class BlockRenderer implements Disposable{
                 }
 
                 //special case for floors
-                if(block == Blocks.air && tile.floor().emitLight){
+                if((block == Blocks.air && tile.floor().emitLight) && procLights.add(tile.pos())){
                     lightview.add(tile);
                 }
             }

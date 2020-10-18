@@ -9,7 +9,7 @@ import mindustry.world.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public abstract class LegacySaveVersion extends SaveVersion{
 

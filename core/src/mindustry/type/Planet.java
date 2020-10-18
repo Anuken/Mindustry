@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
@@ -20,11 +19,11 @@ import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 6f;
+    private static final float orbitSpacing = 8f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
-    public PlanetMesh mesh;
+    public @Nullable PlanetMesh mesh;
     /** Position in global coordinates. Will be 0,0,0 until the Universe updates it. */
     public Vec3 position = new Vec3();
     /** Grid used for the sectors on the planet. Null if this planet can't be landed on. */
@@ -32,7 +31,7 @@ public class Planet extends UnlockableContent{
     /** Generator that will make the planet. Can be null for planets that don't need to be landed on. */
     public @Nullable PlanetGenerator generator;
     /** Array of sectors; directly maps to tiles in the grid. */
-    public @NonNull Seq<Sector> sectors;
+    public Seq<Sector> sectors;
     /** Radius of this planet's sphere. Does not take into account sattelites. */
     public float radius;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
@@ -47,6 +46,8 @@ public class Planet extends UnlockableContent{
     public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
+    /** Whether or not this planet is listed in the planet access UI. **/
+    public boolean accessible = true;
     /** The default starting sector displayed to the map dialog. */
     public int startSector = 0;
     /** Whether the bloom render effect is enabled. */
@@ -60,7 +61,7 @@ public class Planet extends UnlockableContent{
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system.*/
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
-    public @NonNull Planet solarSystem;
+    public Planet solarSystem;
     /** All planets orbiting this one, in ascending order of radius. */
     public Seq<Planet> children = new Seq<>();
     /** Sattelites orbiting this planet. */
@@ -176,7 +177,7 @@ public class Planet extends UnlockableContent{
     public void updateBaseCoverage(){
         for(Sector sector : sectors){
             float sum = 1f;
-            for(Sector other : sector.inRange(2)){
+            for(Sector other : sector.near()){
                 if(other.generateEnemyBase){
                     sum += 1f;
                 }
@@ -186,7 +187,7 @@ public class Planet extends UnlockableContent{
                 sum += 2f;
             }
 
-            sector.baseCoverage = Mathf.clamp(sum / 5f);
+            sector.baseCoverage = sector.preset == null ? Mathf.clamp(sum / 5f) : Mathf.clamp(sector.preset.difficulty / 10f);
         }
     }
 
@@ -202,6 +203,10 @@ public class Planet extends UnlockableContent{
 
     @Override
     public void init(){
+
+        for(Sector sector : sectors){
+            sector.loadInfo();
+        }
 
         if(generator != null){
             Noise.setSeed(id + 1);
@@ -262,5 +267,13 @@ public class Planet extends UnlockableContent{
     @Override
     public ContentType getContentType(){
         return ContentType.planet;
+    }
+
+    public boolean visible(){
+        return true;
+    }
+
+    public void draw(Mat3D projection, Mat3D transform){
+        mesh.render(projection, transform);
     }
 }

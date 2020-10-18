@@ -3,7 +3,6 @@ package mindustry.world.blocks.defense;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -76,7 +75,7 @@ public class TractorBeamTurret extends Block{
             }
 
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().flying && efficiency() > 0.01f){
+            if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.01f){
                 any = true;
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());

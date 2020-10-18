@@ -2,7 +2,6 @@ package mindustry.world.consumers;
 
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -10,7 +9,7 @@ import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
 public class ConsumeItems extends Consume{
-    public final @NonNull ItemStack[] items;
+    public final ItemStack[] items;
 
     public ConsumeItems(ItemStack[] items){
         this.items = items;

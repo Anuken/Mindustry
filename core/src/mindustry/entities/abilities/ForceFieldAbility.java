@@ -27,8 +27,8 @@ public class ForceFieldAbility extends Ability{
     private static float realRad;
     private static Unit paramUnit;
     private static ForceFieldAbility paramField;
-    private static final Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramUnit.team && Intersector.isInsideHexagon(paramUnit.x, paramUnit.y, realRad * 2f, trait.x(), trait.y()) && paramUnit.shield > 0){
+    private static final Cons<Bullet> shieldConsumer = trait -> {
+        if(trait.team != paramUnit.team && trait.type.absorbable && Intersector.isInsideHexagon(paramUnit.x, paramUnit.y, realRad * 2f, trait.x(), trait.y()) && paramUnit.shield > 0){
             trait.absorb();
             Fx.absorb.at(trait);
 
@@ -94,7 +94,7 @@ public class ForceFieldAbility extends Ability{
         }
     }
 
-    private void checkRadius(Unit unit){
+    public void checkRadius(Unit unit){
         //timer2 is used to store radius scale as an effect
         realRad = radiusScale * radius;
     }

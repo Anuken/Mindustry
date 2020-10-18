@@ -1,8 +1,8 @@
 package mindustry.world.blocks.environment;
 
-import arc.graphics.g2d.Draw;
-import arc.math.Mathf;
-import mindustry.world.Tile;
+import arc.graphics.g2d.*;
+import arc.math.*;
+import mindustry.world.*;
 
 /**A type of floor that is overlaid on top of over floors.*/
 public class OverlayFloor extends Floor{
