@@ -1848,6 +1848,7 @@ public class Blocks implements ContentList{
             constructTime = 60f * 10f;
 
             upgrades.addAll(
+                new UnitType[]{UnitTypes.alpha, UnitTypes.beta},
                 new UnitType[]{UnitTypes.nova, UnitTypes.pulsar},
                 new UnitType[]{UnitTypes.dagger, UnitTypes.mace},
                 new UnitType[]{UnitTypes.crawler, UnitTypes.atrax},
@@ -1867,6 +1868,7 @@ public class Blocks implements ContentList{
             constructTime = 60f * 30f;
 
             upgrades.addAll(
+                new UnitType[]{UnitTypes.beta, UnitTypes.gamma},
                 new UnitType[]{UnitTypes.horizon, UnitTypes.zenith},
                 new UnitType[]{UnitTypes.mace, UnitTypes.fortress},
                 new UnitType[]{UnitTypes.poly, UnitTypes.mega},
@@ -1912,7 +1914,7 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.antumbra, UnitTypes.eclipse},
                 new UnitType[]{UnitTypes.arkyid, UnitTypes.toxopid},
                 new UnitType[]{UnitTypes.scepter, UnitTypes.reign},
-                new UnitType[] {UnitTypes.sei, UnitTypes.omura},
+                new UnitType[]{UnitTypes.sei, UnitTypes.omura},
                 new UnitType[]{UnitTypes.quad, UnitTypes.oct},
                 new UnitType[]{UnitTypes.vela, UnitTypes.corvus}
             );
