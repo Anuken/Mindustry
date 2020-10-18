@@ -1,9 +1,12 @@
 package mindustry.world.blocks.distribution;
 
+import arc.math.*;
+import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 public class Router extends Block{
@@ -20,10 +23,22 @@ public class Router extends Block{
         noUpdateDisabled = true;
     }
 
-    public class RouterBuild extends Building{
+    public class RouterBuild extends Building implements ControlBlock{
         public Item lastItem;
         public Tile lastInput;
         public float time;
+        public @NonNull BlockUnitc unit = Nulls.blockUnit;
+
+        @Override
+        public void created(){
+            unit = (BlockUnitc)UnitTypes.block.create(team);
+            unit.tile(this);
+        }
+
+        @Override
+        public Unit unit(){
+            return (Unit)unit;
+        }
 
         @Override
         public void updateTile(){
@@ -72,6 +87,22 @@ public class Router extends Block{
         }
 
         public Building getTileTarget(Item item, Tile from, boolean set){
+            if(isControlled()){
+                unit.health(health);
+                unit.team(team);
+
+                int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
+
+                if(unit.isShooting()){
+                    Building other = nearby(angle);
+                    if(other.acceptItem(this, item)){
+                        return other;
+                    }
+                }
+
+                return null;
+            }
+
             int counter = rotation;
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
