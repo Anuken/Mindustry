@@ -21,13 +21,13 @@ public class CachedTile extends Tile{
     }
 
     @Override
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeBuild(Team team, Prov<Building> buildingProv, int rotation){
         build = null;
 
         Block block = block();
 
         if(block.hasBuilding()){
-            Building n = entityprov.get();
+            Building n = buildingProv.get();
             n.cons(new ConsumeModule(build));
             n.tile(this);
             n.block(block);

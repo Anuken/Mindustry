@@ -44,8 +44,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.overlay = (Floor)overlay;
         this.block = wall;
 
-        //update entity and create it if needed
-        changeEntity(Team.derelict, wall::newBuilding, 0);
+        //update building and create it if needed
+        changeBuild(Team.derelict, wall::newBuilding, 0);
         changed();
     }
 
@@ -177,7 +177,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         setBlock(type, team, rotation, type::newBuilding);
     }
 
-    public void setBlock(Block type, Team team, int rotation, Prov<Building> entityprov){
+    public void setBlock(Block type, Team team, int rotation, Prov<Building> buildingProv){
         changing = true;
 
         if(type.isStatic() || this.block.isStatic()){
@@ -186,7 +186,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         this.block = type;
         preChanged();
-        changeEntity(team, entityprov, (byte)Mathf.mod(rotation, 4));
+        changeBuild(team, buildingProv, (byte)Mathf.mod(rotation, 4));
 
         if(build != null){
             build.team(team);
@@ -196,7 +196,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(block.isMultiblock()){
             int offsetx = -(block.size - 1) / 2;
             int offsety = -(block.size - 1) / 2;
-            Building entity = this.build;
+            Building building = this.build;
             Block block = this.block;
 
             //two passes: first one clears, second one sets
@@ -214,8 +214,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                                     other.setBlock(Blocks.air);
                                 }else{
                                     //second pass: assign changed data
-                                    //assign entity and type to blocks, so they act as proxies for this one
-                                    other.build = entity;
+                                    //assign building and type to blocks, so they act as proxies for this one
+                                    other.build = building;
                                     other.block = block;
                                 }
                             }
@@ -224,7 +224,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                 }
             }
 
-            this.build = entity;
+            this.build = building;
             this.block = block;
         }
 
@@ -446,7 +446,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return null;
     }
 
-    public Building getNearbyEntity(int rotation){
+    public Building getNearbyBuilding(int rotation){
         if(rotation == 0) return world.build(x + 1, y);
         if(rotation == 1) return world.build(x, y + 1);
         if(rotation == 2) return world.build(x - 1, y);
@@ -482,8 +482,8 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                     for(int dy = 0; dy < size; dy++){
                         Tile other = world.tile(cx + dx + offsetx, cy + dy + offsety);
                         if(other != null){
-                            //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
-                            if(other != this){ //do not remove own entity so it can be processed in changed()
+                            //reset building and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
+                            if(other != this){ //do not remove own building so it can be processed in changed()
                                 other.build = null;
                                 other.block = Blocks.air;
 
@@ -503,7 +503,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeBuild(Team team, Prov<Building> buildingProv, int rotation){
         if(build != null){
             int size = build.block.size;
             build.remove();
@@ -526,7 +526,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
 
         if(block.hasBuilding()){
-            build = entityprov.get().init(this, team, block.update && !state.isEditor(), rotation);
+            build = buildingProv.get().init(this, team, block.update && !state.isEditor(), rotation);
         }
     }
 
@@ -535,7 +535,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             if(build != null){
                 build.updateProximity();
             }else{
-                //since the entity won't update proximity for us, update proximity for all nearby tiles manually
+                //since the building won't update proximity for us, update proximity for all nearby tiles manually
                 for(Point2 p : Geometry.d4){
                     Building tile = world.build(x + p.x, y + p.y);
                     if(tile != null && !tile.tile.changing){
@@ -580,7 +580,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (build == null ? "null" : (build.getClass().getSimpleName())) + ":" + team();
+        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "building=" + (build == null ? "null" : (build.getClass().getSimpleName())) + ":" + team();
     }
 
     //remote utility methods

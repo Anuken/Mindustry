@@ -16,9 +16,11 @@ import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
+/** A tile entity, holds state information. */
 public class Build{
     private static final IntSet tmp = new IntSet();
 
+    /** Places a deconstruction ConstructBlock at this location. */
     @Remote(called = Loc.server)
     public static void beginBreak(Team team, int x, int y){
         if(!validBreak(team, x, y)){
@@ -45,7 +47,7 @@ public class Build{
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
 
-    /** Places a BuildBlock at this location. */
+    /** Places a ConstructBlock at this location. */
     @Remote(called = Loc.server)
     public static void beginPlace(Block result, Team team, int x, int y, int rotation){
         if(!validPlace(result, team, x, y, rotation)){
@@ -146,6 +148,7 @@ public class Build{
         return true;
     }
 
+    /** Checks if a block is touching any non-liquid tiles. */
     public static boolean contactsGround(int x, int y, Block block){
         if(block.isMultiblock()){
             for(Point2 point : Edges.getEdges(block.size)){
@@ -161,6 +164,7 @@ public class Build{
         return false;
     }
 
+    /** Checks if a block is touching any shallow water. */
     public static boolean contactsShallows(int x, int y, Block block){
         if(block.isMultiblock()){
             for(Point2 point : Edges.getInsideEdges(block.size)){

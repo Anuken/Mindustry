@@ -105,9 +105,9 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeBuild(Team team, Prov<Building> buildingProv, int rotation){
         if(skip()){
-            super.changeEntity(team, entityprov, rotation);
+            super.changeBuild(team, buildingProv, rotation);
             return;
         }
 
@@ -119,7 +119,7 @@ public class EditorTile extends Tile{
         Block block = block();
 
         if(block.hasBuilding()){
-            build = entityprov.get().init(this, team, false, rotation);
+            build = buildingProv.get().init(this, team, false, rotation);
             build.cons = new ConsumeModule(build);
             if(block.hasItems) build.items = new ItemModule();
             if(block.hasLiquids) build.liquids(new LiquidModule());

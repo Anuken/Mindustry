@@ -34,9 +34,13 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
+/** Defines a type of block, does not store state. */
 public class Block extends UnlockableContent{
+    /** Weather this block can contain items. */
     public boolean hasItems;
+    /** Weather this block can contain liquids. */
     public boolean hasLiquids;
+    /** Weather this block can use or produce power. */
     public boolean hasPower;
 
     public boolean outputsLiquid = false;
@@ -46,6 +50,7 @@ public class Block extends UnlockableContent{
     public boolean outputFacing = true;
     public boolean acceptsItems = false;
 
+    /** How many items of each type this block can hold. */
     public int itemCapacity = 10;
     public float liquidCapacity = 10f;
     public float liquidPressure = 1f;
