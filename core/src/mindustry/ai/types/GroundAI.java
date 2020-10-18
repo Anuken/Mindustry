@@ -34,24 +34,24 @@ public class GroundAI extends AIController{
                 if(spawner != null && unit.within(spawner, state.rules.dropZoneRadius + 120f)) move = false;
             }
 
-            if(move) moveTo(Pathfinder.fieldCore);
+            if(move) pathfind(Pathfinder.fieldCore);
         }
 
         if(command() == UnitCommand.rally){
             Teamc target = targetFlag(unit.x, unit.y, BlockFlag.rally, false);
 
             if(target != null && !unit.within(target, 70f)){
-                moveTo(Pathfinder.fieldRally);
+                pathfind(Pathfinder.fieldRally);
             }
         }
 
-        if(unit.type().canBoost && unit.tileOn() != null && !unit.tileOn().solid()){
+        if(unit.type.canBoost && !unit.onSolid()){
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
-        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type().rotateShooting){
-            if(unit.type().hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
+        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting){
+            if(unit.type.hasWeapons()){
+                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
             unit.lookAt(unit.vel().angle());
@@ -71,17 +71,5 @@ public class GroundAI extends AIController{
                 }
             }
         }*/
-    }
-
-    protected void moveTo(int pathTarget){
-        int costType = unit.pathType();
-
-        Tile tile = unit.tileOn();
-        if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
-
-        if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
-
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type().speed));
     }
 }

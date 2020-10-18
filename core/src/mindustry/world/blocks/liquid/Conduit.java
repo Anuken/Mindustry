@@ -27,7 +27,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "conduit-bottom-#") TextureRegion[] botRegions;
 
-    public float leakResistance = 1.5f;
+    public boolean leaks = true;
 
     public Conduit(String name){
         super(name);
@@ -131,7 +131,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
 
             if(liquids.total() > 0.001f && timer(timerFlow, 1)){
-                moveLiquidForward(leakResistance, liquids.current());
+                moveLiquidForward(leaks, liquids.current());
                 noSleep();
             }else{
                 sleep();

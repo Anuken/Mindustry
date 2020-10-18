@@ -15,6 +15,7 @@ public class Planets implements ContentList{
     public void load(){
         sun = new Planet("sun", null, 0, 2){{
             bloom = true;
+            accessible = false;
 
             //lightColor = Color.valueOf("f4ee8e");
 

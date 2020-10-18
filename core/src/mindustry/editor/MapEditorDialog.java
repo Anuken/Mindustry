@@ -385,7 +385,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     public void build(){
-        float size = 60f;
+        float size = 58f;
 
         clearChildren();
         table(cont -> {
@@ -557,6 +557,21 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     t.add(slider).width(size * 3f - 20).padTop(4f);
                 }).padTop(5).growX().top();
 
+                mid.row();
+
+                if(!mobile){
+                    mid.table(t -> {
+                        t.button("@editor.center", Icon.move, Styles.cleart, view::center).growX().margin(9f);
+                    }).growX().top();
+                }
+
+                if(addCliffButton){
+                    mid.row();
+
+                    mid.table(t -> {
+                        t.button("Cliffs", Icon.terrain, Styles.cleart, editor::addCliffs).growX().margin(9f);
+                    }).growX().top();
+                }
             }).margin(0).left().growY();
 
 

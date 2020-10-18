@@ -14,6 +14,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -50,6 +51,7 @@ public class CoreBlock extends StorageBlock{
         unitCapModifier = 10;
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
+        group = BlockGroup.none;
     }
 
     @Remote(called = Loc.server)
@@ -156,6 +158,13 @@ public class CoreBlock extends StorageBlock{
         public int storageCapacity;
         //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
         public BlockUnitc unit = Nulls.blockUnit;
+        public boolean noEffect = false;
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.itemCapacity) return storageCapacity;
+            return super.sense(sensor);
+        }
 
         @Override
         public void created(){
@@ -188,13 +197,28 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void onDestroyed(){
+            super.onDestroyed();
+
+            //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
+            if(state.isCampaign() && team == state.rules.waveTeam){
+                //do not recache
+                tile.setOverlayQuiet(Blocks.spawn);
+
+                if(!spawner.getSpawns().contains(tile)){
+                    spawner.getSpawns().add(tile);
+                }
+            }
+        }
+
+        @Override
         public void drawLight(){
             Drawf.light(team, x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
         }
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.get(item) < getMaximumAccepted(item);
+            return items.get(item) < getMaximumAccepted(item) || incinerate();
         }
 
         @Override
@@ -263,6 +287,10 @@ public class CoreBlock extends StorageBlock{
             return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == core || ((StorageBuild)tile).linkedCore == null);
         }
 
+        public boolean incinerate(){
+            return state.isCampaign();
+        }
+
         @Override
         public float handleDamage(float amount){
             if(player != null && team == player.team()){
@@ -304,9 +332,30 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void itemTaken(Item item){
+            if(state.isCampaign() && team == state.rules.defaultTeam){
+                //update item taken amount
+                state.secinfo.handleCoreItem(item, -1);
+            }
+        }
+
+        @Override
         public void handleItem(Building source, Item item){
             if(net.server() || !net.active()){
-                super.handleItem(source, item);
+                if(team == state.rules.defaultTeam){
+                    state.secinfo.handleCoreItem(item, 1);
+                }
+
+                if(items.get(item) >= getMaximumAccepted(item)){
+                    //create item incineration effect at random intervals
+                    if(!noEffect){
+                        incinerateEffect(this, source);
+                    }
+                    noEffect = false;
+                }else{
+                    super.handleItem(source, item);
+                }
+
                 if(state.rules.tutorial){
                     Events.fire(new CoreItemDeliverEvent());
                 }

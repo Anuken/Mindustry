@@ -166,6 +166,11 @@ public class Floor extends Block{
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
+    /** @return whether this floor has a valid surface on which to place things, e.g. scorch marks. */
+    public boolean hasSurface(){
+        return !isLiquid && !solid;
+    }
+
     public boolean isDeep(){
         return drownTime > 0;
     }

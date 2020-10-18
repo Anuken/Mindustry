@@ -18,7 +18,6 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -51,7 +50,7 @@ public class UnitType extends UnlockableContent{
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
     public float aimDst = -1f;
-    public int commandLimit = 24;
+    public int commandLimit = 8;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
     public boolean hovering = false;
@@ -80,6 +79,8 @@ public class UnitType extends UnlockableContent{
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
+    /** This is a VERY ROUGH estimate of unit DPS. */
+    public float dpsEstimate = -1;
     public float clipSize = -1;
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
@@ -116,7 +117,7 @@ public class UnitType extends UnlockableContent{
     public Unit create(Team team){
         Unit unit = constructor.get();
         unit.team = team;
-        unit.type(this);
+        unit.setType(this);
         unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
@@ -176,8 +177,7 @@ public class UnitType extends UnlockableContent{
     public void getDependencies(Cons<UnlockableContent> cons){
         //units require reconstructors being researched
         for(Block block : content.blocks()){
-            if(block instanceof Reconstructor){
-                Reconstructor r = (Reconstructor)block;
+            if(block instanceof Reconstructor r){
                 for(UnitType[] recipe : r.upgrades){
                     //result of reconstruction is this, so it must be a dependency
                     if(recipe[1] == this){
@@ -235,7 +235,7 @@ public class UnitType extends UnlockableContent{
             mechStepParticles = hitSize > 15f;
         }
 
-        canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
+        canHeal = weapons.contains(w -> w.bullet.healPercent > 0f);
 
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
@@ -268,6 +268,17 @@ public class UnitType extends UnlockableContent{
 
             ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }
+
+        //calculate estimated DPS for one target based on weapons
+        if(dpsEstimate < 0){
+            dpsEstimate = weapons.sumf(w -> (w.bullet.estimateDPS() / w.reload) * w.shots * 60f);
+
+            //suicide enemy
+            if(weapons.contains(w -> w.bullet.killShooter)){
+                //scale down DPS to be insignificant
+                dpsEstimate /= 100f;
+            }
+        }
     }
 
     @CallSuper
@@ -297,14 +308,14 @@ public class UnitType extends UnlockableContent{
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor && Structs.contains(((Reconstructor)b).upgrades, u -> u[1] == this));
+        Block rec = content.blocks().find(b -> b instanceof Reconstructor && ((Reconstructor)b).upgrades.contains(u -> u[1] == this));
 
         if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems){
             stacks = ((ConsumeItems)rec.consumes.get(ConsumeType.item)).items;
         }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && Structs.contains(((UnitFactory)u).plans, p -> p.unit == this));
+            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && ((UnitFactory)u).plans.contains(p -> p.unit == this));
             if(factory != null){
-                stacks = Structs.find(factory.plans, p -> p.unit == this).requirements;
+                stacks = factory.plans.find(p -> p.unit == this).requirements;
             }
         }
 
@@ -438,7 +449,7 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         //draw back items
-        if(unit.hasItem() && unit.itemTime > 0.01f){
+        if(unit.item() != null && unit.itemTime > 0.01f){
             float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime;
 
             Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));

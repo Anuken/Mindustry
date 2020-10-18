@@ -9,22 +9,25 @@ import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 
 /** A unit that can command other units. */
 @Component
-abstract class CommanderComp implements Unitc{
+abstract class CommanderComp implements Entityc, Posc{
     private static final Seq<FormationMember> members = new Seq<>();
     private static final Seq<Unit> units = new Seq<>();
 
-    @Import float x, y, rotation;
+    @Import float x, y, rotation, hitSize;
+    @Import Team team;
+    @Import UnitType type;
 
     transient @Nullable Formation formation;
-    transient Seq<Unit> controlling = new Seq<>();
+    transient Seq<Unit> controlling = new Seq<>(10);
     /** minimum speed of any unit in the formation. */
     transient float minFormationSpeed;
 
-    @Override
     public void update(){
         if(formation != null){
             formation.anchor.set(x, y, /*rotation*/ 0); //TODO rotation set to 0 because rotating is pointless
@@ -32,18 +35,15 @@ abstract class CommanderComp implements Unitc{
         }
     }
 
-    @Override
     public void remove(){
         clearCommand();
     }
 
-    @Override
     public void killed(){
         clearCommand();
     }
 
     //make sure to reset command state when the controller is switched
-    @Override
     public void controller(UnitController next){
         clearCommand();
     }
@@ -58,14 +58,15 @@ abstract class CommanderComp implements Unitc{
 
         units.clear();
 
-        Units.nearby(team(), x, y, 200f, u -> {
-            if(u.isAI() && include.get(u) && u != self()){
+        Units.nearby(team, x, y, 150f, u -> {
+            if(u.isAI() && include.get(u) && u != self() && u.type.flying == type.flying && u.hitSize <= hitSize * 1.1f){
                 units.add(u);
             }
         });
 
-        units.sort(u -> u.dst2(this));
-        units.truncate(type().commandLimit);
+        //sort by hitbox size, then by distance
+        units.sort(Structs.comps(Structs.comparingFloat(u -> -u.hitSize), Structs.comparingFloat(u -> u.dst2(this))));
+        units.truncate(type.commandLimit);
 
         command(formation, units);
     }
@@ -73,15 +74,15 @@ abstract class CommanderComp implements Unitc{
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
-        float spacing = hitSize() * 0.65f;
-        minFormationSpeed = type().speed;
+        float spacing = hitSize * 0.65f;
+        minFormationSpeed = type.speed;
 
         controlling.addAll(units);
         for(Unit unit : units){
             FormationAI ai;
             unit.controller(ai = new FormationAI(self(), formation));
             spacing = Math.max(spacing, ai.formationSize());
-            minFormationSpeed = Math.min(minFormationSpeed, unit.type().speed);
+            minFormationSpeed = Math.min(minFormationSpeed, unit.type.speed);
         }
         this.formation = formation;
 
@@ -105,7 +106,7 @@ abstract class CommanderComp implements Unitc{
         //reset controlled units
         for(Unit unit : controlling){
             if(unit.controller().isBeingControlled(self())){
-                unit.controller(unit.type().createController());
+                unit.controller(unit.type.createController());
             }
         }
 

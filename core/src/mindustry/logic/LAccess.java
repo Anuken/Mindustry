@@ -5,6 +5,7 @@ import arc.struct.*;
 /** Setter/getter enum for logic-controlled objects. */
 public enum LAccess{
     totalItems,
+    firstItem,
     totalLiquids,
     totalPower,
     itemCapacity,
@@ -14,6 +15,8 @@ public enum LAccess{
     powerNetCapacity,
     powerNetIn,
     powerNetOut,
+    ammo,
+    ammoCapacity,
     health,
     maxHealth,
     heat,
@@ -28,6 +31,9 @@ public enum LAccess{
     type,
     flag,
     name,
+    config,
+    payloadCount,
+    payloadType,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access

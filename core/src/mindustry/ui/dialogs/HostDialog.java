@@ -76,13 +76,15 @@ public class HostDialog extends BaseDialog{
                             platform.updateLobby();
                         });
                     }));
+
+                    if(Version.modifier.contains("beta") || Version.modifier.contains("alpha")){
+                        Core.settings.put("publichost", false);
+                        platform.updateLobby();
+                        Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
+                    }
                 }
 
-                if(Version.modifier.contains("beta")){
-                    Core.settings.put("publichost", false);
-                    platform.updateLobby();
-                    Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
-                }
+
             }catch(IOException e){
                 ui.showException("@server.error", e);
             }

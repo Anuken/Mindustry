@@ -170,8 +170,7 @@ public class Mods implements Loadable{
             //generate new icons
             for(Seq<Content> arr : content.getContentMap()){
                 arr.each(c -> {
-                    if(c instanceof UnlockableContent && c.minfo.mod != null){
-                        UnlockableContent u = (UnlockableContent)c;
+                    if(c instanceof UnlockableContent u && c.minfo.mod != null){
                         u.load();
                         u.createIcons(packer);
                     }
@@ -630,7 +629,7 @@ public class Mods implements Loadable{
             }
 
             //make sure the main class exists before loading it; if it doesn't just don't put it there
-            if(mainFile.exists()){
+            if(mainFile.exists() && Core.settings.getBool("mod-" + meta.name.toLowerCase().replace(" ", "-") + "-enabled", true)){
                 //mobile versions don't support class mods
                 if(ios){
                     throw new IllegalArgumentException("Java class mods are not supported on iOS.");

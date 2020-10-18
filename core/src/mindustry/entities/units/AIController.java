@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -20,6 +21,7 @@ public class AIController implements UnitController{
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
+    protected AIController fallback;
 
     /** main target that is being faced */
     protected Teamc target;
@@ -33,9 +35,25 @@ public class AIController implements UnitController{
 
     @Override
     public void updateUnit(){
+        //use fallback AI when possible
+        if(useFallback() && (fallback != null || (fallback = fallback()) != null)){
+            if(fallback.unit != unit) fallback.unit(unit);
+            fallback.updateUnit();
+            return;
+        }
+
         updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    @Nullable
+    protected AIController fallback(){
+        return null;
+    }
+
+    protected boolean useFallback(){
+        return false;
     }
 
     protected UnitCommand command(){
@@ -67,6 +85,19 @@ public class AIController implements UnitController{
         return Units.invalidateTarget(target, unit.team, unit.x, unit.y);
     }
 
+
+    protected void pathfind(int pathTarget){
+        int costType = unit.pathType();
+
+        Tile tile = unit.tileOn();
+        if(tile == null) return;
+        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
+
+        if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
+
+        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type.speed));
+    }
+
     protected void updateWeapons(){
         if(targets.length != unit.mounts.length) targets = new Teamc[unit.mounts.length];
 
@@ -74,7 +105,7 @@ public class AIController implements UnitController{
         boolean ret = retarget();
 
         if(ret){
-            target = findTarget(unit.x, unit.y, unit.range(), unit.type().targetAir, unit.type().targetGround);
+            target = findTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
         }
 
         if(invalid(target)){
@@ -88,7 +119,7 @@ public class AIController implements UnitController{
             float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
                 mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
 
-            if(unit.type().singleTarget){
+            if(unit.type.singleTarget){
                 targets[i] = target;
             }else{
                 if(ret){
@@ -145,7 +176,7 @@ public class AIController implements UnitController{
     }
 
     protected void circle(Position target, float circleLength){
-        circle(target, circleLength, unit.type().speed);
+        circle(target, circleLength, unit.type.speed);
     }
 
     protected void circle(Position target, float circleLength, float speed){
@@ -173,7 +204,7 @@ public class AIController implements UnitController{
 
         float length = circleLength <= 0.001f ? 1f : Mathf.clamp((unit.dst(target) - circleLength) / smooth, -1f, 1f);
 
-        vec.setLength(unit.type().speed * length);
+        vec.setLength(unit.realSpeed() * length);
         if(length < -0.5f){
             vec.rotate(180f);
         }else if(length < 0){

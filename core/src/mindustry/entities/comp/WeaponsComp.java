@@ -111,7 +111,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
             //update continuous state
             if(weapon.continuous && mount.bullet != null){
-                if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime){
+                if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != weapon.bullet){
                     mount.bullet = null;
                 }else{
                     mount.bullet.rotation(weaponRotation + 90);
@@ -166,7 +166,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         Weapon weapon = mount.weapon;
 
         float baseX = this.x, baseY = this.y;
-        boolean delay = weapon.firstShotDelay > 0f;
+        boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
 
         (delay ? weapon.chargeSound : weapon.shootSound).at(x, y, Mathf.random(0.8f, 1.0f));
 

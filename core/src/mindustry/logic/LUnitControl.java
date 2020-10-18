@@ -4,12 +4,19 @@ public enum LUnitControl{
     stop,
     move("x", "y"),
     approach("x", "y", "radius"),
+    boost("enable"),
+    pathfind(),
     target("x", "y", "shoot"),
     targetp("unit", "shoot"),
     itemDrop("to", "amount"),
     itemTake("from", "item", "amount"),
+    payDrop,
+    payTake("takeUnits"),
     mine("x", "y"),
-    flag("value");
+    flag("value"),
+    build("x", "y", "block", "rotation"),
+    getBlock("x", "y", "result", "resRot"),
+    within("x", "y", "radius", "result");
 
     public final String[] params;
     public static final LUnitControl[] all = values();

@@ -94,7 +94,7 @@ public class ForceFieldAbility extends Ability{
         }
     }
 
-    private void checkRadius(Unit unit){
+    public void checkRadius(Unit unit){
         //timer2 is used to store radius scale as an effect
         realRad = radiusScale * radius;
     }

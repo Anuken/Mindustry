@@ -12,6 +12,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
@@ -41,6 +42,7 @@ public abstract class Turret extends Block{
     public Effect ammoUseEffect = Fx.none;
     public Sound shootSound = Sounds.shoot;
 
+    public int maxAmmo = 30;
     public int ammoPerShot = 1;
     public float ammoEjectBack = 1f;
     public float range = 50f;
@@ -167,7 +169,7 @@ public abstract class Turret extends Block{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.shoot && !unit.isPlayer()){
-                targetPos.set((float)p1, (float)p2);
+                targetPos.set(World.unconv((float)p1), World.unconv((float)p2));
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p3);
             }
@@ -192,6 +194,8 @@ public abstract class Turret extends Block{
         @Override
         public double sense(LAccess sensor){
             return switch(sensor){
+                case ammo -> totalAmmo;
+                case ammoCapacity -> maxAmmo;
                 case rotation -> rotation;
                 case shootX -> targetPos.x;
                 case shootY -> targetPos.y;
@@ -214,6 +218,7 @@ public abstract class Turret extends Block{
         }
 
         public void targetPosition(Posc pos){
+            if(!hasAmmo()) return;
             BulletType bullet = peekAmmo();
             float speed = bullet.speed;
             //slow bullets never intersect
@@ -350,8 +355,9 @@ public abstract class Turret extends Block{
 
             AmmoEntry entry = ammo.peek();
             entry.amount -= ammoPerShot;
-            if(entry.amount == 0) ammo.pop();
+            if(entry.amount <= 0) ammo.pop();
             totalAmmo -= ammoPerShot;
+            totalAmmo = Math.max(totalAmmo, 0);
             Time.run(reloadTime / 2f, this::ejectEffects);
             return entry.type();
         }
@@ -363,7 +369,7 @@ public abstract class Turret extends Block{
 
         /** @return  whether the turret has ammo. */
         public boolean hasAmmo(){
-            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
+            return ammo.size > 0 && ammo.peek().amount >= 1;
         }
 
         protected void updateShooting(){
@@ -432,7 +438,7 @@ public abstract class Turret extends Block{
 
             fshootEffect.at(x + tr.x, y + tr.y, rotation);
             fsmokeEffect.at(x + tr.x, y + tr.y, rotation);
-            shootSound.at(tile, Mathf.random(0.9f, 1.1f));
+            shootSound.at(x + tr.x, y + tr.y, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){
                 Effect.shake(shootShake, shootShake, this);

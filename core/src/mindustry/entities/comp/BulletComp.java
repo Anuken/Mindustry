@@ -7,8 +7,10 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -19,25 +21,19 @@ import static mindustry.Vars.*;
 abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Velc, Bulletc, Timerc{
     @Import Team team;
     @Import Entityc owner;
-    @Import float x,y;
+    @Import float x, y, damage;
 
     IntSeq collided = new IntSeq(6);
     Object data;
     BulletType type;
-    float damage;
     float fdata;
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
-        if(team.active()){
-            for(Team team : team.enemies()){
-                consumer.get(team.data().tree());
-            }
-        }else{
-            for(Team other : Team.all){
-                if(other != team && team.data().unitCount > 0){
-                    consumer.get(team.data().tree());
-                }
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            if(data.items[i].team != team){
+                consumer.get(data.items[i].tree());
             }
         }
     }
@@ -76,11 +72,6 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         return type.drawSize;
     }
 
-    @Override
-    public float damage(){
-        return damage * damageMultiplier();
-    }
-
     @Replace
     @Override
     public boolean collides(Hitboxc other){
@@ -95,14 +86,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         type.hit(self(), x, y);
         float health = 0f;
 
-        if(other instanceof Healthc){
-            Healthc h = (Healthc)other;
+        if(other instanceof Healthc h){
             health = h.health();
             h.damage(damage);
         }
 
-        if(other instanceof Unit){
-            Unit unit = (Unit)other;
+        if(other instanceof Unit unit){
             unit.impulse(Tmp.v3.set(unit).sub(this.x, this.y).nor().scl(type.knockback * 80f));
             unit.apply(type.status, type.statusDuration);
         }
@@ -122,7 +111,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         type.update(self());
 
         if(type.collidesTiles && type.collides && type.collidesGround){
-            world.raycastEach(world.toTile(lastX()), world.toTile(lastY()), tileX(), tileY(), (x, y) -> {
+            world.raycastEach(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
                 Building tile = world.build(x, y);
                 if(tile == null || !isAdded()) return false;
@@ -151,6 +140,10 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
                 return false;
             });
+        }
+
+        if(type.pierceCap != -1 && collided.size >= type.pierceCap) {
+            remove();
         }
     }
 

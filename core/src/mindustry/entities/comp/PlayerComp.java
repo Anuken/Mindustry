@@ -79,7 +79,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         admin = typing = false;
         textFadeTime = 0f;
         if(!dead()){
-            unit.controller(unit.type().createController());
+            unit.controller(unit.type.createController());
             unit = Nulls.unit;
         }
     }
@@ -91,7 +91,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return unit.isNull() ? 20 : unit.type().hitSize * 2f;
+        return unit.isNull() ? 20 : unit.type.hitSize * 2f;
     }
 
     @Override
@@ -123,7 +123,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             deathTimer = 0;
 
             //update some basic state to sync things
-            if(unit.type().canBoost){
+            if(unit.type.canBoost){
                 Tile tile = unit.tileOn();
                 unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
@@ -177,7 +177,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         if(this.unit != Nulls.unit){
             //un-control the old unit
-            this.unit.controller(this.unit.type().createController());
+            this.unit.controller(this.unit.type.createController());
         }
         this.unit = unit;
         if(unit != Nulls.unit){
@@ -187,6 +187,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             //this player just became remote, snap the interpolation so it doesn't go wild
             if(unit.isRemote()){
                 unit.snapInterpolation();
+            }
+
+            //reset selected block when switching units
+            if(!headless && isLocal()){
+                control.input.block = null;
             }
         }
 

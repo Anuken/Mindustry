@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -85,9 +86,6 @@ public class Pathfinder implements Runnable{
                 tiles[tile.x][tile.y] = packTile(tile);
             }
 
-            //special preset which may help speed things up; this is optional
-            preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
-
             start();
         });
 
@@ -114,7 +112,7 @@ public class Pathfinder implements Runnable{
         }
 
         return PathTile.get(
-            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 80),
+            tile.build == null || !tile.solid() ? 0 : Math.min((int)(tile.build.health / 40), 80),
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,
@@ -444,7 +442,7 @@ public class Pathfinder implements Runnable{
 
         @Override
         public void getPositions(IntSeq out){
-            out.add(Point2.pack(world.toTile(position.getX()), world.toTile(position.getY())));
+            out.add(Point2.pack(World.toTile(position.getX()), World.toTile(position.getY())));
         }
 
     }
@@ -453,7 +451,7 @@ public class Pathfinder implements Runnable{
      * Data for a flow field to some set of destinations.
      * Concrete subclasses must specify a way to fetch costs and destinations.
      * */
-    static abstract class Flowfield{
+    public static abstract class Flowfield{
         /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
         protected int refreshRate;
         /** Team this path is for. Set before using. */
@@ -462,7 +460,7 @@ public class Pathfinder implements Runnable{
         protected PathCost cost = costTypes.get(costGround);
 
         /** costs of getting to a specific tile */
-        int[][] weights;
+        public int[][] weights;
         /** search IDs of each position - the highest, most recent search is prioritized and overwritten */
         int[][] searches;
         /** search frontier, these are Pos objects */
