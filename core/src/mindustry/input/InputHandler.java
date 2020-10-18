@@ -242,7 +242,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             pay.dropLastPayload();
             pay.set(prevx, prevy);
             pay.controlling().each(u -> {
-                if (u instanceof Payloadc p){
+                if(u instanceof Payloadc p){
                     p.dropLastPayload();
                 }
             });
