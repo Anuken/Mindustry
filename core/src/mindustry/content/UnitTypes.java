@@ -1101,7 +1101,7 @@ public class UnitTypes implements ContentList{
                 y = 27f;
                 rotateSpeed = 2f;
                 reload = 9f;
-                shootSound = Sounds.flame;
+                shootSound = Sounds.shootSnap;
                 occlusion = 7f;
                 rotate = true;
                 recoil = 0.5f;
@@ -1115,7 +1115,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.shellEjectSmall;
                 rotateSpeed = 7f;
                 shake = 1f;
-                shootSound = Sounds.shootSnap;
+                shootSound = Sounds.shootBig;
                 rotate = true;
                 occlusion = 12f;
                 bullet = fragBullet;
