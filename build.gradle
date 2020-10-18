@@ -262,6 +262,8 @@ project(":ios"){
 project(":core"){
     apply plugin: "java-library"
 
+    compileJava.options.fork = true
+
     task preGen{
         outputs.upToDateWhen{ false }
         generateLocales()
