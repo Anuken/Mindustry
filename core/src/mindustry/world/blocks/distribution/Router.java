@@ -1,7 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -27,17 +27,25 @@ public class Router extends Block{
         public Item lastItem;
         public Tile lastInput;
         public float time;
-        public @NonNull BlockUnitc unit = Nulls.blockUnit;
-
-        @Override
-        public void created(){
-            unit = (BlockUnitc)UnitTypes.block.create(team);
-            unit.tile(this);
-        }
+        public @Nullable BlockUnitc unit;
 
         @Override
         public Unit unit(){
+            if(unit == null){
+                unit = (BlockUnitc)UnitTypes.block.create(team);
+                unit.tile(this);
+            }
             return (Unit)unit;
+        }
+
+        @Override
+        public boolean canControl(){
+            return size == 1;
+        }
+
+        @Override
+        public boolean shouldAutoTarget(){
+            return false;
         }
 
         @Override
@@ -87,8 +95,9 @@ public class Router extends Block{
         }
 
         public Building getTileTarget(Item item, Tile from, boolean set){
-            if(isControlled()){
+            if(unit != null && isControlled()){
                 unit.health(health);
+                unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
                 unit.team(team);
 
                 int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);

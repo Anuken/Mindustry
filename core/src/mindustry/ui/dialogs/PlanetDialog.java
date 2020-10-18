@@ -92,7 +92,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         launching = false;
 
         zoom = 1f;
-        planets.zoom = 2f;
+        planets.zoom = 1f;
         selectAlpha = 0f;
         launchSector = state.getSector();
 
@@ -112,7 +112,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //update view to sector
         lookAt(sector);
         zoom = 1f;
-        planets.zoom = 2f;
+        planets.zoom = 1f;
         selectAlpha = 0f;
         launchSector = sector;
 
@@ -159,10 +159,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                 if(selectAlpha > 0.01f){
                     if(canSelect(sec) || sec.unlocked()){
-                        //TODO remove completely?
-                        //if(sec.baseCoverage > 0){
-                        //planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.5f * sec.baseCoverage * selectAlpha), -0.002f);
-                        //}
 
                         Color color =
                         sec.hasBase() ? Team.sharded.color :
