@@ -28,7 +28,7 @@ public class SectorInfo{
     /** Items stored in all cores. */
     public ItemSeq items = new ItemSeq();
     /** The best available core type. */
-    public Block bestCoreType = Blocks.air;
+    public Block bestCoreType = Blocks.coreShard;
     /** Max storage capacity. */
     public int storageCapacity = 0;
     /** Whether a core is available here. */
