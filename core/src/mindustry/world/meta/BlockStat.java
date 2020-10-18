@@ -12,6 +12,9 @@ public enum BlockStat{
     buildTime(StatCategory.general),
     buildCost(StatCategory.general),
     memoryCapacity(StatCategory.general),
+    baseDeflectChance(StatCategory.general), 
+    lightningChance(StatCategory.general),
+    lightningDamage(StatCategory.general),
 
     itemCapacity(StatCategory.items),
     itemsMoved(StatCategory.items),
