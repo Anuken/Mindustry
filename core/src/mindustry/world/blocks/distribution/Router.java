@@ -104,7 +104,7 @@ public class Router extends Block{
 
                 if(unit.isShooting()){
                     Building other = nearby(angle);
-                    if(other.acceptItem(this, item)){
+                    if(other != null && other.acceptItem(this, item)){
                         return other;
                     }
                 }
