@@ -189,15 +189,26 @@ public class LAssembler{
             return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n")).id;
         }
 
+        //remove spaces for non-strings
+        symbol = symbol.replace(' ', '_');
+
         try{
-            double value = Double.parseDouble(symbol);
+            double value = parseDouble(symbol);
             if(Double.isNaN(value) || Double.isInfinite(value)) value = 0;
+
             //this creates a hidden const variable with the specified value
-            String key = "___" + value;
-            return putConst(key, value).id;
+            return putConst("___" + value, value).id;
         }catch(NumberFormatException e){
             return putVar(symbol).id;
         }
+    }
+
+    double parseDouble(String symbol) throws NumberFormatException{
+        //parse hex/binary syntax
+        if(symbol.startsWith("0b")) return Long.parseLong(symbol.substring(2), 2);
+        if(symbol.startsWith("0x")) return Long.parseLong(symbol.substring(2), 16);
+
+        return Double.parseDouble(symbol);
     }
 
     /** Adds a constant value by name. */

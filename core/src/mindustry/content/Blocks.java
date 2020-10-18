@@ -1912,7 +1912,7 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.antumbra, UnitTypes.eclipse},
                 new UnitType[]{UnitTypes.arkyid, UnitTypes.toxopid},
                 new UnitType[]{UnitTypes.scepter, UnitTypes.reign},
-                new UnitType[] {UnitTypes.sei, UnitTypes.omura},
+                new UnitType[]{UnitTypes.sei, UnitTypes.omura},
                 new UnitType[]{UnitTypes.quad, UnitTypes.oct},
                 new UnitType[]{UnitTypes.vela, UnitTypes.corvus}
             );
