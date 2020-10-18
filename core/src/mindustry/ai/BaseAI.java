@@ -24,7 +24,7 @@ public class BaseAI{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
     private static final float correctPercent = 0.5f;
     private static final float step = 5;
-    private static final int attempts = 5;
+    private static final int attempts = 4;
     private static final float emptyChance = 0.01f;
     private static final int timerStep = 0, timerSpawn = 1;
 

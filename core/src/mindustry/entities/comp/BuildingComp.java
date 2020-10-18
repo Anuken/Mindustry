@@ -464,7 +464,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      */
     public boolean movePayload(Payload todump){
         int trns = block.size/2 + 1;
-        Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
+        Tile next = tile.nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
         if(next != null && next.build != null && next.build.team == team && next.build.acceptPayload(self(), todump)){
             next.build.handlePayload(self(), todump);
@@ -547,7 +547,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float moveLiquidForward(boolean leaks, Liquid liquid){
-        Tile next = tile.getNearby(rotation);
+        Tile next = tile.nearby(rotation);
 
         if(next == null) return 0;
 

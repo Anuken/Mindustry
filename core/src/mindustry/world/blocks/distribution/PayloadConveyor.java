@@ -87,7 +87,7 @@ public class PayloadConveyor extends Block{
             }
 
             int ntrns = 1 + size/2;
-            Tile next = tile.getNearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
+            Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
             blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
         }
 
