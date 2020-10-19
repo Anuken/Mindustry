@@ -9,7 +9,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class Item extends UnlockableContent{
-    public final Color color;
+    public Color color;
 
     /** how explosive this item is. */
     public float explosiveness = 0f;
