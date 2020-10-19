@@ -8,6 +8,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -83,7 +84,9 @@ public class LiquidTurret extends Turret{
                 int tr = (int)(range / tilesize);
                 for(int x = -tr; x <= tr; x++){
                     for(int y = -tr; y <= tr; y++){
-                        if(Fires.has(x + tile.x, y + tile.y)){
+                        Tile other = world.tileWorld(x + tile.x, y + tile.y);
+                        //do not extinguish fires on other team blocks
+                        if(other != null && Fires.has(x + tile.x, y + tile.y) && (other.build == null || other.team() == team)){
                             target = Fires.get(x + tile.x, y + tile.y);
                             return;
                         }

@@ -510,7 +510,7 @@ public class Bullets implements ContentList{
             speed = 4f;
             knockback = 1.3f;
             puddleSize = 8f;
-            damage = 6f;
+            damage = 5f;
             drag = 0.001f;
             ammoMultiplier = 2f;
             statusDuration = 60f * 4f;

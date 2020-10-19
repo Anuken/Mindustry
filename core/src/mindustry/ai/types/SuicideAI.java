@@ -21,7 +21,7 @@ public class SuicideAI extends GroundAI{
         }
 
         if(retarget()){
-            target = target(unit.x, unit.y, unit.range(), unit.type().targetAir, unit.type().targetGround);
+            target = target(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
         }
 
         Building core = unit.closestEnemyCore();
@@ -30,11 +30,11 @@ public class SuicideAI extends GroundAI{
 
         if(!Units.invalidateTarget(target, unit, unit.range()) && unit.hasWeapons()){
             rotate = true;
-            shoot = unit.within(target, unit.type().weapons.first().bullet.range() +
+            shoot = unit.within(target, unit.type.weapons.first().bullet.range() +
                 (target instanceof Building ? ((Building)target).block.size * Vars.tilesize / 2f : ((Hitboxc)target).hitSize() / 2f));
 
-            if(unit.type().hasWeapons()){
-                unit.aimLook(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
+            if(unit.type.hasWeapons()){
+                unit.aimLook(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
             }
 
             //do not move toward walls or transport blocks
@@ -65,7 +65,7 @@ public class SuicideAI extends GroundAI{
                 if(!blocked){
                     moveToTarget = true;
                     //move towards target directly
-                    unit.moveAt(vec.set(target).sub(unit).limit(unit.type().speed));
+                    unit.moveAt(vec.set(target).sub(unit).limit(unit.type.speed));
                 }
             }
 

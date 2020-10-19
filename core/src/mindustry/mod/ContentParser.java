@@ -260,8 +260,8 @@ public class ContentParser{
             //TODO test this!
             read(() -> {
                 //add reconstructor type
-                if(value.hasChild("requirements")){
-                    JsonValue rec =  value.remove("requirements");
+                if(value.has("requirements")){
+                    JsonValue rec = value.remove("requirements");
 
                     //intermediate class for parsing
                     class UnitReq{
@@ -284,6 +284,17 @@ public class ContentParser{
                         throw new IllegalArgumentException("Missing a valid 'block' in 'requirements'");
                     }
 
+                }
+
+                //read extra default waves
+                if(value.has("waves")){
+                    JsonValue waves = value.remove("waves");
+                    SpawnGroup[] groups = parser.readValue(SpawnGroup[].class, waves);
+                    for(SpawnGroup group : groups){
+                        group.type = unit;
+                    }
+
+                    Vars.defaultWaves.get().addAll(groups);
                 }
 
                 readFields(unit, value, true);

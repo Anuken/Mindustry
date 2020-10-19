@@ -18,7 +18,7 @@ public class SectorPresets implements ContentList{
         groundZero = new SectorPreset("groundZero", serpulo, 15){{
             alwaysUnlocked = true;
             captureWave = 10;
-            difficulty = 0;
+            difficulty = 1;
         }};
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
@@ -26,23 +26,23 @@ public class SectorPresets implements ContentList{
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
-            captureWave = 40;
-            difficulty = 1;
+            captureWave = 20;
+            difficulty = 2;
         }};
 
         craters = new SectorPreset("craters", serpulo, 18){{
-            captureWave = 40;
+            captureWave = 20;
             difficulty = 2;
         }};
 
         ruinousShores = new SectorPreset("ruinousShores", serpulo, 19){{
-            captureWave = 40;
+            captureWave = 30;
             difficulty = 3;
         }};
 
         stainedMountains = new SectorPreset("stainedMountains", serpulo, 20){{
             captureWave = 30;
-            difficulty = 2;
+            difficulty = 3;
         }};
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
@@ -54,7 +54,7 @@ public class SectorPresets implements ContentList{
         }};
 
         tarFields = new SectorPreset("tarFields", serpulo, 23){{
-            captureWave = 40;
+            captureWave = 50;
             difficulty = 5;
         }};
 

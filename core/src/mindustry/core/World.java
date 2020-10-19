@@ -148,7 +148,17 @@ public class World{
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    public int toTile(float coord){
+    /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */
+    public static float conv(float coord){
+        return coord / tilesize;
+    }
+
+    /** Convert from tile to world coordinates. */
+    public static float unconv(float coord){
+        return coord * tilesize;
+    }
+
+    public static int toTile(float coord){
         return Math.round(coord / tilesize);
     }
 
@@ -253,7 +263,7 @@ public class World{
         setSectorRules(sector);
 
         if(state.rules.defaultTeam.core() != null){
-            sector.setSpawnPosition(state.rules.defaultTeam.core().pos());
+            sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
         }
     }
 
@@ -267,8 +277,6 @@ public class World{
         ObjectIntMap<Block> floorc = new ObjectIntMap<>();
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
-        float waterFloors = 0, totalFloors = 0;
-
         for(Tile tile : world.tiles){
             if(world.getDarkness(tile.x, tile.y) >= 3){
                 continue;
@@ -280,10 +288,6 @@ public class World{
             if(liquid != null) content.add(liquid);
 
             if(!tile.block().isStatic()){
-                totalFloors ++;
-                if(liquid == Liquids.water){
-                    waterFloors += tile.floor().isDeep() ? 1f : 0.7f;
-                }
                 floorc.increment(tile.floor());
                 if(tile.overlay() != Blocks.air){
                     floorc.increment(tile.overlay());
@@ -326,9 +330,9 @@ public class World{
             state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
         }
 
-        state.secinfo.resources = content.asArray();
-        state.secinfo.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
-
+        sector.info.resources = content.asArray();
+        sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
+        sector.saveInfo();
     }
 
     public Context filterContext(Map map){

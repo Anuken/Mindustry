@@ -64,11 +64,6 @@ public class FakeGraphics extends Graphics{
     }
 
     @Override
-    public float getRawDeltaTime(){
-        return 0;
-    }
-
-    @Override
     public int getFramesPerSecond(){
         return 0;
     }

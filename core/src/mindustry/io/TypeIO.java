@@ -185,7 +185,7 @@ public class TypeIO{
             return unit == null ? Nulls.unit : unit;
         }else if(type == 1){ //block
             Building tile = world.build(id);
-            return tile instanceof ControlBlock ? ((ControlBlock)tile).unit() : Nulls.unit;
+            return tile instanceof ControlBlock cont ? cont.unit() : Nulls.unit;
         }
         return Nulls.unit;
     }
@@ -448,6 +448,16 @@ public class TypeIO{
 
     public static Color readColor(Reads read, Color color){
         return color.set(read.i());
+    }
+
+    public static void writeContent(Writes write, Content cont){
+        write.b(cont.getContentType().ordinal());
+        write.s(cont.id);
+    }
+
+    public static Content readContent(Reads read){
+        byte id = read.b();
+        return content.getByID(ContentType.all[id], read.s());
     }
 
     public static void writeLiquid(Writes write, Liquid liquid){
