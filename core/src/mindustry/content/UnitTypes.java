@@ -1200,7 +1200,6 @@ public class UnitTypes implements ContentList{
 
             mineTier = 3;
             health = 500;
-            armor = 2f;
             armor = 5f;
             speed = 1.8f;
             accel = 0.06f;
