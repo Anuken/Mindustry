@@ -336,16 +336,18 @@ public class ItemBridge extends Block{
 
             Tile other = world.tile(link);
 
+            if(items.total() >= itemCapacity) return false;
+
+            if(linked(source)) return true;
+
             if(linkValid(tile, other)){
                 int rel = relativeTo(other);
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
-                if(rel == rel2) return false;
-            }else{
-                return linked(source) && items.total() < itemCapacity;
+                return rel != rel2;
             }
 
-            return items.total() < itemCapacity;
+            return false;
         }
 
         @Override
@@ -359,16 +361,18 @@ public class ItemBridge extends Block{
 
             Tile other = world.tile(link);
 
+            if(!(liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f)) return false;
+
+            if(linked(source)) return true;
+
             if(linkValid(tile, other)){
                 int rel = relativeTo(other.x, other.y);
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
-                if(rel == rel2) return false;
-            }else if(!(linked(source))){
-                return false;
+                return rel != rel2;
             }
 
-            return (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
+            return false;
         }
 
         protected boolean linked(Building source){

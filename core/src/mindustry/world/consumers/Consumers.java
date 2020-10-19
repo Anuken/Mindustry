@@ -109,7 +109,7 @@ public class Consumers{
         return optionalResults;
     }
 
-    public void display(BlockStats stats){
+    public void display(Stats stats){
         for(Consume c : map){
             if(c != null){
                 c.display(stats);

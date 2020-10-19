@@ -72,6 +72,11 @@ public class BaseAI{
                 int wx = (int)(World.toTile(pos.getX()) + Tmp.v1.x), wy = (int)(World.toTile(pos.getY()) + Tmp.v1.y);
                 Tile tile = world.tiles.getc(wx, wy);
 
+                //try not to block the spawn point
+                if(spawner.getSpawns().contains(t -> t.within(tile, tilesize * 40f))){
+                    continue;
+                }
+
                 Seq<BasePart> parts = null;
 
                 //pick a completely random base part, and place it a random location

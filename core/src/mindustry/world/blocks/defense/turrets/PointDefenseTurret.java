@@ -1,4 +1,4 @@
-package mindustry.world.blocks.defense;
+package mindustry.world.blocks.defense.turrets;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -11,12 +11,9 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
-
-public class PointDefenseTurret extends Block{
+public class PointDefenseTurret extends ReloadTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
@@ -27,9 +24,6 @@ public class PointDefenseTurret extends Block{
     public Effect hitEffect = Fx.pointHit;
     public Effect shootEffect = Fx.sparkShoot;
 
-    public float range = 80f;
-    public float reloadTime = 30f;
-    public float rotateSpeed = 20;
     public float shootCone = 5f;
     public float bulletDamage = 10f;
     public float shootLength = 3f;
@@ -37,13 +31,12 @@ public class PointDefenseTurret extends Block{
     public PointDefenseTurret(String name){
         super(name);
 
-        outlineIcon = true;
-        update = true;
-    }
+        rotateSpeed = 20f;
+        reloadTime = 30f;
 
-    @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
+        coolantMultiplier = 2f;
+        //disabled due to version mismatch problems
+        acceptCoolant = false;
     }
 
     @Override
@@ -55,12 +48,10 @@ public class PointDefenseTurret extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.reload, 60f / reloadTime, StatUnit.none);
+        stats.add(Stat.reload, 60f / reloadTime, StatUnit.none);
     }
 
-    public class PointDefenseBuild extends Building{
-        public float rotation = 90, reload;
+    public class PointDefenseBuild extends ReloadTurretBuild{
         public @Nullable Bullet target;
 
         @Override
@@ -76,14 +67,18 @@ public class PointDefenseTurret extends Block{
                 target = null;
             }
 
+            if(acceptCoolant){
+                updateCooling();
+            }
+
             //look at target
             if(target != null && target.within(this, range) && target.team != team && target.type() != null && target.type().hittable){
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
-                reload -= edelta();
+                reload += edelta();
 
                 //shoot when possible
-                if(Angles.within(rotation, dest, shootCone) && reload <= 0f){
+                if(Angles.within(rotation, dest, shootCone) && reload >= reloadTime){
                     if(target.damage() > bulletDamage){
                         target.damage(target.damage() - bulletDamage);
                     }else{
@@ -95,16 +90,11 @@ public class PointDefenseTurret extends Block{
                     beamEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color, new Vec2().set(target));
                     shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
                     hitEffect.at(target.x, target.y, color);
-                    reload = reloadTime;
+                    reload = 0;
                 }
             }else{
                 target = null;
             }
-        }
-
-        @Override
-        public void drawSelect(){
-            Drawf.dashCircle(x, y, range, Pal.accent);
         }
 
         @Override

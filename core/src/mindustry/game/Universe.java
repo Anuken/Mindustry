@@ -187,7 +187,7 @@ public class Universe{
                         }
 
                         //add production, making sure that it's capped
-                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * seconds * scl), sector.info.storageCapacity - sector.info.items.get(item))));
+                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
 
                         sector.saveInfo();
                     }

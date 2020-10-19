@@ -6,7 +6,7 @@ import mindustry.type.*;
 
 //TODO more stats:
 //- units constructed
-public class Stats{
+public class GameStats{
     /** Total items delivered to global resoure counter. Campaign only. */
     public ObjectIntMap<Item> itemsDelivered = new ObjectIntMap<>();
     /** Enemy (red team) units destroyed. */
