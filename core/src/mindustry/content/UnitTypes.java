@@ -1749,7 +1749,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 3f;
                 shotDelay = 3f;
 
-                bullet = new BasicBulletType(3.5f, 10{{
+                bullet = new BasicBulletType(3.5f, 10){{
                     width = 6.5f;
                     height = 11f;
                     lifetime = 70f;
