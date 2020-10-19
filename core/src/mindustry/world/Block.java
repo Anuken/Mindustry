@@ -14,6 +14,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -35,8 +36,6 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent{
-    public static final int crackRegions = 8, maxCrackSize = 9;
-
     public boolean hasItems;
     public boolean hasLiquids;
     public boolean hasPower;
@@ -212,8 +211,6 @@ public class Block extends UnlockableContent{
     public @Load("@-team") TextureRegion teamRegion;
     public TextureRegion[] teamRegions;
 
-    //TODO make this not static
-    public static TextureRegion[][] cracks;
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempTileEnts = new Seq<>();
 
@@ -352,7 +349,7 @@ public class Block extends UnlockableContent{
                 Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
             }else{
-                current = entity -> entity.liquids.current();
+                current = entity -> entity.liquids == null ? Liquids.water : entity.liquids.current();
             }
             bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
             () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
@@ -621,7 +618,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20 * researchCostMultiplier, 10);
+            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.15f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
@@ -686,15 +683,6 @@ public class Block extends UnlockableContent{
     @Override
     public void load(){
         region = Core.atlas.find(name);
-
-        if(cracks == null || (cracks[0][0].texture != null && cracks[0][0].texture.isDisposed())){
-            cracks = new TextureRegion[maxCrackSize][crackRegions];
-            for(int size = 1; size <= maxCrackSize; size++){
-                for(int i = 0; i < crackRegions; i++){
-                    cracks[size - 1][i] = Core.atlas.find("cracks-" + size + "-" + i);
-                }
-            }
-        }
 
         ContentRegions.loadRegions(this);
 

@@ -48,8 +48,8 @@ public class AmmoTypes implements ContentList{
 
                 if(build.block.consumes.hasPower() && build.block.consumes.getPower().buffered){
                     float amount = closest.build.power.status * build.block.consumes.getPower().capacity;
-                    float powerPerAmmo = totalPower / unit.type().ammoCapacity;
-                    float ammoRequired = unit.type().ammoCapacity - unit.ammo;
+                    float powerPerAmmo = totalPower / unit.type.ammoCapacity;
+                    float ammoRequired = unit.type.ammoCapacity - unit.ammo;
                     float powerRequired = ammoRequired * powerPerAmmo;
                     float powerTaken = Math.min(amount, powerRequired);
 

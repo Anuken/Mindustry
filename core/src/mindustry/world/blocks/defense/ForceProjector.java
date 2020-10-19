@@ -12,6 +12,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -80,10 +81,15 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceBuild extends Building{
+    public class ForceBuild extends Building implements Ranged{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
         public ForceDraw drawer;
+
+        @Override
+        public float range(){
+            return realRadius();
+        }
 
         @Override
         public void created(){

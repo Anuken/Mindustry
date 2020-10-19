@@ -36,6 +36,8 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
+    /** Whether to show the cliff button in the editor*/
+    public static boolean addCliffButton = false;
     /** Maximum extra padding around deployment schematics. */
     public static final int maxLoadoutSchematicPad = 5;
     /** Maximum schematic size.*/
@@ -86,8 +88,10 @@ public class Vars implements Loadable{
     public static final float logicItemTransferRange = 45f;
     /** duration of time between turns in ticks */
     public static final float turnDuration = 2 * Time.toMinutes;
-    /** turns needed to destroy a sector completely */
-    public static final float sectorDestructionTurns = 2f;
+    /** chance of an invasion per turn, 1 = 100% */
+    public static final float baseInvasionChance = 1f / 25f;
+    /** how many turns have to pass before invasions start */
+    public static final int invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
     /** launch animation duration */

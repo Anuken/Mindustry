@@ -153,9 +153,9 @@ public class Generators{
 
         ImagePacker.generate("cracks", () -> {
             RidgedPerlin r = new RidgedPerlin(1, 3);
-            for(int size = 1; size <= Block.maxCrackSize; size++){
+            for(int size = 1; size <= BlockRenderer.maxCrackSize; size++){
                 int dim = size * 32;
-                int steps = Block.crackRegions;
+                int steps = BlockRenderer.crackRegions;
                 for(int i = 0; i < steps; i++){
                     float fract = i / (float)steps;
 

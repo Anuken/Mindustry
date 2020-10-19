@@ -3,7 +3,9 @@ package mindustry.net;
 import arc.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -21,6 +23,18 @@ public class NetworkIO{
     public static void writeWorld(Player player, OutputStream os){
 
         try(DataOutputStream stream = new DataOutputStream(os)){
+            //write all researched content to rules if hosting
+            if(state.isCampaign()){
+                state.rules.researched.clear();
+                for(ContentType type : ContentType.all){
+                    for(Content c : content.getBy(type)){
+                        if(c instanceof UnlockableContent u && u.unlocked() && TechTree.get(u) != null){
+                            state.rules.researched.add(u.name);
+                        }
+                    }
+                }
+            }
+
             stream.writeUTF(JsonIO.write(state.rules));
             SaveIO.getSaveWriter().writeStringMap(stream, state.map.tags);
 
@@ -43,6 +57,8 @@ public class NetworkIO{
             Time.clear();
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
+
+            Log.info("READ RULES: @", state.rules.researched);
 
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();

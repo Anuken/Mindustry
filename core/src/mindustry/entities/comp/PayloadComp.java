@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -120,7 +121,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     /** @return whether the tile has been successfully placed. */
     boolean dropBlock(BuildPayload payload){
         Building tile = payload.build;
-        int tx = Vars.world.toTile(x - tile.block.offset), ty = Vars.world.toTile(y - tile.block.offset);
+        int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
         Tile on = Vars.world.tile(tx, ty);
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
             int rot = (int)((rotation + 45f) / 90f) % 4;

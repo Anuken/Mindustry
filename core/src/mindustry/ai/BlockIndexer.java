@@ -8,8 +8,10 @@ import arc.struct.EnumSet;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -178,8 +180,8 @@ public class BlockIndexer{
     public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Building> pred, Cons<Building> cons){
         intSet.clear();
 
-        int tx = world.toTile(wx);
-        int ty = world.toTile(wy);
+        int tx = World.toTile(wx);
+        int ty = World.toTile(wy);
 
         int tileRange = (int)(range / tilesize + 1);
         boolean any = false;
@@ -205,13 +207,14 @@ public class BlockIndexer{
     /** Get all enemy blocks with a flag. */
     public Seq<Tile> getEnemy(Team team, BlockFlag type){
         returnArray.clear();
-        for(Team enemy : team.enemies()){
-            if(state.teams.isActive(enemy)){
-                TileArray set = getFlagged(enemy)[type.ordinal()];
-                if(set != null){
-                    for(Tile tile : set){
-                        returnArray.add(tile);
-                    }
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            Team enemy = data.items[i].team;
+            if(enemy == team) continue;
+            TileArray set = getFlagged(enemy)[type.ordinal()];
+            if(set != null){
+                for(Tile tile : set){
+                    returnArray.add(tile);
                 }
             }
         }

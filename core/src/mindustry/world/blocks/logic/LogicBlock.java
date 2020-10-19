@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -304,8 +305,8 @@ public class LogicBlock extends Block{
                     }
 
                     asm.getVar("@this").value = this;
-                    asm.putConst("@thisx", x);
-                    asm.putConst("@thisy", y);
+                    asm.putConst("@thisx", World.conv(x));
+                    asm.putConst("@thisy", World.conv(y));
 
                     executor.load(asm);
                 }catch(Exception e){

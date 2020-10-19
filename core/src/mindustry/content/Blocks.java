@@ -919,8 +919,8 @@ public class Blocks implements ContentList{
         shockMine = new ShockMine("shock-mine"){{
             requirements(Category.effect, with(Items.lead, 25, Items.silicon, 12));
             hasShadow = false;
-            health = 40;
-            damage = 23;
+            health = 50;
+            damage = 25;
             tileDamage = 7f;
             length = 10;
             tendrils = 4;
@@ -1353,7 +1353,7 @@ public class Blocks implements ContentList{
             size = 5;
 
             unitCapModifier = 20;
-            researchCostMultiplier = 0.06f;
+            researchCostMultiplier = 0.05f;
         }};
 
         vault = new StorageBlock("vault"){{
@@ -1722,7 +1722,7 @@ public class Blocks implements ContentList{
                 despawnEffect = Fx.instBomb;
                 trailSpacing = 20f;
                 damage = 1350;
-                tileDamageMultiplier = 0.5f;
+                tileDamageMultiplier = 0.3f;
                 speed = brange;
                 hitShake = 6f;
                 ammoMultiplier = 1f;
@@ -1924,7 +1924,7 @@ public class Blocks implements ContentList{
                 new UnitType[]{UnitTypes.antumbra, UnitTypes.eclipse},
                 new UnitType[]{UnitTypes.arkyid, UnitTypes.toxopid},
                 new UnitType[]{UnitTypes.scepter, UnitTypes.reign},
-                new UnitType[] {UnitTypes.sei, UnitTypes.omura},
+                new UnitType[]{UnitTypes.sei, UnitTypes.omura},
                 new UnitType[]{UnitTypes.quad, UnitTypes.oct},
                 new UnitType[]{UnitTypes.vela, UnitTypes.corvus}
             );

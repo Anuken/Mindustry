@@ -38,6 +38,11 @@ public class SwitchBlock extends Block{
         }
 
         @Override
+        public Boolean config(){
+            return enabled;
+        }
+
+        @Override
         public byte version(){
             return 1;
         }

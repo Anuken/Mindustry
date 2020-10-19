@@ -64,6 +64,22 @@ public class Reconstructor extends UnitBlock{
         super.setStats();
 
         stats.add(BlockStat.productionTime, constructTime / 60f, StatUnit.seconds);
+        stats.add(BlockStat.output, table -> {
+            table.row();
+            for(var upgrade : upgrades){
+                float size = 8*3;
+                if(upgrade[0].unlockedNow() && upgrade[1].unlockedNow()){
+                    table.image(upgrade[0].icon(Cicon.small)).size(size).padRight(4).padLeft(10).scaling(Scaling.fit).right();
+                    table.add(upgrade[0].localizedName).left();
+
+                    table.add("[lightgray] -> ");
+
+                    table.image(upgrade[1].icon(Cicon.small)).size(size).padRight(4).scaling(Scaling.fit);
+                    table.add(upgrade[1].localizedName).left();
+                    table.row();
+                }
+            }
+        });
     }
 
     @Override
@@ -90,7 +106,7 @@ public class Reconstructor extends UnitBlock{
             return this.payload == null
                 && relativeTo(source) != rotation
                 && payload instanceof UnitPayload
-                && hasUpgrade(((UnitPayload)payload).unit.type());
+                && hasUpgrade(((UnitPayload)payload).unit.type);
         }
 
         @Override
@@ -114,9 +130,9 @@ public class Reconstructor extends UnitBlock{
             if(constructing() && hasArrived()){
                 Draw.draw(Layer.blockOver, () -> {
                     Draw.alpha(1f - progress/ constructTime);
-                    Draw.rect(payload.unit.type().icon(Cicon.full), x, y, rotdeg() - 90);
+                    Draw.rect(payload.unit.type.icon(Cicon.full), x, y, rotdeg() - 90);
                     Draw.reset();
-                    Drawf.construct(this, upgrade(payload.unit.type()), rotdeg() - 90f, progress / constructTime, speedScl, time);
+                    Drawf.construct(this, upgrade(payload.unit.type), rotdeg() - 90f, progress / constructTime, speedScl, time);
                 });
             }else{
                 Draw.z(Layer.blockOver);
@@ -135,7 +151,7 @@ public class Reconstructor extends UnitBlock{
 
             if(payload != null){
                 //check if offloading
-                if(!hasUpgrade(payload.unit.type())){
+                if(!hasUpgrade(payload.unit.type)){
                     moveOutPayload();
                 }else{ //update progress
                     if(moveInPayload()){
@@ -146,7 +162,7 @@ public class Reconstructor extends UnitBlock{
 
                         //upgrade the unit
                         if(progress >= constructTime){
-                            payload.unit = upgrade(payload.unit.type()).create(payload.unit.team());
+                            payload.unit = upgrade(payload.unit.type).create(payload.unit.team());
                             progress = 0;
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
@@ -168,12 +184,12 @@ public class Reconstructor extends UnitBlock{
         public UnitType unit(){
             if(payload == null) return null;
 
-            UnitType t = upgrade(payload.unit.type());
+            UnitType t = upgrade(payload.unit.type);
             return t != null && t.unlockedNow() ? t : null;
         }
 
         public boolean constructing(){
-            return payload != null && hasUpgrade(payload.unit.type());
+            return payload != null && hasUpgrade(payload.unit.type);
         }
 
         public boolean hasUpgrade(UnitType type){

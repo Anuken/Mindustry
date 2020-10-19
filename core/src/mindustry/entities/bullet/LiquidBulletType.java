@@ -22,6 +22,8 @@ public class LiquidBulletType extends BulletType{
         if(liquid != null){
             this.liquid = liquid;
             this.status = liquid.effect;
+            lightColor = liquid.lightColor;
+            lightOpacity = liquid.lightColor.a;
         }
 
         ammoMultiplier = 1f;

@@ -183,7 +183,7 @@ public class Floor extends Block{
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
-            Tile other = tile.getNearby(point);
+            Tile other = tile.nearby(point);
             if(other != null && other.floor().cacheLayer == layer && other.floor().edges() != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
@@ -200,7 +200,7 @@ public class Floor extends Block{
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
-            Tile other = tile.getNearby(point);
+            Tile other = tile.nearby(point);
             if(other != null && doEdge(other.floor()) && other.floor().cacheLayer == cacheLayer && other.floor().edges() != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
@@ -217,7 +217,7 @@ public class Floor extends Block{
         for(Block block : blenders){
             for(int i = 0; i < 8; i++){
                 Point2 point = Geometry.d8[i];
-                Tile other = tile.getNearby(point);
+                Tile other = tile.nearby(point);
                 if(other != null && other.floor() == block){
                     TextureRegion region = edge((Floor)block, 1 - point.x, 1 - point.y);
                     Draw.rect(region, tile.worldx(), tile.worldy());
@@ -229,7 +229,7 @@ public class Floor extends Block{
     //'new' style of edges with shadows instead of colors, not used currently
     protected void drawEdgesFlat(Tile tile, boolean sameLayer){
         for(int i = 0; i < 4; i++){
-            Tile other = tile.getNearby(i);
+            Tile other = tile.nearby(i);
             if(other != null && doEdge(other.floor())){
                 Color color = other.floor().mapColor;
                 Draw.color(color.r, color.g, color.b, 1f);

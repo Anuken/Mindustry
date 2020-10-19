@@ -243,6 +243,16 @@ public class ItemModule extends BlockModule{
         }
     }
 
+    public void add(ItemSeq stacks){
+        stacks.each(this::add);
+    }
+
+    public void add(ItemModule items){
+        for(int i = 0; i < items.items.length; i++){
+            add(i, items.items[i]);
+        }
+    }
+
     public void add(Item item, int amount){
         add(item.id, amount);
     }
@@ -258,12 +268,6 @@ public class ItemModule extends BlockModule{
     public void undoFlow(Item item){
         if(flow != null){
             cacheSums[item.id] -= 1;
-        }
-    }
-
-    public void addAll(ItemModule items){
-        for(int i = 0; i < items.items.length; i++){
-            add(i, items.items[i]);
         }
     }
 
