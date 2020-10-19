@@ -412,12 +412,12 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);
 
-            state.rules.attackMode = true;
+            state.rules.attackMode = sector.info.attack = true;
         }else{
-            state.rules.winWave = 15 * (int)Math.max(difficulty * 10, 1);
+            state.rules.winWave = sector.info.winWave = 10 + 5 * (int)Math.max(difficulty * 10, 1);
         }
 
-        state.rules.waves = true;
+        state.rules.waves = sector.info.waves = true;
 
         //TODO better waves
         state.rules.spawns = DefaultWaves.generate(difficulty);

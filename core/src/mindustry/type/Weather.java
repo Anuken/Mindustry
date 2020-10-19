@@ -4,7 +4,6 @@ import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -89,11 +88,6 @@ public abstract class Weather extends UnlockableContent{
 
     public void drawUnder(WeatherState state){
 
-    }
-
-    @Override
-    public void displayInfo(Table table){
-        //do not
     }
 
     @Override

@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -177,7 +176,7 @@ public class Planet extends UnlockableContent{
     public void updateBaseCoverage(){
         for(Sector sector : sectors){
             float sum = 1f;
-            for(Sector other : sector.inRange(2)){
+            for(Sector other : sector.near()){
                 if(other.generateEnemyBase){
                     sum += 1f;
                 }
@@ -203,6 +202,10 @@ public class Planet extends UnlockableContent{
 
     @Override
     public void init(){
+
+        for(Sector sector : sectors){
+            sector.loadInfo();
+        }
 
         if(generator != null){
             Noise.setSeed(id + 1);
@@ -256,12 +259,15 @@ public class Planet extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.planet;
+    }
+
+    public boolean visible(){
+        return true;
+    }
+
+    public void draw(Mat3D projection, Mat3D transform){
+        mesh.render(projection, transform);
     }
 }

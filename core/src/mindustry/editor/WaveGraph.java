@@ -154,7 +154,7 @@ public class WaveGraph extends Table{
             int sum = 0;
 
             for(SpawnGroup spawn : groups){
-                int spawned = spawn.getUnitsSpawned(i);
+                int spawned = spawn.getSpawned(i);
                 values[index][spawn.type.id] += spawned;
                 if(spawned > 0){
                     used.add(spawn.type);

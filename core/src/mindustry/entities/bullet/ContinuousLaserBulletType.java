@@ -45,6 +45,12 @@ public class ContinuousLaserBulletType extends BulletType{
     }
 
     @Override
+    public float estimateDPS(){
+        //assume firing duration is about 100 by default, may not be accurate there's no way of knowing in this method
+        return damage * 100f / 5f;
+    }
+
+    @Override
     public float range(){
         return length;
     }

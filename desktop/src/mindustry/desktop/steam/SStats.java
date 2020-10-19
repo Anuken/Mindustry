@@ -7,7 +7,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Stats.*;
+import mindustry.game.GameStats.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -60,7 +60,7 @@ public class SStats implements SteamUserStatsCallback{
            //     active10Phantoms.complete();
             //}
 
-            if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
+            if(Groups.unit.count(u -> u.type == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 

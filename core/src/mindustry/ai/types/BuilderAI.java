@@ -79,7 +79,7 @@ public class BuilderAI extends AIController{
                             float dist = Math.min(cons.dst(unit) - buildingRange, 0);
 
                             //make sure you can reach the request in time
-                            if(dist / unit.type().speed < cons.buildCost * 0.9f){
+                            if(dist / unit.type.speed < cons.buildCost * 0.9f){
                                 following = b;
                                 found = true;
                             }
@@ -112,7 +112,7 @@ public class BuilderAI extends AIController{
 
     @Override
     public AIController fallback(){
-        return unit.type().flying ? new FlyingAI() : new GroundAI();
+        return unit.type.flying ? new FlyingAI() : new GroundAI();
     }
 
     @Override

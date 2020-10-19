@@ -45,7 +45,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.block = wall;
 
         //update entity and create it if needed
-        changeEntity(Team.derelict, wall::newBuilding, 0);
+        changeBuild(Team.derelict, wall::newBuilding, 0);
         changed();
     }
 
@@ -186,7 +186,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         this.block = type;
         preChanged();
-        changeEntity(team, entityprov, (byte)Mathf.mod(rotation, 4));
+        changeBuild(team, entityprov, (byte)Mathf.mod(rotation, 4));
 
         if(build != null){
             build.team(team);
@@ -267,6 +267,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         Geometry.circle(x, y, world.width(), world.height(), radius, cons);
     }
 
+    public void circle(int radius, Cons<Tile> cons){
+        circle(radius, (x, y) -> cons.get(world.rawTile(x, y)));
+    }
+
     public void recache(){
         if(!headless && !world.isGenerating()){
             renderer.blocks.floor.recacheTile(this);
@@ -330,6 +334,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.overlay = (Floor)block;
 
         recache();
+    }
+
+    /** Sets the overlay without a recache. */
+    public void setOverlayQuiet(Block block){
+        this.overlay = (Floor)block;
     }
 
     public void clearOverlay(){
@@ -421,15 +430,15 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         getHitbox(rect);
     }
 
-    public Tile getNearby(Point2 relative){
+    public Tile nearby(Point2 relative){
         return world.tile(x + relative.x, y + relative.y);
     }
 
-    public Tile getNearby(int dx, int dy){
+    public Tile nearby(int dx, int dy){
         return world.tile(x + dx, y + dy);
     }
 
-    public Tile getNearby(int rotation){
+    public Tile nearby(int rotation){
         if(rotation == 0) return world.tile(x + 1, y);
         if(rotation == 1) return world.tile(x, y + 1);
         if(rotation == 2) return world.tile(x - 1, y);
@@ -437,7 +446,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return null;
     }
 
-    public Building getNearbyEntity(int rotation){
+    public Building nearbyBuild(int rotation){
         if(rotation == 0) return world.build(x + 1, y);
         if(rotation == 1) return world.build(x, y + 1);
         if(rotation == 2) return world.build(x - 1, y);
@@ -494,7 +503,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeBuild(Team team, Prov<Building> entityprov, int rotation){
         if(build != null){
             int size = build.block.size;
             build.remove();
