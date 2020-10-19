@@ -48,7 +48,7 @@ public abstract class BaseTurret extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
     }
 
     public class BaseTurretBuild extends Building implements Ranged{

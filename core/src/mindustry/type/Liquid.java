@@ -1,11 +1,10 @@
 package mindustry.type;
 
 import arc.graphics.*;
-import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.ui.*;
+import mindustry.world.meta.*;
 
 public class Liquid extends UnlockableContent{
     /** Color used in pipes and on the ground. */
@@ -46,8 +45,12 @@ public class Liquid extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayLiquid(table, this);
+    public void setStats(){
+        stats.addPercent(Stat.explosiveness, explosiveness);
+        stats.addPercent(Stat.flammability, flammability);
+        stats.addPercent(Stat.temperature, temperature);
+        stats.addPercent(Stat.heatCapacity, heatCapacity);
+        stats.addPercent(Stat.viscosity, viscosity);
     }
 
     @Override

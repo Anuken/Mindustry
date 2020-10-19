@@ -1,11 +1,10 @@
 package mindustry.type;
 
 import arc.graphics.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.ctype.*;
-import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -36,8 +35,10 @@ public class Item extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayItem(table, this);
+    public void setStats(){
+        stats.addPercent(Stat.explosiveness, explosiveness);
+        stats.addPercent(Stat.flammability, flammability);
+        stats.addPercent(Stat.radioactivity, radioactivity);
     }
 
     @Override

@@ -45,7 +45,7 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     }
 
     @Override
-    public void display(BlockStats stats){
-        stats.add(booster ? BlockStat.booster : BlockStat.input, liquid, amount * timePeriod, timePeriod == 60);
+    public void display(Stats stats){
+        stats.add(booster ? Stat.booster : Stat.input, liquid, amount * timePeriod, timePeriod == 60);
     }
 }

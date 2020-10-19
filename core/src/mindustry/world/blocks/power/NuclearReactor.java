@@ -56,7 +56,7 @@ public class NuclearReactor extends PowerGenerator{
         super.setStats();
 
         if(hasItems){
-            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+            stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
     }
 

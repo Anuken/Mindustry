@@ -41,14 +41,14 @@ public class Separator extends Block{
 
         super.setStats();
 
-        stats.add(BlockStat.output, new ItemFilterValue(item -> {
+        stats.add(Stat.output, new ItemFilterValue(item -> {
             for(ItemStack i : results){
                 if(item == i.item) return true;
             }
             return false;
         }));
 
-        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+        stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
     }
 
     public class SeparatorBuild extends Building{

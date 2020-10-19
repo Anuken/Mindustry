@@ -16,7 +16,7 @@ public class PowerTurret extends Turret{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.damage, shootType.damage, StatUnit.none);
+        stats.add(Stat.damage, shootType.damage, StatUnit.none);
     }
 
     @Override

@@ -77,12 +77,16 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.buildTime, 0, StatUnit.seconds);
+        stats.add(Stat.buildTime, 0, StatUnit.seconds);
+    }
 
-        bars.add("capacity", (CoreBuild e) ->
-            new Bar(
-                () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
-                () -> Pal.items,
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.add("capacity", (CoreBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
+            () -> Pal.items,
             () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
         ));
     }

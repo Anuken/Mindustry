@@ -101,13 +101,13 @@ public abstract class Turret extends ReloadTurret{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(BlockStat.reload, 60f / reloadTime * shots, StatUnit.none);
-        stats.add(BlockStat.targetsAir, targetAir);
-        stats.add(BlockStat.targetsGround, targetGround);
+        stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
+        stats.add(Stat.reload, 60f / reloadTime * shots, StatUnit.none);
+        stats.add(Stat.targetsAir, targetAir);
+        stats.add(Stat.targetsGround, targetGround);
 
         if(acceptCoolant){
-            stats.add(BlockStat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
+            stats.add(Stat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
         }
     }
 

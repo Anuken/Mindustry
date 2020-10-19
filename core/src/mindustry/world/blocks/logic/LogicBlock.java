@@ -117,8 +117,8 @@ public class LogicBlock extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.linkRange, range / 8, StatUnit.blocks);
-        stats.add(BlockStat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
+        stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
     }
 
     @Override

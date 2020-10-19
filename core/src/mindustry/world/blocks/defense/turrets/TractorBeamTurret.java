@@ -50,9 +50,9 @@ public class TractorBeamTurret extends BaseTurret{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.targetsAir, targetAir);
-        stats.add(BlockStat.targetsGround, targetGround);
-        stats.add(BlockStat.damage, damage * 60f, StatUnit.perSecond);
+        stats.add(Stat.targetsAir, targetAir);
+        stats.add(Stat.targetsGround, targetGround);
+        stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
     }
 
     public class TractorBeamBuild extends BaseTurretBuild{
