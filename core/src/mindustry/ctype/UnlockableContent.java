@@ -59,9 +59,11 @@ public abstract class UnlockableContent extends MappableContent{
             cicons[icon.ordinal()] =
                 Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
                 Core.atlas.find(getContentType().name() + "-" + name + "-full",
+                Core.atlas.find(name + "-" + icon.name(),
+                Core.atlas.find(name + "-full",
                 Core.atlas.find(name,
                 Core.atlas.find(getContentType().name() + "-" + name,
-                Core.atlas.find(name + "1")))));
+                Core.atlas.find(name + "1")))))));
         }
         return cicons[icon.ordinal()];
     }
