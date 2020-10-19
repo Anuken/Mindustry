@@ -1,7 +1,9 @@
 package mindustry.ui;
 
+import arc.graphics.*;
 import arc.scene.ui.layout.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 
 /** An item image with text. */
 public class ItemDisplay extends Table{
@@ -14,6 +16,15 @@ public class ItemDisplay extends Table{
 
     public ItemDisplay(Item item, int amount, boolean showName){
         add(new ItemImage(new ItemStack(item, amount)));
+        if(showName) add(item.localizedName).padLeft(4 + amount > 99 ? 4 : 0);
+
+        this.item = item;
+        this.amount = amount;
+    }
+
+    public ItemDisplay(Item item, int amount, float timePeriod, boolean showName){
+        add(new ItemImage(item.icon(Cicon.medium), amount / (timePeriod / 60f)));
+        add(StatUnit.perSecond.localized()).padLeft(2).padRight(5).color(Color.lightGray).style(Styles.outlineLabel);
         if(showName) add(item.localizedName).padLeft(4 + amount > 99 ? 4 : 0);
 
         this.item = item;

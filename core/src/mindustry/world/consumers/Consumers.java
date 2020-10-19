@@ -116,4 +116,12 @@ public class Consumers{
             }
         }
     }
+
+    public void display(BlockStats stats, float timePeriod){
+        for(Consume c : map){
+            if(c != null){
+                c.display(stats, timePeriod);
+            }
+        }
+    }
 }

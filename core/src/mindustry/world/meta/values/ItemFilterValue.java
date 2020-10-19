@@ -11,8 +11,15 @@ import static mindustry.Vars.*;
 
 public class ItemFilterValue implements StatValue{
     private final Boolf<Item> filter;
+    private final float timePeriod;
 
     public ItemFilterValue(Boolf<Item> filter){
+        this.timePeriod = -1f;
+        this.filter = filter;
+    }
+
+    public ItemFilterValue(Boolf<Item> filter, float timePeriod){
+        this.timePeriod = timePeriod;
         this.filter = filter;
     }
 
@@ -23,7 +30,11 @@ public class ItemFilterValue implements StatValue{
         for(int i = 0; i < list.size; i++){
             Item item = list.get(i);
 
-            table.add(new ItemDisplay(item)).padRight(5);
+            if(timePeriod > 0f){
+                table.add(new ItemDisplay(item, 0, timePeriod, true)).padRight(5);
+            }else{
+                table.add(new ItemDisplay(item, 0, true)).padRight(5);
+            }
 
             if(i != list.size - 1){
                 table.add("/");

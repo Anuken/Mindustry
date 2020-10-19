@@ -47,12 +47,17 @@ public class GenericCrafter extends Block{
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
 
         if(outputItem != null){
-            stats.add(BlockStat.output, outputItem);
+            stats.add(BlockStat.output, outputItem, craftTime);
         }
 
         if(outputLiquid != null){
-            stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount, false);
+            stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount * 60f / (craftTime / 60f), true);
         }
+    }
+
+    @Override
+    public void displayConsumers() {
+        consumes.display(stats, craftTime);
     }
 
     @Override

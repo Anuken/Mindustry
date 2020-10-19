@@ -33,6 +33,11 @@ public class BlockStats{
     }
 
     /** Adds an item value. */
+    public void add(BlockStat stat, ItemStack item, float timePeriod){
+        add(stat, new ItemListValue(timePeriod, item));
+    }
+
+    /** Adds an item value. */
     public void add(BlockStat stat, Liquid liquid, float amount, boolean perSecond){
         add(stat, new LiquidValue(liquid, amount, perSecond));
     }

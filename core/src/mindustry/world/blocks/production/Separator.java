@@ -51,6 +51,11 @@ public class Separator extends Block{
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
     }
 
+    @Override
+    public void displayConsumers() {
+        consumes.display(stats, craftTime);
+    }
+
     public class SeparatorBuild extends Building{
         public float progress;
         public float totalProgress;
