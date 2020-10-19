@@ -50,9 +50,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     /** Intializes stats on demand. Should only be called once. Only called before something is displayed. */
-    @CallSuper
     public void setStats(){
-        stats.intialized = true;
     }
 
     /** Generate any special icons for this content. Called asynchronously.*/

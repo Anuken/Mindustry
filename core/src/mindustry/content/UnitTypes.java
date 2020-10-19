@@ -1654,7 +1654,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;
-            speed = 2.8f;
+            speed = 3f;
             rotateSpeed = 15f;
             accel = 0.1f;
             itemCapacity = 30;
@@ -1675,7 +1675,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.09f;
+                    tileDamageMultiplier = 0.03f;
                 }};
             }});
         }};
@@ -1689,7 +1689,7 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             buildSpeed = 0.75f;
             drag = 0.05f;
-            speed = 3f;
+            speed = 3.3f;
             rotateSpeed = 17f;
             accel = 0.1f;
             itemCapacity = 50;
@@ -1716,7 +1716,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.1f;
+                    tileDamageMultiplier = 0.03f;
                 }};
             }});
         }};
@@ -1730,7 +1730,7 @@ public class UnitTypes implements ContentList{
             mineTier = 2;
             buildSpeed = 1f;
             drag = 0.05f;
-            speed = 3.5f;
+            speed = 3.55f;
             rotateSpeed = 19f;
             accel = 0.11f;
             itemCapacity = 70;
@@ -1755,7 +1755,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.1f;
+                    tileDamageMultiplier = 0.03f;
                     homingPower = 0.04f;
                 }};
             }});
