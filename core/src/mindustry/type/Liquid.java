@@ -8,7 +8,7 @@ import mindustry.world.meta.*;
 
 public class Liquid extends UnlockableContent{
     /** Color used in pipes and on the ground. */
-    public final Color color;
+    public Color color;
     /** Color used in bars. */
     public @Nullable Color barColor;
     /** Color used to draw lights. Note that the alpha channel is used to dictate brightness. */
