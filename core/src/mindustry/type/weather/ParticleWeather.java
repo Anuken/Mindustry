@@ -15,8 +15,10 @@ public class ParticleWeather extends Weather{
     public float yspeed = -2f, xspeed = 0.25f, padding = 16f, sizeMin = 2.4f, sizeMax = 12f, density = 1200f, minAlpha = 1f, maxAlpha = 1f, force = 0, noiseScale = 2000f, baseSpeed = 6.1f;
     public float sinSclMin = 30f, sinSclMax = 80f, sinMagMin = 1f, sinMagMax = 7f;
 
-    public Color stormColor = color;
-    public boolean drawStorm = false, drawParticles = true, useWindVector = false;
+    public Color noiseColor = color;
+    public boolean drawNoise = false, drawParticles = true, useWindVector = false;
+    public int noiseLayers = 1;
+    public float noiseLayerSpeedM = 1.1f, noiseLayerAlphaM = 0.8f, noiseLayerSclM = 0.99f, noiseLayerColorM = 1f;
     public String noisePath = "noiseAlpha";
     public @Nullable Texture noise;
 
@@ -32,7 +34,7 @@ public class ParticleWeather extends Weather{
 
         //load noise texture
         //TODO mod support
-        if(drawStorm){
+        if(drawNoise){
             Core.assets.load("sprites/" + noisePath + ".png", Texture.class);
         }
     }
@@ -52,27 +54,36 @@ public class ParticleWeather extends Weather{
     @Override
     public void drawOver(WeatherState state){
 
-        if(drawStorm){
+        float windx, windy;
+        if(useWindVector){
+            float speed = baseSpeed * state.intensity;
+            windx = state.windVector.x * speed;
+            windy = state.windVector.y * speed;
+        }else{
+            windx = this.xspeed;
+            windy = this.yspeed;
+        }
+
+        if(drawNoise){
             if(noise == null){
                 noise = Core.assets.get("sprites/" + noisePath + ".png", Texture.class);
                 noise.setWrap(TextureWrap.repeat);
                 noise.setFilter(TextureFilter.linear);
             }
 
-            drawNoise(noise, stormColor, noiseScale, state.opacity, baseSpeed, state.intensity, state.windVector);
+            float sspeed = 1f, sscl = 1f, salpha = 1f, offset = 0f;
+            Color col = Tmp.c1.set(noiseColor);
+            for(int i = 0; i < noiseLayers; i++){
+                drawNoise(noise, noiseColor, noiseScale * sscl, state.opacity * salpha * opacityMultiplier, baseSpeed * sspeed, state.intensity, windx, windy, offset);
+                sspeed *= noiseLayerSpeedM;
+                salpha *= noiseLayerAlphaM;
+                sscl *= noiseLayerSclM;
+                offset += 0.29f;
+                col.mul(noiseLayerColorM);
+            }
         }
 
         if(drawParticles){
-            float windx, windy;
-            if(useWindVector){
-                float speed = baseSpeed * state.intensity;
-                windx = state.windVector.x * speed;
-                windy = state.windVector.y * speed;
-            }else{
-                windx = this.xspeed;
-                windy = this.yspeed;
-            }
-
             drawParticles(region, color, sizeMin, sizeMax, density, state.intensity, state.opacity, windx, windy, minAlpha, maxAlpha, sinSclMin, sinSclMax, sinMagMin, sinMagMax);
         }
     }

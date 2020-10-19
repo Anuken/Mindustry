@@ -209,15 +209,15 @@ public abstract class Weather extends UnlockableContent{
         }
     }
 
-    public void drawNoise(Texture noise, Color color, float noisescl, float opacity, float baseSpeed, float intensity, Vec2 windVector){
+    public void drawNoise(Texture noise, Color color, float noisescl, float opacity, float baseSpeed, float intensity, float vwindx, float vwindy, float offset){
         Draw.alpha(opacity);
         Draw.tint(color);
 
         float speed = baseSpeed * intensity;
-        float windx = windVector.x * speed, windy = windVector.y * speed;
+        float windx = vwindx * speed, windy = vwindy * speed;
 
         float scale = 1f / noisescl;
-        float scroll = Time.time() * scale;
+        float scroll = Time.time() * scale + offset;
         Tmp.tr1.texture = noise;
         Core.camera.bounds(Tmp.r1);
         Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);

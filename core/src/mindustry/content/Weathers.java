@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import arc.graphics.*;
+import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 import mindustry.type.weather.*;
@@ -11,7 +12,8 @@ public class Weathers implements ContentList{
     rain,
     snow,
     sandstorm,
-    sporestorm;
+    sporestorm,
+    fog;
 
     @Override
     public void load(){
@@ -29,8 +31,8 @@ public class Weathers implements ContentList{
         }};
 
         sandstorm = new ParticleWeather("sandstorm"){{
-            color = stormColor = Color.valueOf("f7cba4");
-            drawStorm = true;
+            color = noiseColor = Color.valueOf("f7cba4");
+            drawNoise = true;
             useWindVector = true;
             sizeMax = 140f;
             sizeMin = 70f;
@@ -45,9 +47,9 @@ public class Weathers implements ContentList{
         }};
 
         sporestorm = new ParticleWeather("sporestorm"){{
-            color = stormColor = Color.valueOf("7457ce");
+            color = noiseColor = Color.valueOf("7457ce");
             particleRegion = "circle";
-            drawStorm = true;
+            drawNoise = true;
             statusGround = false;
             useWindVector = true;
             sizeMax = 5f;
@@ -61,6 +63,27 @@ public class Weathers implements ContentList{
             status = StatusEffects.sporeSlowed;
             opacityMultiplier = 0.85f;
             force = 0.1f;
+        }};
+
+        fog = new ParticleWeather("fog"){{
+            duration = 15f * Time.toMinutes;
+            noiseLayers = 3;
+            noiseLayerSclM = 0.8f;
+            noiseLayerAlphaM = 0.7f;
+            noiseLayerSpeedM = 2f;
+            noiseLayerSclM = 0.6f;
+            baseSpeed = 0.05f;
+            color = noiseColor = Color.grays(0.4f);
+            noiseScale = 1100f;
+            noisePath = "fog";
+            drawParticles = false;
+            drawNoise = true;
+            useWindVector = false;
+            xspeed = 1f;
+            yspeed = 0.01f;
+            attrs.set(Attribute.light, -0.3f);
+            attrs.set(Attribute.water, 0.05f);
+            opacityMultiplier = 0.45f;
         }};
     }
 }

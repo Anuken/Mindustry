@@ -343,7 +343,7 @@ public class Block extends UnlockableContent{
     }
 
     public void setBars(){
-        bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
+        bars.add("health", entity -> new Bar("stat.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
             Func<Building, Liquid> current;
