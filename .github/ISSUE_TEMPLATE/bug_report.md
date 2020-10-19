@@ -7,8 +7,6 @@ assignees: ''
 
 ---
 
-**Note**: Do not report any new bugs directly relating to the v6 campaign. They will not be fixed or considered at this time.
-
 **Platform**: *Android/iOS/Mac/Windows/Linux*
 
 **Build**: *The build number under the title in the main menu. Required. "LATEST" IS NOT A VERSION, I NEED THE EXACT BUILD NUMBER OF YOUR GAME.*

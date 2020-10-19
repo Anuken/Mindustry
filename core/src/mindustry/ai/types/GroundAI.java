@@ -45,13 +45,13 @@ public class GroundAI extends AIController{
             }
         }
 
-        if(unit.type().canBoost && !unit.onSolid()){
+        if(unit.type.canBoost && !unit.onSolid()){
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
-        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type().rotateShooting){
-            if(unit.type().hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
+        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting){
+            if(unit.type.hasWeapons()){
+                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
             unit.lookAt(unit.vel().angle());

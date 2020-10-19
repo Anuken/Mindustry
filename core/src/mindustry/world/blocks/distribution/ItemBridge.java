@@ -202,7 +202,7 @@ public class ItemBridge extends Block{
 
             for(int i = 1; i <= range; i++){
                 for(int j = 0; j < 4; j++){
-                    Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
+                    Tile other = tile.nearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
                     if(linkValid(tile, other)){
                         boolean linked = other.pos() == link;
 

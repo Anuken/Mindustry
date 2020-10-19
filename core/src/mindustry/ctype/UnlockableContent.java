@@ -95,16 +95,17 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
-    public final boolean unlocked(){
+    public boolean unlocked(){
+        if(net.client()) return state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
     }
 
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
-    public final boolean unlockedNow(){
-        return unlocked || alwaysUnlocked || !state.isCampaign();
+    public boolean unlockedNow(){
+        return unlocked() || !state.isCampaign();
     }
 
-    public final boolean locked(){
+    public boolean locked(){
         return !unlocked();
     }
 }

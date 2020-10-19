@@ -23,6 +23,7 @@ public class SectorPreset extends UnlockableContent{
         super(name);
         this.generator = new FileMapGenerator(name);
         this.planet = planet;
+        sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
 
         planet.preset(sector, this);

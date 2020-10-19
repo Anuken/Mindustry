@@ -4,6 +4,7 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
@@ -178,6 +179,52 @@ public class MapEditor{
         }
 
         return false;
+    }
+
+    public void addCliffs(){
+        for(Tile tile : world.tiles){
+            if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
+
+            int rotation = 0;
+            for(int i = 0; i < 8; i++){
+                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                if(other != null && !other.block().isStatic()){
+                    rotation |= (1 << i);
+                }
+            }
+
+            if(rotation != 0){
+                tile.setBlock(Blocks.cliff);
+            }
+
+            tile.data = (byte)rotation;
+        }
+
+        for(Tile tile : world.tiles){
+            if(tile.block() != Blocks.cliff && tile.block().isStatic()){
+                tile.setBlock(Blocks.air);
+            }
+        }
+    }
+
+    public void addFloorCliffs(){
+        for(Tile tile : world.tiles){
+            if(!tile.floor().hasSurface() || tile.block() == Blocks.cliff) continue;
+
+            int rotation = 0;
+            for(int i = 0; i < 8; i++){
+                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                if(other != null && !other.floor().hasSurface()){
+                    rotation |= (1 << i);
+                }
+            }
+
+            if(rotation != 0){
+                tile.setBlock(Blocks.cliff);
+            }
+
+            tile.data = (byte)rotation;
+        }
     }
 
     public void drawCircle(int x, int y, Cons<Tile> drawer){
