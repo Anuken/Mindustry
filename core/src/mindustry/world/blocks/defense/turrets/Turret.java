@@ -21,7 +21,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -29,7 +28,7 @@ import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
-public abstract class Turret extends Block{
+public abstract class Turret extends ReloadTurret{
     //after being logic-controlled and this amount of time passes, the turret will resume normal AI
     public final static float logicControlCooldown = 60 * 2;
 
@@ -45,8 +44,6 @@ public abstract class Turret extends Block{
     public int maxAmmo = 30;
     public int ammoPerShot = 1;
     public float ammoEjectBack = 1f;
-    public float range = 50f;
-    public float reloadTime = 10f;
     public float inaccuracy = 0f;
     public float velocityInaccuracy = 0f;
     public int shots = 1;
@@ -54,7 +51,6 @@ public abstract class Turret extends Block{
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
-    public float rotateSpeed = 5f; //in degrees per tick
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
@@ -65,10 +61,7 @@ public abstract class Turret extends Block{
     public boolean targetAir = true;
     public boolean targetGround = true;
     public boolean acceptCoolant = true;
-    /** How much reload is lowered by for each unit of liquid of heat capacity. */
-    public float coolantMultiplier = 5f;
-    /** Effect displayed when coolant is used. */
-    public Effect coolEffect = Fx.fuelburn;
+
     public Sortf unitSort = Unit::dst2;
 
     protected Vec2 tr = new Vec2();
@@ -108,7 +101,6 @@ public abstract class Turret extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
         stats.add(BlockStat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         stats.add(BlockStat.reload, 60f / reloadTime * shots, StatUnit.none);
         stats.add(BlockStat.targetsAir, targetAir);
@@ -134,31 +126,21 @@ public abstract class Turret extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.placing);
-    }
-
     public static abstract class AmmoEntry{
         public int amount;
 
         public abstract BulletType type();
     }
 
-    public class TurretBuild extends Building implements ControlBlock, Ranged{
+    public class TurretBuild extends ReloadTurretBuild implements ControlBlock{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
-        public float reload, rotation = 90, recoil, heat, logicControlTime = -1;
+        public float recoil, heat, logicControlTime = -1;
         public int shotCounter;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = Nulls.blockUnit;
-
-        @Override
-        public float range(){
-            return range;
-        }
 
         @Override
         public void created(){
@@ -197,8 +179,8 @@ public abstract class Turret extends Block{
                 case ammo -> totalAmmo;
                 case ammoCapacity -> maxAmmo;
                 case rotation -> rotation;
-                case shootX -> targetPos.x;
-                case shootY -> targetPos.y;
+                case shootX -> World.conv(targetPos.x);
+                case shootY -> World.conv(targetPos.y);
                 case shooting -> (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
                 default -> super.sense(sensor);
             };
@@ -302,31 +284,12 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public void drawSelect(){
-            Drawf.dashCircle(x, y, range, team.color);
-        }
-
-        @Override
         public void handleLiquid(Building source, Liquid liquid, float amount){
             if(acceptCoolant && liquids.currentAmount() <= 0.001f){
                 Events.fire(Trigger.turretCool);
             }
 
             super.handleLiquid(source, liquid, amount);
-        }
-
-        protected void updateCooling(){
-            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
-
-            Liquid liquid = liquids.current();
-
-            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
-            reload += used * liquid.heatCapacity * coolantMultiplier;
-            liquids.remove(liquid, used);
-
-            if(Mathf.chance(0.06 * used)){
-                coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
-            }
         }
 
         protected boolean validateTarget(){
@@ -451,10 +414,6 @@ public abstract class Turret extends Block{
             if(!isValid()) return;
 
             ammoUseEffect.at(x - Angles.trnsx(rotation, ammoEjectBack), y - Angles.trnsy(rotation, ammoEjectBack), rotation);
-        }
-
-        protected float baseReloadSpeed(){
-            return efficiency();
         }
 
         @Override

@@ -2,6 +2,7 @@ package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -23,9 +24,6 @@ public class GenericCrafter extends Block{
 
     public DrawBlock drawer = new DrawBlock();
 
-    //public Cons<GenericCrafterEntity> drawer = null;
-    //public Prov<TextureRegion[]> drawIcons = null;
-
     public GenericCrafter(String name){
         super(name);
         update = true;
@@ -34,6 +32,7 @@ public class GenericCrafter extends Block{
         idleSound = Sounds.machine;
         sync = true;
         idleSoundVolume = 0.03f;
+        flags = EnumSet.of(BlockFlag.factory);
     }
 
     @Override

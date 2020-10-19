@@ -10,6 +10,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -897,6 +898,7 @@ public class UnitTypes implements ContentList{
             range = 140f;
             faceTarget = false;
             armor = 4f;
+            targetFlag = BlockFlag.factory;
 
             weapons.add(new Weapon(){{
                 minShootVelocity = 0.75f;
@@ -977,6 +979,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 21;
             engineSize = 5.3f;
             hitSize = 56f;
+            targetFlag = BlockFlag.battery;
 
             BulletType missiles = new MissileBulletType(2.7f, 10){{
                 width = 8f;
@@ -1051,6 +1054,7 @@ public class UnitTypes implements ContentList{
             hitSize = 58f;
             destructibleWreck = false;
             armor = 13f;
+            targetFlag = BlockFlag.reactor;
 
             BulletType fragBullet = new FlakBulletType(4f, 5){{
                 shootEffect = Fx.shootBig;
@@ -1246,6 +1250,7 @@ public class UnitTypes implements ContentList{
             buildSpeed = 2.5f;
             range = 140f;
             targetAir = false;
+            targetFlag = BlockFlag.battery;
 
             ammoType = AmmoTypes.powerHigh;
 
@@ -1654,7 +1659,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 15f;
             accel = 0.1f;
             itemCapacity = 30;
-            health = 120f;
+            health = 150f;
             engineOffset = 6f;
             hitSize = 8f;
             commandLimit = 3;
@@ -1665,7 +1670,7 @@ public class UnitTypes implements ContentList{
                 y = 1f;
                 top = false;
 
-                bullet = new BasicBulletType(2.5f, 9){{
+                bullet = new BasicBulletType(2.5f, 10){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
@@ -1689,7 +1694,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 17f;
             accel = 0.1f;
             itemCapacity = 50;
-            health = 150f;
+            health = 170f;
             engineOffset = 6f;
             hitSize = 9f;
             rotateShooting = false;
@@ -1706,7 +1711,7 @@ public class UnitTypes implements ContentList{
                 shotDelay = 4f;
                 spacing = 0f;
 
-                bullet = new BasicBulletType(3f, 9){{
+                bullet = new BasicBulletType(3f, 10){{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
@@ -1730,7 +1735,7 @@ public class UnitTypes implements ContentList{
             rotateSpeed = 19f;
             accel = 0.11f;
             itemCapacity = 70;
-            health = 190f;
+            health = 220f;
             engineOffset = 6f;
             hitSize = 10f;
             commandLimit = 7;
@@ -1745,7 +1750,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 3f;
                 shotDelay = 3f;
 
-                bullet = new BasicBulletType(3.5f, 9){{
+                bullet = new BasicBulletType(3.5f, 10{{
                     width = 6.5f;
                     height = 11f;
                     lifetime = 70f;

@@ -28,6 +28,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -58,6 +59,7 @@ public class UnitType extends UnlockableContent{
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Seq<Ability> abilities = new Seq<>();
+    public BlockFlag targetFlag = BlockFlag.generator;
 
     public int legCount = 4, legGroupSize = 2;
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;

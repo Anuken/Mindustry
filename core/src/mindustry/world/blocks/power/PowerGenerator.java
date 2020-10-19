@@ -18,7 +18,7 @@ public class PowerGenerator extends PowerDistributor{
         super(name);
         sync = true;
         baseExplosiveness = 5f;
-        flags = EnumSet.of(BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.generator);
     }
 
     @Override
