@@ -306,7 +306,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 			
-            Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[" + Pal.adminChat + "]<A>" + NetClient.colorizeName(player.id, player.name)));
+            Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[#" + Pal.adminChat.toString() + "]<A>" + NetClient.colorizeName(player.id, player.name)));
         });
 
         //duration of a a kick in seconds
