@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
@@ -49,6 +50,7 @@ public class Separator extends Block{
         }));
 
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+        stats.add(BlockStat.productionTime, "[lightgray]" + Strings.autoFixed(60f / craftTime, 1) + StatUnit.perSecond.localized(), true);
     }
 
     @Override

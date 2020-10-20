@@ -2,6 +2,7 @@ package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -45,13 +46,14 @@ public class GenericCrafter extends Block{
 
         super.setStats();
         stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+        stats.add(BlockStat.productionTime, "[lightgray]" + Strings.autoFixed(60f / craftTime, 1) + StatUnit.perSecond.localized(), true);
 
         if(outputItem != null){
             stats.add(BlockStat.output, outputItem, craftTime);
         }
 
         if(outputLiquid != null){
-            stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount * 60f / (craftTime / 60f), true);
+            stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount, craftTime);
         }
     }
 

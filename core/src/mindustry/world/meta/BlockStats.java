@@ -37,9 +37,14 @@ public class BlockStats{
         add(stat, new ItemListValue(timePeriod, item));
     }
 
-    /** Adds an item value. */
+    /** Adds an liquid value. */
     public void add(BlockStat stat, Liquid liquid, float amount, boolean perSecond){
         add(stat, new LiquidValue(liquid, amount, perSecond));
+    }
+
+    /** Adds an liquid value. */
+    public void add(BlockStat stat, Liquid liquid, float amount, float timePeriod){
+        add(stat, new LiquidValue(liquid, amount, timePeriod));
     }
 
     public void add(BlockStat stat, Attribute attr){

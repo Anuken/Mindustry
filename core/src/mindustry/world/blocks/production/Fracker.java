@@ -1,6 +1,7 @@
 package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.world.meta.*;
@@ -20,8 +21,9 @@ public class Fracker extends SolidPump{
     @Override
     public void setStats(){
         super.setStats();
-
+        
         stats.add(BlockStat.productionTime, itemUseTime / 60f, StatUnit.seconds);
+        stats.add(BlockStat.productionTime, "[lightgray]" + Strings.autoFixed(60f / itemUseTime, 1) + StatUnit.perSecond.localized(), true);
     }
 
     @Override
