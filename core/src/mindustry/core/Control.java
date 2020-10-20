@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -25,7 +24,6 @@ import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.text.*;
@@ -248,19 +246,6 @@ public class Control implements ApplicationListener, Loadable{
             }
             Events.fire(Trigger.newGame);
         });
-    }
-
-    //TODO move
-    public void handleLaunch(CoreBuild tile){
-        LaunchCorec ent = LaunchCore.create();
-        ent.set(tile);
-        ent.block(Blocks.coreShard);
-        ent.lifetime(Vars.launchDuration);
-        ent.add();
-
-        //remove schematic requirements from core
-        tile.items.remove(universe.getLastLoadout().requirements());
-        tile.items.remove(universe.getLaunchResources());
     }
 
     public void playSector(Sector sector){

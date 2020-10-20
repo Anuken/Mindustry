@@ -45,7 +45,7 @@ public class Build{
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
 
-    /** Places a BuildBlock at this location. */
+    /** Places a ConstructBlock at this location. */
     @Remote(called = Loc.server)
     public static void beginPlace(Block result, Team team, int x, int y, int rotation){
         if(!validPlace(result, team, x, y, rotation)){

@@ -87,7 +87,7 @@ public class UnitFactory extends UnitBlock{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.itemCapacity);
+        stats.remove(Stat.itemCapacity);
     }
 
     @Override

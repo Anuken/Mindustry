@@ -58,8 +58,6 @@ public class NetworkIO{
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
 
-            Log.info("READ RULES: @", state.rules.researched);
-
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
 

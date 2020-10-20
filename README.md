@@ -50,13 +50,6 @@ To debug the application on a connected phone, run `gradlew android:installDebug
 
 If the terminal returns `Permission denied` or `Command not found` on Mac/Linux, run `chmod +x ./gradlew` before running `./gradlew`. *This is a one-time procedure.*
 
-#### Can not attach to current VM / Error during attachment using [...]
-
-This is a problem related to [Jabel](https://github.com/bsideup/jabel), which I use to compile Java 8-compatible bytecode while using Java 9+ language features.
-I don't know of a complete fix to this issue. However, if you're getting the error when running through IntelliJ, a workaround is to launch through Gradle *once*, which starts a daemon and avoids the problem in future runs through IntelliJ.
-
-
-
 ---
 
 Gradle may take up to several minutes to download files. Be patient. <br>

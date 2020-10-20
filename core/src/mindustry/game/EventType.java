@@ -229,8 +229,8 @@ public class EventType{
     }
 
     /**
-     * Called when block building begins by placing down the BuildBlock.
-     * The tile's block will nearly always be a BuildBlock.
+     * Called when block building begins by placing down the ConstructBlock.
+     * The tile's block will nearly always be a ConstructBlock.
      */
     public static class BlockBuildBeginEvent{
         public final Tile tile;
@@ -262,7 +262,7 @@ public class EventType{
 
     /**
      * Called when a player or drone begins building something.
-     * This does not necessarily happen when a new BuildBlock is created.
+     * This does not necessarily happen when a new ConstructBlock is created.
      */
     public static class BuildSelectEvent{
         public final Tile tile;
