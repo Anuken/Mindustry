@@ -96,5 +96,5 @@ public class Pal{
 
     plasticSmoke = Color.valueOf("f1e479"),
 	
-	adminChat = Color.valueOf("ff4000");
+    adminChat = Color.valueOf("ff4000");
 }
