@@ -43,8 +43,6 @@ public class FlyingAI extends AIController{
         return null;
     }
 
-    //TODO clean up
-
     protected void attack(float circleLength){
         vec.set(target).sub(unit);
 
