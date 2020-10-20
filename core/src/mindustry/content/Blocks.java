@@ -527,7 +527,7 @@ public class Blocks implements ContentList{
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
 
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
+            consumes.items(with(Items.coal, 1, Items.sand, 2));
             consumes.power(0.50f);
         }};
 
