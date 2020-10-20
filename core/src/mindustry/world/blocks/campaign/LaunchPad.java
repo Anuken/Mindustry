@@ -42,7 +42,7 @@ public class LaunchPad extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.launchTime, launchTime / 60f, StatUnit.seconds);
+        stats.add(Stat.launchTime, launchTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -115,20 +115,25 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
+            if(!state.isCampaign()) return;
+
             table.row();
             table.label(() -> {
                 Sector dest = state.secinfo.getRealDestination();
 
                 return Core.bundle.format("launch.destination",
                     dest == null ? Core.bundle.get("sectors.nonelaunch") :
-                    dest.preset == null ?
-                        "[accent]Sector " + dest.id :
-                        "[accent]" + dest.preset.localizedName);
-            }).pad(4);
+                    "[accent]" + dest.name());
+            }).pad(4).wrap().width(200f).left();
         }
 
         @Override
         public void buildConfiguration(Table table){
+            if(!state.isCampaign()){
+                deselect();
+                return;
+            }
+
             table.button(Icon.upOpen, Styles.clearTransi, () -> {
                 ui.planet.showSelect(state.rules.sector, other -> state.secinfo.destination = other);
                 deselect();
@@ -208,7 +213,7 @@ public class LaunchPad extends Block{
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam){
                 if(destsec != null && (destsec != state.rules.sector || net.client())){
-                    ItemSeq dest = destsec.getExtraItems();
+                    ItemSeq dest = new ItemSeq();
 
                     for(ItemStack stack : stacks){
                         dest.add(stack);
@@ -218,7 +223,7 @@ public class LaunchPad extends Block{
                         Events.fire(new LaunchItemEvent(stack));
                     }
 
-                    destsec.setExtraItems(dest);
+                    destsec.addItems(dest);
                 }
             }
         }

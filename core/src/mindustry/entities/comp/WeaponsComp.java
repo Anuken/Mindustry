@@ -18,8 +18,6 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @Import Vec2 vel;
     @Import UnitType type;
 
-    /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
-    static final float minAimDst = 18f;
     /** temporary weapon sequence number */
     static int sequenceNum = 0;
 
@@ -67,7 +65,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     /** Aim at something. This will make all mounts point at it. */
     void aim(float x, float y){
         Tmp.v1.set(x, y).sub(this.x, this.y);
-        if(Tmp.v1.len() < minAimDst) Tmp.v1.setLength(minAimDst);
+        if(Tmp.v1.len() < type.aimDst) Tmp.v1.setLength(type.aimDst);
 
         x = Tmp.v1.x + this.x;
         y = Tmp.v1.y + this.y;
@@ -113,7 +111,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
             //update continuous state
             if(weapon.continuous && mount.bullet != null){
-                if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime){
+                if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != weapon.bullet){
                     mount.bullet = null;
                 }else{
                     mount.bullet.rotation(weaponRotation + 90);
@@ -168,14 +166,15 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         Weapon weapon = mount.weapon;
 
         float baseX = this.x, baseY = this.y;
+        boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
 
-        weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+        (delay ? weapon.chargeSound : weapon.shootSound).at(x, y, Mathf.random(0.8f, 1.0f));
 
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
 
         sequenceNum = 0;
-        if(weapon.shotDelay + weapon.firstShotDelay > 0.01f){
+        if(delay){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
                 Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, () -> {
                     if(!isAdded()) return;
@@ -189,13 +188,14 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
         boolean parentize = ammo.keepVelocity;
 
-        if(weapon.firstShotDelay > 0){
+        if(delay){
             Time.run(weapon.firstShotDelay, () -> {
                 if(!isAdded()) return;
 
                 vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
                 Effect.shake(weapon.shake, weapon.shake, x, y);
                 mount.heat = 1f;
+                weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
             });
         }else{
             vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));

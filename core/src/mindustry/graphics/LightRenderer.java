@@ -10,7 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 /** Renders overlay lights. Client only. */
 public class LightRenderer{
@@ -99,7 +99,6 @@ public class LightRenderer{
             vertices[23] = 0;
 
             Draw.vert(ledge.texture, vertices, 0, vertices.length);
-
 
             Vec2 v3 = Tmp.v2.trnsExact(rot, stroke);
 

@@ -6,7 +6,9 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
@@ -34,7 +36,7 @@ public class LiquidTurret extends Turret{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.ammo, new AmmoListValue<>(ammoTypes));
+        stats.add(Stat.ammo, new AmmoListValue<>(ammoTypes));
         consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
             @Override
             public boolean valid(Building entity){
@@ -47,7 +49,7 @@ public class LiquidTurret extends Turret{
             }
 
             @Override
-            public void display(BlockStats stats){
+            public void display(Stats stats){
 
             }
         });
@@ -59,10 +61,7 @@ public class LiquidTurret extends Turret{
             super.draw();
             
             if(liquidRegion.found()){
-                Draw.color(liquids.current().color);
-                Draw.alpha(liquids.total() / liquidCapacity);
-                Draw.rect(liquidRegion, x + tr2.x, y + tr2.y, rotation - 90);
-                Draw.reset();
+                Drawf.liquid(liquidRegion, x + tr2.x, y + tr2.y, liquids.total() / liquidCapacity, liquids.current().color, rotation - 90);
             }
             if(topRegion.found()) Draw.rect(topRegion, x + tr2.x, y + tr2.y, rotation - 90);
         }
@@ -85,7 +84,9 @@ public class LiquidTurret extends Turret{
                 int tr = (int)(range / tilesize);
                 for(int x = -tr; x <= tr; x++){
                     for(int y = -tr; y <= tr; y++){
-                        if(Fires.has(x + tile.x, y + tile.y)){
+                        Tile other = world.tileWorld(x + tile.x, y + tile.y);
+                        //do not extinguish fires on other team blocks
+                        if(other != null && Fires.has(x + tile.x, y + tile.y) && (other.build == null || other.team() == team)){
                             target = Fires.get(x + tile.x, y + tile.y);
                             return;
                         }
@@ -135,7 +136,7 @@ public class LiquidTurret extends Turret{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null
                 && (liquids.current() == liquid || (ammoTypes.containsKey(liquids.current())
                 && liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f));

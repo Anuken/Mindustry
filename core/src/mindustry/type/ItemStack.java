@@ -1,7 +1,7 @@
 package mindustry.type;
 
-import arc.struct.Seq;
-import mindustry.content.Items;
+import arc.struct.*;
+import mindustry.content.*;
 
 public class ItemStack implements Comparable<ItemStack>{
     public static final ItemStack[] empty = {};
@@ -62,6 +62,13 @@ public class ItemStack implements Comparable<ItemStack>{
     @Override
     public int compareTo(ItemStack itemStack){
         return item.compareTo(itemStack.item);
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(!(o instanceof ItemStack stack)) return false;
+        return amount == stack.amount && item == stack.item;
     }
 
     @Override

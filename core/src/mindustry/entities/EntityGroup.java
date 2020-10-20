@@ -8,7 +8,7 @@ import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.collisions;
+import static mindustry.Vars.*;
 
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
@@ -57,8 +57,9 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         each(Entityc::update);
     }
 
-    public void copy(Seq<T> arr){
+    public Seq<T> copy(Seq<T> arr){
         arr.addAll(array);
+        return arr;
     }
 
     public void each(Cons<T> cons){

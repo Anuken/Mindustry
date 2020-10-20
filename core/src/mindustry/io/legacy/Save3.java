@@ -5,7 +5,7 @@ import mindustry.game.Teams.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Save3 extends LegacySaveVersion{
 

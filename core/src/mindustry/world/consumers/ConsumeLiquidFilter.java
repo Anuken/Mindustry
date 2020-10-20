@@ -1,18 +1,15 @@
 package mindustry.world.consumers;
 
+import arc.func.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.func.Boolf;
-import arc.scene.ui.layout.Table;
 import mindustry.gen.*;
-import mindustry.type.Liquid;
-import mindustry.ui.Cicon;
-import mindustry.ui.MultiReqImage;
-import mindustry.ui.ReqImage;
-import mindustry.world.meta.BlockStat;
-import mindustry.world.meta.BlockStats;
-import mindustry.world.meta.values.LiquidFilterValue;
+import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public final Boolf<Liquid> filter;
@@ -52,7 +49,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void display(BlockStats stats){
-        stats.add(booster ? BlockStat.booster : BlockStat.input, new LiquidFilterValue(filter, amount * timePeriod, timePeriod == 60f));
+    public void display(Stats stats){
+        stats.add(booster ? Stat.booster : Stat.input, new LiquidFilterValue(filter, amount * timePeriod, timePeriod == 60f));
     }
 }

@@ -40,7 +40,6 @@ public abstract class SaveVersion extends SaveFileReader{
             map.get("mapname"),
             map.getInt("wave"),
             JsonIO.read(Rules.class, map.get("rules", "{}")),
-            JsonIO.read(SectorInfo.class, map.get("secinfo", "{}")),
             map
         );
     }
@@ -74,6 +73,7 @@ public abstract class SaveVersion extends SaveFileReader{
         //prepare campaign data for writing
         if(state.isCampaign()){
             state.secinfo.prepare();
+            state.rules.sector.saveInfo();
         }
 
         //flush tech node progress
@@ -89,7 +89,6 @@ public abstract class SaveVersion extends SaveFileReader{
             "wave", state.wave,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
-            "secinfo", state.isCampaign() ? JsonIO.write(state.secinfo) : "{}",
             "rules", JsonIO.write(state.rules),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "width", world.width(),
@@ -106,15 +105,14 @@ public abstract class SaveVersion extends SaveFileReader{
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
-        state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
-        state.secinfo = JsonIO.read(SectorInfo.class, map.get("secinfo", "{}"));
+        state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
         lastReadBuild = map.getInt("build", -1);
 
-        //load time spent on sector into state
+        //load in sector info
         if(state.rules.sector != null){
-            state.secinfo.internalTimeSpent = state.rules.sector.getStoredTimeSpent();
+            state.secinfo = state.rules.sector.info;
         }
 
         if(!headless){
@@ -257,7 +255,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                 if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
-                        if(block.hasEntity()){
+                        if(block.hasBuilding()){
                             try{
                                 readChunk(stream, true, in -> {
                                     byte revision = in.readByte();

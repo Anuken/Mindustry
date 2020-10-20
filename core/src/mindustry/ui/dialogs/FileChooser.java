@@ -17,7 +17,7 @@ import java.util.*;
 
 public class FileChooser extends BaseDialog{
     private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
-    static Fi lastDirectory = homeDirectory;
+    static Fi lastDirectory = Core.files.absolute(Core.settings.getString("lastDirectory", homeDirectory.absolutePath()));
 
     private Table files;
     Fi directory = lastDirectory;
@@ -108,7 +108,7 @@ public class FileChooser extends BaseDialog{
         ImageButton home = new ImageButton(Icon.home);
         home.clicked(() -> {
             directory = homeDirectory;
-            lastDirectory = directory;
+            setLastDirectory(directory);
             updateFiles(true);
         });
 
@@ -187,7 +187,7 @@ public class FileChooser extends BaseDialog{
         TextButton upbutton = new TextButton(".." + directory.toString(), Styles.clearTogglet);
         upbutton.clicked(() -> {
             directory = directory.parent();
-            lastDirectory = directory;
+            setLastDirectory(directory);
             updateFiles(true);
         });
 
@@ -217,7 +217,7 @@ public class FileChooser extends BaseDialog{
                     updateFileFieldStatus();
                 }else{
                     directory = directory.child(filename);
-                    lastDirectory = directory;
+                    setLastDirectory(directory);
                     updateFiles(true);
                 }
             });
@@ -240,6 +240,11 @@ public class FileChooser extends BaseDialog{
         updateFileFieldStatus();
 
         if(open) filefield.clearText();
+    }
+
+    public static void setLastDirectory(Fi directory){
+        lastDirectory = directory;
+        Core.settings.put("lastDirectory", directory.absolutePath());
     }
 
     private String shorten(String string){
@@ -269,14 +274,14 @@ public class FileChooser extends BaseDialog{
             if(!canBack()) return;
             index--;
             directory = history.get(index - 1);
-            lastDirectory = directory;
+            setLastDirectory(directory);
             updateFiles(false);
         }
 
         public void forward(){
             if(!canForward()) return;
             directory = history.get(index);
-            lastDirectory = directory;
+            setLastDirectory(directory);
             index++;
             updateFiles(false);
         }

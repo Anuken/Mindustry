@@ -3,10 +3,10 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -17,7 +17,7 @@ import mindustry.world.meta.values.*;
  * Extracts a random list of items from an input item and an input liquid.
  */
 public class Separator extends Block{
-    public @NonNull ItemStack[] results;
+    public ItemStack[] results;
     public float craftTime;
 
     public @Load("@-liquid") TextureRegion liquidRegion;
@@ -41,14 +41,14 @@ public class Separator extends Block{
 
         super.setStats();
 
-        stats.add(BlockStat.output, new ItemFilterValue(item -> {
+        stats.add(Stat.output, new ItemFilterValue(item -> {
             for(ItemStack i : results){
                 if(item == i.item) return true;
             }
             return false;
         }));
 
-        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+        stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
     }
 
     public class SeparatorBuild extends Building{
@@ -78,11 +78,8 @@ public class Separator extends Block{
         public void draw(){
             super.draw();
 
-            Draw.color(liquids.current().color);
-            Draw.alpha(liquids.total() / liquidCapacity);
-            Draw.rect(liquidRegion, x, y);
+            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
 
-            Draw.reset();
             if(Core.atlas.isFound(spinnerRegion)){
                 Draw.rect(spinnerRegion, x, y, totalProgress * spinnerSpeed);
             }
@@ -108,7 +105,7 @@ public class Separator extends Block{
                 int count = 0;
                 Item item = null;
 
-                //TODO guaranteed desync since items are random
+                //guaranteed desync since items are random - won't be fixed and probably isn't too important
                 for(ItemStack stack : results){
                     if(i >= count && i < count + stack.amount){
                         item = stack.item;

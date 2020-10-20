@@ -1,10 +1,10 @@
 package mindustry.ui.dialogs;
 
-import arc.Core;
-import arc.graphics.Color;
-import arc.scene.ui.Dialog;
+import arc.*;
+import arc.graphics.*;
+import arc.scene.ui.*;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 
 import static mindustry.Vars.*;
 

@@ -9,7 +9,6 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.io.Streams.*;
@@ -17,6 +16,7 @@ import arc.util.pooling.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -609,8 +609,8 @@ public class Schematics implements Loadable{
                 wx = wy;
                 wy = -x;
             }
-            req.x = (short)(world.toTile(wx - req.block.offset) + ox);
-            req.y = (short)(world.toTile(wy - req.block.offset) + oy);
+            req.x = (short)(World.toTile(wx - req.block.offset) + ox);
+            req.y = (short)(World.toTile(wy - req.block.offset) + oy);
             req.rotation = (byte)Mathf.mod(req.rotation + direction, 4);
         });
 

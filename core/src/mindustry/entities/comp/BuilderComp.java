@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.Queue;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -117,7 +116,6 @@ abstract class BuilderComp implements Unitc{
         current.progress = entity.progress;
     }
 
-
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     void drawBuildRequests(){
 
@@ -209,7 +207,7 @@ abstract class BuilderComp implements Unitc{
         BuildPlan plan = buildPlan();
         Tile tile = world.tile(plan.x, plan.y);
 
-        if(dst(tile) > buildingRange && !state.isEditor()){
+        if((!within(tile, buildingRange) && !state.isEditor()) || tile == null){
             return;
         }
 

@@ -24,8 +24,8 @@ import static arc.util.Time.*;
 import static mindustry.Vars.*;
 
 public class CustomRulesDialog extends BaseDialog{
-    private Table main;
     Rules rules;
+    private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
     private BaseDialog banDialog;
@@ -166,13 +166,14 @@ public class CustomRulesDialog extends BaseDialog{
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
-        check("@rules.buildai", b -> rules.waveTeam.rules().ai = b, () -> rules.waveTeam.rules().ai);
+        check("@rules.buildai", b -> rules.teams.get(rules.waveTeam).ai = rules.teams.get(rules.waveTeam).infiniteResources = b, () -> rules.teams.get(rules.waveTeam).ai);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("@rules.title.environment");
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
         check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
+        check("@rules.enemyLights", b -> rules.enemyLights = b, () -> rules.enemyLights);
 
         main.button(b -> {
             b.left();
@@ -185,8 +186,6 @@ public class CustomRulesDialog extends BaseDialog{
         }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
         main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
-
-        //TODO add weather patterns
     }
 
     void number(String text, Floatc cons, Floatp prov){

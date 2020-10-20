@@ -6,7 +6,8 @@ public enum ConditionOp{
     lessThan("<", (a, b) -> a < b),
     lessThanEq("<=", (a, b) -> a <= b),
     greaterThan(">", (a, b) -> a > b),
-    greaterThanEq(">=", (a, b) -> a >= b);
+    greaterThanEq(">=", (a, b) -> a >= b),
+    always("always", (a, b) -> true);
 
     public static final ConditionOp[] all = values();
 

@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.net.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;
@@ -238,12 +237,10 @@ public class Net{
      */
     public void handleClientReceived(Object object){
 
-        if(object instanceof StreamBegin){
-            StreamBegin b = (StreamBegin)object;
+        if(object instanceof StreamBegin b){
             streams.put(b.id, currentStream = new StreamBuilder(b));
 
-        }else if(object instanceof StreamChunk){
-            StreamChunk c = (StreamChunk)object;
+        }else if(object instanceof StreamChunk c){
             StreamBuilder builder = streams.get(c.id);
             if(builder == null){
                 throw new RuntimeException("Received stream chunk without a StreamBegin beforehand!");

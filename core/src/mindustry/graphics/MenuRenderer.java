@@ -237,8 +237,6 @@ public class MenuRenderer implements Disposable{
     }
 
     private void drawFlyers(){
-        //TODO fix
-        if(true) return;
         Draw.color(0f, 0f, 0f, 0.4f);
 
         TextureRegion icon = flyerType.icon(Cicon.full);

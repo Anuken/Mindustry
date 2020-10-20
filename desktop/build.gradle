@@ -1,8 +1,7 @@
-import com.badlogicgames.packr.Packr
-import com.badlogicgames.packr.PackrConfig
+import com.badlogicgames.packr.*
 
-import java.nio.ByteBuffer
-import java.security.MessageDigest
+import java.nio.*
+import java.security.*
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
@@ -44,6 +43,8 @@ task run(dependsOn: classes, type: JavaExec){
     if(System.getProperty("os.name").toLowerCase().contains("mac")){
         jvmArgs("-XstartOnFirstThread", "-Djava.awt.headless=true")
     }
+
+    jvmArgs += "-XX:+ShowCodeDetailsInExceptionMessages"
 
     /*spriteHashFile.parentFile.mkdirs()
     String spriteHash = hashDirectory()

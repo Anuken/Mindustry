@@ -2,7 +2,6 @@ package mindustry.entities.abilities;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -13,13 +12,13 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 public class UnitSpawnAbility extends Ability{
-    public @NonNull UnitType type;
+    public UnitType type;
     public float spawnTime = 60f, spawnX, spawnY;
     public Effect spawnEffect = Fx.spawn;
 
     protected float timer;
 
-    public UnitSpawnAbility(@NonNull UnitType type, float spawnTime, float spawnX, float spawnY){
+    public UnitSpawnAbility(UnitType type, float spawnTime, float spawnX, float spawnY){
         this.type = type;
         this.spawnTime = spawnTime;
         this.spawnX = spawnX;

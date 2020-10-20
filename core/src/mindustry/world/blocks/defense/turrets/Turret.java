@@ -8,19 +8,19 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -28,7 +28,7 @@ import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
-public abstract class Turret extends Block{
+public abstract class Turret extends ReloadTurret{
     //after being logic-controlled and this amount of time passes, the turret will resume normal AI
     public final static float logicControlCooldown = 60 * 2;
 
@@ -41,10 +41,9 @@ public abstract class Turret extends Block{
     public Effect ammoUseEffect = Fx.none;
     public Sound shootSound = Sounds.shoot;
 
+    public int maxAmmo = 30;
     public int ammoPerShot = 1;
     public float ammoEjectBack = 1f;
-    public float range = 50f;
-    public float reloadTime = 10f;
     public float inaccuracy = 0f;
     public float velocityInaccuracy = 0f;
     public int shots = 1;
@@ -52,7 +51,6 @@ public abstract class Turret extends Block{
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
-    public float rotateSpeed = 5f; //in degrees per tick
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
@@ -63,10 +61,8 @@ public abstract class Turret extends Block{
     public boolean targetAir = true;
     public boolean targetGround = true;
     public boolean acceptCoolant = true;
-    /** How much reload is lowered by for each unit of liquid of heat capacity. */
-    public float coolantMultiplier = 5f;
-    /** Effect displayed when coolant is used. */
-    public Effect coolEffect = Fx.fuelburn;
+
+    public Sortf unitSort = Unit::dst2;
 
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
@@ -105,14 +101,13 @@ public abstract class Turret extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(BlockStat.reload, 60f / reloadTime * shots, StatUnit.none);
-        stats.add(BlockStat.targetsAir, targetAir);
-        stats.add(BlockStat.targetsGround, targetGround);
+        stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
+        stats.add(Stat.reload, 60f / reloadTime * shots, StatUnit.none);
+        stats.add(Stat.targetsAir, targetAir);
+        stats.add(Stat.targetsGround, targetGround);
 
         if(acceptCoolant){
-            stats.add(BlockStat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
+            stats.add(Stat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
         }
     }
 
@@ -131,31 +126,21 @@ public abstract class Turret extends Block{
         return new TextureRegion[]{baseRegion, region};
     }
 
-    @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.placing);
-    }
-
     public static abstract class AmmoEntry{
         public int amount;
 
         public abstract BulletType type();
     }
 
-    public class TurretBuild extends Building implements ControlBlock, Ranged{
+    public class TurretBuild extends ReloadTurretBuild implements ControlBlock{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
-        public float reload, rotation = 90, recoil, heat, logicControlTime = -1;
+        public float recoil, heat, logicControlTime = -1;
         public int shotCounter;
         public boolean logicShooting = false;
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
-        public @NonNull BlockUnitc unit = Nulls.blockUnit;
-
-        @Override
-        public float range(){
-            return range;
-        }
+        public BlockUnitc unit = Nulls.blockUnit;
 
         @Override
         public void created(){
@@ -166,7 +151,7 @@ public abstract class Turret extends Block{
         @Override
         public void control(LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.shoot && !unit.isPlayer()){
-                targetPos.set((float)p1, (float)p2);
+                targetPos.set(World.unconv((float)p1), World.unconv((float)p2));
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p3);
             }
@@ -175,13 +160,30 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.rotation) return rotation;
-            if(sensor == LAccess.shootX) return targetPos.x;
-            if(sensor == LAccess.shootY) return targetPos.y;
-            if(sensor == LAccess.shooting) return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+        public void control(LAccess type, Object p1, double p2, double p3, double p4){
+            if(type == LAccess.shootp && !unit.isPlayer()){
+                logicControlTime = logicControlCooldown;
+                logicShooting = !Mathf.zero(p2);
 
-            return super.sense(sensor);
+                if(p1 instanceof Posc){
+                    targetPosition((Posc)p1);
+                }
+            }
+
+            super.control(type, p1, p2, p3, p4);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case ammo -> totalAmmo;
+                case ammoCapacity -> maxAmmo;
+                case rotation -> rotation;
+                case shootX -> World.conv(targetPos.x);
+                case shootY -> World.conv(targetPos.y);
+                case shooting -> (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+                default -> super.sense(sensor);
+            };
         }
 
         @Override
@@ -191,6 +193,23 @@ public abstract class Turret extends Block{
 
         public boolean logicControlled(){
             return logicControlTime > 0;
+        }
+
+        public boolean isActive(){
+            return target != null || (logicControlled() && logicShooting) || (isControlled() && unit.isShooting());
+        }
+
+        public void targetPosition(Posc pos){
+            if(!hasAmmo()) return;
+            BulletType bullet = peekAmmo();
+            float speed = bullet.speed;
+            //slow bullets never intersect
+            if(speed < 0.1f) speed = 9999999f;
+
+            targetPos.set(Predict.intercept(this, pos, speed));
+            if(targetPos.isZero()){
+                targetPos.set(target);
+            }
         }
 
         @Override
@@ -240,15 +259,7 @@ public abstract class Turret extends Block{
                     }else if(logicControlled()){ //logic behavior
                         canShoot = logicShooting;
                     }else{ //default AI behavior
-                        BulletType type = peekAmmo();
-                        float speed = type.speed;
-                        //slow bullets never intersect
-                        if(speed < 0.1f) speed = 9999999f;
-
-                        targetPos.set(Predict.intercept(this, target, speed));
-                        if(targetPos.isZero()){
-                            targetPos.set(target);
-                        }
+                        targetPosition(target);
 
                         if(Float.isNaN(rotation)){
                             rotation = 0;
@@ -273,11 +284,6 @@ public abstract class Turret extends Block{
         }
 
         @Override
-        public void drawSelect(){
-            Drawf.dashCircle(x, y, range, team.color);
-        }
-
-        @Override
         public void handleLiquid(Building source, Liquid liquid, float amount){
             if(acceptCoolant && liquids.currentAmount() <= 0.001f){
                 Events.fire(Trigger.turretCool);
@@ -286,29 +292,15 @@ public abstract class Turret extends Block{
             super.handleLiquid(source, liquid, amount);
         }
 
-        protected void updateCooling(){
-            float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
-
-            Liquid liquid = liquids.current();
-
-            float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, ((reloadTime - reload) / coolantMultiplier) / liquid.heatCapacity)) * baseReloadSpeed();
-            reload += used * liquid.heatCapacity * coolantMultiplier;
-            liquids.remove(liquid, used);
-
-            if(Mathf.chance(0.06 * used)){
-                coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
-            }
-        }
-
         protected boolean validateTarget(){
             return !Units.invalidateTarget(target, team, x, y) || isControlled() || logicControlled();
         }
 
         protected void findTarget(){
             if(targetAir && !targetGround){
-                target = Units.closestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded());
+                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded(), unitSort);
             }else{
-                target = Units.closestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround));
+                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> true, unitSort);
             }
         }
 
@@ -326,8 +318,9 @@ public abstract class Turret extends Block{
 
             AmmoEntry entry = ammo.peek();
             entry.amount -= ammoPerShot;
-            if(entry.amount == 0) ammo.pop();
+            if(entry.amount <= 0) ammo.pop();
             totalAmmo -= ammoPerShot;
+            totalAmmo = Math.max(totalAmmo, 0);
             Time.run(reloadTime / 2f, this::ejectEffects);
             return entry.type();
         }
@@ -339,7 +332,7 @@ public abstract class Turret extends Block{
 
         /** @return  whether the turret has ammo. */
         public boolean hasAmmo(){
-            return ammo.size > 0 && ammo.peek().amount >= ammoPerShot;
+            return ammo.size > 0 && ammo.peek().amount >= 1;
         }
 
         protected void updateShooting(){
@@ -397,7 +390,7 @@ public abstract class Turret extends Block{
         }
 
         protected void bullet(BulletType type, float angle){
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
 
             type.create(this, team, x + tr.x, y + tr.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
         }
@@ -408,7 +401,7 @@ public abstract class Turret extends Block{
 
             fshootEffect.at(x + tr.x, y + tr.y, rotation);
             fsmokeEffect.at(x + tr.x, y + tr.y, rotation);
-            shootSound.at(tile, Mathf.random(0.9f, 1.1f));
+            shootSound.at(x + tr.x, y + tr.y, Mathf.random(0.9f, 1.1f));
 
             if(shootShake > 0){
                 Effect.shake(shootShake, shootShake, this);
@@ -421,10 +414,6 @@ public abstract class Turret extends Block{
             if(!isValid()) return;
 
             ammoUseEffect.at(x - Angles.trnsx(rotation, ammoEjectBack), y - Angles.trnsy(rotation, ammoEjectBack), rotation);
-        }
-
-        protected float baseReloadSpeed(){
-            return efficiency();
         }
 
         @Override

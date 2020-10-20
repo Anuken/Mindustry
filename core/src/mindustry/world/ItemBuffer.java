@@ -4,7 +4,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.type.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class ItemBuffer{
     private long[] buffer;

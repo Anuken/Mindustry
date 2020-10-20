@@ -1,7 +1,7 @@
 package mindustry.core;
 
 import arc.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -19,11 +19,11 @@ public class GameState{
     /** Whether the game is in game over state. */
     public boolean gameOver = false, serverPaused = false, wasTimeout;
     /** Map that is currently being played on. */
-    public @NonNull Map map = emptyMap;
+    public Map map = emptyMap;
     /** The current game rules. */
     public Rules rules = new Rules();
     /** Statistics for this save/game. Displayed after game over. */
-    public Stats stats = new Stats();
+    public GameStats stats = new GameStats();
     /** Global attributes of the environment, calculated by weather. */
     public Attributes envAttrs = new Attributes();
     /** Sector information. Only valid in the campaign. */
@@ -41,18 +41,20 @@ public class GameState{
     }
 
     public void set(State astate){
+        //cannot pause when in multiplayer
+        if(astate == State.paused && net.active()) return;
+
         Events.fire(new StateChangeEvent(state, astate));
         state = astate;
+    }
+
+    public boolean hasSpawns(){
+        return rules.waves && !(isCampaign() && rules.attackMode);
     }
 
     /** Note that being in a campaign does not necessarily mean having a sector. */
     public boolean isCampaign(){
         return rules.sector != null;
-    }
-
-    /** @return whether the player is in a campaign and they are out of sector time */
-    public boolean isOutOfTime(){
-        return isCampaign() && isGame() && getSector().getTimeSpent() >= turnDuration;
     }
 
     public boolean hasSector(){
@@ -73,7 +75,7 @@ public class GameState{
     }
 
     public boolean isPlaying(){
-        return state == State.playing;
+        return (state == State.playing) || (state == State.paused && !isPaused());
     }
 
     /** @return whether the current state is *not* the menu. */

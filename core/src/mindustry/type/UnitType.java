@@ -11,7 +11,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -19,7 +18,6 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
-import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -30,6 +28,8 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -39,11 +39,11 @@ public class UnitType extends UnlockableContent{
 
     /** If true, the unit is always at elevation 1. */
     public boolean flying;
-    public @NonNull Prov<? extends Unit> constructor;
-    public @NonNull Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
+    public Prov<? extends Unit> constructor;
+    public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
-    public float health = 200f, range = -1, armor = 0f;
+    public float health = 200f, range = -1, armor = 0f, maxRange = -1f;
     public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
@@ -51,7 +51,8 @@ public class UnitType extends UnlockableContent{
     public boolean destructibleWreck = true;
     public float groundLayer = Layer.groundUnit;
     public float payloadCapacity = 8;
-    public int commandLimit = 24;
+    public float aimDst = -1f;
+    public int commandLimit = 8;
     public float visualElevation = -1f;
     public boolean allowLegStep = false;
     public boolean hovering = false;
@@ -59,11 +60,15 @@ public class UnitType extends UnlockableContent{
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Seq<Ability> abilities = new Seq<>();
+    public BlockFlag targetFlag = BlockFlag.generator;
 
     public int legCount = 4, legGroupSize = 2;
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
+
+    public int ammoResupplyAmount = 10;
+    public float ammoResupplyRange = 100f;
 
     public float mechSideSway = 0.54f, mechFrontSway = 0.1f;
     public float mechStride = -1f;
@@ -77,6 +82,8 @@ public class UnitType extends UnlockableContent{
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
+    /** This is a VERY ROUGH estimate of unit DPS. */
+    public float dpsEstimate = -1;
     public float clipSize = -1;
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
@@ -113,7 +120,7 @@ public class UnitType extends UnlockableContent{
     public Unit create(Team team){
         Unit unit = constructor.get();
         unit.team = team;
-        unit.type(this);
+        unit.setType(this);
         unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
@@ -152,14 +159,19 @@ public class UnitType extends UnlockableContent{
         table.table(bars -> {
             bars.defaults().growX().height(20f).pad(4);
 
-            bars.add(new Bar("blocks.health", Pal.health, unit::healthf).blink(Color.white));
+            bars.add(new Bar("stat.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("blocks.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
+                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("stat.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
         }).growX();
+
+        if(unit.controller() instanceof LogicAI){
+            table.row();
+            table.add(Blocks.microProcessor.emoji() + " " + Core.bundle.get("units.processorcontrol")).growX().left();
+        }
         
         table.row();
     }
@@ -168,8 +180,7 @@ public class UnitType extends UnlockableContent{
     public void getDependencies(Cons<UnlockableContent> cons){
         //units require reconstructors being researched
         for(Block block : content.blocks()){
-            if(block instanceof Reconstructor){
-                Reconstructor r = (Reconstructor)block;
+            if(block instanceof Reconstructor r){
                 for(UnitType[] recipe : r.upgrades){
                     //result of reconstruction is this, so it must be a dependency
                     if(recipe[1] == this){
@@ -180,10 +191,21 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-
     @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayUnit(table, this);
+    public void setStats(){
+        Unit inst = constructor.get();
+
+        stats.add(Stat.health, health);
+        stats.add(Stat.speed, speed);
+        stats.add(Stat.itemCapacity, health);
+        stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
+        //TODO abilities, maybe try something like DPS
+
+        if(inst instanceof Minerc && mineTier >= 1){
+            stats.addPercent(Stat.mineSpeed, mineSpeed);
+            stats.add(Stat.mineTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
+        }
+        if(inst instanceof Builderc) stats.addPercent(Stat.buildSpeed, buildSpeed);
     }
 
     @CallSuper
@@ -203,14 +225,16 @@ public class UnitType extends UnlockableContent{
         singleTarget = weapons.size <= 1;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round(hitSize * 7, 20), 20);
+            itemCapacity = Math.max(Mathf.round(hitSize * 4, 10), 10);
         }
 
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
+            maxRange = 0f;
             for(Weapon weapon : weapons){
                 range = Math.min(range, weapon.bullet.range() + hitSize /2f);
+                maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize /2f);
             }
         }
 
@@ -218,12 +242,16 @@ public class UnitType extends UnlockableContent{
             mechStride = 4f + (hitSize -8f)/2.1f;
         }
 
+        if(aimDst < 0){
+            aimDst = weapons.contains(w -> !w.rotate) ? hitSize * 2f : hitSize / 2f;
+        }
+
         if(mechStepShake < 0){
             mechStepShake = Mathf.round((hitSize - 11f) / 9f);
             mechStepParticles = hitSize > 15f;
         }
 
-        canHeal = weapons.contains(w -> w.bullet instanceof HealBulletType);
+        canHeal = weapons.contains(w -> w.bullet.healPercent > 0f);
 
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
@@ -256,6 +284,17 @@ public class UnitType extends UnlockableContent{
 
             ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }
+
+        //calculate estimated DPS for one target based on weapons
+        if(dpsEstimate < 0){
+            dpsEstimate = weapons.sumf(w -> (w.bullet.estimateDPS() / w.reload) * w.shots * 60f);
+
+            //suicide enemy
+            if(weapons.contains(w -> w.bullet.killShooter)){
+                //scale down DPS to be insignificant
+                dpsEstimate /= 100f;
+            }
+        }
     }
 
     @CallSuper
@@ -285,21 +324,21 @@ public class UnitType extends UnlockableContent{
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor && Structs.contains(((Reconstructor)b).upgrades, u -> u[1] == this));
+        Block rec = content.blocks().find(b -> b instanceof Reconstructor && ((Reconstructor)b).upgrades.contains(u -> u[1] == this));
 
         if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems){
             stacks = ((ConsumeItems)rec.consumes.get(ConsumeType.item)).items;
         }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && Structs.contains(((UnitFactory)u).plans, p -> p.unit == this));
+            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && ((UnitFactory)u).plans.contains(p -> p.unit == this));
             if(factory != null){
-                stacks = Structs.find(factory.plans, p -> p.unit == this).requirements;
+                stacks = factory.plans.find(p -> p.unit == this).requirements;
             }
         }
 
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];
             for(int i = 0; i < out.length; i++){
-                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * 50)));
+                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1) * 50)));
             }
 
             return out;
@@ -352,7 +391,6 @@ public class UnitType extends UnlockableContent{
             drawPayload((Unit & Payloadc)unit);
         }
 
-        //TODO
         drawOcclusion(unit);
 
         Draw.z(z - outlineSpace);
@@ -427,7 +465,7 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         //draw back items
-        if(unit.hasItem() && unit.itemTime > 0.01f){
+        if(unit.item() != null && unit.itemTime > 0.01f){
             float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime;
 
             Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
@@ -616,7 +654,6 @@ public class UnitType extends UnlockableContent{
             }
         }
 
-        //TODO should be below/above legs
         if(baseRegion.found()){
             Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
         }

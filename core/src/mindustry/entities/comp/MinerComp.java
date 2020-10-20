@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -36,6 +35,11 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         return mineTile != null && !(((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding());
     }
 
+    public boolean validMine(Tile tile){
+        return !(tile == null || tile.block() != Blocks.air || !within(tile.worldx(), tile.worldy(), miningRange)
+        || tile.drop() == null || !canMine(tile.drop()));
+    }
+
     @Override
     public void update(){
         Building core = closestCore();
@@ -50,8 +54,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             }
         }
 
-        if(mineTile == null || core == null || mineTile.block() != Blocks.air || dst(mineTile.worldx(), mineTile.worldy()) > miningRange
-        || mineTile.drop() == null || !canMine(mineTile.drop())){
+        if(core == null || !validMine(mineTile)){
             mineTile = null;
             mineTimer = 0f;
         }else if(mining()){
@@ -63,7 +66,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
                 Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
             }
 
-            if(mineTimer >= 50f + item.hardness*10f){
+            if(mineTimer >= 50f + item.hardness*15f){
                 mineTimer = 0;
 
                 if(within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
@@ -105,7 +108,6 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
 
         Drawf.laser(team(), Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
 
-        //TODO hack?
         if(isLocal()){
             Lines.stroke(1f, Pal.accent);
             Lines.poly(mineTile.worldx(), mineTile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time());
