@@ -83,7 +83,7 @@ public class Weathers implements ContentList{
             yspeed = 0.01f;
             attrs.set(Attribute.light, -0.3f);
             attrs.set(Attribute.water, 0.05f);
-            opacityMultiplier = 0.45f;
+            opacityMultiplier = 0.47f;
         }};
     }
 }

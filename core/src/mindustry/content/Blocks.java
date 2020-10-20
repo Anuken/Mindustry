@@ -1644,11 +1644,20 @@ public class Blocks implements ContentList{
 
             float brange = range + 10f;
 
-            ammo(Items.thorium, new ShrapnelBulletType(){{
+            ammo(
+            Items.thorium, new ShrapnelBulletType(){{
                 length = brange;
                 damage = 105f;
-                ammoMultiplier = 6f;
-            }});
+                ammoMultiplier = 5f;
+            }},
+            Items.titanium, new ShrapnelBulletType(){{
+                length = brange;
+                damage = 65f;
+                ammoMultiplier = 4f;
+                width = 17f;
+                reloadMultiplier = 1.3f;
+            }}
+            );
         }};
 
         ripple = new ItemTurret("ripple"){{

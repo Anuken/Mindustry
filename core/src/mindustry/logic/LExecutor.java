@@ -510,7 +510,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Controllable cont){
+            if(obj instanceof Controllable cont && cont.team() == exec.team){
                 if(type.isObj){
                     cont.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
