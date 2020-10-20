@@ -13,6 +13,7 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -22,7 +23,6 @@ import mindustry.graphics.g3d.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
 import static mindustry.graphics.g3d.PlanetRenderer.*;
@@ -40,7 +40,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public int launchRange;
     public float zoom = 1f, selectAlpha = 1f;
     public @Nullable Sector selected, hovered, launchSector;
-    public CoreBuild launcher;
     public Mode mode = look;
     public boolean launching;
     public Cons<Sector> listener = s -> {};
@@ -91,9 +90,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         mode = look;
         selected = hovered = launchSector = null;
         launching = false;
+
+        zoom = 1f;
+        planets.zoom = 1f;
+        selectAlpha = 0f;
+        launchSector = state.getSector();
+
         if(planets.planet.getLastSector() != null){
             lookAt(planets.planet.getLastSector());
         }
+
         return super.show();
     }
 
@@ -106,7 +112,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //update view to sector
         lookAt(sector);
         zoom = 1f;
-        planets.zoom = 2f;
+        planets.zoom = 1f;
         selectAlpha = 0f;
         launchSector = sector;
 
@@ -115,37 +121,33 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         super.show();
     }
 
-    public void showLaunch(Sector sector, CoreBuild launcher){
-        if(launcher == null) return;
-
-        this.launcher = launcher;
-        selected = null;
-        hovered = null;
-        launching = false;
-
-        //update view to sector
-        lookAt(sector);
-        zoom = 1f;
-        planets.zoom = 2f;
-        selectAlpha = 0f;
-        launchRange = ((CoreBlock)launcher.block).launchRange;
-        launchSector = sector;
-
-        mode = launch;
-
-        super.show();
-    }
-
-    private void lookAt(Sector sector){
+    void lookAt(Sector sector){
         planets.camPos.set(Tmp.v33.set(sector.tile.v).rotate(Vec3.Y, -sector.planet.getRotation()));
     }
 
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase();
 
-        return mode == launch &&
-            (sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
-            || (sector.preset != null && sector.preset.unlocked())); //is an unlocked preset
+        return sector.near().contains(Sector::hasBase)//(sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
+            || (sector.preset != null && sector.preset.unlocked()); //is an unlocked preset
+    }
+
+    Sector findLauncher(Sector to){
+        //directly nearby.
+        if(to.near().contains(launchSector)) return launchSector;
+
+        Sector launchFrom = launchSector;
+        if(launchFrom == null){
+            //TODO pick one with the most resources
+            launchFrom = to.near().find(Sector::hasBase);
+            if(launchFrom == null && to.preset != null){
+                if(launchSector != null) return launchSector;
+                launchFrom = planets.planet.sectors.min(s -> !s.hasBase() ? Float.MAX_VALUE : s.tile.v.dst2(to.tile.v));
+                if(!launchFrom.hasBase()) launchFrom = null;
+            }
+        }
+
+        return launchFrom;
     }
 
     @Override
@@ -157,9 +159,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
                 if(selectAlpha > 0.01f){
                     if(canSelect(sec) || sec.unlocked()){
-                        if(sec.baseCoverage > 0){
-                            planets.fill(sec, Tmp.c1.set(Team.crux.color).a(0.5f * sec.baseCoverage * selectAlpha), -0.002f);
-                        }
 
                         Color color =
                         sec.hasBase() ? Team.sharded.color :
@@ -177,8 +176,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
-        if(launchSector != null){
-            planets.fill(launchSector, hoverColor, -0.001f);
+        Sector current = state.getSector() != null && state.getSector().isBeingPlayed() ? state.getSector() : null;
+
+        if(current != null){
+            planets.fill(current, hoverColor, -0.001f);
         }
 
         //draw hover border
@@ -195,9 +196,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         planets.batch.flush(Gl.triangles);
 
-        if(mode == launch || mode == select){
-            if(hovered != launchSector && hovered != null && canSelect(hovered)){
-                planets.drawArc(planet, launchSector.tile.v, hovered.tile.v);
+        if(hovered != null && !hovered.hasBase()){
+            Sector launchFrom = findLauncher(hovered);
+            if(launchFrom != null && hovered != launchFrom && canSelect(hovered)){
+                planets.drawArc(planet, launchFrom.tile.v, hovered.tile.v);
             }
         }
 
@@ -244,7 +246,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 addListener(new ElementGestureListener(){
                     @Override
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
-                        if(hovered != null && ((mode == launch ? canSelect(hovered) && hovered != launchSector : hovered.unlocked()) || debugSelect)){
+                        if(hovered != null && ((mode == look ? canSelect(hovered) && hovered != launchSector : hovered.unlocked()) || debugSelect)){
                             selected = hovered;
                         }
 
@@ -263,9 +265,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         },
         new Table(t -> {
             t.touchable = Touchable.disabled;
-            //TODO localize
             t.top();
-            t.label(() -> mode == select ? "@sectors.select" : mode == launch ? "Select Launch Sector" : "").style(Styles.outlineLabel).color(Pal.accent);
+            t.label(() -> mode == select ? "@sectors.select" : "").style(Styles.outlineLabel).color(Pal.accent);
         }),
         new Table(t -> {
             t.right();
@@ -322,7 +323,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.toFront();
 
             //smooth camera toward the sector
-            if(mode == launch && launching){
+            if(mode == look && launching){
                 float len = planets.camPos.len();
                 planets.camPos.slerp(Tmp.v31.set(selected.tile.v).rotate(Vec3.Y,-selected.planet.getRotation()).setLength(len), 0.1f);
             }
@@ -453,16 +454,20 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     }
                 }
 
-                if(mode == launch && !sector.hasBase()){
-                    Sector current = state.rules.sector;
+                if(mode == look && !sector.hasBase()){
                     shouldHide = false;
-                    loadouts.show((CoreBlock)launcher.block, launcher, () -> {
-                        control.handleLaunch(launcher);
+                    Sector from = findLauncher(sector);
+                    CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
+
+                    loadouts.show(block, from, () -> {
+                        from.removeItems(universe.getLastLoadout().requirements());
+                        from.removeItems(universe.getLaunchResources());
+
                         launching = true;
                         zoom = 0.5f;
 
                         ui.hudfrag.showLaunchDirect();
-                        Time.runTask(launchDuration, () -> control.playSector(current, sector));
+                        Time.runTask(launchDuration, () -> control.playSector(from, sector));
                     });
                 }else if(mode == select){
                     listener.get(sector);
@@ -500,8 +505,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public enum Mode{
         /** Look around for existing sectors. Can only deploy. */
         look,
-        /** Launch to a new location. */
-        launch,
         /** Select a sector for some purpose. */
         select
     }

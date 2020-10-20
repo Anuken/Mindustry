@@ -50,7 +50,7 @@ public class Fracker extends SolidPump{
             Draw.rect(region, x, y);
             super.drawCracks();
 
-            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, result.color);
+            Drawf.liquid(liquidRegion, x, y, liquids.get(result) / liquidCapacity, result.color);
 
             Draw.rect(rotatorRegion, x, y, pumpTime);
             Draw.rect(topRegion, x, y);

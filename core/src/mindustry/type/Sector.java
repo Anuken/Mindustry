@@ -40,9 +40,22 @@ public class Sector{
         this.id = tile.id;
     }
 
+    /** @return a copy of the items in this sector - may be core items, or stored data. */
+    public ItemSeq getItems(){
+        if(isBeingPlayed()){
+            ItemSeq out = new ItemSeq();
+            if(state.rules.defaultTeam.core() != null) out.add(state.rules.defaultTeam.core().items);
+            return out;
+        }else{
+            return info.items;
+        }
+    }
+
     public Seq<Sector> near(){
         tmpSeq1.clear();
-        near(tmpSeq1::add);
+        for(Ptile tile : tile.tiles){
+            tmpSeq1.add(planet.getSector(tile));
+        }
 
         return tmpSeq1;
     }
@@ -129,6 +142,12 @@ public class Sector{
 
     public void addItem(Item item, int amount){
         removeItem(item, -amount);
+    }
+
+    public void removeItems(ItemSeq items){
+        ItemSeq copy = items.copy();
+        copy.each((i, a) -> copy.set(i, -a));
+        addItems(copy);
     }
 
     public void removeItem(Item item, int amount){
