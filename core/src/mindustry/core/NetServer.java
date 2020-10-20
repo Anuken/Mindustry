@@ -299,6 +299,15 @@ public class NetServer implements ApplicationListener{
             }
         });
 
+        clientCommands.<Player>register("a", "<message...>", "Send a message only to admins.", (args, player) -> {
+            if(!player.admin){
+                player.sendMessage("[scarlet]You must be admin to use this command.");
+                return;
+            }
+			
+            Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[#FF4000]<Admin>" + NetClient.colorizeName(player.id, player.name)));
+        });
+
         //duration of a a kick in seconds
         int kickDuration = 60 * 60;
         //voting round duration in seconds
