@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -297,6 +298,15 @@ public class NetServer implements ApplicationListener{
             if(message != null){
                 Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(message, player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id(), player.name)));
             }
+        });
+
+        clientCommands.<Player>register("a", "<message...>", "Send a message only to admins.", (args, player) -> {
+            if(!player.admin){
+                player.sendMessage("[scarlet]You must be admin to use this command.");
+                return;
+            }
+			
+            Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[#" + Pal.adminChat.toString() + "]<A>" + NetClient.colorizeName(player.id, player.name)));
         });
 
         //duration of a a kick in seconds
