@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -305,7 +306,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 			
-            Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[#FF4000]<Admin>" + NetClient.colorizeName(player.id, player.name)));
+            Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[" + Pal.adminChat + "]<Admin>" + NetClient.colorizeName(player.id, player.name)));
         });
 
         //duration of a a kick in seconds
