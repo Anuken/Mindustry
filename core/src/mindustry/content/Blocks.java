@@ -1652,7 +1652,7 @@ public class Blocks implements ContentList{
             }},
             Items.titanium, new ShrapnelBulletType(){{
                 length = brange;
-                damage = 65f;
+                damage = 66f;
                 ammoMultiplier = 4f;
                 width = 17f;
                 reloadMultiplier = 1.3f;

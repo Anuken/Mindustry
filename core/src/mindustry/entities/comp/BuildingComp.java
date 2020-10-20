@@ -911,7 +911,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called when arbitrary configuration is applied to a tile. */
     public void configured(@Nullable Unit builder, @Nullable Object value){
         //null is of type void.class; anonymous classes use their superclass.
-        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
+        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
 
         if(builder != null && builder.isPlayer()){
             lastAccessed = builder.getPlayer().name;
