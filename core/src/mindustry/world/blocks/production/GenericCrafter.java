@@ -53,7 +53,7 @@ public class GenericCrafter extends Block{
         }
 
         if(outputLiquid != null){
-            stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount, craftTime);
+            stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount * (60f / craftTime), craftTime);
         }
     }
 

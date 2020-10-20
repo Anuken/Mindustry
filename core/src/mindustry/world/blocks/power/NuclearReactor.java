@@ -60,6 +60,11 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
+    public void displayConsumers() {
+        consumes.display(stats, itemDuration);
+    }
+
+    @Override
     public void setBars(){
         super.setBars();
         bars.add("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));

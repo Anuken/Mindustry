@@ -52,6 +52,11 @@ public class MendProjector extends Block{
     }
 
     @Override
+    public void displayConsumers() {
+        consumes.display(stats, useTime);
+    }
+
+    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }

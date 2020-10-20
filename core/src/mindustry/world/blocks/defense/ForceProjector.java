@@ -69,6 +69,11 @@ public class ForceProjector extends Block{
     }
 
     @Override
+    public void displayConsumers() {
+        consumes.display(stats, phaseUseTime);
+    }
+
+    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 

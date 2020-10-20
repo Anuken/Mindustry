@@ -11,6 +11,14 @@ public class LiquidConverter extends GenericCrafter{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+        
+        stats.remove(BlockStat.output);
+        stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount * 60f, craftTime);
+    }
+
+    @Override
     public boolean outputsItems(){
         return false;
     }

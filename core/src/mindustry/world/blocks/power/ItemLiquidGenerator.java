@@ -77,6 +77,11 @@ public class ItemLiquidGenerator extends PowerGenerator{
         }
     }
 
+    @Override
+    public void displayConsumers() {
+        consumes.display(stats, itemDuration);
+    }
+
     protected float getItemEfficiency(Item item){
         return 0.0f;
     }

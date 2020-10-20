@@ -61,6 +61,11 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
+    public void displayConsumers() {
+        consumes.display(stats, itemDuration);
+    }
+
+    @Override
     public TextureRegion[] icons(){
         return new TextureRegion[]{bottomRegion, region};
     }

@@ -61,6 +61,11 @@ public class OverdriveProjector extends Block{
         }
     }
 
+    @Override
+    public void displayConsumers() {
+        consumes.display(stats, useTime);
+    }
+
     public class OverdriveBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
