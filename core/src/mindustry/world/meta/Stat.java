@@ -22,6 +22,9 @@ public enum Stat{
     buildSpeed,
     mineSpeed,
     mineTier,
+    baseDeflectChance,
+    lightningChance, 
+    lightningDamage,
 
     itemCapacity(StatCat.items),
     itemsMoved(StatCat.items),

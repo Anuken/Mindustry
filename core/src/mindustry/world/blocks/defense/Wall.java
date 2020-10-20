@@ -43,10 +43,10 @@ public class Wall extends Block{
     public void setStats(){
         super.setStats();
 
-        if(chanceDeflect > 0f) stats.add(BlockStat.baseDeflectChance, chanceDeflect, StatUnit.none);
+        if(chanceDeflect > 0f) stats.add(Stat.baseDeflectChance, chanceDeflect, StatUnit.none);
         if(lightningChance > 0f){
-            stats.add(BlockStat.lightningChance, lightningChance * 100f, StatUnit.percent);
-            stats.add(BlockStat.lightningDamage, lightningDamage, StatUnit.none);
+            stats.add(Stat.lightningChance, lightningChance * 100f, StatUnit.percent);
+            stats.add(Stat.lightningDamage, lightningDamage, StatUnit.none);
         }
     }
 
