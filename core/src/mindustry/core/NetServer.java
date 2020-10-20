@@ -508,7 +508,8 @@ public class NetServer implements ApplicationListener{
                 Call.playerDisconnect(player.id());
             }
 
-            if(Config.showConnectMessages.bool()) Log.info("&lm[@] &lc@ has disconnected. &lg&fi(@)", player.uuid(), player.name, reason);
+            String message = Strings.format("&lb@&fi&lk has disconnected. &fi&lk[&lb@&fi&lk] (@)", player.name, player.uuid(), reason);
+            if(Config.showConnectMessages.bool()) Log.info(message);
         }
 
         player.remove();
@@ -736,7 +737,8 @@ public class NetServer implements ApplicationListener{
 
         if(Config.showConnectMessages.bool()){
             Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-            Log.info("&lm[@] &y@ has connected.", player.uuid(), player.name);
+            String message = Strings.format("&lb@&fi&lk has connected. &fi&lk[&lb@&fi&lk]", player.name, player.uuid());
+            Log.info(message);
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
@@ -785,7 +787,7 @@ public class NetServer implements ApplicationListener{
     public void openServer(){
         try{
             net.host(Config.port.num());
-            info("&lcOpened a server on port @.", Config.port.num());
+            info("Opened a server on port @.", Config.port.num());
         }catch(BindException e){
             Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
             state.set(State.menu);

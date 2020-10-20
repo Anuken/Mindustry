@@ -112,6 +112,14 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
+    /** Unlocks this content, but does not fire any events. */
+    public void quiteUnlock(){
+        if(!unlocked()){
+            unlocked = true;
+            Core.settings.put(name + "-unlocked", true);
+        }
+    }
+
     public boolean unlocked(){
         if(net.client()) return state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
