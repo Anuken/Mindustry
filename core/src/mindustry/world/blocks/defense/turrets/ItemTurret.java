@@ -35,8 +35,8 @@ public class ItemTurret extends Turret{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.itemCapacity);
-        stats.add(BlockStat.ammo, new AmmoListValue<>(ammoTypes));
+        stats.remove(Stat.itemCapacity);
+        stats.add(Stat.ammo, new AmmoListValue<>(ammoTypes));
         consumes.add(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
             @Override
             public void build(Building tile, Table table){
@@ -54,7 +54,7 @@ public class ItemTurret extends Turret{
             }
 
             @Override
-            public void display(BlockStats stats){
+            public void display(Stats stats){
                 //don't display
             }
         });
@@ -83,7 +83,7 @@ public class ItemTurret extends Turret{
         public void displayBars(Table bars){
             super.displayBars(bars);
 
-            bars.add(new Bar("blocks.ammo", Pal.ammo, () -> (float)totalAmmo / maxAmmo)).growX();
+            bars.add(new Bar("stat.ammo", Pal.ammo, () -> (float)totalAmmo / maxAmmo)).growX();
             bars.row();
         }
 

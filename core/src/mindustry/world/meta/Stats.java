@@ -2,64 +2,81 @@ package mindustry.world.meta;
 
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.values.*;
 
 /** Hold and organizes a list of block stats. */
-public class BlockStats{
-    private final OrderedMap<StatCategory, OrderedMap<BlockStat, Seq<StatValue>>> map = new OrderedMap<>();
+public class Stats{
+    /** Whether to display stats with categories. If false, categories are completely ignored during display. */
+    public boolean useCategories = false;
+    /** Whether these stats are initialized yet. */
+    public boolean intialized = false;
+
+    @Nullable
+    private OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> map;
     private boolean dirty;
 
     /** Adds a single float value with this stat, formatted to 2 decimal places. */
-    public void add(BlockStat stat, float value, StatUnit unit){
+    public void add(Stat stat, float value, StatUnit unit){
         add(stat, new NumberValue(value, unit));
     }
 
+    /** Adds a single float value with this stat and no unit. */
+    public void add(Stat stat, float value){
+        add(stat, value, StatUnit.none);
+    }
+
+    /** Adds an integer percent stat value. Value is assumed to be in the 0-1 range. */
+    public void addPercent(Stat stat, float value){
+        add(stat, new NumberValue((int)(value * 100), StatUnit.percent));
+    }
+
     /** Adds a single y/n boolean value. */
-    public void add(BlockStat stat, boolean value){
+    public void add(Stat stat, boolean value){
         add(stat, new BooleanValue(value));
     }
 
     /** Adds an item value. */
-    public void add(BlockStat stat, Item item){
+    public void add(Stat stat, Item item){
         add(stat, new ItemListValue(new ItemStack(item, 1)));
     }
 
     /** Adds an item value. */
-    public void add(BlockStat stat, ItemStack item){
+    public void add(Stat stat, ItemStack item){
         add(stat, new ItemListValue(item));
     }
 
     /** Adds an item value. */
-    public void add(BlockStat stat, ItemStack item, float timePeriod){
+    public void add(Stat stat, ItemStack item, float timePeriod){
         add(stat, new ItemListValue(timePeriod, item));
     }
 
     /** Adds an liquid value. */
-    public void add(BlockStat stat, Liquid liquid, float amount, boolean perSecond){
+    public void add(Stat stat, Liquid liquid, float amount, boolean perSecond){
         add(stat, new LiquidValue(liquid, amount, perSecond));
     }
 
     /** Adds an liquid value. */
-    public void add(BlockStat stat, Liquid liquid, float amount, float timePeriod){
+    public void add(Stat stat, Liquid liquid, float amount, float timePeriod){
         add(stat, new LiquidValue(liquid, amount, timePeriod));
     }
 
-    public void add(BlockStat stat, Attribute attr){
+    public void add(Stat stat, Attribute attr){
         add(stat, attr, false, 1f);
     }
 
-    public void add(BlockStat stat, Attribute attr, float scale){
+    public void add(Stat stat, Attribute attr, float scale){
         add(stat, attr, false, scale);
     }
 
-    public void add(BlockStat stat, Attribute attr, boolean floating){
+    public void add(Stat stat, Attribute attr, boolean floating){
         add(stat, attr, floating, 1f);
     }
 
-    public void add(BlockStat stat, Attribute attr, boolean floating, float scale){
+    public void add(Stat stat, Attribute attr, boolean floating, float scale){
         for(Block block : Vars.content.blocks()){
             if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0 || (block.asFloor().isLiquid && !floating)) continue;
             add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr) * scale));
@@ -67,12 +84,14 @@ public class BlockStats{
     }
 
     /** Adds a single string value with this stat. */
-    public void add(BlockStat stat, String format, Object... args){
+    public void add(Stat stat, String format, Object... args){
         add(stat, new StringValue(format, args));
     }
 
     /** Adds a stat value. */
-    public void add(BlockStat stat, StatValue value){
+    public void add(Stat stat, StatValue value){
+        if(map == null) map = new OrderedMap<>();
+
         if(!map.containsKey(stat.category)){
             map.put(stat.category, new OrderedMap<>());
         }
@@ -83,7 +102,9 @@ public class BlockStats{
     }
 
     /** Removes a stat, if it exists. */
-    public void remove(BlockStat stat){
+    public void remove(Stat stat){
+        if(map == null) map = new OrderedMap<>();
+
         if(!map.containsKey(stat.category) || !map.get(stat.category).containsKey(stat)){
             throw new RuntimeException("No stat entry found: \"" + stat + "\" in block.");
         }
@@ -93,11 +114,13 @@ public class BlockStats{
         dirty = true;
     }
 
-    public OrderedMap<StatCategory, OrderedMap<BlockStat, Seq<StatValue>>> toMap(){
+    public OrderedMap<StatCat, OrderedMap<Stat, Seq<StatValue>>> toMap(){
+        if(map == null) map = new OrderedMap<>();
+
         //sort stats by index if they've been modified
         if(dirty){
             map.orderedKeys().sort();
-            for(Entry<StatCategory, OrderedMap<BlockStat, Seq<StatValue>>> entry : map.entries()){
+            for(Entry<StatCat, OrderedMap<Stat, Seq<StatValue>>> entry : map.entries()){
                 entry.value.orderedKeys().sort();
             }
 

@@ -14,8 +14,8 @@ public class LiquidConverter extends GenericCrafter{
     public void setStats(){
         super.setStats();
         
-        stats.remove(BlockStat.output);
-        stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount * 60f, craftTime);
+        stats.remove(Stat.output);
+        stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount * 60f, craftTime);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class LiquidConverter extends GenericCrafter{
         outputLiquid.amount = cl.amount;
         super.init();
     }
-
+    
     public class LiquidConverterBuild extends GenericCrafterBuild{
         @Override
         public void drawLight(){

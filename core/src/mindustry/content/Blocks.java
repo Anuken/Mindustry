@@ -14,6 +14,8 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.campaign.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.defense.turrets.*;
+import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
+import mindustry.world.blocks.defense.turrets.TractorBeamTurret;
 import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.experimental.*;
@@ -1184,7 +1186,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phasefabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
-            itemDuration = 60 * 15f;
+            itemDuration = 60 * 18f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -1642,11 +1644,20 @@ public class Blocks implements ContentList{
 
             float brange = range + 10f;
 
-            ammo(Items.thorium, new ShrapnelBulletType(){{
+            ammo(
+            Items.thorium, new ShrapnelBulletType(){{
                 length = brange;
                 damage = 105f;
-                ammoMultiplier = 6f;
-            }});
+                ammoMultiplier = 5f;
+            }},
+            Items.titanium, new ShrapnelBulletType(){{
+                length = brange;
+                damage = 66f;
+                ammoMultiplier = 4f;
+                width = 17f;
+                reloadMultiplier = 1.3f;
+            }}
+            );
         }};
 
         ripple = new ItemTurret("ripple"){{

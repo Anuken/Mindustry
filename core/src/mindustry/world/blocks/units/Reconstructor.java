@@ -63,8 +63,8 @@ public class Reconstructor extends UnitBlock{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.productionTime, constructTime / 60f, StatUnit.seconds);
-        stats.add(BlockStat.output, table -> {
+        stats.add(Stat.productionTime, constructTime / 60f, StatUnit.seconds);
+        stats.add(Stat.output, table -> {
             table.row();
             for(var upgrade : upgrades){
                 float size = 8*3;

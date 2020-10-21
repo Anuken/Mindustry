@@ -117,8 +117,8 @@ public class LogicBlock extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.linkRange, range / 8, StatUnit.blocks);
-        stats.add(BlockStat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
+        stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
     }
 
     @Override
@@ -279,10 +279,13 @@ public class LogicBlock extends Block{
 
                     //store link objects
                     executor.links = new Building[links.count(l -> l.valid && l.active)];
+                    executor.linkIds.clear();
                     int index = 0;
                     for(LogicLink link : links){
                         if(link.active && link.valid){
-                            executor.links[index ++] = world.build(link.x, link.y);
+                            Building build = world.build(link.x, link.y);
+                            executor.links[index ++] = build;
+                            if(build != null) executor.linkIds.add(build.id);
                         }
                     }
 

@@ -94,7 +94,7 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public float formationSize(){
-        return unit.hitSize * 1f;
+        return unit.hitSize * 1.1f;
     }
 
     @Override

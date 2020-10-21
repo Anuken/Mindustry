@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -47,6 +48,7 @@ public class NuclearReactor extends PowerGenerator{
         hasItems = true;
         hasLiquids = true;
         rebuildable = false;
+        flags = EnumSet.of(BlockFlag.reactor);
     }
 
     @Override
@@ -54,8 +56,8 @@ public class NuclearReactor extends PowerGenerator{
         super.setStats();
 
         if(hasItems){
-            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
-            stats.add(BlockStat.productionTime, "[lightgray]" + Strings.autoFixed(60f / itemDuration, 1) + StatUnit.perSecond.localized(), true);
+            stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
+            stats.add(Stat.productionTime, "[lightgray]" + Strings.autoFixed(60f / itemDuration, 1) + StatUnit.perSecond.localized(), true);
         }
     }
 

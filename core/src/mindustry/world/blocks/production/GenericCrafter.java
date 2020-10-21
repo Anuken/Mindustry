@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import arc.struct.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -24,9 +25,6 @@ public class GenericCrafter extends Block{
 
     public DrawBlock drawer = new DrawBlock();
 
-    //public Cons<GenericCrafterEntity> drawer = null;
-    //public Prov<TextureRegion[]> drawIcons = null;
-
     public GenericCrafter(String name){
         super(name);
         update = true;
@@ -35,6 +33,7 @@ public class GenericCrafter extends Block{
         idleSound = Sounds.machine;
         sync = true;
         idleSoundVolume = 0.03f;
+        flags = EnumSet.of(BlockFlag.factory);
     }
 
     @Override
@@ -45,15 +44,15 @@ public class GenericCrafter extends Block{
         }
 
         super.setStats();
-        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
-        stats.add(BlockStat.productionTime, "[lightgray]" + Strings.autoFixed(60f / craftTime, 1) + StatUnit.perSecond.localized(), true);
+        stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
+        stats.add(Stat.productionTime, "[lightgray]" + Strings.autoFixed(60f / craftTime, 1) + StatUnit.perSecond.localized(), true);
 
         if(outputItem != null){
-            stats.add(BlockStat.output, outputItem, craftTime);
+            stats.add(Stat.output, outputItem, craftTime);
         }
 
         if(outputLiquid != null){
-            stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount * (60f / craftTime), craftTime);
+            stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount * (60f / craftTime), craftTime);
         }
     }
 

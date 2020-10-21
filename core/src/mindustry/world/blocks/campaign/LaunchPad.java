@@ -42,7 +42,7 @@ public class LaunchPad extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.launchTime, launchTime / 60f, StatUnit.seconds);
+        stats.add(Stat.launchTime, launchTime / 60f, StatUnit.seconds);
     }
 
     @Override
