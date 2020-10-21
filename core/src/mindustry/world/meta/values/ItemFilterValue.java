@@ -23,7 +23,7 @@ public class ItemFilterValue implements StatValue{
         for(int i = 0; i < list.size; i++){
             Item item = list.get(i);
 
-            table.add(new ItemDisplay(item, 0, true)).padRight(5);
+            table.add(new ItemDisplay(item)).padRight(5);
 
             if(i != list.size - 1){
                 table.add("/");
