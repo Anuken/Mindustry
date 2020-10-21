@@ -161,7 +161,7 @@ public class TechTree implements ContentList{
 
                                             node(Items.plastanium, with(Items.titanium, 10000, Items.silicon, 10000), () -> {
                                                 node(plastaniumCompressor, () -> {
-                                                    node(Items.phasefabric, with(Items.thorium, 15000, Items.sand, 30000, Items.silicon, 5000), () -> {
+                                                    node(Items.phaseFabric, with(Items.thorium, 15000, Items.sand, 30000, Items.silicon, 5000), () -> {
                                                         node(phaseWeaver, () -> {
 
                                                         });
@@ -177,7 +177,7 @@ public class TechTree implements ContentList{
                                                 node(Items.scrap, with(Items.copper, 20000, Items.sand, 10000), () -> {
                                                     node(Liquids.slag, with(Items.scrap, 4000), () -> {
                                                         node(melter, () -> {
-                                                            node(Items.surgealloy, with(Items.thorium, 20000, Items.silicon, 30000, Items.lead, 40000), () -> {
+                                                            node(Items.surgeAlloy, with(Items.thorium, 20000, Items.silicon, 30000, Items.lead, 40000), () -> {
                                                                 node(surgeSmelter, () -> {
 
                                                                 });
