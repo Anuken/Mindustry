@@ -13,8 +13,6 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class GroundAI extends AIController{
-    //static final float commandCooldown = 60f * 10;
-    //float commandTimer = 60*3;
 
     @Override
     public void updateMovement(){
@@ -45,31 +43,17 @@ public class GroundAI extends AIController{
             }
         }
 
-        if(unit.type().canBoost && !unit.onSolid()){
+        if(unit.type.canBoost && !unit.onSolid()){
             unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
         }
 
-        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type().rotateShooting){
-            if(unit.type().hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type().weapons.first().bullet.speed));
+        if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.rotateShooting){
+            if(unit.type.hasWeapons()){
+                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
             }
         }else if(unit.moving()){
             unit.lookAt(unit.vel().angle());
         }
 
-        //auto-command works but it's very buggy
-        /*
-        if(unit instanceof Commanderc){
-            Commanderc c = (Commanderc)unit;
-            //try to command when missing members
-            if(c.controlling().size <= unit.type().commandLimit/2){
-                commandTimer -= Time.delta;
-
-                if(commandTimer <= 0){
-                    c.commandNearby(new SquareFormation(), u -> !(u.controller() instanceof FormationAI) && !(u instanceof Commanderc));
-                    commandTimer = commandCooldown;
-                }
-            }
-        }*/
     }
 }

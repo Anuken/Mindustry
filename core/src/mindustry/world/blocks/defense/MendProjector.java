@@ -9,6 +9,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -43,11 +44,11 @@ public class MendProjector extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
-        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
+        stats.add(Stat.range, range / tilesize, StatUnit.blocks);
 
-        stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+        stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
     }
 
     @Override
@@ -55,10 +56,15 @@ public class MendProjector extends Block{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
-    public class MendBuild extends Building{
+    public class MendBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void updateTile(){

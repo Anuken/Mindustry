@@ -26,11 +26,11 @@ public class StorageBlock extends Block{
     }
 
     public static void incinerateEffect(Building self, Building source){
-        if(Mathf.chance(0.1)){
+        if(Mathf.chance(0.3)){
             Tile edge = Edges.getFacingEdge(source, self);
             Tile edge2 = Edges.getFacingEdge(self, source);
             if(edge != null && edge2 != null){
-                Fx.fuelburn.at((edge.worldx() + edge2.worldx())/2f, (edge.worldy() + edge2.worldy())/2f);
+                Fx.coreBurn.at((edge.worldx() + edge2.worldx())/2f, (edge.worldy() + edge2.worldy())/2f);
             }
         }
     }
@@ -46,7 +46,9 @@ public class StorageBlock extends Block{
         @Override
         public void handleItem(Building source, Item item){
             if(linkedCore != null){
-                incinerateEffect(this, source);
+                if(linkedCore.items.get(item) >= ((CoreBuild)linkedCore).storageCapacity){
+                    incinerateEffect(this, source);
+                }
                 ((CoreBuild)linkedCore).noEffect = true;
                 linkedCore.handleItem(source, item);
             }else{
@@ -70,7 +72,7 @@ public class StorageBlock extends Block{
         public void overwrote(Seq<Building> previous){
             for(Building other : previous){
                 if(other.items != null){
-                    items.addAll(other.items);
+                    items.add(other.items);
                 }
             }
 

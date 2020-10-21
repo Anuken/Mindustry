@@ -40,6 +40,11 @@ public class LaserBulletType extends BulletType{
     }
 
     @Override
+    public float estimateDPS(){
+        return super.estimateDPS() * 2f;
+    }
+
+    @Override
     public void init(){
         super.init();
 

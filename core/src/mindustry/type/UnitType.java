@@ -28,6 +28,8 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.*;
 import mindustry.world.consumers.*;
+import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -41,7 +43,7 @@ public class UnitType extends UnlockableContent{
     public Prov<? extends UnitController> defaultController = () -> !flying ? new GroundAI() : new FlyingAI();
     public float speed = 1.1f, boostMultiplier = 1f, rotateSpeed = 5f, baseRotateSpeed = 5f;
     public float drag = 0.3f, accel = 0.5f, landShake = 0f, rippleScale = 1f, fallSpeed = 0.018f;
-    public float health = 200f, range = -1, armor = 0f;
+    public float health = 200f, range = -1, armor = 0f, maxRange = -1f;
     public float crashDamageMultiplier = 1f;
     public boolean targetAir = true, targetGround = true;
     public boolean faceTarget = true, rotateShooting = true, isCounted = true, lowAltitude = false;
@@ -58,6 +60,7 @@ public class UnitType extends UnlockableContent{
     public Effect fallEffect = Fx.fallSmoke;
     public Effect fallThrusterEffect = Fx.fallSmoke;
     public Seq<Ability> abilities = new Seq<>();
+    public BlockFlag targetFlag = BlockFlag.generator;
 
     public int legCount = 4, legGroupSize = 2;
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
@@ -79,6 +82,8 @@ public class UnitType extends UnlockableContent{
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
 
+    /** This is a VERY ROUGH estimate of unit DPS. */
+    public float dpsEstimate = -1;
     public float clipSize = -1;
     public boolean canDrown = true;
     public float engineOffset = 5f, engineSize = 2.5f;
@@ -115,7 +120,7 @@ public class UnitType extends UnlockableContent{
     public Unit create(Team team){
         Unit unit = constructor.get();
         unit.team = team;
-        unit.type(this);
+        unit.setType(this);
         unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
@@ -154,11 +159,11 @@ public class UnitType extends UnlockableContent{
         table.table(bars -> {
             bars.defaults().growX().height(20f).pad(4);
 
-            bars.add(new Bar("blocks.health", Pal.health, unit::healthf).blink(Color.white));
+            bars.add(new Bar("stat.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("blocks.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
+                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("stat.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
         }).growX();
@@ -186,10 +191,21 @@ public class UnitType extends UnlockableContent{
         }
     }
 
-
     @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayUnit(table, this);
+    public void setStats(){
+        Unit inst = constructor.get();
+
+        stats.add(Stat.health, health);
+        stats.add(Stat.speed, speed);
+        stats.add(Stat.itemCapacity, health);
+        stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
+        //TODO abilities, maybe try something like DPS
+
+        if(inst instanceof Minerc && mineTier >= 1){
+            stats.addPercent(Stat.mineSpeed, mineSpeed);
+            stats.add(Stat.mineTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
+        }
+        if(inst instanceof Builderc) stats.addPercent(Stat.buildSpeed, buildSpeed);
     }
 
     @CallSuper
@@ -215,8 +231,10 @@ public class UnitType extends UnlockableContent{
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
+            maxRange = 0f;
             for(Weapon weapon : weapons){
                 range = Math.min(range, weapon.bullet.range() + hitSize /2f);
+                maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize /2f);
             }
         }
 
@@ -266,6 +284,17 @@ public class UnitType extends UnlockableContent{
 
             ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }
+
+        //calculate estimated DPS for one target based on weapons
+        if(dpsEstimate < 0){
+            dpsEstimate = weapons.sumf(w -> (w.bullet.estimateDPS() / w.reload) * w.shots * 60f);
+
+            //suicide enemy
+            if(weapons.contains(w -> w.bullet.killShooter)){
+                //scale down DPS to be insignificant
+                dpsEstimate /= 100f;
+            }
+        }
     }
 
     @CallSuper
@@ -309,7 +338,7 @@ public class UnitType extends UnlockableContent{
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];
             for(int i = 0; i < out.length; i++){
-                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * 50)));
+                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1) * 50)));
             }
 
             return out;
@@ -436,7 +465,7 @@ public class UnitType extends UnlockableContent{
         applyColor(unit);
 
         //draw back items
-        if(unit.hasItem() && unit.itemTime > 0.01f){
+        if(unit.item() != null && unit.itemTime > 0.01f){
             float size = (itemSize + Mathf.absin(Time.time(), 5f, 1f)) * unit.itemTime;
 
             Draw.mixcol(Pal.accent, Mathf.absin(Time.time(), 5f, 0.5f));
