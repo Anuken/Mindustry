@@ -16,7 +16,7 @@ public class FlyingAI extends AIController{
                 moveTo(target, unit.range() * 0.8f);
                 unit.lookAt(target);
             }else{
-                attack(100f);
+                attack(120f);
             }
         }
 

@@ -1277,8 +1277,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case totalItems -> items == null ? 0 : items.total();
             case totalLiquids -> liquids == null ? 0 : liquids.total();
             case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-            case itemCapacity -> block.itemCapacity;
-            case liquidCapacity -> block.liquidCapacity;
+            case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
+            case liquidCapacity -> block.hasLiquids ? block.liquidCapacity : 0;
             case powerCapacity -> block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
             case powerNetIn -> power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
             case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;

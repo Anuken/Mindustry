@@ -37,12 +37,16 @@ public class ItemTurret extends Turret{
 
         stats.remove(Stat.itemCapacity);
         stats.add(Stat.ammo, new AmmoListValue<>(ammoTypes));
+    }
+
+    @Override
+    public void init(){
         consumes.add(new ConsumeItemFilter(i -> ammoTypes.containsKey(i)){
             @Override
             public void build(Building tile, Table table){
                 MultiReqImage image = new MultiReqImage();
                 content.items().each(i -> filter.get(i) && i.unlockedNow(), item -> image.add(new ReqImage(new ItemImage(item.icon(Cicon.medium)),
-                    () -> tile != null && !((ItemTurretBuild)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretBuild)tile).ammo.peek()).item == item)));
+                () -> tile != null && !((ItemTurretBuild)tile).ammo.isEmpty() && ((ItemEntry)((ItemTurretBuild)tile).ammo.peek()).item == item)));
 
                 table.add(image).size(8 * 4);
             }
@@ -58,6 +62,8 @@ public class ItemTurret extends Turret{
                 //don't display
             }
         });
+
+        super.init();
     }
 
     public class ItemTurretBuild extends TurretBuild{
