@@ -75,7 +75,7 @@ public class ConsumeItemFilter extends Consume{
     }
 
     @Override
-    public void display(BlockStats stats, float timePeriod){
+    public void display(Stats stats, float timePeriod){
         display(stats);
     }
 }

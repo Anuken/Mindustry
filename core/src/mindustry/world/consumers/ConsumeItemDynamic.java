@@ -78,7 +78,7 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public void display(BlockStats stats, float timePeriod){
+    public void display(Stats stats, float timePeriod){
         //should be handled by the block
     }
 }

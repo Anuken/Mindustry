@@ -63,7 +63,7 @@ public class ConsumePower extends Consume{
     }
 
     @Override
-    public void display(BlockStats stats, float timePeriod){
+    public void display(Stats stats, float timePeriod){
         //Time period doesn't affect anything
         display(stats);
     }

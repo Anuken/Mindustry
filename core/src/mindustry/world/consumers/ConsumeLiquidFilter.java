@@ -54,7 +54,7 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     }
 
     @Override
-    public void display(BlockStats stats, float timePeriod){
+    public void display(Stats stats, float timePeriod){
         display(stats);
     }
 }

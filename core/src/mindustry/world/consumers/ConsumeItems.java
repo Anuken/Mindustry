@@ -68,7 +68,7 @@ public class ConsumeItems extends Consume{
     }
 
     @Override
-    public void display(BlockStats stats, float timePeriod){
-        stats.add(booster ? BlockStat.booster : BlockStat.input, new ItemListValue(timePeriod, items));
+    public void display(Stats stats, float timePeriod){
+        stats.add(booster ? Stat.booster : Stat.input, new ItemListValue(timePeriod, items));
     }
 }

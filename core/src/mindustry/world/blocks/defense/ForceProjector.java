@@ -64,6 +64,9 @@ public class ForceProjector extends Block{
         stats.add(Stat.shieldHealth, breakage, StatUnit.none);
         stats.add(Stat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
         stats.add(Stat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
+        stats.add(Stat.productionTime, phaseUseTime / 60f, StatUnit.seconds);
+        stats.add(Stat.productionTime, "[lightgray]" + Strings.autoFixed(60f / phaseUseTime, 1) + StatUnit.perSecond.localized(), true);
+        
         stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
         stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
     }
