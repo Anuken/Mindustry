@@ -7,7 +7,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Stats.*;
+import mindustry.game.GameStats.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 

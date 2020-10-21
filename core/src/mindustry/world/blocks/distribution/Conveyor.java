@@ -52,7 +52,7 @@ public class Conveyor extends Block implements Autotiler{
         super.setStats();
         
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
-        stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
     }
 
     @Override

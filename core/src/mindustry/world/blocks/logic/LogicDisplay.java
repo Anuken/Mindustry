@@ -38,7 +38,7 @@ public class LogicDisplay extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.displaySize, "@x@", displaySize, displaySize);
+        stats.add(Stat.displaySize, "@x@", displaySize, displaySize);
     }
 
     public class LogicDisplayBuild extends Building{

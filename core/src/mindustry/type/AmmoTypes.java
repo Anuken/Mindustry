@@ -41,7 +41,7 @@ public class AmmoTypes implements ContentList{
         @Override
         public void resupply(Unit unit){
             float range = unit.hitSize + 60f;
-            Tile closest = Vars.indexer.findClosestFlag(unit.x, unit.y, unit.team, BlockFlag.powerRes);
+            Tile closest = Vars.indexer.findClosestFlag(unit.x, unit.y, unit.team, BlockFlag.battery);
 
             if(closest != null && closest.build != null && unit.within(closest.build, range) && closest.build.power != null){
                 var build = closest.build;

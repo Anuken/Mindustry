@@ -24,6 +24,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
@@ -936,7 +937,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
             }else if(target == null){
                 player.shooting = false;
-                if(Core.settings.getBool("autotarget")){
+                if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
                     target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.team != Team.derelict, u -> u.team != Team.derelict);
 
                     if(allowHealing && target == null){

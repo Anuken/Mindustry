@@ -124,8 +124,8 @@ public class PowerNode extends PowerBlock{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.powerRange, laserRange, StatUnit.blocks);
-        stats.add(BlockStat.powerConnections, maxNodes, StatUnit.none);
+        stats.add(Stat.powerRange, laserRange, StatUnit.blocks);
+        stats.add(Stat.powerConnections, maxNodes, StatUnit.none);
     }
 
     @Override

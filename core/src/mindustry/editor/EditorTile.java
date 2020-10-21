@@ -105,9 +105,9 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeBuild(Team team, Prov<Building> entityprov, int rotation){
         if(skip()){
-            super.changeEntity(team, entityprov, rotation);
+            super.changeBuild(team, entityprov, rotation);
             return;
         }
 

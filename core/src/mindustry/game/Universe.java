@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.io.legacy.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -187,7 +188,7 @@ public class Universe{
                         }
 
                         //add production, making sure that it's capped
-                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * seconds * scl), sector.info.storageCapacity - sector.info.items.get(item))));
+                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
 
                         sector.saveInfo();
                     }
@@ -260,6 +261,11 @@ public class Universe{
     private void load(){
         seconds = Core.settings.getInt("utimei");
         turn = Core.settings.getInt("turn");
+
+        if(Core.settings.has("unlocks")){
+            LegacyIO.readResearch();
+            Core.settings.remove("unlocks");
+        }
     }
 
 }

@@ -30,7 +30,7 @@ public class StorageBlock extends Block{
             Tile edge = Edges.getFacingEdge(source, self);
             Tile edge2 = Edges.getFacingEdge(self, source);
             if(edge != null && edge2 != null){
-                Fx.fuelburn.at((edge.worldx() + edge2.worldx())/2f, (edge.worldy() + edge2.worldy())/2f);
+                Fx.coreBurn.at((edge.worldx() + edge2.worldx())/2f, (edge.worldy() + edge2.worldy())/2f);
             }
         }
     }
