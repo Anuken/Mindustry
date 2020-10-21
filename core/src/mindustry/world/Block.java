@@ -14,6 +14,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
@@ -50,7 +51,6 @@ public class Block extends UnlockableContent{
     public float liquidCapacity = 10f;
     public float liquidPressure = 1f;
 
-    public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
@@ -320,27 +320,30 @@ public class Block extends UnlockableContent{
         return update || destructible;
     }
 
+    @Override
     public void setStats(){
-        stats.add(BlockStat.size, "@x@", size, size);
-        stats.add(BlockStat.health, health, StatUnit.none);
+        super.setStats();
+
+        stats.add(Stat.size, "@x@", size, size);
+        stats.add(Stat.health, health, StatUnit.none);
         if(canBeBuilt()){
-            stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
-            stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
+            stats.add(Stat.buildTime, buildCost / 60, StatUnit.seconds);
+            stats.add(Stat.buildCost, new ItemListValue(false, requirements));
         }
 
         if(instantTransfer){
-            stats.add(BlockStat.maxConsecutive, 2, StatUnit.none);
+            stats.add(Stat.maxConsecutive, 2, StatUnit.none);
         }
 
         consumes.display(stats);
 
-        // Note: Power stats are added by the consumers.
-        if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
-        if(hasItems && itemCapacity > 0) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
+        //Note: Power stats are added by the consumers.
+        if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
+        if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
     public void setBars(){
-        bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
+        bars.add("health", entity -> new Bar("stat.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
             Func<Building, Liquid> current;
@@ -348,7 +351,7 @@ public class Block extends UnlockableContent{
                 Liquid liquid = consumes.<ConsumeLiquid>get(ConsumeType.liquid).liquid;
                 current = entity -> liquid;
             }else{
-                current = entity -> entity.liquids.current();
+                current = entity -> entity.liquids == null ? Liquids.water : entity.liquids.current();
             }
             bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
             () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
@@ -617,7 +620,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.25f) * 20 * researchCostMultiplier, 10);
+            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.15f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
@@ -631,11 +634,6 @@ public class Block extends UnlockableContent{
         for(ItemStack stack : requirements){
             cons.get(stack.item);
         }
-    }
-
-    @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayBlock(table, this);
     }
 
     @Override
@@ -668,8 +666,9 @@ public class Block extends UnlockableContent{
         if(consumes.has(ConsumeType.item)) hasItems = true;
         if(consumes.has(ConsumeType.liquid)) hasLiquids = true;
 
-        setStats();
         setBars();
+
+        stats.useCategories = true;
 
         consumes.init();
 

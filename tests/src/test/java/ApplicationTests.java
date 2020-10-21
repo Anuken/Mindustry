@@ -36,7 +36,7 @@ public class ApplicationTests{
         try{
             boolean[] begins = {false};
             Throwable[] exceptionThrown = {null};
-            Log.setUseColors(false);
+            Log.useColors = false;
 
             ApplicationCore core = new ApplicationCore(){
                 @Override

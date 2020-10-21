@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -48,7 +49,7 @@ public class WaveSpawner{
 
     /** @return true if the player is near a ground spawn point. */
     public boolean playerNear(){
-        return state.rules.waves && !player.dead() && spawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
+        return state.hasSpawns() && !player.dead() && spawns.contains(g -> Mathf.dst(g.x * tilesize, g.y * tilesize, player.x, player.y) < state.rules.dropZoneRadius && player.team() != state.rules.waveTeam);
     }
 
     public void spawnEnemies(){
@@ -79,7 +80,7 @@ public class WaveSpawner{
 
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
-                        Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
+                        spawnEffect(unit);
                     }
                 });
             }
@@ -100,12 +101,14 @@ public class WaveSpawner{
     }
 
     public void eachGroundSpawn(Intc2 cons){
-        eachGroundSpawn((x, y, shock) -> cons.get(world.toTile(x), world.toTile(y)));
+        eachGroundSpawn((x, y, shock) -> cons.get(World.toTile(x), World.toTile(y)));
     }
 
     private void eachGroundSpawn(SpawnConsumer cons){
-        for(Tile spawn : spawns){
-            cons.accept(spawn.worldx(), spawn.worldy(), true);
+        if(state.hasSpawns()){
+            for(Tile spawn : spawns){
+                cons.accept(spawn.worldx(), spawn.worldy(), true);
+            }
         }
 
         if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam) && !state.teams.playerCores().isEmpty()){
@@ -118,7 +121,7 @@ public class WaveSpawner{
 
                 //keep moving forward until the max step amount is reached
                 while(steps++ < maxSteps){
-                    int tx = world.toTile(core.x + Tmp.v1.x), ty = world.toTile(core.y + Tmp.v1.y);
+                    int tx = World.toTile(core.x + Tmp.v1.x), ty = World.toTile(core.y + Tmp.v1.y);
                     any = false;
                     Geometry.circle(tx, ty, world.width(), world.height(), 3, (x, y) -> {
                         if(world.solid(x, y)){

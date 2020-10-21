@@ -78,10 +78,7 @@ public class PausedDialog extends BaseDialog{
 
                 cont.buttonRow("@load", Icon.download, load::show).disabled(b -> net.active());
             }else if(state.isCampaign()){
-                cont.buttonRow("@launchcore", Icon.up, () -> {
-                    hide();
-                    ui.planet.showLaunch(state.getSector(), player.team().core());
-                }).disabled(b -> player.team().core() == null || net.client());
+                cont.buttonRow("@research", Icon.tree, ui.research::show);
 
                 cont.row();
 
@@ -93,11 +90,7 @@ public class PausedDialog extends BaseDialog{
                 cont.row();
             }
 
-            if(state.isCampaign() && net.active()){
-                cont.buttonRow("@research", Icon.tree, ui.research::show);
-            }else{
-                cont.buttonRow("@hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
-            }
+            cont.buttonRow("@hostserver.mobile", Icon.host, ui.host::show).disabled(b -> net.active());
 
             cont.buttonRow("@quit", Icon.exit, this::showQuitConfirm).update(s -> {
                 s.setText(control.saves.getCurrent() != null && control.saves.getCurrent().isAutosave() ? "@save.quit" : "@quit");

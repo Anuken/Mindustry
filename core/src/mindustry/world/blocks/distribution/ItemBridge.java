@@ -202,7 +202,7 @@ public class ItemBridge extends Block{
 
             for(int i = 1; i <= range; i++){
                 for(int j = 0; j < 4; j++){
-                    Tile other = tile.getNearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
+                    Tile other = tile.nearby(Geometry.d4[j].x * i, Geometry.d4[j].y * i);
                     if(linkValid(tile, other)){
                         boolean linked = other.pos() == link;
 
@@ -336,16 +336,18 @@ public class ItemBridge extends Block{
 
             Tile other = world.tile(link);
 
+            if(items.total() >= itemCapacity) return false;
+
+            if(linked(source)) return true;
+
             if(linkValid(tile, other)){
                 int rel = relativeTo(other);
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
-                if(rel == rel2) return false;
-            }else{
-                return linked(source) && items.total() < itemCapacity;
+                return rel != rel2;
             }
 
-            return items.total() < itemCapacity;
+            return false;
         }
 
         @Override
@@ -359,16 +361,18 @@ public class ItemBridge extends Block{
 
             Tile other = world.tile(link);
 
+            if(!(liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f)) return false;
+
+            if(linked(source)) return true;
+
             if(linkValid(tile, other)){
                 int rel = relativeTo(other.x, other.y);
                 int rel2 = relativeTo(Edges.getFacingEdge(source, this));
 
-                if(rel == rel2) return false;
-            }else if(!(linked(source))){
-                return false;
+                return rel != rel2;
             }
 
-            return (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f);
+            return false;
         }
 
         protected boolean linked(Building source){

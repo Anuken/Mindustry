@@ -14,6 +14,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -23,6 +24,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
@@ -405,14 +407,14 @@ public class MobileInput extends InputHandler implements GestureListener{
     protected int schemOriginX(){
         Tmp.v1.setZero();
         selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
+        return World.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
     }
 
     @Override
     protected int schemOriginY(){
         Tmp.v1.setZero();
         selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
+        return World.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
     }
 
     @Override
@@ -935,7 +937,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
             }else if(target == null){
                 player.shooting = false;
-                if(Core.settings.getBool("autotarget")){
+                if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
                     target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.team != Team.derelict, u -> u.team != Team.derelict);
 
                     if(allowHealing && target == null){

@@ -190,6 +190,7 @@ public class ContentParser{
                     "mindustry.world.blocks.defense",
                     "mindustry.world.blocks.defense.turrets",
                     "mindustry.world.blocks.distribution",
+                    "mindustry.world.blocks.environment",
                     "mindustry.world.blocks.liquid",
                     "mindustry.world.blocks.logic",
                     "mindustry.world.blocks.power",
@@ -301,6 +302,20 @@ public class ContentParser{
             });
 
             return unit;
+        },
+        ContentType.weather, (TypeParser<Weather>)(mod, name, value) -> {
+            Weather item;
+            if(locate(ContentType.weather, name) != null){
+                item = locate(ContentType.weather, name);
+                readBundle(ContentType.weather, name, value);
+            }else{
+                readBundle(ContentType.weather, name, value);
+                Class<? extends Weather> type = resolve(getType(value), "mindustry.type.weather");
+                item = make(type);
+            }
+            currentContent = item;
+            read(() -> readFields(item, value));
+            return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, parser(ContentType.liquid, Liquid::new)
