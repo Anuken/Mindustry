@@ -276,7 +276,7 @@ public class UnitTypes implements ContentList{
             armor = 1f;
             commandLimit = 8;
 
-            abilities.add(new HealFieldAbility(10f, 60f * 4, 60f));
+            abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
             ammoType = AmmoTypes.power;
 
             weapons.add(new Weapon("heal-weapon"){{
@@ -305,7 +305,7 @@ public class UnitTypes implements ContentList{
             mineSpeed = 5f;
             commandLimit = 8;
 
-            abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 5, 60f));
+            abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = AmmoTypes.power;
 
             weapons.add(new Weapon("heal-shotgun-weapon"){{
@@ -1161,7 +1161,7 @@ public class UnitTypes implements ContentList{
             mineTier = 2;
             mineSpeed = 3.5f;
 
-            abilities.add(new HealFieldAbility(5f, 60f * 5, 50f));
+            abilities.add(new RepairFieldAbility(5f, 60f * 5, 50f));
 
             weapons.add(new Weapon("heal-weapon-mount"){{
                 top = false;
@@ -1318,7 +1318,7 @@ public class UnitTypes implements ContentList{
             ammoCapacity = 1300;
             ammoResupplyAmount = 20;
 
-            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
+            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new RepairFieldAbility(130f, 60f * 2, 140f));
         }};
 
         //endregion
@@ -1430,7 +1430,7 @@ public class UnitTypes implements ContentList{
             trailY = -9f;
             trailScl = 1.5f;
 
-            abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 4, 60f));
+            abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 4, 60f));
 
             weapons.add(new Weapon("large-artillery"){{
                 reload = 65f;
