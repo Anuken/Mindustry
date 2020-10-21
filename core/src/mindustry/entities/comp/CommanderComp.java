@@ -30,7 +30,7 @@ abstract class CommanderComp implements Entityc, Posc{
 
     public void update(){
         if(formation != null){
-            formation.anchor.set(x, y, /*rotation*/ 0); //TODO rotation set to 0 because rotating is pointless
+            formation.anchor.set(x, y, 0);
             formation.updateSlots();
         }
     }
