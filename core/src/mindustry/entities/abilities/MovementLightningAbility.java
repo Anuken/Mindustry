@@ -1,17 +1,18 @@
 package mindustry.entities.abilities;
 
 import arc.util.*;
+import arc.audio.*;
 import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
-import static mindustry.Vars.*;
 
 public class MovementLightningAbility extends Ability{
     public float damage = 35f, reload = 0.15f;
-    public int length = 12f;
+    public int length = 12;
     public float minSpeed = 0.8f, maxSpeed = 1.2f;
-    public Effect shootEffect = Fx.lightningShoot;
+    public Effect shootEffect = Fx.sparkShoot;
+    public Sound shootSound = Sounds.spark;
     
     MovementLightningAbility(){}
     
@@ -28,7 +29,8 @@ public class MovementLightningAbility extends Ability{
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
         if(Mathf.chance(Time.delta * (reload * scl))){
             shootEffect.at(unit.x, unit.y, unit.rotation, unit.team.color);
-            Lightning.create(unit.team, unit.team.color, damage * Vars.state.rules.playerDamageMultiplie, unit.x + unit.vel().x, unit.y + unit.vel().y, unit.rotation, length);
+            Lightning.create(unit.team, unit.team.color, damage, unit.x + unit.vel().x, unit.y + unit.vel().y, unit.rotation, length);
+            shootSound.at(unit.x, unit.y);
         }
     }
 }
