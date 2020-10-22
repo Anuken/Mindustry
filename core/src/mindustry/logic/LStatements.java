@@ -818,6 +818,7 @@ public class LStatements{
     public static class UnitLocateStatement extends LStatement{
         public LLocate locate = LLocate.building;
         public BlockFlag flag = BlockFlag.core;
+        public String block = "@router";
         public String enemy = "true", ore = "@copper";
         public String outX = "outx", outY = "outy", outFound = "found", outBuild = "building";
 
@@ -892,6 +893,20 @@ public class LStatements{
                 case spawn, damaged -> {
                     table.row();
                 }
+
+                case block -> {
+                    row(table);
+
+                    table.add(" type ").left();
+                    fields(table, block, l -> block = l);
+                    row(table);
+
+                    table.add(" enemy ").left();
+
+                    fields(table, enemy, str -> enemy = str);
+
+                    table.row();
+                }
             }
 
             table.add(" outX ").left();
@@ -917,7 +932,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
+            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(block), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
         }
     }
 }
