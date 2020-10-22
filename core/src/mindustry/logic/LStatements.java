@@ -779,6 +779,7 @@ public class LStatements{
 
                 fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : i == 3 ? p4 : p5, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v).width(110f);
 
+                if(i > 4) row(table);
                 if(++c % 2 == 0) row(table);
             }
         }
