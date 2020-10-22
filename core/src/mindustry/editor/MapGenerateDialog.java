@@ -29,7 +29,8 @@ public class MapGenerateDialog extends BaseDialog{
     private final Prov<GenerateFilter>[] filterTypes = new Prov[]{
         NoiseFilter::new, ScatterFilter::new, TerrainFilter::new, DistortFilter::new,
         RiverNoiseFilter::new, OreFilter::new, OreMedianFilter::new, MedianFilter::new,
-        BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new, EnemySpawnFilter::new
+        BlendFilter::new, MirrorFilter::new, ClearFilter::new, CoreSpawnFilter::new,
+        EnemySpawnFilter::new, SpawnPathFilter::new
     };
     private final MapEditor editor;
     private final boolean applied;
@@ -121,9 +122,9 @@ public class MapGenerateDialog extends BaseDialog{
             for(int x = 0; x < editor.width(); x++){
                 for(int y = 0; y < editor.height(); y++){
                     Tile tile = editor.tile(x, y);
-                    input.apply(x, y, tile.floor(), tile.block(), tile.overlay());
+                    input.apply(x, y, tile.block(), tile.floor(), tile.overlay());
                     filter.apply(input);
-                    writeTiles[x][y].set(input.floor, input.block, input.ore, tile.team());
+                    writeTiles[x][y].set(input.floor, input.block, input.overlay, tile.team());
                 }
             }
 
@@ -295,7 +296,7 @@ public class MapGenerateDialog extends BaseDialog{
         for(Prov<GenerateFilter> gen : filterTypes){
             GenerateFilter filter = gen.get();
 
-            if((!applied && filter.isBuffered()) || (filter.isPost() && applied)) continue;
+            if((filter.isPost() && applied)) continue;
 
             selection.cont.button(filter.name(), () -> {
                 filters.add(filter);
@@ -369,9 +370,9 @@ public class MapGenerateDialog extends BaseDialog{
                     pixmap.each((px, py) -> {
                         int x = px * scaling, y = py * scaling;
                         GenTile tile = buffer1[px][py];
-                        input.apply(x, y, content.block(tile.floor), content.block(tile.block), content.block(tile.ore));
+                        input.apply(x, y, content.block(tile.block), content.block(tile.floor), content.block(tile.ore));
                         filter.apply(input);
-                        buffer2[px][py].set(input.floor, input.block, input.ore, Team.get(tile.team));
+                        buffer2[px][py].set(input.floor, input.block, input.overlay, Team.get(tile.team));
                     });
 
                     pixmap.each((px, py) -> buffer1[px][py].set(buffer2[px][py]));
