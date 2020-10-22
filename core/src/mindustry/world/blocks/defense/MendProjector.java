@@ -47,7 +47,6 @@ public class MendProjector extends Block{
         stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
         stats.add(Stat.productionTime, useTime / 60f, StatUnit.seconds);
-        stats.add(Stat.productionTime, "[lightgray]" + Strings.autoFixed(60f / useTime, 1) + StatUnit.perSecond.localized(), true);
 
         stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
         stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);

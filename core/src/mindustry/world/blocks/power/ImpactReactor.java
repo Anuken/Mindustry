@@ -56,7 +56,6 @@ public class ImpactReactor extends PowerGenerator{
 
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
-            stats.add(Stat.productionTime, "[lightgray]" + Strings.autoFixed(60f / itemDuration, 1) + StatUnit.perSecond.localized(), true);
         }
     }
 

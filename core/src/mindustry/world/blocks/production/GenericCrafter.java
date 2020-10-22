@@ -45,7 +45,6 @@ public class GenericCrafter extends Block{
 
         super.setStats();
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
-        stats.add(Stat.productionTime, "[lightgray]" + Strings.autoFixed(60f / craftTime, 1) + StatUnit.perSecond.localized(), true);
 
         if(outputItem != null){
             stats.add(Stat.output, outputItem, craftTime);

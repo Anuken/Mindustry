@@ -50,7 +50,6 @@ public class Separator extends Block{
         }));
 
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
-        stats.add(Stat.productionTime, "[lightgray]" + Strings.autoFixed(60f / craftTime, 1) + StatUnit.perSecond.localized(), true);
     }
 
     @Override
