@@ -1364,12 +1364,14 @@ public class Blocks implements ContentList{
             requirements(Category.effect, with(Items.titanium, 250, Items.thorium, 125));
             size = 3;
             itemCapacity = 1000;
+            flags = EnumSet.of(BlockFlag.storage);
         }};
 
         container = new StorageBlock("container"){{
             requirements(Category.effect, with(Items.titanium, 100));
             size = 2;
             itemCapacity = 300;
+            flags = EnumSet.of(BlockFlag.storage);
         }};
 
         unloader = new Unloader("unloader"){{
