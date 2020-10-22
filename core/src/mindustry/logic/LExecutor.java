@@ -212,14 +212,15 @@ public class LExecutor{
     public static class UnitLocateI implements LInstruction{
         public LLocate locate = LLocate.building;
         public BlockFlag flag = BlockFlag.core;
-        public int enemy, ore;
+        public int enemy, ore, block;
         public int outX, outY, outFound, outBuild;
 
-        public UnitLocateI(LLocate locate, BlockFlag flag, int enemy, int ore, int outX, int outY, int outFound, int outBuild){
+        public UnitLocateI(LLocate locate, BlockFlag flag, int enemy, int ore, int block, int outX, int outY, int outFound, int outBuild){
             this.locate = locate;
             this.flag = flag;
             this.enemy = enemy;
             this.ore = ore;
+            this.block = block;
             this.outX = outX;
             this.outY = outY;
             this.outFound = outFound;
@@ -259,6 +260,19 @@ public class LExecutor{
                             Building b = Units.findDamagedTile(unit.team, unit.x, unit.y);
                             res = b == null ? null : b.tile;
                             build = true;
+                        }
+                        case block -> {
+                            if(exec.obj(block) instanceof Block) {
+                                if (exec.bool(enemy)) {
+                                    Building b = Units.findEnemyTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, e -> !e.dead() && e.block == exec.obj(block));
+                                    res = b == null ? null : b.tile;
+                                    build = true;
+                                } else {
+                                    Building b = Units.findAllyTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, e -> !e.dead() && e.block == exec.obj(block));
+                                    res = b == null ? null : b.tile;
+                                    build = true;
+                                }
+                            }
                         }
                     }
 
