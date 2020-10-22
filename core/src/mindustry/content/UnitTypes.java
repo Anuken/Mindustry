@@ -1145,7 +1145,7 @@ public class UnitTypes implements ContentList{
 
             flying = true;
             drag = 0.05f;
-            speed = 1.9f;
+            speed = 2.6f;
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 130f;
@@ -1201,7 +1201,7 @@ public class UnitTypes implements ContentList{
             mineTier = 3;
             health = 500;
             armor = 5f;
-            speed = 1.8f;
+            speed = 2.3f;
             accel = 0.06f;
             drag = 0.017f;
             lowAltitude = true;
@@ -1235,7 +1235,7 @@ public class UnitTypes implements ContentList{
         quad = new UnitType("quad"){{
             armor = 8f;
             health = 6000;
-            speed = 1.2f;
+            speed = 1.4f;
             rotateSpeed = 2f;
             accel = 0.05f;
             drag = 0.017f;
@@ -1300,7 +1300,7 @@ public class UnitTypes implements ContentList{
         oct = new UnitType("oct"){{
             armor = 16f;
             health = 24000;
-            speed = 0.6f;
+            speed = 0.8f;
             rotateSpeed = 1f;
             accel = 0.04f;
             drag = 0.018f;

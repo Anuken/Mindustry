@@ -704,7 +704,7 @@ public class LStatements{
 
     @RegisterStatement("ubind")
     public static class UnitBindStatement extends LStatement{
-        public String type = "@mono";
+        public String type = "@poly";
 
         @Override
         public void build(Table table){

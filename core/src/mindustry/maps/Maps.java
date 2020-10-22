@@ -29,7 +29,7 @@ import static mindustry.Vars.*;
 
 public class Maps{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "veins", "glacier"};
+    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "veins", "glacier"};
     /** Maps tagged as PvP */
     static final String[] pvpMaps = {"veins", "glacier"};
     /** All maps stored in an ordered array. */
