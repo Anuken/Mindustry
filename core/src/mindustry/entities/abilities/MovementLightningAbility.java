@@ -13,16 +13,15 @@ public class MovementLightningAbility extends Ability{
     public float damage = 35f;
     //Ticks between firing
     public float reload = 15f;
-    //Length of lightning
+    //Length of the lightning
     public int length = 12;
     //Speeds for when to start lightninging and when to stop getting faster
     public float minSpeed = 0.8f, maxSpeed = 1.2f;
-    //Shoot effect
-    public Effect shootEffect = Fx.sparkShoot;
-    //Shoot sound
-    public Sound shootSound = Sounds.spark;
     //Lightning Color
     public Color color = Color.valueOf("a9d8ff");
+    
+    public Effect shootEffect = Fx.sparkShoot;
+    public Sound shootSound = Sounds.spark;
     
     MovementLightningAbility(){}
     
