@@ -263,11 +263,11 @@ public class LExecutor{
                         }
                         case block -> {
                             if(exec.obj(block) instanceof Block) {
-                                if (exec.bool(enemy)) {
+                                if(exec.bool(enemy)){
                                     Building b = Units.findEnemyTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, e -> !e.dead() && e.block == exec.obj(block));
                                     res = b == null ? null : b.tile;
                                     build = true;
-                                } else {
+                                }else{
                                     Building b = Units.findAllyTile(unit.team, unit.x, unit.y, Float.MAX_VALUE, e -> !e.dead() && e.block == exec.obj(block));
                                     res = b == null ? null : b.tile;
                                     build = true;
