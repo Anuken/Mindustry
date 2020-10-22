@@ -4,7 +4,8 @@ public enum LLocate{
     ore,
     building,
     spawn,
-    damaged;
+    damaged,
+    block;
 
     public static final LLocate[] all = values();
 }
