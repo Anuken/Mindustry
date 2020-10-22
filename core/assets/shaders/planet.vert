@@ -10,7 +10,7 @@ uniform vec3 u_ambientColor;
 
 varying vec4 v_col;
 
-const vec3 diffuse = vec3(0);
+const vec3 diffuse = vec3(0.01);
 const float shinefalloff = 4.0;
 const float shinelen = 0.2;
 

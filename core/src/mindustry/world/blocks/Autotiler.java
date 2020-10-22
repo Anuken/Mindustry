@@ -133,7 +133,7 @@ public interface Autotiler{
 
         for(int i = 0; i < 4; i++){
             int realDir = Mathf.mod(rotation - i, 4);
-            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.getNearbyEntity(realDir) != null && !tile.getNearbyEntity(realDir).block.squareSprite)){
+            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.nearbyBuild(realDir) != null && !tile.nearbyBuild(realDir).block.squareSprite)){
                 blendresult[4] |= (1 << i);
             }
         }
@@ -194,7 +194,7 @@ public interface Autotiler{
 
     // TODO docs -- use for direction?
     default boolean blends(Tile tile, int rotation, int direction){
-        Building other = tile.getNearbyEntity(Mathf.mod(rotation - direction, 4));
+        Building other = tile.nearbyBuild(Mathf.mod(rotation - direction, 4));
         return other != null && other.team == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation, other.block);
     }
 

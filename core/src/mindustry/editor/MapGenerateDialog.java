@@ -51,7 +51,7 @@ public class MapGenerateDialog extends BaseDialog{
     CachedTile ctile = new CachedTile(){
         //nothing.
         @Override
-        protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+        protected void changeBuild(Team team, Prov<Building> entityprov, int rotation){
 
         }
     };
@@ -417,7 +417,7 @@ public class MapGenerateDialog extends BaseDialog{
         public void set(Block floor, Block wall, Block ore, Team team){
             this.floor = floor.id;
             this.block = wall.id;
-            this.ore = !floor.asFloor().hasSurface() ? 0 : ore.id;
+            this.ore = (!floor.asFloor().hasSurface() && ore.asFloor().needsSurface) ? 0 : ore.id;
             this.team = (byte)team.id;
         }
 

@@ -250,7 +250,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             game.checkPref("buildautopause", false);
         }
-        game.checkPref("mapcenter", true);
 
         if(steam){
             game.sliderPref("playerlimit", 16, 2, 32, i -> {
@@ -292,7 +291,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
             return s + "%";
         });
-        graphics.sliderPref("bridgeopacity", 75, 0, 100, 5, s -> s + "%");
+        graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
@@ -340,9 +339,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
-        if(!mobile){
-            graphics.checkPref("blockselectkeys", true);
-        }
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", true);

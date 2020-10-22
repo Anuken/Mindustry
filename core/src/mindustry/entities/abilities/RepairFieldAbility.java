@@ -5,7 +5,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-public class HealFieldAbility extends Ability{
+public class RepairFieldAbility extends Ability{
     public float amount = 1, reload = 100, range = 60;
     public Effect healEffect = Fx.heal;
     public Effect activeEffect = Fx.healWaveDynamic;
@@ -13,9 +13,9 @@ public class HealFieldAbility extends Ability{
     protected float timer;
     protected boolean wasHealed = false;
 
-    HealFieldAbility(){}
+    RepairFieldAbility(){}
 
-    public HealFieldAbility(float amount, float reload, float range){
+    public RepairFieldAbility(float amount, float reload, float range){
         this.amount = amount;
         this.reload = reload;
         this.range = range;

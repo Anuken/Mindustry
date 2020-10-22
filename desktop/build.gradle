@@ -1,8 +1,7 @@
-import com.badlogicgames.packr.Packr
-import com.badlogicgames.packr.PackrConfig
+import com.badlogicgames.packr.*
 
-import java.nio.ByteBuffer
-import java.security.MessageDigest
+import java.nio.*
+import java.security.*
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 

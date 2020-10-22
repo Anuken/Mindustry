@@ -29,7 +29,7 @@ import static mindustry.Vars.*;
 
 public class Maps{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
+    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "veins", "glacier"};
     /** Maps tagged as PvP */
     static final String[] pvpMaps = {"veins", "glacier"};
     /** All maps stored in an ordered array. */
@@ -82,9 +82,7 @@ public class Maps{
     }
 
     public Maps(){
-        Events.on(ClientLoadEvent.class, event -> {
-            maps.sort();
-        });
+        Events.on(ClientLoadEvent.class, event -> maps.sort());
 
         if(Core.assets != null){
             ((CustomLoader)Core.assets.getLoader(ContentLoader.class)).loaded = this::createAllPreviews;
