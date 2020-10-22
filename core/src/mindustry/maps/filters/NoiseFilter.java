@@ -19,7 +19,7 @@ public class NoiseFilter extends GenerateFilter{
         new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
         new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
         new BlockOption("target", () -> target, b -> target = b, anyOptional),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
+        new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
         new BlockOption("wall", () -> block, b -> block = b, wallsOptional)
         );
     }
@@ -29,8 +29,8 @@ public class NoiseFilter extends GenerateFilter{
         float noise = noise(in.x, in.y, scl, 1f, octaves, falloff);
 
         if(noise > threshold && (target == Blocks.air || in.floor == target || in.block == target)){
-            in.floor = floor;
-            if(block != Blocks.air) in.block = block;
+            if(floor != Blocks.air) in.floor = floor;
+            if(block != Blocks.air && in.block != Blocks.air) in.block = block;
         }
     }
 }

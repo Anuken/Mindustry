@@ -26,14 +26,14 @@ public abstract class GenerateFilter{
             //save to buffer
             for(int i = 0; i < tiles.width * tiles.height; i++){
                 Tile tile = tiles.geti(i);
-                buffer[i] = TileBuffer.get(tile.blockID(), tile.floorID(), tile.overlayID());
+                buffer[i] = PackTile.get(tile.blockID(), tile.floorID(), tile.overlayID());
             }
 
             for(int i = 0; i < tiles.width * tiles.height; i++){
                 Tile tile = tiles.geti(i);
                 long b = buffer[i];
 
-                in.apply(tile.x, tile.y, Vars.content.block(TileBuffer.block(b)), Vars.content.block(TileBuffer.floor(b)), Vars.content.block(TileBuffer.overlay(b)));
+                in.apply(tile.x, tile.y, Vars.content.block(PackTile.block(b)), Vars.content.block(PackTile.floor(b)), Vars.content.block(PackTile.overlay(b)));
                 apply();
 
                 tile.setFloor(in.floor.asFloor());
@@ -151,7 +151,7 @@ public abstract class GenerateFilter{
     }
 
     @Struct
-    class TileBufferStruct{
+    class PackTileStruct{
         short block, floor, overlay;
     }
 }
