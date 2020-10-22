@@ -1,8 +1,9 @@
 package mindustry.entities.abilities;
 
+import arc.graphics.*;
+import arc.math.*;
 import arc.util.*;
 import arc.audio.*;
-import arc.math.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
