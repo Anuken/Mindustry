@@ -34,8 +34,8 @@ public class FormationAI extends AIController implements FormationMember{
             return;
         }
 
-        if(unit.type.canBoost && unit.canPassOn()){
-            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
+        if(unit.type.canBoost){
+            unit.elevation = Mathf.approachDelta(unit.elevation, !unit.canPassOn() ? 1f : leader.type.canBoost ? leader.elevation : 0f, 0.08f);
         }
 
         unit.controlWeapons(true, leader.isShooting);
@@ -53,10 +53,12 @@ public class FormationAI extends AIController implements FormationMember{
 
         float margin = 3f;
 
+        float speed = unit.realSpeed();
+
         if(unit.dst(realtarget) <= margin){
-            unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
+            unit.vel.approachDelta(Vec2.ZERO, speed * type.accel / 2f);
         }else{
-            unit.moveAt(realtarget.sub(unit).limit(type.speed));
+            unit.moveAt(realtarget.sub(unit).limit(speed));
         }
 
         if(unit instanceof Minerc mine && leader instanceof Minerc com){

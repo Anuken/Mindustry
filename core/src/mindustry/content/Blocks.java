@@ -121,6 +121,7 @@ public class Blocks implements ContentList{
         spawn = new OverlayFloor("spawn"){
             {
                 variants = 0;
+                needsSurface = false;
             }
             @Override
             public void drawBase(Tile tile){}
