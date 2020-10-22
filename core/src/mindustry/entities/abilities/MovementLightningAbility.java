@@ -14,7 +14,7 @@ public class MovementLightningAbility extends Ability{
     public float minSpeed = 0.8f, maxSpeed = 1.2f;
     public Effect shootEffect = Fx.sparkShoot;
     public Sound shootSound = Sounds.spark;
-    public Color color = Pal.lancerLaser;
+    public Color color = Color.valueOf("a9d8ff");
     
     MovementLightningAbility(){}
     
