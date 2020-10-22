@@ -332,7 +332,7 @@ public class Blocks implements ContentList{
 
         snowBoulder = new Boulder("snow-boulder"){{
             variants = 2;
-            snow.asFloor().decoration = ice.asFloor().decoration = iceSnow.asFloor().decoration = this;
+            snow.asFloor().decoration = ice.asFloor().decoration = iceSnow.asFloor().decoration = salt.asFloor().decoration = this;
         }};
 
         dirtWall = new StaticWall("dirt-wall"){{
