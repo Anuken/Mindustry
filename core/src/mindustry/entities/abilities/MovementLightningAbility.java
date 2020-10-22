@@ -13,23 +13,25 @@ public class MovementLightningAbility extends Ability{
     public float minSpeed = 0.8f, maxSpeed = 1.2f;
     public Effect shootEffect = Fx.sparkShoot;
     public Sound shootSound = Sounds.spark;
+    public Color color = Pal.lancerLaser;
     
     MovementLightningAbility(){}
     
-    public MovementLightningAbility(float damage, int length, float reload, float minSpeed, float maxSpeed){
+    public MovementLightningAbility(float damage, int length, float reload, float minSpeed, float maxSpeed, Color color){
         this.damage = damage;
         this.length = length;
         this.reload = reload;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
+        this.color = color;
     }
     
     @Override
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
         if(Mathf.chance(Time.delta * (reload * scl))){
-            shootEffect.at(unit.x, unit.y, unit.rotation, unit.team.color);
-            Lightning.create(unit.team, unit.team.color, damage, unit.x + unit.vel().x, unit.y + unit.vel().y, unit.rotation, length);
+            shootEffect.at(unit.x, unit.y, unit.rotation, color);
+            Lightning.create(unit.team, color, damage, unit.x + unit.vel().x, unit.y + unit.vel().y, unit.rotation, length);
             shootSound.at(unit.x, unit.y);
         }
     }
