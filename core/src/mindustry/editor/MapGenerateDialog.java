@@ -135,8 +135,12 @@ public class MapGenerateDialog extends BaseDialog{
                         Tile tile = editor.tile(x, y);
                         GenTile write = writeTiles[x][y];
 
+                        //don't mess up synthetic stuff.
+                        if(!tile.synthetic() && !content.block(write.block).synthetic()){
+                            tile.setBlock(content.block(write.block));
+                        }
+
                         tile.setFloor((Floor)content.block(write.floor));
-                        tile.setBlock(content.block(write.block));
                         tile.setTeam(Team.get(write.team));
                         tile.setOverlay(content.block(write.ore));
                     }
