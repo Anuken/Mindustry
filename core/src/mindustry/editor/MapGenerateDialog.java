@@ -66,7 +66,7 @@ public class MapGenerateDialog extends BaseDialog{
         shown(this::setup);
         addCloseButton();
         if(applied){
-            buttons.button("@editor.apply", () -> {
+            buttons.button("@editor.apply", Icon.ok, () -> {
                 ui.loadAnd(() -> {
                     apply();
                     hide();
@@ -79,14 +79,14 @@ public class MapGenerateDialog extends BaseDialog{
                 update();
             }).size(160f, 64f);
         }
-        buttons.button("@editor.randomize", () -> {
+        buttons.button("@editor.randomize", Icon.refresh, () -> {
             for(GenerateFilter filter : filters){
                 filter.randomize();
             }
             update();
         }).size(160f, 64f);
 
-        buttons.button("@add", Icon.add, this::showAdd).height(64f).width(140f);
+        buttons.button("@add", Icon.add, this::showAdd).height(64f).width(150f);
 
         if(!applied){
             hidden(this::apply);

@@ -39,7 +39,7 @@ public class SpawnPathFilter extends GenerateFilter{
 
         if(core != null && spawns.any()){
             for(var spawn : spawns){
-                var path = Astar.pathfind(core.x, core.y, spawn.x, spawn.y, t -> t.solid() ? 20 : 1, Astar.manhattan, tile -> !tile.floor().isDeep());
+                var path = Astar.pathfind(core.x, core.y, spawn.x, spawn.y, t -> t.solid() ? 100 : 1, Astar.manhattan, tile -> !tile.floor().isDeep());
                 for(var tile : path){
                     for(int x = -radius; x <= radius; x++){
                         for(int y = -radius; y <= radius; y++){

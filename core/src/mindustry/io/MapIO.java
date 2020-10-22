@@ -151,7 +151,7 @@ public class MapIO{
         if(wall.synthetic()){
             return team.color.rgba();
         }
-        return (wall.solid ? wall.mapColor : ore == Blocks.air ? floor.mapColor : ore.mapColor).rgba();
+        return (wall.solid ? wall.mapColor : !ore.useColor ? floor.mapColor : ore.mapColor).rgba();
     }
 
     public static Pixmap writeImage(Tiles tiles){

@@ -126,24 +126,62 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Building tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange) || player.dead()) return;
-        amount = Math.min(player.unit().maxAccepted(item), amount);
-        int fa = amount;
-
-        if(amount == 0) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
         !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
             action.item = item;
-            action.itemAmount = fa;
+            action.itemAmount = amount;
         }))) throw new ValidateException(player, "Player cannot request items.");
 
-        int removed = tile.removeStack(item, amount);
+        //remove item for every controlling unit
+        player.unit().eachGroup(unit -> {
+            int removed = Math.min(unit.maxAccepted(item), tile.removeStack(item, amount));
 
-        player.unit().addItem(item, removed);
-        Events.fire(new WithdrawEvent(tile, player, item, amount));
-        for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x, tile.y, player.unit()));
+            unit.addItem(item, removed);
+
+            for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
+                Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x, tile.y, unit));
+            }
+
+            if(unit == player.unit()){
+                Events.fire(new WithdrawEvent(tile, player, item, amount));
+            }
+        });
+    }
+
+    @Remote(targets = Loc.both, forward = true, called = Loc.server)
+    public static void transferInventory(Player player, Building tile){
+        if(player == null || tile == null || !player.within(tile, buildingRange) || tile.items == null || player.dead()) return;
+
+        if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
+        !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile, action -> {
+            action.itemAmount = player.unit().stack.amount;
+            action.item = player.unit().item();
+        }))){
+            throw new ValidateException(player, "Player cannot transfer an item.");
         }
+
+        //deposit for every controlling unit
+        player.unit().eachGroup(unit -> {
+            Item item = unit.item();
+            int accepted = tile.acceptStack(item, unit.stack.amount, unit);
+            unit.stack.amount -= accepted;
+
+            tile.getStackOffset(item, stackTrns);
+            tile.handleStack(item, accepted, unit);
+
+            createItemTransfer(
+                item,
+                accepted,
+                unit.x + Angles.trnsx(unit.rotation + 180f, backTrns), unit.y + Angles.trnsy(unit.rotation + 180f, backTrns),
+                new Vec2(tile.x + stackTrns.x, tile.y + stackTrns.y),
+                () -> {}
+            );
+
+            if(unit == player.unit()){
+                Events.fire(new DepositEvent(tile, player, item, accepted));
+            }
+        });
     }
 
     @Remote(variants = Variant.one)
@@ -274,37 +312,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         tile.rotation = Mathf.mod(tile.rotation + Mathf.sign(direction), 4);
         tile.updateProximity();
         tile.noSleep();
-    }
-
-    @Remote(targets = Loc.both, forward = true, called = Loc.server)
-    public static void transferInventory(Player player, Building tile){
-        if(player == null || tile == null || !player.within(tile, buildingRange) || tile.items == null || player.dead()) return;
-
-        if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile, action -> {
-                action.itemAmount = player.unit().stack.amount;
-                action.item = player.unit().item();
-            }))){
-            throw new ValidateException(player, "Player cannot transfer an item.");
-        }
-
-        Item item = player.unit().item();
-        int amount = player.unit().stack.amount;
-        int accepted = tile.acceptStack(item, amount, player.unit());
-        player.unit().stack.amount -= accepted;
-
-        Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
-
-        tile.getStackOffset(item, stackTrns);
-        tile.handleStack(item, accepted, player.unit());
-
-        createItemTransfer(
-            item,
-            amount,
-            player.x + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y + Angles.trnsy(player.unit().rotation + 180f, backTrns),
-            new Vec2(tile.x + stackTrns.x, tile.y + stackTrns.y),
-            () -> {}
-        );
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)

@@ -183,7 +183,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f) return;
+            if(clogHeat > 0.5f || !enabled) return;
 
             noSleep();
 
