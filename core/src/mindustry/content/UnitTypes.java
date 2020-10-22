@@ -1154,7 +1154,6 @@ public class UnitTypes implements ContentList{
             engineOffset = 6.5f;
             hitSize = 8f;
             lowAltitude = true;
-            isCounted = false;
 
             ammoType = AmmoTypes.power;
 

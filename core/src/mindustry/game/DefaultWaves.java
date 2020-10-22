@@ -263,7 +263,7 @@ public class DefaultWaves{
         {nova, pulsar, quasar, vela, corvus},
         {crawler, atrax, spiroct, arkyid, toxopid},
         //{risso, minke, bryde, sei, omura}, //questionable choices
-        {poly, poly, mega, quad, quad},
+        {flare, horizon, difficulty > 0.5 ? poly : zenith, quad, quad},
         {flare, horizon, zenith, antumbra, eclipse}
         };
 

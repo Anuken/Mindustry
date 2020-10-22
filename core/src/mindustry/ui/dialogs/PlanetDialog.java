@@ -368,7 +368,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(sector.save != null ? sector.save.getPlayTime() : "@sectors.unexplored").row();
 
-        if(sector.isAttacked() || sector.hasEnemyBase()){
+        if(sector.isAttacked() || !sector.hasBase()){
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 
