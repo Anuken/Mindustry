@@ -450,12 +450,15 @@ public class LExecutor{
                         if(!unit.within(x1, y1, range)){
                             exec.setobj(p3, null);
                             exec.setobj(p4, null);
+                            exec.setobj(p5, null);
                         }else{
                             Tile tile = world.tileWorld(x1, y1);
-                            //any environmental solid block is returned as StoneWall, aka "@solid"
-                            Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
+                            //any environmental solid block is returned as StoneWall, aka "@solid", any block in construction progress should return constructBlock
+                            Block block = tile == null ? null : (!tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block());
+
                             exec.setobj(p3, block);
                             exec.setobj(p4, tile != null && tile.build != null ? tile.build : null);
+                            exec.setbool(p5, tile != null && tile.block() instanceof ConstructBlock);
                         }
                     }
                     case itemDrop -> {
