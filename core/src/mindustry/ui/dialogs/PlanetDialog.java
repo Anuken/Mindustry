@@ -49,14 +49,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         shouldPause = true;
 
-        getCell(buttons).padBottom(-4);
-        buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
-
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        buttons.defaults().size(200f, 56f).pad(2);
+        buttons.button("@back", Icon.left, this::hide);
+        buttons.button("@techtree", Icon.tree, () -> ui.research.show());
+        buttons.bottom().margin(0).marginBottom(-8);
 
         dragged((cx, cy) -> {
             Vec3 pos = planets.camPos;
@@ -263,11 +259,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 Core.scene.setScrollFocus(PlanetDialog.this);
             }
         },
+        //info text
         new Table(t -> {
             t.touchable = Touchable.disabled;
             t.top();
             t.label(() -> mode == select ? "@sectors.select" : "").style(Styles.outlineLabel).color(Pal.accent);
         }),
+        buttons,
+        //planet selection
         new Table(t -> {
             t.right();
             if(content.planets().count(p -> p.accessible) > 1) {

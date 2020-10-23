@@ -1,7 +1,6 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.input.*;
 import arc.math.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -39,11 +38,7 @@ public class WaveInfoDialog extends BaseDialog{
             state.rules.spawns = groups;
         });
 
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        addCloseListener();
 
         onResize(this::setup);
         addCloseButton();
