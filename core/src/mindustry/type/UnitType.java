@@ -159,11 +159,11 @@ public class UnitType extends UnlockableContent{
         table.table(bars -> {
             bars.defaults().growX().height(20f).pad(4);
 
-            bars.add(new Bar("blocks.health", Pal.health, unit::healthf).blink(Color.white));
+            bars.add(new Bar("stat.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
 
             if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("blocks.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
+                bars.add(new Bar(ammoType.icon + " " + Core.bundle.get("stat.ammo"), ammoType.barColor, () -> unit.ammo / ammoCapacity));
                 bars.row();
             }
         }).growX();
@@ -171,6 +171,8 @@ public class UnitType extends UnlockableContent{
         if(unit.controller() instanceof LogicAI){
             table.row();
             table.add(Blocks.microProcessor.emoji() + " " + Core.bundle.get("units.processorcontrol")).growX().left();
+            table.row();
+            table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
         }
         
         table.row();
@@ -199,13 +201,29 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.speed, speed);
         stats.add(Stat.itemCapacity, health);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
+        stats.add(Stat.commandLimit, commandLimit);
         //TODO abilities, maybe try something like DPS
+
+        if(abilities.any()){
+            var unique = new ObjectSet<String>();
+
+            for(Ability a : abilities){
+                if(unique.add(a.localized())){
+                    stats.add(Stat.abilities, a.localized());
+                }
+            }
+        }
 
         if(inst instanceof Minerc && mineTier >= 1){
             stats.addPercent(Stat.mineSpeed, mineSpeed);
             stats.add(Stat.mineTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
         }
-        if(inst instanceof Builderc) stats.addPercent(Stat.buildSpeed, buildSpeed);
+        if(inst instanceof Builderc){
+            stats.addPercent(Stat.buildSpeed, buildSpeed);
+        }
+        if(inst instanceof Payloadc){
+            stats.add(Stat.payloadCapacity, (payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared);
+        }
     }
 
     @CallSuper
@@ -231,10 +249,17 @@ public class UnitType extends UnlockableContent{
         //set up default range
         if(range < 0){
             range = Float.MAX_VALUE;
-            maxRange = 0f;
             for(Weapon weapon : weapons){
-                range = Math.min(range, weapon.bullet.range() + hitSize /2f);
-                maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize /2f);
+                range = Math.min(range, weapon.bullet.range() + hitSize / 2f);
+                maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);
+            }
+        }
+
+        if(maxRange < 0){
+            maxRange = 0f;
+
+            for(Weapon weapon : weapons){
+                maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);
             }
         }
 

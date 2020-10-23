@@ -49,14 +49,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         shouldPause = true;
 
-        getCell(buttons).padBottom(-4);
-        buttons.background(Styles.black).defaults().growX().height(64f).pad(0);
-
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        buttons.defaults().size(200f, 56f).pad(2);
+        buttons.button("@back", Icon.left, this::hide);
+        buttons.button("@techtree", Icon.tree, () -> ui.research.show());
+        buttons.bottom().margin(0).marginBottom(-8);
 
         dragged((cx, cy) -> {
             Vec3 pos = planets.camPos;
@@ -128,7 +124,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase();
 
-        return sector.near().contains(Sector::hasBase)//(sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
+        return sector.hasBase() || sector.near().contains(Sector::hasBase) //near an occupied sector
             || (sector.preset != null && sector.preset.unlocked()); //is an unlocked preset
     }
 
@@ -263,11 +259,14 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 Core.scene.setScrollFocus(PlanetDialog.this);
             }
         },
+        //info text
         new Table(t -> {
             t.touchable = Touchable.disabled;
             t.top();
             t.label(() -> mode == select ? "@sectors.select" : "").style(Styles.outlineLabel).color(Pal.accent);
         }),
+        buttons,
+        //planet selection
         new Table(t -> {
             t.right();
             if(content.planets().count(p -> p.accessible) > 1) {
@@ -368,7 +367,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(sector.save != null ? sector.save.getPlayTime() : "@sectors.unexplored").row();
 
-        if(sector.isAttacked() || sector.hasEnemyBase()){
+        if(sector.isAttacked() || !sector.hasBase()){
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 

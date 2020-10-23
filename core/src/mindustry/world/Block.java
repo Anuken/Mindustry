@@ -100,6 +100,8 @@ public class Block extends UnlockableContent{
     public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
+    /** Whether to use this block's color in the minimap. Only used for overlays. */
+    public boolean useColor = true;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -343,7 +345,7 @@ public class Block extends UnlockableContent{
     }
 
     public void setBars(){
-        bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
+        bars.add("health", entity -> new Bar("stat.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
             Func<Building, Liquid> current;

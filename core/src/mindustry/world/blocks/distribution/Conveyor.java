@@ -67,7 +67,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return (otherblock.outputsItems() || lookingAt(tile, rotation, otherx, othery, otherblock))
+        return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
             && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
@@ -183,7 +183,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f) return;
+            if(clogHeat > 0.5f || !enabled) return;
 
             noSleep();
 

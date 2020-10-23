@@ -64,6 +64,8 @@ public class Floor extends Block{
     public Block wall = Blocks.air;
     /** Decoration block. Usually a rock. May be air. */
     public Block decoration = Blocks.air;
+    /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
+    public boolean needsSurface = true;
 
     protected TextureRegion[][] edges;
     protected Seq<Block> blenders = new Seq<>();

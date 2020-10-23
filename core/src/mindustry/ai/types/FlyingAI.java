@@ -16,7 +16,7 @@ public class FlyingAI extends AIController{
                 moveTo(target, unit.range() * 0.8f);
                 unit.lookAt(target);
             }else{
-                attack(100f);
+                attack(120f);
             }
         }
 
@@ -42,8 +42,6 @@ public class FlyingAI extends AIController{
 
         return null;
     }
-
-    //TODO clean up
 
     protected void attack(float circleLength){
         vec.set(target).sub(unit);
