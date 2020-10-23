@@ -60,7 +60,7 @@ public class LogicDialog extends BaseDialog{
                 int i = 0;
                 for(Prov<LStatement> prov : LogicIO.allStatements){
                     LStatement example = prov.get();
-                    if(example instanceof InvalidStatement) continue;
+                    if(example instanceof InvalidStatement || example.hidden()) continue;
 
                     TextButtonStyle style = new TextButtonStyle(Styles.cleart);
                     style.fontColor = example.category().color;

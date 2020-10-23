@@ -39,7 +39,7 @@ public class MirrorFilter extends GenerateFilter{
             if(!tile.block().synthetic()){
                 in.block = tile.block();
             }
-            in.ore = tile.overlay();
+            in.overlay = tile.overlay();
         }
     }
 

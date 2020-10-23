@@ -3,9 +3,11 @@ package mindustry.entities;
 import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -65,7 +67,7 @@ public class Units{
 
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team, UnitType type){
-        return teamIndex.countType(team, type) < getCap(team);
+        return team.data().countType(type) < getCap(team);
     }
 
     public static int getCap(Team team){
@@ -124,7 +126,7 @@ public class Units{
 
         nearby(x, y, width, height, unit -> {
             if(boolResult) return;
-            if((unit.isGrounded() && !unit.type().hovering) == ground){
+            if((unit.isGrounded() && !unit.type.hovering) == ground){
                 unit.hitbox(hitrect);
 
                 if(hitrect.overlaps(x, y, width, height)){
@@ -284,7 +286,7 @@ public class Units{
 
     /** Iterates over all units in a rectangle. */
     public static void nearby(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        teamIndex.tree(team).intersect(x, y, width, height, cons);
+        team.data().tree().intersect(x, y, width, height, cons);
     }
 
     /** Iterates over all units in a circle around this position. */
@@ -308,20 +310,12 @@ public class Units{
 
     /** Iterates over all units that are enemies of this team. */
     public static void nearbyEnemies(Team team, float x, float y, float width, float height, Cons<Unit> cons){
-        if(team.active()){
-            for(Team enemy : state.teams.enemiesOf(team)){
-                nearby(enemy, x, y, width, height, cons);
-            }
-        }else{
-            //inactive teams have no cache, check everything
-            //TODO cache all teams with units OR blocks
-            for(Team other : Team.all){
-                if(other != team && teamIndex.count(other) > 0){
-                    nearby(other, x, y, width, height, cons);
-                }
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            if(data.items[i].team != team){
+                nearby(data.items[i].team, x, y, width, height, cons);
             }
         }
-
     }
 
     /** Iterates over all units that are enemies of this team. */

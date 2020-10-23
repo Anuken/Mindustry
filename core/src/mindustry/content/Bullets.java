@@ -354,6 +354,8 @@ public class Bullets implements ContentList{
             width = 16f;
             height = 23f;
             shootEffect = Fx.shootBig;
+            pierceCap = 2;
+            pierceBuilding = true;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
@@ -363,6 +365,8 @@ public class Bullets implements ContentList{
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
             shootEffect = Fx.shootBig;
+            pierceCap = 2;
+            pierceBuilding = true;
         }};
 
         damageLightning = new BulletType(0.0001f, 0f){{
@@ -379,12 +383,18 @@ public class Bullets implements ContentList{
         JsonIO.copy(damageLightning, damageLightningGround);
         damageLightningGround.collidesAir = false;
 
-        healBullet = new HealBulletType(5.2f, 13){{
+        healBullet = new LaserBoltBulletType(5.2f, 13){{
             healPercent = 3f;
+            collidesTeam = true;
+            backColor = Pal.heal;
+            frontColor = Color.white;
         }};
 
-        healBulletBig = new HealBulletType(5.2f, 15){{
+        healBulletBig = new LaserBoltBulletType(5.2f, 15){{
             healPercent = 5.5f;
+            collidesTeam = true;
+            backColor = Pal.heal;
+            frontColor = Color.white;
         }};
 
         fireball = new BulletType(1f, 4){
@@ -500,7 +510,7 @@ public class Bullets implements ContentList{
             speed = 4f;
             knockback = 1.3f;
             puddleSize = 8f;
-            damage = 6f;
+            damage = 5f;
             drag = 0.001f;
             ammoMultiplier = 2f;
             statusDuration = 60f * 4f;

@@ -305,7 +305,7 @@ public class LCanvas extends Table{
                         statements.finishLayout();
                     }
                 });
-            }).growX();
+            }).growX().height(38);
 
             row();
 

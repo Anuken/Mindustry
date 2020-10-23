@@ -112,14 +112,20 @@ public class PowerNode extends PowerBlock{
             (UI.formatAmount((int)entity.power.graph.getLastPowerStored())), UI.formatAmount((int)entity.power.graph.getLastCapacity())),
             () -> Pal.powerBar,
             () -> Mathf.clamp(entity.power.graph.getLastPowerStored() / entity.power.graph.getLastCapacity())));
+
+        bars.add("connections", entity -> new Bar(() ->
+        Core.bundle.format("bar.powerlines", entity.power.links.size, maxNodes),
+            () -> Pal.items,
+            () -> (float)entity.power.links.size / (float)maxNodes
+        ));
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.powerRange, laserRange, StatUnit.blocks);
-        stats.add(BlockStat.powerConnections, maxNodes, StatUnit.none);
+        stats.add(Stat.powerRange, laserRange, StatUnit.blocks);
+        stats.add(Stat.powerConnections, maxNodes, StatUnit.none);
     }
 
     @Override

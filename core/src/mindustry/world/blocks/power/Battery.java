@@ -20,7 +20,7 @@ public class Battery extends PowerDistributor{
         super(name);
         outputsPower = true;
         consumesPower = true;
-        flags = EnumSet.of(BlockFlag.powerResupply);
+        flags = EnumSet.of(BlockFlag.battery);
     }
 
     public class BatteryBuild extends Building{

@@ -2,7 +2,6 @@ package mindustry.async;
 
 import arc.*;
 import arc.struct.*;
-import mindustry.*;
 import mindustry.game.EventType.*;
 
 import java.util.concurrent.*;
@@ -12,8 +11,7 @@ import static mindustry.Vars.*;
 public class AsyncCore{
     //all processes to be executed each frame
     private final Seq<AsyncProcess> processes = Seq.with(
-        new PhysicsProcess(),
-        Vars.teamIndex = new TeamIndexProcess()
+        new PhysicsProcess()
     );
 
     //futures to be awaited

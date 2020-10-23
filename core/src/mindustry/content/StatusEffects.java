@@ -33,7 +33,7 @@ public class StatusEffects implements ContentList{
 
         freezing = new StatusEffect("freezing"){{
             speedMultiplier = 0.6f;
-            armorMultiplier = 0.8f;
+            healthMultiplier = 0.8f;
             effect = Fx.freezing;
 
             init(() -> {
@@ -81,7 +81,7 @@ public class StatusEffects implements ContentList{
 
         melting = new StatusEffect("melting"){{
             speedMultiplier = 0.8f;
-            armorMultiplier = 0.8f;
+            healthMultiplier = 0.8f;
             damage = 0.3f;
             effect = Fx.melting;
 
@@ -93,7 +93,7 @@ public class StatusEffects implements ContentList{
 
         sapped = new StatusEffect("sapped"){{
             speedMultiplier = 0.7f;
-            armorMultiplier = 0.8f;
+            healthMultiplier = 0.8f;
             effect = Fx.sapped;
             effectChance = 0.1f;
         }};
@@ -115,7 +115,7 @@ public class StatusEffects implements ContentList{
         }};
 
         overdrive = new StatusEffect("overdrive"){{
-            armorMultiplier = 0.95f;
+            healthMultiplier = 0.95f;
             speedMultiplier = 1.15f;
             damageMultiplier = 1.4f;
             damage = -0.01f;
@@ -132,13 +132,13 @@ public class StatusEffects implements ContentList{
         }};
 
         shielded = new StatusEffect("shielded"){{
-            armorMultiplier = 3f;
+            healthMultiplier = 3f;
         }};
 
         boss = new StatusEffect("boss"){{
             permanent = true;
-            damageMultiplier = 1.5f;
-            armorMultiplier = 1.5f;
+            damageMultiplier = 2f;
+            healthMultiplier = 2f;
         }};
 
         shocked = new StatusEffect("shocked");

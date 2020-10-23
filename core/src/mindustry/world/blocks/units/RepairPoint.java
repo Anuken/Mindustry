@@ -42,7 +42,7 @@ public class RepairPoint extends Block{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.range, repairRadius / tilesize, StatUnit.blocks);
+        stats.add(Stat.range, repairRadius / tilesize, StatUnit.blocks);
     }
 
     @Override

@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -44,6 +45,16 @@ public class FileChooser extends BaseDialog{
         shown(() -> {
             cont.clear();
             setupWidgets();
+        });
+
+        keyDown(KeyCode.enter, () -> {
+            ok.fireClick();
+        });
+
+        keyDown(key -> {
+            if(key == KeyCode.escape || key == KeyCode.back){
+                Core.app.post(this::hide);
+            }
         });
     }
 

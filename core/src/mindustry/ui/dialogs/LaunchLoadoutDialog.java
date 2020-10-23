@@ -2,6 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.func.*;
+import arc.input.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -29,18 +30,27 @@ public class LaunchLoadoutDialog extends BaseDialog{
         super("@configure");
     }
 
-    public void show(CoreBlock core, Building build, Runnable confirm){
+    public void show(CoreBlock core, Sector sector, Runnable confirm){
         cont.clear();
         buttons.clear();
 
-        addCloseButton();
+        buttons.defaults().size(160f, 64f);
+        buttons.button("@back", Icon.left, this::hide);
+
+        keyDown(key -> {
+            if(key == KeyCode.escape || key == KeyCode.back){
+                Core.app.post(this::hide);
+            }
+        });
+
+        ItemSeq sitems = sector.getItems();
 
         //updates sum requirements
         Runnable update = () -> {
             total.clear();
             selected.requirements().each(total::add);
             universe.getLaunchResources().each(total::add);
-            valid = build.items.has(total);
+            valid = sitems.has(total);
         };
 
         Cons<Table> rebuild = table -> {
@@ -57,8 +67,8 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 String amountStr = "[lightgray]" + (al + " + [accent]" + as + "[lightgray]");
 
                 table.add(
-                    build.items.has(s.item, s.amount) ? amountStr :
-                    "[scarlet]" + (Math.min(build.items.get(s.item), s.amount) + "[lightgray]/" + amountStr)).padLeft(2).left().padRight(4);
+                    sitems.has(s.item, s.amount) ? amountStr :
+                    "[scarlet]" + (Math.min(sitems.get(s.item), s.amount) + "[lightgray]/" + amountStr)).padLeft(2).left().padRight(4);
 
                 if(++i % 4 == 0){
                     table.row();
@@ -79,7 +89,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 update.run();
                 rebuildItems.run();
             });
-        });
+        }).width(204);
 
         buttons.button("@launch.text", Icon.ok, () -> {
             universe.updateLoadout(core, selected);
@@ -100,7 +110,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                     selected = s;
                     update.run();
                     rebuildItems.run();
-                }).group(group).pad(4).disabled(!build.items.has(s.requirements())).checked(s == selected).size(200f);
+                }).group(group).pad(4).disabled(!sitems.has(s.requirements())).checked(s == selected).size(200f);
 
                 if(++i % cols == 0){
                     t.row();
@@ -110,6 +120,8 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         cont.row();
         cont.add(items);
+        cont.row();
+        cont.add("@sector.missingresources").visible(() -> !valid);
 
         update.run();
         rebuildItems.run();
