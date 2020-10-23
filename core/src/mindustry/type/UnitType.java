@@ -199,7 +199,7 @@ public class UnitType extends UnlockableContent{
 
         stats.add(Stat.health, health);
         stats.add(Stat.speed, speed);
-        stats.add(Stat.itemCapacity, health);
+        stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
         stats.add(Stat.commandLimit, commandLimit);
         //TODO abilities, maybe try something like DPS
