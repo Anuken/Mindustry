@@ -14,6 +14,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.*;
@@ -86,7 +87,7 @@ public class UnitFactory extends UnitBlock{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.itemCapacity);
+        stats.remove(Stat.itemCapacity);
     }
 
     @Override
@@ -120,6 +121,12 @@ public class UnitFactory extends UnitBlock{
 
         public float fraction(){
             return currentPlan == -1 ? 0 : progress / plans.get(currentPlan).time;
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
+            return super.senseObject(sensor);
         }
 
         @Override

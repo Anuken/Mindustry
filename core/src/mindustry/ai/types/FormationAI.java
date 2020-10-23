@@ -7,6 +7,7 @@ import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
 
 public class FormationAI extends AIController implements FormationMember{
     public Unit leader;
@@ -26,15 +27,15 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public void updateUnit(){
-        UnitType type = unit.type();
+        UnitType type = unit.type;
 
         if(leader.dead){
             unit.resetController();
             return;
         }
 
-        if(unit.type().canBoost && unit.canPassOn()){
-            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, 0.08f);
+        if(unit.type.canBoost){
+            unit.elevation = Mathf.approachDelta(unit.elevation, !unit.canPassOn() ? 1f : leader.type.canBoost ? leader.elevation : 0f, 0.08f);
         }
 
         unit.controlWeapons(true, leader.isShooting);
@@ -42,7 +43,7 @@ public class FormationAI extends AIController implements FormationMember{
 
         unit.aim(leader.aimX(), leader.aimY());
 
-        if(unit.type().rotateShooting){
+        if(unit.type.rotateShooting){
             unit.lookAt(leader.aimX(), leader.aimY());
         }else if(unit.moving()){
             unit.lookAt(unit.vel.angle());
@@ -52,10 +53,36 @@ public class FormationAI extends AIController implements FormationMember{
 
         float margin = 3f;
 
+        float speed = unit.realSpeed();
+
         if(unit.dst(realtarget) <= margin){
-            unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
+            unit.vel.approachDelta(Vec2.ZERO, speed * type.accel / 2f);
         }else{
-            unit.moveAt(realtarget.sub(unit).limit(type.speed));
+            unit.moveAt(realtarget.sub(unit).limit(speed));
+        }
+
+        if(unit instanceof Minerc mine && leader instanceof Minerc com){
+            if(mine.validMine(com.mineTile())){
+                mine.mineTile(com.mineTile());
+
+                CoreBuild core = unit.team.core();
+
+                if(core != null && com.mineTile().drop() != null && unit.within(core, unit.type.range) && !unit.acceptsItem(com.mineTile().drop())){
+                    if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
+                        Call.transferItemTo(unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
+
+                        unit.clearItem();
+                    }
+                }
+            }else{
+                mine.mineTile(null);
+            }
+
+        }
+
+        if(unit instanceof Builderc build && leader instanceof Builderc com && com.activelyBuilding()){
+            build.clearBuilding();
+            build.addBuild(com.buildPlan());
         }
     }
 
@@ -69,7 +96,7 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public float formationSize(){
-        return unit.hitSize * 1f;
+        return unit.hitSize * 1.1f;
     }
 
     @Override

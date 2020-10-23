@@ -20,6 +20,7 @@ public class OreBlock extends OverlayFloor{
         this.itemDrop = ore;
         this.variants = 3;
         this.mapColor.set(ore.color);
+        this.useColor = true;
     }
 
     /** For mod use only!*/

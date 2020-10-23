@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -10,6 +11,7 @@ import arc.util.*;
 import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
@@ -36,7 +38,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Import int id;
 
     private UnitController controller;
-    private UnitType type;
+    UnitType type;
     boolean spawnedByCore;
     double flag;
 
@@ -70,6 +72,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
     }
 
+    /** Iterates through this unit and everything it is controlling. */
+    public void eachGroup(Cons<Unit> cons){
+        cons.get(self());
+        controlling().each(cons);
+    }
+
     @Override
     public float range(){
         return type.range;
@@ -88,12 +96,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case rotation -> rotation;
             case health -> health;
             case maxHealth -> maxHealth;
-            case x -> x;
-            case y -> y;
+            case ammo -> !state.rules.unitAmmo ? type.ammoCapacity : ammo;
+            case ammoCapacity -> type.ammoCapacity;
+            case x -> World.conv(x);
+            case y -> World.conv(y);
             case team -> team.id;
             case shooting -> isShooting() ? 1 : 0;
-            case shootX -> aimX();
-            case shootY -> aimY();
+            case shootX -> World.conv(aimX());
+            case shootY -> World.conv(aimY());
             case flag -> flag;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
@@ -108,7 +118,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case firstItem -> stack().amount == 0 ? null : item();
             case payloadType -> self() instanceof Payloadc pay ?
                 (pay.payloads().isEmpty() ? null :
-                pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type() :
+                pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
                 pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
             default -> noSensed;
         };
@@ -161,20 +171,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public void set(UnitType def, UnitController controller){
-        type(type);
+        if(this.type != def){
+            setType(def);
+        }
         controller(controller);
-    }
-
-    @Override
-    public void type(UnitType type){
-        if(this.type == type) return;
-
-        setStats(type);
-    }
-
-    @Override
-    public UnitType type(){
-        return type;
     }
 
     /** @return pathfinder path type for calculating costs */
@@ -206,7 +206,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return Units.getCap(team);
     }
 
-    public void setStats(UnitType type){
+    public void setType(UnitType type){
         this.type = type;
         this.maxHealth = type.health;
         this.drag = type.drag;
@@ -224,7 +224,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     @Override
     public void afterSync(){
         //set up type info after reading
-        setStats(this.type);
+        setType(this.type);
         controller.unit(self());
     }
 
@@ -284,7 +284,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f);
 
         //apply knockback based on spawns
-        if(team != state.rules.waveTeam){
+        if(team != state.rules.waveTeam && state.hasSpawns()){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){

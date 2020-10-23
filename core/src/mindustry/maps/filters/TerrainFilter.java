@@ -31,11 +31,10 @@ public class TerrainFilter extends GenerateFilter{
         float noise = noise(in.x, in.y, scl, magnitude, octaves, falloff) + Mathf.dst((float)in.x / in.width, (float)in.y / in.height, 0.5f, 0.5f) * circleScl;
 
         in.floor = floor;
-        in.ore = Blocks.air;
 
         if(noise >= threshold){
             in.block = block;
-        }else{
+        }else if(!in.block.synthetic()){
             in.block = Blocks.air;
         }
     }
