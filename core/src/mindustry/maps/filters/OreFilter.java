@@ -27,7 +27,7 @@ public class OreFilter extends GenerateFilter{
     public void apply(){
         float noise = noise(in.x, in.y, scl, 1f, octaves, falloff);
 
-        if(noise > threshold && in.overlay != Blocks.spawn && (target == Blocks.air || in.floor == target || in.overlay == target)){
+        if(noise > threshold && in.overlay != Blocks.spawn && (target == Blocks.air || in.floor == target || in.overlay == target) && in.floor.asFloor().hasSurface()){
             in.overlay = ore;
         }
     }
