@@ -113,7 +113,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     /** Unlocks this content, but does not fire any events. */
-    public void quiteUnlock(){
+    public void quietUnlock(){
         if(!unlocked()){
             unlocked = true;
             Core.settings.put(name + "-unlocked", true);
