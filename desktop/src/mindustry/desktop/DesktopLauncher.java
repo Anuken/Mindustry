@@ -227,7 +227,9 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public void updateLobby(){
-        SVars.net.updateLobby();
+        if(SVars.net != null){
+            SVars.net.updateLobby();
+        }
     }
 
     @Override

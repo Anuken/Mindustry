@@ -26,6 +26,8 @@ import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.units.*;
+import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -36,7 +38,7 @@ import java.lang.reflect.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
-    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class);
+    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
@@ -170,11 +172,9 @@ public class ContentParser{
             readBundle(ContentType.block, name, value);
 
             Block block;
-            boolean exists;
 
             if(locate(ContentType.block, name) != null){
                 block = locate(ContentType.block, name);
-                exists = true;
 
                 if(value.has("type")){
                     throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
@@ -182,7 +182,6 @@ public class ContentParser{
             }else{
                 //TODO generate dynamically instead of doing.. this
                 Class<? extends Block> type;
-                exists = false;
 
                 try{
                     type = resolve(getType(value),
@@ -191,6 +190,7 @@ public class ContentParser{
                     "mindustry.world.blocks.defense",
                     "mindustry.world.blocks.defense.turrets",
                     "mindustry.world.blocks.distribution",
+                    "mindustry.world.blocks.environment",
                     "mindustry.world.blocks.liquid",
                     "mindustry.world.blocks.logic",
                     "mindustry.world.blocks.power",
@@ -207,14 +207,6 @@ public class ContentParser{
             }
 
             currentContent = block;
-
-            String[] research = {null};
-
-            //add research tech node
-            if(value.has("research")){
-                research[0] = value.get("research").asString();
-                value.remove("research");
-            }
 
             read(() -> {
                 if(value.has("consumes")){
@@ -246,33 +238,6 @@ public class ContentParser{
                     throw new IllegalArgumentException("Blocks cannot be larger than " + ConstructBlock.maxSize);
                 }
 
-                //add research tech node
-                if(research[0] != null){
-                    //TODO only works with blocks
-                    Block parent = find(ContentType.block, research[0]);
-                    TechNode baseNode = exists && TechTree.all.contains(t -> t.content == block) ? TechTree.all.find(t -> t.content == block) : TechTree.create(parent, block);
-                    LoadedMod cur = currentMod;
-
-                    postreads.add(() -> {
-                        currentContent = block;
-                        currentMod = cur;
-
-                        if(baseNode.parent != null){
-                            baseNode.parent.children.remove(baseNode);
-                        }
-
-                        TechNode parnode = TechTree.all.find(t -> t.content == parent);
-                        if(parnode == null){
-                            throw new IllegalArgumentException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.");
-                        }
-                        if(!parnode.children.contains(baseNode)){
-                            parnode.children.add(baseNode);
-                        }
-                        baseNode.parent = parnode;
-                    });
-
-                }
-
                 //make block visible by default if there are requirements and no visibility set
                 if(value.has("requirements") && block.buildVisibility == BuildVisibility.hidden){
                     block.buildVisibility = BuildVisibility.shown;
@@ -293,9 +258,64 @@ public class ContentParser{
             }
 
             currentContent = unit;
-            read(() -> readFields(unit, value, true));
+            //TODO test this!
+            read(() -> {
+                //add reconstructor type
+                if(value.has("requirements")){
+                    JsonValue rec = value.remove("requirements");
+
+                    //intermediate class for parsing
+                    class UnitReq{
+                        public Block block;
+                        public ItemStack[] requirements = {};
+                        @Nullable
+                        public UnitType previous;
+                        public float time = 60f * 10f;
+                    }
+
+                    UnitReq req = parser.readValue(UnitReq.class, rec);
+
+                    if(req.block instanceof Reconstructor r){
+                        if(req.previous != null){
+                            r.upgrades.add(new UnitType[]{req.previous, unit});
+                        }
+                    }else if(req.block instanceof UnitFactory f){
+                        f.plans.add(new UnitPlan(unit, req.time, req.requirements));
+                    }else{
+                        throw new IllegalArgumentException("Missing a valid 'block' in 'requirements'");
+                    }
+
+                }
+
+                //read extra default waves
+                if(value.has("waves")){
+                    JsonValue waves = value.remove("waves");
+                    SpawnGroup[] groups = parser.readValue(SpawnGroup[].class, waves);
+                    for(SpawnGroup group : groups){
+                        group.type = unit;
+                    }
+
+                    Vars.defaultWaves.get().addAll(groups);
+                }
+
+                readFields(unit, value, true);
+            });
 
             return unit;
+        },
+        ContentType.weather, (TypeParser<Weather>)(mod, name, value) -> {
+            Weather item;
+            if(locate(ContentType.weather, name) != null){
+                item = locate(ContentType.weather, name);
+                readBundle(ContentType.weather, name, value);
+            }else{
+                readBundle(ContentType.weather, name, value);
+                Class<? extends Weather> type = resolve(getType(value), "mindustry.type.weather");
+                item = make(type);
+            }
+            currentContent = item;
+            read(() -> readFields(item, value));
+            return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, parser(ContentType.liquid, Liquid::new)
@@ -324,8 +344,8 @@ public class ContentParser{
     private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
             T item;
-            if(Vars.content.getByName(type, name) != null){
-                item = (T)Vars.content.getByName(type, name);
+            if(locate(type, name) != null){
+                item = (T)locate(type, name);
                 readBundle(type, name, value);
             }else{
                 readBundle(type, name, value);
@@ -563,6 +583,8 @@ public class ContentParser{
     }
 
     void readFields(Object object, JsonValue jsonMap){
+        JsonValue research = jsonMap.remove("research");
+
         toBeParsed.remove(object);
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
@@ -592,6 +614,57 @@ public class ContentParser{
                 ex.addTrace(field.getName() + " (" + type.getName() + ")");
                 throw ex;
             }
+        }
+
+
+        if(object instanceof UnlockableContent unlock && research != null){
+
+            //add research tech node
+            String researchName;
+            ItemStack[] customRequirements;
+
+            //research can be a single string or an object with parent and requirements
+            if(research.isString()){
+                researchName = research.asString();
+                customRequirements = null;
+            }else{
+                researchName = research.getString("parent");
+                customRequirements = research.has("requirements") ? parser.readValue(ItemStack[].class, research.get("requirements")) : null;
+            }
+
+            //remove old node
+            TechNode lastNode = TechTree.all.find(t -> t.content == unlock);
+            if(lastNode != null){
+                lastNode.remove();
+            }
+
+            TechNode node = new TechNode(null, unlock, customRequirements == null ? unlock.researchRequirements() : customRequirements);
+            LoadedMod cur = currentMod;
+
+            postreads.add(() -> {
+                currentContent = unlock;
+                currentMod = cur;
+
+                //remove old node from parent
+                if(node.parent != null){
+                    node.parent.children.remove(node);
+                }
+
+
+                //find parent node.
+                TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
+
+                if(parent == null){
+                    throw new IllegalArgumentException("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                }
+
+                //add this node to the parent
+                if(!parent.children.contains(node)){
+                    parent.children.add(node);
+                }
+                //reparent the node
+                node.parent = parent;
+            });
         }
     }
 

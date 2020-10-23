@@ -53,7 +53,7 @@ public class StackConveyor extends Block implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
     }
 
     @Override
@@ -200,14 +200,10 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
-                    if(front() != null
-                    && front().team == team
-                    && front().block instanceof StackConveyor){
-                        StackConveyorBuild e = (StackConveyorBuild)front();
-
+                    if(front() instanceof StackConveyorBuild e && e.team == team){
                         // sleep if its occupied
                         if(e.link == -1){
-                            e.items.addAll(items);
+                            e.items.add(items);
                             e.lastItem = lastItem;
                             e.link = tile.pos();
                             // ▲ to | from ▼
@@ -227,7 +223,7 @@ public class StackConveyor extends Block implements Autotiler{
             if(builds.first() instanceof ConveyorBuild build){
                 Item item = build.items.first();
                 if(item != null){
-                    handleStack(item, build.items.get(itemCapacity), null);
+                    handleStack(item, build.items.get(item), null);
                 }
             }
         }

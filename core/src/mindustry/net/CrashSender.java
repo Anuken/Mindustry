@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 public class CrashSender{
 
     public static String createReport(String error){
-        String report = "Mindustry has crashed. How unforunate.\n";
+        String report = "Mindustry has crashed. How unfortunate.\n";
         if(mods.list().size == 0 && Version.build != -1){
             report += "Report this at " + Vars.reportIssueURL + "\n\n";
         }

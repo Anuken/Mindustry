@@ -116,7 +116,6 @@ abstract class BuilderComp implements Unitc{
         current.progress = entity.progress;
     }
 
-
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     void drawBuildRequests(){
 
@@ -208,7 +207,8 @@ abstract class BuilderComp implements Unitc{
         BuildPlan plan = buildPlan();
         Tile tile = world.tile(plan.x, plan.y);
 
-        if(dst(tile) > buildingRange && !state.isEditor()){
+
+        if(tile == null || (!within(tile, buildingRange) && !state.isEditor())){
             return;
         }
 

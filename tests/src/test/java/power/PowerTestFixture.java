@@ -28,16 +28,16 @@ public class PowerTestFixture{
         headless = true;
         Core.graphics = new FakeGraphics();
         Core.files = new MockFiles();
-        Vars.state = new GameState();
-        Vars.tree = new FileTree();
         Vars.content = new ContentLoader(){
             @Override
             public void handleMappableContent(MappableContent content){
 
             }
         };
+        Vars.state = new GameState();
+        Vars.tree = new FileTree();
         content.createBaseContent();
-        Log.setUseColors(false);
+        Log.useColors = false;
         Time.setDeltaProvider(() -> 0.5f);
     }
 

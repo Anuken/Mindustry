@@ -146,7 +146,7 @@ public class Effect{
         if(headless || region == null || !Core.atlas.isFound(region)) return;
 
         Tile tile = world.tileWorld(x, y);
-        if(tile == null || tile.floor().isLiquid) return;
+        if(tile == null || !tile.floor().hasSurface()) return;
 
         Decal decal = Decal.create();
         decal.set(x, y);

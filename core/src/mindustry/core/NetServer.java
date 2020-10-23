@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -249,8 +250,7 @@ public class NetServer implements ApplicationListener{
             }catch(ValidateException e){
                 Log.debug("Validation failed for '@': @", e.player, e.getMessage());
             }catch(RuntimeException e){
-                if(e.getCause() instanceof ValidateException){
-                    ValidateException v = (ValidateException)e.getCause();
+                if(e.getCause() instanceof ValidateException v){
                     Log.debug("Validation failed for '@': @", v.player, v.getMessage());
                 }else{
                     throw e;
@@ -300,6 +300,15 @@ public class NetServer implements ApplicationListener{
             }
         });
 
+        clientCommands.<Player>register("a", "<message...>", "Send a message only to admins.", (args, player) -> {
+            if(!player.admin){
+                player.sendMessage("[scarlet]You must be admin to use this command.");
+                return;
+            }
+			
+            Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[#" + Pal.adminChat.toString() + "]<A>" + NetClient.colorizeName(player.id, player.name)));
+        });
+
         //duration of a a kick in seconds
         int kickDuration = 60 * 60;
         //voting round duration in seconds
@@ -330,8 +339,8 @@ public class NetServer implements ApplicationListener{
                 votes += d;
                 voted.addAll(player.uuid(), admins.getInfo(player.uuid()).lastIP);
 
-                Call.sendMessage(Strings.format("[lightgray]A player has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
-                            target.name, votes, votesRequired()));
+                Call.sendMessage(Strings.format("[lightgray]@[lightgray] has voted on kicking[orange] @[].[accent] (@/@)\n[lightgray]Type[orange] /vote <y/n>[] to agree.",
+                    player.name, target.name, votes, votesRequired()));
 
                 checkPass();
             }
@@ -509,7 +518,8 @@ public class NetServer implements ApplicationListener{
                 Call.playerDisconnect(player.id());
             }
 
-            if(Config.showConnectMessages.bool()) Log.info("&lm[@] &lc@ has disconnected. &lg&fi(@)", player.uuid(), player.name, reason);
+            String message = Strings.format("&lb@&fi&lk has disconnected. &fi&lk[&lb@&fi&lk] (@)", player.name, player.uuid(), reason);
+            if(Config.showConnectMessages.bool()) Log.info(message);
         }
 
         player.remove();
@@ -576,7 +586,7 @@ public class NetServer implements ApplicationListener{
             shooting = false;
         }
 
-        if(!player.dead() && (player.unit().type().flying || !player.unit().type().canBoost)){
+        if(!player.dead() && (player.unit().type.flying || !player.unit().type.canBoost)){
             boosting = false;
         }
 
@@ -630,7 +640,7 @@ public class NetServer implements ApplicationListener{
             Unit unit = player.unit();
 
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
-            float maxSpeed = ((player.unit().type().canBoost && player.unit().isFlying()) ? player.unit().type().boostMultiplier : 1f) * player.unit().type().speed;
+            float maxSpeed = ((player.unit().type.canBoost && player.unit().isFlying()) ? player.unit().type.boostMultiplier : 1f) * player.unit().type.speed;
             if(unit.isGrounded()){
                 maxSpeed *= unit.floorSpeedMultiplier();
             }
@@ -737,7 +747,8 @@ public class NetServer implements ApplicationListener{
 
         if(Config.showConnectMessages.bool()){
             Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
-            Log.info("&lm[@] &y@ has connected.", player.uuid(), player.name);
+            String message = Strings.format("&lb@&fi&lk has connected. &fi&lk[&lb@&fi&lk]", player.name, player.uuid());
+            Log.info(message);
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
@@ -786,7 +797,7 @@ public class NetServer implements ApplicationListener{
     public void openServer(){
         try{
             net.host(Config.port.num());
-            info("&lcOpened a server on port @.", Config.port.num());
+            info("Opened a server on port @.", Config.port.num());
         }catch(BindException e){
             Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
             state.set(State.menu);
