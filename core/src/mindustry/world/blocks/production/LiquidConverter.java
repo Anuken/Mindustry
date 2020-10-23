@@ -27,7 +27,7 @@ public class LiquidConverter extends GenericCrafter{
     public void setStats(){
         super.setStats();
         stats.remove(Stat.output);
-        stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount * craftTime, false);
+        stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount * 60f, true);
     }
 
     public class LiquidConverterBuild extends GenericCrafterBuild{
