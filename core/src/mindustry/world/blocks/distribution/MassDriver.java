@@ -105,10 +105,6 @@ public class MassDriver extends Block{
             Building link = world.build(this.link);
             boolean hasLink = linkValid();
 
-            if(hasLink){
-                this.link = link.pos();
-            }
-
             //reload regardless of state
             if(reload > 0f){
                 reload = Mathf.clamp(reload - edelta() / reloadTime);

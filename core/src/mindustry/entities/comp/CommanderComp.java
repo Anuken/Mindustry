@@ -30,7 +30,7 @@ abstract class CommanderComp implements Entityc, Posc{
 
     public void update(){
         if(formation != null){
-            formation.anchor.set(x, y, 0);
+            formation.anchor.set(x, y, /*rotation*/ 0); //TODO rotation set to 0 because rotating is pointless
             formation.updateSlots();
         }
     }
@@ -74,7 +74,7 @@ abstract class CommanderComp implements Entityc, Posc{
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
-        float spacing = hitSize * 0.8f;
+        float spacing = hitSize * 0.65f;
         minFormationSpeed = type.speed;
 
         controlling.addAll(units);

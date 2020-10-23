@@ -29,10 +29,10 @@ public class ServerLauncher implements ApplicationListener{
             Vars.platform = new Platform(){};
             Vars.net = new Net(platform.getNet());
 
-            logger = (level1, text) -> {
-                    String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level1.ordinal()] + " " + text + "&fr");
-                    System.out.println(result);
-                };
+            Log.setLogger((level, text) -> {
+                String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level.ordinal()] + " " + text + "&fr");
+                System.out.println(result);
+            });
             new HeadlessApplication(new ServerLauncher(), null, throwable -> CrashSender.send(throwable, f -> {}));
         }catch(Throwable t){
             CrashSender.send(t, f -> {});

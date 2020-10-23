@@ -9,7 +9,7 @@ import static mindustry.maps.filters.FilterOption.*;
 
 public class NoiseFilter extends GenerateFilter{
     float scl = 40, threshold = 0.5f, octaves = 3f, falloff = 0.5f;
-    Block floor = Blocks.stone, block = Blocks.stoneWall, target = Blocks.air;
+    Block floor = Blocks.stone, block = Blocks.stoneWall;
 
     @Override
     public FilterOption[] options(){
@@ -18,9 +18,8 @@ public class NoiseFilter extends GenerateFilter{
         new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
         new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
         new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
-        new BlockOption("target", () -> target, b -> target = b, anyOptional),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
-        new BlockOption("wall", () -> block, b -> block = b, wallsOptional)
+        new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
+        new BlockOption("wall", () -> block, b -> block = b, wallsOnly)
         );
     }
 
@@ -28,9 +27,9 @@ public class NoiseFilter extends GenerateFilter{
     public void apply(){
         float noise = noise(in.x, in.y, scl, 1f, octaves, falloff);
 
-        if(noise > threshold && (target == Blocks.air || in.floor == target || in.block == target)){
-            if(floor != Blocks.air) in.floor = floor;
-            if(block != Blocks.air && in.block != Blocks.air) in.block = block;
+        if(noise > threshold){
+            in.floor = floor;
+            if(wallsOnly.get(in.block)) in.block = block;
         }
     }
 }

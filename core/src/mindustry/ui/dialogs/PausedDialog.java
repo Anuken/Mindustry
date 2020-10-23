@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.input.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
@@ -16,7 +17,11 @@ public class PausedDialog extends BaseDialog{
 
         shown(this::rebuild);
 
-        addCloseListener();
+        keyDown(key -> {
+            if(key == KeyCode.escape || key == KeyCode.back){
+                hide();
+            }
+        });
     }
 
     void rebuild(){

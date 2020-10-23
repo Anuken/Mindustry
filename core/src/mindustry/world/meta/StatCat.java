@@ -9,7 +9,7 @@ public enum StatCat{
     liquids,
     items,
     crafting,
-    function,
+    shooting,
     optional;
 
     public String localized(){

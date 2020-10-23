@@ -24,6 +24,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -59,6 +60,7 @@ public abstract class Turret extends ReloadTurret{
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
+    public boolean acceptCoolant = true;
 
     public Sortf unitSort = Unit::dst2;
 
@@ -103,6 +105,10 @@ public abstract class Turret extends ReloadTurret{
         stats.add(Stat.reload, 60f / reloadTime * shots, StatUnit.none);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
+
+        if(acceptCoolant){
+            stats.add(Stat.booster, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, true, l -> consumes.liquidfilters.get(l.id)));
+        }
     }
 
     @Override

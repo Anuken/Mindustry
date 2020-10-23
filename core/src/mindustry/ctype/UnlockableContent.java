@@ -50,7 +50,9 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     /** Intializes stats on demand. Should only be called once. Only called before something is displayed. */
+    @CallSuper
     public void setStats(){
+        stats.intialized = true;
     }
 
     /** Generate any special icons for this content. Called asynchronously.*/
@@ -74,11 +76,9 @@ public abstract class UnlockableContent extends MappableContent{
             cicons[icon.ordinal()] =
                 Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
                 Core.atlas.find(getContentType().name() + "-" + name + "-full",
-                Core.atlas.find(name + "-" + icon.name(),
-                Core.atlas.find(name + "-full",
                 Core.atlas.find(name,
                 Core.atlas.find(getContentType().name() + "-" + name,
-                Core.atlas.find(name + "1")))))));
+                Core.atlas.find(name + "1")))));
         }
         return cicons[icon.ordinal()];
     }
@@ -114,25 +114,9 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
-    /** Unlocks this content, but does not fire any events. */
-    public void quietUnlock(){
-        if(!unlocked()){
-            unlocked = true;
-            Core.settings.put(name + "-unlocked", true);
-        }
-    }
-
     public boolean unlocked(){
         if(net.client()) return state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
-    }
-
-    /** Locks this content again. */
-    public void clearUnlock(){
-        if(unlocked){
-            unlocked = false;
-            Core.settings.put(name + "-unlocked", false);
-        }
     }
 
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */

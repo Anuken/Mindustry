@@ -1,7 +1,6 @@
 package mindustry.entities.comp;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -70,12 +69,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     /** @return speed with boost multipliers factored in. */
     public float realSpeed(){
         return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
-    }
-
-    /** Iterates through this unit and everything it is controlling. */
-    public void eachGroup(Cons<Unit> cons){
-        cons.get(self());
-        controlling().each(cons);
     }
 
     @Override

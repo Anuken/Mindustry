@@ -37,10 +37,6 @@ public class LiquidTurret extends Turret{
         super.setStats();
 
         stats.add(Stat.ammo, new AmmoListValue<>(ammoTypes));
-    }
-
-    @Override
-    public void init(){
         consumes.add(new ConsumeLiquidFilter(i -> ammoTypes.containsKey(i), 1f){
             @Override
             public boolean valid(Building entity){
@@ -57,8 +53,6 @@ public class LiquidTurret extends Turret{
 
             }
         });
-
-        super.init();
     }
 
     public class LiquidTurretBuild extends TurretBuild{

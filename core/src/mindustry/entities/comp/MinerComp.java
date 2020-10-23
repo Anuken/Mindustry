@@ -54,7 +54,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             }
         }
 
-        if(!validMine(mineTile)){
+        if(core == null || !validMine(mineTile)){
             mineTile = null;
             mineTimer = 0f;
         }else if(mining()){
@@ -69,7 +69,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             if(mineTimer >= 50f + item.hardness*15f){
                 mineTimer = 0;
 
-                if(core != null && within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
+                if(within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
                     Call.transferItemTo(item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f), core);

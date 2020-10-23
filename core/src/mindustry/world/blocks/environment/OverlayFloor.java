@@ -9,7 +9,6 @@ public class OverlayFloor extends Floor{
 
     public OverlayFloor(String name){
         super(name);
-        useColor = false;
     }
 
     @Override

@@ -118,7 +118,7 @@ public enum EditorTool{
                 if(editor.drawBlock.isOverlay()){
                     Block dest = tile.overlay();
                     if(dest == editor.drawBlock) return;
-                    tester = t -> t.overlay() == dest && (t.floor().hasSurface() || !t.floor().needsSurface);
+                    tester = t -> t.overlay() == dest && t.floor().hasSurface();
                     setter = t -> t.setOverlay(editor.drawBlock);
                 }else if(editor.drawBlock.isFloor()){
                     Block dest = tile.floor();

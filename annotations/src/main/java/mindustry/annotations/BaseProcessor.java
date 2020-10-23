@@ -204,10 +204,10 @@ public abstract class BaseProcessor extends AbstractProcessor{
         context = ((JavacProcessingEnvironment)env).getContext();
         maker = TreeMaker.instance(javacProcessingEnv.getContext());
 
-        Log.level = LogLevel.info;
+        Log.setLogLevel(LogLevel.info);
 
         if(System.getProperty("debug") != null){
-            Log.level = LogLevel.debug;
+            Log.setLogLevel(LogLevel.debug);
         }
     }
 

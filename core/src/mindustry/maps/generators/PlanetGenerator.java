@@ -25,11 +25,6 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
         if(noise < 0.15){
             for(Ptile other : tile.tiles){
-                //no sectors near start sector!
-                if(sector.planet.getSector(other).id == sector.planet.startSector){
-                    return;
-                }
-                
                 if(sector.planet.getSector(other).generateEnemyBase){
                     any = false;
                     break;

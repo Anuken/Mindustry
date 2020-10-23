@@ -94,7 +94,5 @@ public class Pal{
     redDust = Color.valueOf("ffa480"),
     redderDust = Color.valueOf("ff7b69"),
 
-    plasticSmoke = Color.valueOf("f1e479"),
-	
-    adminChat = Color.valueOf("ff4000");
+    plasticSmoke = Color.valueOf("f1e479");
 }

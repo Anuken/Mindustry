@@ -199,13 +199,19 @@ public class Logic implements ApplicationListener{
                 state.gameOver = true;
                 Events.fire(new GameOverEvent(state.rules.waveTeam));
             }else if(state.rules.attackMode){
-                //count # of teams alive
-                int countAlive = state.teams.getActive().count(TeamData::hasCore);
+                Team alive = null;
 
-                if((countAlive <= 1 || (!state.rules.pvp && state.rules.defaultTeam.core() == null)) && !state.gameOver){
-                    //find team that won
-                    TeamData left = state.teams.getActive().find(TeamData::hasCore);
-                    Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
+                for(TeamData team : state.teams.getActive()){
+                    if(team.hasCore()){
+                        if(alive != null){
+                            return;
+                        }
+                        alive = team.team;
+                    }
+                }
+
+                if(alive != null && !state.gameOver){
+                    Events.fire(new GameOverEvent(alive));
                     state.gameOver = true;
                 }
             }

@@ -47,7 +47,6 @@ public class LExecutor{
     public LongSeq graphicsBuffer = new LongSeq();
     public StringBuilder textBuffer = new StringBuilder();
     public Building[] links = {};
-    public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
 
     public boolean initialized(){
@@ -213,9 +212,9 @@ public class LExecutor{
         public LLocate locate = LLocate.building;
         public BlockFlag flag = BlockFlag.core;
         public int enemy, ore;
-        public int outX, outY, outFound, outBuild;
+        public int outX, outY, outFound;
 
-        public UnitLocateI(LLocate locate, BlockFlag flag, int enemy, int ore, int outX, int outY, int outFound, int outBuild){
+        public UnitLocateI(LLocate locate, BlockFlag flag, int enemy, int ore, int outX, int outY, int outFound){
             this.locate = locate;
             this.flag = flag;
             this.enemy = enemy;
@@ -272,7 +271,6 @@ public class LExecutor{
                         cache.found = false;
                         exec.setnum(outFound, 0);
                     }
-                    exec.setobj(outFound, res != null && res.build != null && res.build.team == exec.team ? res.build : null);
                 }else{
                     exec.setbool(outFound, cache.found);
                     exec.setnum(outX, cache.x);
@@ -437,9 +435,8 @@ public class LExecutor{
                             ai.plan.set(x, y, rot, block);
                             ai.plan.config = null;
 
-                            builder.clearBuilding();
-
                             if(ai.plan.tile() != null){
+                                builder.clearBuilding();
                                 builder.updateBuilding(true);
                                 builder.addBuild(ai.plan);
                             }
@@ -449,13 +446,13 @@ public class LExecutor{
                         float range = Math.max(unit.range(), buildingRange);
                         if(!unit.within(x1, y1, range)){
                             exec.setobj(p3, null);
-                            exec.setobj(p4, null);
+                            exec.setnum(p4, 0);
                         }else{
                             Tile tile = world.tileWorld(x1, y1);
                             //any environmental solid block is returned as StoneWall, aka "@solid"
                             Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
                             exec.setobj(p3, block);
-                            exec.setobj(p4, tile != null && tile.build != null ? tile.build : null);
+                            exec.setnum(p4, tile != null && tile.build != null ? tile.build.rotation : 0);
                         }
                     }
                     case itemDrop -> {
@@ -478,7 +475,7 @@ public class LExecutor{
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
 
-                        if(build != null && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange)){
+                        if(build != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){
@@ -513,11 +510,11 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id)){
+            if(obj instanceof Controllable cont){
                 if(type.isObj){
-                    b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+                    cont.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
-                    b.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
+                    cont.control(type, exec.num(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }
             }
         }
@@ -610,7 +607,6 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
-            //TODO should remote enemy buildings be senseable?
             if(target instanceof Senseable se){
                 if(sense instanceof Content){
                     exec.setnum(to, se.sense(((Content)sense)));

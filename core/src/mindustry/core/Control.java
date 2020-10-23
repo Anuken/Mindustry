@@ -35,7 +35,7 @@ import static mindustry.Vars.*;
 
 /**
  * Control module.
- * Handles all input, saving and keybinds.
+ * Handles all input, saving, keybinds and keybinds.
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.
  */

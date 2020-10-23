@@ -577,10 +577,7 @@ public class Administration{
         autosave("Whether the periodically save the map when playing.", false),
         autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
         autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
-        debug("Enable debug logging", false, () -> {
-            LogLevel level = debug() ? LogLevel.debug : LogLevel.info;
-            Log.level = level;
-        });
+        debug("Enable debug logging", false, () -> Log.setLogLevel(debug() ? LogLevel.debug : LogLevel.info));
 
         public static final Config[] all = values();
 

@@ -11,7 +11,6 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 public class StorageBlock extends Block{
-
     public StorageBlock(String name){
         super(name);
         hasItems = true;
@@ -31,7 +30,7 @@ public class StorageBlock extends Block{
             Tile edge = Edges.getFacingEdge(source, self);
             Tile edge2 = Edges.getFacingEdge(self, source);
             if(edge != null && edge2 != null){
-                Fx.coreBurn.at((edge.worldx() + edge2.worldx())/2f, (edge.worldy() + edge2.worldy())/2f);
+                Fx.fuelburn.at((edge.worldx() + edge2.worldx())/2f, (edge.worldy() + edge2.worldy())/2f);
             }
         }
     }

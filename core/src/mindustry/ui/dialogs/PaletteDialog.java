@@ -38,7 +38,8 @@ public class PaletteDialog extends Dialog{
         }
 
         keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back) hide();
+            if(key == KeyCode.escape || key == KeyCode.back)
+                hide();
         });
 
     }

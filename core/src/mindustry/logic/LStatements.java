@@ -704,7 +704,7 @@ public class LStatements{
 
     @RegisterStatement("ubind")
     public static class UnitBindStatement extends LStatement{
-        public String type = "@poly";
+        public String type = "@mono";
 
         @Override
         public void build(Table table){
@@ -819,7 +819,7 @@ public class LStatements{
         public LLocate locate = LLocate.building;
         public BlockFlag flag = BlockFlag.core;
         public String enemy = "true", ore = "@copper";
-        public String outX = "outx", outY = "outy", outFound = "found", outBuild = "building";
+        public String outX = "outx", outY = "outy", outFound = "found";
 
         @Override
         public void build(Table table){
@@ -905,8 +905,6 @@ public class LStatements{
             table.add(" found ").left();
             fields(table, outFound, str -> outFound = str);
 
-            table.add(" building ").left();
-            fields(table, outBuild, str -> outBuild = str);
 
         }
 
@@ -917,7 +915,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
+            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound));
         }
     }
 }

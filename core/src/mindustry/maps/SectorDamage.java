@@ -185,17 +185,13 @@ public class SectorDamage{
         }
 
         //create sparse tile array for fast range query
-        int sparseSkip = 5, sparseSkip2 = 3;
+        int sparseSkip = 6;
         //TODO if this is slow, use a quadtree
         Seq<Tile> sparse = new Seq<>(path.size / sparseSkip + 1);
-        Seq<Tile> sparse2 = new Seq<>(path.size / sparseSkip2 + 1);
 
         for(int i = 0; i < path.size; i++){
             if(i % sparseSkip == 0){
                 sparse.add(path.get(i));
-            }
-            if(i % sparseSkip2 == 0){
-                sparse2.add(path.get(i));
             }
         }
 
@@ -206,11 +202,8 @@ public class SectorDamage{
 
         //first, calculate the total health of blocks in the path
 
-        //radius around the path that gets counted
-        int radius = 7;
-        IntSet counted = new IntSet();
-
-        for(Tile t : sparse2){
+        for(Tile t : path){
+            int radius = 2;
 
             //radius is square.
             for(int dx = -radius; dx <= radius; dx++){
@@ -219,7 +212,7 @@ public class SectorDamage{
                     if(wx >= 0 && wy >= 0 && wx < world.width() && wy < world.height()){
                         Tile tile = world.rawTile(wx, wy);
 
-                        if(tile.build != null && tile.team() == state.rules.defaultTeam && counted.add(tile.pos())){
+                        if(tile.build != null && tile.team() == state.rules.defaultTeam){
                             //health is divided by block size, because multiblocks are counted multiple times.
                             sumHealth += tile.build.health / tile.block().size;
                             totalPathBuild += 1f / tile.block().size;
@@ -235,7 +228,7 @@ public class SectorDamage{
         for(Building build : Groups.build){
             float e = build.efficiency();
             if(e > 0.08f){
-                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range() + radius*tilesize))){
+                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range()))){
                     if(build.block instanceof Turret t && build instanceof TurretBuild b && b.hasAmmo()){
                         sumDps += t.shots / t.reloadTime * 60f * b.peekAmmo().estimateDPS() * e;
                     }
@@ -265,7 +258,7 @@ public class SectorDamage{
 
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
-                if(unit.abilities.find(a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
+                if(unit.abilities.find(a -> a instanceof HealFieldAbility) instanceof HealFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{
@@ -311,7 +304,7 @@ public class SectorDamage{
         //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
         info.sumHealth = sumHealth * 1.2f;
         //players tend to have longer range units/turrets, so assume DPS is higher
-        info.sumDps = sumDps * 1.5f;
+        info.sumDps = sumDps * 1.2f;
         info.sumRps = sumRps;
 
         //finally, find an equation to put it all together and produce a 0-1 number

@@ -2,6 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.func.*;
+import arc.input.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -36,7 +37,11 @@ public class LaunchLoadoutDialog extends BaseDialog{
         buttons.defaults().size(160f, 64f);
         buttons.button("@back", Icon.left, this::hide);
 
-        addCloseListener();
+        keyDown(key -> {
+            if(key == KeyCode.escape || key == KeyCode.back){
+                Core.app.post(this::hide);
+            }
+        });
 
         ItemSeq sitems = sector.getItems();
 
@@ -115,8 +120,6 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         cont.row();
         cont.add(items);
-        cont.row();
-        cont.add("@sector.missingresources").visible(() -> !valid);
 
         update.run();
         rebuildItems.run();

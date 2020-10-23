@@ -293,7 +293,7 @@ public class BlockRenderer implements Disposable{
                     entity.drawLight();
                 }else if(tile.block().emitLight){
                     tile.block().drawEnvironmentLight(tile);
-                }else if(tile.floor().emitLight && !tile.block().solid && world.getDarkness(tile.x, tile.y) < 3){ //only draw floor light under non-solid blocks
+                }else if(tile.floor().emitLight){
                     tile.floor().drawEnvironmentLight(tile);
                 }
             }

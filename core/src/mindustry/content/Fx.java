@@ -1293,14 +1293,6 @@ public class Fx{
         });
     }),
 
-    coreBurn = new Effect(23, e -> {
-        randLenVectors(e.id, 5, e.fin() * 9f, (x, y) -> {
-            float len = e.fout() * 4f;
-            color(Pal.accent, Color.gray, e.fin());
-            Fill.circle(e.x + x, e.y + y, len/2f);
-        });
-    }),
-
     plasticburn = new Effect(40, e -> {
         randLenVectors(e.id, 5, 3f + e.fin() * 5f, (x, y) -> {
             color(Color.valueOf("e9ead3"), Color.gray, e.fin());

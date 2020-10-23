@@ -194,14 +194,14 @@ public class NetClient implements ApplicationListener{
             }
 
             //server console logging
-            Log.info("&fi@: @", "&lc" + player.name, "&lw" + message);
+            Log.info("&y@: &lb@", player.name, message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
             Call.sendMessage(message, colorizeName(player.id(), player.name), player);
         }else{
             //log command to console but with brackets
-            Log.info("<&fi@: @&fr>", "&lk" + player.name, "&lw" + message);
+            Log.info("<&y@: &lm@&lg>", player.name, message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){

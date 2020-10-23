@@ -277,7 +277,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             //hotrock tweaks
             if(floor == Blocks.hotrock){
-                if(Math.abs(0.5f - noise(x - 90, y, 4, 0.8, 80)) > 0.035){
+                if(rand.chance(0.3)){
                     floor = Blocks.basalt;
                 }else{
                     ore = Blocks.air;

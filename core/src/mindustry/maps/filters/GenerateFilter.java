@@ -5,10 +5,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.gen.*;
 import mindustry.world.*;
 
 public abstract class GenerateFilter{
@@ -18,42 +15,15 @@ public abstract class GenerateFilter{
 
     public void apply(Tiles tiles, GenerateInput in){
         this.in = in;
+        for(Tile tile : tiles){
+            in.apply(tile.x, tile.y, tile.floor(), tile.block(), tile.overlay());
+            apply();
 
-        if(isBuffered()){
-            //buffer of tiles used, each tile packed into a long struct
-            long[] buffer = new long[tiles.width * tiles.height];
+            tile.setFloor(in.floor.asFloor());
+            tile.setOverlay(!in.floor.asFloor().hasSurface() ? Blocks.air : in.ore);
 
-            //save to buffer
-            for(int i = 0; i < tiles.width * tiles.height; i++){
-                Tile tile = tiles.geti(i);
-                buffer[i] = PackTile.get(tile.blockID(), tile.floorID(), tile.overlayID());
-            }
-
-            for(int i = 0; i < tiles.width * tiles.height; i++){
-                Tile tile = tiles.geti(i);
-                long b = buffer[i];
-
-                in.apply(tile.x, tile.y, Vars.content.block(PackTile.block(b)), Vars.content.block(PackTile.floor(b)), Vars.content.block(PackTile.overlay(b)));
-                apply();
-
-                tile.setFloor(in.floor.asFloor());
-                tile.setOverlay(!in.floor.asFloor().hasSurface() ? Blocks.air : in.overlay);
-
-                if(!tile.block().synthetic() && !in.block.synthetic()){
-                    tile.setBlock(in.block);
-                }
-            }
-        }else{
-            for(Tile tile : tiles){
-                in.apply(tile.x, tile.y, tile.block(), tile.floor(), tile.overlay());
-                apply();
-
-                tile.setFloor(in.floor.asFloor());
-                tile.setOverlay(!in.floor.asFloor().hasSurface() ? Blocks.air : in.overlay);
-
-                if(!tile.block().synthetic() && !in.block.synthetic()){
-                    tile.setBlock(in.block);
-                }
+            if(!tile.block().synthetic() && !in.block.synthetic()){
+                tile.setBlock(in.block);
             }
         }
     }
@@ -119,16 +89,16 @@ public abstract class GenerateFilter{
         public int x, y, width, height;
 
         /** output parameters */
-        public Block floor, block, overlay;
+        public Block floor, block, ore;
 
         Simplex noise = new Simplex();
         RidgedPerlin pnoise = new RidgedPerlin(0, 1);
         TileProvider buffer;
 
-        public void apply(int x, int y, Block block, Block floor, Block overlay){
+        public void apply(int x, int y, Block floor, Block block, Block ore){
             this.floor = floor;
             this.block = block;
-            this.overlay = overlay;
+            this.ore = ore;
             this.x = x;
             this.y = y;
         }
@@ -148,10 +118,5 @@ public abstract class GenerateFilter{
         public interface TileProvider{
             Tile get(int x, int y);
         }
-    }
-
-    @Struct
-    class PackTileStruct{
-        short block, floor, overlay;
     }
 }

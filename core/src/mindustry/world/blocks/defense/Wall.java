@@ -17,17 +17,16 @@ import static mindustry.Vars.*;
 public class Wall extends Block{
     public int variants = 0;
 
-    /** Lighting chance. -1 to disable */
-    public float lightningChance = -1f;
+    public float lightningChance = -0.001f;
     public float lightningDamage = 20f;
     public int lightningLength = 17;
     public Color lightningColor = Pal.surge;
     public Sound lightningSound = Sounds.spark;
 
-    /** Bullet deflection chance. -1 to disable */
-    public float chanceDeflect = -1f;
+    public float chanceDeflect = 10f;
     public boolean flashHit;
     public Color flashColor = Color.white;
+    public boolean deflect;
     public Sound deflectSound = Sounds.none;
 
     public Wall(String name){
@@ -37,17 +36,6 @@ public class Wall extends Block{
         group = BlockGroup.walls;
         buildCostMultiplier = 6f;
         canOverdrive = false;
-    }
-
-    @Override
-    public void setStats(){
-        super.setStats();
-
-        if(chanceDeflect > 0f) stats.add(Stat.baseDeflectChance, chanceDeflect, StatUnit.none);
-        if(lightningChance > 0f){
-            stats.add(Stat.lightningChance, lightningChance * 100f, StatUnit.percent);
-            stats.add(Stat.lightningDamage, lightningDamage, StatUnit.none);
-        }
     }
 
     @Override
@@ -108,7 +96,7 @@ public class Wall extends Block{
             hit = 1f;
 
             //create lightning if necessary
-            if(lightningChance > 0f){
+            if(lightningChance > 0){
                 if(Mathf.chance(lightningChance)){
                     Lightning.create(team, lightningColor, lightningDamage, x, y, bullet.rotation() + 180f, lightningLength);
                     lightningSound.at(tile, Mathf.random(0.9f, 1.1f));
@@ -116,7 +104,7 @@ public class Wall extends Block{
             }
 
             //deflect bullets if necessary
-            if(chanceDeflect > 0f){
+            if(deflect){
                 //slow bullets are not deflected
                 if(bullet.vel().len() <= 0.1f || !bullet.type.reflectable) return true;
 

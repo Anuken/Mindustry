@@ -36,7 +36,7 @@ public class ApplicationTests{
         try{
             boolean[] begins = {false};
             Throwable[] exceptionThrown = {null};
-            Log.useColors = false;
+            Log.setUseColors(false);
 
             ApplicationCore core = new ApplicationCore(){
                 @Override
@@ -145,7 +145,7 @@ public class ApplicationTests{
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
         assertEquals(tile.build.items.total(), 55);
-        tile.build.items.remove(Items.phaseFabric, 10);
+        tile.build.items.remove(Items.phasefabric, 10);
         tile.build.items.remove(Items.titanium, 10);
         assertEquals(tile.build.items.total(), 45);
     }

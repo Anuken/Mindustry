@@ -23,14 +23,14 @@ public class Fires{
 
         if(fire == null){
             fire = Fire.create();
-            fire.tile = tile;
-            fire.lifetime = baseLifetime;
+            fire.tile(tile);
+            fire.lifetime(baseLifetime);
             fire.set(tile.worldx(), tile.worldy());
             fire.add();
             map.put(tile.pos(), fire);
         }else{
-            fire.lifetime = baseLifetime;
-            fire.time = 0f;
+            fire.lifetime(baseLifetime);
+            fire.time(0f);
         }
     }
 

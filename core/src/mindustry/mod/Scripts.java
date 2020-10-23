@@ -59,12 +59,12 @@ public class Scripts implements Disposable{
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
         }catch(Throwable t){
-            return getError(t, false);
+            return getError(t);
         }
     }
 
-    private String getError(Throwable t, boolean log){
-        if(log) Log.err(t);
+    private String getError(Throwable t){
+        t.printStackTrace();
         return t.getClass().getSimpleName() + (t.getMessage() == null ? "" : ": " + t.getMessage());
     }
 
@@ -138,7 +138,7 @@ public class Scripts implements Disposable{
             if(currentMod != null){
                 file = currentMod.name + "/" + file;
             }
-            log(LogLevel.err, file, "" + getError(t, true));
+            log(LogLevel.err, file, "" + getError(t));
             return false;
         }
     }

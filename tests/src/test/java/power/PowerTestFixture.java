@@ -37,7 +37,7 @@ public class PowerTestFixture{
         Vars.state = new GameState();
         Vars.tree = new FileTree();
         content.createBaseContent();
-        Log.useColors = false;
+        Log.setUseColors(false);
         Time.setDeltaProvider(() -> 0.5f);
     }
 
