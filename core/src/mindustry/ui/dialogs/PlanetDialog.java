@@ -242,7 +242,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 addListener(new ElementGestureListener(){
                     @Override
                     public void tap(InputEvent event, float x, float y, int count, KeyCode button){
-                        if(hovered != null && ((mode == look ? canSelect(hovered) && hovered != launchSector : hovered.unlocked()) || debugSelect)){
+                        if(hovered != null && (canSelect(hovered) || debugSelect)){
                             selected = hovered;
                         }
 
