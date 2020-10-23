@@ -1770,6 +1770,7 @@ public class UnitTypes implements ContentList{
                 health = 1;
                 rotateSpeed = 360f;
                 itemCapacity = 0;
+                commandLimit = 0;
             }
 
             @Override

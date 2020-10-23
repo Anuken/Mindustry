@@ -613,7 +613,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //reset payload target
                 payloadTarget = null;
                 //apply command on double tap when own unit is tapped
-                if(Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f)){
+                if(!player.dead() && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f) && player.unit().type.commandLimit > 0){
                     Call.unitCommand(player);
                 }else{
                     //control a unit/block

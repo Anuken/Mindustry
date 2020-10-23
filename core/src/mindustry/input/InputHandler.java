@@ -336,6 +336,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void unitControl(Player player, @Nullable Unit unit){
         if(player == null) return;
 
+        //make sure player is allowed to control the unit
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.control, action -> action.unit = unit)){
+            throw new ValidateException(player, "Player cannot control a unit.");
+        }
+
         //clear player unit when they possess a core
         if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreBuild)){
             Fx.spawn.at(player);
@@ -375,6 +380,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitCommand(Player player){
         if(player == null || player.dead() || !(player.unit() instanceof Commanderc commander)) return;
+
+        //make sure player is allowed to make the command
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.command, action -> {})){
+            throw new ValidateException(player, "Player cannot command a unit.");
+        }
 
         if(commander.isCommanding()){
             commander.clearCommand();

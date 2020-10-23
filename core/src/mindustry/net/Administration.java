@@ -142,11 +142,18 @@ public class Administration{
 
     /** @return whether this action is allowed by the action filters. */
     public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
+        return allowAction(player, type, action -> setter.get(action.set(player, type, tile)));
+    }
+
+    /** @return whether this action is allowed by the action filters. */
+    public boolean allowAction(Player player, ActionType type, Cons<PlayerAction> setter){
         //some actions are done by the server (null player) and thus are always allowed
         if(player == null) return true;
 
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
-        setter.get(act.set(player, type, tile));
+        act.player = player;
+        act.type = type;
+        setter.get(act);
         for(ActionFilter filter : actionFilters){
             if(!filter.allow(act)){
                 Pools.free(act);
@@ -699,7 +706,7 @@ public class Administration{
     public static class PlayerAction implements Poolable{
         public Player player;
         public ActionType type;
-        public Tile tile;
+        public @Nullable Tile tile;
 
         /** valid for block placement events only */
         public @Nullable Block block;
@@ -712,10 +719,20 @@ public class Administration{
         public @Nullable Item item;
         public int itemAmount;
 
+        /** valid for unit-type events only, and even in that case may be null. */
+        public @Nullable Unit unit;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
             this.tile = tile;
+            return this;
+        }
+
+        public PlayerAction set(Player player, ActionType type, Unit unit){
+            this.player = player;
+            this.type = type;
+            this.unit = unit;
             return this;
         }
 
@@ -728,11 +745,12 @@ public class Administration{
             type = null;
             tile = null;
             block = null;
+            unit = null;
         }
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, command
     }
 
 }
