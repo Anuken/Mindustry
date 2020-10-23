@@ -264,7 +264,6 @@ public class Universe{
 
         if(Core.settings.has("unlocks")){
             LegacyIO.readResearch();
-            Core.settings.remove("unlocks");
         }
     }
 
