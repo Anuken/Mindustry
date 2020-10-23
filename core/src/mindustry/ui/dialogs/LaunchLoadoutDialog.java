@@ -99,18 +99,24 @@ public class LaunchLoadoutDialog extends BaseDialog{
         cont.pane(t -> {
             int i = 0;
 
-            for(Schematic s : schematics.getLoadouts(core)){
+            for(var entry : schematics.getLoadouts()){
+                if(entry.key.size <= core.size){
+                    for(Schematic s : entry.value){
 
-                t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
-                    selected = s;
-                    update.run();
-                    rebuildItems.run();
-                }).group(group).pad(4).disabled(!sitems.has(s.requirements())).checked(s == selected).size(200f);
+                        t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
+                            selected = s;
+                            update.run();
+                            rebuildItems.run();
+                        }).group(group).pad(4).disabled(!sitems.has(s.requirements())).checked(s == selected).size(200f);
 
-                if(++i % cols == 0){
-                    t.row();
+                        if(++i % cols == 0){
+                            t.row();
+                        }
+                    }
                 }
             }
+
+
         }).growX().get().setScrollingDisabled(true, false);
 
         cont.row();
