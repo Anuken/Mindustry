@@ -128,7 +128,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     boolean canSelect(Sector sector){
         if(mode == select) return sector.hasBase();
 
-        return sector.near().contains(Sector::hasBase)//(sector.tile.v.within(launchSector.tile.v, (launchRange + 0.5f) * planets.planet.sectorApproxRadius*2) //within range
+        return sector.hasBase() || sector.near().contains(Sector::hasBase) //near an occupied sector
             || (sector.preset != null && sector.preset.unlocked()); //is an unlocked preset
     }
 
@@ -368,7 +368,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();
         stable.add(sector.save != null ? sector.save.getPlayTime() : "@sectors.unexplored").row();
 
-        if(sector.isAttacked() || sector.hasEnemyBase()){
+        if(sector.isAttacked() || !sector.hasBase()){
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 
@@ -457,18 +457,23 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 if(mode == look && !sector.hasBase()){
                     shouldHide = false;
                     Sector from = findLauncher(sector);
-                    CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
+                    if(from == null){
+                        //free launch.
+                        control.playSector(sector);
+                    }else{
+                        CoreBlock block = from.info.bestCoreType instanceof CoreBlock b ? b : (CoreBlock)Blocks.coreShard;
 
-                    loadouts.show(block, from, () -> {
-                        from.removeItems(universe.getLastLoadout().requirements());
-                        from.removeItems(universe.getLaunchResources());
+                        loadouts.show(block, from, () -> {
+                            from.removeItems(universe.getLastLoadout().requirements());
+                            from.removeItems(universe.getLaunchResources());
 
-                        launching = true;
-                        zoom = 0.5f;
+                            launching = true;
+                            zoom = 0.5f;
 
-                        ui.hudfrag.showLaunchDirect();
-                        Time.runTask(launchDuration, () -> control.playSector(from, sector));
-                    });
+                            ui.hudfrag.showLaunchDirect();
+                            Time.runTask(launchDuration, () -> control.playSector(from, sector));
+                        });
+                    }
                 }else if(mode == select){
                     listener.get(sector);
                 }else{

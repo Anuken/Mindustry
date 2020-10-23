@@ -80,7 +80,7 @@ public class WaveSpawner{
 
                         Unit unit = group.createUnit(state.rules.waveTeam, state.wave - 1);
                         unit.set(spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
-                        Time.run(Math.min(i * 5, 60 * 2), () -> spawnEffect(unit));
+                        spawnEffect(unit);
                     }
                 });
             }

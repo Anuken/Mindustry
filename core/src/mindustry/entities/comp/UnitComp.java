@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -71,6 +72,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
     }
 
+    /** Iterates through this unit and everything it is controlling. */
+    public void eachGroup(Cons<Unit> cons){
+        cons.get(self());
+        controlling().each(cons);
+    }
+
     @Override
     public float range(){
         return type.range;
@@ -89,7 +96,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case rotation -> rotation;
             case health -> health;
             case maxHealth -> maxHealth;
-            case ammo -> state.rules.unitAmmo ? type.ammoCapacity : ammo;
+            case ammo -> !state.rules.unitAmmo ? type.ammoCapacity : ammo;
             case ammoCapacity -> type.ammoCapacity;
             case x -> World.conv(x);
             case y -> World.conv(y);

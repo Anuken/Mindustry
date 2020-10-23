@@ -16,7 +16,7 @@ public class FlyingAI extends AIController{
                 moveTo(target, unit.range() * 0.8f);
                 unit.lookAt(target);
             }else{
-                attack(100f);
+                attack(120f);
             }
         }
 
@@ -34,16 +34,14 @@ public class FlyingAI extends AIController{
         Teamc result = target(x, y, range, air, ground);
         if(result != null) return result;
 
-        if(ground) result = targetFlag(x, y, BlockFlag.producer, true);
+        if(ground) result = targetFlag(x, y, BlockFlag.generator, true);
         if(result != null) return result;
 
-        if(ground) result = targetFlag(x, y, BlockFlag.turret, true);
+        if(ground) result = targetFlag(x, y, BlockFlag.core, true);
         if(result != null) return result;
 
         return null;
     }
-
-    //TODO clean up
 
     protected void attack(float circleLength){
         vec.set(target).sub(unit);

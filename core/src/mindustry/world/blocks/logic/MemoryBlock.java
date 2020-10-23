@@ -18,7 +18,7 @@ public class MemoryBlock extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.memoryCapacity, memoryCapacity, StatUnit.none);
+        stats.add(Stat.memoryCapacity, memoryCapacity, StatUnit.none);
     }
 
     public class MemoryBuild extends Building{

@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -257,11 +256,6 @@ public class Planet extends UnlockableContent{
     @Override
     public boolean isHidden(){
         return true;
-    }
-
-    @Override
-    public void displayInfo(Table table){
-
     }
 
     @Override

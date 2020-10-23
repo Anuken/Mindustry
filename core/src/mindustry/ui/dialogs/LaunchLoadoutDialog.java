@@ -120,6 +120,8 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         cont.row();
         cont.add(items);
+        cont.row();
+        cont.add("@sector.missingresources").visible(() -> !valid);
 
         update.run();
         rebuildItems.run();

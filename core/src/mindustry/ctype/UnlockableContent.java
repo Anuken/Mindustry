@@ -10,11 +10,14 @@ import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
+    /** Stat storage for this content. Initialized on demand. */
+    public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description. May be null. */
@@ -38,6 +41,18 @@ public abstract class UnlockableContent extends MappableContent{
         return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName());
     }
 
+    /** Checks stat initialization state. Call before displaying stats. */
+    public void checkStats(){
+        if(!stats.intialized){
+            setStats();
+            stats.intialized = true;
+        }
+    }
+
+    /** Intializes stats on demand. Should only be called once. Only called before something is displayed. */
+    public void setStats(){
+    }
+
     /** Generate any special icons for this content. Called asynchronously.*/
     @CallSuper
     public void createIcons(MultiPacker packer){
@@ -59,9 +74,11 @@ public abstract class UnlockableContent extends MappableContent{
             cicons[icon.ordinal()] =
                 Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
                 Core.atlas.find(getContentType().name() + "-" + name + "-full",
+                Core.atlas.find(name + "-" + icon.name(),
+                Core.atlas.find(name + "-full",
                 Core.atlas.find(name,
                 Core.atlas.find(getContentType().name() + "-" + name,
-                Core.atlas.find(name + "1")))));
+                Core.atlas.find(name + "1")))))));
         }
         return cicons[icon.ordinal()];
     }
@@ -73,7 +90,9 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     /** This should show all necessary info about this content in the specified table. */
-    public abstract void displayInfo(Table table);
+    public void display(Table table){
+
+    }
 
     /** Called when this content is unlocked. Use this to unlock other related content. */
     public void onUnlock(){
@@ -95,9 +114,25 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
+    /** Unlocks this content, but does not fire any events. */
+    public void quietUnlock(){
+        if(!unlocked()){
+            unlocked = true;
+            Core.settings.put(name + "-unlocked", true);
+        }
+    }
+
     public boolean unlocked(){
         if(net.client()) return state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
+    }
+
+    /** Locks this content again. */
+    public void clearUnlock(){
+        if(unlocked){
+            unlocked = false;
+            Core.settings.put(name + "-unlocked", false);
+        }
     }
 
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */

@@ -21,7 +21,7 @@ public class Fracker extends SolidPump{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.productionTime, itemUseTime / 60f, StatUnit.seconds);
+        stats.add(Stat.productionTime, itemUseTime / 60f, StatUnit.seconds);
     }
 
     @Override

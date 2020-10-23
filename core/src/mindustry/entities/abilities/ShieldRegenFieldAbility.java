@@ -5,7 +5,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-public class ShieldFieldAbility extends Ability{
+public class ShieldRegenFieldAbility extends Ability{
     public float amount = 1, max = 100f, reload = 100, range = 60;
     public Effect applyEffect = Fx.shieldApply;
     public Effect activeEffect = Fx.shieldWave;
@@ -13,9 +13,9 @@ public class ShieldFieldAbility extends Ability{
     protected float timer;
     protected boolean applied = false;
 
-    ShieldFieldAbility(){}
+    ShieldRegenFieldAbility(){}
 
-    public ShieldFieldAbility(float amount, float max, float reload, float range){
+    public ShieldRegenFieldAbility(float amount, float max, float reload, float range){
         this.amount = amount;
         this.max = max;
         this.reload = reload;

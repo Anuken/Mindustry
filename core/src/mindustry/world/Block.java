@@ -51,7 +51,6 @@ public class Block extends UnlockableContent{
     public float liquidCapacity = 10f;
     public float liquidPressure = 1f;
 
-    public final BlockStats stats = new BlockStats();
     public final BlockBars bars = new BlockBars();
     public final Consumers consumes = new Consumers();
 
@@ -101,6 +100,8 @@ public class Block extends UnlockableContent{
     public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
+    /** Whether to use this block's color in the minimap. Only used for overlays. */
+    public boolean useColor = true;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -321,27 +322,30 @@ public class Block extends UnlockableContent{
         return update || destructible;
     }
 
+    @Override
     public void setStats(){
-        stats.add(BlockStat.size, "@x@", size, size);
-        stats.add(BlockStat.health, health, StatUnit.none);
+        super.setStats();
+
+        stats.add(Stat.size, "@x@", size, size);
+        stats.add(Stat.health, health, StatUnit.none);
         if(canBeBuilt()){
-            stats.add(BlockStat.buildTime, buildCost / 60, StatUnit.seconds);
-            stats.add(BlockStat.buildCost, new ItemListValue(false, requirements));
+            stats.add(Stat.buildTime, buildCost / 60, StatUnit.seconds);
+            stats.add(Stat.buildCost, new ItemListValue(false, requirements));
         }
 
         if(instantTransfer){
-            stats.add(BlockStat.maxConsecutive, 2, StatUnit.none);
+            stats.add(Stat.maxConsecutive, 2, StatUnit.none);
         }
 
         consumes.display(stats);
 
-        // Note: Power stats are added by the consumers.
-        if(hasLiquids) stats.add(BlockStat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
-        if(hasItems && itemCapacity > 0) stats.add(BlockStat.itemCapacity, itemCapacity, StatUnit.items);
+        //Note: Power stats are added by the consumers.
+        if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
+        if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
     }
 
     public void setBars(){
-        bars.add("health", entity -> new Bar("blocks.health", Pal.health, entity::healthf).blink(Color.white));
+        bars.add("health", entity -> new Bar("stat.health", Pal.health, entity::healthf).blink(Color.white));
 
         if(hasLiquids){
             Func<Building, Liquid> current;
@@ -635,11 +639,6 @@ public class Block extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-        ContentDisplay.displayBlock(table, this);
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.block;
     }
@@ -669,8 +668,9 @@ public class Block extends UnlockableContent{
         if(consumes.has(ConsumeType.item)) hasItems = true;
         if(consumes.has(ConsumeType.liquid)) hasLiquids = true;
 
-        setStats();
         setBars();
+
+        stats.useCategories = true;
 
         consumes.init();
 
