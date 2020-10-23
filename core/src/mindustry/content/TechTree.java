@@ -605,8 +605,6 @@ public class TechTree implements ContentList{
         public final ItemStack[] finishedRequirements;
         /** Extra objectives needed to research this. */
         public Seq<Objective> objectives = new Seq<>();
-        /** Time required to research this content, in seconds. */
-        public float time;
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
 
@@ -617,7 +615,6 @@ public class TechTree implements ContentList{
             this.content = content;
             this.requirements = requirements;
             this.depth = parent == null ? 0 : parent.depth + 1;
-            this.time = Seq.with(requirements).mapFloat(i -> i.item.cost * i.amount).sum() * 10;
             this.finishedRequirements = new ItemStack[requirements.length];
 
             //load up the requirements that have been finished if settings are available
@@ -630,6 +627,14 @@ public class TechTree implements ContentList{
 
             map.put(content, this);
             all.add(this);
+        }
+
+        /** Resets finished requirements and saves. */
+        public void reset(){
+            for(ItemStack stack : finishedRequirements){
+                stack.amount = 0;
+            }
+            save();
         }
 
         /** Removes this node from the tech tree. */

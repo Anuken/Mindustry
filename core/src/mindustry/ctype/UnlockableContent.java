@@ -125,6 +125,14 @@ public abstract class UnlockableContent extends MappableContent{
         return unlocked || alwaysUnlocked;
     }
 
+    /** Locks this content again. */
+    public void clearUnlock(){
+        if(unlocked){
+            unlocked = false;
+            Core.settings.put(name + "-unlocked", false);
+        }
+    }
+
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
     public boolean unlockedNow(){
         return unlocked() || !state.isCampaign();
