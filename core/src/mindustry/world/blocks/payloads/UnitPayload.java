@@ -43,7 +43,7 @@ public class UnitPayload implements Payload{
 
     @Override
     public boolean dump(){
-        if(!Units.canCreate(unit.team, unit.type())){
+        if(!Units.canCreate(unit.team, unit.type)){
             deactiveTime = 1f;
             return false;
         }
@@ -74,7 +74,7 @@ public class UnitPayload implements Payload{
     @Override
     public void draw(){
         Drawf.shadow(unit.x, unit.y, 20);
-        Draw.rect(unit.type().icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
+        Draw.rect(unit.type.icon(Cicon.full), unit.x, unit.y, unit.rotation - 90);
 
         //draw warning
         if(deactiveTime > 0){

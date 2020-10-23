@@ -1,5 +1,6 @@
 package mindustry.entities.abilities;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -55,5 +56,10 @@ public class UnitSpawnAbility extends Ability{
                 Drawf.construct(x, y, type.icon(Cicon.full), unit.rotation - 90, timer / spawnTime, 1f, timer);
             });
         }
+    }
+
+    @Override
+    public String localized(){
+        return Core.bundle.format("ability.unitspawn", type.localizedName);
     }
 }
