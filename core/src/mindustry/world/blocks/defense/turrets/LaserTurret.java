@@ -96,7 +96,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotateSpeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f) * (idleTurning ? idleTurnSpeedMul : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, (idleTurning ? idleTurnSpeedMul : 1f) * (efficiency() * rotateSpeed * delta()) * (bulletLife > 0f ? firingMoveFract : 1f));
         }
 
         @Override

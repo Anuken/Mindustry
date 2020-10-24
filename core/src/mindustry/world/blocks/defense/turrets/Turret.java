@@ -273,7 +273,7 @@ public abstract class Turret extends ReloadTurret{
                 if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
                     updateShooting();
                 }
-            }else if(!validateTarget() && shouldTurn()){
+            }else if(!validateTarget()){
                 if(!idleTurning){
                   Time.run(Mathf.random(idleTurnTime[0], idleTurnTime[1]), () -> {
                       idleTurning = true;
@@ -314,7 +314,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed() * (idleTurning ? idleTurnSpeedMul : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, (idleTurning ? idleTurnSpeedMul : 1f) * (rotateSpeed * delta() * baseReloadSpeed()));
         }
 
         public boolean shouldTurn(){
