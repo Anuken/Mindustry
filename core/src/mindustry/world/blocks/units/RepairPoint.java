@@ -68,15 +68,24 @@ public class RepairPoint extends Block{
         public float strength, rotation = 90;
 
         @Override
+        public void drawTeam(){
+            Draw.z(Layer.turret + 0.1);
+            Draw.color(cellColor());
+            if(teamRegion.found()) Draw.rect(teamRegion, x, y, rotation - 90);
+            Draw.color();
+        }
+
+        public Color cellColor(){
+            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+        }
+
+        @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
 
             Draw.z(Layer.turret);
             Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
-            Draw.color(cellColor());
-            if(teamRegion.found()) Draw.rect(teamRegion, x, y, rotation - 90);
-            Draw.color();
 
             if(target != null && Angles.angleDist(angleTo(target), rotation) < 30f){
                 Draw.z(Layer.flyingUnit + 1); //above all units
@@ -89,10 +98,6 @@ public class RepairPoint extends Block{
                 target.x(), target.y(), strength);
                 Draw.color();
             }
-        }
-
-        public Color cellColor(){
-            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         }
 
         @Override

@@ -99,10 +99,8 @@ public class PointDefenseTurret extends ReloadTurret{
         }
 
         @Override
-        public void draw(){
-            Draw.rect(baseRegion, x, y);
-            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
-            Draw.rect(region, x, y, rotation - 90);
+        public void drawTeam(){
+            Draw.z(Layer.turret + 0.1);
             Draw.color(cellColor());
             if(teamRegion.found()) Draw.rect(teamRegion, x, y, rotation - 90);
             Draw.color();
@@ -110,6 +108,13 @@ public class PointDefenseTurret extends ReloadTurret{
 
         public Color cellColor(){
             return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+        }
+
+        @Override
+        public void draw(){
+            Draw.rect(baseRegion, x, y);
+            Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
+            Draw.rect(region, x, y, rotation - 90);
         }
 
         @Override

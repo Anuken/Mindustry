@@ -185,6 +185,20 @@ public class MassDriver extends Block{
         }
 
         @Override
+        public void drawTeam(){
+            Draw.z(Layer.turret + 0.1);
+            Draw.color(cellColor());
+            if(teamRegion.found()) Draw.rect(teamRegion,
+                x + Angles.trnsx(rotation + 180f, reload * knockback),
+                y + Angles.trnsy(rotation + 180f, reload * knockback), rotation - 90);
+            Draw.color();
+        }
+
+        public Color cellColor(){
+            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+        }
+
+        @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
 
@@ -195,13 +209,6 @@ public class MassDriver extends Block{
 
             Drawf.shadow(region, angleX - (size / 2), angleY - (size / 2), rotation - 90);
             Draw.rect(region, angleX, angleY, rotation - 90);
-            Draw.color(cellColor());
-            if(teamRegion.found()) Draw.rect(teamRegion, angleX, angleY, rotation - 90);
-            Draw.color();
-        }
-
-        public Color cellColor(){
-            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         }
 
         @Override

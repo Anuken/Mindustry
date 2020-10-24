@@ -208,6 +208,18 @@ public abstract class Turret extends ReloadTurret{
         }
 
         @Override
+        public void drawTeam(){
+            Draw.z(Layer.turret + 0.1);
+            Draw.color(cellColor());
+            if(teamRegion.found()) Draw.rect(teamRegion, x + tr2.x, y + tr2.y, rotation - 90);
+            Draw.color();
+        }
+
+        public Color cellColor(){
+            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
+        }
+
+        @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
             Draw.color();
@@ -218,17 +230,10 @@ public abstract class Turret extends ReloadTurret{
 
             Drawf.shadow(region, x + tr2.x - (size / 2f), y + tr2.y - (size / 2f), rotation - 90);
             drawer.get(this);
-            Draw.color(cellColor());
-            if(teamRegion.found()) Draw.rect(teamRegion, x + tr2.x, y + tr2.y, rotation - 90);
-            Draw.color();
 
             if(heatRegion != Core.atlas.find("error")){
                 heatDrawer.get(this);
             }
-        }
-
-        public Color cellColor(){
-            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         }
 
         @Override
