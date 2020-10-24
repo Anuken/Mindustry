@@ -80,7 +80,7 @@ public abstract class Turret extends Block{
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
 
-    public @Load("block-@size") TextureRegion baseRegion;
+    public @Load("@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
 
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
