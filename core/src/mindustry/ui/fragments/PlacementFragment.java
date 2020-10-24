@@ -11,6 +11,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -342,7 +343,12 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : displayBlock.unplaceableMessage()).width(190f).wrap();
+                                    if (!player.isBuilder()) {
+                                        b.add(player.unit().type == UnitTypes.block ? "@block.nobuild" : "@unit.nobuild")
+                                        .width(190f).wrap();
+                                    } else {
+                                        b.add(displayBlock.unplaceableMessage()).width(190f).wrap();
+                                    }
                                     b.left();
                                 }).padTop(2).left();
                             }
