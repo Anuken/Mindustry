@@ -284,6 +284,7 @@ public class Control implements ApplicationListener, Loadable{
 
                         //kill all units, since they should be dead anwyay
                         Groups.unit.clear();
+                        Groups.fire.clear();
 
                         Tile spawn = world.tile(sector.info.spawnPosition);
                         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
