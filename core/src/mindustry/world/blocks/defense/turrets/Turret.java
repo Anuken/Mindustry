@@ -283,7 +283,7 @@ public abstract class Turret extends ReloadTurret{
                 }else if(idleTurning){
                     turnToTarget(idleRotationTarget);
                     if(Angles.within(rotation, idleRotationTarget, 0.5f)){
-                        idleTurning = false;
+                      idleTurning = false;
                     }
                 }
             }
