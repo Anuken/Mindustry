@@ -529,7 +529,7 @@ public class Blocks implements ContentList{
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
 
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
+            consumes.items(with(Items.coal, 1, Items.sand, 2));
             consumes.power(0.50f);
         }};
 
@@ -545,7 +545,7 @@ public class Blocks implements ContentList{
             itemCapacity = 30;
             boostScale = 0.15f;
 
-            consumes.items(new ItemStack(Items.coal, 4), new ItemStack(Items.sand, 6), new ItemStack(Items.pyratite, 1));
+            consumes.items(with(Items.coal, 4, Items.sand, 6, Items.pyratite, 1));
             consumes.power(4f);
         }};
 
@@ -558,7 +558,7 @@ public class Blocks implements ContentList{
             hasPower = hasItems = true;
             flameColor = Color.valueOf("ffc099");
 
-            consumes.items(new ItemStack(Items.lead, 1), new ItemStack(Items.sand, 1));
+            consumes.items(with(Items.lead, 1, Items.sand, 1));
             consumes.power(0.60f);
         }};
 
@@ -589,7 +589,7 @@ public class Blocks implements ContentList{
             hasPower = true;
             drawer = new DrawWeave();
 
-            consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
+            consumes.items(with(Items.thorium, 4, Items.sand, 10));
             consumes.power(5f);
             itemCapacity = 20;
         }};
@@ -603,7 +603,7 @@ public class Blocks implements ContentList{
             hasPower = true;
 
             consumes.power(4f);
-            consumes.items(new ItemStack(Items.copper, 3), new ItemStack(Items.lead, 4), new ItemStack(Items.titanium, 2), new ItemStack(Items.silicon, 3));
+            consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
         }};
 
         cryofluidMixer = new LiquidConverter("cryofluid-mixer"){{
@@ -631,7 +631,7 @@ public class Blocks implements ContentList{
             outputItem = new ItemStack(Items.blastCompound, 1);
             size = 2;
 
-            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
+            consumes.items(with(Items.pyratite, 1, Items.sporePod, 1));
             consumes.power(0.40f);
         }};
 
@@ -645,7 +645,7 @@ public class Blocks implements ContentList{
             size = 2;
 
             consumes.power(0.20f);
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2));
+            consumes.items(with(Items.coal, 1, Items.lead, 2, Items.sand, 2));
         }};
 
         melter = new GenericCrafter("melter"){{
