@@ -292,14 +292,15 @@ public class LExecutor{
     /** Controls the unit based on some parameters. */
     public static class UnitControlI implements LInstruction{
         public LUnitControl type = LUnitControl.move;
-        public int p1, p2, p3, p4;
+        public int p1, p2, p3, p4, p5;
 
-        public UnitControlI(LUnitControl type, int p1, int p2, int p3, int p4){
+        public UnitControlI(LUnitControl type, int p1, int p2, int p3, int p4, int p5){
             this.type = type;
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
             this.p4 = p4;
+            this.p5 = p5;
         }
 
         public UnitControlI(){
@@ -437,7 +438,7 @@ public class LExecutor{
                             }
 
                             ai.plan.set(x, y, rot, block);
-                            ai.plan.config = null;
+                            ai.plan.config = exec.obj(p5) instanceof Content c ? c : null;
 
                             builder.clearBuilding();
 
@@ -500,6 +501,7 @@ public class LExecutor{
         public int target;
         public LAccess type = LAccess.enabled;
         public int p1, p2, p3, p4;
+        public Interval timer = new Interval(1);
 
         public ControlI(LAccess type, int target, int p1, int p2, int p3, int p4){
             this.type = type;
@@ -515,7 +517,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id)){
+            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id) && (type.cooldown <= 0 || timer.get(type.cooldown))){
                 if(type.isObj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{

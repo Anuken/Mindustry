@@ -748,7 +748,7 @@ public class LStatements{
     @RegisterStatement("ucontrol")
     public static class UnitControlStatement extends LStatement{
         public LUnitControl type = LUnitControl.move;
-        public String p1 = "0", p2 = "0", p3 = "0", p4 = "0";
+        public String p1 = "0", p2 = "0", p3 = "0", p4 = "0", p5 = "";
 
         @Override
         public void build(Table table){
@@ -777,7 +777,7 @@ public class LStatements{
             int c = 0;
             for(int i = 0; i < type.params.length; i++){
 
-                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v).width(110f);
+                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v).width(110f);
 
                 if(++c % 2 == 0) row(table);
             }
@@ -790,7 +790,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4), builder.var(p5));
         }
     }
 
@@ -861,7 +861,7 @@ public class LStatements{
                     table.table(ts -> {
                         ts.color.set(table.color);
 
-                        field(ts, ore, str -> ore = str);
+                        fields(ts, ore, str -> ore = str);
 
                         ts.button(b -> {
                             b.image(Icon.pencilSmall);
@@ -905,8 +905,10 @@ public class LStatements{
             table.add(" found ").left();
             fields(table, outFound, str -> outFound = str);
 
-            table.add(" building ").left();
-            fields(table, outBuild, str -> outBuild = str);
+            if(locate != LLocate.ore){
+                table.add(" building ").left();
+                fields(table, outBuild, str -> outBuild = str);
+            }
 
         }
 

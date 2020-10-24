@@ -33,14 +33,17 @@ public class UnitFactory extends UnitBlock{
         hasPower = true;
         hasItems = true;
         solid = true;
-        //flags = EnumSet.of(BlockFlag.producer, BlockFlag.unitModifier);
-        //unitCapModifier = 2;
         configurable = true;
         outputsPayload = true;
         rotate = true;
 
         config(Integer.class, (UnitFactoryBuild tile, Integer i) -> {
             tile.currentPlan = i < 0 || i >= plans.size ? -1 : i;
+            tile.progress = 0;
+        });
+
+        config(UnitType.class, (UnitFactoryBuild tile, UnitType val) -> {
+            tile.currentPlan = plans.indexOf(p -> p.unit == val);
             tile.progress = 0;
         });
 

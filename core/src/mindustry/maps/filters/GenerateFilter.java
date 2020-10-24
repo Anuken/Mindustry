@@ -37,7 +37,7 @@ public abstract class GenerateFilter{
                 apply();
 
                 tile.setFloor(in.floor.asFloor());
-                tile.setOverlay(!in.floor.asFloor().hasSurface() ? Blocks.air : in.overlay);
+                tile.setOverlay(!in.floor.asFloor().hasSurface() && in.overlay.asFloor().needsSurface ? Blocks.air : in.overlay);
 
                 if(!tile.block().synthetic() && !in.block.synthetic()){
                     tile.setBlock(in.block);
@@ -49,7 +49,7 @@ public abstract class GenerateFilter{
                 apply();
 
                 tile.setFloor(in.floor.asFloor());
-                tile.setOverlay(!in.floor.asFloor().hasSurface() ? Blocks.air : in.overlay);
+                tile.setOverlay(!in.floor.asFloor().hasSurface() && in.overlay.asFloor().needsSurface ? Blocks.air : in.overlay);
 
                 if(!tile.block().synthetic() && !in.block.synthetic()){
                     tile.setBlock(in.block);

@@ -133,6 +133,8 @@ public class Block extends UnlockableContent{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** If true, this block can be configured by logic. */
+    public boolean logicConfigurable = false;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
@@ -673,6 +675,14 @@ public class Block extends UnlockableContent{
         stats.useCategories = true;
 
         consumes.init();
+
+        if(!logicConfigurable){
+            configurations.each((key, val) -> {
+                if(UnlockableContent.class.isAssignableFrom(key)){
+                    logicConfigurable = true;
+                }
+            });
+        }
 
         if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
             throw new IllegalArgumentException("Consumer using buffered power: " + name);
