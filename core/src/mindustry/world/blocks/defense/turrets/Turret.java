@@ -117,7 +117,7 @@ public abstract class Turret extends ReloadTurret{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{baseRegion, region};
+        return teamRegion.found() ? new TextureRegion[]{baseRegion, region, teamRegions[Team.sharded.id]} : new TextureRegion[]{baseRegion, region};
     }
 
     public static abstract class AmmoEntry{
@@ -217,10 +217,17 @@ public abstract class Turret extends ReloadTurret{
 
             Drawf.shadow(region, x + tr2.x - (size / 2f), y + tr2.y - (size / 2f), rotation - 90);
             drawer.get(this);
+            Draw.color(cellColor());
+            if(teamRegion.found()) Draw.rect(teamRegion, x + tr2.x, y + tr2.y, rotation - 90);
+            Draw.color();
 
             if(heatRegion != Core.atlas.find("error")){
                 heatDrawer.get(this);
             }
+        }
+
+        public Color cellColor(){
+            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         }
 
         @Override

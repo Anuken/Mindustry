@@ -1,5 +1,6 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -58,7 +59,7 @@ public class RepairPoint extends Block{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{baseRegion, region};
+        return teamRegion.found() ? new TextureRegion[]{baseRegion, region, teamRegions[Team.sharded.id]} : new TextureRegion[]{baseRegion, region};
     }
 
     public class RepairPointBuild extends Building{
@@ -72,6 +73,9 @@ public class RepairPoint extends Block{
             Draw.z(Layer.turret);
             Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
+            Draw.color(cellColor());
+            if(teamRegion.found()) Draw.rect(teamRegion, x, y, rotation - 90);
+            Draw.color();
 
             if(target != null && Angles.angleDist(angleTo(target), rotation) < 30f){
                 Draw.z(Layer.flyingUnit + 1); //above all units
@@ -84,6 +88,10 @@ public class RepairPoint extends Block{
                 target.x(), target.y(), strength);
                 Draw.color();
             }
+        }
+
+        public Color cellColor(){
+            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         }
 
         @Override

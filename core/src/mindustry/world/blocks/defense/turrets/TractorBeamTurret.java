@@ -43,7 +43,7 @@ public class TractorBeamTurret extends BaseTurret{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{baseRegion, region};
+        return teamRegion.found() ? new TextureRegion[]{baseRegion, region, teamRegions[Team.sharded.id]} : new TextureRegion[]{baseRegion, region};
     }
 
     @Override
@@ -119,6 +119,9 @@ public class TractorBeamTurret extends BaseTurret{
             Draw.rect(baseRegion, x, y);
             Drawf.shadow(region, x - (size / 2f), y - (size / 2f), rotation - 90);
             Draw.rect(region, x, y, rotation - 90);
+            Draw.color(cellColor());
+            if(teamRegion.found()) Draw.rect(teamRegion, x, y, rotation - 90);
+            Draw.color();
 
             //draw laser if applicable
             if(any){
@@ -134,6 +137,10 @@ public class TractorBeamTurret extends BaseTurret{
 
                 Draw.mixcol();
             }
+        }
+
+        public Color cellColor(){
+            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         }
 
         @Override

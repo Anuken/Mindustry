@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.audio.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -52,7 +53,7 @@ public class MassDriver extends Block{
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{baseRegion, region};
+        return teamRegion.found() ? new TextureRegion[]{baseRegion, region, teamRegions[Team.sharded.id]} : new TextureRegion[]{baseRegion, region};
     }
 
     @Override
@@ -188,12 +189,18 @@ public class MassDriver extends Block{
 
             Draw.z(Layer.turret);
 
-            Drawf.shadow(region,
-            x + Angles.trnsx(rotation + 180f, reload * knockback) - (size / 2),
-            y + Angles.trnsy(rotation + 180f, reload * knockback) - (size / 2), rotation - 90);
-            Draw.rect(region,
-            x + Angles.trnsx(rotation + 180f, reload * knockback),
-            y + Angles.trnsy(rotation + 180f, reload * knockback), rotation - 90);
+            float angleX = x + Angles.trnsx(rotation + 180f, reload * knockback);
+            float angleY = y + Angles.trnsy(rotation + 180f, reload * knockback);
+
+            Drawf.shadow(region, angleX - (size / 2), angleY - (size / 2), rotation - 90);
+            Draw.rect(region, angleX, angleY, rotation - 90);
+            Draw.color(cellColor());
+            if(teamRegion.found()) Draw.rect(teamRegion, angleX, angleY, rotation - 90);
+            Draw.color();
+        }
+
+        public Color cellColor(){
+            return Tmp.c1.set(Color.black).lerp(team.color, healthf() + Mathf.absin(Time.time(), Math.max(healthf() * 5f, 1f), 1f - healthf()));
         }
 
         @Override
