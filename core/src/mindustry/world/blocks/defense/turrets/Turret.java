@@ -248,7 +248,7 @@ public abstract class Turret extends ReloadTurret{
                 if(timer(timerTarget, targetInterval)){
                     findTarget();
                 }
-                
+            
                 if(validateTarget()){
                     boolean canShoot = true;
                     idleTurning = false;
@@ -282,7 +282,7 @@ public abstract class Turret extends ReloadTurret{
                 if(!idleTurning){
                     Time.run(Mathf.random(idleTurnTime[0], idleTurnTime[1]), () -> {
                         idleTurning = true;
-                        idleTurnTarget = rotation + (Mathf.signs[(int)Mathf.round(Mathf.random(1))] * Mathf.random(idleTurnRange[0], idleTurnRange[1]));
+                        idleTurnTarget = rotation + (Mathf.signs[Mathf.round(Mathf.random(1))] * Mathf.random(idleTurnRange[0], idleTurnRange[1]));
                     });
                 }else if(idleTurning){
                     turnToTarget(idleTurnTarget);
