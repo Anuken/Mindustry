@@ -117,7 +117,7 @@ public class TractorBeamTurret extends BaseTurret{
 
         @Override
         public void drawTeam(){
-            Draw.z(Layer.turret + 0.1);
+            Draw.z(Layer.turret + 0.1f);
             Draw.color(cellColor());
             if(teamRegion.found()) Draw.rect(teamRegion, x, y, rotation - 90);
             Draw.color();

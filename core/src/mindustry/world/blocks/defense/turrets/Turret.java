@@ -209,7 +209,7 @@ public abstract class Turret extends ReloadTurret{
 
         @Override
         public void drawTeam(){
-            Draw.z(Layer.turret + 0.1);
+            Draw.z(Layer.turret + 0.1f);
             Draw.color(cellColor());
             if(teamRegion.found()) Draw.rect(teamRegion, x + tr2.x, y + tr2.y, rotation - 90);
             Draw.color();
