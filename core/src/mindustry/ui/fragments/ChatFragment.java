@@ -168,10 +168,10 @@ public class ChatFragment extends Table{
     }
 
     private void sendMessage(){
-        String message = chatfield.getText();
+        String message = chatfield.getText().trim();
         clearChatInput();
 
-        if(message.replace(" ", "").isEmpty()) return;
+        if(message.isEmpty()) return;
 
         history.insert(1, message);
 
