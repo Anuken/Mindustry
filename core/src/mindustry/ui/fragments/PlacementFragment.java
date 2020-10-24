@@ -350,8 +350,6 @@ public class PlacementFragment extends Fragment{
                                         b.add("@banned").width(190f).wrap();
                                     }
 
-    
-
                                     b.left();
                                 }).padTop(2).left();
                             }
