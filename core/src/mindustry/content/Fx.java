@@ -1217,7 +1217,15 @@ public class Fx{
         randLenVectors(e.id, 7, 25f * e.finpow(), e.rotation, 50f, (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f);
         });
+    }),
 
+    thoriumShoot = new Effect(12f, e -> {
+        color(Color.white, Pal.thoriumPink, e.fin());
+        stroke(e.fout() * 1.2f + 0.5f);
+
+        randLenVectors(e.id, 7, 25f * e.finpow(), e.rotation, 50f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f);
+        });
     }),
 
     reactorsmoke = new Effect(17, e -> {

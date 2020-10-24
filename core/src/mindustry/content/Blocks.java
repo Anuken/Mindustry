@@ -1655,6 +1655,8 @@ public class Blocks implements ContentList{
                 length = brange;
                 damage = 105f;
                 ammoMultiplier = 5f;
+                toColor = Pal.thoriumPink;
+                shootEffect = smokeEffect = Fx.thoriumShoot;
             }},
             Items.titanium, new ShrapnelBulletType(){{
                 length = brange;
@@ -2034,7 +2036,7 @@ public class Blocks implements ContentList{
         }};
 
         microProcessor = new LogicBlock("micro-processor"){{
-            requirements(Category.logic, with(Items.copper, 80, Items.lead, 50, Items.silicon, 50));
+            requirements(Category.logic, with(Items.copper, 80, Items.lead, 50, Items.silicon, 30));
 
             instructionsPerTick = 2;
 
@@ -2042,7 +2044,7 @@ public class Blocks implements ContentList{
         }};
 
         logicProcessor = new LogicBlock("logic-processor"){{
-            requirements(Category.logic, with(Items.lead, 320, Items.silicon, 100, Items.graphite, 60, Items.thorium, 50));
+            requirements(Category.logic, with(Items.lead, 320, Items.silicon, 60, Items.graphite, 60, Items.thorium, 50));
 
             instructionsPerTick = 8;
 
@@ -2052,7 +2054,7 @@ public class Blocks implements ContentList{
         }};
 
         hyperProcessor = new LogicBlock("hyper-processor"){{
-            requirements(Category.logic, with(Items.lead, 450, Items.silicon, 150, Items.thorium, 75, Items.surgeAlloy, 50));
+            requirements(Category.logic, with(Items.lead, 450, Items.silicon, 130, Items.thorium, 75, Items.surgeAlloy, 50));
 
             consumes.liquid(Liquids.cryofluid, 0.08f);
             hasLiquids = true;
