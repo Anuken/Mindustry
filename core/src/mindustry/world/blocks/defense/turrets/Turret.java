@@ -57,7 +57,7 @@ public abstract class Turret extends ReloadTurret{
     public float minRange = 0f;
     public float burstSpacing = 0;
     public float idleTurnRange = 90f;
-    public float idleTurnSpeedMul = 0.5f;
+    public float idleTurnSpeed = 2f;
     public float idleTurnMinTime = 120f;
     public float idleTurnMaxTime = 720f;
     public boolean alternate = false;
@@ -315,7 +315,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed() * (idleTurning ? idleTurnSpeedMul : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, (idleTurning ? idleTurnSpeed : rotateSpeed) * delta() * baseReloadSpeed());
         }
 
         public boolean shouldTurn(){
