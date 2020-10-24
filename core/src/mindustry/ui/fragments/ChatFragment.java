@@ -163,8 +163,9 @@ public class ChatFragment extends Table{
 
         Draw.color();
 
-        if(fadetime > 0 && !shown)
+        if(fadetime > 0 && !shown){
             fadetime -= Time.delta / 180f;
+        }
     }
 
     private void sendMessage(){
