@@ -69,7 +69,7 @@ public abstract class Turret extends ReloadTurret{
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
     protected boolean idleTurning = false;
-    protected float idleRotationTarget = 0;
+    protected float idleTurnTarget = 0;
 
     public @Load("block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
@@ -276,13 +276,13 @@ public abstract class Turret extends ReloadTurret{
                 }
             }else if(!validateTarget() && shouldTurn()){
                 if(!idleTurning){
-                    Time.run(Mathf.random(idleTurnMinTime, idleTurnMaxTime), () -> {
-                        idleTurning = true;
-                        idleRotationTarget = rotation + Mathf.range(idleTurnRange);
-                    });
+                  Time.run(Mathf.random(idleTurnMinTime, idleTurnMaxTime), () -> {
+                      idleTurning = true;
+                      idleTurnTarget = rotation + Mathf.range(idleTurnRange);
+                  });
                 }else if(idleTurning){
-                    turnToTarget(idleRotationTarget);
-                    if(Angles.within(rotation, idleRotationTarget, 0.5f)){
+                    turnToTarget(idleTurnTarget);
+                    if(Angles.within(rotation, idleTurnTarget, 0.5f)){
                       idleTurning = false;
                     }
                 }
