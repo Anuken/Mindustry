@@ -56,6 +56,9 @@ public abstract class Turret extends ReloadTurret{
     /** Currently used for artillery only. */
     public float minRange = 0f;
     public float burstSpacing = 0;
+    public float idleTurnRange = 90f;
+    public float idleTurnSpeedMul = 0.5f;
+    public float[] idleTurnTime = {120, 720};
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
@@ -64,6 +67,8 @@ public abstract class Turret extends ReloadTurret{
 
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
+    protected boolean idleTurning = false;
+    protected float idleTurnTarget = 0;
 
     public @Load("block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
@@ -238,36 +243,46 @@ public abstract class Turret extends ReloadTurret{
                 logicControlTime -= Time.delta;
             }
 
-            if(hasAmmo()){
+            if(timer(timerTarget, targetInterval)){
+                findTarget();
+            }
 
-                if(timer(timerTarget, targetInterval)){
-                    findTarget();
+            if(validateTarget()){
+                boolean canShoot = true;
+                idleTurning = false;
+
+                if(isControlled()){ //player behavior
+                    targetPos.set(unit.aimX(), unit.aimY());
+                    canShoot = unit.isShooting();
+                }else if(logicControlled()){ //logic behavior
+                    canShoot = logicShooting;
+                }else{ //default AI behavior
+                    targetPosition(target);
+
+                    if(Float.isNaN(rotation)){
+                        rotation = 0;
+                    }
                 }
 
-                if(validateTarget()){
-                    boolean canShoot = true;
+                float targetRot = angleTo(targetPos);
 
-                    if(isControlled()){ //player behavior
-                        targetPos.set(unit.aimX(), unit.aimY());
-                        canShoot = unit.isShooting();
-                    }else if(logicControlled()){ //logic behavior
-                        canShoot = logicShooting;
-                    }else{ //default AI behavior
-                        targetPosition(target);
+                if(shouldTurn()){
+                    turnToTarget(targetRot);
+                }
 
-                        if(Float.isNaN(rotation)){
-                            rotation = 0;
-                        }
-                    }
-
-                    float targetRot = angleTo(targetPos);
-
-                    if(shouldTurn()){
-                        turnToTarget(targetRot);
-                    }
-
-                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
-                        updateShooting();
+                if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                    updateShooting();
+                }
+            }else if(!validateTarget()){
+                if(!idleTurning){
+                  Time.run(Mathf.random(idleTurnTime[0], idleTurnTime[1]), () -> {
+                      idleTurning = true;
+                      idleTurnTarget = rotation + Mathf.range(idleTurnRange);
+                  });
+                }else if(idleTurning){
+                    turnToTarget(idleTurnTarget);
+                    if(Angles.within(rotation, idleTurnTarget, 0.5f)){
+                      idleTurning = false;
                     }
                 }
             }
@@ -299,7 +314,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed());
+            rotation = Angles.moveToward(rotation, targetRot, (idleTurning ? idleTurnSpeedMul : 1f) * (rotateSpeed * delta() * baseReloadSpeed()));
         }
 
         public boolean shouldTurn(){
@@ -330,7 +345,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void updateShooting(){
-            if(reload >= reloadTime){
+            if(reload >= reloadTime && hasAmmo()){
                 BulletType type = peekAmmo();
 
                 shoot(type);
