@@ -304,6 +304,7 @@ public class Bullets implements ContentList{
             height = 13f;
             shootEffect = Fx.shootBig;
             smokeEffect = Fx.shootBigSmoke;
+            backColor = Pal.thoriumPink;
             ammoMultiplier = 4;
             lifetime = 60f;
         }};
@@ -354,6 +355,7 @@ public class Bullets implements ContentList{
             width = 16f;
             height = 23f;
             shootEffect = Fx.shootBig;
+            backColor = Pal.thoriumPink;
             pierceCap = 2;
             pierceBuilding = true;
         }};
