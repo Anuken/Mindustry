@@ -223,6 +223,7 @@ public class LExecutor{
             this.outX = outX;
             this.outY = outY;
             this.outFound = outFound;
+            this.outBuild = outBuild;
         }
 
         public UnitLocateI(){
