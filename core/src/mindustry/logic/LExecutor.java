@@ -876,10 +876,11 @@ public class LExecutor{
             if(v.isobj && value != 0){
                 String strValue =
                     v.objval == null ? "null" :
-                    v.objval instanceof String ? (String)v.objval :
+                    v.objval instanceof String s ? s :
+                    v.objval instanceof MappableContent content ? content.name :
                     v.objval instanceof Content ? "[content]" :
-                    v.objval instanceof Building ? "[building]" :
-                    v.objval instanceof Unit ? "[unit]" :
+                    v.objval instanceof Building build ? build.block.name :
+                    v.objval instanceof Unit unit ? unit.type.name :
                     "[object]";
 
                 exec.textBuffer.append(strValue);
