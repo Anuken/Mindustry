@@ -343,11 +343,15 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
+
                                     if(!player.isBuilder()){
                                         b.add(player.unit().type == UnitTypes.block ? "@block.nobuild" : "@unit.nobuild").width(190f).wrap();
                                     }else{
-                                        b.add(displayBlock.unplaceableMessage()).width(190f).wrap();
+                                        b.add("@banned").width(190f).wrap();
                                     }
+
+    
+
                                     b.left();
                                 }).padTop(2).left();
                             }
