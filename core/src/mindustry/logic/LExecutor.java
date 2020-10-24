@@ -878,6 +878,7 @@ public class LExecutor{
                     v.objval == null ? "null" :
                     v.objval instanceof String ? (String)v.objval :
                     v.objval instanceof MappableContent ? "[content] " + ((MappableContent)v.objval).name :
+                    v.objval instanceof Content ? "[content]" :
                     v.objval instanceof Building ? "[building] " + ((Building)v.objval).block.name :
                     v.objval instanceof Unit ? "[unit] " + ((Unit)v.objval).type.name :
                     "[object]";
