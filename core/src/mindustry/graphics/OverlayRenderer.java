@@ -85,7 +85,7 @@ public class OverlayRenderer{
                 //special selection for block "units"
                 Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block.size * tilesize/2f);
             }else{
-                Draw.rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+                Draw.rect(select.type.icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
             }
 
             Lines.stroke(unitFade);
@@ -121,7 +121,7 @@ public class OverlayRenderer{
         Lines.stroke(2f);
         Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time(), 8f, 1f));
 
-        if(state.rules.waves){
+        if(state.hasSpawns()){
             for(Tile tile : spawner.getSpawns()){
                 if(tile.within(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
                     Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));

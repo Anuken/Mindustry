@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
@@ -38,19 +39,19 @@ public class PlanetRenderer implements Disposable{
     public float zoom = 1f;
 
     private final Mesh[] outlines = new Mesh[10];
-    private final PlaneBatch3D projector = new PlaneBatch3D();
-    private final Mat3D mat = new Mat3D();
-    private final FrameBuffer buffer = new FrameBuffer(2, 2, true);
-    private PlanetInterfaceRenderer irenderer;
+    public final PlaneBatch3D projector = new PlaneBatch3D();
+    public final Mat3D mat = new Mat3D();
+    public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    public PlanetInterfaceRenderer irenderer;
 
-    private final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
+    public final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
         setThreshold(0.8f);
         blurPasses = 6;
     }};
-    private final Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, false, 1.5f);
+    public final Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, false, 1.5f);
 
     //seed: 8kmfuix03fw
-    private final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
+    public final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
 
     public PlanetRenderer(){
         camPos.set(0, 0f, camLength);
@@ -82,13 +83,19 @@ public class PlanetRenderer implements Disposable{
         projector.proj(cam.combined);
         batch.proj(cam.combined);
 
+        Events.fire(Trigger.universeDrawBegin);
+
         beginBloom();
 
         skybox.render(cam.combined);
 
+        Events.fire(Trigger.universeDraw);
+
         renderPlanet(solarSystem);
 
         endBloom();
+
+        Events.fire(Trigger.universeDrawEnd);
 
         Gl.enable(Gl.blend);
 
@@ -100,18 +107,21 @@ public class PlanetRenderer implements Disposable{
         cam.update();
     }
 
-    private void beginBloom(){
+    public void beginBloom(){
         bloom.resize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4);
         bloom.capture();
     }
 
-    private void endBloom(){
+    public void endBloom(){
         bloom.render();
     }
 
-    private void renderPlanet(Planet planet){
+
+    public void renderPlanet(Planet planet){
+        if(!planet.visible()) return;
+      
         //render planet at offsetted position in the world
-        planet.mesh.render(cam.combined, planet.getTransform(mat));
+        planet.draw(cam.combined, planet.getTransform(mat));
 
         renderOrbit(planet);
 
@@ -137,8 +147,8 @@ public class PlanetRenderer implements Disposable{
         }
     }
 
-    private void renderOrbit(Planet planet){
-        if(planet.parent == null) return;
+    public void renderOrbit(Planet planet){
+        if(planet.parent == null || !planet.visible()) return;
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
@@ -147,7 +157,7 @@ public class PlanetRenderer implements Disposable{
         batch.flush(Gl.lineLoop);
     }
 
-    private void renderSectors(Planet planet){
+    public void renderSectors(Planet planet){
         //apply transformed position
         batch.proj().mul(planet.getTransform(mat));
 
@@ -268,7 +278,7 @@ public class PlanetRenderer implements Disposable{
         }
     }
 
-    private Mesh outline(int size){
+    public Mesh outline(int size){
         if(outlines[size] == null){
             outlines[size] = MeshBuilder.buildHex(new HexMesher(){
                 @Override

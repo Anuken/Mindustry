@@ -53,15 +53,19 @@ public class BaseDialog extends Dialog{
         });
     }
 
-    @Override
-    public void addCloseButton(){
-        buttons.defaults().size(210f, 64f);
-        buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
-
+    public void addCloseListener(){
         keyDown(key -> {
             if(key == KeyCode.escape || key == KeyCode.back){
                 Core.app.post(this::hide);
             }
         });
+    }
+
+    @Override
+    public void addCloseButton(){
+        buttons.defaults().size(210f, 64f);
+        buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
+
+        addCloseListener();
     }
 }

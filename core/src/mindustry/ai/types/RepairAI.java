@@ -12,7 +12,7 @@ public class RepairAI extends AIController{
         if(target instanceof Building){
             boolean shoot = false;
 
-            if(target.within(unit, unit.type().range)){
+            if(target.within(unit, unit.type.range)){
                 unit.aim(target);
                 shoot = true;
             }
@@ -23,8 +23,8 @@ public class RepairAI extends AIController{
         }
 
         if(target != null){
-            if(!target.within(unit, unit.type().range * 0.65f) && target instanceof Building){
-                moveTo(target, unit.type().range * 0.65f);
+            if(!target.within(unit, unit.type.range * 0.65f) && target instanceof Building){
+                moveTo(target, unit.type.range * 0.65f);
             }
 
             unit.lookAt(target);

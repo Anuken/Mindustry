@@ -148,7 +148,17 @@ public class World{
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    public int toTile(float coord){
+    /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */
+    public static float conv(float coord){
+        return coord / tilesize;
+    }
+
+    /** Convert from tile to world coordinates. */
+    public static float unconv(float coord){
+        return coord * tilesize;
+    }
+
+    public static int toTile(float coord){
         return Math.round(coord / tilesize);
     }
 
@@ -300,7 +310,7 @@ public class World{
 
         //TODO bad code
         boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
-        boolean hasRain = !hasSnow && floors[0].name.contains("water");
+        boolean hasRain = !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
         boolean hasDesert = !hasSnow && !hasRain && floors[0].name.contains("sand");
         boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
 
@@ -310,6 +320,7 @@ public class World{
 
         if(hasRain){
             state.rules.weather.add(new WeatherEntry(Weathers.rain));
+            state.rules.weather.add(new WeatherEntry(Weathers.fog));
         }
 
         if(hasDesert){

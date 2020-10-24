@@ -26,7 +26,7 @@ public class EditorTile extends Tile{
 
         if(type instanceof OverlayFloor){
             //don't place on liquids
-            if(floor.hasSurface()){
+            if(floor.hasSurface() || !type.needsSurface){
                 setOverlayID(type.id);
             }
             return;
@@ -75,7 +75,7 @@ public class EditorTile extends Tile{
             return;
         }
 
-        if(floor.isLiquid) return;
+        if(!floor.hasSurface() && overlay.asFloor().needsSurface) return;
         if(overlay() == overlay) return;
         op(OpType.overlay, this.overlay.id);
         super.setOverlay(overlay);
@@ -105,9 +105,9 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeBuild(Team team, Prov<Building> entityprov, int rotation){
         if(skip()){
-            super.changeEntity(team, entityprov, rotation);
+            super.changeBuild(team, entityprov, rotation);
             return;
         }
 

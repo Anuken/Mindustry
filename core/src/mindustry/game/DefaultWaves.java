@@ -18,6 +18,7 @@ public class DefaultWaves{
             new SpawnGroup(dagger){{
                 end = 10;
                 unitScaling = 2f;
+                max = 30;
             }},
 
             new SpawnGroup(crawler){{
@@ -38,13 +39,14 @@ public class DefaultWaves{
                 unitScaling = 1.7f;
                 spacing = 2;
                 max = 4;
-                shieldScaling = 15f;
+                shieldScaling = 25f;
             }},
 
             new SpawnGroup(pulsar){{
                 begin = 13;
                 spacing = 3;
                 unitScaling = 0.5f;
+                max = 25;
             }},
 
             new SpawnGroup(mace){{
@@ -60,8 +62,8 @@ public class DefaultWaves{
                 unitScaling = 1;
                 unitAmount = 4;
                 spacing = 2;
-                shieldScaling = 10f;
-                max = 20;
+                shieldScaling = 20f;
+                max = 14;
             }},
 
             new SpawnGroup(mace){{
@@ -77,7 +79,8 @@ public class DefaultWaves{
                 spacing = 3;
                 unitScaling = 1;
                 max = 10;
-                shieldScaling = 10f;
+                shieldScaling = 30f;
+                shields = 100;
                 effect = StatusEffects.overdrive;
             }},
 
@@ -94,6 +97,7 @@ public class DefaultWaves{
                 unitScaling = 1;
                 spacing = 2;
                 shieldScaling = 20f;
+                max = 20;
             }},
 
             new SpawnGroup(quasar){{
@@ -111,6 +115,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 3;
                 effect = StatusEffects.shielded;
+                max = 25;
             }},
 
             new SpawnGroup(fortress){{
@@ -138,6 +143,7 @@ public class DefaultWaves{
                 effect = StatusEffects.overdrive;
                 items = new ItemStack(Items.pyratite, 100);
                 end = 130;
+                max = 30;
             }},
 
             new SpawnGroup(horizon){{
@@ -156,6 +162,7 @@ public class DefaultWaves{
                 shields = 100f;
                 shieldScaling = 10f;
                 effect = StatusEffects.overdrive;
+                max = 20;
             }},
 
             new SpawnGroup(zenith){{
@@ -172,7 +179,7 @@ public class DefaultWaves{
                 unitAmount = 2;
                 unitScaling = 3;
                 spacing = 4;
-                shieldScaling = 20;
+                shieldScaling = 30;
             }},
 
             new SpawnGroup(atrax){{
@@ -180,7 +187,7 @@ public class DefaultWaves{
                 unitAmount = 4;
                 unitScaling = 1;
                 spacing = 3;
-                shieldScaling = 5f;
+                shieldScaling = 10f;
             }},
 
             new SpawnGroup(scepter){{
@@ -188,7 +195,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 30;
-                shieldScaling = 10f;
+                shieldScaling = 30f;
             }},
 
             new SpawnGroup(reign){{
@@ -196,7 +203,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
-                shieldScaling = 20f;
+                shieldScaling = 30f;
             }},
 
             new SpawnGroup(antumbra){{
@@ -204,7 +211,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 40;
-                shieldScaling = 20f;
+                shieldScaling = 30f;
             }},
 
             new SpawnGroup(vela){{
@@ -212,7 +219,7 @@ public class DefaultWaves{
                 unitAmount = 1;
                 unitScaling = 1;
                 spacing = 30;
-                shieldScaling = 20f;
+                shieldScaling = 30f;
             }},
 
             new SpawnGroup(corvus){{
@@ -230,7 +237,7 @@ public class DefaultWaves{
                 unitScaling = 3;
                 spacing = 4;
                 shields = 40f;
-                shieldScaling = 20f;
+                shieldScaling = 30f;
             }},
 
             new SpawnGroup(toxopid){{
@@ -246,19 +253,17 @@ public class DefaultWaves{
         return spawns == null ? new Seq<>() : spawns;
     }
 
-    //TODO move elsewhere
     public static Seq<SpawnGroup> generate(float difficulty){
         return generate(new Rand(), difficulty);
     }
 
-    //TODO move elsewhere
     public static Seq<SpawnGroup> generate(Rand rand, float difficulty){
         UnitType[][] species = {
         {dagger, mace, fortress, scepter, reign},
         {nova, pulsar, quasar, vela, corvus},
         {crawler, atrax, spiroct, arkyid, toxopid},
         //{risso, minke, bryde, sei, omura}, //questionable choices
-        {poly, poly, mega, quad, quad},
+        {flare, horizon, difficulty > 0.5 ? poly : zenith, quad, quad},
         {flare, horizon, zenith, antumbra, eclipse}
         };
 

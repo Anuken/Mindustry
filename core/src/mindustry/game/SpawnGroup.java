@@ -9,6 +9,8 @@ import mindustry.gen.*;
 import mindustry.io.legacy.*;
 import mindustry.type.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 /**
@@ -137,5 +139,21 @@ public class SpawnGroup implements Serializable{
         ", effect=" + effect +
         ", items=" + items +
         '}';
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(o == null || getClass() != o.getClass()) return false;
+        SpawnGroup group = (SpawnGroup)o;
+        return end == group.end && begin == group.begin && spacing == group.spacing && max == group.max
+            && Float.compare(group.unitScaling, unitScaling) == 0 && Float.compare(group.shields, shields) == 0
+            && Float.compare(group.shieldScaling, shieldScaling) == 0 && unitAmount == group.unitAmount &&
+            type == group.type && effect == group.effect && Structs.eq(items, group.items);
+    }
+
+    @Override
+    public int hashCode(){
+        return Arrays.hashCode(new Object[]{type, end, begin, spacing, max, unitScaling, shields, shieldScaling, unitAmount, effect, items});
     }
 }

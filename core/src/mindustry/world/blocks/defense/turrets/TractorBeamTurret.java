@@ -1,4 +1,4 @@
-package mindustry.world.blocks.defense;
+package mindustry.world.blocks.defense.turrets;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -9,12 +9,13 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
+import mindustry.type.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class TractorBeamTurret extends Block{
+public class TractorBeamTurret extends BaseTurret{
     public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
@@ -22,8 +23,6 @@ public class TractorBeamTurret extends Block{
     public @Load("@-laser") TextureRegion laser;
     public @Load("@-laser-end") TextureRegion laserEnd;
 
-    public float range = 80f;
-    public float rotateSpeed = 10;
     public float shootCone = 6f;
     public float laserWidth = 0.6f;
     public float force = 0.3f;
@@ -35,14 +34,11 @@ public class TractorBeamTurret extends Block{
     public TractorBeamTurret(String name){
         super(name);
 
-        update = true;
-        solid = true;
-        outlineIcon = true;
-    }
+        rotateSpeed = 10f;
+        coolantMultiplier = 1f;
 
-    @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
+        //disabled due to version mismatch problems
+        acceptCoolant = false;
     }
 
     @Override
@@ -54,17 +50,16 @@ public class TractorBeamTurret extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.shootRange, range / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.targetsAir, targetAir);
-        stats.add(BlockStat.targetsGround, targetGround);
-        stats.add(BlockStat.damage, damage * 60f, StatUnit.perSecond);
+        stats.add(Stat.targetsAir, targetAir);
+        stats.add(Stat.targetsGround, targetGround);
+        stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
     }
 
-    public class TractorBeamBuild extends Building{
-        public float rotation = 90;
+    public class TractorBeamBuild extends BaseTurretBuild{
         public @Nullable Unit target;
         public float lastX, lastY, strength;
         public boolean any;
+        public float coolant = 1f;
 
         @Override
         public void updateTile(){
@@ -74,8 +69,25 @@ public class TractorBeamTurret extends Block{
                 target = Units.closestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
             }
 
+            //consume coolant
+            if(target != null && acceptCoolant){
+                float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
+
+                Liquid liquid = liquids.current();
+
+                float used = Math.min(Math.min(liquids.get(liquid), maxUsed * Time.delta), Math.max(0, (1f / coolantMultiplier) / liquid.heatCapacity));
+
+                liquids.remove(liquid, used);
+
+                if(Mathf.chance(0.06 * used)){
+                    coolEffect.at(x + Mathf.range(size * tilesize / 2f), y + Mathf.range(size * tilesize / 2f));
+                }
+
+                coolant = 1f + (used * liquid.heatCapacity * coolantMultiplier);
+            }
+
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type().flying && efficiency() > 0.01f){
+            if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.01f){
                 any = true;
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
@@ -98,8 +110,8 @@ public class TractorBeamTurret extends Block{
         }
 
         @Override
-        public void drawSelect(){
-            Drawf.dashCircle(x, y, range, Pal.accent);
+        public float efficiency() {
+            return super.efficiency() * coolant;
         }
 
         @Override

@@ -42,7 +42,7 @@ public class LaunchPad extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.launchTime, launchTime / 60f, StatUnit.seconds);
+        stats.add(Stat.launchTime, launchTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -115,6 +115,8 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
+            if(!state.isCampaign()) return;
+
             table.row();
             table.label(() -> {
                 Sector dest = state.secinfo.getRealDestination();
@@ -122,7 +124,7 @@ public class LaunchPad extends Block{
                 return Core.bundle.format("launch.destination",
                     dest == null ? Core.bundle.get("sectors.nonelaunch") :
                     "[accent]" + dest.name());
-            }).pad(4);
+            }).pad(4).wrap().width(200f).left();
         }
 
         @Override

@@ -258,6 +258,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
             Groups.unit.clear();
             Groups.build.clear();
             logic.play();
+
+            if(player.team().core() == null){
+                player.set(world.width() * tilesize/2f, world.height() * tilesize/2f);
+                player.unit(UnitTypes.alpha.spawn(player.team(), player.x, player.y));
+            }
         });
     }
 
@@ -561,7 +566,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 if(!mobile){
                     mid.table(t -> {
-                        t.button("@editor.center", Icon.move, Styles.cleart, () -> view.center()).growX().margin(9f);
+                        t.button("@editor.center", Icon.move, Styles.cleart, view::center).growX().margin(9f);
+                    }).growX().top();
+                }
+
+                if(addCliffButton){
+                    mid.row();
+
+                    mid.table(t -> {
+                        t.button("Cliffs", Icon.terrain, Styles.cleart, editor::addCliffs).growX().margin(9f);
                     }).growX().top();
                 }
             }).margin(0).left().growY();

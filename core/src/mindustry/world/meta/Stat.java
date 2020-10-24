@@ -1,0 +1,88 @@
+package mindustry.world.meta;
+
+import arc.*;
+
+import java.util.*;
+
+/** Describes one type of stat for content. */
+public enum Stat{
+    health,
+    size,
+    displaySize,
+    buildTime,
+    buildCost,
+    memoryCapacity,
+    explosiveness,
+    flammability,
+    radioactivity,
+    heatCapacity,
+    viscosity,
+    temperature,
+    speed,
+    buildSpeed,
+    mineSpeed,
+    mineTier,
+    payloadCapacity,
+    commandLimit,
+    baseDeflectChance,
+    lightningChance, 
+    lightningDamage,
+    abilities,
+
+    itemCapacity(StatCat.items),
+    itemsMoved(StatCat.items),
+    launchTime(StatCat.items),
+    maxConsecutive(StatCat.items),
+
+    liquidCapacity(StatCat.liquids),
+
+    powerCapacity(StatCat.power),
+    powerUse(StatCat.power),
+    powerDamage(StatCat.power),
+    powerRange(StatCat.power),
+    powerConnections(StatCat.power),
+    basePowerGeneration(StatCat.power),
+
+    tiles(StatCat.crafting),
+    input(StatCat.crafting),
+    output(StatCat.crafting),
+    productionTime(StatCat.crafting),
+    drillTier(StatCat.crafting),
+    drillSpeed(StatCat.crafting),
+    maxUnits(StatCat.crafting),
+    linkRange(StatCat.crafting),
+    instructions(StatCat.crafting),
+
+    speedIncrease(StatCat.function),
+    repairTime(StatCat.function),
+    range(StatCat.function),
+    shootRange(StatCat.function),
+    inaccuracy(StatCat.function),
+    shots(StatCat.function),
+    reload(StatCat.function),
+    powerShot(StatCat.function),
+    targetsAir(StatCat.function),
+    targetsGround(StatCat.function),
+    damage(StatCat.function),
+    ammo(StatCat.function),
+    shieldHealth(StatCat.function),
+    cooldownTime(StatCat.function),
+
+    booster(StatCat.optional),
+    boostEffect(StatCat.optional),
+    affinities(StatCat.optional);
+
+    public final StatCat category;
+
+    Stat(StatCat category){
+        this.category = category;
+    }
+
+    Stat(){
+        this.category = StatCat.general;
+    }
+
+    public String localized(){
+        return Core.bundle.get("stat." + name().toLowerCase(Locale.ROOT));
+    }
+}
