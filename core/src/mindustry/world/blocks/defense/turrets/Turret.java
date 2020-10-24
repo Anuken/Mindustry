@@ -56,11 +56,9 @@ public abstract class Turret extends ReloadTurret{
     /** Currently used for artillery only. */
     public float minRange = 0f;
     public float burstSpacing = 0;
-    public float idleTurnMinDist = 45f;
-    public float idleTurnMaxDist = 90f;
+    public float[] idleTurnRange = {45f, 90f};
     public float idleTurnSpeed = 2f;
-    public float idleTurnMinTime = 240f;
-    public float idleTurnMaxTime = 720f;
+    public float[] idleTurnTime = {240f, 720f};
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
@@ -282,9 +280,9 @@ public abstract class Turret extends ReloadTurret{
             
             if(!validateTarget() && shouldTurn()){
                 if(!idleTurning){
-                    Time.run(Mathf.random(idleTurnMinTime, idleTurnMaxTime), () -> {
+                    Time.run(Mathf.random(idleTurnTime[0], idleTurnTime[1]), () -> {
                         idleTurning = true;
-                        idleTurnTarget = rotation + (Mathf.signs[(int)Mathf.round(Mathf.random(1))] * Mathf.random(idleTurnMinDist, idleTurnMaxDist));
+                        idleTurnTarget = rotation + (Mathf.signs[(int)Mathf.round(Mathf.random(1))] * Mathf.random(idleTurnRange[0], idleTurnRange[1]));
                     });
                 }else if(idleTurning){
                     turnToTarget(idleTurnTarget);
