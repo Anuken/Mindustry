@@ -10,6 +10,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;

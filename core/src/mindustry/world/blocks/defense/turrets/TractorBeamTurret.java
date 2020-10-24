@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;

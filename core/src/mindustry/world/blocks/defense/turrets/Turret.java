@@ -18,6 +18,7 @@ import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
