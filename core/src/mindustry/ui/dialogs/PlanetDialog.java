@@ -382,8 +382,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
         }
 
-        Log.info("sector resources = @ / @", sector.info.resources, sector.info.hashCode());
-
         if(sector.save != null && sector.info.resources.any()){
             stable.add("@sectors.resources").row();
             stable.table(t -> {

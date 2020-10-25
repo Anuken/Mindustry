@@ -181,6 +181,12 @@ public class Control implements ApplicationListener, Loadable{
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effect.shake(5f, 5f, core);
+
+                if(state.isCampaign()){
+                    ui.announce("[accent]" + state.rules.sector.name() + "\n" +
+                        (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
+                            state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
+                }
             });
         });
 
