@@ -321,7 +321,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * baseReloadSpeed() * (idleTurning ? idleTurnSpeedMul : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, (idleTurning ? idleTurnSpeed : rotateSpeed) * delta() * baseReloadSpeed());
         }
 
         public boolean shouldTurn(){
