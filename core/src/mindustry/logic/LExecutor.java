@@ -273,9 +273,9 @@ public class LExecutor{
                         cache.found = false;
                         exec.setnum(outFound, 0);
                     }
-                    exec.setobj(outBuild, res != null && res.build != null && res.build.team == exec.team ? res.build : null);
+                    exec.setobj(outBuild, res != null && res.build != null && res.build.team == exec.team ? cache.build = res.build : null);
                 }else{
-                    exec.setobj(outBuild, null);
+                    exec.setobj(outBuild, cache.build);
                     exec.setbool(outFound, cache.found);
                     exec.setnum(outX, cache.x);
                     exec.setnum(outY, cache.y);
@@ -286,6 +286,7 @@ public class LExecutor{
         static class Cache{
             float x, y;
             boolean found;
+            Building build;
         }
     }
 
