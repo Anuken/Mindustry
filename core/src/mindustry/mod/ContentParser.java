@@ -569,7 +569,9 @@ public class ContentParser{
                 if(field.field.getType().isPrimitive()) return;
 
                 if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null && !implicitNullable.contains(field.field.getType())){
-                    throw new RuntimeException("'" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
+                    throw new RuntimeException("'" + field.field.getName() + "' in " +
+                        ((object.getClass().isAnonymousClass() ? object.getClass().getSuperclass() : object.getClass()).getSimpleName()) +
+                        " is missing! Object = " + object + ", field = (" + field.field.getName() + " = " + field.field.get(object) + ")");
                 }
             }catch(Exception e){
                 throw new RuntimeException(e);

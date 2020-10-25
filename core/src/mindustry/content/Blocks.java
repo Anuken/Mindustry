@@ -103,6 +103,7 @@ public class Blocks implements ContentList{
                 alwaysReplace = true;
                 hasShadow = false;
                 useColor = false;
+                wall = this;
             }
 
             @Override public void drawBase(Tile tile){}
