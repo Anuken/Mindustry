@@ -17,7 +17,7 @@ public class ContinuousLaserBulletType extends BulletType{
     public Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
     public float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
     public float[] strokes = {2f, 1.5f, 1f, 0.3f};
-    public float[] lenscales = {0f, 0.12f, 0.15f, 0.17f};
+    public float[] lenscales = {1f, 1.12f, 1.15f, 1.17f};
     public float width = 9f, oscScl = 0.8f, oscMag = 1.5f;
     public boolean largeHit = true;
 
@@ -86,7 +86,7 @@ public class ContinuousLaserBulletType extends BulletType{
         for(int s = 0; s < colors.length; s++){
             Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
             for(int i = 0; i < tscales.length; i++){
-                Tmp.v1.trns(b.rotation() + 180f, lenscales[i] * 35f);
+                Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1) * 35f);
                 Lines.stroke((width + Mathf.absin(Time.time(), oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
                 Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
             }
