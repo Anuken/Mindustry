@@ -34,9 +34,7 @@ public class WaveInfoDialog extends BaseDialog{
         super("@waves.title");
 
         shown(this::setup);
-        hidden(() -> {
-            state.rules.spawns = groups;
-        });
+        hidden(() -> state.rules.spawns = groups);
 
         addCloseListener();
 
@@ -96,6 +94,14 @@ public class WaveInfoDialog extends BaseDialog{
                 view(1);
             }
         });
+
+        if(experimental){
+            buttons.button("Random", Icon.refresh, () -> {
+                groups.clear();
+                groups = DefaultWaves.generate(1f / 10f);
+                updateWaves();
+            }).width(200f);
+        }
     }
 
     void view(int amount){
