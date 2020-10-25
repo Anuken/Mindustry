@@ -368,9 +368,9 @@ public class HudFragment extends Fragment{
                     c.clearChildren();
 
                     for(Item item : content.items()){
-                        if(state.secinfo.getExport(item) >= 1){
+                        if(state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1){
                             c.image(item.icon(Cicon.small));
-                            c.label(() -> (int)state.secinfo.getExport(item) + " /s").color(Color.lightGray);
+                            c.label(() -> (int)state.rules.sector.info.getExport(item) + " /s").color(Color.lightGray);
                             c.row();
                         }
                     }
@@ -379,7 +379,7 @@ public class HudFragment extends Fragment{
                 c.update(() -> {
                     boolean wrong = false;
                     for(Item item : content.items()){
-                        boolean has = state.secinfo.getExport(item) >= 1;
+                        boolean has = state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1;
                         if(used.get(item.id) != has){
                             used.set(item.id, has);
                             wrong = true;
@@ -389,7 +389,7 @@ public class HudFragment extends Fragment{
                         rebuild.run();
                     }
                 });
-            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
+            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.rules.sector != null && state.rules.sector.info.getExport(i) > 0));
         });
 
         blockfrag.build(parent);

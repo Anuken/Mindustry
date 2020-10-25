@@ -331,6 +331,7 @@ public class World{
             state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
         }
 
+        Log.info("saving resources as @ -> @ / @", sector.info.resources, content.asArray(), sector.info.hashCode());
         sector.info.resources = content.asArray();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
         sector.saveInfo();

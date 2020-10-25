@@ -246,7 +246,7 @@ public class LExecutor{
                     switch(locate){
                         case ore -> {
                             if(exec.obj(ore) instanceof Item item){
-                                res = indexer.findClosestOre(unit.x, unit.y, item);
+                                res = indexer.findClosestOre(unit, item);
                             }
                         }
                         case building -> {
@@ -466,9 +466,8 @@ public class LExecutor{
                         if(ai.itemTimer > 0) return;
 
                         Building build = exec.building(p1);
-                        int amount = exec.numi(p2);
-                        int dropped = Math.min(unit.stack.amount, amount);
-                        if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange)){
+                        int dropped = Math.min(unit.stack.amount, exec.numi(p2));
+                        if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int accepted = build.acceptStack(unit.item(), dropped, unit);
                             if(accepted > 0){
                                 Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -482,7 +481,7 @@ public class LExecutor{
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
 
-                        if(build != null && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange)){
+                        if(build != null && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){

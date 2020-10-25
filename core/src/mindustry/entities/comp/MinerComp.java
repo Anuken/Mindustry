@@ -32,12 +32,16 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     }
 
     boolean mining(){
-        return mineTile != null && !(((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding());
+        return mineTile != null && !(((Object)this) instanceof Builderc b && b.activelyBuilding());
+    }
+
+    public boolean validMine(Tile tile, boolean checkDst){
+        return !(tile == null || tile.block() != Blocks.air || (!within(tile.worldx(), tile.worldy(), miningRange) && checkDst)
+        || tile.drop() == null || !canMine(tile.drop())) && state.teams.canMine(self(), tile);
     }
 
     public boolean validMine(Tile tile){
-        return !(tile == null || tile.block() != Blocks.air || !within(tile.worldx(), tile.worldy(), miningRange)
-        || tile.drop() == null || !canMine(tile.drop()));
+        return validMine(tile, true);
     }
 
     @Override
@@ -58,6 +62,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             mineTile = null;
             mineTimer = 0f;
         }else if(mining()){
+            state.teams.registerMined(mineTile, self());
             Item item = mineTile.drop();
             lookAt(angleTo(mineTile.worldx(), mineTile.worldy()));
             mineTimer += Time.delta *type.mineSpeed;
@@ -84,8 +89,6 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
                     mineTimer = 0f;
                 }
             }
-
-
         }
     }
 

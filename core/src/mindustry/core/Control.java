@@ -264,7 +264,6 @@ public class Control implements ApplicationListener, Loadable{
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
-                    state.secinfo = state.rules.sector.info;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty()){
@@ -281,6 +280,9 @@ public class Control implements ApplicationListener, Loadable{
 
                         //reset wave so things are more fair
                         state.wave = 1;
+
+                        //reset win wave??
+                        state.rules.winWave = sector.preset != null ? sector.preset.captureWave : 40;
 
                         //kill all units, since they should be dead anwyay
                         Groups.unit.clear();
@@ -312,8 +314,8 @@ public class Control implements ApplicationListener, Loadable{
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching
-                state.secinfo.origin = origin;
-                state.secinfo.destination = origin;
+                sector.info.origin = origin;
+                sector.info.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);

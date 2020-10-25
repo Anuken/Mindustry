@@ -126,7 +126,6 @@ public class Build{
             for(int dy = 0; dy < type.size; dy++){
                 int wx = dx + offsetx + tile.x, wy = dy + offsety + tile.y;
 
-
                 Tile check = world.tile(wx, wy);
 
                 if(
@@ -136,6 +135,10 @@ public class Build{
                 !check.interactable(team) || //cannot interact
                 !check.floor().placeableOn || //solid wall
                     !((type.canReplace(check.block()) || //can replace type
+                        //controversial change: allow rebuilding damaged blocks
+                        //this could be buggy and abusable, so I'm not enabling it yet
+                        //note that this requires a change in BuilderComp as well
+                        //(type == check.block() && check.centerX() == x && check.centerY() == y && check.build != null && check.build.health < check.build.maxHealth - 0.0001f) ||
                         (check.block instanceof ConstructBlock && check.<ConstructBuild>bc().cblock == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found

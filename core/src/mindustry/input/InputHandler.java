@@ -945,10 +945,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null && player.miner().canMine(tile.drop())
+        && tile.drop() != null
+        && player.miner().validMine(tile)
         && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
         && player.unit().acceptsItem(tile.drop())
-        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
+        && tile.block() == Blocks.air;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */

@@ -49,6 +49,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         shouldPause = true;
 
+        addCloseListener();
+
         buttons.defaults().size(200f, 56f).pad(2);
         buttons.button("@back", Icon.left, this::hide);
         buttons.button("@techtree", Icon.tree, () -> ui.research.show());
@@ -379,6 +381,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.add("[accent]" + (int)(sector.info.damage * 100) + "% damaged");
             stable.row();
         }
+
+        Log.info("sector resources = @ / @", sector.info.resources, sector.info.hashCode());
 
         if(sector.save != null && sector.info.resources.any()){
             stable.add("@sectors.resources").row();

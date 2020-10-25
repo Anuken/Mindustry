@@ -312,6 +312,28 @@ public class BlockIndexer{
         return null;
     }
 
+    /** Find the closest ore block relative to a position. */
+    public Tile findClosestOre(Unit unit, Item item){
+        if(!(unit instanceof Minerc miner)) return null;
+
+        TileArray arr = getOrePositions(item);
+
+        arr.tiles.sort(t -> t.dst2(unit.x, unit.y));
+
+        for(Tile tile : arr.tiles){
+            for(int x = Math.max(0, tile.x - quadrantSize / 2); x < tile.x + quadrantSize / 2 && x < world.width(); x++){
+                for(int y = Math.max(0, tile.y - quadrantSize / 2); y < tile.y + quadrantSize / 2 && y < world.height(); y++){
+                    Tile res = world.tile(x, y);
+                    if(res.drop() == item && miner.validMine(res, false)){
+                        return res;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     /** @return extra unit cap of a team. This is added onto the base value. */
     public int getExtraUnits(Team team){
         return unitCaps[team.id];
@@ -457,8 +479,8 @@ public class BlockIndexer{
     }
 
     public static class TileArray implements Iterable<Tile>{
-        private Seq<Tile> tiles = new Seq<>(false, 16);
-        private IntSet contained = new IntSet();
+        Seq<Tile> tiles = new Seq<>(false, 16);
+        IntSet contained = new IntSet();
 
         public void add(Tile tile){
             if(contained.add(tile.pos())){
