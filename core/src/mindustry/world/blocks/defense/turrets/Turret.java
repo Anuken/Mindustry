@@ -58,7 +58,8 @@ public abstract class Turret extends ReloadTurret{
     public float burstSpacing = 0;
     public float idleTurnRange = 90f;
     public float idleTurnSpeedMul = 0.5f;
-    public float[] idleTurnTime = {120, 720};
+    public float idleTurnMinTime = 120f;
+    public float idleTurnMaxTime = 720f;
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
@@ -275,7 +276,7 @@ public abstract class Turret extends ReloadTurret{
                 }
             }else if(!validateTarget() && shouldTurn()){
                 if(!idleTurning){
-                  Time.run(Mathf.random(idleTurnTime[0], idleTurnTime[1]), () -> {
+                  Time.run(Mathf.random(idleTurnMinTime, idleTurnMaxTime), () -> {
                       idleTurning = true;
                       idleTurnTarget = rotation + Mathf.range(idleTurnRange);
                   });
