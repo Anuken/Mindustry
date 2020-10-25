@@ -1137,7 +1137,7 @@ public class UnitTypes implements ContentList{
             ammoType = AmmoTypes.powerLow;
 
             mineTier = 1;
-            mineSpeed = 2.5f;
+            mineSpeed = 2.6f;
         }};
 
         poly = new UnitType("poly"){{
@@ -1735,7 +1735,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 70;
             health = 220f;
             engineOffset = 6f;
-            hitSize = 10f;
+            hitSize = 11f;
             commandLimit = 7;
 
             weapons.add(new Weapon("small-mount-weapon"){{

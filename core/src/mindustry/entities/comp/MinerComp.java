@@ -95,7 +95,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     @Override
     public void draw(){
         if(!mining()) return;
-        float focusLen = 4f + Mathf.absin(Time.time(), 1.1f, 0.5f);
+        float focusLen = hitSize() / 2f + Mathf.absin(Time.time(), 1.1f, 0.5f);
         float swingScl = 12f, swingMag = tilesize / 8f;
         float flashScl = 0.3f;
 
@@ -105,7 +105,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         float ex = mineTile.worldx() + Mathf.sin(Time.time() + 48, swingScl, swingMag);
         float ey = mineTile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
 
-        Draw.z(Layer.flyingUnit + 0.1f);
+        Draw.z(Layer.flyingUnit - 0.1f);
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 
