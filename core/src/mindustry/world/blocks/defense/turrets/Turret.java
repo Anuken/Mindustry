@@ -69,7 +69,7 @@ public abstract class Turret extends ReloadTurret{
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
     protected boolean idleTurning = false;
-    protected float idleRotationTarget = 0;
+    protected float idleTurnTarget = 0;
 
     public @Load("block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
@@ -243,46 +243,51 @@ public abstract class Turret extends ReloadTurret{
             if(logicControlTime > 0){
                 logicControlTime -= Time.delta;
             }
+            
+            if(hasAmmo()){
+                
+                if(timer(timerTarget, targetInterval)){
+                    findTarget();
+                }
+            
+                if(validateTarget()){
+                    boolean canShoot = true;
+                    idleTurning = false;
 
-            if(timer(timerTarget, targetInterval)){
-                findTarget();
-            }
+                    if(isControlled()){ //player behavior
+                        targetPos.set(unit.aimX(), unit.aimY());
+                        canShoot = unit.isShooting();
+                    }else if(logicControlled()){ //logic behavior
+                        canShoot = logicShooting;
+                    }else{ //default AI behavior
+                        targetPosition(target);
 
-            if(validateTarget()){
-                boolean canShoot = true;
-                idleTurning = false;
+                        if(Float.isNaN(rotation)){
+                            rotation = 0;
+                        }
+                    }
 
-                if(isControlled()){ //player behavior
-                    targetPos.set(unit.aimX(), unit.aimY());
-                    canShoot = unit.isShooting();
-                }else if(logicControlled()){ //logic behavior
-                    canShoot = logicShooting;
-                }else{ //default AI behavior
-                    targetPosition(target);
+                    float targetRot = angleTo(targetPos);
 
-                    if(Float.isNaN(rotation)){
-                        rotation = 0;
+                    if(shouldTurn()){
+                        turnToTarget(targetRot);
+                    }
+
+                    if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                        updateShooting();
                     }
                 }
-
-                float targetRot = angleTo(targetPos);
-
-                if(shouldTurn()){
-                    turnToTarget(targetRot);
-                }
-
-                if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
-                    updateShooting();
-                }
-            }else if(!validateTarget() && shouldTurn()){
+            }
+            
+            if(!validateTarget() && shouldTurn()){
                 if(!idleTurning){
-                    Time.run(Mathf.random(idleTurnMinTime, idleTurnMaxTime), () -> {
+                    Time.run(Mathf.random(idleTurnTime[0], idleTurnTime[1]), () -> {
                         idleTurning = true;
-                        idleRotationTarget = rotation + Mathf.range(idleTurnRange);
+                        idleTurnTarget = rotation + (Mathf.signs[Mathf.round(Mathf.random(1))] * Mathf.random(idleTurnRange[0], idleTurnRange[1]));
                     });
                 }else if(idleTurning){
-                    turnToTarget(idleRotationTarget);
-                    if(Angles.within(rotation, idleRotationTarget, 0.5f)){
+                    turnToTarget(idleTurnTarget);
+                    if(Angles.within(rotation, idleTurnTarget, 0.1f)){
                         idleTurning = false;
                     }
                 }
@@ -346,7 +351,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void updateShooting(){
-            if(reload >= reloadTime && hasAmmo()){
+            if(reload >= reloadTime){
                 BulletType type = peekAmmo();
 
                 shoot(type);
