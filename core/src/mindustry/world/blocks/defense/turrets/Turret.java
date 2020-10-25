@@ -56,10 +56,9 @@ public abstract class Turret extends ReloadTurret{
     /** Currently used for artillery only. */
     public float minRange = 0f;
     public float burstSpacing = 0;
-    public float idleTurnRange = 90f;
-    public float idleTurnSpeedMul = 0.5f;
-    public float idleTurnMinTime = 120f;
-    public float idleTurnMaxTime = 720f;
+    public float[] idleTurnRange = {45f, 90f};
+    public float idleTurnSpeed = 2f;
+    public float[] idleTurnTime = {240f, 720f};
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
