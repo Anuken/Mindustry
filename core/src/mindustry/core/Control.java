@@ -412,13 +412,15 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void pause(){
-        wasPaused = state.is(State.paused);
-        if(state.is(State.playing)) state.set(State.paused);
+        if(settings.getBool("backgroundpause", true)){
+            wasPaused = state.is(State.paused);
+            if(state.is(State.playing)) state.set(State.paused);
+        }
     }
 
     @Override
     public void resume(){
-        if(state.is(State.paused) && !wasPaused){
+        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true)){
             state.set(State.playing);
         }
     }
