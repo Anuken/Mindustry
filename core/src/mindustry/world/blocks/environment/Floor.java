@@ -7,7 +7,7 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.graphics.*;
@@ -37,7 +37,7 @@ public class Floor extends Block{
     /** Effect displayed when drowning on this floor. */
     public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
-    public @NonNull StatusEffect status = StatusEffects.none;
+    public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect. */
     public float statusDuration = 60f;
     /** liquids that drop from this block, used for pumps */
@@ -64,6 +64,8 @@ public class Floor extends Block{
     public Block wall = Blocks.air;
     /** Decoration block. Usually a rock. May be air. */
     public Block decoration = Blocks.air;
+    /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
+    public boolean needsSurface = true;
 
     protected TextureRegion[][] edges;
     protected Seq<Block> blenders = new Seq<>();
@@ -166,6 +168,11 @@ public class Floor extends Block{
         return new TextureRegion[]{Core.atlas.find(Core.atlas.has(name) ? name : name + "1")};
     }
 
+    /** @return whether this floor has a valid surface on which to place things, e.g. scorch marks. */
+    public boolean hasSurface(){
+        return !isLiquid && !solid;
+    }
+
     public boolean isDeep(){
         return drownTime > 0;
     }
@@ -178,7 +185,7 @@ public class Floor extends Block{
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
-            Tile other = tile.getNearby(point);
+            Tile other = tile.nearby(point);
             if(other != null && other.floor().cacheLayer == layer && other.floor().edges() != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
@@ -195,7 +202,7 @@ public class Floor extends Block{
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
-            Tile other = tile.getNearby(point);
+            Tile other = tile.nearby(point);
             if(other != null && doEdge(other.floor()) && other.floor().cacheLayer == cacheLayer && other.floor().edges() != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
@@ -212,7 +219,7 @@ public class Floor extends Block{
         for(Block block : blenders){
             for(int i = 0; i < 8; i++){
                 Point2 point = Geometry.d8[i];
-                Tile other = tile.getNearby(point);
+                Tile other = tile.nearby(point);
                 if(other != null && other.floor() == block){
                     TextureRegion region = edge((Floor)block, 1 - point.x, 1 - point.y);
                     Draw.rect(region, tile.worldx(), tile.worldy());
@@ -224,7 +231,7 @@ public class Floor extends Block{
     //'new' style of edges with shadows instead of colors, not used currently
     protected void drawEdgesFlat(Tile tile, boolean sameLayer){
         for(int i = 0; i < 4; i++){
-            Tile other = tile.getNearby(i);
+            Tile other = tile.nearby(i);
             if(other != null && doEdge(other.floor())){
                 Color color = other.floor().mapColor;
                 Draw.color(color.r, color.g, color.b, 1f);

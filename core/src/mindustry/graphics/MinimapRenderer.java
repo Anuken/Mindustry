@@ -9,7 +9,6 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -97,7 +96,7 @@ public class MinimapRenderer implements Disposable{
 
             Draw.mixcol(unit.team().color, 1f);
             float scale = Scl.scl(1f) / 2f * scaling * 32f;
-            Draw.rect(unit.type().icon(Cicon.full), x + rx, y + ry, scale, scale, unit.rotation() - 90);
+            Draw.rect(unit.type.icon(Cicon.full), x + rx, y + ry, scale, scale, unit.rotation() - 90);
             Draw.reset();
 
             //only disable player names in multiplayer
@@ -159,7 +158,7 @@ public class MinimapRenderer implements Disposable{
     private int colorFor(Tile tile){
         if(tile == null) return 0;
         int bc = tile.block().minimapColor(tile);
-        Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(tile.floor(), tile.block(), tile.overlay(), tile.team()) : bc);
+        Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()) : bc);
         color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
 
         return color.rgba();

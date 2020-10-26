@@ -166,29 +166,33 @@ public class AndroidLauncher extends AndroidApplication{
         }});
         checkFiles(getIntent());
 
+        try{
+            //new external folder
+            Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+            Core.settings.setDataDirectory(data);
 
-        //new external folder
-        Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
-        Core.settings.setDataDirectory(data);
+            //move to internal storage if there's no file indicating that it moved
+            if(!Core.files.local("files_moved").exists()){
+                Log.info("Moving files to external storage...");
 
-        //move to internal storage if there's no file indicating that it moved
-        if(!Core.files.local("files_moved").exists()){
-            Log.info("Moving files to external storage...");
-
-            try{
-                //current local storage folder
-                Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
-                for(Fi fi : src.list()){
-                    fi.copyTo(data);
+                try{
+                    //current local storage folder
+                    Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
+                    for(Fi fi : src.list()){
+                        fi.copyTo(data);
+                    }
+                    //create marker
+                    Core.files.local("files_moved").writeString("files moved to " + data);
+                    Core.files.local("files_moved_103").writeString("files moved again");
+                    Log.info("Files moved.");
+                }catch(Throwable t){
+                    Log.err("Failed to move files!");
+                    t.printStackTrace();
                 }
-                //create marker
-                Core.files.local("files_moved").writeString("files moved to " + data);
-                Core.files.local("files_moved_103").writeString("files moved again");
-                Log.info("Files moved.");
-            }catch(Throwable t){
-                Log.err("Failed to move files!");
-                t.printStackTrace();
             }
+        }catch(Exception e){
+            //print log but don't crash
+            Log.err(e);
         }
     }
 

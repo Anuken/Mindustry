@@ -1,8 +1,8 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.struct.*;
 import arc.scene.ui.*;
+import arc.struct.*;
 import mindustry.*;
 import mindustry.game.*;
 import mindustry.io.*;

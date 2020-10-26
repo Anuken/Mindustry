@@ -32,7 +32,7 @@ allprojects{
 
     ext{
         versionNumber = '6'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'alpha'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = '891ed912791e01fe9ee6237a6497e5212b85c256'
@@ -200,7 +200,11 @@ configure(subprojects - project(":annotations")){
     }
 
     tasks.withType(Javadoc){
-       options.addStringOption('Xdoclint:none', '-quiet')
+        options{
+            addStringOption('Xdoclint:none', '-quiet')
+            addBooleanOption('-enable-preview', true)
+            addStringOption('-release', '14')
+        }
     }
 }
 
@@ -258,6 +262,8 @@ project(":ios"){
 project(":core"){
     apply plugin: "java-library"
 
+    compileJava.options.fork = true
+
     task preGen{
         outputs.upToDateWhen{ false }
         generateLocales()
@@ -299,7 +305,7 @@ project(":core"){
 
         compileOnly project(":annotations")
         annotationProcessor project(":annotations")
-        annotationProcessor 'com.github.Anuken:jabel:40eec868af'
+        annotationProcessor 'com.github.Anuken:jabel:34e4c172e65b3928cd9eabe1993654ea79c409cd'
 
     }
 }

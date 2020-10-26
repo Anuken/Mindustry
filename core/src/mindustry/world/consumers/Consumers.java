@@ -1,13 +1,13 @@
 package mindustry.world.consumers;
 
+import arc.func.*;
 import arc.struct.*;
-import arc.func.Boolf;
-import arc.util.Structs;
-import mindustry.Vars;
+import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
-import mindustry.world.blocks.power.ConditionalConsumePower;
-import mindustry.world.meta.BlockStats;
+import mindustry.world.blocks.power.*;
+import mindustry.world.meta.*;
 
 public class Consumers{
     private Consume[] map = new Consume[ConsumeType.values().length];
@@ -109,7 +109,7 @@ public class Consumers{
         return optionalResults;
     }
 
-    public void display(BlockStats stats){
+    public void display(Stats stats){
         for(Consume c : map){
             if(c != null){
                 c.display(stats);

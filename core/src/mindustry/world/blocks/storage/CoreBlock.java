@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -15,6 +14,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -47,10 +47,11 @@ public class CoreBlock extends StorageBlock{
         update = true;
         hasItems = true;
         priority = TargetPriority.core;
-        flags = EnumSet.of(BlockFlag.core, BlockFlag.producer, BlockFlag.unitModifier);
+        flags = EnumSet.of(BlockFlag.core, BlockFlag.unitModifier);
         unitCapModifier = 10;
         activeSound = Sounds.respawning;
         activeSoundVolume = 1f;
+        group = BlockGroup.none;
     }
 
     @Remote(called = Loc.server)
@@ -76,10 +77,16 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
-        bars.add("capacity", (CoreBuild e) ->
-            new Bar(
-                () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
-                () -> Pal.items,
+        stats.add(Stat.buildTime, 0, StatUnit.seconds);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        bars.add("capacity", (CoreBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.capacity", UI.formatAmount(e.storageCapacity)),
+            () -> Pal.items,
             () -> e.items.total() / ((float)e.storageCapacity * content.items().count(i -> i.unlockedNow()))
         ));
     }
@@ -154,7 +161,14 @@ public class CoreBlock extends StorageBlock{
     public class CoreBuild extends Building implements ControlBlock{
         public int storageCapacity;
         //note that this unit is never actually used for control; the possession handler makes the player respawn when this unit is controlled
-        public @NonNull BlockUnitc unit = Nulls.blockUnit;
+        public BlockUnitc unit = Nulls.blockUnit;
+        public boolean noEffect = false;
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.itemCapacity) return storageCapacity;
+            return super.sense(sensor);
+        }
 
         @Override
         public void created(){
@@ -187,13 +201,28 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void onDestroyed(){
+            super.onDestroyed();
+
+            //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
+            if(state.isCampaign() && team == state.rules.waveTeam){
+                //do not recache
+                tile.setOverlayQuiet(Blocks.spawn);
+
+                if(!spawner.getSpawns().contains(tile)){
+                    spawner.getSpawns().add(tile);
+                }
+            }
+        }
+
+        @Override
         public void drawLight(){
             Drawf.light(team, x, y, 30f * size, Pal.accent, 0.5f + Mathf.absin(20f, 0.1f));
         }
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return items.get(item) < getMaximumAccepted(item);
+            return items.get(item) < getMaximumAccepted(item) || incinerate();
         }
 
         @Override
@@ -262,6 +291,10 @@ public class CoreBlock extends StorageBlock{
             return tile instanceof StorageBuild && (((StorageBuild)tile).linkedCore == core || ((StorageBuild)tile).linkedCore == null);
         }
 
+        public boolean incinerate(){
+            return state.isCampaign();
+        }
+
         @Override
         public float handleDamage(float amount){
             if(player != null && team == player.team()){
@@ -303,9 +336,30 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
+        public void itemTaken(Item item){
+            if(state.isCampaign() && team == state.rules.defaultTeam){
+                //update item taken amount
+                state.rules.sector.info.handleCoreItem(item, -1);
+            }
+        }
+
+        @Override
         public void handleItem(Building source, Item item){
             if(net.server() || !net.active()){
-                super.handleItem(source, item);
+                if(team == state.rules.defaultTeam && state.isCampaign()){
+                    state.rules.sector.info.handleCoreItem(item, 1);
+                }
+
+                if(items.get(item) >= getMaximumAccepted(item)){
+                    //create item incineration effect at random intervals
+                    if(!noEffect){
+                        incinerateEffect(this, source);
+                    }
+                    noEffect = false;
+                }else{
+                    super.handleItem(source, item);
+                }
+
                 if(state.rules.tutorial){
                     Events.fire(new CoreItemDeliverEvent());
                 }

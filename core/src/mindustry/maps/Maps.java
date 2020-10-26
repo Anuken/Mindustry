@@ -8,7 +8,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.struct.IntSet.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.io.*;
@@ -30,7 +29,7 @@ import static mindustry.Vars.*;
 
 public class Maps{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
+    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "veins", "glacier"};
     /** Maps tagged as PvP */
     static final String[] pvpMaps = {"veins", "glacier"};
     /** All maps stored in an ordered array. */
@@ -83,9 +82,7 @@ public class Maps{
     }
 
     public Maps(){
-        Events.on(ClientLoadEvent.class, event -> {
-            maps.sort();
-        });
+        Events.on(ClientLoadEvent.class, event -> maps.sort());
 
         if(Core.assets != null){
             ((CustomLoader)Core.assets.getLoader(ContentLoader.class)).loaded = this::createAllPreviews;

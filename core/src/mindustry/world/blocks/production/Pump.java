@@ -4,8 +4,8 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.game.*;
-import mindustry.type.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.*;
@@ -26,7 +26,7 @@ public class Pump extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.output, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
+        stats.add(Stat.output, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.math.*;
+import arc.util.*;
 
 public enum LogicOp{
     add("+", (a, b) -> a + b),
@@ -9,8 +10,8 @@ public enum LogicOp{
     div("/", (a, b) -> a / b),
     idiv("//", (a, b) -> Math.floor(a / b)),
     mod("%", (a, b) -> a % b),
-    equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> a == b ? 1 : 0),
-    notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> a != b ? 1 : 0),
+    equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> Structs.eq(a, b) ? 1 : 0),
+    notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> !Structs.eq(a, b) ? 1 : 0),
     lessThan("<", (a, b) -> a < b ? 1 : 0),
     lessThanEq("<=", (a, b) -> a <= b ? 1 : 0),
     greaterThan(">", (a, b) -> a > b ? 1 : 0),

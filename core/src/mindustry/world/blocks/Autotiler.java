@@ -3,7 +3,6 @@ package mindustry.world.blocks;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -11,7 +10,6 @@ import mindustry.world.*;
 
 import java.util.*;
 
-//TODO documentation
 public interface Autotiler{
 
     /**
@@ -109,7 +107,6 @@ public interface Autotiler{
         blendresult[0] = 0;
         blendresult[1] = blendresult[2] = 1;
 
-        // TODO code refactoring maybe?
         int num =
         (blends(tile, rotation, directional, 2, world) && blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 3, world)) ? 0 :
         (blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 3, world)) ? 1 :
@@ -136,7 +133,7 @@ public interface Autotiler{
 
         for(int i = 0; i < 4; i++){
             int realDir = Mathf.mod(rotation - i, 4);
-            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.getNearbyEntity(realDir) != null && !tile.getNearbyEntity(realDir).block.squareSprite)){
+            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.nearbyBuild(realDir) != null && !tile.nearbyBuild(realDir).block.squareSprite)){
                 blendresult[4] |= (1 << i);
             }
         }
@@ -151,20 +148,19 @@ public interface Autotiler{
      * @param bits The blending value array
      */
     default void transformCase(int num, int[] bits){
-        if(num == 0){
-            bits[0] = 3;
-        }else if(num == 1){
-            bits[0] = 4;
-        }else if(num == 2){
-            bits[0] = 2;
-        }else if(num == 3){
-            bits[0] = 2;
-            bits[2] = -1;
-        }else if(num == 4){
-            bits[0] = 1;
-            bits[2] = -1;
-        }else if(num == 5){
-            bits[0] = 1;
+        switch(num){
+            case 0 -> bits[0] = 3;
+            case 1 -> bits[0] = 4;
+            case 2 -> bits[0] = 2;
+            case 3 -> {
+                bits[0] = 2;
+                bits[2] = -1;
+            }
+            case 4 -> {
+                bits[0] = 1;
+                bits[2] = -1;
+            }
+            case 5 -> bits[0] = 1;
         }
     }
 
@@ -198,7 +194,7 @@ public interface Autotiler{
 
     // TODO docs -- use for direction?
     default boolean blends(Tile tile, int rotation, int direction){
-        Building other = tile.getNearbyEntity(Mathf.mod(rotation - direction, 4));
+        Building other = tile.nearbyBuild(Mathf.mod(rotation - direction, 4));
         return other != null && other.team == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation, other.block);
     }
 

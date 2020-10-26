@@ -4,7 +4,7 @@ import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class StaticTree extends StaticWall{
 
@@ -21,7 +21,7 @@ public class StaticTree extends StaticWall{
         float oy = 0;
 
         for(int i = 0; i < 4; i++){
-            if(tile.getNearby(i) != null && tile.getNearby(i).block() instanceof StaticWall){
+            if(tile.nearby(i) != null && tile.nearby(i).block() instanceof StaticWall){
 
                 if(i == 0){
                     r.setWidth(r.width - crop);

@@ -5,8 +5,8 @@ import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
 import arc.struct.*;
 import mindustry.*;
-import mindustry.entities.*;
 import mindustry.async.PhysicsProcess.PhysicsWorld.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 
 public class PhysicsProcess implements AsyncProcess{
@@ -57,7 +57,7 @@ public class PhysicsProcess implements AsyncProcess{
             PhysicRef ref = entity.physref();
 
             ref.body.layer =
-                entity.type().allowLegStep ? layerLegs :
+                entity.type.allowLegStep ? layerLegs :
                 entity.isGrounded() ? layerGround : layerFlying;
             ref.x = entity.x();
             ref.y = entity.y();

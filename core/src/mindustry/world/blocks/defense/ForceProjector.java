@@ -13,6 +13,7 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -36,8 +37,8 @@ public class ForceProjector extends Block{
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
-    static final Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramEntity.team && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
+    static final Cons<Bullet> shieldConsumer = trait -> {
+        if(trait.team != paramEntity.team && trait.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
@@ -63,13 +64,15 @@ public class ForceProjector extends Block{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.shieldHealth, breakage, StatUnit.none);
-        stats.add(BlockStat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
-        stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
+        stats.add(Stat.shieldHealth, breakage, StatUnit.none);
+        stats.add(Stat.cooldownTime, (int) (breakage / cooldownBrokenBase / 60f), StatUnit.seconds);
+        stats.add(Stat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
+        stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+        stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
         
         if(hasBoost){
-            stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
-            stats.add(BlockStat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+            stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+            stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
         }
     }
 
@@ -108,10 +111,15 @@ public class ForceProjector extends Block{
         }
     }
 
-    public class ForceBuild extends Building{
+    public class ForceBuild extends Building implements Ranged{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
         public ForceDraw drawer;
+
+        @Override
+        public float range(){
+            return realRadius();
+        }
 
         @Override
         public void created(){

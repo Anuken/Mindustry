@@ -10,16 +10,12 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
-import arc.scene.ui.layout.*;
 import arc.scene.ui.layout.Stack;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
-import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.net.Administration.*;
-import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -40,29 +36,6 @@ public class BlockInventoryFragment extends Fragment{
 
     {
         Events.on(WorldLoadEvent.class, e -> hide());
-    }
-
-    @Remote(called = Loc.server, targets = Loc.both, forward = true)
-    public static void requestItem(Player player, Building tile, Item item, int amount){
-        if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange)) return;
-        amount = Math.min(player.unit().maxAccepted(item), amount);
-        int fa = amount;
-
-        if(amount == 0) return;
-
-        if(net.server() && (!Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
-                action.item = item;
-                action.itemAmount = fa;
-            }))) throw new ValidateException(player, "Player cannot request items.");
-
-        int removed = tile.removeStack(item, amount);
-
-        player.unit().addItem(item, removed);
-        Events.fire(new WithdrawEvent(tile, player, item, amount));
-        for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x, tile.y, player.unit()));
-        }
     }
 
     @Override

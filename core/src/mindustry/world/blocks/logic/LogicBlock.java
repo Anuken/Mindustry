@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -116,8 +117,8 @@ public class LogicBlock extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.linkRange, range / 8, StatUnit.blocks);
-        stats.add(BlockStat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
+        stats.add(Stat.linkRange, range / 8, StatUnit.blocks);
+        stats.add(Stat.instructions, instructionsPerTick * 60, StatUnit.perSecond);
     }
 
     @Override
@@ -127,8 +128,7 @@ public class LogicBlock extends Block{
 
     @Override
     public Object pointConfig(Object config, Cons<Point2> transformer){
-        if(config instanceof byte[]){
-            byte[] data = (byte[])config;
+        if(config instanceof byte[] data){
 
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
                 //discard version for now
@@ -279,10 +279,13 @@ public class LogicBlock extends Block{
 
                     //store link objects
                     executor.links = new Building[links.count(l -> l.valid && l.active)];
+                    executor.linkIds.clear();
                     int index = 0;
                     for(LogicLink link : links){
                         if(link.active && link.valid){
-                            executor.links[index ++] = world.build(link.x, link.y);
+                            Building build = world.build(link.x, link.y);
+                            executor.links[index ++] = build;
+                            if(build != null) executor.linkIds.add(build.id);
                         }
                     }
 
@@ -304,9 +307,9 @@ public class LogicBlock extends Block{
                         assemble.get(asm);
                     }
 
-                    asm.putConst("@this", this);
-                    asm.putConst("@thisx", x);
-                    asm.putConst("@thisy", y);
+                    asm.getVar("@this").value = this;
+                    asm.putConst("@thisx", World.conv(x));
+                    asm.putConst("@thisy", World.conv(y));
 
                     executor.load(asm);
                 }catch(Exception e){
@@ -331,6 +334,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
+            executor.team = team;
 
             //check for previously invalid links to add after configuration
             boolean changed = false;
@@ -423,7 +427,6 @@ public class LogicBlock extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-
             table.button(Icon.pencil, Styles.clearTransi, () -> {
                 Vars.ui.logic.show(code, code -> {
                     configure(compress(code, relativeConnections()));

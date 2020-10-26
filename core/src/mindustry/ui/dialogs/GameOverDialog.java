@@ -2,7 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Stats.*;
+import mindustry.game.GameStats.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.ui.*;

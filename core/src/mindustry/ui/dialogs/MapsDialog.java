@@ -2,7 +2,6 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.graphics.*;
-import arc.input.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
@@ -24,11 +23,7 @@ public class MapsDialog extends BaseDialog{
 
         buttons.remove();
 
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        addCloseListener();
 
         shown(this::setup);
         onResize(() -> {

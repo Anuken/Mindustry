@@ -2,7 +2,7 @@ package mindustry.game;
 
 import arc.graphics.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
@@ -82,6 +82,8 @@ public class Rules{
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
+    /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
+    public ObjectSet<String> researched = new ObjectSet<>();
     /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
     /** Whether enemy lighting is visible.
@@ -104,6 +106,8 @@ public class Rules{
         public boolean ai;
         /** TODO Tier of blocks/designs that the AI uses for building. [0, 1]*/
         public float aiTier = 0f;
+        /** Whether, when AI is enabled, ships should be spawned from the core. */
+        public boolean aiCoreSpawn = true;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
         /** If true, resources are not consumed when building. */

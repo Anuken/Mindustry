@@ -9,8 +9,8 @@ const readBytes = path => Vars.mods.getScripts().readBytes(path)
 const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
 const loadSound = path => Vars.mods.getScripts().loadSound(path)
 
-var scriptName = "base.js"
-var modName = "none"
+let scriptName = "base.js"
+let modName = "none"
 
 const print = text => log(modName + "/" + scriptName, text);
 

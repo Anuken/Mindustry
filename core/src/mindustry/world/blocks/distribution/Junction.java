@@ -7,7 +7,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class Junction extends Block{
     public float speed = 26; //frames taken to go through this junction

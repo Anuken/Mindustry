@@ -10,9 +10,9 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -49,7 +49,7 @@ public class DesktopInput extends InputHandler{
     public void buildUI(Group group){
 
         group.fill(t -> {
-            t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown() && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
+            t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -177,7 +177,7 @@ public class DesktopInput extends InputHandler{
     public void update(){
         super.update();
 
-        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content))){
+        if(net.active() && Core.input.keyTap(Binding.player_list) && (scene.getKeyboardFocus() == null || scene.getKeyboardFocus().isDescendantOf(ui.listfrag.content) || scene.getKeyboardFocus().isDescendantOf(ui.minimapfrag.elem))){
             ui.listfrag.toggle();
         }
 
@@ -279,7 +279,7 @@ public class DesktopInput extends InputHandler{
 
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
-            }else if(!selectRequests.isEmpty()){
+            }else if(!selectRequests.isEmpty() && !ui.chatfrag.shown()){
                 rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
             }
         }
@@ -353,9 +353,7 @@ public class DesktopInput extends InputHandler{
             ui.planet.show();
         }).visible(() -> state.isCampaign()).tooltip("@planetmap");
 
-        table.button(Icon.up, Styles.clearPartiali, () -> {
-            ui.planet.showLaunch(state.getSector(), player.team().core());
-        }).visible(() -> state.isCampaign()).tooltip("@launchcore").disabled(b -> player.team().core() == null);
+        table.add();
     }
 
     void pollInput(){
@@ -364,7 +362,7 @@ public class DesktopInput extends InputHandler{
         Tile selected = tileAt(Core.input.mouseX(), Core.input.mouseY());
         int cursorX = tileX(Core.input.mouseX());
         int cursorY = tileY(Core.input.mouseY());
-        int rawCursorX = world.toTile(Core.input.mouseWorld().x), rawCursorY = world.toTile(Core.input.mouseWorld().y);
+        int rawCursorX = World.toTile(Core.input.mouseWorld().x), rawCursorY = World.toTile(Core.input.mouseWorld().y);
 
         // automatically pause building if the current build queue is empty
         if(Core.settings.getBool("buildautopause") && isBuilding && !player.builder().isBuilding()){
@@ -600,19 +598,19 @@ public class DesktopInput extends InputHandler{
     }
 
     protected void updateMovement(Unit unit){
-        boolean omni = unit.type().omniMovement;
+        boolean omni = unit.type.omniMovement;
         boolean ground = unit.isGrounded();
 
-        float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type().strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
-        float baseSpeed = unit.type().speed;
+        float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type.strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
+        float baseSpeed = unit.type.speed;
 
         //limit speed to minimum formation speed to preserve formation
-        if(unit instanceof Commanderc && ((Commanderc)unit).isCommanding()){
+        if(unit.isCommanding()){
             //add a tiny multiplier to let units catch up just in case
-            baseSpeed = ((Commanderc)unit).minFormationSpeed() * 0.95f;
+            baseSpeed = unit.minFormationSpeed * 0.95f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, unit.type().canBoost ? unit.type().boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = baseSpeed * Mathf.lerp(1f, unit.type.canBoost ? unit.type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -623,7 +621,7 @@ public class DesktopInput extends InputHandler{
         }
 
         float mouseAngle = Angles.mouseAngle(unit.x, unit.y);
-        boolean aimCursor = omni && player.shooting && unit.type().hasWeapons() && unit.type().faceTarget && !boosted && unit.type().rotateShooting;
+        boolean aimCursor = omni && player.shooting && unit.type.hasWeapons() && unit.type.faceTarget && !boosted && unit.type.rotateShooting;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
@@ -638,11 +636,11 @@ public class DesktopInput extends InputHandler{
         }else{
             unit.moveAt(Tmp.v2.trns(unit.rotation, movement.len()));
             if(!movement.isZero() && ground){
-                unit.vel.rotateTo(movement.angle(), unit.type().rotateSpeed);
+                unit.vel.rotateTo(movement.angle(), unit.type.rotateSpeed);
             }
         }
 
-        unit.aim(unit.type().faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
+        unit.aim(unit.type.faceTarget ? Core.input.mouseWorld() : Tmp.v1.trns(unit.rotation, Core.input.mouseWorld().dst(unit)).add(unit.x, unit.y));
         unit.controlWeapons(true, player.shooting && !boosted);
 
         player.boosting = Core.input.keyDown(Binding.boost) && !movement.isZero();
@@ -661,11 +659,9 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        //update commander inut
-        if(unit instanceof Commanderc){
-            if(Core.input.keyTap(Binding.command)){
-                Call.unitCommand(player);
-            }
+        //update commander unit
+        if(Core.input.keyTap(Binding.command) && unit.type.commandLimit > 0){
+            Call.unitCommand(player);
         }
     }
 }

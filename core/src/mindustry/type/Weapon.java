@@ -4,7 +4,6 @@ import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
@@ -16,7 +15,7 @@ public class Weapon{
     /** displayed weapon region */
     public String name;
     /** bullet shot */
-    public @NonNull BulletType bullet;
+    public BulletType bullet;
     /** shell ejection effect */
     public Effect ejectEffect = Fx.none;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
@@ -51,7 +50,7 @@ public class Weapon{
     public float x = 5f, y = 0f;
     /** random spread on the X axis */
     public float xRand = 0f;
-    /** radius of occlusion drawn under the weapon; <0 to diable */
+    /** radius of occlusion drawn under the weapon; <0 to disable */
     public float occlusion = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
@@ -71,6 +70,8 @@ public class Weapon{
     public int otherSide = -1;
     /** sound used for shooting */
     public Sound shootSound = Sounds.pew;
+    /** sound used for weapons that have a delay */
+    public Sound chargeSound = Sounds.none;
     /** sound played when there is nothing to shoot */
     public Sound noAmmoSound = Sounds.click;
     /** displayed region (autoloaded) */

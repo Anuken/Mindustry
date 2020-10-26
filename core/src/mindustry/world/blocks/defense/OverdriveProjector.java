@@ -11,6 +11,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -81,20 +82,25 @@ public class OverdriveProjector extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
-        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.productionTime, useTime / 60f, StatUnit.seconds);
+        stats.add(Stat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
+        stats.add(Stat.range, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.productionTime, useTime / 60f, StatUnit.seconds);
 
         if(hasBoost){
-            stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-            stats.add(BlockStat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
+            stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+            stats.add(Stat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
         }
     }
 
-    public class OverdriveBuild extends Building{
+    public class OverdriveBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void drawLight(){

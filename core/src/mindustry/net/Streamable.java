@@ -1,6 +1,6 @@
 package mindustry.net;
 
-import mindustry.net.Packets.StreamBegin;
+import mindustry.net.Packets.*;
 
 import java.io.*;
 

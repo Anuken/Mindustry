@@ -3,7 +3,6 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -54,10 +53,10 @@ public class SolidPump extends Pump{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.output);
-        stats.add(BlockStat.output, result, 60f * pumpAmount, true);
+        stats.remove(Stat.output);
+        stats.add(Stat.output, result, 60f * pumpAmount, true);
         if(attribute != null){
-            stats.add(baseEfficiency > 0.0001f ? BlockStat.affinities : BlockStat.tiles, attribute);
+            stats.add(baseEfficiency > 0.0001f ? Stat.affinities : Stat.tiles, attribute);
         }
     }
 

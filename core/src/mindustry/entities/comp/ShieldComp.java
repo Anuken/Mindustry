@@ -5,11 +5,11 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.minArmorDamage;
+import static mindustry.Vars.*;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{
-    @Import float health, hitTime, x, y;
+    @Import float health, hitTime, x, y, healthMultiplier;
     @Import boolean dead;
 
     /** Absorbs health damage. */
@@ -22,8 +22,8 @@ abstract class ShieldComp implements Healthc, Posc{
     @Replace
     @Override
     public void damage(float amount){
+        amount /= healthMultiplier;
         //apply armor
-        //TODO balancing of armor stats & minArmorDamage
         amount = Math.max(amount - armor, minArmorDamage * amount);
 
         hitTime = 1f;

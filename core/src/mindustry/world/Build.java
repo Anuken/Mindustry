@@ -3,18 +3,21 @@ package mindustry.world;
 import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
 
 import static mindustry.Vars.*;
 
 public class Build{
+    private static final IntSet tmp = new IntSet();
 
     @Remote(called = Loc.server)
     public static void beginBreak(Team team, int x, int y){
@@ -36,12 +39,13 @@ public class Build{
 
         tile.setBlock(sub, team, rotation);
         tile.<ConstructBuild>bc().setDeconstruct(previous);
-        tile.build.health(tile.build.maxHealth() * prevPercent);
+        tile.build.health = tile.build.maxHealth * prevPercent;
+
 
         Core.app.post(() -> Events.fire(new BlockBuildBeginEvent(tile, team, true)));
     }
 
-    /** Places a BuildBlock at this location. */
+    /** Places a ConstructBlock at this location. */
     @Remote(called = Loc.server)
     public static void beginPlace(Block result, Team team, int x, int y, int rotation){
         if(!validPlace(result, team, x, y, rotation)){
@@ -55,11 +59,23 @@ public class Build{
 
         Block previous = tile.block();
         Block sub = ConstructBlock.get(result.size);
+        Seq<Building> prevBuild = new Seq<>(9);
 
         result.beforePlaceBegan(tile, previous);
+        tmp.clear();
+
+        tile.getLinkedTilesAs(result, t -> {
+            if(t.build != null && t.build.team == team && tmp.add(t.build.id)){
+                prevBuild.add(t.build);
+            }
+        });
 
         tile.setBlock(sub, team, rotation);
-        tile.<ConstructBuild>bc().setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
+
+        ConstructBuild build = tile.bc();
+
+        build.setConstruct(previous.size == sub.size ? previous : Blocks.air, result);
+        build.prevBuild = prevBuild;
 
         result.placeBegan(tile, previous);
 
@@ -111,6 +127,7 @@ public class Build{
                 int wx = dx + offsetx + tile.x, wy = dy + offsety + tile.y;
 
                 Tile check = world.tile(wx, wy);
+
                 if(
                 check == null || //nothing there
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
@@ -118,6 +135,10 @@ public class Build{
                 !check.interactable(team) || //cannot interact
                 !check.floor().placeableOn || //solid wall
                     !((type.canReplace(check.block()) || //can replace type
+                        //controversial change: allow rebuilding damaged blocks
+                        //this could be buggy and abusable, so I'm not enabling it yet
+                        //note that this requires a change in BuilderComp as well
+                        //(type == check.block() && check.centerX() == x && check.centerY() == y && check.build != null && check.build.health < check.build.maxHealth - 0.0001f) ||
                         (check.block instanceof ConstructBlock && check.<ConstructBuild>bc().cblock == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
