@@ -213,6 +213,16 @@ public class LogicBlock extends Block{
                             x += tileX();
                             y += tileY();
                         }
+
+                        Building build = world.build(x, y);
+
+                        if(build != null){
+                            String bestName = getLinkName(build.block);
+                            if(!name.startsWith(bestName)){
+                                name = findLinkName(build.block);
+                            }
+                        }
+
                         links.add(new LogicLink(x, y, name, validLink(world.build(x, y))));
                     }
                 }
