@@ -2,14 +2,19 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
+import static mindustry.Vars.*;
+
 public class FormationAI extends AIController implements FormationMember{
+    private static Seq<Tile> tiles = new Seq<>();
     public Unit leader;
 
     private Vec3 target = new Vec3();
@@ -51,19 +56,33 @@ public class FormationAI extends AIController implements FormationMember{
 
         Vec2 realtarget = vec.set(target);
 
-        float margin = 3f;
+        float margin = 4f;
 
         float speed = unit.realSpeed();
 
         if(unit.dst(realtarget) <= margin){
-            unit.vel.approachDelta(Vec2.ZERO, speed * type.accel / 2f);
+            //unit.vel.approachDelta(Vec2.ZERO, speed * type.accel / 2f);
         }else{
             unit.moveAt(realtarget.sub(unit).limit(speed));
         }
 
         if(unit instanceof Minerc mine && leader instanceof Minerc com){
-            if(mine.validMine(com.mineTile())){
-                mine.mineTile(com.mineTile());
+            if(com.mineTile() != null){
+                if(multimine){
+                    mine.mineTile(mine.validMine(com.mineTile()) ? com.mineTile() : null);
+                }else{
+                    if(mine.mineTile() == null){
+                        tiles.clear();
+                        com.mineTile().circle(6, (cx, cy) -> {
+                            Tile tile = world.tile(cx, cy);
+                            if(mine.validMine(tile) && tile.drop() == com.mineTile().drop() && tile != com.mineTile()){
+                                tiles.add(tile);
+                            }
+                        });
+                        Tile min = tiles.min(t -> t.dst2(com.mineTile()));
+                        mine.mineTile(min);
+                    }
+                }
 
                 CoreBuild core = unit.team.core();
 
@@ -77,7 +96,6 @@ public class FormationAI extends AIController implements FormationMember{
             }else{
                 mine.mineTile(null);
             }
-
         }
 
         if(unit instanceof Builderc build && leader instanceof Builderc com && com.activelyBuilding()){

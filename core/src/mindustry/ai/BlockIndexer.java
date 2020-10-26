@@ -314,6 +314,7 @@ public class BlockIndexer{
 
     /** Find the closest ore block relative to a position. */
     public Tile findClosestOre(Unit unit, Item item){
+        if(multimine) return findClosestOre(unit.x, unit.y, item);
         if(!(unit instanceof Minerc miner)) return null;
 
         TileArray arr = getOrePositions(item);

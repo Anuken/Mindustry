@@ -145,15 +145,16 @@ public class Teams{
         }
     }
 
-    /** @return whether this ore is taken. */
-    public boolean canMine(Unit unit, Tile tile){
+    /** @return whether this ore is not taken. */
+    public boolean isValidMine(Unit unit, Tile tile){
+        if(multimine) return true;
         if(tile == null) return false;
         Unit u = mined.get(tile.pos());
         return u == unit || u == null;
     }
 
     public void registerMined(Tile tile, Unit unit){
-        if(tile == null || unit == null) return;
+        if(tile == null || unit == null || multimine) return;
         mined.put(tile.pos(), unit);
     }
 

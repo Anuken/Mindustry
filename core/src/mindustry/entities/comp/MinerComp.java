@@ -37,7 +37,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
 
     public boolean validMine(Tile tile, boolean checkDst){
         return !(tile == null || tile.block() != Blocks.air || (!within(tile.worldx(), tile.worldy(), miningRange) && checkDst)
-        || tile.drop() == null || !canMine(tile.drop())) && state.teams.canMine(self(), tile);
+        || tile.drop() == null || !canMine(tile.drop())) && state.teams.isValidMine(self(), tile);
     }
 
     public boolean validMine(Tile tile){
@@ -105,7 +105,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         float ex = mineTile.worldx() + Mathf.sin(Time.time() + 48, swingScl, swingMag);
         float ey = mineTile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
 
-        Draw.z(Layer.flyingUnit - 0.1f);
+        Draw.z(Layer.flyingUnitLow - 0.1f);
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 
