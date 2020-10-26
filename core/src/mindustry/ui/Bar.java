@@ -21,7 +21,7 @@ public class Bar extends Element{
 
     public Bar(String name, Color color, Floatp fraction){
         this.fraction = fraction;
-        this.name = Core.bundle.get(name);
+        this.name = Core.bundle.get(name, name);
         this.blinkColor.set(color);
         lastValue = value = fraction.get();
         setColor(color);

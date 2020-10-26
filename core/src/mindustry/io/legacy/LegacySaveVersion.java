@@ -9,7 +9,7 @@ import mindustry.world.*;
 
 import java.io.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public abstract class LegacySaveVersion extends SaveVersion{
 
@@ -61,7 +61,7 @@ public abstract class LegacySaveVersion extends SaveVersion{
                     tile.setBlock(block);
                 }
 
-                if(block.hasEntity()){
+                if(block.hasBuilding()){
                     try{
                         readChunk(stream, true, in -> {
                             byte version = in.readByte();

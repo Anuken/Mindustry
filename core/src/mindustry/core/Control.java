@@ -9,8 +9,6 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
-import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
@@ -26,7 +24,6 @@ import mindustry.maps.Map;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
-import mindustry.world.blocks.storage.CoreBlock.*;
 
 import java.io.*;
 import java.text.*;
@@ -38,7 +35,7 @@ import static mindustry.Vars.*;
 
 /**
  * Control module.
- * Handles all input, saving, keybinds and keybinds.
+ * Handles all input, saving and keybinds.
  * Should <i>not</i> handle any logic-critical state.
  * This class is not created in the headless server.
  */
@@ -161,9 +158,7 @@ public class Control implements ApplicationListener, Loadable{
 
                 //delete the save, it is gone.
                 if(saves.getCurrent() != null && !state.rules.tutorial){
-                    Sector sector = state.getSector();
-                    sector.save = null;
-                    saves.getCurrent().delete();
+                    saves.getCurrent().save();
                 }
             }
         });
@@ -186,12 +181,14 @@ public class Control implements ApplicationListener, Loadable{
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effect.shake(5f, 5f, core);
+
+                if(state.isCampaign()){
+                    ui.announce("[accent]" + state.rules.sector.name() + "\n" +
+                        (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
+                            state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
+                }
             });
         });
-
-    }
-
-    void resetCamera(){
 
     }
 
@@ -257,19 +254,6 @@ public class Control implements ApplicationListener, Loadable{
         });
     }
 
-    //TODO move
-    public void handleLaunch(CoreBuild tile){
-        LaunchCorec ent = LaunchCore.create();
-        ent.set(tile);
-        ent.block(Blocks.coreShard);
-        ent.lifetime(Vars.launchDuration);
-        ent.add();
-
-        //remove schematic requirements from core
-        tile.items.remove(universe.getLastLoadout().requirements());
-        tile.items.remove(universe.getLaunchResources());
-    }
-
     public void playSector(Sector sector){
         playSector(sector, sector);
     }
@@ -288,19 +272,30 @@ public class Control implements ApplicationListener, Loadable{
                     state.rules.sector = sector;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
-                    //TODO this is broken?
                     if(state.rules.defaultTeam.cores().isEmpty()){
 
-                        //kill all friendly units, since they should be dead anwyay
-                        for(Unit unit : Groups.unit){
-                            if(unit.team() == state.rules.defaultTeam){
-                                unit.remove();
-                            }
+                        //no spawn set -> delete the sector save
+                        if(sector.info.spawnPosition == 0){
+                            //delete old save
+                            sector.save = null;
+                            slot.delete();
+                            //play again
+                            playSector(origin, sector);
+                            return;
                         }
 
-                        Tile spawn = world.tile(sector.getSpawnPosition());
-                        //TODO PLACE CORRECT LOADOUT
-                        Schematics.placeLoadout(universe.getLastLoadout(), spawn.x, spawn.y);
+                        //reset wave so things are more fair
+                        state.wave = 1;
+
+                        //reset win wave??
+                        state.rules.winWave = sector.preset != null ? sector.preset.captureWave : 40;
+
+                        //kill all units, since they should be dead anwyay
+                        Groups.unit.clear();
+                        Groups.fire.clear();
+
+                        Tile spawn = world.tile(sector.info.spawnPosition);
+                        Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
                         //set up camera/player locations
                         player.set(spawn.x * tilesize, spawn.y * tilesize);
@@ -325,7 +320,8 @@ public class Control implements ApplicationListener, Loadable{
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching
-                state.secinfo.origin = origin;
+                sector.info.origin = origin;
+                sector.info.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);
@@ -416,13 +412,15 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void pause(){
-        wasPaused = state.is(State.paused);
-        if(state.is(State.playing)) state.set(State.paused);
+        if(settings.getBool("backgroundpause", true)){
+            wasPaused = state.is(State.paused);
+            if(state.is(State.playing)) state.set(State.paused);
+        }
     }
 
     @Override
     public void resume(){
-        if(state.is(State.paused) && !wasPaused){
+        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true)){
             state.set(State.playing);
         }
     }
@@ -484,7 +482,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void update(){
-        //TODO find out why this happens on Android
+        //this happens on Android and nobody knows why
         if(assets == null) return;
 
         saves.update();
@@ -522,7 +520,7 @@ public class Control implements ApplicationListener, Loadable{
                 platform.updateRPC();
             }
 
-            if(Core.input.keyTap(Binding.pause) && !state.isOutOfTime() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
+            if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
                 state.set(state.is(State.playing) ? State.paused : State.playing);
             }
 

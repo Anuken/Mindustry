@@ -49,7 +49,9 @@ public abstract class SaveFileReader{
     "holostone-wall", "dacite-wall",
     "rock", "boulder",
     "snowrock", "snow-boulder",
-    "cliffs", "stone-wall"
+    "cliffs", "stone-wall", 
+
+    "cryofluidmixer", "cryofluid-mixer"
     );
 
     protected final ReusableByteOutStream byteOutput = new ReusableByteOutStream();

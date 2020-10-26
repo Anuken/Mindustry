@@ -3,14 +3,13 @@ package mindustry.world.consumers;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 public class ConsumeItemDynamic extends Consume{
-    public final @NonNull Func<Building, ItemStack[]> items;
+    public final Func<Building, ItemStack[]> items;
 
     public <T extends Building> ConsumeItemDynamic(Func<T, ItemStack[]> items){
         this.items = (Func<Building, ItemStack[]>)items;
@@ -74,7 +73,7 @@ public class ConsumeItemDynamic extends Consume{
     }
 
     @Override
-    public void display(BlockStats stats){
+    public void display(Stats stats){
         //should be handled by the block
     }
 }

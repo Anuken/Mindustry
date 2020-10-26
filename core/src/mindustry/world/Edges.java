@@ -6,7 +6,7 @@ import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class Edges{
     private static final int maxSize = 14;

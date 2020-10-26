@@ -3,7 +3,6 @@ package mindustry.net;
 import arc.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
@@ -24,6 +23,7 @@ public class Administration{
     public Seq<ChatFilter> chatFilters = new Seq<>();
     public Seq<ActionFilter> actionFilters = new Seq<>();
     public Seq<String> subnetBans = new Seq<>();
+    public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
 
     /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not access directly. */
     private ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
@@ -86,6 +86,20 @@ public class Administration{
         });
     }
 
+    /** @return time at which a player would be pardoned for a kick (0 means they were never kicked) */
+    public long getKickTime(String uuid, String ip){
+        return Math.max(getInfo(uuid).lastKicked, kickedIPs.get(ip, 0L));
+    }
+
+    /** Sets up kick duration for a player. */
+    public void handleKicked(String uuid, String ip, long duration){
+        kickedIPs.put(ip, Math.max(kickedIPs.get(ip, 0L), Time.millis() + duration));
+
+        PlayerInfo info = getInfo(uuid);
+        info.timesKicked++;
+        info.lastKicked = Math.max(Time.millis() + duration, info.lastKicked);
+    }
+
     public Seq<String> getSubnetBans(){
         return subnetBans;
     }
@@ -128,11 +142,18 @@ public class Administration{
 
     /** @return whether this action is allowed by the action filters. */
     public boolean allowAction(Player player, ActionType type, Tile tile, Cons<PlayerAction> setter){
+        return allowAction(player, type, action -> setter.get(action.set(player, type, tile)));
+    }
+
+    /** @return whether this action is allowed by the action filters. */
+    public boolean allowAction(Player player, ActionType type, Cons<PlayerAction> setter){
         //some actions are done by the server (null player) and thus are always allowed
         if(player == null) return true;
 
         PlayerAction act = Pools.obtain(PlayerAction.class, PlayerAction::new);
-        setter.get(act.set(player, type, tile));
+        act.player = player;
+        act.type = type;
+        setter.get(act);
         for(ActionFilter filter : actionFilters){
             if(!filter.allow(act)){
                 Pools.free(act);
@@ -563,7 +584,10 @@ public class Administration{
         autosave("Whether the periodically save the map when playing.", false),
         autosaveAmount("The maximum amount of autosaves. Older ones get replaced.", 10),
         autosaveSpacing("Spacing between autosaves in seconds.", 60 * 5),
-        debug("Enable debug logging", false, () -> Log.setLogLevel(debug() ? LogLevel.debug : LogLevel.info));
+        debug("Enable debug logging", false, () -> {
+            LogLevel level = debug() ? LogLevel.debug : LogLevel.info;
+            Log.level = level;
+        });
 
         public static final Config[] all = values();
 
@@ -680,9 +704,9 @@ public class Administration{
     /** Defines a (potentially dangerous) action that a player has done in the world.
      * These objects are pooled; do not cache them! */
     public static class PlayerAction implements Poolable{
-        public @NonNull Player player;
-        public @NonNull ActionType type;
-        public @NonNull Tile tile;
+        public Player player;
+        public ActionType type;
+        public @Nullable Tile tile;
 
         /** valid for block placement events only */
         public @Nullable Block block;
@@ -695,10 +719,20 @@ public class Administration{
         public @Nullable Item item;
         public int itemAmount;
 
+        /** valid for unit-type events only, and even in that case may be null. */
+        public @Nullable Unit unit;
+
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
             this.type = type;
             this.tile = tile;
+            return this;
+        }
+
+        public PlayerAction set(Player player, ActionType type, Unit unit){
+            this.player = player;
+            this.type = type;
+            this.unit = unit;
             return this;
         }
 
@@ -711,11 +745,12 @@ public class Administration{
             type = null;
             tile = null;
             block = null;
+            unit = null;
         }
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, command
     }
 
 }

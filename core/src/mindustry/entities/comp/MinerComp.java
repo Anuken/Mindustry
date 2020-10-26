@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
@@ -33,7 +32,16 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     }
 
     boolean mining(){
-        return mineTile != null && !(((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding());
+        return mineTile != null && !(((Object)this) instanceof Builderc b && b.activelyBuilding());
+    }
+
+    public boolean validMine(Tile tile, boolean checkDst){
+        return !(tile == null || tile.block() != Blocks.air || (!within(tile.worldx(), tile.worldy(), miningRange) && checkDst)
+        || tile.drop() == null || !canMine(tile.drop())) && state.teams.canMine(self(), tile);
+    }
+
+    public boolean validMine(Tile tile){
+        return validMine(tile, true);
     }
 
     @Override
@@ -50,23 +58,23 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             }
         }
 
-        if(mineTile == null || core == null || mineTile.block() != Blocks.air || dst(mineTile.worldx(), mineTile.worldy()) > miningRange
-        || mineTile.drop() == null || !canMine(mineTile.drop())){
+        if(!validMine(mineTile)){
             mineTile = null;
             mineTimer = 0f;
         }else if(mining()){
+            state.teams.registerMined(mineTile, self());
             Item item = mineTile.drop();
-            rotation = Mathf.slerpDelta(rotation, angleTo(mineTile.worldx(), mineTile.worldy()), 0.4f);
+            lookAt(angleTo(mineTile.worldx(), mineTile.worldy()));
             mineTimer += Time.delta *type.mineSpeed;
 
             if(Mathf.chance(0.06 * Time.delta)){
                 Fx.pulverizeSmall.at(mineTile.worldx() + Mathf.range(tilesize / 2f), mineTile.worldy() + Mathf.range(tilesize / 2f), 0f, item.color);
             }
 
-            if(mineTimer >= 50f + item.hardness*10f){
+            if(mineTimer >= 50f + item.hardness*15f){
                 mineTimer = 0;
 
-                if(within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
+                if(core != null && within(core, mineTransferRange) && core.acceptStack(item, 1, this) == 1 && offloadImmediately()){
                     Call.transferItemTo(item, 1,
                     mineTile.worldx() + Mathf.range(tilesize / 2f),
                     mineTile.worldy() + Mathf.range(tilesize / 2f), core);
@@ -81,15 +89,13 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
                     mineTimer = 0f;
                 }
             }
-
-
         }
     }
 
     @Override
     public void draw(){
         if(!mining()) return;
-        float focusLen = 4f + Mathf.absin(Time.time(), 1.1f, 0.5f);
+        float focusLen = hitSize() / 2f + Mathf.absin(Time.time(), 1.1f, 0.5f);
         float swingScl = 12f, swingMag = tilesize / 8f;
         float flashScl = 0.3f;
 
@@ -99,13 +105,12 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         float ex = mineTile.worldx() + Mathf.sin(Time.time() + 48, swingScl, swingMag);
         float ey = mineTile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
 
-        Draw.z(Layer.flyingUnit + 0.1f);
+        Draw.z(Layer.flyingUnit - 0.1f);
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 
         Drawf.laser(team(), Core.atlas.find("minelaser"), Core.atlas.find("minelaser-end"), px, py, ex, ey, 0.75f);
 
-        //TODO hack?
         if(isLocal()){
             Lines.stroke(1f, Pal.accent);
             Lines.poly(mineTile.worldx(), mineTile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time());

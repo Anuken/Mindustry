@@ -36,6 +36,8 @@ public class Vars implements Loadable{
     public static boolean loadLocales = true;
     /** Whether the logger is loaded. */
     public static boolean loadedLogger = false, loadedFileLogger = false;
+    /** Whether to enable various experimental features (e.g. cliffs) */
+    public static boolean experimental = false;
     /** Maximum extra padding around deployment schematics. */
     public static final int maxLoadoutSchematicPad = 5;
     /** Maximum schematic size.*/
@@ -63,7 +65,7 @@ public class Vars implements Loadable{
     /** URL to the JSON file containing all the BE servers. Only queried in the V6 alpha (will be removed once it's out). */
     public static final String serverJsonV6URL = "https://raw.githubusercontent.com/Anuken/Mindustry/master/servers_v6.json";
     /** URL of the github issue report template.*/
-    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?template=bug_report.md";
+    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<String> defaultServers = Seq.with();
     /** maximum distance between mine and core that supports automatic transferring */
@@ -72,8 +74,6 @@ public class Vars implements Loadable{
     public static final int maxTextLength = 150;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
-    /** shadow color for turrets */
-    public static final float turretShadowColor = Color.toFloatBits(0, 0, 0, 0.22f);
     /** displayed item size when ingame. */
     public static final float itemSize = 5f;
     /** units outside of this bound will die instantly */
@@ -84,10 +84,14 @@ public class Vars implements Loadable{
     public static final float buildingRange = 220f;
     /** range for moving items */
     public static final float itemTransferRange = 220f;
+    /** range for moving items for logic units */
+    public static final float logicItemTransferRange = 45f;
     /** duration of time between turns in ticks */
-    public static final float turnDuration = 20 * Time.toMinutes;
-    /** turns needed to destroy a sector completely */
-    public static final float sectorDestructionTurns = 3f;
+    public static final float turnDuration = 2 * Time.toMinutes;
+    /** chance of an invasion per turn, 1 = 100% */
+    public static final float baseInvasionChance = 1f / 30f;
+    /** how many turns have to pass before invasions start */
+    public static final int invasionGracePeriod = 20;
     /** min armor fraction damage; e.g. 0.05 = at least 5% damage */
     public static final float minArmorDamage = 0.1f;
     /** launch animation duration */
@@ -184,13 +188,12 @@ public class Vars implements Loadable{
     public static GameState state;
     public static EntityCollisions collisions;
     public static DefaultWaves defaultWaves;
-    public static mindustry.audio.LoopControl loops;
+    public static LoopControl loops;
     public static Platform platform = new Platform(){};
     public static Mods mods;
     public static Schematics schematics;
     public static BeControl becontrol;
     public static AsyncCore asyncCore;
-    public static TeamIndexProcess teamIndex;
     public static BaseRegistry bases;
 
     public static Universe universe;
@@ -282,10 +285,10 @@ public class Vars implements Loadable{
         if(loadedLogger) return;
 
         String[] tags = {"[green][D][]", "[royal][I][]", "[yellow][W][]", "[scarlet][E][]", ""};
-        String[] stags = {"&lc&fb[D]", "&lg&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
+        String[] stags = {"&lc&fb[D]", "&lb&fb[I]", "&ly&fb[W]", "&lr&fb[E]", ""};
 
         Seq<String> logBuffer = new Seq<>();
-        Log.setLogger((level, text) -> {
+        Log.logger = (level, text) -> {
             String result = text;
             String rawText = Log.format(stags[level.ordinal()] + "&fr " + text);
             System.out.println(rawText);
@@ -301,9 +304,9 @@ public class Vars implements Loadable{
                     }
                 }
 
-                ui.scriptfrag.addMessage(Log.removeCodes(result));
+                ui.scriptfrag.addMessage(Log.removeColors(result));
             }
-        });
+        };
 
         Events.on(ClientLoadEvent.class, e -> logBuffer.each(ui.scriptfrag::addMessage));
 
@@ -316,18 +319,19 @@ public class Vars implements Loadable{
         settings.setAppName(appName);
 
         Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
-        LogHandler log = Log.getLogger();
-        Log.setLogger((level, text) -> {
+        LogHandler log = Log.logger;
+        //ignore it
+        Log.logger = (level, text) -> {
             log.log(level, text);
 
             try{
-                writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeCodes(text) + "\n");
+                writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeColors(text) + "\n");
                 writer.flush();
             }catch(IOException e){
                 e.printStackTrace();
                 //ignore it
             }
-        });
+        };
 
         loadedFileLogger = true;
     }

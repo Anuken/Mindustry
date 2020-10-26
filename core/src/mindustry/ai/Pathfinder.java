@@ -4,10 +4,10 @@ import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -43,7 +43,7 @@ public class Pathfinder implements Runnable{
             PathTile.health(tile) * 5 +
             (PathTile.nearSolid(tile) ? 2 : 0) +
             (PathTile.nearLiquid(tile) ? 6 : 0) +
-            (PathTile.deep(tile) ? 70 : 0) +
+            (PathTile.deep(tile) ? 6000 : 0) +
             (PathTile.damages(tile) ? 30 : 0),
 
         //legs
@@ -51,7 +51,7 @@ public class Pathfinder implements Runnable{
             (PathTile.solid(tile) ? 5 : 0),
 
         //water
-        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 + //TODO cannot go through blocks - pathfinding isn't great
+        (team, tile) -> PathTile.solid(tile) || !PathTile.liquid(tile) ? 200 : 2 +
             (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
             (PathTile.deep(tile) ? -1 : 0) +
             (PathTile.damages(tile) ? 35 : 0)
@@ -86,9 +86,6 @@ public class Pathfinder implements Runnable{
                 tiles[tile.x][tile.y] = packTile(tile);
             }
 
-            //special preset which may help speed things up; this is optional
-            preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
-
             start();
         });
 
@@ -103,11 +100,10 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     private int packTile(Tile tile){
-        //TODO nearGround is just the inverse of nearLiquid?
         boolean nearLiquid = false, nearSolid = false, nearGround = false;
 
         for(int i = 0; i < 4; i++){
-            Tile other = tile.getNearby(i);
+            Tile other = tile.nearby(i);
             if(other != null){
                 if(other.floor().isLiquid) nearLiquid = true;
                 if(other.solid()) nearSolid = true;
@@ -116,7 +112,7 @@ public class Pathfinder implements Runnable{
         }
 
         return PathTile.get(
-            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 127),
+            tile.build == null || !tile.solid() ? 0 : Math.min((int)(tile.build.health / 40), 80),
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,
@@ -188,6 +184,8 @@ public class Pathfinder implements Runnable{
                     for(Flowfield data : threadList){
                         updateFrontier(data, maxUpdate / threadList.size);
 
+                        //TODO implement timeouts... or don't
+                        /*
                         //remove flowfields that have 'timed out' so they can be garbage collected and no longer waste space
                         if(data.refreshRate > 0 && Time.timeSinceMillis(data.lastUpdateTime) > fieldTimeout){
                             //make sure it doesn't get removed twice
@@ -196,12 +194,11 @@ public class Pathfinder implements Runnable{
                             Team team = data.team;
 
                             Core.app.post(() -> {
-                                //TODO ?????
                                 //remove its used state
-                                //if(fieldMap[team.id] != null){
-                                //    fieldMap[team.id].remove(data.target);
-                                //    fieldMapUsed[team.id].remove(data.target);
-                                //}
+                                if(fieldMap[team.id] != null){
+                                    fieldMap[team.id].remove(data.target);
+                                    fieldMapUsed[team.id].remove(data.target);
+                                }
                                 //remove from main thread list
                                 mainList.remove(data);
                             });
@@ -210,7 +207,7 @@ public class Pathfinder implements Runnable{
                                 //remove from this thread list with a delay
                                 threadList.remove(data);
                             });
-                        }
+                        }*/
                     }
                 }
 
@@ -445,7 +442,7 @@ public class Pathfinder implements Runnable{
 
         @Override
         public void getPositions(IntSeq out){
-            out.add(Point2.pack(world.toTile(position.getX()), world.toTile(position.getY())));
+            out.add(Point2.pack(World.toTile(position.getX()), World.toTile(position.getY())));
         }
 
     }
@@ -454,7 +451,7 @@ public class Pathfinder implements Runnable{
      * Data for a flow field to some set of destinations.
      * Concrete subclasses must specify a way to fetch costs and destinations.
      * */
-    static abstract class Flowfield{
+    public static abstract class Flowfield{
         /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
         protected int refreshRate;
         /** Team this path is for. Set before using. */
@@ -463,13 +460,13 @@ public class Pathfinder implements Runnable{
         protected PathCost cost = costTypes.get(costGround);
 
         /** costs of getting to a specific tile */
-        int[][] weights;
+        public int[][] weights;
         /** search IDs of each position - the highest, most recent search is prioritized and overwritten */
         int[][] searches;
         /** search frontier, these are Pos objects */
         IntQueue frontier = new IntQueue();
         /** all target positions; these positions have a cost of 0, and must be synchronized on! */
-        IntSeq targets = new IntSeq();
+        final IntSeq targets = new IntSeq();
         /** current search ID */
         int search = 1;
         /** last updated time */

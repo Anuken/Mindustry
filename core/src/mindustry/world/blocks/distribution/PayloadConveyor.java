@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -21,6 +20,7 @@ public class PayloadConveyor extends Block{
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-edge") TextureRegion edgeRegion;
     public Interp interp = Interp.pow5;
+    public float payloadLimit = 2.5f;
 
     public PayloadConveyor(String name){
         super(name);
@@ -87,7 +87,7 @@ public class PayloadConveyor extends Block{
             }
 
             int ntrns = 1 + size/2;
-            Tile next = tile.getNearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
+            Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
             blocked = (next != null && next.solid() && !next.block().outputsPayload) || (this.next != null && (this.next.rotation + 2)%4 == rotation);
         }
 
@@ -217,10 +217,10 @@ public class PayloadConveyor extends Block{
         @Override
         public boolean acceptPayload(Building source, Payload payload){
             if(source == this){
-                return this.item == null && payload.fits();
+                return this.item == null && payload.fits(payloadLimit);
             }
             //accepting payloads from units isn't supported
-            return this.item == null && progress <= 5f && payload.fits();
+            return this.item == null && progress <= 5f && payload.fits(payloadLimit);
         }
 
         @Override

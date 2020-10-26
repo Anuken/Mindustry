@@ -6,9 +6,12 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.EnumSet;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -165,6 +168,11 @@ public class BlockIndexer{
         return flagMap[team.id][type.ordinal()];
     }
 
+    @Nullable
+    public Tile findClosestFlag(float x, float y, Team team, BlockFlag flag){
+        return Geometry.findClosest(x, y, getAllied(team, flag));
+    }
+
     public boolean eachBlock(Teamc team, float range, Boolf<Building> pred, Cons<Building> cons){
         return eachBlock(team.team(), team.getX(), team.getY(), range, pred, cons);
     }
@@ -172,8 +180,8 @@ public class BlockIndexer{
     public boolean eachBlock(Team team, float wx, float wy, float range, Boolf<Building> pred, Cons<Building> cons){
         intSet.clear();
 
-        int tx = world.toTile(wx);
-        int ty = world.toTile(wy);
+        int tx = World.toTile(wx);
+        int ty = World.toTile(wy);
 
         int tileRange = (int)(range / tilesize + 1);
         boolean any = false;
@@ -186,7 +194,7 @@ public class BlockIndexer{
 
                 if(other == null) continue;
 
-                if(other.team == team && pred.get(other) && intSet.add(other.pos())){
+                if((team == null || other.team == team) && pred.get(other) && intSet.add(other.pos())){
                     cons.get(other);
                     any = true;
                 }
@@ -199,13 +207,14 @@ public class BlockIndexer{
     /** Get all enemy blocks with a flag. */
     public Seq<Tile> getEnemy(Team team, BlockFlag type){
         returnArray.clear();
-        for(Team enemy : team.enemies()){
-            if(state.teams.isActive(enemy)){
-                TileArray set = getFlagged(enemy)[type.ordinal()];
-                if(set != null){
-                    for(Tile tile : set){
-                        returnArray.add(tile);
-                    }
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            Team enemy = data.items[i].team;
+            if(enemy == team) continue;
+            TileArray set = getFlagged(enemy)[type.ordinal()];
+            if(set != null){
+                for(Tile tile : set){
+                    returnArray.add(tile);
                 }
             }
         }
@@ -214,7 +223,7 @@ public class BlockIndexer{
 
     public void notifyTileDamaged(Building entity){
         if(damagedTiles[entity.team.id] == null){
-            damagedTiles[entity.team.id] = new ObjectSet<Building>();
+            damagedTiles[entity.team.id] = new ObjectSet<>();
         }
 
         damagedTiles[entity.team.id].add(entity);
@@ -296,6 +305,28 @@ public class BlockIndexer{
                 Tile res = world.tile(x, y);
                 if(res.block() == Blocks.air && res.drop() == item){
                     return res;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /** Find the closest ore block relative to a position. */
+    public Tile findClosestOre(Unit unit, Item item){
+        if(!(unit instanceof Minerc miner)) return null;
+
+        TileArray arr = getOrePositions(item);
+
+        arr.tiles.sort(t -> t.dst2(unit.x, unit.y));
+
+        for(Tile tile : arr.tiles){
+            for(int x = Math.max(0, tile.x - quadrantSize / 2); x < tile.x + quadrantSize / 2 && x < world.width(); x++){
+                for(int y = Math.max(0, tile.y - quadrantSize / 2); y < tile.y + quadrantSize / 2 && y < world.height(); y++){
+                    Tile res = world.tile(x, y);
+                    if(res.drop() == item && miner.validMine(res, false)){
+                        return res;
+                    }
                 }
             }
         }
@@ -448,8 +479,8 @@ public class BlockIndexer{
     }
 
     public static class TileArray implements Iterable<Tile>{
-        private Seq<Tile> tiles = new Seq<>(false, 16);
-        private IntSet contained = new IntSet();
+        Seq<Tile> tiles = new Seq<>(false, 16);
+        IntSet contained = new IntSet();
 
         public void add(Tile tile){
             if(contained.add(tile.pos())){

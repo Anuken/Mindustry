@@ -1,9 +1,11 @@
 package mindustry.graphics;
 
-import arc.graphics.Color;
+import arc.graphics.*;
 
 public class Pal{
     public static Color
+
+    thoriumPink = Color.valueOf("f9a3c7"),
 
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
@@ -47,6 +49,7 @@ public class Pal{
     darkishGray = new Color(0.3f, 0.3f, 0.3f, 1f),
     darkerGray = new Color(0.2f, 0.2f, 0.2f, 1f),
     darkestGray = new Color(0.1f, 0.1f, 0.1f, 1f),
+    shadow = new Color(0, 0, 0, 0.22f),
     ammo = Color.valueOf("ff8947"),
     rubble = Color.valueOf("1c1817"),
 
@@ -93,5 +96,7 @@ public class Pal{
     redDust = Color.valueOf("ffa480"),
     redderDust = Color.valueOf("ff7b69"),
 
-    plasticSmoke = Color.valueOf("f1e479");
+    plasticSmoke = Color.valueOf("f1e479"),
+	
+    adminChat = Color.valueOf("ff4000");
 }

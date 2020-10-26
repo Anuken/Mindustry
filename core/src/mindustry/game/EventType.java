@@ -1,6 +1,6 @@
 package mindustry.game;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
@@ -35,12 +35,17 @@ public class EventType{
         preDraw,
         postDraw,
         uiDrawBegin,
-        uiDrawEnd
+        uiDrawEnd,
+        //before/after bloom used, skybox or planets drawn
+        universeDrawBegin,
+        //skybox drawn and bloom is enabled - use Vars.renderer.planets
+        universeDraw,
+        //planets drawn and bloom disabled
+        universeDrawEnd
     }
 
     public static class WinEvent{}
     public static class LoseEvent{}
-    public static class LaunchEvent{}
     public static class ResizeEvent{}
     public static class MapMakeEvent{}
     public static class MapPublishEvent{}
@@ -70,6 +75,15 @@ public class EventType{
         public final Sector sector;
 
         public SectorLoseEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
+    /** Called when a sector is destroyed by waves when you're not there. */
+    public static class SectorInvasionEvent{
+        public final Sector sector;
+
+        public SectorInvasionEvent(Sector sector){
             this.sector = sector;
         }
     }
@@ -149,7 +163,7 @@ public class EventType{
         }
     }
 
-    /** Called when the configures sets a specific block. */
+    /** Called when the player configures a specific building. */
     public static class ConfigEvent{
         public final Building tile;
         public final Player player;
@@ -159,6 +173,17 @@ public class EventType{
             this.tile = tile;
             this.player = player;
             this.value = value;
+        }
+    }
+
+    /** Called when a player taps any tile. */
+    public static class TapEvent{
+        public final Player player;
+        public final Tile tile;
+
+        public TapEvent(Player player, Tile tile){
+            this.tile = tile;
+            this.player = player;
         }
     }
 
@@ -204,8 +229,8 @@ public class EventType{
     }
 
     /**
-     * Called when block building begins by placing down the BuildBlock.
-     * The tile's block will nearly always be a BuildBlock.
+     * Called when block building begins by placing down the ConstructBlock.
+     * The tile's block will nearly always be a ConstructBlock.
      */
     public static class BlockBuildBeginEvent{
         public final Tile tile;
@@ -237,7 +262,7 @@ public class EventType{
 
     /**
      * Called when a player or drone begins building something.
-     * This does not necessarily happen when a new BuildBlock is created.
+     * This does not necessarily happen when a new ConstructBlock is created.
      */
     public static class BuildSelectEvent{
         public final Tile tile;
@@ -267,6 +292,14 @@ public class EventType{
         public final Unit unit;
 
         public UnitDestroyEvent(Unit unit){
+            this.unit = unit;
+        }
+    }
+
+    public static class UnitDrownEvent{
+        public final Unit unit;
+
+        public UnitDrownEvent(Unit unit){
             this.unit = unit;
         }
     }

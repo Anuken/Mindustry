@@ -105,12 +105,10 @@ public class NetClient implements ApplicationListener{
             Time.runTask(3f, ui.loadfrag::hide);
 
             if(packet.reason != null){
-                if(packet.reason.equals("closed")){
-                    ui.showSmall("@disconnect", "@disconnect.closed");
-                }else if(packet.reason.equals("timeout")){
-                    ui.showSmall("@disconnect", "@disconnect.timeout");
-                }else if(packet.reason.equals("error")){
-                    ui.showSmall("@disconnect", "@disconnect.error");
+                switch(packet.reason){
+                    case "closed" -> ui.showSmall("@disconnect", "@disconnect.closed");
+                    case "timeout" -> ui.showSmall("@disconnect", "@disconnect.timeout");
+                    case "error" -> ui.showSmall("@disconnect", "@disconnect.error");
                 }
             }else{
                 ui.showErrorMessage("@disconnect");
@@ -196,14 +194,14 @@ public class NetClient implements ApplicationListener{
             }
 
             //server console logging
-            Log.info("&y@: &lb@", player.name, message);
+            Log.info("&fi@: @", "&lc" + player.name, "&lw" + message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
             Call.sendMessage(message, colorizeName(player.id(), player.name), player);
         }else{
             //log command to console but with brackets
-            Log.info("<&y@: &lm@&lg>", player.name, message);
+            Log.info("<&fi@: @&fr>", "&lk" + player.name, "&lw" + message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
@@ -293,6 +291,13 @@ public class NetClient implements ApplicationListener{
     @Remote(variants = Variant.both)
     public static void setHudTextReliable(String message){
         setHudText(message);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void announce(String message){
+        if(message == null) return;
+
+        ui.announce(message);
     }
 
     @Remote(variants = Variant.both)

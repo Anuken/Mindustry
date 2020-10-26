@@ -3,7 +3,6 @@ package mindustry.world.blocks;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -11,23 +10,42 @@ import mindustry.world.*;
 
 import java.util.*;
 
-//TODO documentation
 public interface Autotiler{
 
-    //holds some static temporary variables, required due to some RoboVM bugs
+    /**
+     * Holds some static temporary variables, required due to some RoboVM bugs
+     */
     class AutotilerHolder{
         static final int[] blendresult = new int[5];
         static final BuildPlan[] directionals = new BuildPlan[4];
     }
 
-    /** slices a texture region:
-     * mode == 0 -> no slice
-     * mode == 1 -> bottom
-     * mode == 2 -> top */
-    default TextureRegion sliced(TextureRegion input, int mode){
-        return mode == 0 ? input : mode == 1 ? botHalf(input) : topHalf(input);
+    /**
+     * The mode to slice a texture at.
+     */
+    enum SliceMode{
+        none,
+        bottom,
+        top
     }
 
+    /**
+     * Slices a texture region depending on the SliceMode paramater
+     *
+     * @param input The TextureRegion to be sliced
+     * @param mode The SliceMode to be applied
+     * @return The sliced texture
+     */
+    default TextureRegion sliced(TextureRegion input, SliceMode mode){
+        return mode == SliceMode.none ? input : mode == SliceMode.bottom ? botHalf(input) : topHalf(input);
+    }
+
+    /**
+     * Get the top half of a texture
+     *
+     * @param input The TextureRegion to slice
+     * @return The top half of the texture
+     */
     default TextureRegion topHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
@@ -35,6 +53,12 @@ public interface Autotiler{
         return region;
     }
 
+    /**
+     * Get the buttom half of a texture
+     *
+     * @param input The TextureRegion to slice
+     * @return The buttom half of the texture
+     */
     default TextureRegion botHalf(TextureRegion input){
         TextureRegion region = Tmp.tr1;
         region.set(input);
@@ -82,6 +106,7 @@ public interface Autotiler{
         int[] blendresult = AutotilerHolder.blendresult;
         blendresult[0] = 0;
         blendresult[1] = blendresult[2] = 1;
+
         int num =
         (blends(tile, rotation, directional, 2, world) && blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 3, world)) ? 0 :
         (blends(tile, rotation, directional, 1, world) && blends(tile, rotation, directional, 3, world)) ? 1 :
@@ -92,6 +117,8 @@ public interface Autotiler{
         -1;
         transformCase(num, blendresult);
 
+        // Calculate bitmask for direction.
+
         blendresult[3] = 0;
 
         for(int i = 0; i < 4; i++){
@@ -100,11 +127,13 @@ public interface Autotiler{
             }
         }
 
+        // Calculate direction for non-square sprites.
+
         blendresult[4] = 0;
 
         for(int i = 0; i < 4; i++){
             int realDir = Mathf.mod(rotation - i, 4);
-            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.getNearbyEntity(realDir) != null && !tile.getNearbyEntity(realDir).block.squareSprite)){
+            if(blends(tile, rotation, directional, i, world) && (tile != null && tile.nearbyBuild(realDir) != null && !tile.nearbyBuild(realDir).block.squareSprite)){
                 blendresult[4] |= (1 << i);
             }
         }
@@ -112,24 +141,41 @@ public interface Autotiler{
         return blendresult;
     }
 
+    /**
+     * Transforms the autotiler setting the connection and the y-scale
+     *
+     * @param num The number to use to transform the array
+     * @param bits The blending value array
+     */
     default void transformCase(int num, int[] bits){
-        if(num == 0){
-            bits[0] = 3;
-        }else if(num == 1){
-            bits[0] = 4;
-        }else if(num == 2){
-            bits[0] = 2;
-        }else if(num == 3){
-            bits[0] = 2;
-            bits[2] = -1;
-        }else if(num == 4){
-            bits[0] = 1;
-            bits[2] = -1;
-        }else if(num == 5){
-            bits[0] = 1;
+        switch(num){
+            case 0 -> bits[0] = 3;
+            case 1 -> bits[0] = 4;
+            case 2 -> bits[0] = 2;
+            case 3 -> {
+                bits[0] = 2;
+                bits[2] = -1;
+            }
+            case 4 -> {
+                bits[0] = 1;
+                bits[2] = -1;
+            }
+            case 5 -> bits[0] = 1;
         }
     }
 
+    /**
+     * Check if a position is facing the secondary position at a rotation
+     *
+     * @param x The x coordinate of position 1
+     * @param y The y coordinate of position 1
+     * @param rotation The rotation of the tile on (x, y)
+     *
+     * @param x2 The x coordinate of position 2
+     * @param y2 The y coordinate of position 2
+     *
+     * @return If position 1 is facing position 2 at a certain angle
+     */
     default boolean facing(int x, int y, int rotation, int x2, int y2){
         return Point2.equals(x + Geometry.d4(rotation).x,y + Geometry.d4(rotation).y, x2, y2);
     }
@@ -145,8 +191,10 @@ public interface Autotiler{
         return checkWorld && blends(tile, rotation, direction);
     }
 
+
+    // TODO docs -- use for direction?
     default boolean blends(Tile tile, int rotation, int direction){
-        Building other = tile.getNearbyEntity(Mathf.mod(rotation - direction, 4));
+        Building other = tile.nearbyBuild(Mathf.mod(rotation - direction, 4));
         return other != null && other.team == tile.team() && blends(tile, rotation, other.tileX(), other.tileY(), other.rotation, other.block);
     }
 
@@ -168,7 +216,16 @@ public interface Autotiler{
         || (!otherblock.rotatedOutput(otherx, othery) || Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
-    /** @return whether this tile is looking at the other tile. */
+    /**
+     * Check if a position is facing the secondary position at a rotation
+     *
+     * @param tile The origin tile that is or is not facing the destinated `otherblock`
+     * @param rotation The rotation of the tile on (x, y)
+     *
+     * @param otherx The x coordinate of position 2
+     * @param othery The y coordinate of position 2
+     * @return whether this tile is looking at the other tile.
+     */
     default boolean lookingAt(Tile tile, int rotation, int otherx, int othery, Block otherblock){
         Tile facing = Edges.getFacingEdge(otherblock, otherx, othery, tile);
         return facing != null &&

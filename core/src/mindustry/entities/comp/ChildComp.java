@@ -1,6 +1,6 @@
 package mindustry.entities.comp;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 

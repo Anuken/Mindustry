@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -34,13 +35,14 @@ public class LaunchPad extends Block{
         hasItems = true;
         solid = true;
         update = true;
+        configurable = true;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.launchTime, launchTime / 60f, StatUnit.seconds);
+        stats.add(Stat.launchTime, launchTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -51,6 +53,7 @@ public class LaunchPad extends Block{
     }
 
     public class LaunchPadBuild extends Building{
+
         @Override
         public void draw(){
             super.draw();
@@ -106,6 +109,39 @@ public class LaunchPad extends Block{
                 items.clear();
                 Effect.shake(3f, 3f, this);
             }
+        }
+
+        @Override
+        public void display(Table table){
+            super.display(table);
+
+            if(!state.isCampaign()) return;
+
+            table.row();
+            table.label(() -> {
+                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
+
+                return Core.bundle.format("launch.destination",
+                    dest == null ? Core.bundle.get("sectors.nonelaunch") :
+                    "[accent]" + dest.name());
+            }).pad(4).wrap().width(200f).left();
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            if(!state.isCampaign()){
+                deselect();
+                return;
+            }
+
+            table.button(Icon.upOpen, Styles.clearTransi, () -> {
+                ui.planet.showSelect(state.rules.sector, other -> {
+                    if(state.isCampaign()){
+                        state.rules.sector.info.destination = other;
+                    }
+                });
+                deselect();
+            }).size(40f);
         }
     }
 
@@ -176,29 +212,22 @@ public class LaunchPad extends Block{
         public void remove(){
             if(!state.isCampaign()) return;
 
-            //on multiplayer the destination is a the first captured sector (basically random)
-            Sector destsec = !net.client() ? state.secinfo.origin : state.rules.sector.planet.sectors.find(Sector::hasBase);
+            Sector destsec = state.rules.sector.info.getRealDestination();
 
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam){
                 if(destsec != null && (destsec != state.rules.sector || net.client())){
-                    ItemSeq dest = destsec.getExtraItems();
+                    ItemSeq dest = new ItemSeq();
 
                     for(ItemStack stack : stacks){
                         dest.add(stack);
 
                         //update export
-                        state.secinfo.handleItemExport(stack);
+                        state.rules.sector.info.handleItemExport(stack);
                         Events.fire(new LaunchItemEvent(stack));
                     }
 
-                    destsec.setExtraItems(dest);
-                }else if(team().core() != null){
-                    //dump launched stuff into the core
-                    for(ItemStack stack : stacks){
-                        int min = Math.min(team().core().block.itemCapacity - team().core().items.get(stack.item), stack.amount);
-                        team().core().items.add(stack.item, min);
-                    }
+                    destsec.addItems(dest);
                 }
             }
         }

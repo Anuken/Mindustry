@@ -1,14 +1,16 @@
 package mindustry.entities.comp;
 
+import arc.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.environment.*;
 
-import static mindustry.Vars.net;
+import static mindustry.Vars.*;
 
 @Component
 abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
@@ -90,7 +92,7 @@ abstract class FlyingComp implements Posc, Velc, Healthc, Hitboxc{
             //TODO is the netClient check necessary?
             if(drownTime >= 0.999f && !net.client()){
                 kill();
-                //TODO drown event!
+                Events.fire(new UnitDrownEvent(self()));
             }
         }else{
             drownTime = Mathf.lerpDelta(drownTime, 0f, 0.03f);

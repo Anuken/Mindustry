@@ -1,6 +1,6 @@
 package mindustry.world.blocks.payloads;
 
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -25,9 +25,9 @@ public interface Payload{
         return false;
     }
 
-    /** @return whether this payload fits on a standard 3x3 conveyor. */
-    default boolean fits(){
-        return size() / tilesize <= 2.5f;
+    /** @return whether this payload fits in a given size. 2.5 is the max for a standard 3x3 conveyor. */
+    default boolean fits(float s){
+        return size() / tilesize <= s;
     }
 
     /** writes the payload for saving. */
@@ -51,9 +51,9 @@ public interface Payload{
         byte type = read.b();
         if(type == payloadBlock){
             Block block = content.block(read.s());
-            BlockPayload payload = new BlockPayload(block, Team.derelict);
+            BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
-            payload.entity.readAll(read, version);
+            payload.build.readAll(read, version);
             return (T)payload;
         }else if(type == payloadUnit){
             byte id = read.b();
