@@ -100,6 +100,10 @@ public class Renderer implements ApplicationListener{
     public float weatherAlpha(){
         return weatherAlpha;
     }
+    
+    public Bloom renderedBloom(){
+        return bloom;
+    }
 
     public float landScale(){
         return landTime > 0 ? landscale : 1f;
