@@ -1547,7 +1547,7 @@ public class UnitTypes implements ContentList{
                 xRand = 8f;
                 shotDelay = 1f;
 
-                bullet = new MissileBulletType(4.2f, 30){{
+                bullet = new MissileBulletType(4.2f, 40){{
                     homingPower = 0.12f;
                     width = 8f;
                     height = 8f;
@@ -1555,8 +1555,8 @@ public class UnitTypes implements ContentList{
                     drag = -0.003f;
                     homingRange = 80f;
                     keepVelocity = false;
-                    splashDamageRadius = 30f;
-                    splashDamage = 35f;
+                    splashDamageRadius = 35f;
+                    splashDamage = 45f;
                     lifetime = 56f;
                     trailColor = Pal.bulletYellowBack;
                     backColor = Pal.bulletYellowBack;
@@ -1569,7 +1569,7 @@ public class UnitTypes implements ContentList{
             }});
 
             weapons.add(new Weapon("large-bullet-mount"){{
-                reload = 80f;
+                reload = 60f;
                 cooldownTime = 90f;
                 x = 70f/4f;
                 y = -66f/4f;
@@ -1584,7 +1584,7 @@ public class UnitTypes implements ContentList{
                 shots = 3;
                 shotDelay = 4f;
                 inaccuracy = 1f;
-                bullet = new BasicBulletType(7f, 50){{
+                bullet = new BasicBulletType(7f, 55){{
                     width = 13f;
                     height = 19f;
                     shootEffect = Fx.shootBig;

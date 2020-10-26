@@ -27,8 +27,12 @@ public class SectorDamage{
 
     /** @return calculated capture progress of the enemy */
     public static float getDamage(SectorInfo info){
+        return getDamage(info, info.wavesPassed);
+    }
+
+    /** @return calculated capture progress of the enemy */
+    public static float getDamage(SectorInfo info, int wavesPassed){
         float health = info.sumHealth;
-        int wavesPassed = info.wavesPassed;
         int wave = info.wave;
         float waveSpace = info.waveSpacing;
 
