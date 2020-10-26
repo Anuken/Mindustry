@@ -105,7 +105,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
         float ex = mineTile.worldx() + Mathf.sin(Time.time() + 48, swingScl, swingMag);
         float ey = mineTile.worldy() + Mathf.sin(Time.time() + 48, swingScl + 2f, swingMag);
 
-        Draw.z(Layer.flyingUnitLow - 0.1f);
+        Draw.z(multimine ? Layer.flyingUnit + 0.1f : Layer.flyingUnitLow - 0.1f);
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time(), 0.5f, flashScl));
 

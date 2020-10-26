@@ -36,7 +36,7 @@ public class OverlayRenderer{
 
     public void drawTop(){
 
-        if(!player.dead()){
+        if(!player.dead() && ui.hudfrag.shown){
             if(Core.settings.getBool("playerindicators")){
                 for(Player player : Groups.player){
                     if(Vars.player != player && Vars.player.team() == player.team()){

@@ -54,6 +54,11 @@ public class MapGenerateDialog extends BaseDialog{
         protected void changeBuild(Team team, Prov<Building> entityprov, int rotation){
 
         }
+
+        @Override
+        public void setBlock(Block type, Team team, int rotation, Prov<Building> entityprov){
+            this.block = type;
+        }
     };
 
     /** @param applied whether or not to use the applied in-game mode. */
