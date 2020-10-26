@@ -55,15 +55,14 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        Events.on(LaunchItemEvent.class, e -> state.secinfo.handleItemExport(e.stack));
-
         //when loading a 'damaged' sector, propagate the damage
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
-                state.secinfo.write();
+                SectorInfo info = state.rules.sector.info;
+                info.write();
 
                 //how much wave time has passed
-                int wavesPassed = state.secinfo.wavesPassed;
+                int wavesPassed = info.wavesPassed;
 
                 //wave has passed, remove all enemies, they are assumed to be dead
                 if(wavesPassed > 0){
@@ -84,10 +83,10 @@ public class Logic implements ApplicationListener{
                 }
 
                 //reset values
-                state.secinfo.damage = 0f;
-                state.secinfo.wavesPassed = 0;
-                state.secinfo.hasCore = true;
-                state.secinfo.secondsPassed = 0;
+                info.damage = 0f;
+                info.wavesPassed = 0;
+                info.hasCore = true;
+                info.secondsPassed = 0;
 
                 state.rules.sector.saveInfo();
             }
@@ -273,7 +272,7 @@ public class Logic implements ApplicationListener{
                 state.teams.updateTeamStats();
 
                 if(state.isCampaign()){
-                    state.secinfo.update();
+                    state.rules.sector.info.update();
                 }
 
                 if(state.isCampaign()){

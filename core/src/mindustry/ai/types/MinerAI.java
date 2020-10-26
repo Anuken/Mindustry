@@ -39,12 +39,12 @@ public class MinerAI extends AIController{
             if(unit.stack.amount >= unit.type.itemCapacity || (targetItem != null && !unit.acceptsItem(targetItem))){
                 mining = false;
             }else{
-                if(retarget() && targetItem != null){
-                    ore = indexer.findClosestOre(unit.x, unit.y, targetItem);
+                if(timer.get(timerTarget, 60) && targetItem != null){
+                    ore = indexer.findClosestOre(unit, targetItem);
                 }
 
                 if(ore != null){
-                    moveTo(ore, unit.type.range / 2f);
+                    moveTo(ore, unit.type.range / 2f, 20f);
 
                     if(unit.within(ore, unit.type.range)){
                         miner.mineTile(ore);

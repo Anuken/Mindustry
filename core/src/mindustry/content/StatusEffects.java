@@ -6,6 +6,8 @@ import arc.math.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.type.*;
+import mindustry.graphics.*;
+
 
 import static mindustry.Vars.*;
 
@@ -18,6 +20,7 @@ public class StatusEffects implements ContentList{
         none = new StatusEffect("none");
 
         burning = new StatusEffect("burning"){{
+            color = Pal.lightFlame;
             damage = 0.12f; //over 8 seconds, this would be 60 damage
             effect = Fx.burning;
 
@@ -32,6 +35,7 @@ public class StatusEffects implements ContentList{
         }};
 
         freezing = new StatusEffect("freezing"){{
+            color = Color.valueOf("6ecdec");
             speedMultiplier = 0.6f;
             healthMultiplier = 0.8f;
             effect = Fx.freezing;
@@ -47,10 +51,12 @@ public class StatusEffects implements ContentList{
         }};
 
         unmoving = new StatusEffect("unmoving"){{
+            color = Pal.gray;
             speedMultiplier = 0.001f;
         }};
 
         slow = new StatusEffect("slow"){{
+            color = Pal.lightishGray;
             speedMultiplier = 0.4f;
         }};
 
@@ -80,6 +86,7 @@ public class StatusEffects implements ContentList{
         }};
 
         melting = new StatusEffect("melting"){{
+            color = Color.valueOf("ffa166");
             speedMultiplier = 0.8f;
             healthMultiplier = 0.8f;
             damage = 0.3f;
@@ -92,6 +99,7 @@ public class StatusEffects implements ContentList{
         }};
 
         sapped = new StatusEffect("sapped"){{
+            color = Pal.sap;
             speedMultiplier = 0.7f;
             healthMultiplier = 0.8f;
             effect = Fx.sapped;
@@ -99,12 +107,14 @@ public class StatusEffects implements ContentList{
         }};
 
         sporeSlowed = new StatusEffect("spore-slowed"){{
+            color = Pal.spore;
             speedMultiplier = 0.8f;
             effect = Fx.sapped;
             effectChance = 0.04f;
         }};
 
         tarred = new StatusEffect("tarred"){{
+            color = Color.valueOf("313131");
             speedMultiplier = 0.6f;
             effect = Fx.oily;
 
@@ -115,6 +125,7 @@ public class StatusEffects implements ContentList{
         }};
 
         overdrive = new StatusEffect("overdrive"){{
+            color = Pal.accent;
             healthMultiplier = 0.95f;
             speedMultiplier = 1.15f;
             damageMultiplier = 1.4f;
@@ -124,6 +135,7 @@ public class StatusEffects implements ContentList{
         }};
 
         overclock = new StatusEffect("overclock"){{
+            color = Pal.accent;
             speedMultiplier = 1.15f;
             damageMultiplier = 1.15f;
             reloadMultiplier = 1.25f;
@@ -132,20 +144,27 @@ public class StatusEffects implements ContentList{
         }};
 
         shielded = new StatusEffect("shielded"){{
+            color = Pal.accent;
             healthMultiplier = 3f;
         }};
 
         boss = new StatusEffect("boss"){{
+            color = Pal.health;
             permanent = true;
             damageMultiplier = 2f;
             healthMultiplier = 2f;
         }};
 
-        shocked = new StatusEffect("shocked");
+        shocked = new StatusEffect("shocked"){{
+            color = Pal.lancerLaser;
+        }};
 
-        blasted = new StatusEffect("blasted");
+        blasted = new StatusEffect("blasted"){{
+            color = Color.valueOf("ff795e");
+        }};
 
         corroded = new StatusEffect("corroded"){{
+            color = Pal.plastanium;
             damage = 0.1f;
         }};
     }

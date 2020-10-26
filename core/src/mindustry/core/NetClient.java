@@ -294,6 +294,13 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both)
+    public static void announce(String message){
+        if(message == null) return;
+
+        ui.announce(message);
+    }
+
+    @Remote(variants = Variant.both)
     public static void infoMessage(String message){
         if(message == null) return;
 

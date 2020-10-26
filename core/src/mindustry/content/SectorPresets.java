@@ -17,6 +17,7 @@ public class SectorPresets implements ContentList{
 
         groundZero = new SectorPreset("groundZero", serpulo, 15){{
             alwaysUnlocked = true;
+            addStartingItems = true;
             captureWave = 10;
             difficulty = 1;
         }};

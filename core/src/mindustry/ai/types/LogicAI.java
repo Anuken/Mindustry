@@ -44,8 +44,8 @@ public class LogicAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(itemTimer > 0) itemTimer -= Time.delta;
-        if(payTimer > 0) payTimer -= Time.delta;
+        if(itemTimer >= 0) itemTimer -= Time.delta;
+        if(payTimer >= 0) payTimer -= Time.delta;
 
         if(targetTimer > 0f){
             targetTimer -= Time.delta;

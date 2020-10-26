@@ -50,7 +50,7 @@ public class Weapon{
     public float x = 5f, y = 0f;
     /** random spread on the X axis */
     public float xRand = 0f;
-    /** radius of occlusion drawn under the weapon; <0 to diable */
+    /** radius of occlusion drawn under the weapon; <0 to disable */
     public float occlusion = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;

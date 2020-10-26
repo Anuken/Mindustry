@@ -1127,17 +1127,17 @@ public class UnitTypes implements ContentList{
             flying = true;
             drag = 0.06f;
             accel = 0.12f;
-            speed = 1.1f;
+            speed = 2f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            range = 50f;
+            range = 56f;
             isCounted = false;
 
             ammoType = AmmoTypes.powerLow;
 
             mineTier = 1;
-            mineSpeed = 2.5f;
+            mineSpeed = 2.6f;
         }};
 
         poly = new UnitType("poly"){{
@@ -1735,7 +1735,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 70;
             health = 220f;
             engineOffset = 6f;
-            hitSize = 10f;
+            hitSize = 11f;
             commandLimit = 7;
 
             weapons.add(new Weapon("small-mount-weapon"){{

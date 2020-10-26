@@ -281,7 +281,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+
         if(!mobile){
+            game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
         }
 

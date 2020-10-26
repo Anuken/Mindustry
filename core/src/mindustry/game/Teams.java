@@ -11,6 +11,7 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -26,6 +27,8 @@ public class Teams{
     public Seq<TeamData> active = new Seq<>();
     /** Teams with block or unit presence. */
     public Seq<TeamData> present = new Seq<>(TeamData.class);
+    /** Ores currently being mined. */
+    private IntMap<Unit> mined = new IntMap<>();
 
     public Teams(){
         active.add(get(Team.crux));
@@ -142,7 +145,20 @@ public class Teams{
         }
     }
 
+    /** @return whether this ore is taken. */
+    public boolean canMine(Unit unit, Tile tile){
+        if(tile == null) return false;
+        Unit u = mined.get(tile.pos());
+        return u == unit || u == null;
+    }
+
+    public void registerMined(Tile tile, Unit unit){
+        if(tile == null || unit == null) return;
+        mined.put(tile.pos(), unit);
+    }
+
     public void updateTeamStats(){
+        mined.clear();
         present.clear();
 
         for(Team team : Team.all){
