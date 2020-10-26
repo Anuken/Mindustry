@@ -1137,7 +1137,7 @@ public class UnitTypes implements ContentList{
             ammoType = AmmoTypes.powerLow;
 
             mineTier = 1;
-            mineSpeed = 2.6f;
+            mineSpeed = 3f;
         }};
 
         poly = new UnitType("poly"){{
@@ -1649,7 +1649,7 @@ public class UnitTypes implements ContentList{
             isCounted = false;
 
             flying = true;
-            mineSpeed = 6f;
+            mineSpeed = 6.5f;
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;

@@ -143,6 +143,12 @@ public class LStatements{
                     if(type == GraphicsType.color){
                         p2 = "255";
                     }
+
+                    if(type == GraphicsType.image){
+                        p1 = "@copper";
+                        p2 = "32";
+                        p3 = "0";
+                    }
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
@@ -204,6 +210,15 @@ public class LStatements{
                         row(s);
                         fields(s, "x3", p3, v -> p3 = v);
                         fields(s, "y3", p4, v -> p4 = v);
+                    }
+                    case image -> {
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                        row(s);
+                        fields(s, "image", p1, v -> p1 = v);
+                        fields(s, "size", p2, v -> p2 = v);
+                        row(s);
+                        fields(s, "rotation", p3, v -> p3 = v);
                     }
                 }
             }).expand().left();

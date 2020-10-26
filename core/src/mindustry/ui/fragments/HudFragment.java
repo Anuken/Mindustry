@@ -640,6 +640,8 @@ public class HudFragment extends Fragment{
             public void draw(){
                 float next = amount.get();
 
+                if(Float.isNaN(next) || Float.isInfinite(next)) next = 1f;
+
                 if(next < last && flash.get()){
                     blink = 1f;
                 }
@@ -647,6 +649,8 @@ public class HudFragment extends Fragment{
                 blink = Mathf.lerpDelta(blink, 0f, 0.2f);
                 value = Mathf.lerpDelta(value, next, 0.15f);
                 last = next;
+
+                if(Float.isNaN(value) || Float.isInfinite(value)) value = 1f;
 
                 drawInner(Pal.darkishGray);
 

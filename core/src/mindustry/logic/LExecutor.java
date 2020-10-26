@@ -15,6 +15,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
@@ -823,9 +824,15 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
+            int num1 = exec.numi(p1);
+
+            if(type == LogicDisplay.commandImage){
+                num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+            }
+
             //add graphics calls, cap graphics buffer size
             if(exec.graphicsBuffer.size < maxGraphicsBuffer){
-                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3), exec.numi(p4)));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), num1, exec.numi(p2), exec.numi(p3), exec.numi(p4)));
             }
         }
     }

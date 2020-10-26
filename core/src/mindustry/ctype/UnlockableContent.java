@@ -24,6 +24,8 @@ public abstract class UnlockableContent extends MappableContent{
     public @Nullable String description;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
+    /** Special logic icon ID. */
+    public int iconId = 0;
     /** Icons by Cicon ID.*/
     protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
