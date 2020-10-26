@@ -5,7 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.type.*;
-import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.values.*;
 
 /** Hold and organizes a list of block stats. */
@@ -67,9 +67,10 @@ public class Stats{
     }
 
     public void add(Stat stat, Attribute attr, boolean floating, float scale){
-        for(Block block : Vars.content.blocks()){
-            if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0 || (block.asFloor().isLiquid && !floating)) continue;
-            add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr) * scale));
+        for(var block : Vars.content.blocks()
+            .select(block -> block instanceof Floor f && f.attributes.get(attr) != 0 && !(f.isLiquid && !floating))
+            .<Floor>as().with(s -> s.sort(f -> f.attributes.get(attr)))){
+            add(stat, new FloorEfficiencyValue(block, block.attributes.get(attr) * scale));
         }
     }
 
