@@ -1,5 +1,6 @@
 package mindustry.world.meta;
 
+import arc.func.*;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
@@ -67,9 +68,20 @@ public class Stats{
     }
 
     public void add(Stat stat, Attribute attr, boolean floating, float scale){
+        Seq<FloorEfficiencyValue> attributeTiles = new Seq<FloorEfficiencyValue>();
         for(Block block : Vars.content.blocks()){
             if(!block.isFloor() || block.asFloor().attributes.get(attr) == 0 || (block.asFloor().isLiquid && !floating)) continue;
-            add(stat, new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr) * scale));
+            attributeTiles.add(new FloorEfficiencyValue(block.asFloor(), block.asFloor().attributes.get(attr) * scale));
+        }
+
+        attributeTiles.sort(new Floatf<FloorEfficiencyValue>(){
+            public float get(FloorEfficiencyValue value){
+                return value.multiplier;
+            }
+        });
+        
+        for(FloorEfficiencyValue value : attributeTiles) {
+            add(stat, value);
         }
     }
 

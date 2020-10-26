@@ -9,7 +9,7 @@ import mindustry.world.meta.*;
 
 public class FloorEfficiencyValue implements StatValue{
     private final Floor floor;
-    private final float multiplier;
+    public final float multiplier;
 
     public FloorEfficiencyValue(Floor floor, float multiplier){
         this.floor = floor;
