@@ -121,6 +121,15 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                         Effect.shake(type.landShake, type.landShake, l.base);
                     }
 
+                    //plays leg step sound if there is any
+                    if(type.stepSound != null){
+                        type.stepSound.play(
+                        type.stepSound.calcVolume(l.base.x, l.base.y) * type.stepSoundVolume,
+                        type.stepSoundPitch,
+                        type.stepSound.calcPan(l.base.x, l.base.y)
+                        );
+                    }
+
                     if(type.legSplashDamage > 0){
                         Damage.damage(team(), l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage, false, true);
                     }

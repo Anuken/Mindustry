@@ -765,6 +765,7 @@ public class UnitTypes implements ContentList{
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
+            stepSound = Sounds.bang;
             ammoType = AmmoTypes.powerHigh;
 
             legSplashDamage = 80;

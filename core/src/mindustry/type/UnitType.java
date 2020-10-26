@@ -66,6 +66,9 @@ public class UnitType extends UnlockableContent{
     public float legLength = 10f, legSpeed = 0.1f, legTrns = 1f, legBaseOffset = 0f, legMoveSpace = 1f, legExtension = 0, legPairOffset = 0, legLengthScl = 1f, kinematicScl = 1f, maxStretch = 1.75f;
     public float legSplashDamage = 0f, legSplashRange = 5;
     public boolean flipBackLegs = true;
+    public @Nullable Sound stepSound;
+    public float stepSoundPitch = 0.5f;
+    public float stepSoundVolume = 0.6f;
 
     public int ammoResupplyAmount = 10;
     public float ammoResupplyRange = 100f;
