@@ -94,7 +94,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     }
     
-    /** This attaches customized info of content (usually for mod)*/
+    /** This attaches customized info of content (usually for mod contents)*/
     public void displayInfo(Table table){
         
     }
