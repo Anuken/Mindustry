@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -11,6 +12,7 @@ import mindustry.world.meta.*;
 
 public class Router extends Block{
     public float speed = 8f;
+    private float root2 = 1.41f;//less than the square root of 2 on purpose
 
     public Router(String name){
         super(name);
@@ -40,7 +42,7 @@ public class Router extends Block{
 
         @Override
         public boolean canControl(){
-            return size == 1;
+            return size < 5;
         }
 
         @Override
@@ -100,10 +102,10 @@ public class Router extends Block{
                 unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
                 unit.team(team);
 
-                int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
+                Tmp.v1.trns(angleTo(unit.aimX(), unit.aimY()), size * root2 / 2);
 
                 if(unit.isShooting()){
-                    Building other = nearby(angle);
+                    Building other = world.buildWorld(x + Tmp.v1.x, y + Tmp.v1.y);
                     if(other != null && other.acceptItem(this, item)){
                         return other;
                     }
