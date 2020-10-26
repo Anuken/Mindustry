@@ -128,7 +128,7 @@ public class ImpactReactor extends PowerGenerator{
             Effect.shake(6f, 16f, x, y);
             Fx.impactShockwave.at(x, y);
             for(int i = 0; i < 6; i++){
-                Time.run(Mathf.random(80), () -> Fx.impactcloud.at(x, y));
+                Time.run(Mathf.random(80), () -> Fx.impactCloud.at(x, y));
             }
 
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
@@ -144,7 +144,7 @@ public class ImpactReactor extends PowerGenerator{
             for(int i = 0; i < 70; i++){
                 Time.run(Mathf.random(90), () -> {
                     Tmp.v1.rnd(Mathf.random(120f));
-                    Fx.impactsmoke.at(Tmp.v1.x + x, Tmp.v1.y + y);
+                    Fx.impactSmoke.at(Tmp.v1.x + x, Tmp.v1.y + y);
                 });
             }
         }

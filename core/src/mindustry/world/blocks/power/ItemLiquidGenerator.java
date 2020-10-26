@@ -28,8 +28,8 @@ public class ItemLiquidGenerator extends PowerGenerator{
     /** Maximum liquid used per frame. */
     public float maxLiquidGenerate = 0.4f;
 
-    public Effect generateEffect = Fx.generatespark;
-    public Effect explodeEffect = Fx.generatespark;
+    public Effect generateEffect = Fx.generateSpark;
+    public Effect explodeEffect = Fx.generateSpark;
     public Color heatColor = Color.valueOf("ff9b59");
     public @Load("@-top") TextureRegion topRegion;
     public @Load("@-liquid") TextureRegion liquidRegion;

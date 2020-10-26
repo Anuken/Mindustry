@@ -17,7 +17,7 @@ public abstract class BaseTurret extends Block{
 
     public boolean acceptCoolant = true;
     /** Effect displayed when coolant is used. */
-    public Effect coolEffect = Fx.fuelburn;
+    public Effect coolEffect = Fx.fuelBurn;
     /** How much reload is lowered by for each unit of liquid of heat capacity. */
     public float coolantMultiplier = 5f;
 

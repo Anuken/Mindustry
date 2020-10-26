@@ -11,7 +11,7 @@ import mindustry.type.*;
 import mindustry.world.*;
 
 public class Incinerator extends Block{
-    public Effect effect = Fx.fuelburn;
+    public Effect effect = Fx.fuelBurn;
     public Color flameColor = Color.valueOf("ffad9d");
 
     public Incinerator(String name){

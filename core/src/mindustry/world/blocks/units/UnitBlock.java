@@ -37,7 +37,7 @@ public class UnitBlock extends PayloadAcceptor{
             progress = 0f;
 
             Tmp.v1.trns(rotdeg(), size * tilesize/2f);
-            Fx.smeltsmoke.at(x + Tmp.v1.x, y + Tmp.v1.y);
+            Fx.smeltSmoke.at(x + Tmp.v1.x, y + Tmp.v1.y);
 
             if(!net.client() && payload != null){
                 Unit unit = payload.unit;

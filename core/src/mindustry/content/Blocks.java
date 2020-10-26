@@ -255,7 +255,7 @@ public class Blocks implements ContentList{
         magmarock = new Floor("magmarock"){{
             attributes.set(Attribute.heat, 0.75f);
             attributes.set(Attribute.water, -0.75f);
-            updateEffect = Fx.magmasmoke;
+            updateEffect = Fx.magmaSmoke;
             blendGroup = basalt;
 
             emitLight = true;
@@ -521,7 +521,7 @@ public class Blocks implements ContentList{
 
         siliconSmelter = new GenericSmelter("silicon-smelter"){{
             requirements(Category.crafting, with(Items.copper, 30, Items.lead, 25));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.smeltSmoke;
             outputItem = new ItemStack(Items.silicon, 1);
             craftTime = 40f;
             size = 2;
@@ -535,7 +535,7 @@ public class Blocks implements ContentList{
 
         siliconCrucible = new AttributeSmelter("silicon-crucible"){{
             requirements(Category.crafting, with(Items.titanium, 120, Items.metaglass, 80, Items.plastanium, 35, Items.silicon, 60));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.smeltSmoke;
             outputItem = new ItemStack(Items.silicon, 8);
             craftTime = 90f;
             size = 3;
@@ -551,7 +551,7 @@ public class Blocks implements ContentList{
 
         kiln = new GenericSmelter("kiln"){{
             requirements(Category.crafting, with(Items.copper, 60, Items.graphite, 30, Items.lead, 30));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.smeltSmoke;
             outputItem = new ItemStack(Items.metaglass, 1);
             craftTime = 30f;
             size = 2;
@@ -571,7 +571,7 @@ public class Blocks implements ContentList{
             size = 2;
             health = 320;
             hasPower = hasLiquids = true;
-            craftEffect = Fx.formsmoke;
+            craftEffect = Fx.formSmoke;
             updateEffect = Fx.plasticburn;
             drawer = new DrawGlow();
 
@@ -582,7 +582,7 @@ public class Blocks implements ContentList{
 
         phaseWeaver = new GenericCrafter("phase-weaver"){{
             requirements(Category.crafting, with(Items.silicon, 130, Items.lead, 120, Items.thorium, 75));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.smeltSmoke;
             outputItem = new ItemStack(Items.phaseFabric, 1);
             craftTime = 120f;
             size = 2;
@@ -596,7 +596,7 @@ public class Blocks implements ContentList{
 
         surgeSmelter = new GenericSmelter("alloy-smelter"){{
             requirements(Category.crafting, with(Items.silicon, 80, Items.lead, 80, Items.thorium, 70));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.smeltSmoke;
             outputItem = new ItemStack(Items.surgeAlloy, 1);
             craftTime = 75f;
             size = 3;
@@ -724,7 +724,7 @@ public class Blocks implements ContentList{
 
         coalCentrifuge = new GenericCrafter("coal-centrifuge"){{
             requirements(Category.crafting, with(Items.titanium, 20, Items.graphite, 40, Items.lead, 30));
-            craftEffect = Fx.smeltsmoke;
+            craftEffect = Fx.smeltSmoke;
             outputItem = new ItemStack(Items.coal, 1);
             craftTime = 30f;
             size = 2;
@@ -828,8 +828,8 @@ public class Blocks implements ContentList{
 
         doorLarge = new Door("door-large"){{
             requirements(Category.defense, ItemStack.mult(door.requirements, 4));
-            openfx = Fx.dooropenlarge;
-            closefx = Fx.doorcloselarge;
+            openfx = Fx.doorOpenLarge;
+            closefx = Fx.doorCloseLarge;
             health = 100 * 4 * wallHealthMultiplier;
             size = 2;
         }};
@@ -1160,7 +1160,7 @@ public class Blocks implements ContentList{
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
             requirements(Category.power, with(Items.copper, 40, Items.graphite, 35, Items.lead, 50, Items.silicon, 35, Items.metaglass, 40));
             powerProduction = 1.8f;
-            generateEffect = Fx.redgeneratespark;
+            generateEffect = Fx.redGenerateSpark;
             size = 2;
             floating = true;
         }};

@@ -428,11 +428,11 @@ public class Bullets implements ContentList{
                 }
 
                 if(Mathf.chance(0.1 * Time.delta)){
-                    Fx.fireballsmoke.at(b.x, b.y);
+                    Fx.fireballSmoke.at(b.x, b.y);
                 }
 
                 if(Mathf.chance(0.1 * Time.delta)){
-                    Fx.ballfire.at(b.x, b.y);
+                    Fx.ballFire.at(b.x, b.y);
                 }
             }
         };

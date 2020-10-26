@@ -99,7 +99,7 @@ public class NuclearReactor extends PowerGenerator{
             if(heat > smokeThreshold){
                 float smoke = 1.0f + (heat - smokeThreshold) / (1f - smokeThreshold); //ranges from 1.0 to 2.0
                 if(Mathf.chance(smoke / 20.0 * delta())){
-                    Fx.reactorsmoke.at(x + Mathf.range(size * tilesize / 2f),
+                    Fx.reactorSmoke.at(x + Mathf.range(size * tilesize / 2f),
                     y + Mathf.random(size * tilesize / 2f));
                 }
             }
@@ -131,7 +131,7 @@ public class NuclearReactor extends PowerGenerator{
             Effect.shake(6f, 16f, x, y);
             Fx.nuclearShockwave.at(x, y);
             for(int i = 0; i < 6; i++){
-                Time.run(Mathf.random(40), () -> Fx.nuclearcloud.at(x, y));
+                Time.run(Mathf.random(40), () -> Fx.nuclearCloud.at(x, y));
             }
 
             Damage.damage(x, y, explosionRadius * tilesize, explosionDamage * 4);
@@ -146,7 +146,7 @@ public class NuclearReactor extends PowerGenerator{
             for(int i = 0; i < 70; i++){
                 Time.run(Mathf.random(80), () -> {
                     tr.rnd(Mathf.random(120f));
-                    Fx.nuclearsmoke.at(tr.x + x, tr.y + y);
+                    Fx.nuclearSmoke.at(tr.x + x, tr.y + y);
                 });
             }
         }

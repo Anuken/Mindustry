@@ -22,8 +22,8 @@ public class Door extends Wall{
     protected final static Rect rect = new Rect();
 
     public final int timerToggle = timers++;
-    public Effect openfx = Fx.dooropen;
-    public Effect closefx = Fx.doorclose;
+    public Effect openfx = Fx.doorOpen;
+    public Effect closefx = Fx.doorClose;
     public Sound doorSound = Sounds.door;
     public @Load("@-open") TextureRegion openRegion;
 

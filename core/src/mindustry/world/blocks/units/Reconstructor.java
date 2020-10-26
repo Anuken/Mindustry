@@ -165,7 +165,7 @@ public class Reconstructor extends UnitBlock{
                             payload.unit = upgrade(payload.unit.type).create(payload.unit.team());
                             progress = 0;
                             Effect.shake(2f, 3f, this);
-                            Fx.producesmoke.at(this);
+                            Fx.produceSmoke.at(this);
                             consume();
                         }
                     }

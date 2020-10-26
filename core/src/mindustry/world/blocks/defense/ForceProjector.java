@@ -119,7 +119,7 @@ public class ForceProjector extends Block{
             radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.05f);
 
             if(Mathf.chanceDelta(buildup / breakage * 0.1f)){
-                Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2f), y + Mathf.range(tilesize / 2f));
+                Fx.reactorSmoke.at(x + Mathf.range(tilesize / 2f), y + Mathf.range(tilesize / 2f));
             }
 
             warmup = Mathf.lerpDelta(warmup, efficiency(), 0.1f);
