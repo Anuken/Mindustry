@@ -714,7 +714,7 @@ public class HudFragment extends Fragment{
             t.margin(0);
 
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
-            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f).clicked(() -> {
+            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f).get().clicked(() -> {
                 Call.unitClear(player);
                 control.input.controlledType = null;
             });
