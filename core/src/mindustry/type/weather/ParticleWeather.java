@@ -34,7 +34,7 @@ public class ParticleWeather extends Weather{
 
         //load noise texture
         //TODO mod support
-        if(drawNoise){
+        if(drawNoise && Core.assets != null){
             Core.assets.load("sprites/" + noisePath + ".png", Texture.class);
         }
     }
