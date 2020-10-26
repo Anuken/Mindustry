@@ -1127,11 +1127,11 @@ public class UnitTypes implements ContentList{
             flying = true;
             drag = 0.06f;
             accel = 0.12f;
-            speed = 1.1f;
+            speed = 2f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            range = 50f;
+            range = 56f;
             isCounted = false;
 
             ammoType = AmmoTypes.powerLow;
