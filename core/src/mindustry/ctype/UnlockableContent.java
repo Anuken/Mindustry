@@ -93,7 +93,12 @@ public abstract class UnlockableContent extends MappableContent{
     public void display(Table table){
 
     }
-
+    
+    /** This attaches customized info of content (usually for mod)*/
+    public void displayInfo(Table table){
+        
+    }
+        
     /** Called when this content is unlocked. Use this to unlock other related content. */
     public void onUnlock(){
     }
