@@ -8,6 +8,11 @@ const readString = path => Vars.mods.getScripts().readString(path)
 const readBytes = path => Vars.mods.getScripts().readBytes(path)
 const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
 const loadSound = path => Vars.mods.getScripts().loadSound(path)
+const newFloats = cap => Vars.mods.getScripts().newFloats(cap)
+const newDoubles = cap => Vars.mods.getScripts().newDoubles(cap)
+const newBytes = cap => Vars.mods.getScripts().newBytes(cap);
+const newInts = cap => Vars.mods.getScripts().newInts(cap);
+const newLongs = cap => Vars.mods.getScripts().newLongs(cap);
 
 let scriptName = "base.js"
 let modName = "none"

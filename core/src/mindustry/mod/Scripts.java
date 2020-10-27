@@ -116,6 +116,26 @@ public class Scripts implements Disposable{
         return sound;
     }
 
+    public float[] newFloats(int capacity){
+        return new float[capacity];
+    }
+
+    public double[] newDoubles(int capacity){
+        return new double[capacity];
+    }
+
+    public byte[] newBytes(int capacity){
+        return new byte[capacity];
+    }
+
+    public int[] newInts(int capacity){
+        return new int[capacity];
+    }
+
+    public long[] newLongs(int capacity){
+        return new long[capacity];
+    }
+
     //endregion
 
     public void run(LoadedMod mod, Fi file){
