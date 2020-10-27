@@ -10,4 +10,4 @@ void main(){
     vec4 bloom = texture2D(u_texture1, v_texCoords) * BloomIntensity;
     original = original *  (vec4(1.0) - bloom);
     gl_FragColor =  original + bloom;
-
+}

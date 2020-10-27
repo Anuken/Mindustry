@@ -26,4 +26,4 @@ public class InverseKinematics{
         return dist > 0 && dist < lengthA;
     }
 
-
+}

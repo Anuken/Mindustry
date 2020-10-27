@@ -198,4 +198,4 @@ public class LightRenderer{
 
         lights.clear();
     }
-
+}

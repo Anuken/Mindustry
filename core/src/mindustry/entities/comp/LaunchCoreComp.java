@@ -73,4 +73,4 @@ abstract class LaunchCoreComp implements Drawc, Timedc{
             Fx.rocketSmokeLarge.at(cx() + Mathf.range(r), cy() + Mathf.range(r), fin());
         }
     }
-
+}

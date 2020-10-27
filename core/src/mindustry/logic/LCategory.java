@@ -15,4 +15,4 @@ public enum LCategory{
     LCategory(Color color){
         this.color = color;
     }
-
+}

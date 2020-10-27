@@ -11,4 +11,4 @@ void main(){
 		gl_FragColor = vec4(0.0);
 	}
  	//gl_FragColor = (texture2D(u_texture0, v_texCoords) - vec4(threshold.r))  * threshold.g;
-
+}

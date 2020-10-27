@@ -9,4 +9,4 @@ const float SCALE = 50.0;
 void main(){
     v_texCoords = a_position;
     gl_Position = u_proj * vec4(a_position * SCALE, 1.0);
-
+}

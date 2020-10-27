@@ -115,4 +115,4 @@ void main(){
     vec3 result = inScatter(eye, dir, e, l);
 
     gl_FragColor = vec4(result, 1.0);
-
+}

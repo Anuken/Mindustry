@@ -20,4 +20,4 @@ void main(){
     color.rgb = texture2D(u_stars, coords/NSCALE + vec2(-0.1, -0.1) + u_ccampos / CAMSCALE).rgb;
 
     gl_FragColor = color;
-
+}

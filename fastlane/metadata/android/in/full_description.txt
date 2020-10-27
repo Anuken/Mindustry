@@ -11,4 +11,4 @@ Fitur:
 - Multipemain lintas platform melalui jaringan lokal atau server khusus
 - Aturan permainan khusus: Ubah biaya blok, statistik musuh, item awal, waktu gelombang, dan lainnya
 - Editor yang andal, dengan alat untuk menghasilkan sumber daya, medan, dekorasi, dan menerapkan simetri ke peta secara acak
-- Tata letak gelombang peta yang dapat disesuaika
+- Tata letak gelombang peta yang dapat disesuaikan
