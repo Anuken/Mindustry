@@ -31,6 +31,7 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float basePowerDraw = 0.2f;
+    public float pushAmount = 50f;
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
@@ -40,6 +41,12 @@ public class ForceProjector extends Block{
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
             paramEntity.buildup += trait.damage() * paramEntity.warmup;
+        }
+    };
+
+    static final Cons<Unit> unitPusher = unit -> {
+        if(unit.team != paramEntity.team && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, unit.x(), unit.y())){
+            unit.impulse(Tmp.v3.set(unit).sub(paramEntity.x, paramEntity.y).nor().scl(((ForceProjector)paramEntity.block).pushAmount));
         }
     };
 
@@ -154,6 +161,7 @@ public class ForceProjector extends Block{
             if(realRadius > 0 && !broken){
                 paramEntity = this;
                 Groups.bullet.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, shieldConsumer);
+                Groups.unit.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, unitPusher);
             }
         }
 
