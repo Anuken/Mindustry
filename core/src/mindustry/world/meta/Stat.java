@@ -67,6 +67,7 @@ public enum Stat{
     ammo(StatCat.function),
     shieldHealth(StatCat.function),
     cooldownTime(StatCat.function),
+    none(StatCat.function),
 
     booster(StatCat.optional),
     boostEffect(StatCat.optional),
