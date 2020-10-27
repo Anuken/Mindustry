@@ -214,6 +214,12 @@ public class UnitType extends UnlockableContent{
             }
         }
 
+        stats.add(Stat.flying, flying);
+
+        if(!flying){
+            stats.add(Stat.canBoost, canBoost);
+        }
+
         if(inst instanceof Minerc && mineTier >= 1){
             stats.addPercent(Stat.mineSpeed, mineSpeed);
             stats.add(Stat.mineTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
