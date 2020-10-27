@@ -11,8 +11,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
-import static mindustry.Vars.*;
-
 public class FormationAI extends AIController implements FormationMember{
     private static Seq<Tile> tiles = new Seq<>();
     public Unit leader;
@@ -67,22 +65,8 @@ public class FormationAI extends AIController implements FormationMember{
         }
 
         if(unit instanceof Minerc mine && leader instanceof Minerc com){
-            if(com.mineTile() != null){
-                if(multimine){
-                    mine.mineTile(mine.validMine(com.mineTile()) ? com.mineTile() : null);
-                }else{
-                    if(mine.mineTile() == null){
-                        tiles.clear();
-                        com.mineTile().circle(6, (cx, cy) -> {
-                            Tile tile = world.tile(cx, cy);
-                            if(mine.validMine(tile) && tile.drop() == com.mineTile().drop() && tile != com.mineTile()){
-                                tiles.add(tile);
-                            }
-                        });
-                        Tile min = tiles.min(t -> t.dst2(com.mineTile()));
-                        mine.mineTile(min);
-                    }
-                }
+            if(com.mineTile() != null && mine.validMine(com.mineTile())){
+                mine.mineTile(com.mineTile());
 
                 CoreBuild core = unit.team.core();
 

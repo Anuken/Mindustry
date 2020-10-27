@@ -7,10 +7,10 @@ public enum BuildVisibility{
     hidden(() -> false),
     shown(() -> true),
     debugOnly(() -> false),
-    sandboxOnly(() -> Vars.state.rules.infiniteResources),
-    campaignOnly(() -> Vars.state.isCampaign()),
-    lightingOnly(() -> Vars.state.rules.lighting || Vars.state.isCampaign()),
-    ammoOnly(() -> Vars.state.rules.unitAmmo);
+    sandboxOnly(() -> Vars.state == null || Vars.state.rules.infiniteResources),
+    campaignOnly(() -> Vars.state == null || Vars.state.isCampaign()),
+    lightingOnly(() -> Vars.state == null || Vars.state.rules.lighting || Vars.state.isCampaign()),
+    ammoOnly(() -> Vars.state == null || Vars.state.rules.unitAmmo);
 
     private final Boolp visible;
 

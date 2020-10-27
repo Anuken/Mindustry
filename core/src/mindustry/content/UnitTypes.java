@@ -1127,17 +1127,17 @@ public class UnitTypes implements ContentList{
             flying = true;
             drag = 0.06f;
             accel = 0.12f;
-            speed = 2f;
+            speed = 1.5f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
-            range = 56f;
+            range = 50f;
             isCounted = false;
 
             ammoType = AmmoTypes.powerLow;
 
             mineTier = 1;
-            mineSpeed = 3f;
+            mineSpeed = 2.5f;
         }};
 
         poly = new UnitType("poly"){{
