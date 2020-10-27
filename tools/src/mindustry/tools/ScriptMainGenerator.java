@@ -1,6 +1,7 @@
 package mindustry.tools;
 
 import arc.*;
+import arc.Graphics.Cursor.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -43,7 +44,7 @@ public class ScriptMainGenerator{
 
         classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
         || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()));
-        classes.add(NetConnection.class, SaveIO.class);
+        classes.add(NetConnection.class, SaveIO.class, SystemCursor.class);
 
         classes.distinct();
         classes.sortComparing(Class::getName);

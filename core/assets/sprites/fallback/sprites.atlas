@@ -877,7 +877,21 @@ block-loader
   orig: 96, 96
   offset: 0, 0
   index: -1
+block-loader-icon-logic
+  rotate: false
+  xy: 1267, 529
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
 block-unloader
+  rotate: false
+  xy: 1231, 235
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+block-unloader-icon-logic
   rotate: false
   xy: 1231, 235
   size: 96, 96
@@ -1256,6 +1270,13 @@ alloy-smelter-top
   offset: 0, 0
   index: -1
 block-forge
+  rotate: false
+  xy: 1267, 725
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+block-forge-icon-logic
   rotate: false
   xy: 1267, 725
   size: 96, 96
@@ -1753,6 +1774,13 @@ core-nucleus-icon-logic
   offset: 0, 0
   index: -1
 block-core-shard-full
+  rotate: false
+  xy: 1267, 921
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+core-shard-icon-logic
   rotate: false
   xy: 1267, 921
   size: 96, 96

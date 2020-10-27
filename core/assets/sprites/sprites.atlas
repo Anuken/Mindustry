@@ -158,7 +158,21 @@ block-loader
   orig: 96, 96
   offset: 0, 0
   index: -1
+block-loader-icon-logic
+  rotate: false
+  xy: 1899, 2937
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
 block-unloader
+  rotate: false
+  xy: 1644, 2741
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+block-unloader-icon-logic
   rotate: false
   xy: 1644, 2741
   size: 96, 96
@@ -1992,6 +2006,13 @@ block-forge
   orig: 96, 96
   offset: 0, 0
   index: -1
+block-forge-icon-logic
+  rotate: false
+  xy: 3281, 2695
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
 coal-centrifuge
   rotate: false
   xy: 3874, 2651
@@ -3806,6 +3827,13 @@ core-nucleus-icon-logic
   offset: 0, 0
   index: -1
 block-core-shard-full
+  rotate: false
+  xy: 3379, 2903
+  size: 96, 96
+  orig: 96, 96
+  offset: 0, 0
+  index: -1
+core-shard-icon-logic
   rotate: false
   xy: 3379, 2903
   size: 96, 96
