@@ -491,4 +491,4 @@ public class JoinDialog extends BaseDialog{
         public Server(){
         }
     }
-}
+

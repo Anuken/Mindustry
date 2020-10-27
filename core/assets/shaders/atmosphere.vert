@@ -10,4 +10,4 @@ void main(){
     v_position = a_position;
     v_model = u_model;
     gl_Position = u_projection*u_model*a_position;
-}
+
