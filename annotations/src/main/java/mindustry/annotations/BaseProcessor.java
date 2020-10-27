@@ -115,12 +115,12 @@ public abstract class BaseProcessor extends AbstractProcessor{
         return ClassName.get(c).box();
     }
 
-    public static TypeVariableName getTVN(TypeParameterElement element) {
+    public static TypeVariableName getTVN(TypeParameterElement element){
         String name = element.getSimpleName().toString();
         List<? extends TypeMirror> boundsMirrors = element.getBounds();
 
         List<TypeName> boundsTypeNames = new ArrayList<>();
-        for (TypeMirror typeMirror : boundsMirrors) {
+        for (TypeMirror typeMirror : boundsMirrors){
             boundsTypeNames.add(TypeName.get(typeMirror));
         }
 
@@ -137,11 +137,11 @@ public abstract class BaseProcessor extends AbstractProcessor{
         if(imports != null){
             String rawSource = file.toString();
             Seq<String> result = new Seq<>();
-            for (String s : rawSource.split("\n", -1)) {
+            for(String s : rawSource.split("\n", -1)){
                 result.add(s);
-                if (s.startsWith("package ")) {
+                if (s.startsWith("package ")){
                     result.add("");
-                    for (String i : imports) {
+                    for (String i : imports){
                         result.add(i);
                     }
                 }

@@ -122,7 +122,7 @@ public class PlacementFragment extends Fragment{
 
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
-                if(i > 9) { //select block directionally
+                if(i > 9){ //select block directionally
                     Seq<Block> blocks = getUnlockedByCategory(currentCategory);
                     Block currentBlock = getSelectedBlock(currentCategory);
                     for(int j = 0; j < blocks.size; j++){

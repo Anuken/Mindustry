@@ -158,7 +158,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
-        if(status == StatusEffects.burning) {
+        if(status == StatusEffects.burning){
             Fires.create(tile.tile);
         }
         hit(b);
@@ -209,14 +209,14 @@ public abstract class BulletType extends Content{
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
             
-            if(healPercent > 0f) {
+            if(healPercent > 0f){
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
                 });
             }
 
-            if(status == StatusEffects.burning) {
+            if(status == StatusEffects.burning){
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
                     Fires.create(other.tile);
                 });
@@ -247,7 +247,7 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
-        if(pierceCap >= 1) {
+        if(pierceCap >= 1){
             pierce = true;
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
         }

@@ -433,7 +433,7 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public void drawSelect() {
+        public void drawSelect(){
             Groups.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
                 Drawf.square(unit.x, unit.y, unit.hitSize, unit.rotation + 45);
             });

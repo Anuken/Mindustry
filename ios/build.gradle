@@ -26,7 +26,7 @@ task copyAssets(){
         }
     
         delete{
-            delete fileTree('assets') {
+            delete fileTree('assets'){
                 include '**/*.ogg'
             }
         }
