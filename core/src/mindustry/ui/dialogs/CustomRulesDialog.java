@@ -134,7 +134,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
-        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
+        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true, 1, Float.MAX_VALUE);
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("@rules.title.resourcesbuilding");
@@ -142,7 +142,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
         check("@rules.schematic", b-> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
-        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
+        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.00001f, 10000f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
@@ -162,7 +162,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
-        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
+        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.00001f, 100f);
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
@@ -189,10 +189,22 @@ public class CustomRulesDialog extends BaseDialog{
     }
 
     void number(String text, Floatc cons, Floatp prov){
-        number(text, false, cons, prov, () -> true);
+        number(text, false, cons, prov, () -> true, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, Floatc cons, Floatp prov, float min, float max){
+        number(text, false, cons, prov, () -> true, min, max);
     }
 
     void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition){
+        number(text, integer, cons, prov, condition, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, Floatc cons, Floatp prov, Boolp condition){
+        number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
@@ -200,7 +212,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
-            .valid(Strings::canParsePositiveFloat).width(120f).left().addInputDialog();
+            .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left().addInputDialog();
         }).padTop(0);
         main.row();
     }

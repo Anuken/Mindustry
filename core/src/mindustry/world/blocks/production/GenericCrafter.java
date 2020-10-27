@@ -37,11 +37,6 @@ public class GenericCrafter extends Block{
 
     @Override
     public void setStats(){
-        if(consumes.has(ConsumeType.liquid)){
-            ConsumeLiquidBase cons = consumes.get(ConsumeType.liquid);
-            cons.timePeriod = craftTime;
-        }
-
         super.setStats();
         stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
 
@@ -50,7 +45,7 @@ public class GenericCrafter extends Block{
         }
 
         if(outputLiquid != null){
-            stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount, false);
+            stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount * (60f / craftTime), true);
         }
     }
 

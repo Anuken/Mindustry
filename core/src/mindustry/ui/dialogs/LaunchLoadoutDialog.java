@@ -2,7 +2,6 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.func.*;
-import arc.input.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -37,11 +36,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
         buttons.defaults().size(160f, 64f);
         buttons.button("@back", Icon.left, this::hide);
 
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        addCloseListener();
 
         ItemSeq sitems = sector.getItems();
 
@@ -104,22 +99,30 @@ public class LaunchLoadoutDialog extends BaseDialog{
         cont.pane(t -> {
             int i = 0;
 
-            for(Schematic s : schematics.getLoadouts(core)){
+            for(var entry : schematics.getLoadouts()){
+                if(entry.key.size <= core.size){
+                    for(Schematic s : entry.value){
 
-                t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
-                    selected = s;
-                    update.run();
-                    rebuildItems.run();
-                }).group(group).pad(4).disabled(!sitems.has(s.requirements())).checked(s == selected).size(200f);
+                        t.button(b -> b.add(new SchematicImage(s)), Styles.togglet, () -> {
+                            selected = s;
+                            update.run();
+                            rebuildItems.run();
+                        }).group(group).pad(4).disabled(!sitems.has(s.requirements())).checked(s == selected).size(200f);
 
-                if(++i % cols == 0){
-                    t.row();
+                        if(++i % cols == 0){
+                            t.row();
+                        }
+                    }
                 }
             }
+
+
         }).growX().get().setScrollingDisabled(true, false);
 
         cont.row();
         cont.add(items);
+        cont.row();
+        cont.add("@sector.missingresources").visible(() -> !valid);
 
         update.run();
         rebuildItems.run();

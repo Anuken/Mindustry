@@ -87,7 +87,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         to.addItem(item, removed);
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> Call.transferItemEffect(item, build.x, build.y, to));
+            Time.run(j * 3f, () -> transferItemEffect(item, build.x, build.y, to));
         }
     }
 
@@ -100,7 +100,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(Item item, int amount, float x, float y, Building build){
         if(build == null || build.items == null) return;
-        for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
+        for(int i = 0; i < Mathf.clamp(amount / 5, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
         build.items.add(item, amount);
@@ -126,24 +126,47 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void requestItem(Player player, Building tile, Item item, int amount){
         if(player == null || tile == null || !tile.interactable(player.team()) || !player.within(tile, buildingRange) || player.dead()) return;
-        amount = Math.min(player.unit().maxAccepted(item), amount);
-        int fa = amount;
-
-        if(amount == 0) return;
 
         if(net.server() && (!Units.canInteract(player, tile) ||
         !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
             action.item = item;
-            action.itemAmount = fa;
+            action.itemAmount = amount;
         }))) throw new ValidateException(player, "Player cannot request items.");
 
-        int removed = tile.removeStack(item, amount);
+        //remove item for every controlling unit
+        player.unit().eachGroup(unit -> {
+            Call.takeItems(tile, item, unit.maxAccepted(item), unit);
 
-        player.unit().addItem(item, removed);
-        Events.fire(new WithdrawEvent(tile, player, item, amount));
-        for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x, tile.y, player.unit()));
+            if(unit == player.unit()){
+                Events.fire(new WithdrawEvent(tile, player, item, amount));
+            }
+        });
+    }
+
+    @Remote(targets = Loc.both, forward = true, called = Loc.server)
+    public static void transferInventory(Player player, Building tile){
+        if(player == null || tile == null || !player.within(tile, buildingRange) || tile.items == null || player.dead()) return;
+
+        if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
+        !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile, action -> {
+            action.itemAmount = player.unit().stack.amount;
+            action.item = player.unit().item();
+        }))){
+            throw new ValidateException(player, "Player cannot transfer an item.");
         }
+
+        //deposit for every controlling unit
+        player.unit().eachGroup(unit -> {
+            Item item = unit.item();
+            int accepted = tile.acceptStack(item, unit.stack.amount, unit);
+            unit.stack.amount -= accepted;
+
+            Call.transferItemTo(item, accepted, unit.x, unit.y, tile);
+
+            if(unit == player.unit()){
+                Events.fire(new DepositEvent(tile, player, item, accepted));
+            }
+        });
     }
 
     @Remote(variants = Variant.one)
@@ -276,37 +299,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         tile.noSleep();
     }
 
-    @Remote(targets = Loc.both, forward = true, called = Loc.server)
-    public static void transferInventory(Player player, Building tile){
-        if(player == null || tile == null || !player.within(tile, buildingRange) || tile.items == null || player.dead()) return;
-
-        if(net.server() && (player.unit().stack.amount <= 0 || !Units.canInteract(player, tile) ||
-            !netServer.admins.allowAction(player, ActionType.depositItem, tile.tile, action -> {
-                action.itemAmount = player.unit().stack.amount;
-                action.item = player.unit().item();
-            }))){
-            throw new ValidateException(player, "Player cannot transfer an item.");
-        }
-
-        Item item = player.unit().item();
-        int amount = player.unit().stack.amount;
-        int accepted = tile.acceptStack(item, amount, player.unit());
-        player.unit().stack.amount -= accepted;
-
-        Core.app.post(() -> Events.fire(new DepositEvent(tile, player, item, accepted)));
-
-        tile.getStackOffset(item, stackTrns);
-        tile.handleStack(item, accepted, player.unit());
-
-        createItemTransfer(
-            item,
-            amount,
-            player.x + Angles.trnsx(player.unit().rotation + 180f, backTrns), player.y + Angles.trnsy(player.unit().rotation + 180f, backTrns),
-            new Vec2(tile.x + stackTrns.x, tile.y + stackTrns.y),
-            () -> {}
-        );
-    }
-
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void tileConfig(@Nullable Player player, Building tile, @Nullable Object value){
         if(tile == null) return;
@@ -328,6 +320,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
     public static void unitControl(Player player, @Nullable Unit unit){
         if(player == null) return;
+
+        //make sure player is allowed to control the unit
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.control, action -> action.unit = unit)){
+            throw new ValidateException(player, "Player cannot control a unit.");
+        }
 
         //clear player unit when they possess a core
         if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreBuild)){
@@ -368,6 +365,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitCommand(Player player){
         if(player == null || player.dead() || !(player.unit() instanceof Commanderc commander)) return;
+
+        //make sure player is allowed to make the command
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.command, action -> {})){
+            throw new ValidateException(player, "Player cannot command a unit.");
+        }
 
         if(commander.isCommanding()){
             commander.clearCommand();
@@ -928,10 +930,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null && player.miner().canMine(tile.drop())
+        && tile.drop() != null
+        && player.miner().validMine(tile)
         && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
         && player.unit().acceptsItem(tile.drop())
-        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
+        && tile.block() == Blocks.air;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -1196,7 +1199,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             line.x = point.x;
             line.y = point.y;
             if(!overrideLineRotation || diagonal){
-                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+                if(next != null){
+                    line.rotation = Tile.relativeTo(point.x, point.y, next.x, next.y);
+                }else if(block.conveyorPlacement && i > 0){
+                    Point2 prev = points.get(i - 1);
+                    line.rotation = Tile.relativeTo(prev.x, prev.y, point.x, point.y);
+                }else{
+                    line.rotation = baseRotation;
+                }
             }else{
                 line.rotation = rotation;
             }

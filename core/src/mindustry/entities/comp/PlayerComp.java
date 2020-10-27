@@ -78,6 +78,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         team = state.rules.defaultTeam;
         admin = typing = false;
         textFadeTime = 0f;
+        x = y = 0f;
         if(!dead()){
             unit.controller(unit.type.createController());
             unit = Nulls.unit;

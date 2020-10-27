@@ -197,7 +197,7 @@ public class Universe{
                     if(!sector.isAttacked() && turn > invasionGracePeriod){
                         //invasion chance depends on # of nearby bases
                         if(Mathf.chance(baseInvasionChance * sector.near().count(Sector::hasEnemyBase))){
-                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : 0) + Mathf.random(2, 5) * 5;
+                            int waveMax = Math.max(sector.info.winWave, state.wave) + Mathf.random(2, 5) * 5;
 
                             //assign invasion-related things
                             if(sector.isBeingPlayed()){
@@ -264,7 +264,6 @@ public class Universe{
 
         if(Core.settings.has("unlocks")){
             LegacyIO.readResearch();
-            Core.settings.remove("unlocks");
         }
     }
 

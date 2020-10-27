@@ -30,14 +30,14 @@ public class Bullets implements ContentList{
     missileExplosive, missileIncendiary, missileSurge,
 
     //standard
-    standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
-    standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
+    standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary,
+    standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //liquid
     waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
 
     //environment, misc.
-    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag;
+    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig;
 
     @Override
     public void load(){
@@ -327,23 +327,6 @@ public class Bullets implements ContentList{
             lifetime = 60f;
         }};
 
-        standardGlaive = new BasicBulletType(4f, 7.5f, "bullet"){{
-            width = 10f;
-            height = 12f;
-            frontColor = Color.valueOf("feb380");
-            backColor = Color.valueOf("ea8878");
-            status = StatusEffects.burning;
-            lifetime = 60f;
-        }};
-
-        standardMechSmall = new BasicBulletType(4f, 9, "bullet"){{
-            width = 11f;
-            height = 14f;
-            lifetime = 40f;
-            inaccuracy = 5f;
-            despawnEffect = Fx.hitBulletSmall;
-        }};
-
         standardDenseBig = new BasicBulletType(7f, 55, "bullet"){{
             width = 15f;
             height = 21f;
@@ -491,7 +474,7 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 2f;
             statusDuration = 60f * 4f;
-            damage = 0.1f;
+            damage = 0.2f;
         }};
 
         heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
@@ -502,7 +485,7 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 2f;
             statusDuration = 60f * 4f;
-            damage = 0.1f;
+            damage = 0.2f;
         }};
 
         heavySlagShot = new LiquidBulletType(Liquids.slag){{
@@ -524,17 +507,9 @@ public class Bullets implements ContentList{
             drag = 0.001f;
             ammoMultiplier = 2f;
             statusDuration = 60f * 4f;
-            damage = 0.1f;
+            damage = 0.2f;
         }};
 
         driverBolt = new MassDriverBolt();
-
-        frag = new BasicBulletType(5f, 8, "bullet"){{
-            width = 8f;
-            height = 9f;
-            shrinkY = 0.5f;
-            lifetime = 50f;
-            drag = 0.04f;
-        }};
     }
 }

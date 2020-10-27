@@ -92,7 +92,7 @@ public class HudFragment extends Fragment{
         //paused table
         parent.fill(t -> {
             t.name = "paused";
-            t.top().visible(() -> state.isPaused()).touchable = Touchable.disabled;
+            t.top().visible(() -> state.isPaused() && shown).touchable = Touchable.disabled;
             t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
@@ -368,9 +368,9 @@ public class HudFragment extends Fragment{
                     c.clearChildren();
 
                     for(Item item : content.items()){
-                        if(state.secinfo.getExport(item) >= 1){
+                        if(state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1){
                             c.image(item.icon(Cicon.small));
-                            c.label(() -> (int)state.secinfo.getExport(item) + " /s").color(Color.lightGray);
+                            c.label(() -> (int)state.rules.sector.info.getExport(item) + " /s").color(Color.lightGray);
                             c.row();
                         }
                     }
@@ -379,7 +379,7 @@ public class HudFragment extends Fragment{
                 c.update(() -> {
                     boolean wrong = false;
                     for(Item item : content.items()){
-                        boolean has = state.secinfo.getExport(item) >= 1;
+                        boolean has = state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1;
                         if(used.get(item.id) != has){
                             used.set(item.id, has);
                             wrong = true;
@@ -389,7 +389,7 @@ public class HudFragment extends Fragment{
                         rebuild.run();
                     }
                 });
-            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
+            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.rules.sector != null && state.rules.sector.info.getExport(i) > 0));
         });
 
         blockfrag.build(parent);
@@ -640,6 +640,8 @@ public class HudFragment extends Fragment{
             public void draw(){
                 float next = amount.get();
 
+                if(Float.isNaN(next) || Float.isInfinite(next)) next = 1f;
+
                 if(next < last && flash.get()){
                     blink = 1f;
                 }
@@ -647,6 +649,8 @@ public class HudFragment extends Fragment{
                 blink = Mathf.lerpDelta(blink, 0f, 0.2f);
                 value = Mathf.lerpDelta(value, next, 0.15f);
                 last = next;
+
+                if(Float.isNaN(value) || Float.isInfinite(value)) value = 1f;
 
                 drawInner(Pal.darkishGray);
 

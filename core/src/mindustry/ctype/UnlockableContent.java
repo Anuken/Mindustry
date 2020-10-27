@@ -24,6 +24,8 @@ public abstract class UnlockableContent extends MappableContent{
     public @Nullable String description;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
+    /** Special logic icon ID. */
+    public int iconId = 0;
     /** Icons by Cicon ID.*/
     protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
@@ -74,9 +76,11 @@ public abstract class UnlockableContent extends MappableContent{
             cicons[icon.ordinal()] =
                 Core.atlas.find(getContentType().name() + "-" + name + "-" + icon.name(),
                 Core.atlas.find(getContentType().name() + "-" + name + "-full",
+                Core.atlas.find(name + "-" + icon.name(),
+                Core.atlas.find(name + "-full",
                 Core.atlas.find(name,
                 Core.atlas.find(getContentType().name() + "-" + name,
-                Core.atlas.find(name + "1")))));
+                Core.atlas.find(name + "1")))))));
         }
         return cicons[icon.ordinal()];
     }
@@ -113,7 +117,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     /** Unlocks this content, but does not fire any events. */
-    public void quiteUnlock(){
+    public void quietUnlock(){
         if(!unlocked()){
             unlocked = true;
             Core.settings.put(name + "-unlocked", true);
@@ -121,8 +125,16 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean unlocked(){
-        if(net.client()) return state.rules.researched.contains(name);
+        if(net != null && net.client()) return state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
+    }
+
+    /** Locks this content again. */
+    public void clearUnlock(){
+        if(unlocked){
+            unlocked = false;
+            Core.settings.put(name + "-unlocked", false);
+        }
     }
 
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */

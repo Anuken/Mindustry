@@ -26,8 +26,6 @@ public class GameState{
     public GameStats stats = new GameStats();
     /** Global attributes of the environment, calculated by weather. */
     public Attributes envAttrs = new Attributes();
-    /** Sector information. Only valid in the campaign. */
-    public SectorInfo secinfo = new SectorInfo();
     /** Team data. Gets reset every new game. */
     public Teams teams = new Teams();
     /** Number of enemies in the game; only used clientside in servers. */

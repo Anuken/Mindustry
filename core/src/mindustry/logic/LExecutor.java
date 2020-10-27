@@ -15,6 +15,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
@@ -223,6 +224,7 @@ public class LExecutor{
             this.outX = outX;
             this.outY = outY;
             this.outFound = outFound;
+            this.outBuild = outBuild;
         }
 
         public UnitLocateI(){
@@ -245,7 +247,7 @@ public class LExecutor{
                     switch(locate){
                         case ore -> {
                             if(exec.obj(ore) instanceof Item item){
-                                res = indexer.findClosestOre(unit.x, unit.y, item);
+                                res = indexer.findClosestOre(unit, item);
                             }
                         }
                         case building -> {
@@ -272,8 +274,9 @@ public class LExecutor{
                         cache.found = false;
                         exec.setnum(outFound, 0);
                     }
-                    exec.setobj(outFound, res != null && res.build != null && res.build.team == exec.team ? res.build : null);
+                    exec.setobj(outBuild, res != null && res.build != null && res.build.team == exec.team ? cache.build = res.build : null);
                 }else{
+                    exec.setobj(outBuild, cache.build);
                     exec.setbool(outFound, cache.found);
                     exec.setnum(outX, cache.x);
                     exec.setnum(outY, cache.y);
@@ -284,20 +287,22 @@ public class LExecutor{
         static class Cache{
             float x, y;
             boolean found;
+            Building build;
         }
     }
 
     /** Controls the unit based on some parameters. */
     public static class UnitControlI implements LInstruction{
         public LUnitControl type = LUnitControl.move;
-        public int p1, p2, p3, p4;
+        public int p1, p2, p3, p4, p5;
 
-        public UnitControlI(LUnitControl type, int p1, int p2, int p3, int p4){
+        public UnitControlI(LUnitControl type, int p1, int p2, int p3, int p4, int p5){
             this.type = type;
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
             this.p4 = p4;
+            this.p5 = p5;
         }
 
         public UnitControlI(){
@@ -435,10 +440,11 @@ public class LExecutor{
                             }
 
                             ai.plan.set(x, y, rot, block);
-                            ai.plan.config = null;
+                            ai.plan.config = exec.obj(p5) instanceof Content c ? c : null;
+
+                            builder.clearBuilding();
 
                             if(ai.plan.tile() != null){
-                                builder.clearBuilding();
                                 builder.updateBuilding(true);
                                 builder.addBuild(ai.plan);
                             }
@@ -461,9 +467,8 @@ public class LExecutor{
                         if(ai.itemTimer > 0) return;
 
                         Building build = exec.building(p1);
-                        int amount = exec.numi(p2);
-                        int dropped = Math.min(unit.stack.amount, amount);
-                        if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange)){
+                        int dropped = Math.min(unit.stack.amount, exec.numi(p2));
+                        if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int accepted = build.acceptStack(unit.item(), dropped, unit);
                             if(accepted > 0){
                                 Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -477,7 +482,7 @@ public class LExecutor{
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
 
-                        if(build != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange)){
+                        if(build != null && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){
@@ -497,6 +502,7 @@ public class LExecutor{
         public int target;
         public LAccess type = LAccess.enabled;
         public int p1, p2, p3, p4;
+        public Interval timer = new Interval(1);
 
         public ControlI(LAccess type, int target, int p1, int p2, int p3, int p4){
             this.type = type;
@@ -512,7 +518,7 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id)){
+            if(obj instanceof Building b && b.team == exec.team && exec.linkIds.contains(b.id) && (type.cooldown <= 0 || timer.get(type.cooldown))){
                 if(type.isObj){
                     b.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
@@ -818,9 +824,15 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
+            int num1 = exec.numi(p1);
+
+            if(type == LogicDisplay.commandImage){
+                num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+            }
+
             //add graphics calls, cap graphics buffer size
             if(exec.graphicsBuffer.size < maxGraphicsBuffer){
-                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3), exec.numi(p4)));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), num1, exec.numi(p2), exec.numi(p3), exec.numi(p4)));
             }
         }
     }
@@ -871,10 +883,11 @@ public class LExecutor{
             if(v.isobj && value != 0){
                 String strValue =
                     v.objval == null ? "null" :
-                    v.objval instanceof String ? (String)v.objval :
+                    v.objval instanceof String s ? s :
+                    v.objval instanceof MappableContent content ? content.name :
                     v.objval instanceof Content ? "[content]" :
-                    v.objval instanceof Building ? "[building]" :
-                    v.objval instanceof Unit ? "[unit]" :
+                    v.objval instanceof Building build ? build.block.name :
+                    v.objval instanceof Unit unit ? unit.type.name :
                     "[object]";
 
                 exec.textBuffer.append(strValue);

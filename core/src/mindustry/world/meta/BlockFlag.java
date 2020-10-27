@@ -4,6 +4,8 @@ package mindustry.world.meta;
 public enum BlockFlag{
     /** Enemy core; primary target for all units. */
     core,
+    /** Vault/container/etc */
+    storage,
     /** Something that generates power. */
     generator,
     /** Any turret. */

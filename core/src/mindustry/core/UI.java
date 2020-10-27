@@ -378,6 +378,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.add(text).pad(2f).growX().wrap().get().setAlignment(Align.center);
             cont.row();
             cont.button("@ok", this::hide).size(120, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -405,6 +406,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.button("@ok", this::hide).size(110, 50).fillX().left();
             cont.row();
             cont.add(col).colspan(2).pad(2);
+            closeOnBack();
         }}.show();
     }
 
@@ -420,6 +422,7 @@ public class UI implements ApplicationListener, Loadable{
             cont.add(text).width(400f).wrap().get().setAlignment(align, align);
             cont.row();
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -427,6 +430,7 @@ public class UI implements ApplicationListener, Loadable{
         new Dialog(titleText){{
             cont.margin(15).add(text).width(400f).wrap().left().get().setAlignment(Align.left, Align.left);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -436,6 +440,7 @@ public class UI implements ApplicationListener, Loadable{
             titleTable.row();
             titleTable.image().color(Pal.accent).height(3f).growX().pad(2f);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -487,13 +492,19 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
+    /** Display text in the middle of the screen, then fade out. */
     public void announce(String text){
-        Table t = new Table();
+        announce(text, 3);
+    }
+
+    /** Display text in the middle of the screen, then fade out. */
+    public void announce(String text, float duration){
+        Table t = new Table(Styles.black3);
         t.touchable = Touchable.disabled;
-        t.background(Styles.black3).margin(8f)
-        .add(text).style(Styles.outlineLabel).labelAlign(Align.center);
+        t.margin(8f).add(text).style(Styles.outlineLabel).labelAlign(Align.center);
         t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
-        t.actions(Actions.fadeOut(3, Interp.pow4In), Actions.remove());
+        t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
+        t.pack();
         Core.scene.add(t);
     }
 

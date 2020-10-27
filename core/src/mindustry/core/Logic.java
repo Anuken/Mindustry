@@ -55,15 +55,14 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        Events.on(LaunchItemEvent.class, e -> state.secinfo.handleItemExport(e.stack));
-
         //when loading a 'damaged' sector, propagate the damage
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
-                state.secinfo.write();
+                SectorInfo info = state.rules.sector.info;
+                info.write();
 
                 //how much wave time has passed
-                int wavesPassed = state.secinfo.wavesPassed;
+                int wavesPassed = info.wavesPassed;
 
                 //wave has passed, remove all enemies, they are assumed to be dead
                 if(wavesPassed > 0){
@@ -84,10 +83,10 @@ public class Logic implements ApplicationListener{
                 }
 
                 //reset values
-                state.secinfo.damage = 0f;
-                state.secinfo.wavesPassed = 0;
-                state.secinfo.hasCore = true;
-                state.secinfo.secondsPassed = 0;
+                info.damage = 0f;
+                info.wavesPassed = 0;
+                info.hasCore = true;
+                info.secondsPassed = 0;
 
                 state.rules.sector.saveInfo();
             }
@@ -199,19 +198,13 @@ public class Logic implements ApplicationListener{
                 state.gameOver = true;
                 Events.fire(new GameOverEvent(state.rules.waveTeam));
             }else if(state.rules.attackMode){
-                Team alive = null;
+                //count # of teams alive
+                int countAlive = state.teams.getActive().count(TeamData::hasCore);
 
-                for(TeamData team : state.teams.getActive()){
-                    if(team.hasCore()){
-                        if(alive != null){
-                            return;
-                        }
-                        alive = team.team;
-                    }
-                }
-
-                if(alive != null && !state.gameOver){
-                    Events.fire(new GameOverEvent(alive));
+                if((countAlive <= 1 || (!state.rules.pvp && state.rules.defaultTeam.core() == null)) && !state.gameOver){
+                    //find team that won
+                    TeamData left = state.teams.getActive().find(TeamData::hasCore);
+                    Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
             }
@@ -252,7 +245,7 @@ public class Logic implements ApplicationListener{
         if(!(content instanceof UnlockableContent u)) return;
 
         state.rules.researched.add(u.name);
-        ui.hudfrag.showUnlock(u);
+        Events.fire(new UnlockEvent(u));
     }
 
     @Override
@@ -279,7 +272,7 @@ public class Logic implements ApplicationListener{
                 state.teams.updateTeamStats();
 
                 if(state.isCampaign()){
-                    state.secinfo.update();
+                    state.rules.sector.info.update();
                 }
 
                 if(state.isCampaign()){

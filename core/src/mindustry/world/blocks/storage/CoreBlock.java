@@ -339,15 +339,15 @@ public class CoreBlock extends StorageBlock{
         public void itemTaken(Item item){
             if(state.isCampaign() && team == state.rules.defaultTeam){
                 //update item taken amount
-                state.secinfo.handleCoreItem(item, -1);
+                state.rules.sector.info.handleCoreItem(item, -1);
             }
         }
 
         @Override
         public void handleItem(Building source, Item item){
             if(net.server() || !net.active()){
-                if(team == state.rules.defaultTeam){
-                    state.secinfo.handleCoreItem(item, 1);
+                if(team == state.rules.defaultTeam && state.isCampaign()){
+                    state.rules.sector.info.handleCoreItem(item, 1);
                 }
 
                 if(items.get(item) >= getMaximumAccepted(item)){

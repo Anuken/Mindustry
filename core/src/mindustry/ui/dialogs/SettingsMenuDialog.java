@@ -14,8 +14,11 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -111,6 +114,37 @@ public class SettingsMenuDialog extends SettingsDialog{
             t.button("@settings.clearsaves", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> {
                     control.saves.deleteAll();
+                });
+            }).marginLeft(4);
+
+            t.row();
+
+            t.button("@settings.clearresearch", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
+                    for(TechNode node : TechTree.all){
+                        node.reset();
+                    }
+                    content.each(c -> {
+                        if(c instanceof UnlockableContent u){
+                            u.clearUnlock();
+                        }
+                    });
+                });
+            }).marginLeft(4);
+
+            t.row();
+
+            t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
+                    for(var planet : content.planets()){
+                        for(var sec : planet.sectors){
+                            sec.clearInfo();
+                            if(sec.save != null){
+                                sec.save.delete();
+                                sec.save = null;
+                            }
+                        }
+                    }
                 });
             }).marginLeft(4);
 
@@ -247,7 +281,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+
         if(!mobile){
+            game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
         }
 

@@ -288,6 +288,10 @@ public class Schematics implements Loadable{
         return loadouts.get(block, Seq::new);
     }
 
+    public ObjectMap<CoreBlock, Seq<Schematic>> getLoadouts(){
+        return loadouts;
+    }
+
     /** Checks a schematic for deployment validity and adds it to the cache. */
     private void checkLoadout(Schematic s, boolean validate){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);

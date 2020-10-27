@@ -15,8 +15,7 @@ import static mindustry.Vars.*;
 
 /** A small section of a planet. */
 public class Sector{
-    private static final Seq<Sector> tmpSeq1 = new Seq<>(), tmpSeq2 = new Seq<>(), tmpSeq3 = new Seq<>();
-    private static final ObjectSet<Sector> tmpSet = new ObjectSet<>();
+    private static final Seq<Sector> tmpSeq1 = new Seq<>();
 
     public final SectorRect rect;
     public final Plane plane;
@@ -78,6 +77,12 @@ public class Sector{
 
     public void loadInfo(){
         info = Core.settings.getJson(planet.name + "-s-" + id + "-info", SectorInfo.class, SectorInfo::new);
+    }
+
+    /** Removes any sector info. */
+    public void clearInfo(){
+        info = new SectorInfo();
+        Core.settings.remove(planet.name + "-s-" + id + "-info");
     }
 
     public float getProductionScale(){

@@ -156,7 +156,6 @@ public class SectorInfo{
         damage = 0;
 
         if(state.rules.sector != null){
-            state.rules.sector.info = this;
             state.rules.sector.saveInfo();
         }
 

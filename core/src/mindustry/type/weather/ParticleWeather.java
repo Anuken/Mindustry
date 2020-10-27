@@ -34,7 +34,7 @@ public class ParticleWeather extends Weather{
 
         //load noise texture
         //TODO mod support
-        if(drawNoise){
+        if(drawNoise && Core.assets != null){
             Core.assets.load("sprites/" + noisePath + ".png", Texture.class);
         }
     }
@@ -74,7 +74,7 @@ public class ParticleWeather extends Weather{
             float sspeed = 1f, sscl = 1f, salpha = 1f, offset = 0f;
             Color col = Tmp.c1.set(noiseColor);
             for(int i = 0; i < noiseLayers; i++){
-                drawNoise(noise, noiseColor, noiseScale * sscl, state.opacity * salpha * opacityMultiplier, baseSpeed * sspeed, state.intensity, windx, windy, offset);
+                drawNoise(noise, noiseColor, noiseScale * sscl, state.opacity * salpha * opacityMultiplier, sspeed * (useWindVector ? 1f : baseSpeed), state.intensity, windx, windy, offset);
                 sspeed *= noiseLayerSpeedM;
                 salpha *= noiseLayerAlphaM;
                 sscl *= noiseLayerSclM;

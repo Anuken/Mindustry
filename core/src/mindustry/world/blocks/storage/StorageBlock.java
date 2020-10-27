@@ -11,6 +11,7 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import mindustry.world.meta.*;
 
 public class StorageBlock extends Block{
+
     public StorageBlock(String name){
         super(name);
         hasItems = true;

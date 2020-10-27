@@ -276,7 +276,7 @@ public class UnitTypes implements ContentList{
             armor = 1f;
             commandLimit = 8;
 
-            abilities.add(new HealFieldAbility(10f, 60f * 4, 60f));
+            abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
             ammoType = AmmoTypes.power;
 
             weapons.add(new Weapon("heal-weapon"){{
@@ -305,7 +305,7 @@ public class UnitTypes implements ContentList{
             mineSpeed = 5f;
             commandLimit = 8;
 
-            abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 5, 60f));
+            abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
             ammoType = AmmoTypes.power;
 
             weapons.add(new Weapon("heal-shotgun-weapon"){{
@@ -1127,7 +1127,7 @@ public class UnitTypes implements ContentList{
             flying = true;
             drag = 0.06f;
             accel = 0.12f;
-            speed = 1.1f;
+            speed = 1.5f;
             health = 100;
             engineSize = 1.8f;
             engineOffset = 5.7f;
@@ -1145,7 +1145,7 @@ public class UnitTypes implements ContentList{
 
             flying = true;
             drag = 0.05f;
-            speed = 1.9f;
+            speed = 2.6f;
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 130f;
@@ -1154,14 +1154,13 @@ public class UnitTypes implements ContentList{
             engineOffset = 6.5f;
             hitSize = 8f;
             lowAltitude = true;
-            isCounted = false;
 
             ammoType = AmmoTypes.power;
 
             mineTier = 2;
             mineSpeed = 3.5f;
 
-            abilities.add(new HealFieldAbility(5f, 60f * 5, 50f));
+            abilities.add(new RepairFieldAbility(5f, 60f * 5, 50f));
 
             weapons.add(new Weapon("heal-weapon-mount"){{
                 top = false;
@@ -1201,7 +1200,7 @@ public class UnitTypes implements ContentList{
             mineTier = 3;
             health = 500;
             armor = 5f;
-            speed = 1.8f;
+            speed = 2.4f;
             accel = 0.06f;
             drag = 0.017f;
             lowAltitude = true;
@@ -1235,7 +1234,7 @@ public class UnitTypes implements ContentList{
         quad = new UnitType("quad"){{
             armor = 8f;
             health = 6000;
-            speed = 1.2f;
+            speed = 1.4f;
             rotateSpeed = 2f;
             accel = 0.05f;
             drag = 0.017f;
@@ -1300,7 +1299,7 @@ public class UnitTypes implements ContentList{
         oct = new UnitType("oct"){{
             armor = 16f;
             health = 24000;
-            speed = 0.6f;
+            speed = 0.8f;
             rotateSpeed = 1f;
             accel = 0.04f;
             drag = 0.018f;
@@ -1318,7 +1317,7 @@ public class UnitTypes implements ContentList{
             ammoCapacity = 1300;
             ammoResupplyAmount = 20;
 
-            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new HealFieldAbility(130f, 60f * 2, 140f));
+            abilities.add(new ForceFieldAbility(140f, 4f, 7000f, 60f * 8), new RepairFieldAbility(130f, 60f * 2, 140f));
         }};
 
         //endregion
@@ -1430,7 +1429,7 @@ public class UnitTypes implements ContentList{
             trailY = -9f;
             trailScl = 1.5f;
 
-            abilities.add(new ShieldFieldAbility(20f, 40f, 60f * 4, 60f));
+            abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 4, 60f));
 
             weapons.add(new Weapon("large-artillery"){{
                 reload = 65f;
@@ -1547,7 +1546,7 @@ public class UnitTypes implements ContentList{
                 xRand = 8f;
                 shotDelay = 1f;
 
-                bullet = new MissileBulletType(4.2f, 30){{
+                bullet = new MissileBulletType(4.2f, 40){{
                     homingPower = 0.12f;
                     width = 8f;
                     height = 8f;
@@ -1555,8 +1554,8 @@ public class UnitTypes implements ContentList{
                     drag = -0.003f;
                     homingRange = 80f;
                     keepVelocity = false;
-                    splashDamageRadius = 30f;
-                    splashDamage = 35f;
+                    splashDamageRadius = 35f;
+                    splashDamage = 45f;
                     lifetime = 56f;
                     trailColor = Pal.bulletYellowBack;
                     backColor = Pal.bulletYellowBack;
@@ -1569,7 +1568,7 @@ public class UnitTypes implements ContentList{
             }});
 
             weapons.add(new Weapon("large-bullet-mount"){{
-                reload = 80f;
+                reload = 60f;
                 cooldownTime = 90f;
                 x = 70f/4f;
                 y = -66f/4f;
@@ -1584,7 +1583,7 @@ public class UnitTypes implements ContentList{
                 shots = 3;
                 shotDelay = 4f;
                 inaccuracy = 1f;
-                bullet = new BasicBulletType(7f, 50){{
+                bullet = new BasicBulletType(7f, 55){{
                     width = 13f;
                     height = 19f;
                     shootEffect = Fx.shootBig;
@@ -1650,7 +1649,7 @@ public class UnitTypes implements ContentList{
             isCounted = false;
 
             flying = true;
-            mineSpeed = 6f;
+            mineSpeed = 6.5f;
             mineTier = 1;
             buildSpeed = 0.5f;
             drag = 0.05f;
@@ -1736,7 +1735,7 @@ public class UnitTypes implements ContentList{
             itemCapacity = 70;
             health = 220f;
             engineOffset = 6f;
-            hitSize = 10f;
+            hitSize = 11f;
             commandLimit = 7;
 
             weapons.add(new Weapon("small-mount-weapon"){{
@@ -1771,6 +1770,7 @@ public class UnitTypes implements ContentList{
                 health = 1;
                 rotateSpeed = 360f;
                 itemCapacity = 0;
+                commandLimit = 0;
             }
 
             @Override

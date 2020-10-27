@@ -100,6 +100,8 @@ public class Block extends UnlockableContent{
     public boolean autoResetEnabled = true;
     /** if true, the block stops updating when disabled */
     public boolean noUpdateDisabled = false;
+    /** Whether to use this block's color in the minimap. Only used for overlays. */
+    public boolean useColor = true;
     /** tile entity health */
     public int health = -1;
     /** base block explosiveness */
@@ -131,6 +133,8 @@ public class Block extends UnlockableContent{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** If true, this block can be configured by logic. */
+    public boolean logicConfigurable = false;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
@@ -187,8 +191,6 @@ public class Block extends UnlockableContent{
     public float buildCost;
     /** Whether this block is visible and can currently be built. */
     public BuildVisibility buildVisibility = BuildVisibility.hidden;
-    /** Defines when this block can be placed. */
-    public BuildPlaceability buildPlaceability = BuildPlaceability.always;
     /** Multiplier for speed of building this block. */
     public float buildCostMultiplier = 1f;
     /** Multiplier for cost of research in tech tree. */
@@ -354,7 +356,7 @@ public class Block extends UnlockableContent{
                 current = entity -> entity.liquids == null ? Liquids.water : entity.liquids.current();
             }
             bars.add("liquid", entity -> new Bar(() -> entity.liquids.get(current.get(entity)) <= 0.001f ? Core.bundle.get("bar.liquid") : current.get(entity).localizedName,
-            () -> current.get(entity).barColor(), () -> entity.liquids.get(current.get(entity)) / liquidCapacity));
+            () -> current.get(entity).barColor(), () -> entity == null || entity.liquids == null ? 0f : entity.liquids.get(current.get(entity)) / liquidCapacity));
         }
 
         if(hasPower && consumes.hasPower()){
@@ -517,7 +519,7 @@ public class Block extends UnlockableContent{
     }
 
     public boolean isPlaceable(){
-        return isVisible() && buildPlaceability.placeable() && !state.rules.bannedBlocks.contains(this);
+        return isVisible() && !state.rules.bannedBlocks.contains(this);
     }
 
     /** Called when building of this block begins. */
@@ -528,11 +530,6 @@ public class Block extends UnlockableContent{
     /** Called right before building of this block begins. */
     public void beforePlaceBegan(Tile tile, Block previous){
 
-    }
-
-    /** @return a message detailing why this block can't be placed. */
-    public String unplaceableMessage(){
-        return state.rules.bannedBlocks.contains(this) ? Core.bundle.get("banned") : buildPlaceability.message();
     }
 
     public boolean isFloor(){
@@ -620,7 +617,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 40 + Mathf.round(Mathf.pow(requirements[i].amount, 1.15f) * 20 * researchCostMultiplier, 10);
+            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.15f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
@@ -671,6 +668,14 @@ public class Block extends UnlockableContent{
         stats.useCategories = true;
 
         consumes.init();
+
+        if(!logicConfigurable){
+            configurations.each((key, val) -> {
+                if(UnlockableContent.class.isAssignableFrom(key)){
+                    logicConfigurable = true;
+                }
+            });
+        }
 
         if(!outputsPower && consumes.hasPower() && consumes.getPower().buffered){
             throw new IllegalArgumentException("Consumer using buffered power: " + name);

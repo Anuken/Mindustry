@@ -1,7 +1,6 @@
 package mindustry.editor;
 
 import arc.*;
-import arc.input.*;
 import arc.math.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -35,15 +34,9 @@ public class WaveInfoDialog extends BaseDialog{
         super("@waves.title");
 
         shown(this::setup);
-        hidden(() -> {
-            state.rules.spawns = groups;
-        });
+        hidden(() -> state.rules.spawns = groups);
 
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+        addCloseListener();
 
         onResize(this::setup);
         addCloseButton();
@@ -101,6 +94,14 @@ public class WaveInfoDialog extends BaseDialog{
                 view(1);
             }
         });
+
+        if(experimental){
+            buttons.button("Random", Icon.refresh, () -> {
+                groups.clear();
+                groups = DefaultWaves.generate(1f / 10f);
+                updateWaves();
+            }).width(200f);
+        }
     }
 
     void view(int amount){
@@ -159,7 +160,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.margin(0).defaults().pad(3).padLeft(5f).growX().left();
                     t.button(b -> {
                         b.left();
-                        b.image(group.type.icon(mindustry.ui.Cicon.medium)).size(32f).padRight(3);
+                        b.image(group.type.icon(Cicon.medium)).size(32f).padRight(3).scaling(Scaling.fit);
                         b.add(group.type.localizedName).color(Pal.accent);
 
                         b.add().growX();
@@ -262,7 +263,7 @@ public class WaveInfoDialog extends BaseDialog{
                 if(type.isHidden()) continue;
                 p.button(t -> {
                     t.left();
-                    t.image(type.icon(Cicon.medium)).size(40f).padRight(2f);
+                    t.image(type.icon(Cicon.medium)).size(8 * 4).scaling(Scaling.fit).padRight(2f);
                     t.add(type.localizedName);
                 }, () -> {
                     lastType = type;

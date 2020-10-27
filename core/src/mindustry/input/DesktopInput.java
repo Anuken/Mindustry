@@ -279,7 +279,7 @@ public class DesktopInput extends InputHandler{
 
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
-            }else if(!selectRequests.isEmpty()){
+            }else if(!selectRequests.isEmpty() && !ui.chatfrag.shown()){
                 rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
             }
         }
@@ -610,7 +610,7 @@ public class DesktopInput extends InputHandler{
             baseSpeed = unit.minFormationSpeed * 0.95f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : unit.type.canBoost ? unit.type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = baseSpeed * Mathf.lerp(1f, unit.type.canBoost ? unit.type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -660,7 +660,7 @@ public class DesktopInput extends InputHandler{
         }
 
         //update commander unit
-        if(Core.input.keyTap(Binding.command)){
+        if(Core.input.keyTap(Binding.command) && unit.type.commandLimit > 0){
             Call.unitCommand(player);
         }
     }

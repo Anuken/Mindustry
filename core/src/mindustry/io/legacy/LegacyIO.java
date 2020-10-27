@@ -70,7 +70,7 @@ public class LegacyIO{
                             String name = stream.readUTF();
                             Content out = Vars.content.getByName(type, name);
                             if(out instanceof UnlockableContent u){
-                                u.unlock();
+                                u.quietUnlock();
                             }
                         }
                     }

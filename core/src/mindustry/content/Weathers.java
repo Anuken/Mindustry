@@ -39,7 +39,7 @@ public class Weathers implements ContentList{
             minAlpha = 0f;
             maxAlpha = 0.2f;
             density = 1500f;
-            baseSpeed = 6.1f;
+            baseSpeed = 5.4f;
             attrs.set(Attribute.light, -0.1f);
             attrs.set(Attribute.water, -0.1f);
             opacityMultiplier = 0.8f;

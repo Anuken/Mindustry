@@ -27,8 +27,12 @@ public class SectorDamage{
 
     /** @return calculated capture progress of the enemy */
     public static float getDamage(SectorInfo info){
+        return getDamage(info, info.wavesPassed);
+    }
+
+    /** @return calculated capture progress of the enemy */
+    public static float getDamage(SectorInfo info, int wavesPassed){
         float health = info.sumHealth;
-        int wavesPassed = info.wavesPassed;
         int wave = info.wave;
         float waveSpace = info.waveSpacing;
 
@@ -82,13 +86,13 @@ public class SectorDamage{
     /** Applies wave damage based on sector parameters. */
     public static void applyCalculatedDamage(){
         //calculate base damage fraction
-        float damage = getDamage(state.secinfo);
+        float damage = getDamage(state.rules.sector.info);
 
         //scaled damage has a power component to make it seem a little more realistic (as systems fail, enemy capturing gets easier and easier)
         float scaled = Mathf.pow(damage, 1.5f);
 
         //apply damage to units
-        float unitDamage = damage * state.secinfo.sumHealth;
+        float unitDamage = damage * state.rules.sector.info.sumHealth;
         Tile spawn = spawner.getFirstSpawn();
 
         //damage only units near the spawn point
@@ -114,7 +118,7 @@ public class SectorDamage{
             }
         }
 
-        if(state.secinfo.wavesPassed > 0){
+        if(state.rules.sector.info.wavesPassed > 0){
             //simply remove each block in the spawner range if a wave passed
             for(Tile spawner : spawner.getSpawns()){
                 spawner.circle((int)(state.rules.dropZoneRadius / tilesize), tile -> {
@@ -207,7 +211,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 7;
+        int radius = 9;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -265,7 +269,7 @@ public class SectorDamage{
 
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
-                if(unit.abilities.find(a -> a instanceof HealFieldAbility) instanceof HealFieldAbility h){
+                if(unit.abilities.find(a -> a instanceof RepairFieldAbility) instanceof RepairFieldAbility h){
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{

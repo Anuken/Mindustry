@@ -14,7 +14,7 @@ public enum LUnitControl{
     payTake("takeUnits"),
     mine("x", "y"),
     flag("value"),
-    build("x", "y", "block", "rotation"),
+    build("x", "y", "block", "rotation", "config"),
     getBlock("x", "y", "type", "building"),
     within("x", "y", "radius", "result");
 
