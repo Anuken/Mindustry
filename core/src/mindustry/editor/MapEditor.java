@@ -157,7 +157,7 @@ public class MapEditor{
     boolean hasOverlap(int x, int y){
         Tile tile = world.tile(x, y);
         //allow direct replacement of blocks of the same size
-        if(tile != null && tile.isCenter() && tile.block() != drawBlock && tile.block().size == drawBlock.size){
+        if(tile != null && tile.isCenter() && tile.block() != drawBlock && tile.block().size == drawBlock.size && tile.x == x && tile.y == y){
             return false;
         }
 
@@ -168,12 +168,10 @@ public class MapEditor{
             for(int dy = 0; dy < drawBlock.size; dy++){
                 int worldx = dx + offsetx + x;
                 int worldy = dy + offsety + y;
-                if(!(worldx == x && worldy == y)){
-                    Tile other = world.tile(worldx, worldy);
+                Tile other = world.tile(worldx, worldy);
 
-                    if(other != null && other.block().isMultiblock()){
-                        return true;
-                    }
+                if(other != null && other.block().isMultiblock()){
+                    return true;
                 }
             }
         }

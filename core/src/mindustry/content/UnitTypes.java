@@ -1290,7 +1290,7 @@ public class UnitTypes implements ContentList{
                     collides = false;
 
                     healPercent = 15f;
-                    splashDamage = 320f;
+                    splashDamage = 240f;
                     splashDamageRadius = 120f;
                 }};
             }});
