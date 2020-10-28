@@ -296,10 +296,11 @@ public class Schematics implements Loadable{
     /** Checks a schematic for deployment validity and adds it to the cache. */
     private void checkLoadout(Schematic s, boolean validate){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
+        int cores = s.tiles.count(t -> t.block instanceof CoreBlock);
 
         //make sure a core exists, and that the schematic is small enough.
         if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2
-            || s.tiles.contains(t -> t.block.buildVisibility == BuildVisibility.sandboxOnly)))) return;
+            || s.tiles.contains(t -> t.block.buildVisibility == BuildVisibility.sandboxOnly || !t.block.unlocked()) || cores > 1))) return;
 
         //place in the cache
         loadouts.get((CoreBlock)core.block, Seq::new).add(s);
