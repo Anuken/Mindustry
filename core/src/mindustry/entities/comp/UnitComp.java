@@ -106,7 +106,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
             case flag -> flag;
-            case bounded -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
+            case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };

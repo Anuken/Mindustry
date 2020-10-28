@@ -30,7 +30,7 @@ public enum LAccess{
     team,
     type,
     flag,
-    bounded,
+    controlled,
     name,
     config,
     payloadCount,
