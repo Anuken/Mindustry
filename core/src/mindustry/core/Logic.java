@@ -245,7 +245,7 @@ public class Logic implements ApplicationListener{
         if(!(content instanceof UnlockableContent u)) return;
 
         state.rules.researched.add(u.name);
-        ui.hudfrag.showUnlock(u);
+        Events.fire(new UnlockEvent(u));
     }
 
     @Override

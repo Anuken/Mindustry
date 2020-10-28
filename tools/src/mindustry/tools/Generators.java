@@ -22,6 +22,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -309,7 +310,7 @@ public class Generators{
                             Log.info("saving VOID icon @ / @", icon, "../ui/block-" + block.name + "-" + icon.name());
                         }
 
-                        if(icon == logicIcon && block.synthetic() && !block.isHidden()){
+                        if(icon == logicIcon && block.synthetic() && block.buildVisibility != BuildVisibility.hidden){
                             image.save(block.name + "-icon-logic");
                         }
                     }
