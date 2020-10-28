@@ -137,7 +137,7 @@ public class MapEditor{
 
                 if(isFloor){
                     tile.setFloor(drawBlock.asFloor());
-                }else{
+                }else if(!(tile.block().isMultiblock() && !drawBlock.isMultiblock())){
                     if(drawBlock.rotate && tile.build != null && tile.build.rotation != rotation){
                         addTileOp(TileOp.get(tile.x, tile.y, (byte)OpType.rotation.ordinal(), (byte)rotation));
                     }
