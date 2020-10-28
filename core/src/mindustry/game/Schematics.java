@@ -33,6 +33,7 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -297,7 +298,8 @@ public class Schematics implements Loadable{
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
 
         //make sure a core exists, and that the schematic is small enough.
-        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2))) return;
+        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2
+            || s.tiles.contains(t -> t.block.buildVisibility == BuildVisibility.sandboxOnly)))) return;
 
         //place in the cache
         loadouts.get((CoreBlock)core.block, Seq::new).add(s);

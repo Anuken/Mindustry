@@ -9,7 +9,9 @@ import mindustry.type.*;
 
 import static mindustry.content.UnitTypes.*;
 
-public class DefaultWaves{
+public class Waves{
+    public static final int waveVersion = 1;
+
     private Seq<SpawnGroup> spawns;
 
     public Seq<SpawnGroup> get(){
@@ -337,7 +339,7 @@ public class DefaultWaves{
             step += (int)(rand.random(15, 30) * Mathf.lerp(1f, 0.5f, difficulty));
         }
 
-        int bossWave = (int)(rand.random(30, 60) * Mathf.lerp(1f, 0.7f, difficulty));
+        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.6f, difficulty));
         int bossSpacing = (int)(rand.random(25, 40) * Mathf.lerp(1f, 0.6f, difficulty));
 
         //main boss progression

@@ -187,7 +187,7 @@ public class Vars implements Loadable{
     public static ContentLoader content;
     public static GameState state;
     public static EntityCollisions collisions;
-    public static DefaultWaves defaultWaves;
+    public static Waves waves;
     public static LoopControl loops;
     public static Platform platform = new Platform(){};
     public static Mods mods;
@@ -256,7 +256,7 @@ public class Vars implements Loadable{
 
         content = new ContentLoader();
         loops = new LoopControl();
-        defaultWaves = new DefaultWaves();
+        waves = new Waves();
         collisions = new EntityCollisions();
         world = new World();
         universe = new Universe();

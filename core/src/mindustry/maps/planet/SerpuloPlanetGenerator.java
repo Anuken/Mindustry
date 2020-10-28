@@ -420,7 +420,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         state.rules.waves = sector.info.waves = true;
 
         //TODO better waves
-        state.rules.spawns = DefaultWaves.generate(difficulty);
+        state.rules.spawns = Waves.generate(difficulty);
     }
 
     @Override
