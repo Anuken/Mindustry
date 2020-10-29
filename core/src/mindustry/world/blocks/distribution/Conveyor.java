@@ -94,15 +94,15 @@ public class Conveyor extends Block implements Autotiler{
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
             req.tile().block() instanceof Conveyor &&
-            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1) {
+            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1){
             return Blocks.junction;
         }
 
         int ogRot = req.rotation;
-        for(int i = 0;i < 2;i ++) {
+        for(int i = 0;i < 2;i ++){
             //TODO: automatically generate bridges?
             Block[] bridges = {Blocks.itemBridge, Blocks.phaseConveyor};
-            for(int j = 0;j < bridges.length;j ++) {
+            for(int j = 0;j < bridges.length;j ++){
                 final int distance = ((ItemBridge)bridges[j]).range;
                 if(req.block instanceof Conveyor && !thisPlaceableOn(frontTile(req.x, req.y, req.rotation)) && requests.contains(o -> 
                     (o.block instanceof Conveyor || o.block instanceof ItemBridge) && 
@@ -110,7 +110,7 @@ public class Conveyor extends Block implements Autotiler{
                     thisPlaceableOn(world.tile(o.x, o.y)) &&
                     !thisPlaceableOn(frontTile(o.x, o.y, (req.rotation + 2) % 4)) && 
                     inFront(req.x, req.y, req.rotation, o) && 
-                    Mathf.dstm(req.x, req.y, o.x, o.y) <= distance)) {
+                    Mathf.dstm(req.x, req.y, o.x, o.y) <= distance)){
                     return bridges[j];
                 }
             }
@@ -122,17 +122,17 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     /** Whether the second build plan is "in front" of the first. */
-    public boolean inFront(int x, int y, int rotation, BuildPlan other) {
+    public boolean inFront(int x, int y, int rotation, BuildPlan other){
         return !(other.x == x && other.y == y) && (other.x - x) == Geometry.d4x(rotation) * Math.abs(other.x - x) && (other.y - y) == Geometry.d4y(rotation) * Math.abs(other.y - y); 
     }
 
     /** Returns the tile in front of this one. */
-    public Tile frontTile(int x, int y, int rotation) {
+    public Tile frontTile(int x, int y, int rotation){
         return world.tile(x + Geometry.d4x(rotation), y + Geometry.d4y(rotation));
     }
 
     /** Whether this block can be placed on this tile. */
-    public boolean thisPlaceableOn(Tile tile) {
+    public boolean thisPlaceableOn(Tile tile){
         return (tile.block() instanceof Conveyor || tile.block() == Blocks.air) && !tile.floor().isDeep();
     }
 
