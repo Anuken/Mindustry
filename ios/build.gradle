@@ -49,7 +49,7 @@ robovm{
     if(project.hasProperty("signIdentity")) println "iOS Sign Identity: " + project.property("signIdentity")
     if(project.hasProperty("provisioningProfile")) println "iOS Provisioning Profile: " + project.property("provisioningProfile")
 
-    iosSignIdentity = project.property("signIdentity")
-    iosProvisioningProfile = project.property("provisioningProfile")
+    iosSignIdentity = project.properties["signIdentity"]
+    iosProvisioningProfile = project.properties["provisioningProfile"]
     iosSkipSigning = false
 }
