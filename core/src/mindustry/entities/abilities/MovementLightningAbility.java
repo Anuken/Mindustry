@@ -11,8 +11,8 @@ import mindustry.gen.*;
 public class MovementLightningAbility extends Ability{
     //Lightning damage
     public float damage = 35f;
-    //Ticks between firing
-    public float reload = 15f;
+    //Chance of firing every tick. Set >= 1 to always fire lightning every tick at max speed.
+    public float chance = 0.15f;
     //Length of the lightning
     public int length = 12;
     //Speeds for when to start lightninging and when to stop getting faster
@@ -25,10 +25,10 @@ public class MovementLightningAbility extends Ability{
     
     MovementLightningAbility(){}
     
-    public MovementLightningAbility(float damage, int length, float reload, float minSpeed, float maxSpeed, Color color){
+    public MovementLightningAbility(float damage, int length, float chance, float minSpeed, float maxSpeed, Color color){
         this.damage = damage;
         this.length = length;
-        this.reload = reload;
+        this.chance = chance;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
@@ -37,7 +37,7 @@ public class MovementLightningAbility extends Ability{
     @Override
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
-        if(Mathf.chance(Time.delta * (reload/10 * scl))){
+        if(Mathf.chance(Time.delta * (chance * scl))){
             shootEffect.at(unit.x, unit.y, unit.rotation, color);
             Lightning.create(unit.team, color, damage, unit.x + unit.vel().x, unit.y + unit.vel().y, unit.rotation, length);
             shootSound.at(unit.x, unit.y);
