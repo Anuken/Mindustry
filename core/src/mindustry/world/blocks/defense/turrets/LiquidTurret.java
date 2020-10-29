@@ -144,7 +144,7 @@ public class LiquidTurret extends Turret{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null
-                && (liquids.current() == liquid || (ammoTypes.containsKey(liquids.current())
+                && (liquids.current() == liquid || (ammoTypes.containsKey(liquid)
                 && liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f));
         }
     }
