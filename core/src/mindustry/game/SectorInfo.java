@@ -208,8 +208,7 @@ public class SectorInfo{
                 }
 
                 //get item delta
-                //TODO is preventing negative production a good idea?
-                int delta = Math.max(ent == null ? 0 : coreItemCounts[item.id], 0);
+                int delta = coreItemCounts[item.id];
 
                 //store means
                 stat.means.add(delta);
