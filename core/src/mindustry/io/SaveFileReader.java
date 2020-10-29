@@ -117,11 +117,8 @@ public abstract class SaveFileReader{
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
     public int readChunk(DataInput input, boolean isShort, IORunner<DataInput> runner) throws IOException{
         int length = isShort ? input.readUnsignedShort() : input.readInt();
-        int pos = currCounter.count;
         lastRegionLength = length;
         runner.accept(input);
-
-        if(pos + length != currCounter.count) throw new IOException("Read length mismatch. Expected: " + length + ", Actual: " + (currCounter.count - pos));
         return length;
     }
 
