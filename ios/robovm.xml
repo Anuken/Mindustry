@@ -37,6 +37,8 @@
     </forceLinkClasses>
     <libs>
         <lib>z</lib>
+        <lib>arc</lib>
+        <lib>arc-freetype</lib>
     </libs>
     <frameworks>
         <framework>UIKit</framework>
