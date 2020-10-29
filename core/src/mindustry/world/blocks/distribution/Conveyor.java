@@ -53,7 +53,7 @@ public class Conveyor extends Block implements Autotiler{
         super.setStats();
         
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
-        stats.add(BlockStat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        return (otherblock.outputsItems() || lookingAt(tile, rotation, otherx, othery, otherblock))
+        return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
             && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
@@ -201,7 +201,7 @@ public class Conveyor extends Block implements Autotiler{
                 lastInserted = build.lastInserted;
                 mid = build.mid;
                 minitem = build.minitem;
-                items.addAll(build.items);
+                items.add(build.items);
             }
         }
 
@@ -228,7 +228,7 @@ public class Conveyor extends Block implements Autotiler{
         @Override
         public void unitOn(Unit unit){
 
-            if(clogHeat > 0.5f) return;
+            if(clogHeat > 0.5f || !enabled) return;
 
             noSleep();
 

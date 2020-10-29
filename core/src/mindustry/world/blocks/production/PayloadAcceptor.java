@@ -95,7 +95,7 @@ public class PayloadAcceptor extends Block{
             updatePayload();
 
             payRotation = Mathf.slerpDelta(payRotation, rotate ? rotdeg() : 90f, 0.3f);
-            payVector.approachDelta(Vec2.ZERO, payloadSpeed);
+            payVector.approach(Vec2.ZERO, payloadSpeed * delta());
 
             return hasArrived();
         }
@@ -105,7 +105,7 @@ public class PayloadAcceptor extends Block{
 
             updatePayload();
 
-            payVector.trns(rotdeg(), payVector.len() + edelta() * payloadSpeed);
+            payVector.trns(rotdeg(), payVector.len() + delta() * payloadSpeed);
             payRotation = rotdeg();
 
             if(payVector.len() >= size * tilesize/2f){

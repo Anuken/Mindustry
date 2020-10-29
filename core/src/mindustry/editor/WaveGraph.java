@@ -81,7 +81,7 @@ public class WaveGraph extends Table{
                 for(int i = 0; i < values.length; i++){
                     float sum = 0;
                     for(UnitType type : used.orderedItems()){
-                        sum += type.health * values[i][type.id];
+                        sum += (type.health) * values[i][type.id];
                     }
 
                     float cx = graphX + i*spacing, cy = 2f + graphY + sum * (graphH - 4f) / maxHealth;
@@ -154,13 +154,13 @@ public class WaveGraph extends Table{
             int sum = 0;
 
             for(SpawnGroup spawn : groups){
-                int spawned = spawn.getUnitsSpawned(i);
+                int spawned = spawn.getSpawned(i);
                 values[index][spawn.type.id] += spawned;
                 if(spawned > 0){
                     used.add(spawn.type);
                 }
                 max = Math.max(max, values[index][spawn.type.id]);
-                healthsum += spawned * spawn.type.health;
+                healthsum += spawned * (spawn.type.health);
                 sum += spawned;
             }
             maxTotal = Math.max(maxTotal, sum);

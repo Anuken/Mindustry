@@ -289,7 +289,7 @@ public class PlacementFragment extends Fragment{
 
                             topTable.table(header -> {
                                 String keyCombo = "";
-                                if(!mobile && Core.settings.getBool("blockselectkeys")){
+                                if(!mobile){
                                     Seq<Block> blocks = getByCategory(currentCategory);
                                     for(int i = 0; i < blocks.size; i++){
                                         if(blocks.get(i) == displayBlock && (i + 1) / 10 - 1 < blockSelect.length){
@@ -342,7 +342,7 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : displayBlock.unplaceableMessage()).width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "@unit.nobuild" : "@banned").width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }

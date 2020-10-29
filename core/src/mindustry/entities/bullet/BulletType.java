@@ -104,6 +104,8 @@ public abstract class BulletType extends Content{
     public float incendChance = 1f;
     public float homingPower = 0f;
     public float homingRange = 50f;
+    /** Use a negative value to disable homing delay. */
+    public float homingDelay = -1f;
 
     public Color lightningColor = Pal.surge;
     public int lightning;
@@ -135,6 +137,15 @@ public abstract class BulletType extends Content{
 
     public BulletType(){
         this(1f, 1f);
+    }
+
+    /** @return estimated damage per shot. this can be very inaccurate. */
+    public float estimateDPS(){
+        float sum = damage + splashDamage*0.75f;
+        if(fragBullet != null && fragBullet != this){
+            sum += fragBullet.estimateDPS() * fragBullets / 2f;
+        }
+        return sum;
     }
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
@@ -251,7 +262,7 @@ public abstract class BulletType extends Content{
     }
 
     public void update(Bullet b){
-        if(homingPower > 0.0001f){
+        if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
                 b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));

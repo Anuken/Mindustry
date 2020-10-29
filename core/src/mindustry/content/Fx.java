@@ -56,7 +56,7 @@ public class Fx{
 
         mixcol(Pal.accent, 1f);
         alpha(e.fout());
-        rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type().icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
+        rect(block ? ((BlockUnitc)select).tile().block.icon(Cicon.full) : select.type.icon(Cicon.full), select.x, select.y, block ? 0f : select.rotation - 90f);
         alpha(1f);
         Lines.stroke(e.fslope() * 1f);
         Lines.square(select.x, select.y, e.fout() * select.hitSize * 2f, 45);
@@ -66,7 +66,7 @@ public class Fx{
     }),
 
     unitDespawn = new Effect(100f, e -> {
-        if(!(e.data instanceof Unit) || e.<Unit>data().type() == null) return;
+        if(!(e.data instanceof Unit) || e.<Unit>data().type == null) return;
 
         Unit select = e.data();
         float scl = e.fout(Interp.pow2Out);
@@ -74,7 +74,7 @@ public class Fx{
         Draw.scl *= scl;
 
         mixcol(Pal.accent, 1f);
-        rect(select.type().icon(Cicon.full), select.x, select.y, select.rotation - 90f);
+        rect(select.type.icon(Cicon.full), select.x, select.y, select.rotation - 90f);
         reset();
 
         Draw.scl = p;
@@ -1217,7 +1217,15 @@ public class Fx{
         randLenVectors(e.id, 7, 25f * e.finpow(), e.rotation, 50f, (x, y) -> {
             lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f);
         });
+    }),
 
+    thoriumShoot = new Effect(12f, e -> {
+        color(Color.white, Pal.thoriumPink, e.fin());
+        stroke(e.fout() * 1.2f + 0.5f);
+
+        randLenVectors(e.id, 7, 25f * e.finpow(), e.rotation, 50f, (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin() * 5f + 2f);
+        });
     }),
 
     reactorsmoke = new Effect(17, e -> {
@@ -1289,6 +1297,14 @@ public class Fx{
         randLenVectors(e.id, 5, e.fin() * 9f, (x, y) -> {
             float len = e.fout() * 4f;
             color(Color.lightGray, Color.gray, e.fin());
+            Fill.circle(e.x + x, e.y + y, len/2f);
+        });
+    }),
+
+    coreBurn = new Effect(23, e -> {
+        randLenVectors(e.id, 5, e.fin() * 9f, (x, y) -> {
+            float len = e.fout() * 4f;
+            color(Pal.accent, Color.gray, e.fin());
             Fill.circle(e.x + x, e.y + y, len/2f);
         });
     }),

@@ -7,8 +7,10 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -28,15 +30,10 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
-        if(team.active()){
-            for(Team team : team.enemies()){
-                consumer.get(team.data().tree());
-            }
-        }else{
-            for(Team other : Team.all){
-                if(other != team && team.data().unitCount > 0){
-                    consumer.get(team.data().tree());
-                }
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            if(data.items[i].team != team){
+                consumer.get(data.items[i].tree());
             }
         }
     }
@@ -114,7 +111,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         type.update(self());
 
         if(type.collidesTiles && type.collides && type.collidesGround){
-            world.raycastEach(world.toTile(lastX()), world.toTile(lastY()), tileX(), tileY(), (x, y) -> {
+            world.raycastEach(World.toTile(lastX()), World.toTile(lastY()), tileX(), tileY(), (x, y) -> {
 
                 Building tile = world.build(x, y);
                 if(tile == null || !isAdded()) return false;

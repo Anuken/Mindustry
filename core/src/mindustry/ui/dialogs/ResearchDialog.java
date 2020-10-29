@@ -60,7 +60,7 @@ public class ResearchDialog extends BaseDialog{
                     for(Planet planet : content.planets()){
                         for(Sector sector : planet.sectors){
                             if(sector.hasSave()){
-                                ItemSeq cached = sector.calculateItems();
+                                ItemSeq cached = sector.items();
                                 add(cached);
                                 cache.put(sector, cached);
                             }
@@ -164,13 +164,10 @@ public class ResearchDialog extends BaseDialog{
 
     @Override
     public Dialog show(){
-        Core.app.post(() -> {
-            if(net.client()){
-                //TODO make this not display every time
-                //TODO rework this in the future
-                ui.showInfo("@campaign.multiplayer");
-            }
-        });
+        if(net.client()){
+            ui.showInfo("@research.multiplayer");
+            return null;
+        }
 
         return super.show();
     }
@@ -400,7 +397,8 @@ public class ResearchDialog extends BaseDialog{
                 }
             }
 
-            return false;
+            //can always spend when locked
+            return node.content.locked();
         }
 
         void spend(TechNode node){
@@ -414,7 +412,7 @@ public class ResearchDialog extends BaseDialog{
                 ItemStack completed = node.finishedRequirements[i];
 
                 //amount actually taken from inventory
-                int used = Math.min(req.amount - completed.amount, items.get(req.item));
+                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0);
                 items.remove(req.item, used);
                 completed.amount += used;
 

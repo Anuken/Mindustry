@@ -22,7 +22,9 @@ import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 
 import java.util.*;
 
@@ -30,12 +32,18 @@ public class Fonts{
     private static final String mainFont = "fonts/font.woff";
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
+    private static TextureRegion[] iconTable;
+    private static int lastCid;
 
     public static Font def;
     public static Font outline;
     public static Font chat;
     public static Font icon;
     public static Font tech;
+
+    public static TextureRegion logicIcon(int id){
+        return iconTable[id];
+    }
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -111,6 +119,19 @@ public class Fonts{
                 fonts.each(f -> f.getData().setGlyph(ch, glyph));
             }
         }
+
+        iconTable = new TextureRegion[512];
+        iconTable[0] = Core.atlas.find("error");
+        lastCid = 1;
+
+        Vars.content.each(c -> {
+            if(c instanceof UnlockableContent u){
+                TextureRegion region = Core.atlas.find(u.name + "-icon-logic");
+                if(region.found()){
+                    iconTable[u.iconId = lastCid++] = region;
+                }
+            }
+        });
     }
 
     /** Called from a static context for use in the loading screen.*/

@@ -42,7 +42,7 @@ public class Cultivator extends GenericCrafter{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.affinities, attribute);
+        stats.add(Stat.affinities, attribute);
     }
 
     @Override

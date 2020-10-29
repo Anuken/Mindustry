@@ -54,7 +54,7 @@ public class HudFragment extends Fragment{
             outer:
             for(int i = state.wave - 1; i <= state.wave + max; i++){
                 for(SpawnGroup group : state.rules.spawns){
-                    if(group.effect == StatusEffects.boss && group.getUnitsSpawned(i) > 0){
+                    if(group.effect == StatusEffects.boss && group.getSpawned(i) > 0){
                         int diff = (i + 2) - state.wave;
 
                         //increments at which to warn about incoming guardian
@@ -71,12 +71,17 @@ public class HudFragment extends Fragment{
         //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
             //TODO localize
-            showToast("Sector[accent] captured[]!");
+            showToast("Sector [accent]" + (e.sector.isBeingPlayed() ? "" : e.sector.name() + " ") + "[white]captured!");
         });
 
         //TODO localize
         Events.on(SectorLoseEvent.class, e -> {
-            showToast(Icon.warning, "Sector " + e.sector.id + " [scarlet]lost!");
+            showToast(Icon.warning, "Sector [accent]" + e.sector.name() + "[white] lost!");
+        });
+
+        //TODO localize
+        Events.on(SectorInvasionEvent.class, e -> {
+            showToast(Icon.warning, "Sector [accent]" + e.sector.name() + "[white] under attack!");
         });
 
         Events.on(ResetEvent.class, e -> {
@@ -87,7 +92,7 @@ public class HudFragment extends Fragment{
         //paused table
         parent.fill(t -> {
             t.name = "paused";
-            t.top().visible(() -> state.isPaused()).touchable = Touchable.disabled;
+            t.top().visible(() -> state.isPaused() && shown).touchable = Touchable.disabled;
             t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
@@ -363,9 +368,9 @@ public class HudFragment extends Fragment{
                     c.clearChildren();
 
                     for(Item item : content.items()){
-                        if(state.secinfo.getExport(item) >= 1){
+                        if(state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1){
                             c.image(item.icon(Cicon.small));
-                            c.label(() -> (int)state.secinfo.getExport(item) + " /s").color(Color.lightGray);
+                            c.label(() -> (int)state.rules.sector.info.getExport(item) + " /s").color(Color.lightGray);
                             c.row();
                         }
                     }
@@ -374,7 +379,7 @@ public class HudFragment extends Fragment{
                 c.update(() -> {
                     boolean wrong = false;
                     for(Item item : content.items()){
-                        boolean has = state.secinfo.getExport(item) >= 1;
+                        boolean has = state.rules.sector != null && state.rules.sector.info.getExport(item) >= 1;
                         if(used.get(item.id) != has){
                             used.set(item.id, has);
                             wrong = true;
@@ -384,7 +389,7 @@ public class HudFragment extends Fragment{
                         rebuild.run();
                     }
                 });
-            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.secinfo.getExport(i) > 0));
+            }).visible(() -> state.isCampaign() && content.items().contains(i -> state.rules.sector != null && state.rules.sector.info.getExport(i) > 0));
         });
 
         blockfrag.build(parent);
@@ -589,6 +594,7 @@ public class HudFragment extends Fragment{
         StringBuilder ibuild = new StringBuilder();
 
         IntFormat wavef = new IntFormat("wave");
+        IntFormat wavefc = new IntFormat("wave.cap");
         IntFormat enemyf = new IntFormat("wave.enemy");
         IntFormat enemiesf = new IntFormat("wave.enemies");
         IntFormat waitingf = new IntFormat("wave.waiting", i -> {
@@ -634,6 +640,8 @@ public class HudFragment extends Fragment{
             public void draw(){
                 float next = amount.get();
 
+                if(Float.isNaN(next) || Float.isInfinite(next)) next = 1f;
+
                 if(next < last && flash.get()){
                     blink = 1f;
                 }
@@ -641,6 +649,8 @@ public class HudFragment extends Fragment{
                 blink = Mathf.lerpDelta(blink, 0f, 0.2f);
                 value = Mathf.lerpDelta(value, next, 0.15f);
                 last = next;
+
+                if(Float.isNaN(value) || Float.isInfinite(value)) value = 1f;
 
                 drawInner(Pal.darkishGray);
 
@@ -706,7 +716,7 @@ public class HudFragment extends Fragment{
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
-                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type().ammoType.color : Pal.health);
+                b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color : Pal.health);
             });
 
             t.getChildren().get(1).toFront();
@@ -714,7 +724,11 @@ public class HudFragment extends Fragment{
 
         table.labelWrap(() -> {
             builder.setLength(0);
-            builder.append(wavef.get(state.wave));
+            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave && state.isCampaign()){
+                builder.append(wavefc.get(state.wave, state.rules.winWave));
+            }else{
+                builder.append(wavef.get(state.wave));
+            }
             builder.append("\n");
 
             if(state.enemies > 0){
@@ -727,7 +741,7 @@ public class HudFragment extends Fragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((logic.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : ( waitingf.get((int)(state.wavetime/60)))));
+                builder.append((logic.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : (waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

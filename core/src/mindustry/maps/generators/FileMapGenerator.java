@@ -14,9 +14,11 @@ import static mindustry.Vars.*;
 
 public class FileMapGenerator implements WorldGenerator{
     public final Map map;
+    public final SectorPreset preset;
 
-    public FileMapGenerator(String mapName){
+    public FileMapGenerator(String mapName, SectorPreset preset){
         this.map = maps != null ? maps.loadInternalMap(mapName) : null;
+        this.preset = preset;
     }
 
     @Override
@@ -56,6 +58,10 @@ public class FileMapGenerator implements WorldGenerator{
             if(tile.isCenter() && tile.block() instanceof CoreBlock && tile.team() == state.rules.defaultTeam && !anyCores){
                 Schematics.placeLaunchLoadout(tile.x, tile.y);
                 anyCores = true;
+
+                if(preset.addStartingItems){
+                    tile.build.items.add(state.rules.loadout);
+                }
             }
         }
 

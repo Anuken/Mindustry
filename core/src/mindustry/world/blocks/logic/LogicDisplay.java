@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -22,7 +23,8 @@ public class LogicDisplay extends Block{
         commandLineRect = 5,
         commandPoly = 6,
         commandLinePoly = 7,
-        commandTriangle = 8;
+        commandTriangle = 8,
+        commandImage = 9;
 
     public int maxSides = 25;
 
@@ -38,7 +40,7 @@ public class LogicDisplay extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.displaySize, "@x@", displaySize, displaySize);
+        stats.add(Stat.displaySize, "@x@", displaySize, displaySize);
     }
 
     public class LogicDisplayBuild extends Building{
@@ -84,6 +86,7 @@ public class LogicDisplay extends Block{
                             case commandTriangle -> Fill.tri(x, y, p1, p2, p3, p4);
                             case commandColor -> Draw.color(this.color = Color.toFloatBits(x, y, p1, p2));
                             case commandStroke -> Lines.stroke(this.stroke = x);
+                            case commandImage -> Draw.rect(Fonts.logicIcon(p1), x, y, p2, p2, p3);
                         }
                     }
 
@@ -110,7 +113,8 @@ public class LogicDisplay extends Block{
         lineRect,
         poly,
         linePoly,
-        triangle;
+        triangle,
+        image;
 
         public static final GraphicsType[] all = values();
     }

@@ -69,5 +69,5 @@ public abstract class Consume{
 
     public abstract boolean valid(Building entity);
 
-    public abstract void display(BlockStats stats);
+    public abstract void display(Stats stats);
 }

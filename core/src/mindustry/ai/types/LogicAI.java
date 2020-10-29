@@ -44,8 +44,8 @@ public class LogicAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(itemTimer > 0) itemTimer -= Time.delta;
-        if(payTimer > 0) payTimer -= Time.delta;
+        if(itemTimer >= 0) itemTimer -= Time.delta;
+        if(payTimer >= 0) payTimer -= Time.delta;
 
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
@@ -98,7 +98,7 @@ public class LogicAI extends AIController{
             }
         }
 
-        if(unit.type().canBoost && !unit.type().flying){
+        if(unit.type.canBoost && !unit.type.flying){
             unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid()), 0.08f);
         }
 
@@ -129,7 +129,7 @@ public class LogicAI extends AIController{
 
     @Override
     protected boolean shouldShoot(){
-        return shoot && !(unit.type().canBoost && boost);
+        return shoot && !(unit.type.canBoost && boost);
     }
 
     //always aim for the main target

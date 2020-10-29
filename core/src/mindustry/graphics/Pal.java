@@ -5,6 +5,8 @@ import arc.graphics.*;
 public class Pal{
     public static Color
 
+    thoriumPink = Color.valueOf("f9a3c7"),
+
     items = Color.valueOf("2ea756"),
     command = Color.valueOf("eab678"),
 
@@ -94,5 +96,7 @@ public class Pal{
     redDust = Color.valueOf("ffa480"),
     redderDust = Color.valueOf("ff7b69"),
 
-    plasticSmoke = Color.valueOf("f1e479");
+    plasticSmoke = Color.valueOf("f1e479"),
+	
+    adminChat = Color.valueOf("ff4000");
 }

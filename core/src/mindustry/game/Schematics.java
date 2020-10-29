@@ -16,6 +16,7 @@ import arc.util.pooling.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -32,6 +33,7 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -287,12 +289,18 @@ public class Schematics implements Loadable{
         return loadouts.get(block, Seq::new);
     }
 
+    public ObjectMap<CoreBlock, Seq<Schematic>> getLoadouts(){
+        return loadouts;
+    }
+
     /** Checks a schematic for deployment validity and adds it to the cache. */
     private void checkLoadout(Schematic s, boolean validate){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
+        int cores = s.tiles.count(t -> t.block instanceof CoreBlock);
 
         //make sure a core exists, and that the schematic is small enough.
-        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2))) return;
+        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2
+            || s.tiles.contains(t -> t.block.buildVisibility == BuildVisibility.sandboxOnly || !t.block.unlocked()) || cores > 1))) return;
 
         //place in the cache
         loadouts.get((CoreBlock)core.block, Seq::new).add(s);
@@ -608,8 +616,8 @@ public class Schematics implements Loadable{
                 wx = wy;
                 wy = -x;
             }
-            req.x = (short)(world.toTile(wx - req.block.offset) + ox);
-            req.y = (short)(world.toTile(wy - req.block.offset) + oy);
+            req.x = (short)(World.toTile(wx - req.block.offset) + ox);
+            req.y = (short)(World.toTile(wy - req.block.offset) + oy);
             req.rotation = (byte)Mathf.mod(req.rotation + direction, 4);
         });
 

@@ -321,7 +321,7 @@ public class MapView extends Element implements GestureListener{
     }
 
     private boolean active(){
-        return Core.scene.getKeyboardFocus() != null
+        return Core.scene != null && Core.scene.getKeyboardFocus() != null
         && Core.scene.getKeyboardFocus().isDescendantOf(ui.editor)
         && ui.editor.isShown() && tool == EditorTool.zoom &&
         Core.scene.hit(Core.input.mouse().x, Core.input.mouse().y, true) == this;
