@@ -875,6 +875,7 @@ public class UnitTypes implements ContentList{
             health = 75;
             engineOffset = 5.5f;
             range = 140f;
+            targetAir = false;
 
             weapons.add(new Weapon(){{
                 y = 0f;

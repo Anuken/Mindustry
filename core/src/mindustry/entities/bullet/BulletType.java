@@ -79,8 +79,10 @@ public abstract class BulletType extends Content{
     public boolean backMove = true;
     /** Bullet range override. */
     public float range = -1f;
-    /** Heal Bullet Percent **/
+    /** % of block health healed **/
     public float healPercent = 0f;
+    /** whether to make fire on impact */
+    public boolean makeFire = false;
 
     //additional effects
 
@@ -158,7 +160,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
-        if(status == StatusEffects.burning) {
+        if(makeFire) {
             Fires.create(tile.tile);
         }
         hit(b);
@@ -209,14 +211,14 @@ public abstract class BulletType extends Content{
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
             
-            if(healPercent > 0f) {
+            if(healPercent > 0f){
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
                 });
             }
 
-            if(status == StatusEffects.burning) {
+            if(makeFire){
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
                     Fires.create(other.tile);
                 });
