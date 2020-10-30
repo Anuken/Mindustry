@@ -8,7 +8,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-public class MovementLightningAbility extends Ability{
+public class MoveLightningAbility extends Ability{
     //Lightning damage
     public float damage = 35f;
     //Chance of firing every tick. Set >= 1 to always fire lightning every tick at max speed.
@@ -17,15 +17,15 @@ public class MovementLightningAbility extends Ability{
     public int length = 12;
     //Speeds for when to start lightninging and when to stop getting faster
     public float minSpeed = 0.8f, maxSpeed = 1.2f;
-    //Lightning Color
+    //Lightning color
     public Color color = Color.valueOf("a9d8ff");
     
     public Effect shootEffect = Fx.sparkShoot;
     public Sound shootSound = Sounds.spark;
     
-    MovementLightningAbility(){}
+    MoveLightningAbility(){}
     
-    public MovementLightningAbility(float damage, int length, float chance, float minSpeed, float maxSpeed, Color color){
+    public MoveLightningAbility(float damage, int length, float chance, float minSpeed, float maxSpeed, Color color){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
@@ -37,10 +37,10 @@ public class MovementLightningAbility extends Ability{
     @Override
     public void update(Unit unit){
         float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
-        if(Mathf.chance(Time.delta * (chance * scl))){
+        if(Mathf.chance(Time.delta * chance * scl)){
             shootEffect.at(unit.x, unit.y, unit.rotation, color);
-            Lightning.create(unit.team, color, damage, unit.x + unit.vel().x, unit.y + unit.vel().y, unit.rotation, length);
-            shootSound.at(unit.x, unit.y);
+            Lightning.create(unit.team, color, damage, unit.x + unit.vel.x, unit.y + unit.vel.y, unit.rotation, length);
+            shootSound.at(unit);
         }
     }
 }
