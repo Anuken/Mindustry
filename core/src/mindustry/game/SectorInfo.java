@@ -45,6 +45,8 @@ public class SectorInfo{
     public boolean attack = false;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
+    /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
+    public int wavesSurvived = -1;
     /** Time between waves. */
     public float waveSpacing = 60 * 60 * 2;
     /** Damage dealt to sector. */

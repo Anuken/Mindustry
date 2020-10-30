@@ -380,6 +380,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
             stable.add("[accent]" + (int)(sector.info.damage * 100) + "% damaged");
             stable.row();
+
+            if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
+                boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= 99;
+                stable.add("[accent]Will survive " + (sector.info.wavesSurvived - sector.info.wavesPassed) +  (plus ? "+" : "") + " waves");
+                stable.row();
+            }
         }
 
         if(sector.save != null && sector.info.resources.any()){
@@ -416,14 +422,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
+        ItemSeq items = sector.items();
+
         //stored resources
-        if(sector.hasBase() && sector.info.items.total > 0){
+        if(sector.hasBase() && items.total > 0){
+
             stable.add("@sectors.stored").row();
             stable.table(t -> {
                 t.left();
 
                 t.table(res -> {
-                    ItemSeq items = sector.items();
 
                     int i = 0;
                     for(ItemStack stack : items){

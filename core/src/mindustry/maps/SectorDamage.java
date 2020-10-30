@@ -23,7 +23,7 @@ import static mindustry.Vars.*;
 public class SectorDamage{
     //direct damage is for testing only
     private static final boolean direct = false, rubble = true;
-    private static final int maxWavesSimulated = 50;
+    private static final int maxWavesSimulated = 50, maxRetWave = 100;
 
     /** @return calculated capture progress of the enemy */
     public static float getDamage(SectorInfo info){
@@ -32,6 +32,17 @@ public class SectorDamage{
 
     /** @return calculated capture progress of the enemy */
     public static float getDamage(SectorInfo info, int wavesPassed){
+        return getDamage(info, wavesPassed, false);
+    }
+
+    /** @return maximum waves survived, up to maxRetWave. */
+    public static int getWavesSurvived(SectorInfo info){
+        return (int)getDamage(info, maxRetWave, true);
+    }
+
+    /** @return calculated capture progress of the enemy if retWave if false, otherwise return the maximum waves survived as int.
+     * if it survives all the waves, returns maxRetWave. */
+    public static float getDamage(SectorInfo info, int wavesPassed, boolean retWave){
         float health = info.sumHealth;
         int wave = info.wave;
         float waveSpace = info.waveSpacing;
@@ -43,7 +54,7 @@ public class SectorDamage{
             int waveEnd = wave + wavesPassed;
 
             //do not simulate every single wave if there's too many
-            if(wavesPassed > maxWavesSimulated){
+            if(wavesPassed > maxWavesSimulated && !retWave){
                 waveBegin = waveEnd - maxWavesSimulated;
             }
 
@@ -66,6 +77,8 @@ public class SectorDamage{
                 //sector is lost, enemy took too long.
                 if(timeDestroyEnemy > timeDestroyBase){
                     health = 0f;
+                    //return current wave if simulating
+                    if(retWave) return i - waveBegin;
                     break;
                 }
 
@@ -78,6 +91,11 @@ public class SectorDamage{
                 //regen health after wave.
                 health = Math.min(health + rps / 60f * waveSpace, info.sumHealth);
             }
+        }
+
+        //survived everything
+        if(retWave){
+            return maxRetWave;
         }
 
         return 1f - Mathf.clamp(health / info.sumHealth);
@@ -318,8 +336,7 @@ public class SectorDamage{
         info.sumDps = sumDps * 1.5f;
         info.sumRps = sumRps;
 
-        //finally, find an equation to put it all together and produce a 0-1 number
-        //due to the way most defenses are structured, this number will likely need a ^4 power or so
+        info.wavesSurvived = getWavesSurvived(info);
     }
 
     public static void apply(float fraction){

@@ -38,7 +38,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         addCloseListener();
 
-        ItemSeq sitems = sector.getItems();
+        ItemSeq sitems = sector.items();
 
         //updates sum requirements
         Runnable update = () -> {
@@ -59,7 +59,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
                 table.image(s.item.icon(Cicon.small)).left();
                 int as = schems.get(s.item), al = launches.get(s.item);
 
-                String amountStr = "[lightgray]" + (al + " + [accent]" + as + "[lightgray]");
+                String amountStr = (al + as) + "[gray] (" + (al + " + " + as + ")");
 
                 table.add(
                     sitems.has(s.item, s.amount) ? amountStr :
