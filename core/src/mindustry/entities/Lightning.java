@@ -37,9 +37,9 @@ public class Lightning{
         hit.clear();
 
         BulletType bulletType;
-        if(hitter != null && hitter.type.lightningHitter != null) {
+        if(hitter != null && hitter.type.lightningHitter != null){
             bulletType = hitter.type.lightningHitter;
-        } else {
+        }else{
             bulletType = hitter != null && !hitter.type.collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
 
