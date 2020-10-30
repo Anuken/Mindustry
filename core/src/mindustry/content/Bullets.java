@@ -42,6 +42,21 @@ public class Bullets implements ContentList{
     @Override
     public void load(){
 
+        //lightning bullets need to be initialized first.
+        damageLightning = new BulletType(0.0001f, 0f){{
+            lifetime = Fx.lightning.lifetime;
+            hitEffect = Fx.hitLancer;
+            despawnEffect = Fx.none;
+            status = StatusEffects.shocked;
+            statusDuration = 10f;
+            hittable = false;
+        }};
+
+        //this is just a copy of the damage lightning bullet that doesn't damage air units
+        damageLightningGround = new BulletType(0.0001f, 0f){};
+        JsonIO.copy(damageLightning, damageLightningGround);
+        damageLightningGround.collidesAir = false;
+
         artilleryDense = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
@@ -356,20 +371,6 @@ public class Bullets implements ContentList{
             pierceCap = 2;
             pierceBuilding = true;
         }};
-
-        damageLightning = new BulletType(0.0001f, 0f){{
-            lifetime = Fx.lightning.lifetime;
-            hitEffect = Fx.hitLancer;
-            despawnEffect = Fx.none;
-            status = StatusEffects.shocked;
-            statusDuration = 10f;
-            hittable = false;
-        }};
-
-        //this is just a copy of the damage lightning bullet that doesn't damage air units
-        damageLightningGround = new BulletType(0.0001f, 0f){};
-        JsonIO.copy(damageLightning, damageLightningGround);
-        damageLightningGround.collidesAir = false;
 
         healBullet = new LaserBoltBulletType(5.2f, 13){{
             healPercent = 3f;

@@ -116,8 +116,8 @@ public abstract class BulletType extends Content{
     public float lightningDamage = -1;
     public float lightningCone = 360f;
     public float lightningAngle = 0f;
-    /** The lighting "hitter"; Use when trying to implement special lightning. */
-    public BulletType lightningHitter;
+    /** The bullet created at lightning points. */
+    public BulletType lightningType;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
@@ -255,6 +255,10 @@ public abstract class BulletType extends Content{
         if(pierceCap >= 1){
             pierce = true;
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
+        }
+
+        if(lightningType == null){
+            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
 
         if(killShooter && b.owner() instanceof Healthc){

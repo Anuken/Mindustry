@@ -332,14 +332,14 @@ public class UnitTypes implements ContentList{
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
 
-                    lightningHitter = new BulletType(0.0001f, 0f){{
+                    lightningType = new BulletType(0.0001f, 0f){{
                         lifetime = Fx.lightning.lifetime;
                         hitEffect = Fx.hitLancer;
                         despawnEffect = Fx.none;
                         status = StatusEffects.shocked;
                         statusDuration = 10f;
                         hittable = false;
-                        healPercent = 5f;
+                        healPercent = 2f;
                         collidesTeam = true;
                     }};
                 }};
@@ -518,7 +518,7 @@ public class UnitTypes implements ContentList{
 
                     shootEffect = Fx.greenLaserCharge;
 
-                    healPercent = 20f;
+                    healPercent = 25f;
                     collidesTeam = true;
 
                     sideAngle = 15f;

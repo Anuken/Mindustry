@@ -37,18 +37,12 @@ public class Lightning{
         random.setSeed(seed);
         hit.clear();
 
-        BulletType bulletType;
-        if(hitter != null && hitter.type.lightningHitter != null){
-            bulletType = hitter.type.lightningHitter;
-        }else{
-            bulletType = hitter != null && !hitter.type.collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
-        }
-
+        BulletType hitCreate = hitter.type.lightningType;
         Seq<Vec2> lines = new Seq<>();
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){
-            bulletType.create(null, team, x, y, 0f, damage, 1f, 1f, hitter);
+            hitCreate.create(null, team, x, y, 0f, damage, 1f, 1f, hitter);
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             if(lines.size > 1){

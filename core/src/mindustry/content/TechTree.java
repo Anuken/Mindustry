@@ -120,7 +120,7 @@ public class TechTree implements ContentList{
                                         });
                                     });
 
-                                    node(Items.thorium, with(Items.titanium, 8000, Items.lead, 15000, Items.copper, 20000), () -> {
+                                    node(Items.thorium, with(Items.titanium, 8000, Items.lead, 12000, Items.copper, 20000), () -> {
                                         node(laserDrill, () -> {
                                             node(blastDrill, () -> {
 
@@ -136,7 +136,7 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(Items.pyratite, with(Items.coal, 6000, Items.lead, 10000, Items.sand, 4000), () -> {
+                            node(Items.pyratite, with(Items.coal, 6000, Items.lead, 8000, Items.sand, 4000), () -> {
                                 node(pyratiteMixer, () -> {
                                     node(Items.blastCompound, with(Items.pyratite, 3000, Items.sporePod, 3000), () -> {
                                         node(blastMixer, () -> {
@@ -159,7 +159,7 @@ public class TechTree implements ContentList{
                                                 });
                                             });
 
-                                            node(Items.plastanium, with(Items.titanium, 10000, Items.silicon, 10000), () -> {
+                                            node(Items.plastanium, with(Items.titanium, 8000, Items.silicon, 8000), () -> {
                                                 node(plastaniumCompressor, () -> {
                                                     node(Items.phaseFabric, with(Items.thorium, 12000, Items.sand, 8000, Items.silicon, 5000), () -> {
                                                         node(phaseWeaver, () -> {

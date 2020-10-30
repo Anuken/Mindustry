@@ -115,13 +115,15 @@ public class Damage{
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team != team && tile.collide(hitter)){
+            boolean collide = tile != null && collidedBlocks.add(tile.pos());
+
+            if(collide && tile.team != team && tile.collide(hitter)){
                 tile.collision(hitter);
-                collidedBlocks.add(tile.pos());
                 hitter.type.hit(hitter, tile.x, tile.y);
             }
-            //can heal?
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && hitter.type.collides(hitter, tile)){
+
+            //try to heal the tile
+            if(collide && hitter.type.collides(hitter, tile)){
                 hitter.type.hitTile(hitter, tile, 0f);
             }
         };
