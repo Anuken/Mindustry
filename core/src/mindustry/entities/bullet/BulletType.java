@@ -116,6 +116,8 @@ public abstract class BulletType extends Content{
     public float lightningDamage = -1;
     public float lightningCone = 360f;
     public float lightningAngle = 0f;
+    /** The lighting "hitter"; Use when trying to implement special lightning. */
+    public BulletType lightningHitter;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
@@ -163,11 +165,12 @@ public abstract class BulletType extends Content{
         if(makeFire){
             Fires.create(tile.tile);
         }
-        hit(b);
-
+        
         if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
             Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
             tile.heal(healPercent / 100f * tile.maxHealth());
+        }else{
+            hit(b);
         }
     }
 

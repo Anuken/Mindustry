@@ -120,6 +120,10 @@ public class Damage{
                 collidedBlocks.add(tile.pos());
                 hitter.type.hit(hitter, tile.x, tile.y);
             }
+            //can heal?
+            if(tile != null && !collidedBlocks.contains(tile.pos()) && hitter.type.collides(hitter, tile)){
+                hitter.type.hitTile(hitter, tile, 0f);
+            }
         };
 
         if(hitter.type.collidesGround){
