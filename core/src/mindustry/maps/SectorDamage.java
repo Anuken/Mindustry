@@ -21,9 +21,10 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class SectorDamage{
+    public static final int maxRetWave = 30, maxWavesSimulated = 50;
+
     //direct damage is for testing only
     private static final boolean direct = false, rubble = true;
-    private static final int maxWavesSimulated = 50, maxRetWave = 100;
 
     /** @return calculated capture progress of the enemy */
     public static float getDamage(SectorInfo info){
@@ -107,7 +108,7 @@ public class SectorDamage{
         float damage = getDamage(state.rules.sector.info);
 
         //scaled damage has a power component to make it seem a little more realistic (as systems fail, enemy capturing gets easier and easier)
-        float scaled = Mathf.pow(damage, 1.5f);
+        float scaled = Mathf.pow(damage, 1.6f);
 
         //apply damage to units
         float unitDamage = damage * state.rules.sector.info.sumHealth;
@@ -429,54 +430,57 @@ public class SectorDamage{
         float falloff = (damage) / (Math.max(tiles.width, tiles.height) * Mathf.sqrt2);
         int peak = 0;
 
-        //phase two: propagate the damage
-        while(!frontier.isEmpty()){
-            peak = Math.max(peak, frontier.size);
-            Tile tile = frontier.removeFirst();
-            float currDamage = values[tile.x][tile.y] - falloff;
+        if(damage > 0.1f){
+            //phase two: propagate the damage
+            while(!frontier.isEmpty()){
+                peak = Math.max(peak, frontier.size);
+                Tile tile = frontier.removeFirst();
+                float currDamage = values[tile.x][tile.y] - falloff;
 
-            for(int i = 0; i < 4; i++){
-                int cx = tile.x + Geometry.d4x[i], cy = tile.y + Geometry.d4y[i];
+                for(int i = 0; i < 4; i++){
+                    int cx = tile.x + Geometry.d4x[i], cy = tile.y + Geometry.d4y[i];
 
-                //propagate to new tiles
-                if(tiles.in(cx, cy) && values[cx][cy] < currDamage){
-                    Tile other = tiles.getn(cx, cy);
-                    float resultDamage = currDamage;
+                    //propagate to new tiles
+                    if(tiles.in(cx, cy) && values[cx][cy] < currDamage){
+                        Tile other = tiles.getn(cx, cy);
+                        float resultDamage = currDamage;
 
-                    //damage the tile if it's not friendly
-                    if(other.build != null && other.team() != state.rules.waveTeam){
-                        resultDamage -= other.build.health();
+                        //damage the tile if it's not friendly
+                        if(other.build != null && other.team() != state.rules.waveTeam){
+                            resultDamage -= other.build.health();
 
-                        if(direct){
-                            other.build.damage(currDamage);
-                        }else{ //indirect damage happens at game load time
-                            other.build.health -= currDamage;
-                            //don't kill the core!
-                            if(other.block() instanceof CoreBlock) other.build.health = Math.max(other.build.health, 1f);
+                            if(direct){
+                                other.build.damage(currDamage);
+                            }else{ //indirect damage happens at game load time
+                                other.build.health -= currDamage;
+                                //don't kill the core!
+                                if(other.block() instanceof CoreBlock) other.build.health = Math.max(other.build.health, 1f);
 
-                            //remove the block when destroyed
-                            if(other.build.health < 0){
-                                //rubble
-                                if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                    Effect.rubble(other.build.x, other.build.y, other.block().size);
+                                //remove the block when destroyed
+                                if(other.build.health < 0){
+                                    //rubble
+                                    if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
+                                        Effect.rubble(other.build.x, other.build.y, other.block().size);
+                                    }
+
+                                    other.build.addPlan(false);
+                                    other.remove();
                                 }
-
-                                other.build.addPlan(false);
-                                other.remove();
                             }
+
+                        }else if(other.solid() && !other.synthetic()){ //skip damage propagation through solid blocks
+                            continue;
                         }
 
-                    }else if(other.solid() && !other.synthetic()){ //skip damage propagation through solid blocks
-                        continue;
-                    }
-
-                    if(resultDamage > 0 && values[cx][cy] < resultDamage){
-                        frontier.addLast(other);
-                        values[cx][cy] = resultDamage;
+                        if(resultDamage > 0 && values[cx][cy] < resultDamage){
+                            frontier.addLast(other);
+                            values[cx][cy] = resultDamage;
+                        }
                     }
                 }
             }
         }
+
     }
 
     static float cost(Tile tile){

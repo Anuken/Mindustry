@@ -20,6 +20,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
@@ -382,8 +383,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
 
             if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
-                boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= 99;
-                stable.add("[accent]Will survive " + (sector.info.wavesSurvived - sector.info.wavesPassed) +  (plus ? "+" : "") + " waves");
+                boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
+                stable.add("[accent]Will survive\n" + (sector.info.wavesSurvived - sector.info.wavesPassed) +  (plus ? "+" : "") + " waves");
                 stable.row();
             }
         }

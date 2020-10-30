@@ -424,7 +424,7 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(3.35f, 15f){{
+        basicFlame = new BulletType(3.35f, 16f){{
             ammoMultiplier = 3f;
             hitSize = 7f;
             lifetime = 18f;
@@ -439,7 +439,7 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
-        pyraFlame = new BulletType(3.35f, 22f){{
+        pyraFlame = new BulletType(3.35f, 25f){{
             ammoMultiplier = 4f;
             hitSize = 7f;
             lifetime = 18f;
