@@ -53,13 +53,13 @@ public class Predict{
 
     public static Vec2 intercept(Position src, Position dst, float v){
         float ddx = 0, ddy = 0;
-        if(dst instanceof Hitboxc){
-            ddx += ((Hitboxc)dst).deltaX();
-            ddy += ((Hitboxc)dst).deltaY();
+        if(dst instanceof Hitboxc h){
+            ddx += h.deltaX();
+            ddy += h.deltaY();
         }
-        if(src instanceof Hitboxc){
-            ddx -= ((Hitboxc)src).deltaX()/(Time.delta);
-            ddy -= ((Hitboxc)src).deltaY()/(Time.delta);
+        if(src instanceof Hitboxc h){
+            ddx -= h.deltaX()/(Time.delta);
+            ddy -= h.deltaY()/(Time.delta);
         }
         return intercept(src.getX(), src.getY(), dst.getX(), dst.getY(), ddx, ddy, v);
     }

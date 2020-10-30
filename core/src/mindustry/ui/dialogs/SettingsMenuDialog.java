@@ -14,8 +14,11 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -86,14 +89,14 @@ public class SettingsMenuDialog extends SettingsDialog{
         dataDialog.addCloseButton();
 
         dataDialog.cont.table(Tex.button, t -> {
-            t.defaults().size(270f, 60f).left();
+            t.defaults().size(280f, 60f).left();
             TextButtonStyle style = Styles.cleart;
 
             t.button("@settings.cleardata", Icon.trash, style, () -> ui.showConfirm("@confirm", "@settings.clearall.confirm", () -> {
                 ObjectMap<String, Object> map = new ObjectMap<>();
                 for(String value : Core.settings.keys()){
                     if(value.contains("usid") || value.contains("uuid")){
-                        map.put(value, Core.settings.getString(value));
+                        map.put(value, Core.settings.get(value, null));
                     }
                 }
                 Core.settings.clear();
@@ -111,6 +114,37 @@ public class SettingsMenuDialog extends SettingsDialog{
             t.button("@settings.clearsaves", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> {
                     control.saves.deleteAll();
+                });
+            }).marginLeft(4);
+
+            t.row();
+
+            t.button("@settings.clearresearch", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
+                    for(TechNode node : TechTree.all){
+                        node.reset();
+                    }
+                    content.each(c -> {
+                        if(c instanceof UnlockableContent u){
+                            u.clearUnlock();
+                        }
+                    });
+                });
+            }).marginLeft(4);
+
+            t.row();
+
+            t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
+                    for(var planet : content.planets()){
+                        for(var sec : planet.sectors){
+                            sec.clearInfo();
+                            if(sec.save != null){
+                                sec.save.delete();
+                                sec.save = null;
+                            }
+                        }
+                    }
                 });
             }).marginLeft(4);
 
@@ -247,10 +281,11 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+
         if(!mobile){
+            game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
         }
-        game.checkPref("mapcenter", true);
 
         if(steam){
             game.sliderPref("playerlimit", 16, 2, 32, i -> {
@@ -292,7 +327,7 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
             return s + "%";
         });
-        graphics.sliderPref("bridgeopacity", 75, 0, 100, 5, s -> s + "%");
+        graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         if(!mobile){
             graphics.checkPref("vsync", true, b -> Core.graphics.setVSync(b));
@@ -340,9 +375,6 @@ public class SettingsMenuDialog extends SettingsDialog{
         graphics.checkPref("smoothcamera", true);
         graphics.checkPref("position", false);
         graphics.checkPref("fps", false);
-        if(!mobile){
-            graphics.checkPref("blockselectkeys", true);
-        }
         graphics.checkPref("playerindicators", true);
         graphics.checkPref("indicators", true);
         graphics.checkPref("animatedwater", true);
@@ -419,6 +451,9 @@ public class SettingsMenuDialog extends SettingsDialog{
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
         dest.delete();
+
+        //load data so it's saved on exit
+        settings.load();
     }
 
     private void back(){

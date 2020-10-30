@@ -1,7 +1,7 @@
 package mindustry.net;
 
-import arc.struct.ObjectIntMap;
-import arc.func.Prov;
+import arc.func.*;
+import arc.struct.*;
 import mindustry.net.Packets.*;
 
 public class Registrator{

@@ -127,7 +127,7 @@ public class EntityCollisions{
 
     public static boolean legsSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || tile.staticDarkness() >= 2;
+        return tile == null || tile.staticDarkness() >= 2 || tile.floor().solid;
     }
 
     public static boolean waterSolid(int x, int y){

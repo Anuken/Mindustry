@@ -5,8 +5,9 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
+import mindustry.io.legacy.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
 
@@ -14,12 +15,14 @@ import static mindustry.Vars.*;
 
 /** Updates and handles state of the campaign universe. Has no relevance to other gamemodes. */
 public class Universe{
-    private long seconds;
+    private int seconds;
+    private int netSeconds;
     private float secondCounter;
     private int turn;
+    private float turnCounter;
 
     private Schematic lastLoadout;
-    private Seq<ItemStack> lastLaunchResources = new Seq<>();
+    private ItemSeq lastLaunchResources = new ItemSeq();
 
     public Universe(){
         load();
@@ -53,25 +56,28 @@ public class Universe{
         }
     }
 
-    public void displayTimeEnd(){
-        if(!headless){
-            state.set(State.paused);
-
-            ui.announce("Next turn incoming.");
-        }
-    }
-
     /** Update planet rotations, global time and relevant state. */
     public void update(){
-        secondCounter += Time.delta / 60f;
 
-        if(secondCounter >= 1){
-            seconds += (int)secondCounter;
-            secondCounter %= 1f;
+        //only update time when not in multiplayer
+        if(!net.client()){
+            secondCounter += Time.delta / 60f;
+            turnCounter += Time.delta;
 
-            //save every few seconds
-            if(seconds % 10 == 1){
-                save();
+            //auto-run turns
+            if(turnCounter >= turnDuration){
+                turnCounter = 0;
+                runTurn();
+            }
+
+            if(secondCounter >= 1){
+                seconds += (int)secondCounter;
+                secondCounter %= 1f;
+
+                //save every few seconds
+                if(seconds % 10 == 1){
+                    save();
+                }
             }
         }
 
@@ -86,14 +92,14 @@ public class Universe{
         }
     }
 
-    public Seq<ItemStack> getLaunchResources(){
-        lastLaunchResources = Core.settings.getJson("launch-resources", Seq.class, ItemStack.class, Seq::new);
+    public ItemSeq getLaunchResources(){
+        lastLaunchResources = Core.settings.getJson("launch-resources-seq", ItemSeq.class, ItemSeq::new);
         return lastLaunchResources;
     }
 
-    public void updateLaunchResources(Seq<ItemStack> stacks){
+    public void updateLaunchResources(ItemSeq stacks){
         this.lastLaunchResources = stacks;
-        Core.settings.putJson("launch-resources", ItemStack.class, lastLaunchResources);
+        Core.settings.putJson("launch-resources-seq", lastLaunchResources);
     }
 
     /** Updates selected loadout for future deployment. */
@@ -131,32 +137,84 @@ public class Universe{
         //update relevant sectors
         for(Planet planet : content.planets()){
             for(Sector sector : planet.sectors){
-                if(sector.hasSave()){
-                    int spent = (int)(sector.getTimeSpent() / 60);
-                    int actuallyPassed = Math.max(newSecondsPassed - spent, 0);
+                if(sector.hasSave() && sector.hasBase()){
 
                     //increment seconds passed for this sector by the time that just passed with this turn
                     if(!sector.isBeingPlayed()){
-                        sector.setSecondsPassed(sector.getSecondsPassed() + actuallyPassed);
+                        //increment time
+                        sector.info.secondsPassed += turnDuration/60f;
+
+                        int wavesPassed = (int)(sector.info.secondsPassed*60f / sector.info.waveSpacing);
+                        boolean attacked = sector.info.waves;
+
+                        if(attacked){
+                            sector.info.wavesPassed = wavesPassed;
+                        }
+
+                        float damage = attacked ? SectorDamage.getDamage(sector.info) : 0f;
+
+                        //damage never goes down until the player visits the sector, so use max
+                        sector.info.damage = Math.max(sector.info.damage, damage);
 
                         //check if the sector has been attacked too many times...
-                        if(sector.hasBase() && sector.getSecondsPassed() * 60f > turnDuration * sectorDestructionTurns){
+                        if(attacked && damage >= 0.999f){
                             //fire event for losing the sector
                             Events.fire(new SectorLoseEvent(sector));
 
-                            //if so, just delete the save for now. it's lost.
-                            //TODO don't delete it later maybe
-                            sector.save.delete();
-                            sector.save = null;
+                            //sector is dead.
+                            sector.info.items.clear();
+                            sector.info.damage = 1f;
+                            sector.info.hasCore = false;
+                            sector.info.production.clear();
+                        }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
+                            //autocapture the sector
+                            sector.info.waves = false;
+
+                            //fire the event
+                            Events.fire(new SectorCaptureEvent(sector));
                         }
+
+                        float scl = sector.getProductionScale();
+
+                        //export to another sector
+                        if(sector.info.destination != null){
+                            Sector to = sector.info.destination;
+                            if(to.hasBase()){
+                                ItemSeq items = new ItemSeq();
+                                //calculated exported items to this sector
+                                sector.info.export.each((item, stat) -> items.add(item, (int)(stat.mean * newSecondsPassed * scl)));
+                                to.addItems(items);
+                            }
+                        }
+
+                        //add production, making sure that it's capped
+                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
+
+                        sector.saveInfo();
                     }
 
-                    //reset time spent to 0
-                    sector.setTimeSpent(0f);
+                    //queue random invasions
+                    if(!sector.isAttacked() && turn > invasionGracePeriod){
+                        //invasion chance depends on # of nearby bases
+                        if(Mathf.chance(baseInvasionChance * sector.near().count(Sector::hasEnemyBase))){
+                            int waveMax = Math.max(sector.info.winWave, state.wave) + Mathf.random(2, 5) * 5;
+
+                            //assign invasion-related things
+                            if(sector.isBeingPlayed()){
+                                state.rules.winWave = waveMax;
+                                state.rules.waves = true;
+                            }else{
+                                sector.info.winWave = waveMax;
+                                sector.info.waves = true;
+                                sector.saveInfo();
+                            }
+
+                            Events.fire(new SectorInvasionEvent(sector));
+                        }
+                    }
                 }
             }
         }
-        //TODO events
 
         Events.fire(new TurnEvent());
 
@@ -170,7 +228,7 @@ public class Universe{
         for(Planet planet : content.planets()){
             for(Sector sector : planet.sectors){
                 if(sector.hasSave()){
-                    count.add(sector.calculateItems());
+                    count.add(sector.items());
                 }
             }
         }
@@ -178,26 +236,35 @@ public class Universe{
         return count;
     }
 
-    public float secondsMod(float mod, float scale){
-        return (seconds / scale) % mod;
+    public void updateNetSeconds(int value){
+        netSeconds = value;
     }
 
-    public long seconds(){
-        return seconds;
+    public float secondsMod(float mod, float scale){
+        return (seconds() / scale) % mod;
+    }
+
+    public int seconds(){
+        //use networked seconds when playing as client
+        return net.client() ? netSeconds : seconds;
     }
 
     public float secondsf(){
-        return seconds + secondCounter;
+        return seconds() + secondCounter;
     }
 
     private void save(){
-        Core.settings.put("utime", seconds);
+        Core.settings.put("utimei", seconds);
         Core.settings.put("turn", turn);
     }
 
     private void load(){
-        seconds = Core.settings.getLong("utime");
+        seconds = Core.settings.getInt("utimei");
         turn = Core.settings.getInt("turn");
+
+        if(Core.settings.has("unlocks")){
+            LegacyIO.readResearch();
+        }
     }
 
 }

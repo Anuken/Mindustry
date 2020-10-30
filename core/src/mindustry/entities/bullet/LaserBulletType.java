@@ -8,20 +8,17 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.world.*;
-
-import static mindustry.Vars.world;
 
 public class LaserBulletType extends BulletType{
-    protected static Tile furthest;
-
-    protected Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
-    protected Effect laserEffect = Fx.lancerLaserShootSmoke;
-    protected float length = 160f;
-    protected float width = 15f;
-    protected float lengthFalloff = 0.5f;
-    protected float sideLength = 29f, sideWidth = 0.7f;
-    protected float sideAngle = 90f;
+    public Color[] colors = {Pal.lancerLaser.cpy().mul(1f, 1f, 1f, 0.4f), Pal.lancerLaser, Color.white};
+    public Effect laserEffect = Fx.lancerLaserShootSmoke;
+    public float length = 160f;
+    public float width = 15f;
+    public float lengthFalloff = 0.5f;
+    public float sideLength = 29f, sideWidth = 0.7f;
+    public float sideAngle = 90f;
+    public float lightningSpacing = -1, lightningDelay = 0.1f, lightningAngleRand;
+    public boolean largeHit = false;
 
     public LaserBulletType(float damage){
         super(0.01f, damage);
@@ -43,30 +40,53 @@ public class LaserBulletType extends BulletType{
     }
 
     @Override
+    public float estimateDPS(){
+        return super.estimateDPS() * 2f;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        drawSize = Math.max(drawSize, length*2f);
+    }
+
+    @Override
     public float range(){
         return length;
     }
 
     @Override
     public void init(Bullet b){
-        Tmp.v1.trns(b.rotation(), length);
+        float resultLength = Damage.collideLaser(b, length, largeHit), rot = b.rotation();
 
-        furthest = null;
+        laserEffect.at(b.x, b.y, rot, resultLength * 0.75f);
 
-        world.raycast(b.tileX(), b.tileY(), world.toTile(b.x + Tmp.v1.x), world.toTile(b.y + Tmp.v1.y),
-        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
+        if(lightningSpacing > 0){
+            int idx = 0;
+            for(float i = 0; i <= resultLength; i += lightningSpacing){
+                float cx = b.x + Angles.trnsx(rot,  i),
+                    cy = b.y + Angles.trnsy(rot, i);
 
-        float resultLength = furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+                int f = idx++;
 
-        Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), resultLength);
-        if(furthest != null) b.data(resultLength);
-
-        laserEffect.at(b.x, b.y, b.rotation(), resultLength * 0.75f);
+                for(int s : Mathf.signs){
+                    Time.run(f * lightningDelay, () -> {
+                        if(b.isAdded() && b.type == this){
+                            Lightning.create(b, lightningColor,
+                                lightningDamage < 0 ? damage : lightningDamage,
+                                cx, cy, rot + 90*s + Mathf.range(lightningAngleRand),
+                                lightningLength + Mathf.random(lightningLengthRand));
+                        }
+                    });
+                }
+            }
+        }
     }
 
     @Override
     public void draw(Bullet b){
-        float realLength = b.data() == null ? length : (Float)b.data();
+        float realLength = b.fdata;
 
         float f = Mathf.curve(b.fin(), 0f, 0.2f);
         float baseLen = realLength * f;
@@ -74,11 +94,10 @@ public class LaserBulletType extends BulletType{
         float compound = 1f;
 
         Lines.lineAngle(b.x, b.y, b.rotation(), baseLen);
-        Lines.precise(true);
         for(Color color : colors){
             Draw.color(color);
             Lines.stroke((cwidth *= lengthFalloff) * b.fout());
-            Lines.lineAngle(b.x, b.y, b.rotation(), baseLen, CapStyle.none);
+            Lines.lineAngle(b.x, b.y, b.rotation(), baseLen, false);
             Tmp.v1.trns(b.rotation(), baseLen);
             Drawf.tri(b.x + Tmp.v1.x, b.y + Tmp.v1.y, Lines.getStroke() * 1.22f, cwidth * 2f + width / 2f, b.rotation());
 
@@ -89,7 +108,6 @@ public class LaserBulletType extends BulletType{
 
             compound *= lengthFalloff;
         }
-        Lines.precise(false);
         Draw.reset();
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);

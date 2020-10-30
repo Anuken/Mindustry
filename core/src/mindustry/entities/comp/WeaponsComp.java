@@ -13,12 +13,11 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
+abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     @Import float x, y, rotation, reloadMultiplier;
     @Import Vec2 vel;
+    @Import UnitType type;
 
-    /** minimum cursor distance from unit, fixes 'cross-eyed' shooting */
-    static final float minAimDst = 18f;
     /** temporary weapon sequence number */
     static int sequenceNum = 0;
 
@@ -28,6 +27,10 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     @ReadOnly transient boolean isRotate;
     boolean isShooting;
     float ammo;
+
+    float ammof(){
+        return ammo / type.ammoCapacity;
+    }
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
@@ -62,7 +65,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
     /** Aim at something. This will make all mounts point at it. */
     void aim(float x, float y){
         Tmp.v1.set(x, y).sub(this.x, this.y);
-        if(Tmp.v1.len() < minAimDst) Tmp.v1.setLength(minAimDst);
+        if(Tmp.v1.len() < type.aimDst) Tmp.v1.setLength(type.aimDst);
 
         x = Tmp.v1.x + this.x;
         y = Tmp.v1.y + this.y;
@@ -76,12 +79,49 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         aimY = y;
     }
 
+    boolean canShoot(){
+        return true;
+    }
+
+    @Override
+    public void remove(){
+        for(WeaponMount mount : mounts){
+            if(mount.bullet != null){
+                mount.bullet.time = mount.bullet.lifetime - 10f;
+                mount.bullet = null;
+            }
+        }
+    }
+
     /** Update shooting and rotation for this unit. */
     @Override
     public void update(){
+        boolean can = canShoot();
+
         for(WeaponMount mount : mounts){
             Weapon weapon = mount.weapon;
             mount.reload = Math.max(mount.reload - Time.delta * reloadMultiplier, 0);
+
+            float weaponRotation = this.rotation - 90 + (weapon.rotate ? mount.rotation : 0);
+            float mountX = this.x + Angles.trnsx(this.rotation - 90, weapon.x, weapon.y),
+                mountY = this.y + Angles.trnsy(this.rotation - 90, weapon.x, weapon.y);
+            float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY),
+                shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX, weapon.shootY);
+            float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
+
+            //update continuous state
+            if(weapon.continuous && mount.bullet != null){
+                if(!mount.bullet.isAdded() || mount.bullet.time >= mount.bullet.lifetime || mount.bullet.type != weapon.bullet){
+                    mount.bullet = null;
+                }else{
+                    mount.bullet.rotation(weaponRotation + 90);
+                    mount.bullet.set(shootX, shootY);
+                    vel.add(Tmp.v1.trns(rotation + 180f, mount.bullet.type.recoil));
+                }
+            }else{
+                //heat decreases when not firing
+                mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
+            }
 
             //flip weapon shoot side for alternating weapons at half reload
             if(weapon.otherSide != -1 && weapon.alternate && mount.side == weapon.flipSprite &&
@@ -91,11 +131,11 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
             }
 
             //rotate if applicable
-            if(weapon.rotate && (mount.rotate || mount.shoot)){
-                float axisX = this.x + Angles.trnsx(rotation - 90,  weapon.x, weapon.y),
-                    axisY = this.y + Angles.trnsy(rotation - 90,  weapon.x, weapon.y);
+            if(weapon.rotate && (mount.rotate || mount.shoot) && can){
+                float axisX = this.x + Angles.trnsx(this.rotation - 90,  weapon.x, weapon.y),
+                    axisY = this.y + Angles.trnsy(this.rotation - 90,  weapon.x, weapon.y);
 
-                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - rotation;
+                mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - this.rotation;
                 mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, weapon.rotateSpeed * Time.delta);
             }else if(!weapon.rotate){
                 mount.rotation = 0;
@@ -104,25 +144,15 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
 
             //shoot if applicable
             if(mount.shoot && //must be shooting
+                can && //must be able to shoot
                 (ammo > 0 || !state.rules.unitAmmo || team().rules().infiniteAmmo) && //check ammo
                 (!weapon.alternate || mount.side == weapon.flipSprite) &&
-                vel.len() >= mount.weapon.minShootVelocity && //check velocity requirements
+                //TODO checking for velocity this way isn't entirely correct
+                (vel.len() >= mount.weapon.minShootVelocity || (net.active() && !isLocal())) && //check velocity requirements
                 mount.reload <= 0.0001f && //reload has to be 0
                 Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
             ){
-
-                float rotation = this.rotation - 90;
-                float weaponRotation = rotation + (weapon.rotate ? mount.rotation : 0);
-
-                //m a t h
-
-                float mountX = this.x + Angles.trnsx(rotation, weapon.x, weapon.y),
-                    mountY = this.y + Angles.trnsy(rotation, weapon.x, weapon.y);
-                float shootX = mountX + Angles.trnsx(weaponRotation, weapon.shootX, weapon.shootY),
-                    shootY = mountY + Angles.trnsy(weaponRotation, weapon.shootX, weapon.shootY);
-                float shootAngle = weapon.rotate ? weaponRotation + 90 : Angles.angle(shootX, shootY, mount.aimX, mount.aimY) + (this.rotation - angleTo(mount.aimX, mount.aimY));
-
-                shoot(weapon, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
+                shoot(mount, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
 
                 mount.reload = weapon.reload;
 
@@ -132,37 +162,59 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc{
         }
     }
 
-    private void shoot(Weapon weapon, float x, float y, float aimX, float aimY, float rotation, int side){
+    private void shoot(WeaponMount mount, float x, float y, float aimX, float aimY, float rotation, int side){
+        Weapon weapon = mount.weapon;
 
         float baseX = this.x, baseY = this.y;
+        boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
 
-        weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+        (delay ? weapon.chargeSound : weapon.shootSound).at(x, y, Mathf.random(0.8f, 1.0f));
 
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
 
         sequenceNum = 0;
-        if(weapon.shotDelay > 0.01f){
+        if(delay){
             Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> {
-                Time.run(sequenceNum * weapon.shotDelay, () -> bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl));
+                Time.run(sequenceNum * weapon.shotDelay + weapon.firstShotDelay, () -> {
+                    if(!isAdded()) return;
+                    mount.bullet = bullet(weapon, x + this.x - baseX, y + this.y - baseY, f + Mathf.range(weapon.inaccuracy), lifeScl);
+                });
                 sequenceNum++;
             });
         }else{
-            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
+            Angles.shotgun(weapon.shots, weapon.spacing, rotation, f -> mount.bullet = bullet(weapon, x, y, f + Mathf.range(weapon.inaccuracy), lifeScl));
         }
 
-        if(this instanceof Velc){
-            ((Velc)this).vel().add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
-        }
         boolean parentize = ammo.keepVelocity;
 
-        Effect.shake(weapon.shake, weapon.shake, x, y);
+        if(delay){
+            Time.run(weapon.firstShotDelay, () -> {
+                if(!isAdded()) return;
+
+                vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
+                Effect.shake(weapon.shake, weapon.shake, x, y);
+                mount.heat = 1f;
+                weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+            });
+        }else{
+            vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
+            Effect.shake(weapon.shake, weapon.shake, x, y);
+            mount.heat = 1f;
+        }
+
         weapon.ejectEffect.at(x, y, rotation * side);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);
+        apply(weapon.shootStatus, weapon.shootStatusDuration);
     }
 
-    private void bullet(Weapon weapon, float x, float y, float angle, float lifescl){
-        weapon.bullet.create(this, team(), x, y, angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
+    private Bullet bullet(Weapon weapon, float x, float y, float angle, float lifescl){
+        float xr = Mathf.range(weapon.xRand);
+
+        return weapon.bullet.create(this, team(),
+        x + Angles.trnsx(angle, 0, xr),
+        y + Angles.trnsy(angle, 0, xr),
+        angle, (1f - weapon.velocityRnd) + Mathf.random(weapon.velocityRnd), lifescl);
     }
 }

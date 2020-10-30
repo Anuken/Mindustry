@@ -15,6 +15,10 @@ public class ItemSelection{
     private static float scrollPos = 0f;
 
     public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer){
+        buildTable(table, items, holder, consumer, true);
+    }
+    
+    public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect){
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
@@ -26,7 +30,9 @@ public class ItemSelection{
         for(T item : items){
             if(!item.unlockedNow()) continue;
 
-            ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> control.input.frag.config.hideConfig()).group(group).get();
+            ImageButton button = cont.button(Tex.whiteui, Styles.clearToggleTransi, 24, () -> {
+                if(closeSelect) control.input.frag.config.hideConfig();
+            }).group(group).get();
             button.changed(() -> consumer.get(button.isChecked() ? item : null));
             button.getStyle().imageUp = new TextureRegionDrawable(item.icon(Cicon.small));
             button.update(() -> button.setChecked(holder.get() == item));

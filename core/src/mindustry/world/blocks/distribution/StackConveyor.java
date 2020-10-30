@@ -2,10 +2,12 @@ package mindustry.world.blocks.distribution;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -13,6 +15,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.distribution.Conveyor.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -26,7 +29,10 @@ public class StackConveyor extends Block implements Autotiler{
 
     public float speed = 0f;
     public boolean splitOut = true;
+    /** (minimum) amount of loading docks needed to fill a line */
     public float recharge = 2f;
+    public Effect loadEffect = Fx.plasticburn;
+    public Effect unloadEffect = Fx.plasticburn;
 
     public StackConveyor(String name){
         super(name);
@@ -47,21 +53,21 @@ public class StackConveyor extends Block implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
     }
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(tile.build instanceof StackConveyorEntity){
-            int state = ((StackConveyorEntity)tile.build).state;
+        if(tile.build instanceof StackConveyorBuild){
+            int state = ((StackConveyorBuild)tile.build).state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
                 return otherblock.acceptsItems &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorEntity && ((StackConveyorEntity)world.build(otherx, othery)).state == stateUnload) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorEntity && ((StackConveyorEntity)world.build(otherx, othery)).state == stateMove &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild && ((StackConveyorBuild)world.build(otherx, othery)).state == stateUnload) &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild && ((StackConveyorBuild)world.build(otherx, othery)).state == stateMove &&
                         !facing(otherx, othery, otherrot, tile.x, tile.y));
             }
         }
@@ -87,13 +93,13 @@ public class StackConveyor extends Block implements Autotiler{
     @Override
     public boolean rotatedOutput(int x, int y){
         Building tile = world.build(x, y);
-        if(tile instanceof StackConveyorEntity){
-            return ((StackConveyorEntity)tile).state != stateUnload;
+        if(tile instanceof StackConveyorBuild){
+            return ((StackConveyorBuild)tile).state != stateUnload;
         }
         return super.rotatedOutput(x, y);
     }
 
-    public class StackConveyorEntity extends Building{
+    public class StackConveyorBuild extends Building{
         public int state, blendprox;
 
         public int link = -1;
@@ -112,20 +118,22 @@ public class StackConveyor extends Block implements Autotiler{
 
             Draw.z(Layer.blockOver);
 
-            Building from = world.build(link);
+            Tile from = world.tile(link);
 
-            if(link == -1 || from == null) return;
+            if(link == -1 || from == null || lastItem == null) return;
+
+            int fromRot = from.build == null ? rotation : from.build.rotation;
 
             //offset
-            Tmp.v1.set(from);
-            Tmp.v2.set(tile);
+            Tmp.v1.set(from.worldx(), from.worldy());
+            Tmp.v2.set(x, y);
             Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interp.linear);
 
             //rotation
-            float a = (from.rotation%4) * 90;
+            float a = (fromRot%4) * 90;
             float b = (rotation%4) * 90;
-            if((from.rotation%4) == 3 && (rotation%4) == 0) a = -1 * 90;
-            if((from.rotation%4) == 0 && (rotation%4) == 3) a =  4 * 90;
+            if((fromRot%4) == 3 && (rotation%4) == 0) a = -1 * 90;
+            if((fromRot%4) == 0 && (rotation%4) == 3) a =  4 * 90;
 
             //stack
             Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
@@ -133,7 +141,7 @@ public class StackConveyor extends Block implements Autotiler{
             //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
             Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
-            Draw.rect(items.first().icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
+            Draw.rect(lastItem.icon(Cicon.medium), Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
         @Override
@@ -148,21 +156,23 @@ public class StackConveyor extends Block implements Autotiler{
             if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
             if(bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
 
-            blendprox = 0;
+            if(!headless){
+                blendprox = 0;
 
-            for(int i = 0; i < 4; i++){
-                if(blends(tile, rotation, i)){
-                    blendprox |= (1 << i);
+                for(int i = 0; i < 4; i++){
+                    if(blends(tile, rotation, i)){
+                        blendprox |= (1 << i);
+                    }
                 }
             }
 
             //update other conveyor state when this conveyor's state changes
             if(state != lastState){
                 for(Building near : proximity){
-                    if(near instanceof StackConveyorEntity){
+                    if(near instanceof StackConveyorBuild){
                         near.onProximityUpdate();
                         for(Building other : near.proximity){
-                            if(!(other instanceof StackConveyorEntity)) other.onProximityUpdate();
+                            if(!(other instanceof StackConveyorBuild)) other.onProximityUpdate();
                         }
                     }
                 }
@@ -192,14 +202,10 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
-                    if(front() != null
-                    && front().team == team
-                    && front().block instanceof StackConveyor){
-                        StackConveyorEntity e = (StackConveyorEntity)front();
-
+                    if(front() instanceof StackConveyorBuild e && e.team == team){
                         // sleep if its occupied
                         if(e.link == -1){
-                            e.items.addAll(items);
+                            e.items.add(items);
                             e.lastItem = lastItem;
                             e.link = tile.pos();
                             // ▲ to | from ▼
@@ -215,17 +221,27 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
+        public void overwrote(Seq<Building> builds){
+            if(builds.first() instanceof ConveyorBuild build){
+                Item item = build.items.first();
+                if(item != null){
+                    handleStack(item, build.items.get(item), null);
+                }
+            }
+        }
+
+        @Override
         public boolean shouldIdleSound(){
             return false; // has no moving parts;
         }
 
         protected void poofIn(){
             link = tile.pos();
-            Fx.plasticburn.at(this);
+            loadEffect.at(this);
         }
 
         protected void poofOut(){
-            Fx.plasticburn.at(this);
+            unloadEffect.at(this);
             link = -1;
         }
 

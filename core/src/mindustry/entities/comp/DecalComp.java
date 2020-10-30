@@ -27,7 +27,7 @@ abstract class DecalComp implements Drawc, Timedc, Rotc, Posc{
 
     @Replace
     public float clipSize(){
-        return region.getWidth()*2;
+        return region.width *2;
     }
 
 }

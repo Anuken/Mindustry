@@ -6,7 +6,7 @@ import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class Edges{
     private static final int maxSize = 14;
@@ -51,7 +51,7 @@ public class Edges{
     }
 
     public static Tile getFacingEdge(Building tile, Building other){
-        return getFacingEdge(tile.block(), tile.tileX(), tile.tileY(), other.tile());
+        return getFacingEdge(tile.block, tile.tileX(), tile.tileY(), other.tile());
     }
 
     public static Tile getFacingEdge(Tile tile, Tile other){

@@ -9,7 +9,6 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.io.Streams.*;
@@ -17,6 +16,7 @@ import arc.util.pooling.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -28,10 +28,12 @@ import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.distribution.*;
+import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -247,7 +249,7 @@ public class Schematics implements Loadable{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Seq<BuildPlan> requests = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block).configure(t.config));
+            Seq<BuildPlan> requests = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
 
             Draw.flush();
             //scale each request to fit schematic
@@ -278,7 +280,7 @@ public class Schematics implements Loadable{
 
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Seq<BuildPlan> toRequests(Schematic schem, int x, int y){
-        return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block).original(t.x, t.y, schem.width, schem.height).configure(t.config))
+        return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config).original(t.x, t.y, schem.width, schem.height))
             .removeAll(s -> !s.block.isVisible() || !s.block.unlockedNow());
     }
 
@@ -287,12 +289,18 @@ public class Schematics implements Loadable{
         return loadouts.get(block, Seq::new);
     }
 
+    public ObjectMap<CoreBlock, Seq<Schematic>> getLoadouts(){
+        return loadouts;
+    }
+
     /** Checks a schematic for deployment validity and adds it to the cache. */
     private void checkLoadout(Schematic s, boolean validate){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
+        int cores = s.tiles.count(t -> t.block instanceof CoreBlock);
 
         //make sure a core exists, and that the schematic is small enough.
-        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2))) return;
+        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2
+            || s.tiles.contains(t -> t.block.buildVisibility == BuildVisibility.sandboxOnly || !t.block.unlocked()) || cores > 1))) return;
 
         //place in the cache
         loadouts.get((CoreBlock)core.block, Seq::new).add(s);
@@ -346,9 +354,9 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
 
-                if(linked != null &&linked.block().isVisible() && !(linked.block() instanceof BuildBlock)){
-                    int top = linked.block().size/2;
-                    int bot = linked.block().size % 2 == 1 ? -linked.block().size/2 : -(linked.block().size - 1)/2;
+                if(linked != null && linked.block.isVisible() && !(linked.block instanceof ConstructBlock)){
+                    int top = linked.block.size/2;
+                    int bot = linked.block.size % 2 == 1 ? -linked.block.size/2 : -(linked.block.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
                     miny = Math.min(linked.tileY() + bot, miny);
                     maxx = Math.max(linked.tileX() + top, maxx);
@@ -374,11 +382,11 @@ public class Schematics implements Loadable{
             for(int cy = oy; cy <= oy2; cy++){
                 Building tile = world.build(cx, cy);
 
-                if(tile != null && !counted.contains(tile.pos()) && !(tile.block() instanceof BuildBlock)
-                    && (tile.block().isVisible() || (tile.block() instanceof CoreBlock))){
+                if(tile != null && !counted.contains(tile.pos()) && !(tile.block instanceof ConstructBlock)
+                    && (tile.block.isVisible() || (tile.block instanceof CoreBlock))){
                     Object config = tile.config();
 
-                    tiles.add(new Stile(tile.block(), tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
+                    tiles.add(new Stile(tile.block, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
                     counted.add(tile.pos());
                 }
             }
@@ -486,8 +494,9 @@ public class Schematics implements Loadable{
             IntMap<Block> blocks = new IntMap<>();
             byte length = stream.readByte();
             for(int i = 0; i < length; i++){
-                Block block = Vars.content.getByName(ContentType.block, stream.readUTF());
-                blocks.put(i, block == null ? Blocks.air : block);
+                String name = stream.readUTF();
+                Block block = Vars.content.getByName(ContentType.block, SaveFileReader.fallback.get(name, name));
+                blocks.put(i, block == null || block instanceof LegacyBlock ? Blocks.air : block);
             }
 
             int total = stream.readInt();
@@ -583,7 +592,7 @@ public class Schematics implements Loadable{
         int ox = schem.width/2, oy = schem.height/2;
 
         schem.tiles.each(req -> {
-            req.config = BuildPlan.pointConfig(req.config, p -> {
+            req.config = BuildPlan.pointConfig(req.block, req.config, p -> {
                 int cx = p.x, cy = p.y;
                 int lx = cx;
 
@@ -607,8 +616,8 @@ public class Schematics implements Loadable{
                 wx = wy;
                 wy = -x;
             }
-            req.x = (short)(world.toTile(wx - req.block.offset) + ox);
-            req.y = (short)(world.toTile(wy - req.block.offset) + oy);
+            req.x = (short)(World.toTile(wx - req.block.offset) + ox);
+            req.y = (short)(World.toTile(wy - req.block.offset) + oy);
             req.rotation = (byte)Mathf.mod(req.rotation + direction, 4);
         });
 

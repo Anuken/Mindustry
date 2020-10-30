@@ -1,14 +1,15 @@
 package mindustry.ai;
 
 import arc.*;
+import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
@@ -16,12 +17,16 @@ import mindustry.world.meta.*;
 
 import java.io.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class BaseRegistry{
+    /** cores, sorted by tier */
     public Seq<BasePart> cores = new Seq<>();
+    /** parts with no requirement */
     public Seq<BasePart> parts = new Seq<>();
     public ObjectMap<Content, Seq<BasePart>> reqParts = new ObjectMap<>();
+    public ObjectMap<Item, OreBlock> ores = new ObjectMap<>();
+    public ObjectMap<Item, Floor> oreFloors = new ObjectMap<>();
 
     public Seq<BasePart> forResource(Content item){
         return reqParts.get(item, Seq::new);
@@ -31,6 +36,15 @@ public class BaseRegistry{
         cores.clear();
         parts.clear();
         reqParts.clear();
+
+        //load ore types and corresponding items
+        for(Block block : content.blocks()){
+            if(block instanceof OreBlock && block.asFloor().itemDrop != null){
+                ores.put(block.asFloor().itemDrop, (OreBlock)block);
+            }else if(block.isFloor() && block.asFloor().itemDrop != null && !oreFloors.containsKey(block.asFloor().itemDrop)){
+                oreFloors.put(block.asFloor().itemDrop, block.asFloor());
+            }
+        }
 
         String[] names = Core.files.internal("basepartnames").readString().split("\n");
 
@@ -68,7 +82,7 @@ public class BaseRegistry{
                 }
                 schem.tiles.removeAll(s -> s.block.buildVisibility == BuildVisibility.sandboxOnly);
 
-                part.tier = schem.tiles.sumf(s -> s.block.buildCost / s.block.buildCostMultiplier);
+                part.tier = schem.tiles.sumf(s -> Mathf.pow(s.block.buildCost / s.block.buildCostMultiplier, 1.2f));
 
                 if(part.core != null){
                     cores.add(part);
@@ -92,7 +106,7 @@ public class BaseRegistry{
             }
         }
 
-        cores.sort(Structs.comps(Structs.comparingFloat(b -> b.core.health), Structs.comparingFloat(b -> b.tier)));
+        cores.sort(b -> b.tier);
         parts.sort();
         reqParts.each((key, arr) -> arr.sort());
     }

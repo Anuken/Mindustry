@@ -1,10 +1,10 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -15,8 +15,8 @@ import mindustry.ui.Links.*;
 import static mindustry.Vars.*;
 
 public class AboutDialog extends BaseDialog{
-    private Seq<String> contributors = new Seq<>();
-    private static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
+    Seq<String> contributors = new Seq<>();
+    static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
 
     public AboutDialog(){
         super("@about.button");

@@ -4,7 +4,6 @@ import arc.*;
 import arc.audio.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -19,6 +18,7 @@ public class MusicControl{
     public Seq<Music> ambientMusic = Seq.with();
     /** darker music, used in times of conflict  */
     public Seq<Music> darkMusic = Seq.with();
+
     protected Music lastRandomPlayed;
     protected Interval timer = new Interval();
     protected @Nullable Music current;

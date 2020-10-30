@@ -7,8 +7,8 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
@@ -24,6 +24,17 @@ public abstract class LStatement{
     public abstract LCategory category();
     public abstract LInstruction build(LAssembler builder);
 
+    public LStatement copy(){
+        StringBuilder build = new StringBuilder();
+        write(build);
+        Seq<LStatement> read = LAssembler.read(build.toString());
+        return read.size == 0 ? null : read.first();
+    }
+
+    public boolean hidden(){
+        return false;
+    }
+
     //protected methods are only for internal UI layout utilities
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
@@ -31,13 +42,19 @@ public abstract class LStatement{
             .size(144f, 40f).pad(2f).color(table.color).addInputDialog();
     }
 
-    protected void fields(Table table, String desc, String value, Cons<String> setter){
+    protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
         table.add(desc).padLeft(10).left();
-        field(table, value, setter).width(85f).padRight(10).left();
+        return field(table, value, setter).width(85f).padRight(10).left();
     }
 
     protected void fields(Table table, String value, Cons<String> setter){
         field(table, value, setter).width(85f);
+    }
+
+    protected void row(Table table){
+        if(LCanvas.useRows()){
+            table.row();
+        }
     }
 
     protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
@@ -74,23 +91,36 @@ public abstract class LStatement{
 
         hitter.fillParent = true;
         hitter.tapped(hide);
-        Core.scene.add(hitter);
 
+        Core.scene.add(hitter);
         Core.scene.add(t);
 
         t.update(() -> {
-            if(b.parent == null) return;
+            if(b.parent == null || !b.isDescendantOf(Core.scene.root)){
+                Core.app.post(() -> {
+                    hitter.remove();
+                    t.remove();
+                });
+                return;
+            }
 
             b.localToStageCoordinates(Tmp.v1.set(b.getWidth()/2f, b.getHeight()/2f));
             t.setPosition(Tmp.v1.x, Tmp.v1.y, Align.center);
+            if(t.getWidth() > Core.scene.getWidth()) t.setWidth(Core.graphics.getWidth());
+            if(t.getHeight() > Core.scene.getHeight()) t.setHeight(Core.graphics.getHeight());
             t.keepInStage();
         });
         t.actions(Actions.alpha(0), Actions.fadeIn(0.3f, Interp.fade));
 
-        hideCons.get(t, hide);
+        t.top().pane(inner -> {
+            inner.top();
+            hideCons.get(inner, hide);
+        }).top();
 
         t.pack();
     }
+
+    public void afterRead(){}
 
     public void write(StringBuilder builder){
         LogicIO.write(this,builder);
@@ -105,6 +135,6 @@ public abstract class LStatement{
     }
 
     public String name(){
-        return getClass().getSimpleName().replace("Statement", "");
+        return Strings.insertSpaces(getClass().getSimpleName().replace("Statement", ""));
     }
 }

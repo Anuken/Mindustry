@@ -2,7 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Stats.*;
+import mindustry.game.GameStats.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -29,7 +29,7 @@ public class GameOverDialog extends BaseDialog{
     }
 
     void rebuild(){
-        title.setText(state.launched ? "@launch.title" : "@gameover");
+        title.setText("@gameover");
         buttons.clear();
         cont.clear();
 
@@ -79,7 +79,7 @@ public class GameOverDialog extends BaseDialog{
                 }
 
                 if(state.hasSector()){
-                    RankResult result = state.stats.calculateRank(state.getSector(), state.launched);
+                    RankResult result = state.stats.calculateRank(state.getSector(), true);
                     t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
                     t.row();
                 }

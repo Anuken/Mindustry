@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense;
 
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import mindustry.entities.*;
@@ -15,6 +16,7 @@ public class ShockMine extends Block{
     public float damage = 13;
     public int length = 10;
     public int tendrils = 6;
+    public Color lightningColor = Pal.lancerLaser;
 
     public ShockMine(String name){
         super(name);
@@ -25,7 +27,7 @@ public class ShockMine extends Block{
         rebuildable = false;
     }
 
-    public class ShockMineEntity extends Building{
+    public class ShockMineBuild extends Building{
 
         @Override
         public void drawTeam(){
@@ -43,9 +45,9 @@ public class ShockMine extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(unit.team() != team && timer(timerDamage, cooldown)){
+            if(enabled && unit.team != team && timer(timerDamage, cooldown)){
                 for(int i = 0; i < tendrils; i++){
-                    Lightning.create(team, Pal.lancerLaser, damage, x, y, Mathf.random(360f), length);
+                    Lightning.create(team, lightningColor, damage, x, y, Mathf.random(360f), length);
                 }
                 damage(tileDamage);
             }

@@ -12,6 +12,8 @@ import arc.math.geom.*;
  */
 public abstract class FormationPattern{
     public int slots;
+    /** Spacing between members. */
+    public float spacing = 20f;
 
     /** Returns the location of the given slot index. */
     public abstract Vec3 calculateSlotLocation(Vec3 out, int slot);

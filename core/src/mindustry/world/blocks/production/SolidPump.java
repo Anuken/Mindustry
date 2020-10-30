@@ -3,7 +3,6 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -44,7 +43,7 @@ public class SolidPump extends Pump{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("efficiency", (SolidPumpEntity entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
+        bars.add("efficiency", (SolidPumpBuild entity) -> new Bar(() -> Core.bundle.formatFloat("bar.pumpspeed",
         entity.lastPump / Time.delta * 60, 1),
         () -> Pal.ammo,
         () -> entity.warmup));
@@ -54,10 +53,10 @@ public class SolidPump extends Pump{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.output);
-        stats.add(BlockStat.output, result, 60f * pumpAmount, true);
+        stats.remove(Stat.output);
+        stats.add(Stat.output, result, 60f * pumpAmount, true);
         if(attribute != null){
-            stats.add(baseEfficiency > 0.0001f ? BlockStat.affinities : BlockStat.tiles, attribute);
+            stats.add(baseEfficiency > 0.0001f ? Stat.affinities : Stat.tiles, attribute);
         }
     }
 
@@ -77,7 +76,7 @@ public class SolidPump extends Pump{
         return new TextureRegion[]{region, rotatorRegion, topRegion};
     }
 
-    public class SolidPumpEntity extends PumpEntity{
+    public class SolidPumpBuild extends PumpBuild{
         public float warmup;
         public float pumpTime;
         public float boost;
@@ -87,17 +86,14 @@ public class SolidPump extends Pump{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
-            Draw.color(liquids.current().color);
-            Draw.alpha(liquids.total() / liquidCapacity);
-            Draw.rect(liquidRegion, x, y);
-            Draw.color();
+            Drawf.liquid(liquidRegion, x, y, liquids.total() / liquidCapacity, liquids.current().color);
             Draw.rect(rotatorRegion, x, y, pumpTime * rotateSpeed);
             Draw.rect(topRegion, x, y);
         }
 
         @Override
         public boolean shouldConsume(){
-            return liquids.get(result) < liquidCapacity - 0.01f;
+            return liquids.get(result) < liquidCapacity - 0.01f && enabled;
         }
 
         @Override

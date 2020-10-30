@@ -1,7 +1,10 @@
 package mindustry.mod;
 
 import arc.*;
+import arc.assets.*;
+import arc.audio.*;
 import arc.files.*;
+import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -19,11 +22,11 @@ public class Scripts implements Disposable{
     private final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
         ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.");
-    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.", "mindustry.logic.");
+    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.", "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor");
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
-    private LoadedMod currentMod = null;
+    LoadedMod currentMod = null;
 
     public Scripts(){
         Time.mark();
@@ -56,12 +59,12 @@ public class Scripts implements Disposable{
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
         }catch(Throwable t){
-            return getError(t);
+            return getError(t, false);
         }
     }
 
-    private String getError(Throwable t){
-        t.printStackTrace();
+    private String getError(Throwable t, boolean log){
+        if(log) Log.err(t);
         return t.getClass().getSimpleName() + (t.getMessage() == null ? "" : ": " + t.getMessage());
     }
 
@@ -73,7 +76,7 @@ public class Scripts implements Disposable{
         Log.log(level, "[@]: @", source, message);
     }
 
-    //utility mod functions
+    //region utility mod functions
 
     public String readString(String path){
         return Vars.tree.get(path, true).readString();
@@ -82,6 +85,38 @@ public class Scripts implements Disposable{
     public byte[] readBytes(String path){
         return Vars.tree.get(path, true).readBytes();
     }
+
+    public Sound loadSound(String soundName){
+        if(Vars.headless) return new MockSound();
+
+        String name = "sounds/" + soundName;
+        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+
+        if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
+        ModLoadingSound sound = new ModLoadingSound();
+        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
+        desc.loaded = result -> sound.sound = (Sound)result;
+        desc.errored = Throwable::printStackTrace;
+
+        return sound;
+    }
+
+    public Music loadMusic(String soundName){
+        if(Vars.headless) return new MockMusic();
+
+        String name = "music/" + soundName;
+        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+
+        if(Core.assets.contains(path, Music.class)) return Core.assets.get(path, Music.class);
+        ModLoadingMusic sound = new ModLoadingMusic();
+        AssetDescriptor<?> desc = Core.assets.load(path, Music.class);
+        desc.loaded = result -> sound.music = (Music)result;
+        desc.errored = Throwable::printStackTrace;
+
+        return sound;
+    }
+
+    //endregion
 
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;
@@ -103,7 +138,7 @@ public class Scripts implements Disposable{
             if(currentMod != null){
                 file = currentMod.name + "/" + file;
             }
-            log(LogLevel.err, file, "" + getError(t));
+            log(LogLevel.err, file, "" + getError(t, true));
             return false;
         }
     }

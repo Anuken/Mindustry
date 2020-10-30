@@ -9,15 +9,17 @@ assignees: ''
 
 **Platform**: *Android/iOS/Mac/Windows/Linux*
 
-**Build**: *The build number under the title in the main menu. Required.*
+**Build**: *The build number under the title in the main menu. Required. "LATEST" IS NOT A VERSION, I NEED THE EXACT BUILD NUMBER OF YOUR GAME.*
 
 **Issue**: *Explain your issue in detail.*
 
-**Steps to reproduce**: *How you happened across the issue, and what you were doing at the time.*
+**Steps to reproduce**: *How you happened across the issue, and what exactly you did to make the bug happen.*
 
-**Link to mod(s) used, if applicable**: *The mod repositories or zip files that are related to the issue.*
+**Link(s) to mod(s) used**: *The mod repositories or zip files that are related to the issue, if applicable.*
 
-**Crash report, if applicable**: *The contents of relevant crash report files.*
+**Save file**: *The (zipped) save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*
+
+**Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*
 
 ---
 

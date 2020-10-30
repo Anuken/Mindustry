@@ -8,7 +8,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.struct.IntSet.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.async.*;
 import arc.util.io.*;
@@ -30,9 +29,9 @@ import static mindustry.Vars.*;
 
 public class Maps{
     /** List of all built-in maps. Filenames only. */
-    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "veins", "glacier"};
+    private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "veins", "glacier"};
     /** Maps tagged as PvP */
-    private static final String[] pvpMaps = {"veins", "glacier"};
+    static final String[] pvpMaps = {"veins", "glacier"};
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
     /** Serializer for meta. */
@@ -59,6 +58,7 @@ public class Maps{
 
     /** @return the next map to shuffle to. May be null, in which case the server should be stopped. */
     public @Nullable Map getNextMap(Gamemode mode, @Nullable Map previous){
+        if(shuffler != null) return shuffler.next(mode, previous);
         return shuffleMode.next(mode, previous);
     }
 
@@ -82,9 +82,7 @@ public class Maps{
     }
 
     public Maps(){
-        Events.on(ClientLoadEvent.class, event -> {
-            maps.sort();
-        });
+        Events.on(ClientLoadEvent.class, event -> maps.sort());
 
         if(Core.assets != null){
             ((CustomLoader)Core.assets.getLoader(ContentLoader.class)).loaded = this::createAllPreviews;
@@ -293,24 +291,28 @@ public class Maps{
             //create default filters list
             Seq<GenerateFilter> filters =  Seq.with(
                 new ScatterFilter(){{
-                    flooronto = Blocks.stone;
-                    block = Blocks.rock;
-                }},
-                new ScatterFilter(){{
-                    flooronto = Blocks.shale;
-                    block = Blocks.shaleBoulder;
-                }},
-                new ScatterFilter(){{
                     flooronto = Blocks.snow;
-                    block = Blocks.snowrock;
+                    block = Blocks.snowBoulder;
                 }},
                 new ScatterFilter(){{
                     flooronto = Blocks.ice;
-                    block = Blocks.snowrock;
+                    block = Blocks.snowBoulder;
                 }},
                 new ScatterFilter(){{
                     flooronto = Blocks.sand;
                     block = Blocks.sandBoulder;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.dacite;
+                    block = Blocks.daciteBoulder;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.stone;
+                    block = Blocks.boulder;
+                }},
+                new ScatterFilter(){{
+                    flooronto = Blocks.shale;
+                    block = Blocks.shaleBoulder;
                 }}
             );
 

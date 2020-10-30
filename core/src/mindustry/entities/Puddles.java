@@ -45,6 +45,10 @@ public class Puddles{
             return;
         }
 
+        if(tile.floor().solid){
+            return;
+        }
+
         Puddle p = map.get(tile.pos());
         if(p == null){
             Puddle puddle = Puddle.create();
@@ -83,7 +87,7 @@ public class Puddles{
         (liquid.flammability > 0.3f && dest.temperature > 0.7f)){ //flammable liquid + hot liquid
             Fires.create(tile);
             if(Mathf.chance(0.006 * amount)){
-                Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), -1f, 1f, 1f);
+                Bullets.fireball.createNet(Team.derelict, x, y, Mathf.random(360f), -1f, 1f, 1f);
             }
         }else if(dest.temperature > 0.7f && liquid.temperature < 0.55f){ //cold liquid poured onto hot Puddle
             if(Mathf.chance(0.5f * amount)){

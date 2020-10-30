@@ -17,20 +17,20 @@ public class Fires{
 
     /** Start a fire on the tile. If there already is a file there, refreshes its lifetime. */
     public static void create(Tile tile){
-        if(net.client() || tile == null) return; //not clientside.
+        if(net.client() || tile == null || !state.rules.fire) return; //not clientside.
 
         Fire fire = map.get(tile.pos());
 
         if(fire == null){
             fire = Fire.create();
-            fire.tile(tile);
-            fire.lifetime(baseLifetime);
+            fire.tile = tile;
+            fire.lifetime = baseLifetime;
             fire.set(tile.worldx(), tile.worldy());
             fire.add();
             map.put(tile.pos(), fire);
         }else{
-            fire.lifetime(baseLifetime);
-            fire.time(0f);
+            fire.lifetime = baseLifetime;
+            fire.time = 0f;
         }
     }
 

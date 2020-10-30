@@ -12,13 +12,13 @@ import mindustry.world.meta.*;
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
     public float powerProduction;
-    public BlockStat generationType = BlockStat.basePowerGeneration;
+    public Stat generationType = Stat.basePowerGeneration;
 
     public PowerGenerator(String name){
         super(name);
         sync = true;
         baseExplosiveness = 5f;
-        flags = EnumSet.of(BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.generator);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class PowerGenerator extends PowerDistributor{
         super.setBars();
 
         if(hasPower && outputsPower && !consumes.hasPower()){
-            bars.add("power", (GeneratorEntity entity) -> new Bar(() ->
+            bars.add("power", (GeneratorBuild entity) -> new Bar(() ->
             Core.bundle.format("bar.poweroutput",
             Strings.fixed(entity.getPowerProduction() * 60 * entity.timeScale(), 1)),
             () -> Pal.powerBar,
@@ -45,7 +45,7 @@ public class PowerGenerator extends PowerDistributor{
         return false;
     }
 
-    public class GeneratorEntity extends Building{
+    public class GeneratorBuild extends Building{
         public float generateTime;
         /** The efficiency of the producer. An efficiency of 1.0 means 100% */
         public float productionEfficiency = 0.0f;

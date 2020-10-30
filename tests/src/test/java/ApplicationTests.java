@@ -36,7 +36,7 @@ public class ApplicationTests{
         try{
             boolean[] begins = {false};
             Throwable[] exceptionThrown = {null};
-            Log.setUseColors(false);
+            Log.useColors = false;
 
             ApplicationCore core = new ApplicationCore(){
                 @Override
@@ -145,7 +145,7 @@ public class ApplicationTests{
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
         assertEquals(tile.build.items.total(), 55);
-        tile.build.items.remove(Items.phasefabric, 10);
+        tile.build.items.remove(Items.phaseFabric, 10);
         tile.build.items.remove(Items.titanium, 10);
         assertEquals(tile.build.items.total(), 45);
     }
@@ -377,7 +377,7 @@ public class ApplicationTests{
         world.tile(length + 1, 0).setBlock(new Block("___"){{
             hasItems = true;
             destructible = true;
-            entityType = () -> new Building(){
+            buildType = () -> new Building(){
                 @Override
                 public void handleItem(Building source, Item item){
                     itemsa[0] ++;
@@ -422,6 +422,15 @@ public class ApplicationTests{
 
         assertEquals(250, world.width());
         assertEquals(300, world.height());
+    }
+
+    @Test
+    void load108Save(){
+        resetWorld();
+        SaveIO.load(Core.files.internal("108.msav"));
+
+        assertEquals(256, world.width());
+        assertEquals(256, world.height());
     }
 
     @Test
@@ -523,6 +532,9 @@ public class ApplicationTests{
 
         Time.setDeltaProvider(() -> 9999f);
 
+        //prevents range issues
+        state.rules.infiniteResources = true;
+
         d1.update();
 
         assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
@@ -530,7 +542,10 @@ public class ApplicationTests{
 
         d2.clearBuilding();
         d2.addBuild(new BuildPlan(1, 1));
-        d2.update();
+
+        for(int i = 0; i < 3; i++){
+            d2.update();
+        }
 
         assertEquals(Blocks.air, world.tile(0, 0).block());
         assertEquals(Blocks.air, world.tile(2, 2).block());
@@ -568,7 +583,7 @@ public class ApplicationTests{
                     }catch(Throwable t){
                         fail("Failed to update block '" + tile.block() + "'.", t);
                     }
-                    assertEquals(tile.block(), tile.build.block());
+                    assertEquals(tile.block(), tile.build.block);
                     assertEquals(tile.block().health, tile.build.health());
                 }
             }

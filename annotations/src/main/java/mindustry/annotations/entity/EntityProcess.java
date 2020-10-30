@@ -1,10 +1,8 @@
 package mindustry.annotations.entity;
 
-import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
@@ -77,7 +75,12 @@ public class EntityProcess extends BaseProcessor{
                 for(Smethod elem : component.methods()){
                     if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
                     //get all statements in the method, store them
-                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString());
+                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString()
+                        .replaceAll("this\\.<(.*)>self\\(\\)", "this") //fix parameterized self() calls
+                        .replaceAll("self\\(\\)", "this") //fix self() calls
+                        .replaceAll(" yield ", "") //fix enchanced switch
+                        .replaceAll("\\/\\*missing\\*\\/", "var") //fix vars
+                    );
                 }
             }
 
@@ -285,8 +288,6 @@ public class EntityProcess extends BaseProcessor{
 
                 TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-                if(isFinal && !typeIsBase) builder.addModifiers(Modifier.FINAL);
-
                 //add serialize() boolean
                 builder.addMethod(MethodSpec.methodBuilder("serialize").addModifiers(Modifier.PUBLIC).returns(boolean.class).addStatement("return " + ann.serialize()).build());
 
@@ -377,7 +378,7 @@ public class EntityProcess extends BaseProcessor{
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return $S + $L", name + "#", "id").build());
 
-                EntityIO io = new EntityIO(type.name(), builder, allFieldSpecs, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(name));
+                EntityIO io = new EntityIO(type.name(), builder, allFieldSpecs, serializer, rootDirectory.child("annotations/src/main/resources/revisions").child(type.name()));
                 //entities with no sync comp and no serialization gen no code
                 boolean hasIO = ann.genio() && (components.contains(s -> s.name().contains("Sync")) || ann.serialize());
 
@@ -470,6 +471,17 @@ public class EntityProcess extends BaseProcessor{
                                 mbuilder.addStatement("$L = $L", field.name(), field.name() + EntityIO.targetSuf);
                             }
                         }
+
+                        //SPECIAL CASE: method to snap to current position so interpolation doesn't go wild
+                        if(first.name().equals("snapInterpolation")){
+                            mbuilder.addStatement("updateSpacing = 16");
+                            mbuilder.addStatement("lastUpdated = $T.millis()", Time.class);
+                            for(Svar field : syncedFields){
+                                //reset last+current state to target position
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.lastSuf, field.name());
+                                mbuilder.addStatement("$L = $L", field.name() + EntityIO.targetSuf, field.name());
+                            }
+                        }
                     }
 
                     for(Smethod elem : entry.value){
@@ -507,7 +519,7 @@ public class EntityProcess extends BaseProcessor{
                     //add free code to remove methods - always at the end
                     //this only gets called next frame.
                     if(first.name().equals("remove") && ann.pooled()){
-                        mbuilder.addStatement("$T.app.post(() -> $T.free(this))", Core.class, Pools.class);
+                        mbuilder.addStatement("mindustry.gen.Groups.queueFree(($T)this)", Poolable.class);
                     }
 
                     builder.addMethod(mbuilder.build());
@@ -574,6 +586,17 @@ public class EntityProcess extends BaseProcessor{
             //write clear
             groupsBuilder.addMethod(groupClear.build());
 
+            //add method for pool storage
+            groupsBuilder.addField(FieldSpec.builder(ParameterizedTypeName.get(Seq.class, Poolable.class), "freeQueue", Modifier.PRIVATE, Modifier.STATIC).initializer("new Seq<>()").build());
+
+            //method for freeing things
+            MethodSpec.Builder groupFreeQueue = MethodSpec.methodBuilder("queueFree")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(Poolable.class, "obj")
+                .addStatement("freeQueue.add(obj)");
+
+            groupsBuilder.addMethod(groupFreeQueue.build());
+
             //add method for resizing all necessary groups
             MethodSpec.Builder groupResize = MethodSpec.methodBuilder("resize")
                 .addParameter(TypeName.FLOAT, "x").addParameter(TypeName.FLOAT, "y").addParameter(TypeName.FLOAT, "w").addParameter(TypeName.FLOAT, "h")
@@ -581,6 +604,11 @@ public class EntityProcess extends BaseProcessor{
 
             MethodSpec.Builder groupUpdate = MethodSpec.methodBuilder("update")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+            //free everything pooled at the start of each updaet
+            groupUpdate
+                .addStatement("for($T p : freeQueue) $T.free(p)", Poolable.class, Pools.class)
+                .addStatement("freeQueue.clear()");
 
             //method resize
             for(GroupDefinition group : groupDefs){
@@ -633,10 +661,10 @@ public class EntityProcess extends BaseProcessor{
 
             //build mapping class for sync IDs
             TypeSpec.Builder idBuilder = TypeSpec.classBuilder("EntityMapping").addModifiers(Modifier.PUBLIC)
-            .addField(FieldSpec.builder(TypeName.get(Prov[].class), "idMap", Modifier.PRIVATE, Modifier.STATIC).initializer("new Prov[256]").build())
+            .addField(FieldSpec.builder(TypeName.get(Prov[].class), "idMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new Prov[256]").build())
             .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(ObjectMap.class),
                 tname(String.class), tname(Prov.class)),
-                "nameMap", Modifier.PRIVATE, Modifier.STATIC).initializer("new ObjectMap<>()").build())
+                "nameMap", Modifier.PUBLIC, Modifier.STATIC).initializer("new ObjectMap<>()").build())
             .addMethod(MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.get(Prov.class)).addParameter(int.class, "id").addStatement("return idMap[id]").build())
             .addMethod(MethodSpec.methodBuilder("map").addModifiers(Modifier.PUBLIC, Modifier.STATIC)

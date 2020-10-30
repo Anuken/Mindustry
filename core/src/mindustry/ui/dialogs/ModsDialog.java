@@ -3,6 +3,7 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.Net.*;
 import arc.files.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.TextButton.*;
@@ -52,7 +53,7 @@ public class ModsDialog extends BaseDialog{
 
     void setup(){
         float h = 110f;
-        float w = mobile ? 430f : 524f;
+        float w = mobile ? 440f : 524f;
 
         cont.clear();
         cont.defaults().width(mobile ? 500 : 560f).pad(4);
@@ -106,31 +107,15 @@ public class ModsDialog extends BaseDialog{
                             Core.settings.put("lastmod", text);
 
                             ui.loadfrag.show();
-                            Core.net.httpGet("http://api.github.com/repos/" + text + "/zipball/master", loc -> {
-                                Core.net.httpGet(loc.getHeader("Location"), result -> {
-                                    if(result.getStatus() != HttpStatus.OK){
-                                        ui.showErrorMessage(Core.bundle.format("connectfail", result.getStatus()));
+                            //Try to download the 6.0 branch first, but if it doesn't exist try master.
+                            githubImport("6.0", text, e1 -> {
+                                githubImport("master", text, e2 -> {
+                                    githubImport("main", text, e3 -> {
+                                        ui.showErrorMessage(Core.bundle.format("connectfail", e2));
                                         ui.loadfrag.hide();
-                                    }else{
-                                        try{
-                                            Fi file = tmpDirectory.child(text.replace("/", "") + ".zip");
-                                            Streams.copy(result.getResultAsStream(), file.write(false));
-                                            mods.importMod(file);
-                                            file.delete();
-                                            Core.app.post(() -> {
-                                                try{
-                                                    setup();
-                                                    ui.loadfrag.hide();
-                                                }catch(Throwable e){
-                                                    ui.showException(e);
-                                                }
-                                            });
-                                        }catch(Throwable e){
-                                            modError(e);
-                                        }
-                                    }
-                                }, t2 -> Core.app.post(() -> modError(t2)));
-                            }, t2 -> Core.app.post(() -> modError(t2)));
+                                    });
+                                });
+                            });
                         });
                     }).margin(12f);
                 });
@@ -153,7 +138,6 @@ public class ModsDialog extends BaseDialog{
 
                 boolean anyDisabled = false;
                 for(LoadedMod mod : mods.list()){
-                    String letter = (Strings.stripColors(mod.name).charAt(0) + "").toUpperCase();
 
                     if(!mod.enabled() && !anyDisabled && mods.list().size > 0){
                         anyDisabled = true;
@@ -170,36 +154,47 @@ public class ModsDialog extends BaseDialog{
                         t.table(title -> {
                             title.left();
 
-                            title.add(new BorderImage(){
-                                {
-                                    if(mod.iconTexture != null){
-                                        setDrawable(new TextureRegion(mod.iconTexture));
-                                    }else{
-                                        setDrawable(Tex.clear);
-                                    }
-                                    border(Pal.accent);
+                            title.add(new BorderImage(){{
+                                if(mod.iconTexture != null){
+                                    setDrawable(new TextureRegion(mod.iconTexture));
+                                }else{
+                                    setDrawable(Tex.nomap);
                                 }
+                                border(Pal.accent);
+                            }}).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
 
-                                @Override
-                                public void draw(){
-                                    super.draw();
+                            title.table(text -> {
+                                boolean hideDisabled = !mod.isSupported() || mod.hasUnmetDependencies() || mod.hasContentErrors();
 
-                                    if(mod.iconTexture == null){
-                                        Fonts.def.draw(letter, x + width/2f, y + height/2f, Align.center);
-                                    }
+                                text.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() || hideDisabled ? "" : "\n" + Core.bundle.get("mod.disabled") + ""))
+                                    .wrap().top().width(300f).growX().left();
+
+                                text.row();
+
+                                if(mod.isOutdated()){
+                                    text.labelWrap("@mod.outdated").growX();
+                                    text.row();
+                                }else if(!mod.isSupported()){
+                                    text.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
+                                    text.row();
+                                }else if(mod.hasUnmetDependencies()){
+                                    text.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
+                                    t.row();
+                                }else if(mod.hasContentErrors()){
+                                    text.labelWrap("@mod.erroredcontent").growX();
+                                    text.row();
                                 }
-                            }).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
+                            }).top().growX();
 
-                            title.add("" + mod.meta.displayName() + "\n[lightgray]v" + mod.meta.version + (mod.enabled() ? "" : "\n" + Core.bundle.get("mod.disabled") + "")).wrap().width(170f).growX();
                             title.add().growX();
-                        }).growX().left();
+                        }).growX().growY().left();
 
                         t.table(right -> {
                             right.right();
-                            right.button(mod.enabled() ? "@mod.disable" : "@mod.enable", mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.transt, () -> {
+                            right.button(mod.enabled() ? Icon.downOpen : Icon.upOpen, Styles.clearPartiali, () -> {
                                 mods.setEnabled(mod, !mod.enabled());
                                 setup();
-                            }).height(50f).margin(8f).width(130f).disabled(!mod.isSupported());
+                            }).size(50f).disabled(!mod.isSupported());
 
                             right.button(mod.hasSteamID() ? Icon.link : Icon.trash, Styles.clearPartiali, () -> {
                                 if(!mod.hasSteamID()){
@@ -218,19 +213,9 @@ public class ModsDialog extends BaseDialog{
                                     platform.publish(mod);
                                 }).size(50f);
                             }
-                        }).growX().right();
+                        }).growX().right().padRight(-8f).padTop(-8f);
 
-                        t.row();
-                        if(!mod.isSupported()){
-                            t.labelWrap(Core.bundle.format("mod.requiresversion", mod.meta.minGameVersion)).growX();
-                            t.row();
-                        }else if(mod.hasUnmetDependencies()){
-                            t.labelWrap(Core.bundle.format("mod.missingdependencies", mod.missingDependencies.toString(", "))).growX();
-                            t.row();
-                        }else if(mod.hasContentErrors()){
-                            t.labelWrap("@mod.erroredcontent").growX();
-                            t.row();
-                        }
+
                     }, Styles.clearPartialt, () -> showMod(mod)).size(w, h).growX().pad(4f);
                     table.row();
                 }
@@ -298,8 +283,33 @@ public class ModsDialog extends BaseDialog{
             }*/
         }).width(400f);
 
-
-
         dialog.show();
+    }
+
+    private void githubImport(String branch, String repo, Cons<HttpStatus> err){
+        Core.net.httpGet("http://api.github.com/repos/" + repo + "/zipball/" + branch, loc -> {
+            Core.net.httpGet(loc.getHeader("Location"), result -> {
+                if(result.getStatus() != HttpStatus.OK){
+                    err.get(result.getStatus());
+                }else{
+                    try{
+                        Fi file = tmpDirectory.child(repo.replace("/", "") + ".zip");
+                        Streams.copy(result.getResultAsStream(), file.write(false));
+                        mods.importMod(file);
+                        file.delete();
+                        Core.app.post(() -> {
+                            try{
+                                setup();
+                                ui.loadfrag.hide();
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
+                        });
+                    }catch(Throwable e){
+                        modError(e);
+                    }
+                }
+             }, t2 -> Core.app.post(() -> modError(t2)));
+         }, t2 -> Core.app.post(() -> modError(t2)));
     }
 }

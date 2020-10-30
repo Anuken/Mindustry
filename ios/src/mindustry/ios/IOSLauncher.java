@@ -205,7 +205,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                         UIInterfaceOrientation o = UIApplication.getSharedApplication().getStatusBarOrientation();
                         return forced && (o == UIInterfaceOrientation.Portrait || o == UIInterfaceOrientation.PortraitUpsideDown);
                     });
-                    t.add("Please rotate the device to landscape orientation to use the editor.").wrap().grow();
+                    t.add("Rotate the device to landscape orientation to use the editor.").wrap().grow();
                 });
             }));
         });

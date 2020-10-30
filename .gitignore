@@ -79,9 +79,11 @@ com_crashlytics_export_strings.xml
 /android/bin/
 /core/bin/
 /desktop/bin/
-/html/bin/
 /ios/bin/
-/ios-moe/bin/
+/annotations/bin/
+/server/bin/
+/tests/bin/
+/tools/bin/
 *.tmp
 *.bak
 *.swp

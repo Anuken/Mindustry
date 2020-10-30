@@ -2,7 +2,7 @@ package mindustry.game;
 
 import arc.graphics.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.content.*;
@@ -38,6 +38,12 @@ public class Rules{
     public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
     public boolean reactorExplosions = true;
+    /** Whether schematics are allowed */
+    public boolean schematicsAllowed = true;
+    /** Whether friendly explosions can occur and set fire/damage other blocks. */
+    public boolean damageExplosions = true;
+    /** Whether fire is enabled. */
+    public boolean fire = true;
     /** Whether units use and require ammo. */
     public boolean unitAmmo = false;
     /** How fast unit pads build units. */
@@ -62,8 +68,6 @@ public class Rules{
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 60 * 60 * 2;
-    /** How many times longer a launch wave takes. */
-    public float launchWaveMultiplier = 2f;
     /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
     public int winWave = 0;
     /** Base unit cap. Can still be increased by blocks. */
@@ -78,6 +82,8 @@ public class Rules{
     public Seq<WeatherEntry> weather = new Seq<>(1);
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
+    /** Unlocked content names. Only used in multiplayer when the campaign is enabled. */
+    public ObjectSet<String> researched = new ObjectSet<>();
     /** Whether ambient lighting is enabled. */
     public boolean lighting = false;
     /** Whether enemy lighting is visible.
@@ -85,13 +91,12 @@ public class Rules{
     public boolean enemyLights = true;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-    /** Multiplier for solar panel power output.
-    negative = use ambient light if lighting is enabled. */
-    public float solarPowerMultiplier = -1f;
     /** team of the player by default */
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors */
     public Team waveTeam = Team.crux;
+    /** name of the custom mode that this ruleset describes, or null. */
+    public @Nullable String modeName;
     /** special tags for additional info */
     public StringMap tags = new StringMap();
 
@@ -101,6 +106,8 @@ public class Rules{
         public boolean ai;
         /** TODO Tier of blocks/designs that the AI uses for building. [0, 1]*/
         public float aiTier = 0f;
+        /** Whether, when AI is enabled, ships should be spawned from the core. */
+        public boolean aiCoreSpawn = true;
         /** If true, blocks don't require power or resources. */
         public boolean cheat;
         /** If true, resources are not consumed when building. */

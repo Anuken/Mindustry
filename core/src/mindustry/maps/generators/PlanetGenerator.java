@@ -1,14 +1,15 @@
 package mindustry.maps.generators;
 
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.noise.*;
 import mindustry.graphics.g3d.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
-import mindustry.type.Sector.*;
 import mindustry.world.*;
 
 public abstract class PlanetGenerator extends BasicGenerator implements HexMesher{
+    protected IntSeq ints = new IntSeq();
     protected Sector sector;
 
     /** Should generate sector bases for a planet. */
@@ -24,7 +25,12 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
 
         if(noise < 0.15){
             for(Ptile other : tile.tiles){
-                if(sector.planet.getSector(other).is(SectorAttribute.base)){
+                //no sectors near start sector!
+                if(sector.planet.getSector(other).id == sector.planet.startSector){
+                    return;
+                }
+                
+                if(sector.planet.getSector(other).generateEnemyBase){
                     any = false;
                     break;
                 }
@@ -32,7 +38,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         }
 
         if(any){
-            sector.data.attributes |= (1 << SectorAttribute.base.ordinal());
+            sector.generateEnemyBase = true;
         }
     }
 

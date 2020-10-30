@@ -1,8 +1,8 @@
 package mindustry.world.modules;
 
-import arc.struct.IntSeq;
+import arc.struct.*;
 import arc.util.io.*;
-import mindustry.world.blocks.power.PowerGraph;
+import mindustry.world.blocks.power.*;
 
 public class PowerModule extends BlockModule{
     /**

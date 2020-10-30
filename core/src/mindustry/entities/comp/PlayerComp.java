@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -33,11 +32,13 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Import float x, y;
 
-    @NonNull @ReadOnly Unit unit = Nulls.unit;
+    @ReadOnly Unit unit = Nulls.unit;
+    transient private Unit lastReadUnit = Nulls.unit;
     transient @Nullable NetConnection con;
 
     @ReadOnly Team team = Team.sharded;
-    @SyncLocal boolean admin, typing, shooting, boosting;
+    @SyncLocal boolean typing, shooting, boosting;
+    boolean admin;
     @SyncLocal float mouseX, mouseY;
     String name = "noname";
     Color color = new Color();
@@ -54,11 +55,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit instanceof Minerc;
     }
 
-    public @Nullable CoreEntity closestCore(){
+    public @Nullable CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
 
-    public @Nullable CoreEntity core(){
+    public @Nullable CoreBuild core(){
         return team.core();
     }
 
@@ -69,12 +70,17 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit.icon();
     }
 
+    public boolean displayAmmo(){
+        return unit instanceof BlockUnitc || state.rules.unitAmmo;
+    }
+
     public void reset(){
         team = state.rules.defaultTeam;
         admin = typing = false;
         textFadeTime = 0f;
+        x = y = 0f;
         if(!dead()){
-            unit.controller(unit.type().createController());
+            unit.controller(unit.type.createController());
             unit = Nulls.unit;
         }
     }
@@ -86,11 +92,17 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     @Replace
     public float clipSize(){
-        return unit.isNull() ? 20 : unit.type().hitsize * 2f;
+        return unit.isNull() ? 20 : unit.type.hitSize * 2f;
     }
 
     @Override
     public void afterSync(){
+        //simulate a unit change after sync
+        Unit set = unit;
+        unit = lastReadUnit;
+        unit(set);
+        lastReadUnit = unit;
+
         unit.aim(mouseX, mouseY);
         //this is only necessary when the thing being controlled isn't synced
         unit.controlWeapons(shooting, shooting);
@@ -104,7 +116,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             clearUnit();
         }
 
-        CoreEntity core = closestCore();
+        CoreBuild core = closestCore();
 
         if(!dead()){
             set(unit);
@@ -112,7 +124,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             deathTimer = 0;
 
             //update some basic state to sync things
-            if(unit.type().canBoost){
+            if(unit.type.canBoost){
                 Tile tile = unit.tileOn();
                 unit.elevation = Mathf.approachDelta(unit.elevation, (tile != null && tile.solid()) || boosting ? 1f : 0f, 0.08f);
             }
@@ -122,7 +134,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             deathTimer += Time.delta;
             if(deathTimer >= deathDelay){
                 //request spawn - this happens serverside only
-                core.requestSpawn(base());
+                core.requestSpawn(self());
                 deathTimer = 0;
             }
         }
@@ -163,17 +175,28 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     public void unit(Unit unit){
         if(unit == null) throw new IllegalArgumentException("Unit cannot be null. Use clearUnit() instead.");
         if(this.unit == unit) return;
+
         if(this.unit != Nulls.unit){
             //un-control the old unit
-            this.unit.controller(this.unit.type().createController());
+            this.unit.controller(this.unit.type.createController());
         }
         this.unit = unit;
         if(unit != Nulls.unit){
             unit.team(team);
             unit.controller(this);
+
+            //this player just became remote, snap the interpolation so it doesn't go wild
+            if(unit.isRemote()){
+                unit.snapInterpolation();
+            }
+
+            //reset selected block when switching units
+            if(!headless && isLocal()){
+                control.input.block = null;
+            }
         }
 
-        Events.fire(new UnitChangeEvent(base(), unit));
+        Events.fire(new UnitChangeEvent(self(), unit));
     }
 
     boolean dead(){
