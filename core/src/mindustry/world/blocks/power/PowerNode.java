@@ -280,8 +280,8 @@ public class PowerNode extends PowerBlock{
         public void placed(){
             if(net.client()) return;
 
-            Boolf<Building> valid = other -> other != null && other != this && ((!other.block.outputsPower && other.block.consumesPower) ||
-                (other.block.outputsPower && !other.block.consumesPower) || other.block instanceof PowerNode) && linkValid(this, other)
+            Boolf<Building> valid = other -> other != null && other != this &&
+                (other.block.outputsPower || other.block.consumesPower || other.block instanceof PowerNode) && linkValid(this, other)
                 && !other.proximity().contains(this) && other.power.graph != power.graph;
 
             tempTileEnts.clear();

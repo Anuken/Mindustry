@@ -42,8 +42,8 @@ public class ServerControl implements ApplicationListener{
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
-    private final CommandHandler handler = new CommandHandler("");
-    private final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
+    public final CommandHandler handler = new CommandHandler("");
+    public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
     private Fi currentLogFile;
     private boolean inExtraRound;
@@ -55,8 +55,7 @@ public class ServerControl implements ApplicationListener{
     private Thread socketThread;
     private ServerSocket serverSocket;
     private PrintWriter socketOutput;
-
-    private String yes;
+    private String suggested;
 
     public ServerControl(String[] args){
         Core.settings.defaults(
@@ -916,10 +915,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("yes", "Run the last suggested incorrect command.", arg -> {
-            if(yes == null){
+            if(suggested == null){
                 err("There is nothing to say yes to.");
             }else{
-                handleCommandString(yes);
+                handleCommandString(suggested);
             }
         });
 
@@ -953,7 +952,7 @@ public class ServerControl implements ApplicationListener{
 
             if(closest != null){
                 err("Command not found. Did you mean \"" + closest.text + "\"?");
-                yes = line.replace(response.runCommand, closest.text);
+                suggested = line.replace(response.runCommand, closest.text);
             }else{
                 err("Invalid command. Type 'help' for help.");
             }
@@ -962,7 +961,7 @@ public class ServerControl implements ApplicationListener{
         }else if(response.type == ResponseType.manyArguments){
             err("Too many command arguments. Usage: " + response.command.text + " " + response.command.paramText);
         }else if(response.type == ResponseType.valid){
-            yes = null;
+            suggested = null;
         }
     }
 

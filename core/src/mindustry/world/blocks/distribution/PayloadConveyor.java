@@ -12,6 +12,7 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -24,7 +25,7 @@ public class PayloadConveyor extends Block{
 
     public PayloadConveyor(String name){
         super(name);
-
+        group = BlockGroup.transportation;
         size = 3;
         rotate = true;
         update = true;

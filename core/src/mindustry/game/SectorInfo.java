@@ -57,6 +57,8 @@ public class SectorInfo{
     public float secondsPassed;
     /** Display name. */
     public @Nullable String name;
+    /** Version of generated waves. When it doesn't match, new waves are generated. */
+    public int waveVersion = -1;
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;
@@ -118,12 +120,17 @@ public class SectorInfo{
         state.rules.winWave = winWave;
         state.rules.attackMode = attack;
 
+        //assign new wave patterns when the version changes
+        if(waveVersion != Waves.waveVersion && state.rules.sector.preset == null){
+            state.rules.spawns = Waves.generate(state.rules.sector.baseCoverage);
+        }
+
         CoreBuild entity = state.rules.defaultTeam.core();
         if(entity != null){
             entity.items.clear();
             entity.items.add(items);
             //ensure capacity.
-            entity.items.each((i, a) -> entity.items.set(i, Math.min(a, entity.storageCapacity)));
+            entity.items.each((i, a) -> entity.items.set(i, Mathf.clamp(a, 0, entity.storageCapacity)));
         }
     }
 
@@ -143,6 +150,7 @@ public class SectorInfo{
             spawnPosition = entity.pos();
         }
 
+        waveVersion = Waves.waveVersion;
         waveSpacing = state.rules.waveSpacing;
         wave = state.wave;
         winWave = state.rules.winWave;
@@ -200,8 +208,7 @@ public class SectorInfo{
                 }
 
                 //get item delta
-                //TODO is preventing negative production a good idea?
-                int delta = Math.max(ent == null ? 0 : coreItemCounts[item.id], 0);
+                int delta = coreItemCounts[item.id];
 
                 //store means
                 stat.means.add(delta);

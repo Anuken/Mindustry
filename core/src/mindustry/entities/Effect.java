@@ -27,8 +27,8 @@ public class Effect{
     /** Clip size. */
     public float size;
 
-    public boolean ground;
-    public float groundDuration;
+    public float layer = Layer.effect;
+    public float layerDuration;
 
     public Effect(float life, float clipsize, Cons<EffectContainer> renderer){
         this.id = all.size;
@@ -42,14 +42,14 @@ public class Effect{
         this(life,50f, renderer);
     }
 
-    public Effect ground(){
-        ground = true;
+    public Effect layer(float l){
+        layer = l;
         return this;
     }
 
-    public Effect ground(float duration){
-        ground = true;
-        this.groundDuration = duration;
+    public Effect layer(float l, float duration){
+        layer = l;
+        this.layerDuration = duration;
         return this;
     }
 
@@ -87,7 +87,7 @@ public class Effect{
 
     public float render(int id, Color color, float life, float lifetime, float rotation, float x, float y, Object data){
         container.set(id, color, life, lifetime, rotation, x, y, data);
-        Draw.z(ground ? Layer.debris : Layer.effect);
+        Draw.z(layer);
         Draw.reset();
         renderer.get(container);
         Draw.reset();

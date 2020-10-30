@@ -102,6 +102,7 @@ public class Bullets implements ContentList{
             status = StatusEffects.burning;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
+            makeFire = true;
             trailEffect = Fx.incendTrail;
         }};
 
@@ -265,6 +266,7 @@ public class Bullets implements ContentList{
             homingPower = 0.08f;
             splashDamageRadius = 20f;
             splashDamage = 20f;
+            makeFire = true;
             hitEffect = Fx.blastExplosion;
             status = StatusEffects.burning;
         }};
@@ -323,6 +325,7 @@ public class Bullets implements ContentList{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
+            makeFire = true;
             inaccuracy = 3f;
             lifetime = 60f;
         }};
@@ -348,6 +351,7 @@ public class Bullets implements ContentList{
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
             shootEffect = Fx.shootBig;
+            makeFire = true;
             pierceCap = 2;
             pierceBuilding = true;
         }};

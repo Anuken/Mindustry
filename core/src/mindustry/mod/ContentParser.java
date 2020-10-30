@@ -295,7 +295,7 @@ public class ContentParser{
                         group.type = unit;
                     }
 
-                    Vars.defaultWaves.get().addAll(groups);
+                    Vars.waves.get().addAll(groups);
                 }
 
                 readFields(unit, value, true);

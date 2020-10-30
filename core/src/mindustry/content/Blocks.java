@@ -1191,7 +1191,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
-            itemDuration = 60 * 18f;
+            itemDuration = 60 * 15f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -1543,10 +1543,10 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 5f;
-            scaledForce = 5.5f;
-            range = 160f;
-            damage = 0.4f;
+            force = 7f;
+            scaledForce = 7f;
+            range = 220f;
+            damage = 0.3f;
             health = 160 * size * size;
             rotateSpeed = 10;
 
@@ -1991,8 +1991,8 @@ public class Blocks implements ContentList{
 
         illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
-            brightness = 0.67f;
-            radius = 140f;
+            brightness = 0.75f;
+            radius = 160f;
             consumes.power(0.06f);
         }};
 
