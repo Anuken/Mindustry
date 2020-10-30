@@ -52,6 +52,17 @@ public class Effect{
         this.layerDuration = duration;
         return this;
     }
+    
+    public Effect ground(){
+        layer = Layer.debris;
+        return this;
+    }
+    
+    public Effect ground(float duration){
+        layer = Layer.debris;
+        this.layerDuration = duration;
+        return this;
+    }
 
     public void at(Position pos){
         create(this, pos.getX(), pos.getY(), 0, Color.white, null);
