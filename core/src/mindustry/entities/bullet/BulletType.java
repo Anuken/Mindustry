@@ -160,7 +160,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
-        if(makeFire) {
+        if(makeFire){
             Fires.create(tile.tile);
         }
         hit(b);
@@ -249,7 +249,7 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
-        if(pierceCap >= 1) {
+        if(pierceCap >= 1){
             pierce = true;
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
         }

@@ -110,7 +110,7 @@ public class TractorBeamTurret extends BaseTurret{
         }
 
         @Override
-        public float efficiency() {
+        public float efficiency(){
             return super.efficiency() * coolant;
         }
 

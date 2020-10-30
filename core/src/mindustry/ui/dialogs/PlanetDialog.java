@@ -271,7 +271,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //planet selection
         new Table(t -> {
             t.right();
-            if(content.planets().count(p -> p.accessible) > 1) {
+            if(content.planets().count(p -> p.accessible) > 1){
                 t.table(Styles.black6, pt -> {
                     //TODO localize
                     pt.add("[accent]Planets[]");

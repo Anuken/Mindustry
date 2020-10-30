@@ -254,7 +254,7 @@ public class Conveyor extends Block implements Autotiler{
             noSleep();
         }
 
-        public boolean pass(Item item) {
+        public boolean pass(Item item){
             if(next != null && next.team == team && next.acceptItem(this, item)){
                 next.handleItem(this, item);
                 return true;
