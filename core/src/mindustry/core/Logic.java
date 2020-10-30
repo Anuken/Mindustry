@@ -14,8 +14,6 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
-import mindustry.world.blocks.ConstructBlock.*;
 
 import java.util.*;
 
@@ -40,32 +38,7 @@ public class Logic implements ApplicationListener{
             //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
             if(tile.build == null || !tile.block().rebuildable || net.client()) return;
 
-            if(block instanceof ConstructBlock){
-
-                ConstructBuild entity = tile.bc();
-
-                //update block to reflect the fact that something was being constructed
-                if(entity.cblock != null && entity.cblock.synthetic()){
-                    block = entity.cblock;
-                }else{
-                    //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
-                    return;
-                }
-            }
-
-            TeamData data = state.teams.get(tile.team());
-
-            //remove existing blocks that have been placed here.
-            //painful O(n) iteration + copy
-            for(int i = 0; i < data.blocks.size; i++){
-                BlockPlan b = data.blocks.get(i);
-                if(b.x == tile.x && b.y == tile.y){
-                    data.blocks.removeIndex(i);
-                    break;
-                }
-            }
-
-            data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)tile.build.rotation, block.id, tile.build.config()));
+            tile.build.addPlan(true);
         });
 
         Events.on(BlockBuildEndEvent.class, event -> {
@@ -82,15 +55,14 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        Events.on(LaunchItemEvent.class, e -> state.secinfo.handleItemExport(e.stack));
-
         //when loading a 'damaged' sector, propagate the damage
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
-                state.secinfo.write();
+                SectorInfo info = state.rules.sector.info;
+                info.write();
 
                 //how much wave time has passed
-                int wavesPassed = state.secinfo.wavesPassed;
+                int wavesPassed = info.wavesPassed;
 
                 //wave has passed, remove all enemies, they are assumed to be dead
                 if(wavesPassed > 0){
@@ -111,10 +83,10 @@ public class Logic implements ApplicationListener{
                 }
 
                 //reset values
-                state.secinfo.damage = 0f;
-                state.secinfo.wavesPassed = 0;
-                state.secinfo.hasCore = true;
-                state.secinfo.secondsPassed = 0;
+                info.damage = 0f;
+                info.wavesPassed = 0;
+                info.hasCore = true;
+                info.secondsPassed = 0;
 
                 state.rules.sector.saveInfo();
             }
@@ -123,6 +95,11 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
+            if(state.isCampaign()){
+                //enable building AI
+                state.rules.waveTeam.rules().ai = true;
+                state.rules.waveTeam.rules().infiniteResources = true;
+            }
 
             //save settings
             Core.settings.manualSave();
@@ -201,9 +178,12 @@ public class Logic implements ApplicationListener{
             }
 
             //if there's a "win" wave and no enemies are present, win automatically
-            if(state.rules.waves && state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()){
+            if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
+                (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
                 //the sector has been conquered - waves get disabled
                 state.rules.waves = false;
+                //disable attack mode
+                state.rules.attackMode = false;
 
                 //fire capture event
                 Events.fire(new SectorCaptureEvent(state.rules.sector));
@@ -218,19 +198,13 @@ public class Logic implements ApplicationListener{
                 state.gameOver = true;
                 Events.fire(new GameOverEvent(state.rules.waveTeam));
             }else if(state.rules.attackMode){
-                Team alive = null;
+                //count # of teams alive
+                int countAlive = state.teams.getActive().count(TeamData::hasCore);
 
-                for(TeamData team : state.teams.getActive()){
-                    if(team.hasCore()){
-                        if(alive != null){
-                            return;
-                        }
-                        alive = team.team;
-                    }
-                }
-
-                if(alive != null && !state.gameOver){
-                    Events.fire(new GameOverEvent(alive));
+                if((countAlive <= 1 || (!state.rules.pvp && state.rules.defaultTeam.core() == null)) && !state.gameOver){
+                    //find team that won
+                    TeamData left = state.teams.getActive().find(TeamData::hasCore);
+                    Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
             }
@@ -271,7 +245,7 @@ public class Logic implements ApplicationListener{
         if(!(content instanceof UnlockableContent u)) return;
 
         state.rules.researched.add(u.name);
-        ui.hudfrag.showUnlock(u);
+        Events.fire(new UnlockEvent(u));
     }
 
     @Override
@@ -291,14 +265,14 @@ public class Logic implements ApplicationListener{
 
         if(state.isGame()){
             if(!net.client()){
-                state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type().isCounted);
+                state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.type.isCounted);
             }
 
             if(!state.isPaused()){
                 state.teams.updateTeamStats();
 
                 if(state.isCampaign()){
-                    state.secinfo.update();
+                    state.rules.sector.info.update();
                 }
 
                 if(state.isCampaign()){

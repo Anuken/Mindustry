@@ -15,8 +15,7 @@ import static mindustry.Vars.*;
 
 /** A small section of a planet. */
 public class Sector{
-    private static final Seq<Sector> tmpSeq1 = new Seq<>(), tmpSeq2 = new Seq<>(), tmpSeq3 = new Seq<>();
-    private static final ObjectSet<Sector> tmpSet = new ObjectSet<>();
+    private static final Seq<Sector> tmpSeq1 = new Seq<>();
 
     public final SectorRect rect;
     public final Plane plane;
@@ -42,7 +41,9 @@ public class Sector{
 
     public Seq<Sector> near(){
         tmpSeq1.clear();
-        near(tmpSeq1::add);
+        for(Ptile tile : tile.tiles){
+            tmpSeq1.add(planet.getSector(tile));
+        }
 
         return tmpSeq1;
     }
@@ -65,6 +66,12 @@ public class Sector{
 
     public void loadInfo(){
         info = Core.settings.getJson(planet.name + "-s-" + id + "-info", SectorInfo.class, SectorInfo::new);
+    }
+
+    /** Removes any sector info. */
+    public void clearInfo(){
+        info = new SectorInfo();
+        Core.settings.remove(planet.name + "-s-" + id + "-info");
     }
 
     public float getProductionScale(){
@@ -131,6 +138,12 @@ public class Sector{
         removeItem(item, -amount);
     }
 
+    public void removeItems(ItemSeq items){
+        ItemSeq copy = items.copy();
+        copy.each((i, a) -> copy.set(i, -a));
+        addItems(copy);
+    }
+
     public void removeItem(Item item, int amount){
         ItemSeq seq = new ItemSeq();
         seq.add(item, -amount);
@@ -146,6 +159,7 @@ public class Sector{
             }
         }else if(hasBase()){
             items.each((item, amount) -> info.items.add(item, Math.min(info.storageCapacity - info.items.get(item), amount)));
+            info.items.checkNegative();
             saveInfo();
         }
     }
@@ -156,7 +170,7 @@ public class Sector{
 
         //for sectors being played on, add items directly
         if(isBeingPlayed()){
-            count.add(state.rules.defaultTeam.items());
+            if(state.rules.defaultTeam.core() != null) count.add(state.rules.defaultTeam.items());
         }else{
             //add items already present
             count.add(info.items);

@@ -79,8 +79,10 @@ public abstract class BulletType extends Content{
     public boolean backMove = true;
     /** Bullet range override. */
     public float range = -1f;
-    /** Heal Bullet Percent **/
+    /** % of block health healed **/
     public float healPercent = 0f;
+    /** whether to make fire on impact */
+    public boolean makeFire = false;
 
     //additional effects
 
@@ -104,6 +106,8 @@ public abstract class BulletType extends Content{
     public float incendChance = 1f;
     public float homingPower = 0f;
     public float homingRange = 50f;
+    /** Use a negative value to disable homing delay. */
+    public float homingDelay = -1f;
 
     public Color lightningColor = Pal.surge;
     public int lightning;
@@ -158,7 +162,7 @@ public abstract class BulletType extends Content{
     }
 
     public void hitTile(Bullet b, Building tile, float initialHealth){
-        if(status == StatusEffects.burning){
+        if(makeFire){
             Fires.create(tile.tile);
         }
         
@@ -210,14 +214,14 @@ public abstract class BulletType extends Content{
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
             
-            if(healPercent > 0f) {
+            if(healPercent > 0f){
                 indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
                 });
             }
 
-            if(status == StatusEffects.burning) {
+            if(makeFire){
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> {
                     Fires.create(other.tile);
                 });
@@ -248,7 +252,7 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
-        if(pierceCap >= 1) {
+        if(pierceCap >= 1){
             pierce = true;
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
         }
@@ -263,7 +267,7 @@ public abstract class BulletType extends Content{
     }
 
     public void update(Bullet b){
-        if(homingPower > 0.0001f){
+        if(homingPower > 0.0001f && b.time >= homingDelay){
             Teamc target = Units.closestTarget(b.team, b.x, b.y, homingRange, e -> (e.isGrounded() && collidesGround) || (e.isFlying() && collidesAir), t -> collidesGround);
             if(target != null){
                 b.vel.setAngle(Mathf.slerpDelta(b.rotation(), b.angleTo(target), homingPower));

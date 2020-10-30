@@ -42,7 +42,7 @@ public class LaunchPad extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.launchTime, launchTime / 60f, StatUnit.seconds);
+        stats.add(Stat.launchTime, launchTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -115,14 +115,16 @@ public class LaunchPad extends Block{
         public void display(Table table){
             super.display(table);
 
+            if(!state.isCampaign()) return;
+
             table.row();
             table.label(() -> {
-                Sector dest = state.secinfo.getRealDestination();
+                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
 
                 return Core.bundle.format("launch.destination",
                     dest == null ? Core.bundle.get("sectors.nonelaunch") :
                     "[accent]" + dest.name());
-            }).pad(4);
+            }).pad(4).wrap().width(200f).left();
         }
 
         @Override
@@ -133,7 +135,11 @@ public class LaunchPad extends Block{
             }
 
             table.button(Icon.upOpen, Styles.clearTransi, () -> {
-                ui.planet.showSelect(state.rules.sector, other -> state.secinfo.destination = other);
+                ui.planet.showSelect(state.rules.sector, other -> {
+                    if(state.isCampaign()){
+                        state.rules.sector.info.destination = other;
+                    }
+                });
                 deselect();
             }).size(40f);
         }
@@ -206,7 +212,7 @@ public class LaunchPad extends Block{
         public void remove(){
             if(!state.isCampaign()) return;
 
-            Sector destsec = state.secinfo.getRealDestination();
+            Sector destsec = state.rules.sector.info.getRealDestination();
 
             //actually launch the items upon removal
             if(team() == state.rules.defaultTeam){
@@ -217,7 +223,7 @@ public class LaunchPad extends Block{
                         dest.add(stack);
 
                         //update export
-                        state.secinfo.handleItemExport(stack);
+                        state.rules.sector.info.handleItemExport(stack);
                         Events.fire(new LaunchItemEvent(stack));
                     }
 

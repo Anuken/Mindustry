@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -102,7 +103,7 @@ public class Pathfinder implements Runnable{
         boolean nearLiquid = false, nearSolid = false, nearGround = false;
 
         for(int i = 0; i < 4; i++){
-            Tile other = tile.getNearby(i);
+            Tile other = tile.nearby(i);
             if(other != null){
                 if(other.floor().isLiquid) nearLiquid = true;
                 if(other.solid()) nearSolid = true;
@@ -111,7 +112,7 @@ public class Pathfinder implements Runnable{
         }
 
         return PathTile.get(
-            tile.build == null ? 0 : Math.min((int)(tile.build.health / 40), 80),
+            tile.build == null || !tile.solid() ? 0 : Math.min((int)(tile.build.health / 40), 80),
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,
@@ -441,7 +442,7 @@ public class Pathfinder implements Runnable{
 
         @Override
         public void getPositions(IntSeq out){
-            out.add(Point2.pack(world.toTile(position.getX()), world.toTile(position.getY())));
+            out.add(Point2.pack(World.toTile(position.getX()), World.toTile(position.getY())));
         }
 
     }

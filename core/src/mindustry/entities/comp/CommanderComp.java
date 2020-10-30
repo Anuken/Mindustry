@@ -30,7 +30,7 @@ abstract class CommanderComp implements Entityc, Posc{
 
     public void update(){
         if(formation != null){
-            formation.anchor.set(x, y, /*rotation*/ 0); //TODO rotation set to 0 because rotating is pointless
+            formation.anchor.set(x, y, 0);
             formation.updateSlots();
         }
     }
@@ -59,7 +59,7 @@ abstract class CommanderComp implements Entityc, Posc{
         units.clear();
 
         Units.nearby(team, x, y, 150f, u -> {
-            if(u.isAI() && include.get(u) && u != self() && u.type().flying == type.flying && u.hitSize <= hitSize * 1.1f){
+            if(u.isAI() && include.get(u) && u != self() && u.type.flying == type.flying && u.hitSize <= hitSize * 1.1f){
                 units.add(u);
             }
         });
@@ -74,7 +74,7 @@ abstract class CommanderComp implements Entityc, Posc{
     void command(Formation formation, Seq<Unit> units){
         clearCommand();
 
-        float spacing = hitSize * 0.65f;
+        float spacing = hitSize * 0.8f;
         minFormationSpeed = type.speed;
 
         controlling.addAll(units);
@@ -82,7 +82,7 @@ abstract class CommanderComp implements Entityc, Posc{
             FormationAI ai;
             unit.controller(ai = new FormationAI(self(), formation));
             spacing = Math.max(spacing, ai.formationSize());
-            minFormationSpeed = Math.min(minFormationSpeed, unit.type().speed);
+            minFormationSpeed = Math.min(minFormationSpeed, unit.type.speed);
         }
         this.formation = formation;
 
@@ -106,7 +106,7 @@ abstract class CommanderComp implements Entityc, Posc{
         //reset controlled units
         for(Unit unit : controlling){
             if(unit.controller().isBeingControlled(self())){
-                unit.controller(unit.type().createController());
+                unit.controller(unit.type.createController());
             }
         }
 

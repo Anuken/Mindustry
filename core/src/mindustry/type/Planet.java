@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -260,12 +259,15 @@ public class Planet extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.planet;
+    }
+
+    public boolean visible(){
+        return true;
+    }
+
+    public void draw(Mat3D projection, Mat3D transform){
+        mesh.render(projection, transform);
     }
 }

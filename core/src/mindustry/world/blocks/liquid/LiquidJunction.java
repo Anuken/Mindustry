@@ -14,7 +14,7 @@ public class LiquidJunction extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.remove(BlockStat.liquidCapacity);
+        stats.remove(Stat.liquidCapacity);
     }
 
     @Override

@@ -38,7 +38,7 @@ public class Objectives{
 
         @Override
         public boolean complete(){
-            return preset.sector.save != null && preset.sector.save.meta.wave >= preset.captureWave;
+            return preset.sector.save != null && !preset.sector.isAttacked() && preset.sector.hasBase();
         }
 
         @Override

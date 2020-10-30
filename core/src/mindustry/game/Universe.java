@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
+import mindustry.io.legacy.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.storage.*;
@@ -83,7 +84,7 @@ public class Universe{
         if(state.hasSector()){
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.1f, 1f));
+            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.2f, 1f));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
@@ -165,7 +166,7 @@ public class Universe{
                             sector.info.damage = 1f;
                             sector.info.hasCore = false;
                             sector.info.production.clear();
-                        }else if(attacked && wavesPassed > 0 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
+                        }else if(attacked && wavesPassed > 0 && sector.info.winWave > 1 && sector.info.wave + wavesPassed >= sector.info.winWave && !sector.hasEnemyBase()){
                             //autocapture the sector
                             sector.info.waves = false;
 
@@ -187,27 +188,24 @@ public class Universe{
                         }
 
                         //add production, making sure that it's capped
-                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * seconds * scl), sector.info.storageCapacity - sector.info.items.get(item))));
+                        sector.info.production.each((item, stat) -> sector.info.items.add(item, Math.min((int)(stat.mean * newSecondsPassed * scl), sector.info.storageCapacity - sector.info.items.get(item))));
 
                         sector.saveInfo();
                     }
 
                     //queue random invasions
                     if(!sector.isAttacked() && turn > invasionGracePeriod){
-                        //TODO use factors like difficulty for better invasion chance
-                        if(sector.near().contains(Sector::hasEnemyBase) && Mathf.chance(baseInvasionChance)){
-                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : 0) + Mathf.random(2, 4) * 5;
-                            float waveSpace = Math.max(sector.info.waveSpacing - Mathf.random(1, 4) * 5 * 60, 40 * 60);
+                        //invasion chance depends on # of nearby bases
+                        if(Mathf.chance(baseInvasionChance * sector.near().count(Sector::hasEnemyBase))){
+                            int waveMax = Math.max(sector.info.winWave, state.wave) + Mathf.random(2, 5) * 5;
 
                             //assign invasion-related things
                             if(sector.isBeingPlayed()){
                                 state.rules.winWave = waveMax;
                                 state.rules.waves = true;
-                                state.rules.waveSpacing = waveSpace;
                             }else{
                                 sector.info.winWave = waveMax;
                                 sector.info.waves = true;
-                                sector.info.waveSpacing = waveSpace;
                                 sector.saveInfo();
                             }
 
@@ -263,6 +261,10 @@ public class Universe{
     private void load(){
         seconds = Core.settings.getInt("utimei");
         turn = Core.settings.getInt("turn");
+
+        if(Core.settings.has("unlocks")){
+            LegacyIO.readResearch();
+        }
     }
 
 }

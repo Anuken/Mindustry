@@ -3,13 +3,13 @@ package mindustry.world.meta;
 import arc.*;
 
 /** A specific category for a stat. */
-public enum StatCategory{
+public enum StatCat{
     general,
     power,
     liquids,
     items,
     crafting,
-    shooting,
+    function,
     optional;
 
     public String localized(){

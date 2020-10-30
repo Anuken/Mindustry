@@ -17,16 +17,19 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
@@ -190,6 +193,36 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //endregion
     //region utility methods
+
+    public void addPlan(boolean checkPrevious){
+        if(!block.rebuildable) return;
+
+        if(self() instanceof ConstructBuild entity){
+            //update block to reflect the fact that something was being constructed
+            if(entity.cblock != null && entity.cblock.synthetic()){
+                block = entity.cblock;
+            }else{
+                //otherwise this was a deconstruction that was interrupted, don't want to rebuild that
+                return;
+            }
+        }
+
+        TeamData data = state.teams.get(team);
+
+        if(checkPrevious){
+            //remove existing blocks that have been placed here.
+            //painful O(n) iteration + copy
+            for(int i = 0; i < data.blocks.size; i++){
+                BlockPlan b = data.blocks.get(i);
+                if(b.x == tile.x && b.y == tile.y){
+                    data.blocks.removeIndex(i);
+                    break;
+                }
+            }
+        }
+
+        data.blocks.addFirst(new BlockPlan(tile.x, tile.y, (short)rotation, block.id, config()));
+    }
 
     /** Configure with the current, local player. */
     public void configure(Object value){
@@ -431,7 +464,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      */
     public boolean movePayload(Payload todump){
         int trns = block.size/2 + 1;
-        Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
+        Tile next = tile.nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
         if(next != null && next.build != null && next.build.team == team && next.build.acceptPayload(self(), todump)){
             next.build.handlePayload(self(), todump);
@@ -514,7 +547,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float moveLiquidForward(boolean leaks, Liquid liquid){
-        Tile next = tile.getNearby(rotation);
+        Tile next = tile.nearby(rotation);
 
         if(next == null) return 0;
 
@@ -836,7 +869,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void placed(){
         if(net.client()) return;
 
-        if((block.consumesPower && !block.outputsPower) || (!block.consumesPower && block.outputsPower)){
+        if(block.consumesPower || block.outputsPower){
             int range = 10;
             tempTiles.clear();
             Geometry.circle(tileX(), tileY(), range, (x, y) -> {
@@ -878,7 +911,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called when arbitrary configuration is applied to a tile. */
     public void configured(@Nullable Unit builder, @Nullable Object value){
         //null is of type void.class; anonymous classes use their superclass.
-        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
+        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
 
         if(builder != null && builder.isPlayer()){
             lastAccessed = builder.getPlayer().name;
@@ -1234,8 +1267,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public double sense(LAccess sensor){
         return switch(sensor){
-            case x -> x;
-            case y -> y;
+            case x -> World.conv(x);
+            case y -> World.conv(y);
             case team -> team.id;
             case health -> health;
             case maxHealth -> maxHealth;
@@ -1244,8 +1277,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case totalItems -> items == null ? 0 : items.total();
             case totalLiquids -> liquids == null ? 0 : liquids.total();
             case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-            case itemCapacity -> block.itemCapacity;
-            case liquidCapacity -> block.liquidCapacity;
+            case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
+            case liquidCapacity -> block.hasLiquids ? block.liquidCapacity : 0;
             case powerCapacity -> block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
             case powerNetIn -> power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
             case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
@@ -1263,7 +1296,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case type -> block;
             case firstItem -> items == null ? null : items.first();
             case config -> block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
-            case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type() : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
+            case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
             default -> noSensed;
         };
 
@@ -1286,7 +1319,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void control(LAccess type, Object p1, double p2, double p3, double p4){
-
+        if(type == LAccess.configure && block.logicConfigurable){
+            //change config only if it's new
+            Object prev = senseObject(LAccess.config);
+            if(prev != p1){
+                configureAny(p1);
+            }
+        }
     }
 
     @Override

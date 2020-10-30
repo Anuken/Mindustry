@@ -30,7 +30,7 @@ bool cont(vec2 T, vec2 v){
                            		id(T + vec2(step, -step) * v, base) || id(T + vec2(-step, step) * v, base));
 }
 
-void main() {
+void main(){
     vec2 coords = (v_texCoords.xy - u_uv) / (u_uv2 - u_uv);
     vec2 t = v_texCoords.xy;
     vec2 v = vec2(1.0/u_texsize.x, 1.0/u_texsize.y);

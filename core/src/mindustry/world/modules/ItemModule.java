@@ -103,7 +103,7 @@ public class ItemModule extends BlockModule{
 
     public void each(ItemConsumer cons){
         for(int i = 0; i < items.length; i++){
-            if(items[i] > 0){
+            if(items[i] != 0){
                 cons.accept(content.item(i), items[i]);
             }
         }

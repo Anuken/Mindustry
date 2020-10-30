@@ -27,10 +27,11 @@ public class Renderer implements ApplicationListener{
     public final Pixelator pixelator = new Pixelator();
     public PlanetRenderer planets;
 
+    public @Nullable Bloom bloom;
     public FrameBuffer effectBuffer = new FrameBuffer();
     public float laserOpacity = 1f;
 
-    private Bloom bloom;
+    //TODO unused
     private FxProcessor fx = new FxProcessor();
     private Color clearColor = new Color(0f, 0f, 0f, 1f);
     private float targetscale = Scl.scl(4);

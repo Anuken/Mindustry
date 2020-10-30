@@ -1,6 +1,6 @@
 #define HIGHP
 #define NSCALE 2700.0
-#define CAMSCALE (NSCALE*5.0)
+#define CAMSCALE (NSCALE*10.0)
 
 uniform sampler2D u_texture;
 uniform sampler2D u_stars;

@@ -3,6 +3,7 @@ package mindustry.world.blocks.sandbox;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class LiquidVoid extends Block{
 
@@ -11,6 +12,7 @@ public class LiquidVoid extends Block{
         hasLiquids = true;
         solid = true;
         update = true;
+        group = BlockGroup.liquids;
     }
 
     @Override

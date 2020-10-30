@@ -28,7 +28,7 @@ public class SectorInfo{
     /** Items stored in all cores. */
     public ItemSeq items = new ItemSeq();
     /** The best available core type. */
-    public Block bestCoreType = Blocks.air;
+    public Block bestCoreType = Blocks.coreShard;
     /** Max storage capacity. */
     public int storageCapacity = 0;
     /** Whether a core is available here. */
@@ -41,8 +41,12 @@ public class SectorInfo{
     public Seq<UnlockableContent> resources = new Seq<>();
     /** Whether waves are enabled here. */
     public boolean waves = true;
+    /** Whether attack mode is enabled here. */
+    public boolean attack = false;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
+    /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
+    public int wavesSurvived = -1;
     /** Time between waves. */
     public float waveSpacing = 60 * 60 * 2;
     /** Damage dealt to sector. */
@@ -55,6 +59,8 @@ public class SectorInfo{
     public float secondsPassed;
     /** Display name. */
     public @Nullable String name;
+    /** Version of generated waves. When it doesn't match, new waves are generated. */
+    public int waveVersion = -1;
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;
@@ -99,20 +105,35 @@ public class SectorInfo{
 
     /** Write contents of meta into main storage. */
     public void write(){
+        //enable attack mode when there's a core.
+        if(state.rules.waveTeam.core() != null){
+            attack = true;
+            winWave = 0;
+        }
+
+        //if there are infinite waves and no win wave, add a win wave.
+        if(waves && winWave <= 0 && !attack){
+            winWave = 30;
+        }
+
         state.wave = wave;
         state.rules.waves = waves;
         state.rules.waveSpacing = waveSpacing;
         state.rules.winWave = winWave;
+        state.rules.attackMode = attack;
+
+        //assign new wave patterns when the version changes
+        if(waveVersion != Waves.waveVersion && state.rules.sector.preset == null){
+            state.rules.spawns = Waves.generate(state.rules.sector.baseCoverage);
+        }
 
         CoreBuild entity = state.rules.defaultTeam.core();
         if(entity != null){
             entity.items.clear();
             entity.items.add(items);
             //ensure capacity.
-            entity.items.each((i, a) -> entity.items.set(i, Math.min(a, entity.block.itemCapacity)));
+            entity.items.each((i, a) -> entity.items.set(i, Mathf.clamp(a, 0, entity.storageCapacity)));
         }
-
-        //TODO write items.
     }
 
     /** Prepare data for writing to a save. */
@@ -131,10 +152,12 @@ public class SectorInfo{
             spawnPosition = entity.pos();
         }
 
+        waveVersion = Waves.waveVersion;
         waveSpacing = state.rules.waveSpacing;
         wave = state.wave;
         winWave = state.rules.winWave;
         waves = state.rules.waves;
+        attack = state.rules.attackMode;
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
@@ -143,7 +166,6 @@ public class SectorInfo{
         damage = 0;
 
         if(state.rules.sector != null){
-            state.rules.sector.info = this;
             state.rules.sector.saveInfo();
         }
 
@@ -188,8 +210,7 @@ public class SectorInfo{
                 }
 
                 //get item delta
-                //TODO is preventing negative production a good idea?
-                int delta = Math.max(ent == null ? 0 : coreItemCounts[item.id], 0);
+                int delta = coreItemCounts[item.id];
 
                 //store means
                 stat.means.add(delta);
