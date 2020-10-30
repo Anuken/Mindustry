@@ -342,8 +342,10 @@ public class Waves{
         int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.6f, difficulty));
         int bossSpacing = (int)(rand.random(25, 40) * Mathf.lerp(1f, 0.6f, difficulty));
 
+        int bossTier = difficulty < 0.5 ? 4 : 5;
+
         //main boss progression
-        out.add(new SpawnGroup(Structs.random(species)[4]){{
+        out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
             unitAmount = 1;
             begin = bossWave;
             spacing = bossSpacing;
@@ -355,7 +357,7 @@ public class Waves{
         }});
 
         //alt boss progression
-        out.add(new SpawnGroup(Structs.random(species)[4]){{
+        out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
             unitAmount = 1;
             begin = bossWave + rand.random(3, 5) * bossSpacing;
             spacing = bossSpacing;
@@ -369,7 +371,7 @@ public class Waves{
         int finalBossStart = 120 + rand.random(30);
 
         //final boss waves
-        out.add(new SpawnGroup(Structs.random(species)[4]){{
+        out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
             unitAmount = 1;
             begin = finalBossStart;
             spacing = bossSpacing/2;
@@ -381,7 +383,7 @@ public class Waves{
         }});
 
         //final boss waves (alt)
-        out.add(new SpawnGroup(Structs.random(species)[4]){{
+        out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
             unitAmount = 1;
             begin = finalBossStart + 15;
             spacing = bossSpacing/2;

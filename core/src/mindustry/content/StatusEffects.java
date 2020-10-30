@@ -151,8 +151,8 @@ public class StatusEffects implements ContentList{
         boss = new StatusEffect("boss"){{
             color = Pal.health;
             permanent = true;
-            damageMultiplier = 2f;
-            healthMultiplier = 2f;
+            damageMultiplier = 1.5f;
+            healthMultiplier = 1.5f;
         }};
 
         shocked = new StatusEffect("shocked"){{
