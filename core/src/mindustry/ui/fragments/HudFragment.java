@@ -51,8 +51,9 @@ public class HudFragment extends Fragment{
         //warn about guardian/boss waves
         Events.on(WaveEvent.class, e -> {
             int max = 10;
+            int winWave = state.isCampaign() && state.rules.winWave > 0 ? state.rules.winWave : Integer.MAX_VALUE;
             outer:
-            for(int i = state.wave - 1; i <= state.wave + max; i++){
+            for(int i = state.wave - 1; i <= Math.min(state.wave + max, winWave); i++){
                 for(SpawnGroup group : state.rules.spawns){
                     if(group.effect == StatusEffects.boss && group.getSpawned(i) > 0){
                         int diff = (i + 2) - state.wave;

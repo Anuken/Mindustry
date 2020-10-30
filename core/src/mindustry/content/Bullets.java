@@ -280,6 +280,7 @@ public class Bullets implements ContentList{
             splashDamage = 25f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
+            lightningDamage = 10;
             lightning = 2;
             lightningLength = 10;
         }};

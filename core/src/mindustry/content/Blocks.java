@@ -174,12 +174,14 @@ public class Blocks implements ContentList{
             isLiquid = true;
             cacheLayer = CacheLayer.water;
             albedo = 0.5f;
+            attributes.set(Attribute.spores, 0.15f);
         }};
 
         darksandTaintedWater = new ShallowLiquid("darksand-tainted-water"){{
             speedMultiplier = 0.75f;
             statusDuration = 60f;
             albedo = 0.5f;
+            attributes.set(Attribute.spores, 0.1f);
         }};
 
         sandWater = new ShallowLiquid("sand-water"){{
