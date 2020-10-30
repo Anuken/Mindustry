@@ -301,7 +301,7 @@ public class SectorDamage{
         var reg = new LinearRegression();
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
 
-        for(int wave = state.wave, i = 0; i < 3; wave += (1 + i++)){
+        for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
 
             //first wave has to take into account current dps
