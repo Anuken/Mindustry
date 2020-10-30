@@ -13,6 +13,7 @@ import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -66,6 +67,12 @@ public class ForceProjector extends Block{
         stats.add(Stat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
         stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
         stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("shield", entity -> new Bar("stat.shieldremaining", Pal.shield, () -> 1 - ((ForceBuild) entity).buildup / breakage).blink(Color.white));
     }
 
     @Override
