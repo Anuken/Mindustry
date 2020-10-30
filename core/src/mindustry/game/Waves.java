@@ -10,7 +10,7 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 1;
+    public static final int waveVersion = 2;
 
     private Seq<SpawnGroup> spawns;
 
@@ -264,7 +264,7 @@ public class Waves{
         {dagger, mace, fortress, scepter, reign},
         {nova, pulsar, quasar, vela, corvus},
         {crawler, atrax, spiroct, arkyid, toxopid},
-        {flare, horizon, rand.chance(0.2) && difficulty > 0.5 ? poly : zenith, rand.chance(0.5) ? quad : antumbra, rand.chance(0.1) ? quad : eclipse}
+        {flare, horizon, zenith, rand.chance(0.5) ? quad : antumbra, rand.chance(0.1) ? quad : eclipse}
         };
 
         //required progression:
