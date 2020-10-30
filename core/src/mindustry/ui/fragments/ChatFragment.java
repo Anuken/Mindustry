@@ -163,15 +163,16 @@ public class ChatFragment extends Table{
 
         Draw.color();
 
-        if(fadetime > 0 && !shown)
+        if(fadetime > 0 && !shown){
             fadetime -= Time.delta / 180f;
+        }
     }
 
     private void sendMessage(){
-        String message = chatfield.getText();
+        String message = chatfield.getText().trim();
         clearChatInput();
 
-        if(message.replace(" ", "").isEmpty()) return;
+        if(message.isEmpty()) return;
 
         history.insert(1, message);
 
