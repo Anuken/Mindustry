@@ -170,6 +170,7 @@ public class Sector{
             }
         }else if(hasBase()){
             items.each((item, amount) -> info.items.add(item, Math.min(info.storageCapacity - info.items.get(item), amount)));
+            info.items.checkNegative();
             saveInfo();
         }
     }

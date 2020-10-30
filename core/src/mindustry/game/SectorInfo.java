@@ -130,7 +130,7 @@ public class SectorInfo{
             entity.items.clear();
             entity.items.add(items);
             //ensure capacity.
-            entity.items.each((i, a) -> entity.items.set(i, Math.min(a, entity.storageCapacity)));
+            entity.items.each((i, a) -> entity.items.set(i, Mathf.clamp(a, 0, entity.storageCapacity)));
         }
     }
 
