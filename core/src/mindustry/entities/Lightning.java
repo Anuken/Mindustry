@@ -38,7 +38,7 @@ public class Lightning{
         random.setSeed(seed);
         hit.clear();
 
-        BulletType hitCreate = hitter == null ? Bullets.damageLightning : hitter.type.lightningType;
+        BulletType hitCreate = hitter == null || hitter.type.lightningType == null ? Bullets.damageLightning : hitter.type.lightningType;
         Seq<Vec2> lines = new Seq<>();
         bhit = false;
 

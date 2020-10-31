@@ -252,14 +252,6 @@ public abstract class BulletType extends Content{
     }
 
     public void init(Bullet b){
-        if(pierceCap >= 1){
-            pierce = true;
-            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
-        }
-
-        if(lightningType == null){
-            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
-        }
 
         if(killShooter && b.owner() instanceof Healthc){
             ((Healthc)b.owner()).kill();
@@ -286,6 +278,18 @@ public abstract class BulletType extends Content{
             if(Mathf.chanceDelta(trailChance)){
                 trailEffect.at(b.x, b.y, trailParam, trailColor);
             }
+        }
+    }
+
+    @Override
+    public void init(){
+        if(pierceCap >= 1){
+            pierce = true;
+            //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
+        }
+
+        if(lightningType == null){
+            lightningType = !collidesAir ? Bullets.damageLightningGround : Bullets.damageLightning;
         }
     }
 
