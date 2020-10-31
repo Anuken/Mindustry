@@ -268,7 +268,7 @@ public class SectorDamage{
                     }
 
                     if(build.block instanceof ForceProjector f){
-                        sumHealth += f.breakage * e;
+                        sumHealth += f.shieldHealth * e;
                         sumRps += 1f * e;
                     }
                 }

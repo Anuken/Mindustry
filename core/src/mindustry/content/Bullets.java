@@ -478,7 +478,7 @@ public class Bullets implements ContentList{
             knockback = 1.7f;
             puddleSize = 8f;
             drag = 0.001f;
-            ammoMultiplier = 2f;
+            ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
             damage = 0.2f;
         }};
@@ -489,7 +489,7 @@ public class Bullets implements ContentList{
             knockback = 1.3f;
             puddleSize = 8f;
             drag = 0.001f;
-            ammoMultiplier = 2f;
+            ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
             damage = 0.2f;
         }};
@@ -499,9 +499,9 @@ public class Bullets implements ContentList{
             speed = 4f;
             knockback = 1.3f;
             puddleSize = 8f;
-            damage = 5f;
+            damage = 4.75f;
             drag = 0.001f;
-            ammoMultiplier = 2f;
+            ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
         }};
 
@@ -511,7 +511,7 @@ public class Bullets implements ContentList{
             knockback = 1.3f;
             puddleSize = 8f;
             drag = 0.001f;
-            ammoMultiplier = 2f;
+            ammoMultiplier = 0.4f;
             statusDuration = 60f * 4f;
             damage = 0.2f;
         }};

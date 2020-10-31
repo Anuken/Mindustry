@@ -916,7 +916,7 @@ public class Blocks implements ContentList{
             size = 3;
             phaseRadiusBoost = 80f;
             radius = 101.7f;
-            breakage = 750f;
+            shieldHealth = 750f;
             cooldownNormal = 1.5f;
             cooldownLiquid = 1.2f;
             cooldownBrokenBase = 0.35f;
