@@ -34,6 +34,7 @@ public class MassDriver extends Block{
     public Sound shootSound = Sounds.shootBig;
     public float shake = 3f;
     public @Load("@-base") TextureRegion baseRegion;
+    public @Load("@-indicator") TextureRegion indicatorRegion;
 
     public MassDriver(String name){
         super(name);
@@ -95,6 +96,7 @@ public class MassDriver extends Block{
         public float reload = 0f;
         public DriverState state = DriverState.idle;
         public OrderedSet<Tile> waitingShooters = new OrderedSet<>();
+        public Item indicatorItem;
 
         public Tile currentShooter(){
             return waitingShooters.isEmpty() ? null : waitingShooters.first();
@@ -127,6 +129,10 @@ public class MassDriver extends Block{
                 }else if(hasLink){ //switch to shooting if there's a valid link.
                     state = DriverState.shooting;
                 }
+            }
+
+            if(items.first() != null) {
+                indicatorItem = items.first();
             }
 
             //dump when idle or accepting
@@ -198,6 +204,13 @@ public class MassDriver extends Block{
             Draw.rect(region,
             x + Angles.trnsx(rotation + 180f, reload * knockback),
             y + Angles.trnsy(rotation + 180f, reload * knockback), rotation - 90);
+
+            if(indicatorItem != null){
+                Draw.color(indicatorItem.color);
+                Draw.rect(indicatorRegion,
+                x + Angles.trnsx(rotation + 180f, reload * knockback),
+                y + Angles.trnsy(rotation + 180f, reload * knockback), rotation - 90);
+            }
         }
 
         @Override
