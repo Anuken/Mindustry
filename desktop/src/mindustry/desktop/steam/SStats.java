@@ -7,7 +7,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.game.GameStats.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -242,10 +241,6 @@ public class SStats implements SteamUserStatsCallback{
                 if(Vars.state.rules.attackMode){
                     SStat.attacksWon.add();
                 }
-
-                RankResult result = state.stats.calculateRank(state.getSector(), true);
-                if(result.rank == Rank.S) earnSRank.complete();
-                if(result.rank == Rank.SS) earnSSRank.complete();
             }
 
             if(state.rules.pvp){
