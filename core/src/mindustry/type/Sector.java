@@ -99,7 +99,7 @@ public class Sector{
     }
 
     public String name(){
-        if(preset != null) return preset.localizedName;
+        if(preset != null && info.name == null) return preset.localizedName;
         return info.name == null ? id + "" : info.name;
     }
 

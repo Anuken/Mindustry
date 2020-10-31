@@ -21,9 +21,11 @@ public class LogicDialog extends BaseDialog{
 
         canvas = new LCanvas();
         shouldPause = true;
-        addCloseButton();
 
-        buttons.getCells().first().width(170f);
+        addCloseListener();
+
+        buttons.defaults().size(160f, 64f);
+        buttons.button("@back", Icon.left, this::hide);
 
         buttons.button("@edit", Icon.edit, () -> {
             BaseDialog dialog = new BaseDialog("@editor.export");
@@ -51,7 +53,7 @@ public class LogicDialog extends BaseDialog{
 
             dialog.addCloseButton();
             dialog.show();
-        }).width(170f);
+        });
 
         buttons.button("@add", Icon.add, () -> {
             BaseDialog dialog = new BaseDialog("@add");
@@ -75,7 +77,7 @@ public class LogicDialog extends BaseDialog{
             });
             dialog.addCloseButton();
             dialog.show();
-        }).width(170f).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+        }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
 
         add(canvas).grow();
 
