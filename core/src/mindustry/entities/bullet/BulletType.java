@@ -117,7 +117,7 @@ public abstract class BulletType extends Content{
     public float lightningCone = 360f;
     public float lightningAngle = 0f;
     /** The bullet created at lightning points. */
-    public BulletType lightningType;
+    public @Nullable BulletType lightningType = null;
 
     public float weaveScale = 1f;
     public float weaveMag = -1f;
