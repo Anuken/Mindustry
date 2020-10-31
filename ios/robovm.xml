@@ -23,6 +23,7 @@
         <pattern>mindustry.gen.Call</pattern>
         <pattern>mindustry.net.**</pattern>
         <pattern>mindustry.world.blocks.**</pattern>
+        <pattern>mindustry.logic.**</pattern>
         <pattern>com.android.okhttp.HttpHandler</pattern>
         <pattern>com.android.okhttp.HttpsHandler</pattern>
         <pattern>com.android.org.conscrypt.**</pattern>

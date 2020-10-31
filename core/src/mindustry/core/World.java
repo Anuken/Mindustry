@@ -200,8 +200,8 @@ public class World{
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
-            if(tile.block() instanceof LegacyBlock){
-                tile.remove();
+            if(tile.block() instanceof LegacyBlock l){
+                l.removeSelf(tile);
                 continue;
             }
 

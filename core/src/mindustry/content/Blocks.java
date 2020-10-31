@@ -1994,8 +1994,8 @@ public class Blocks implements ContentList{
         illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
             brightness = 0.75f;
-            radius = 160f;
-            consumes.power(0.06f);
+            radius = 120f;
+            consumes.power(0.05f);
         }};
 
         //endregion
@@ -2004,6 +2004,12 @@ public class Blocks implements ContentList{
         //looked up by name, no ref needed
         new LegacyMechPad("legacy-mech-pad");
         new LegacyUnitFactory("legacy-unit-factory");
+        new LegacyUnitFactory("legacy-unit-factory-air"){{
+            replacement = Blocks.airFactory;
+        }};
+        new LegacyUnitFactory("legacy-unit-factory-ground"){{
+            replacement = Blocks.groundFactory;
+        }};
 
         //endregion
         //region campaign
