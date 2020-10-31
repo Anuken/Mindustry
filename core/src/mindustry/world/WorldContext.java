@@ -20,4 +20,7 @@ public interface WorldContext{
     /** End generating, prepares tiles.*/
     void end();
 
+    /** Called when a building is finished reading. */
+    default void onReadBuilding(){}
+
 }

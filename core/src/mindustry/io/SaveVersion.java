@@ -263,6 +263,8 @@ public abstract class SaveVersion extends SaveFileReader{
                             //skip the entity region, as the entity and its IO code are now gone
                             skipChunk(stream, true);
                         }
+
+                        context.onReadBuilding();
                     }
                 }else if(hadData){
                     tile.setBlock(block);
