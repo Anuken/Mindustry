@@ -29,7 +29,6 @@ public class UnitFactory extends UnitBlock{
 
     public UnitFactory(String name){
         super(name);
-        group = BlockGroup.units;
         update = true;
         hasPower = true;
         hasItems = true;

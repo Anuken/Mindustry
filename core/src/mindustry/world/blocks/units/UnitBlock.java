@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.production.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -17,7 +18,7 @@ public class UnitBlock extends PayloadAcceptor{
 
     public UnitBlock(String name){
         super(name);
-
+        group = BlockGroup.units;
         outputsPayload = true;
         rotate = true;
         update = true;
