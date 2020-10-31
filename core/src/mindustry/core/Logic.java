@@ -180,18 +180,8 @@ public class Logic implements ApplicationListener{
             //if there's a "win" wave and no enemies are present, win automatically
             if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                 (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
-                //the sector has been conquered - waves get disabled
-                state.rules.waves = false;
-                //disable attack mode
-                state.rules.attackMode = false;
 
-                //fire capture event
-                Events.fire(new SectorCaptureEvent(state.rules.sector));
-
-                //save, just in case
-                if(!headless){
-                    control.saves.saveSector(state.rules.sector);
-                }
+                Call.sectorCapture();
             }
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
@@ -224,6 +214,24 @@ public class Logic implements ApplicationListener{
                 Tmp.v1.setToRandomDirection();
                 Call.createWeather(entry.weather, entry.intensity, duration, Tmp.v1.x, Tmp.v1.y);
             }
+        }
+    }
+
+    @Remote(called = Loc.server)
+    public static void sectorCapture(){
+        //the sector has been conquered - waves get disabled
+        state.rules.waves = false;
+        //disable attack mode
+        state.rules.attackMode = false;
+
+        if(state.rules.sector == null) return;
+
+        //fire capture event
+        Events.fire(new SectorCaptureEvent(state.rules.sector));
+
+        //save, just in case
+        if(!headless){
+            control.saves.saveSector(state.rules.sector);
         }
     }
 

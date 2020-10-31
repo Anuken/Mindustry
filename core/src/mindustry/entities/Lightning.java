@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.bullet.*;
@@ -33,11 +34,11 @@ public class Lightning{
         createLightningInternal(bullet, lastSeed++, bullet.team, color, damage, x, y, targetAngle, length);
     }
 
-    private static void createLightningInternal(Bullet hitter, int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
+    private static void createLightningInternal(@Nullable Bullet hitter, int seed, Team team, Color color, float damage, float x, float y, float rotation, int length){
         random.setSeed(seed);
         hit.clear();
 
-        BulletType hitCreate = hitter.type.lightningType;
+        BulletType hitCreate = hitter == null ? Bullets.damageLightning : hitter.type.lightningType;
         Seq<Vec2> lines = new Seq<>();
         bhit = false;
 
