@@ -72,7 +72,7 @@ public class ForceProjector extends Block{
     @Override
     public void setBars(){
         super.setBars();
-        bars.add("shield", entity -> new Bar("stat.shieldremaining", Pal.shield, () -> 1 - ((ForceBuild) entity).buildup / breakage).blink(Color.white));
+        bars.add("shield", (ForceBuild entity) -> new Bar("stat.shieldremaining", Pal.shield, () -> 1 - entity.buildup / breakage).blink(Color.white));
     }
 
     @Override
