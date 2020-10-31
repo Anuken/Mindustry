@@ -152,7 +152,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 mount.reload <= 0.0001f && //reload has to be 0
                 Angles.within(weapon.rotate ? mount.rotation : this.rotation, mount.targetRotation, mount.weapon.shootCone) //has to be within the cone
             ){
-                shoot(mount, shootX, shootY, mount.aimX, mount.aimY, shootAngle, Mathf.sign(weapon.x));
+                shoot(mount, shootX, shootY, mount.aimX, mount.aimY, shootAngle);
 
                 mount.reload = weapon.reload;
 
@@ -162,7 +162,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         }
     }
 
-    private void shoot(WeaponMount mount, float x, float y, float aimX, float aimY, float rotation, int side){
+    private void shoot(WeaponMount mount, float x, float y, float aimX, float aimY, float rotation){
         Weapon weapon = mount.weapon;
 
         float baseX = this.x, baseY = this.y;
@@ -203,7 +203,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
             mount.heat = 1f;
         }
 
-        weapon.ejectEffect.at(x, y, rotation * side);
+        weapon.ejectEffect.at(x, y, rotation);
         ammo.shootEffect.at(x, y, rotation, parentize ? this : null);
         ammo.smokeEffect.at(x, y, rotation, parentize ? this : null);
         apply(weapon.shootStatus, weapon.shootStatusDuration);
