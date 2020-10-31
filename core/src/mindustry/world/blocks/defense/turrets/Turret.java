@@ -233,6 +233,7 @@ public abstract class Turret extends ReloadTurret{
             unit.health(health);
             unit.rotation(rotation);
             unit.team(team);
+            unit.set(x, y);
 
             if(logicControlTime > 0){
                 logicControlTime -= Time.delta;

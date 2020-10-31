@@ -99,6 +99,7 @@ public class Router extends Block{
                 unit.health(health);
                 unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
                 unit.team(team);
+                unit.set(x, y);
 
                 int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
 

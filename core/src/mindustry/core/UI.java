@@ -328,20 +328,21 @@ public class UI implements ApplicationListener, Loadable{
 
     /** Shows a label in the world. This label is behind everything. Does not fade. */
     public void showLabel(String info, float duration, float worldx, float worldy){
-        Table table = new Table();
-        table.setFillParent(true);
+        var table = new Table(Styles.black3).margin(4);
         table.touchable = Touchable.disabled;
         table.update(() -> {
             if(state.isMenu()) table.remove();
+            Vec2 v = Core.camera.project(worldx, worldy);
+            table.setPosition(v.x, v.y, Align.center);
         });
         table.actions(Actions.delay(duration), Actions.remove());
-        table.align(Align.center).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).update(t -> {
-            Vec2 v = Core.camera.project(worldx, worldy);
-            t.setPosition(v.x, v.y, Align.center);
-        });
+        table.add(info).style(Styles.outlineLabel);
+        table.pack();
         table.act(0f);
         //make sure it's at the back
         Core.scene.root.addChildAt(0, table);
+
+        table.getChildren().first().act(0f);
     }
 
     public void showInfo(String info){

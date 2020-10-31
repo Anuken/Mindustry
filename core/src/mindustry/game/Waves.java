@@ -342,7 +342,7 @@ public class Waves{
         int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.6f, difficulty));
         int bossSpacing = (int)(rand.random(25, 40) * Mathf.lerp(1f, 0.6f, difficulty));
 
-        int bossTier = difficulty < 0.5 ? 4 : 5;
+        int bossTier = difficulty < 0.5 ? 3 : 4;
 
         //main boss progression
         out.add(new SpawnGroup(Structs.random(species)[bossTier]){{
