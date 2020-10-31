@@ -50,6 +50,11 @@ public class Stats{
     }
 
     /** Adds an item value. */
+    public void add(Stat stat, ItemStack item, float timePeriod){
+        add(stat, new ItemListValue(timePeriod, item));
+    }
+
+    /** Adds an liquid value. */
     public void add(Stat stat, Liquid liquid, float amount, boolean perSecond){
         add(stat, new LiquidValue(liquid, amount, perSecond));
     }

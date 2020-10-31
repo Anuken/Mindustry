@@ -73,4 +73,9 @@ public class ConsumeItemFilter extends Consume{
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, new ItemFilterValue(filter));
     }
+
+    @Override
+    public void display(Stats stats, float timePeriod){
+        display(stats);
+    }
 }

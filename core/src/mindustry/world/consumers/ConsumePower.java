@@ -62,6 +62,11 @@ public class ConsumePower extends Consume{
         }
     }
 
+    @Override
+    public void display(Stats stats, float timePeriod){
+        display(stats);
+    }
+
     /**
      * Retrieves the amount of power which is requested for the given block and entity.
      * @param entity The entity which contains the power module.

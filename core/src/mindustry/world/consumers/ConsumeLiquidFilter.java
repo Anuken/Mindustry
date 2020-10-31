@@ -52,4 +52,9 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, new LiquidFilterValue(filter, amount * 60f, true));
     }
+
+    @Override
+    public void display(Stats stats, float timePeriod){
+        display(stats);
+    }
 }

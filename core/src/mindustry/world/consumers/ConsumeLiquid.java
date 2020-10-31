@@ -48,4 +48,9 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
     public void display(Stats stats){
         stats.add(booster ? Stat.booster : Stat.input, liquid, amount * 60f, true);
     }
+
+    @Override
+    public void display(Stats stats, float timePeriod){
+        display(stats);
+    }
 }

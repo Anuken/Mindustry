@@ -25,6 +25,11 @@ public class Fracker extends SolidPump{
     }
 
     @Override
+    public void displayConsumers() {
+        consumes.display(stats, itemUseTime);
+    }
+
+    @Override
     public boolean outputsItems(){
         return false;
     }
