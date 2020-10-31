@@ -79,19 +79,16 @@ public class MapIO{
             CachedTile tile = new CachedTile(){
                 @Override
                 public void setBlock(Block type){
+                    //previous state.
+                    if(build != null && build.block instanceof CoreBlock){
+                        map.teams.add(build.team.id);
+                    }
+
                     super.setBlock(type);
                     int c = colorFor(block(), Blocks.air, Blocks.air, team());
                     if(c != black){
                         walls.draw(x, floors.getHeight() - 1 - y, c);
                         floors.draw(x, floors.getHeight() - 1 - y + 1, shade);
-                    }
-                }
-
-                @Override
-                public void setTeam(Team team){
-                    super.setTeam(team);
-                    if(block instanceof CoreBlock){
-                        map.teams.add(team.id);
                     }
                 }
             };
