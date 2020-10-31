@@ -75,6 +75,9 @@ public class SectorDamage{
                 float timeDestroyEnemy = dps <= 0.0001f ? Float.POSITIVE_INFINITY : enemyHealth / dps; //if dps == 0, this is infinity
                 float timeDestroyBase = health / (enemyDps - rps); //if regen > enemyDps this is negative
 
+                //regenerating faster than the base can be damaged
+                if(timeDestroyBase < 0) continue;
+
                 //sector is lost, enemy took too long.
                 if(timeDestroyEnemy > timeDestroyBase){
                     health = 0f;
