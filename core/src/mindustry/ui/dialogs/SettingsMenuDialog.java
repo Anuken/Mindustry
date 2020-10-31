@@ -381,13 +381,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
+
         if(!ios){
             graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
         }else{
             Core.settings.put("bloom", false);
         }
-
-
 
         graphics.checkPref("pixelate", false, val -> {
             if(val){
