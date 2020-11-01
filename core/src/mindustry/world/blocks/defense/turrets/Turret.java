@@ -63,6 +63,7 @@ public abstract class Turret extends ReloadTurret{
     public float chargeTime = -1; //<0 to disable charging and chargeEffects. If you still want the charge effects for some reason, set to 0;
     public int chargeEffects = 5;
     public float chargeMaxDelay = 10f;
+    public boolean chargeTurn = false;
     public Effect chargeEffect = Fx.none;
     public Effect chargeBeginEffect = Fx.none;
     public Sound chargeSound = Sounds.none;
@@ -312,7 +313,11 @@ public abstract class Turret extends ReloadTurret{
         }
 
         public boolean shouldTurn(){
-            return !charging;
+            if(chargeTurn){
+                return true;
+            }else{
+                return !charging;
+            }
         }
 
         /** Consume ammo and return a type. */
