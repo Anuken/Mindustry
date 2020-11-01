@@ -22,7 +22,7 @@ const extend = function(classType, params){
     return new JavaAdapter(classType, params)
 }
 
-//these are not sctrictly necessary, but are kept for edge cases
+//these are not strictly necessary, but are kept for edge cases
 const run = method => new java.lang.Runnable(){run: method}
 const boolf = method => new Boolf(){get: method}
 const boolp = method => new Boolp(){get: method}
