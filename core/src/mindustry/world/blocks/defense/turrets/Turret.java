@@ -313,11 +313,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         public boolean shouldTurn(){
-            if(chargeTurn){
-                return true;
-            }else{
-                return !charging;
-            }
+            return chargeTurn ? true : !charging;
         }
 
         /** Consume ammo and return a type. */
