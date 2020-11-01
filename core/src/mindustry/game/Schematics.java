@@ -418,12 +418,26 @@ public class Schematics implements Loadable{
     }
 
     public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource){
+        placeLoadout(schem, x, y, team, resource, true);
+    }
+
+    public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource, boolean check){
         Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
+        Seq<Tile> seq = new Seq<>();
         if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
+
+            //check for blocks that are in the way.
+            if(check && !(st.block instanceof CoreBlock)){
+                seq.clear();
+                tile.getLinkedTilesAs(st.block, seq);
+                if(seq.contains(t -> !t.block().alwaysReplace)){
+                    return;
+                }
+            }
 
             tile.setBlock(st.block, team, st.rotation);
 

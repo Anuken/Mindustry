@@ -121,6 +121,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.button("@settings.clearresearch", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
+                    universe.clearLoadoutInfo();
                     for(TechNode node : TechTree.all){
                         node.reset();
                     }

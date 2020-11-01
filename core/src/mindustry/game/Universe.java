@@ -21,7 +21,7 @@ public class Universe{
     private int turn;
     private float turnCounter;
 
-    private Schematic lastLoadout;
+    private @Nullable Schematic lastLoadout;
     private ItemSeq lastLaunchResources = new ItemSeq();
 
     public Universe(){
@@ -90,6 +90,15 @@ public class Universe{
             state.rules.ambientLight.a = 1f - alpha;
             state.rules.lighting = !Mathf.equal(alpha, 1f);
         }
+    }
+
+    public void clearLoadoutInfo(){
+        lastLoadout = null;
+        lastLaunchResources = new ItemSeq();
+        Core.settings.remove("launch-resources-seq");
+        Core.settings.remove("lastloadout-core-shard");
+        Core.settings.remove("lastloadout-core-nucleus");
+        Core.settings.remove("lastloadout-core-foundation");
     }
 
     public ItemSeq getLaunchResources(){

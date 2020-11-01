@@ -159,9 +159,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.unit().eachGroup(unit -> {
             Item item = unit.item();
             int accepted = tile.acceptStack(item, unit.stack.amount, unit);
-            unit.stack.amount -= accepted;
 
-            Call.transferItemTo(item, accepted, unit.x, unit.y, tile);
+            Call.transferItemTo(unit, item, accepted, unit.x, unit.y, tile);
 
             if(unit == player.unit()){
                 Events.fire(new DepositEvent(tile, player, item, accepted));
