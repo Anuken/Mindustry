@@ -39,9 +39,7 @@ public enum LAccess{
     enabled("to"), //"to" is standard for single parameter access
     shoot("x", "y", "shoot"),
     shootp(true, "unit", "shoot"),
-    configure(true, 30, "to")
-
-    ;
+    configure(true, 30, "to");
 
     public final String[] params;
     public final boolean isObj;
