@@ -59,6 +59,13 @@ public abstract class Turret extends ReloadTurret{
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
+    /** Charging related stuff*/
+    public float chargeTime = -1; //<0 to disable charging and chargeEffects. Effects play if chargeTime = 0, but there's not delay.
+    public int chargeEffects = 5;
+    public float chargeMaxDelay = 10f;
+    public Effect chargeEffect = Fx.none;
+    public Effect chargeBeginEffect = Fx.none;
+    public Sound chargeSound = Sounds.none;
 
     public Sortf unitSort = Unit::dst2;
 
@@ -135,6 +142,7 @@ public abstract class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = Nulls.blockUnit;
+        public boolean charging;
 
         @Override
         public void created(){
@@ -304,7 +312,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         public boolean shouldTurn(){
-            return true;
+            return !charging;
         }
 
         /** Consume ammo and return a type. */
@@ -343,45 +351,65 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void shoot(BulletType type){
-            recoil = recoilAmount;
-            heat = 1f;
-
-            //when burst spacing is enabled, use the burst pattern
-            if(burstSpacing > 0.0001f){
-                for(int i = 0; i < shots; i++){
-                    Time.run(burstSpacing * i, () -> {
-                        if(!isValid() || !hasAmmo()) return;
-
-                        recoil = recoilAmount;
-
-                        tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
-                        bullet(type, rotation + Mathf.range(inaccuracy));
-                        effects();
-                        useAmmo();
+            tr.trns(rotation, size * tilesize / 2f);
+            
+            if(chargeTime >= 0){
+                chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
+                chargeSound.at(x + tr.x, y + tr.y, 1);
+                for(int i = 0; i < chargeEffects; i++){
+                    Time.run(Mathf.random(chargeMaxDelay), () -> {
+                        if(!isValid()) return;
+                        tr.trns(rotation, size * tilesize / 2f);
+                        chargeEffect.at(x + tr.x, y + tr.y, rotation);
                     });
                 }
-
-            }else{
-                //otherwise, use the normal shot pattern(s)
-
-                if(alternate){
-                    float i = (shotCounter % shots) - (shots-1)/2f;
-
-                    tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2f);
-                    bullet(type, rotation + Mathf.range(inaccuracy));
-                }else{
-                    tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
-
-                    for(int i = 0; i < shots; i++){
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
-                    }
-                }
-
-                shotCounter++;
-
-                effects();
-                useAmmo();
             }
+            
+            charging = true;
+            
+            Time.run((chargeTime <= 0 ? 0 : chargeTime), () -> {
+                charging = false;
+                //when burst spacing is enabled, use the burst pattern
+                if(burstSpacing > 0.0001f){
+                    for(int i = 0; i < shots; i++){
+                        Time.run(burstSpacing * i, () -> {
+                            if(!isValid() || !hasAmmo()) return;
+
+                            heat = 1f;
+                            recoil = recoilAmount;
+
+                            tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+                            bullet(type, rotation + Mathf.range(inaccuracy));
+                            effects();
+                            useAmmo();
+                        });
+                    }
+
+                }else{
+                    heat = 1f;
+                    recoil = recoilAmount;
+                    
+                    //otherwise, use the normal shot pattern(s)
+
+                    if(alternate){
+                        float i = (shotCounter % shots) - (shots-1)/2f;
+
+                        tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2f);
+                        bullet(type, rotation + Mathf.range(inaccuracy));
+                    }else{
+                        tr.trns(rotation, size * tilesize / 2f, Mathf.range(xRand));
+
+                        for(int i = 0; i < shots; i++){
+                            bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (i - (int)(shots / 2f)) * spread);
+                        }
+                    }
+
+                    shotCounter++;
+
+                    effects();
+                    useAmmo();
+                }
+            });
         }
 
         protected void bullet(BulletType type, float angle){
