@@ -60,7 +60,7 @@ public abstract class Turret extends ReloadTurret{
     public boolean targetAir = true;
     public boolean targetGround = true;
     /** Charging related stuff*/
-    public float chargeTime = -1; //<0 to disable charging and chargeEffects. Effects play if chargeTime = 0, but there's not delay.
+    public float chargeTime = -1; //<0 to disable charging and chargeEffects. If you still want the charge effects for some reason, set to 0;
     public int chargeEffects = 5;
     public float chargeMaxDelay = 10f;
     public Effect chargeEffect = Fx.none;
@@ -351,11 +351,11 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void shoot(BulletType type){
-            tr.trns(rotation, size * tilesize / 2f);
-            
             if(chargeTime >= 0){
+                tr.trns(rotation, size * tilesize / 2f);
                 chargeBeginEffect.at(x + tr.x, y + tr.y, rotation);
                 chargeSound.at(x + tr.x, y + tr.y, 1);
+                
                 for(int i = 0; i < chargeEffects; i++){
                     Time.run(Mathf.random(chargeMaxDelay), () -> {
                         if(!isValid()) return;
