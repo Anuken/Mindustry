@@ -1319,7 +1319,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void control(LAccess type, Object p1, double p2, double p3, double p4){
-        if(type == LAccess.configure && block.logicConfigurable){
+        //don't execute configure instructions as the client
+        if(type == LAccess.configure && block.logicConfigurable && !net.client()){
             //change config only if it's new
             Object prev = senseObject(LAccess.config);
             if(prev != p1){

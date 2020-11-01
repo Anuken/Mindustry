@@ -21,11 +21,14 @@ public class Effect{
     private static final EffectContainer container = new EffectContainer();
     private static final Seq<Effect> all = new Seq<>();
 
+    private boolean initialized;
+
     public final int id;
-    public final Cons<EffectContainer> renderer;
-    public final float lifetime;
+
+    public Cons<EffectContainer> renderer = e -> {};
+    public float lifetime = 50f;
     /** Clip size. */
-    public float size;
+    public float clip;
 
     public float layer = Layer.effect;
     public float layerDuration;
@@ -34,13 +37,21 @@ public class Effect{
         this.id = all.size;
         this.lifetime = life;
         this.renderer = renderer;
-        this.size = clipsize;
+        this.clip = clipsize;
         all.add(this);
     }
 
     public Effect(float life, Cons<EffectContainer> renderer){
-        this(life,50f, renderer);
+        this(life, 50f, renderer);
     }
+
+    //for custom implementations
+    public Effect(){
+        this.id = all.size;
+        all.add(this);
+    }
+
+    public void init(){}
 
     public Effect layer(float l){
         layer = l;
@@ -89,10 +100,14 @@ public class Effect{
         container.set(id, color, life, lifetime, rotation, x, y, data);
         Draw.z(layer);
         Draw.reset();
-        renderer.get(container);
+        render(container);
         Draw.reset();
 
         return container.lifetime;
+    }
+
+    public void render(EffectContainer e){
+        renderer.get(e);
     }
 
     public static @Nullable Effect get(int id){
@@ -122,9 +137,14 @@ public class Effect{
         if(headless || effect == Fx.none) return;
         if(Core.settings.getBool("effects")){
             Rect view = Core.camera.bounds(Tmp.r1);
-            Rect pos = Tmp.r2.setSize(effect.size).setCenter(x, y);
+            Rect pos = Tmp.r2.setSize(effect.clip).setCenter(x, y);
 
             if(view.overlaps(pos)){
+                if(!effect.initialized){
+                    effect.initialized = true;
+                    effect.init();
+                }
+
                 EffectState entity = EffectState.create();
                 entity.effect = effect;
                 entity.rotation = rotation;

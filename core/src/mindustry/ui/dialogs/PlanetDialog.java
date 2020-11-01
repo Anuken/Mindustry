@@ -468,6 +468,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     shouldHide = false;
                     Sector from = findLauncher(sector);
                     if(from == null){
+                        //clear loadout information, so only the basic loadout gets used
+                        universe.clearLoadoutInfo();
                         //free launch.
                         control.playSector(sector);
                     }else{
