@@ -38,9 +38,7 @@ public enum LogicOp{
     floor("floor", Math::floor),
     ceil("ceil", Math::ceil),
     sqrt("sqrt", Math::sqrt),
-    rand("rand", d -> Mathf.rand.nextDouble() * d),
-
-    ;
+    rand("rand", d -> Mathf.rand.nextDouble() * d);
 
     public static final LogicOp[] all = values();
 

@@ -17,9 +17,9 @@ public class LAssembler{
 
     private int lastVar;
     /** Maps names to variable IDs. */
-    ObjectMap<String, BVar> vars = new ObjectMap<>();
+    public ObjectMap<String, BVar> vars = new ObjectMap<>();
     /** All instructions to be executed. */
-    LInstruction[] instructions;
+    public LInstruction[] instructions;
 
     public LAssembler(){
         //instruction counter
@@ -105,7 +105,7 @@ public class LAssembler{
             if(index++ > max) break;
 
             line = line.replace("\t", "").trim();
-            
+
             try{
                 String[] arr;
 
