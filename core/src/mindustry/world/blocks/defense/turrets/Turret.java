@@ -316,7 +316,7 @@ public abstract class Turret extends ReloadTurret{
             if(entry.amount <= 0) ammo.pop();
             totalAmmo -= ammoPerShot;
             totalAmmo = Math.max(totalAmmo, 0);
-            Time.run(reloadTime / 2f, this::ejectEffects);
+            ejectEffects();
             return entry.type();
         }
 
@@ -408,7 +408,10 @@ public abstract class Turret extends ReloadTurret{
         protected void ejectEffects(){
             if(!isValid()) return;
 
-            ammoUseEffect.at(x - Angles.trnsx(rotation, ammoEjectBack), y - Angles.trnsy(rotation, ammoEjectBack), rotation);
+            //alternate sides when using a double turret
+            float scl = (shots == 2 && alternate && shotCounter % 2 == 1 ? -1f : 1f);
+
+            ammoUseEffect.at(x - Angles.trnsx(rotation, ammoEjectBack), y - Angles.trnsy(rotation, ammoEjectBack), rotation * scl);
         }
 
         @Override

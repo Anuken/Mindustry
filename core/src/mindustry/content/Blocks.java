@@ -1404,7 +1404,7 @@ public class Blocks implements ContentList{
             restitution = 0.03f;
             range = 100;
             shootCone = 15f;
-            ammoUseEffect = Fx.shellEjectSmall;
+            ammoUseEffect = Fx.casing1;
             health = 250;
             inaccuracy = 2f;
             rotateSpeed = 10f;
@@ -1593,7 +1593,7 @@ public class Blocks implements ContentList{
             shootShake = 1f;
             burstSpacing = 3f;
             shots = 4;
-            ammoUseEffect = Fx.shellEjectBig;
+            ammoUseEffect = Fx.casing2;
             health = 240 * size * size;
             shootSound = Sounds.shootBig;
         }};
@@ -1687,7 +1687,7 @@ public class Blocks implements ContentList{
             inaccuracy = 12f;
             reloadTime = 60f;
             ammoEjectBack = 5f;
-            ammoUseEffect = Fx.shellEjectBig;
+            ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
             cooldown = 0.03f;
             velocityInaccuracy = 0.2f;
@@ -1745,7 +1745,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 2.5f;
             reloadTime = 200f;
             restitution = 0.2f;
-            ammoUseEffect = Fx.shellEjectBig;
+            ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
             restitution = 0.009f;
             cooldown = 0.009f;
@@ -1774,7 +1774,7 @@ public class Blocks implements ContentList{
             reloadTime = 6f;
             coolantMultiplier = 0.5f;
             restitution = 0.1f;
-            ammoUseEffect = Fx.shellEjectBig;
+            ammoUseEffect = Fx.casing3Double;
             range = 200f;
             inaccuracy = 3f;
             recoilAmount = 3f;

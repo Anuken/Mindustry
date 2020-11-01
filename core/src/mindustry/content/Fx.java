@@ -1064,68 +1064,102 @@ public class Fx{
 
     }),
 
-    shellEjectSmall = new Effect(30f, e -> {
+    casing1 = new Effect(30f, e -> {
         color(Pal.lightOrange, Color.lightGray, Pal.lightishGray, e.fin());
-        alpha(e.fout(0.2f));
+        alpha(e.fout(0.3f));
         float rot = Math.abs(e.rotation) + 90f;
-
         int i = -Mathf.sign(e.rotation);
 
         float len = (2f + e.finpow() * 6f) * i;
         float lr = rot + e.fin() * 30f * i;
-        Fill.rect(e.x + trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
+        Fill.rect(
+            e.x + trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
             e.y + trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
-            1f, 2f, rot + e.fin() * 50f * i);
+            1f, 2f, rot + e.fin() * 50f * i
+        );
 
-    }).layer(Layer.debris, 400f),
+    }).layer(Layer.bullet),
 
-    shellEjectMedium = new Effect(34f, e -> {
+    casing2 = new Effect(34f, e -> {
         color(Pal.lightOrange, Color.lightGray, Pal.lightishGray, e.fin());
+        alpha(e.fout(0.5f));
         float rot = Math.abs(e.rotation) + 90f;
-        int i = Mathf.sign(e.rotation);
-        //for(int i : Mathf.signs){
+        int i = -Mathf.sign(e.rotation);
+        float len = (2f + e.finpow() * 10f) * i;
+        float lr = rot + e.fin() * 20f * i;
+        rect(Core.atlas.find("casing"),
+            e.x + trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
+            e.y + trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
+            2f, 3f, rot + e.fin() * 50f * i
+        );
+    }).layer(Layer.bullet),
+
+    casing3 = new Effect(40f, e -> {
+        color(Pal.lightOrange, Pal.lightishGray, Pal.lightishGray, e.fin());
+        alpha(e.fout(0.5f));
+        float rot = Math.abs(e.rotation) + 90f;
+        int i = -Mathf.sign(e.rotation);
+        float len = (4f + e.finpow() * 9f) * i;
+        float lr = rot + Mathf.randomSeedRange(e.id + i + 6, 20f * e.fin()) * i;
+
+        rect(Core.atlas.find("casing"),
+            e.x + trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
+            e.y + trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
+            2.5f, 4f,
+            rot + e.fin() * 50f * i
+        );
+    }).layer(Layer.bullet),
+
+    casing4 = new Effect(45f, e -> {
+        color(Pal.lightOrange, Pal.lightishGray, Pal.lightishGray, e.fin());
+        alpha(e.fout(0.5f));
+        float rot = Math.abs(e.rotation) + 90f;
+        int i = -Mathf.sign(e.rotation);
+        float len = (4f + e.finpow() * 9f) * i;
+        float lr = rot + Mathf.randomSeedRange(e.id + i + 6, 20f * e.fin()) * i;
+
+        rect(Core.atlas.find("casing"),
+        e.x + trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
+        e.y + trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
+        3f, 6f,
+        rot + e.fin() * 50f * i
+        );
+    }).layer(Layer.bullet),
+
+    casing2Double = new Effect(34f, e -> {
+        color(Pal.lightOrange, Color.lightGray, Pal.lightishGray, e.fin());
+        alpha(e.fout(0.5f));
+        float rot = Math.abs(e.rotation) + 90f;
+        for(int i : Mathf.signs){
             float len = (2f + e.finpow() * 10f) * i;
             float lr = rot + e.fin() * 20f * i;
             rect(Core.atlas.find("casing"),
             e.x + trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
             e.y + trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
-            2f, 3f, rot);
-        //}
+            2f, 3f, rot + e.fin() * 50f * i
+            );
+        }
 
-        color(Color.lightGray, Color.gray, e.fin());
+    }).layer(Layer.bullet),
 
-        //for(int i : Mathf.signs){
-            float ex = e.x, ey = e.y, fout = e.fout();
-            randLenVectors(e.id, 4, 1f + e.finpow() * 11f, e.rotation + 90f * i, 20f, (x, y) -> {
-                Fill.circle(ex + x, ey + y, fout * 1.5f);
-            });
-        //}
+    casing3Double = new Effect(40f, e -> {
+        color(Pal.lightOrange, Pal.lightishGray, Pal.lightishGray, e.fin());
+        alpha(e.fout(0.5f));
+        float rot = Math.abs(e.rotation) + 90f;
 
-    }).layer(Layer.debris, 400f),
-
-    shellEjectBig = new Effect(22f, e -> {
-        color(Pal.lightOrange, Color.lightGray, Pal.lightishGray, e.fin());
-        float rot = e.rotation + 90f;
         for(int i : Mathf.signs){
-            float len = (4f + e.finpow() * 8f) * i;
+            float len = (4f + e.finpow() * 9f) * i;
             float lr = rot + Mathf.randomSeedRange(e.id + i + 6, 20f * e.fin()) * i;
+
             rect(Core.atlas.find("casing"),
             e.x + trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
             e.y + trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
             2.5f, 4f,
-            rot + e.fin() * 30f * i + Mathf.randomSeedRange(e.id + i + 9, 40f * e.fin()));
+            rot + e.fin() * 50f * i
+            );
         }
 
-        color(Color.lightGray);
-
-        for(int i : Mathf.signs){
-            float ex = e.x, ey = e.y, fout = e.fout();
-            randLenVectors(e.id, 4, -e.finpow() * 15f, e.rotation + 90f * i, 25f, (x, y) -> {
-                Fill.circle(ex + x, ey + y, fout * 2f);
-            });
-        }
-
-    }).layer(Layer.debris, 400f),
+    }).layer(Layer.bullet),
 
     railShoot = new Effect(24f, e -> {
         e.scaled(10f, b -> {
