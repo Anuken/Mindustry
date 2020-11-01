@@ -393,7 +393,7 @@ public abstract class Turret extends ReloadTurret{
                     //otherwise, use the normal shot pattern(s)
 
                     if(alternate){
-                        float i = (shotCounter % shots) - (shots-1)/2f;
+                        float i = (shotCounter % shots) - (shots - 1) / 2f;
 
                         tr.trns(rotation - 90, spread * i + Mathf.range(xRand), size * tilesize / 2f);
                         bullet(type, rotation + Mathf.range(inaccuracy));
