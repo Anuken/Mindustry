@@ -10,7 +10,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -305,10 +304,6 @@ public class Generators{
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
                         scaled.save("../ui/block-" + block.name + "-" + icon.name());
-
-                        if(block == Blocks.itemVoid){
-                            Log.info("saving VOID icon @ / @", icon, "../ui/block-" + block.name + "-" + icon.name());
-                        }
 
                         if(icon == logicIcon && block.synthetic() && block.buildVisibility != BuildVisibility.hidden){
                             image.save(block.name + "-icon-logic");
