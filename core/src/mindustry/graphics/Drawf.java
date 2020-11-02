@@ -109,13 +109,35 @@ public class Drawf{
     }
 
     public static void dashCircle(float x, float y, float rad, Color color){
+        dashCircle(x, y, rad, color, 1f);
+    }
+    
+    public static void dashCircle(float x, float y, float rad, Color color, float alpha){
         Lines.stroke(3f, Pal.gray);
+        Draw.alpha(alpha);
         Lines.dashCircle(x, y, rad);
+        Draw.reset();
         Lines.stroke(1f, color);
+        Draw.alpha(alpha);
         Lines.dashCircle(x, y, rad);
         Draw.reset();
     }
+    
+    public static void hexagon(float x, float y, float rad, Color color){
+        hexagon(x, y, rad, color, 1f);
+    }
 
+    public static void hexagon(float x, float y, float rad, Color color, float alpha){
+        Lines.stroke(3f, Pal.gray);
+        Draw.alpha(alpha);
+        Lines.poly(x, y, 6, rad);
+        Draw.reset();
+        Lines.stroke(1f, color);
+        Draw.alpha(alpha);
+        Lines.poly(x, y, 6, rad);
+        Draw.reset();
+    }
+    
     public static void circles(float x, float y, float rad){
         circles(x, y, rad, Pal.accent);
     }

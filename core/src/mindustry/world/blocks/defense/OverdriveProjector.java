@@ -1,13 +1,16 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -25,8 +28,8 @@ public class OverdriveProjector extends Block{
     public float useTime = 400f;
     public float phaseRangeBoost = 20f;
     public boolean hasBoost = true;
-    public Color baseColor = Color.valueOf("feb380");
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color baseColor = Pal.overdrive;
+    public Color phaseColor = Pal.accent;
 
     public OverdriveProjector(String name){
         super(name);
@@ -44,7 +47,35 @@ public class OverdriveProjector extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
+        //inner circle
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
+
+        boolean boosterUnlocked = true;
+        for(ItemStack item : consumes.getItem().items){
+            if(!item.item.unlockedNow()){
+                boosterUnlocked = false;
+                break;
+            }
+        }
+
+        if(hasBoost && boosterUnlocked){
+            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+            float transparency = Time.time() %90f / 90f;
+
+            //outside circle
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.25f);
+
+            //expanding circle
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, baseColor.cpy().lerp(phaseColor, transparency), 1f - transparency);
+
+            //arrows
+            float sin = Mathf.absin(Time.time(), 6f, 1f);
+            for(int i = 0; i < 360; i += 60){
+                Tmp.v1.trns(i, 0, range - sin);
+                Tmp.v2.trns(i, 0, range + phaseRangeBoost);
+                Drawf.arrow(x * tilesize + offset + Tmp.v1.x, y * tilesize + offset + Tmp.v1.y, x * tilesize + offset + Tmp.v2.x, y * tilesize + offset + Tmp.v2.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
+            }
+        }
     }
 
     @Override
@@ -102,9 +133,13 @@ public class OverdriveProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
-
-            Drawf.dashCircle(x, y, realRange, baseColor);
+            if(!cons().optionalValid() || !hasBoost){
+                indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, baseColor.cpy().a(Mathf.absin(4f, 1f))));
+                Drawf.dashCircle(x, y, realRange, baseColor);
+            }else{
+                indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, phaseColor.cpy().a(Mathf.absin(4f, 1f))));
+                Drawf.dashCircle(x, y, realRange, phaseColor);
+            }
         }
 
         @Override

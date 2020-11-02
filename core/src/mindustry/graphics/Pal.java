@@ -63,6 +63,7 @@ public class Pal{
 
     health = Color.valueOf("ff341c"),
     heal = Color.valueOf("98ffa9"),
+    overdrive = Color.valueOf("feb380"),
     bar = Color.slate,
     accent = Color.valueOf("ffd37f"),
     stat = Color.valueOf("ffd37f"),

@@ -12,6 +12,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -23,9 +24,10 @@ import static mindustry.Vars.*;
 public class ForceProjector extends Block{
     public final int timerUse = timers++;
     public float phaseUseTime = 350f;
-
+    public Color phaseColor = Pal.accent;
     public float phaseRadiusBoost = 80f;
     public float phaseShieldBoost = 400f;
+    public boolean hasBoost = true;
     public float radius = 101.7f;
     public float shieldHealth = 700f;
     public float cooldownNormal = 1.75f;
@@ -71,21 +73,45 @@ public class ForceProjector extends Block{
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
         stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
         stats.add(Stat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
-        stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        if(hasBoost){
+            stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+            stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
+        }
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Draw.color(Pal.gray);
-        Lines.stroke(3f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
-        Draw.color(player.team().color);
-        Lines.stroke(1f);
-        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
-        Draw.color();
+        //inner hexagon
+        Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius, player.team().color);
+        
+        boolean boosterUnlocked = true;
+        for(ItemStack item : consumes.getItem().items) {
+            if(!item.item.unlockedNow()) {
+                boosterUnlocked = false;
+                break;
+            }
+        }
+
+        if(hasBoost && boosterUnlocked) {
+            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+            float transparency = Time.time() % 90f / 90f;
+
+            //outside hexagon
+            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + phaseRadiusBoost, phaseColor, 0.25f);
+
+            //expanding hexagon
+            Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius + expandProgress * phaseRadiusBoost, player.team().color.cpy().lerp(phaseColor, expandProgress), 1f - transparency);
+
+            //arrows
+            float sin = Mathf.absin(Time.time(), 6f, 1f);
+            for(int i = 0; i < 360; i += 60){
+                Tmp.v1.trns(i, 0, radius - sin);
+                Tmp.v2.trns(i, 0, radius + phaseRadiusBoost);
+                Drawf.arrow(x * tilesize + offset + Tmp.v1.x, y * tilesize + offset + Tmp.v1.y, x * tilesize + offset + Tmp.v2.x, y * tilesize + offset + Tmp.v2.y, phaseRadiusBoost/4f + sin, 4f + sin, phaseColor);
+            }
+        }
     }
 
     public class ForceBuild extends Building implements Ranged{
@@ -116,8 +142,10 @@ public class ForceProjector extends Block{
         @Override
         public void updateTile(){
             boolean phaseValid = consumes.get(ConsumeType.item).valid(this);
-
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
+            
+            if(hasBoost){
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
+            }
 
             if(phaseValid && !broken && timer(timerUse, phaseUseTime) && efficiency() > 0){
                 consume();
@@ -191,17 +219,10 @@ public class ForceProjector extends Block{
 
                 Draw.z(Layer.shields);
 
-                Draw.color(team.color, Color.white, Mathf.clamp(hit));
-
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(x, y, 6, radius);
                 }else{
-                    Lines.stroke(1.5f);
-                    Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
-                    Fill.poly(x, y, 6, radius);
-                    Draw.alpha(1f);
-                    Lines.poly(x, y, 6, radius);
-                    Draw.reset();
+                    Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius, team.color.cpy().lerp(Color.white, Mathf.clamp(hit)));
                 }
             }
 

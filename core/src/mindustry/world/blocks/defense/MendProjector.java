@@ -1,14 +1,17 @@
 package mindustry.world.blocks.defense;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -17,8 +20,8 @@ import static mindustry.Vars.*;
 
 public class MendProjector extends Block{
     public final int timerUse = timers++;
-    public Color baseColor = Color.valueOf("84f491");
-    public Color phaseColor = Color.valueOf("ffd59e");
+    public Color baseColor = Pal.heal;
+    public Color phaseColor = Pal.accent;
     public @Load("@-top") TextureRegion topRegion;
     public float reload = 250f;
     public float range = 60f;
@@ -26,6 +29,7 @@ public class MendProjector extends Block{
     public float phaseBoost = 12f;
     public float phaseRangeBoost = 50f;
     public float useTime = 400f;
+    public boolean hasBoost = true;
 
     public MendProjector(String name){
         super(name);
@@ -46,14 +50,44 @@ public class MendProjector extends Block{
 
         stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
-
-        stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-        stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        
+        if(hasBoost){
+            stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+            stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        }
     }
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
+        //inner circle
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
+
+        boolean boosterUnlocked = true;
+        for(ItemStack item : consumes.getItem().items){
+            if(!item.item.unlockedNow()){
+                boosterUnlocked = false;
+                break;
+            }
+        }
+
+        if(hasBoost && boosterUnlocked){
+            float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+            float transparency = Time.time() % 90f / 90f;
+
+            //outside circle
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + phaseRangeBoost, phaseColor, 0.25f);
+
+            //expanding circle
+            Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range + expandProgress * phaseRangeBoost, baseColor.cpy().lerp(phaseColor, transparency), 1f - transparency);
+
+            //arrows
+            float sin = Mathf.absin(Time.time(), 6f, 1f);
+            for(int i = 0; i < 360; i += 60){
+                Tmp.v1.trns(i, 0, range - sin);
+                Tmp.v2.trns(i, 0, range + phaseRangeBoost);
+                Drawf.arrow(x * tilesize + offset + Tmp.v1.x, y * tilesize + offset + Tmp.v1.y, x * tilesize + offset + Tmp.v2.x, y * tilesize + offset + Tmp.v2.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
+            }
+        }
     }
 
     public class MendBuild extends Building implements Ranged{
@@ -71,7 +105,9 @@ public class MendProjector extends Block{
             heat = Mathf.lerpDelta(heat, consValid() || cheating() ? 1f : 0f, 0.08f);
             charge += heat * delta();
 
-            phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
+            if(hasBoost){
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
+            }
 
             if(cons.optionalValid() && timer(timerUse, useTime) && efficiency() > 0){
                 consume();
@@ -92,9 +128,13 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
-
-            Drawf.dashCircle(x, y, realRange, baseColor);
+            if(!cons().optionalValid() || !hasBoost){
+                indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, baseColor.cpy().a(Mathf.absin(4f, 1f))));
+                Drawf.dashCircle(x, y, realRange, baseColor);
+            }else{
+                indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, phaseColor.cpy().a(Mathf.absin(4f, 1f))));
+                Drawf.dashCircle(x, y, realRange, phaseColor);
+            }
         }
 
         @Override
