@@ -22,10 +22,10 @@ public class LCanvas extends Table{
     //ew static variables
     static LCanvas canvas;
 
-    DragLayout statements;
+    public DragLayout statements;
+    public ScrollPane pane;
+    public Group jumps;
     StatementElem dragging;
-    ScrollPane pane;
-    Group jumps;
     StatementElem hovered;
     float targetWidth;
     int jumpCount = 0;
@@ -78,18 +78,18 @@ public class LCanvas extends Table{
         super.draw();
     }
 
-    void add(LStatement statement){
+    public void add(LStatement statement){
         statements.addChild(new StatementElem(statement));
     }
 
-    String save(){
+    public String save(){
         Seq<LStatement> st = statements.getChildren().<StatementElem>as().map(s -> s.st);
         st.each(LStatement::saveUI);
 
         return LAssembler.write(st);
     }
 
-    void load(String asm){
+    public void load(String asm){
         jumps.clear();
 
         Seq<LStatement> statements = LAssembler.read(asm);
@@ -261,7 +261,7 @@ public class LCanvas extends Table{
     }
 
     public class StatementElem extends Table{
-        LStatement st;
+        public LStatement st;
 
         public StatementElem(LStatement st){
             this.st = st;
@@ -341,7 +341,7 @@ public class LCanvas extends Table{
             marginBottom(7);
         }
 
-        void copy(){
+        public void copy(){
             LStatement copy = st.copy();
             if(copy != null){
                 StatementElem s = new StatementElem(copy);
@@ -374,7 +374,7 @@ public class LCanvas extends Table{
         float mx, my;
         ClickListener listener;
 
-        JumpCurve curve;
+        public JumpCurve curve;
 
         public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter){
             super(Tex.logicNode, Styles.colori);
@@ -437,7 +437,7 @@ public class LCanvas extends Table{
     }
 
     public static class JumpCurve extends Element{
-        JumpButton button;
+        public JumpButton button;
 
         public JumpCurve(JumpButton button){
             this.button = button;
@@ -492,7 +492,7 @@ public class LCanvas extends Table{
             }
         }
 
-        void drawCurve(float x, float y, float x2, float y2){
+        public void drawCurve(float x, float y, float x2, float y2){
             Lines.stroke(4f, button.color);
             Draw.alpha(parentAlpha);
 
@@ -518,8 +518,7 @@ public class LCanvas extends Table{
             x + dist, y,
             x2 + dist, y2,
             x2, y2,
-            Math.max(18, (int)(Mathf.dst(x, y, x2, y2) / 6))
-            );
+            Math.max(18, (int)(Mathf.dst(x, y, x2, y2) / 6)));
         }
     }
 }

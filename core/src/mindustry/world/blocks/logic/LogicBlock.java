@@ -324,7 +324,8 @@ public class LogicBlock extends Block{
 
                     executor.load(asm);
                 }catch(Exception e){
-                    e.printStackTrace();
+                    Log.err("Failed to compile logic program @", code);
+                    Log.err(e);
 
                     //handle malformed code and replace it with nothing
                     executor.load("", LExecutor.maxInstructions);
