@@ -10,7 +10,7 @@ import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.logic.*;
+import mindustry.world.blocks.logic.LogicBlock.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
