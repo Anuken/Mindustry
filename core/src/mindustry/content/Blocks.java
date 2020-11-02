@@ -627,17 +627,6 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.2f);
         }};
 
-        blastMixer = new GenericCrafter("blast-mixer"){{
-            requirements(Category.crafting, with(Items.lead, 30, Items.titanium, 20));
-            hasItems = true;
-            hasPower = true;
-            outputItem = new ItemStack(Items.blastCompound, 1);
-            size = 2;
-
-            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
-            consumes.power(0.40f);
-        }};
-
         pyratiteMixer = new GenericSmelter("pyratite-mixer"){{
             requirements(Category.crafting, with(Items.copper, 50, Items.lead, 25));
             flameColor = Color.clear;
@@ -649,6 +638,17 @@ public class Blocks implements ContentList{
 
             consumes.power(0.20f);
             consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2));
+        }};
+
+        blastMixer = new GenericCrafter("blast-mixer"){{
+            requirements(Category.crafting, with(Items.lead, 30, Items.titanium, 20));
+            hasItems = true;
+            hasPower = true;
+            outputItem = new ItemStack(Items.blastCompound, 1);
+            size = 2;
+
+            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
+            consumes.power(0.40f);
         }};
 
         melter = new GenericCrafter("melter"){{
