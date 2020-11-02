@@ -136,7 +136,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(to.near().contains(launchSector)) return launchSector;
 
         Sector launchFrom = launchSector;
-        if(launchFrom == null || (to.preset == null && !to.near().contains(launchSector))){
+        if(launchFrom == null){
             //TODO pick one with the most resources
             launchFrom = to.near().find(Sector::hasBase);
             if(launchFrom == null && to.preset != null){

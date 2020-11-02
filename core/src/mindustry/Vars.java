@@ -318,20 +318,25 @@ public class Vars implements Loadable{
 
         settings.setAppName(appName);
 
-        Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
-        LogHandler log = Log.logger;
-        //ignore it
-        Log.logger = (level, text) -> {
-            log.log(level, text);
+        try{
+            Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
+            LogHandler log = Log.logger;
+            //ignore it
+            Log.logger = (level, text) -> {
+                log.log(level, text);
 
-            try{
-                writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeColors(text) + "\n");
-                writer.flush();
-            }catch(IOException e){
-                e.printStackTrace();
-                //ignore it
-            }
-        };
+                try{
+                    writer.write("[" + Character.toUpperCase(level.name().charAt(0)) +"] " + Log.removeColors(text) + "\n");
+                    writer.flush();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    //ignore it
+                }
+            };
+        }catch(Exception e){
+            //handle log file not being found
+            Log.err(e);
+        }
 
         loadedFileLogger = true;
     }

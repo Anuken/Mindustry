@@ -305,7 +305,7 @@ public class Block extends UnlockableContent{
         return hasItems;
     }
 
-    /** Returns whether ot not this block can be place on the specified  */
+    /** Returns whether or not this block can be place on the specified  */
     public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
@@ -365,7 +365,7 @@ public class Block extends UnlockableContent{
             float capacity = cons.capacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : (int)(entity.power.status * capacity)) :
-            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
         }
 
         if(hasItems && configurable){

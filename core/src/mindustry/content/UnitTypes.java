@@ -429,8 +429,8 @@ public class UnitTypes implements ContentList{
                 continuous = true;
                 cooldownTime = 200f;
 
-                bullet = new ContinuousLaserBulletType(20){{
-                    length = 150f;
+                bullet = new ContinuousLaserBulletType(22){{
+                    length = 160f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
                     lifetime = 160f;
@@ -445,7 +445,7 @@ public class UnitTypes implements ContentList{
                     incendAmount = 1;
 
                     //constant healing
-                    healPercent = 0.5f;
+                    healPercent = 1f;
                     collidesTeam = true;
 
                     colors = new Color[]{Pal.heal.cpy().a(.2f), Pal.heal.cpy().a(.5f), Pal.heal.cpy().mul(1.2f), Color.white};
@@ -909,7 +909,7 @@ public class UnitTypes implements ContentList{
 
         horizon = new UnitType("horizon"){{
             health = 350;
-            speed = 2f;
+            speed = 1.8f;
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
@@ -931,7 +931,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 15f;
                 ignoreRotation = true;
                 shootSound = Sounds.none;
-                bullet = new BombBulletType(28f, 25f){{
+                bullet = new BombBulletType(27f, 25f){{
                     width = 10f;
                     height = 14f;
                     hitEffect = Fx.flakExplosion;

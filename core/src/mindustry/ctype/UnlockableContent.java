@@ -20,8 +20,8 @@ public abstract class UnlockableContent extends MappableContent{
     public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
-    /** Localized description. May be null. */
-    public @Nullable String description;
+    /** Localized description & details. May be null. */
+    public @Nullable String description, details;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
     /** Special logic icon ID. */
@@ -36,6 +36,7 @@ public abstract class UnlockableContent extends MappableContent{
 
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
+        this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
     }
 
@@ -51,7 +52,7 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
-    /** Intializes stats on demand. Should only be called once. Only called before something is displayed. */
+    /** Initializes stats on demand. Should only be called once. Only called before something is displayed. */
     public void setStats(){
     }
 

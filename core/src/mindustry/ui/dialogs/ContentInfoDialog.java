@@ -1,6 +1,5 @@
 package mindustry.ui.dialogs;
 
-import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -36,16 +35,16 @@ public class ContentInfoDialog extends BaseDialog{
 
         table.row();
 
-        table.image().height(3).color(Color.lightGray).pad(8).padLeft(0).padRight(0).fillX();
-
-        table.row();
-
         if(content.description != null){
-            table.add(content.displayDescription()).padLeft(5).padRight(5).width(400f).wrap().fillX();
+            table.add("@category.purpose").color(Pal.accent).fillX().padTop(10);
+            table.row();
+            table.add("[lightgray]" + content.displayDescription()).wrap().fillX().padLeft(10).width(500f).left();
             table.row();
 
-            table.image().height(3).color(Color.lightGray).pad(8).padLeft(0).padRight(0).fillX();
-            table.row();
+            if(!content.stats.useCategories){
+                table.add("@category.general").fillX().color(Pal.accent);
+                table.row();
+            }
         }
 
         Stats stats = content.stats;
@@ -74,6 +73,12 @@ public class ContentInfoDialog extends BaseDialog{
                 }).fillX().padLeft(10);
                 table.row();
             }
+        }
+
+
+        if(content.details != null){
+            table.add("[gray]" + content.details).pad(6).padTop(20).width(400f).wrap().fillX();
+            table.row();
         }
 
         ScrollPane pane = new ScrollPane(table);

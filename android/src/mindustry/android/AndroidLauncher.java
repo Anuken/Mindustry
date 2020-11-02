@@ -27,7 +27,6 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
     boolean doubleScaleTablets = true;

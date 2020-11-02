@@ -18,6 +18,7 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
+    public static final int maxJumpsDrawn = 100;
     //ew static variables
     static LCanvas canvas;
 
@@ -25,7 +26,9 @@ public class LCanvas extends Table{
     StatementElem dragging;
     ScrollPane pane;
     Group jumps;
+    StatementElem hovered;
     float targetWidth;
+    int jumpCount = 0;
 
     public LCanvas(){
         canvas = this;
@@ -69,6 +72,12 @@ public class LCanvas extends Table{
         }
     }
 
+    @Override
+    public void draw(){
+        jumpCount = 0;
+        super.draw();
+    }
+
     void add(LStatement statement){
         statements.addChild(new StatementElem(statement));
     }
@@ -97,9 +106,22 @@ public class LCanvas extends Table{
         this.statements.layout();
     }
 
+    StatementElem checkHovered(){
+        Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+        if(e != null){
+            while(e != null && !(e instanceof StatementElem)){
+                e = e.parent;
+            }
+        }
+        if(e == null || isDescendantOf(e)) return null;
+        return (StatementElem)e;
+    }
+
     @Override
     public void act(float delta){
         super.act(delta);
+
+        hovered = checkHovered();
 
         if(Core.input.isTouched()){
             float y = Core.input.mouseY();
@@ -351,7 +373,6 @@ public class LCanvas extends Table{
         boolean selecting;
         float mx, my;
         ClickListener listener;
-        StatementElem hovered;
 
         JumpCurve curve;
 
@@ -380,7 +401,7 @@ public class LCanvas extends Table{
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode code){
                     localToStageCoordinates(Tmp.v1.set(x, y));
-                    StatementElem elem = hovered();
+                    StatementElem elem = canvas.hovered;
 
                     if(elem != null && !isDescendantOf(elem)){
                         setter.get(elem);
@@ -404,13 +425,6 @@ public class LCanvas extends Table{
         }
 
         @Override
-        public void act(float delta){
-            super.act(delta);
-
-            hovered = hovered();
-        }
-
-        @Override
         protected void setScene(Scene stage){
             super.setScene(stage);
 
@@ -419,17 +433,6 @@ public class LCanvas extends Table{
             }else{
                 canvas.jumps.addChild(curve);
             }
-        }
-
-        StatementElem hovered(){
-            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-            if(e != null){
-                while(e != null && !(e instanceof StatementElem)){
-                    e = e.parent;
-                }
-            }
-            if(e == null || isDescendantOf(e)) return null;
-            return (StatementElem)e;
         }
     }
 
@@ -451,7 +454,13 @@ public class LCanvas extends Table{
 
         @Override
         public void draw(){
-            Element hover = button.to.get() == null && button.selecting ? button.hovered : button.to.get();
+            canvas.jumpCount ++;
+
+            if(canvas.jumpCount > maxJumpsDrawn && !button.selecting && !button.listener.isOver()){
+                return;
+            }
+
+            Element hover = button.to.get() == null && button.selecting ? canvas.hovered : button.to.get();
             boolean draw = false;
             Vec2 t = Tmp.v1, r = Tmp.v2;
 
@@ -489,12 +498,27 @@ public class LCanvas extends Table{
 
             float dist = 100f;
 
+            //square jumps
+            if(false){
+                float len = Scl.scl(Mathf.randomSeed(hashCode(), 10, 50));
+
+                float maxX = Math.max(x, x2) + len;
+
+                Lines.beginLine();
+                Lines.linePoint(x, y);
+                Lines.linePoint(maxX, y);
+                Lines.linePoint(maxX, y2);
+                Lines.linePoint(x2, y2);
+                Lines.endLine();
+                return;
+            }
+
             Lines.curve(
             x, y,
             x + dist, y,
             x2 + dist, y2,
             x2, y2,
-            Math.max(20, (int)(Mathf.dst(x, y, x2, y2) / 6))
+            Math.max(18, (int)(Mathf.dst(x, y, x2, y2) / 6))
             );
         }
     }
