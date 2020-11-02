@@ -210,8 +210,6 @@ public class Bullets implements ContentList{
             ammoMultiplier = 3f;
             shootEffect = Fx.shootSmall;
             reloadMultiplier = 0.8f;
-            width = 6f;
-            height = 8f;
             hitEffect = Fx.flakExplosion;
             splashDamage = 18f;
             splashDamageRadius = 16f;
