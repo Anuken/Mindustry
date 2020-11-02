@@ -131,8 +131,8 @@ public class MassDriver extends Block{
                 }
             }
 
-            if(items.first() != null) {
-                indicatorItem = items.first();
+            if(items.largest() != null) {
+                indicatorItem = items.largest();
             }
 
             //dump when idle or accepting

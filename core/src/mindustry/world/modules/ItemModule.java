@@ -188,6 +188,20 @@ public class ItemModule extends BlockModule{
         }
         return null;
     }
+    
+    /** Returns the largest amount of items in the module. */
+    @Nullable
+    public Item largest(){
+        Item item = null;
+        int maxItem = 0;
+        for(int i = 0;i < items.length;i ++) {
+            if(items[i] > maxItem) {
+                item = content.item(i);
+                maxItem = items[i];
+            }
+        }
+        return item;
+    }
 
     @Nullable
     public Item take(){

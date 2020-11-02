@@ -24,7 +24,19 @@ public class MassDriverBolt extends BulletType{
     public void draw(Bullet b){
         float w = 11f, h = 13f;
 
-        Draw.color(Pal.bulletYellowBack);
+        DriverBulletData data = (DriverBulletData)b.data();
+        Color itemColor = null;
+        int maxItem = 0;
+        for(int i = 0;i < data.items.length;i ++) {
+            if(data.items[i] > maxItem) {
+                itemColor = content.item(i).color;
+                maxItem = data.items[i];
+            }
+        }
+
+        if(itemColor == null) itemColor = Pal.bulletYellowBack;
+
+        Draw.color(itemColor);
         Draw.rect("shell-back", b.x, b.y, w, h, b.rotation() + 90);
 
         Draw.color(Pal.bulletYellow);
