@@ -359,6 +359,18 @@ public class Fx{
         Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
     }),
 
+    deflectWaveDynamic = new Effect(22, e -> {
+        color(Color.valueOf("ffd59e"));
+        stroke(e.fout() * 2.5f);
+        Lines.circle(e.x, e.y, 4f + e.finpow() * e.rotation);
+    }),
+
+    bulletDeflect = new Effect(11, e -> {
+        color(Color.valueOf("ffd59e"));
+        stroke(e.fout() * 2f);
+        Lines.circle(e.x, e.y, 2f + e.finpow() * 7f);
+    }),
+
     hitBulletSmall = new Effect(14, e -> {
         color(Color.white, Pal.lightOrange, e.fin());
 
