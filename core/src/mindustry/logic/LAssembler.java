@@ -10,6 +10,7 @@ import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.logic.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
@@ -20,8 +21,12 @@ public class LAssembler{
     public ObjectMap<String, BVar> vars = new ObjectMap<>();
     /** All instructions to be executed. */
     public LInstruction[] instructions;
+    /** Processor assembling the code */
+    public final LogicBuild processor;
 
-    public LAssembler(){
+    public LAssembler(LogicBuild processor){
+        this.processor = processor;
+
         //instruction counter
         putVar("@counter").value = 0;
         //unix timestamp
@@ -68,8 +73,8 @@ public class LAssembler{
         }
     }
 
-    public static LAssembler assemble(String data, int maxInstructions){
-        LAssembler asm = new LAssembler();
+    public static LAssembler assemble(LogicBuild processor, String data, int maxInstructions){
+        LAssembler asm = new LAssembler(processor);
 
         Seq<LStatement> st = read(data, maxInstructions);
 

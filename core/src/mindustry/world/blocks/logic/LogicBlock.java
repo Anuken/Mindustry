@@ -181,7 +181,7 @@ public class LogicBlock extends Block{
     public class LogicBuild extends Building implements Ranged{
         /** logic "source code" as list of asm statements */
         public String code = "";
-        public LExecutor executor = new LExecutor();
+        public LExecutor executor = new LExecutor(this);
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
 
@@ -279,7 +279,7 @@ public class LogicBlock extends Block{
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str, LExecutor.maxInstructions);
+                    LAssembler asm = LAssembler.assemble(this, str, LExecutor.maxInstructions);
 
                     //store connections
                     for(LogicLink link : links){

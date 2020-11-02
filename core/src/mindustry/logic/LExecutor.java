@@ -51,6 +51,13 @@ public class LExecutor{
     public IntSet linkIds = new IntSet();
     public Team team = Team.derelict;
 
+    /** Shortcut for (LogicBuild) exec.obj(builder.var("@this")) */
+    public final LogicBuild processor;
+
+    public LExecutor(LogicBuild processor){
+        this.processor = processor;
+    }
+
     public boolean initialized(){
         return instructions != null && vars != null && instructions.length > 0;
     }
