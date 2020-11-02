@@ -62,6 +62,7 @@ public abstract class Turret extends ReloadTurret{
     /** <0 to disable charging and chargeEffects. If you still want the charge effects for some reason, set to 0*/
     public float chargeTime = -1;
     public int chargeEffects = 5;
+    public float chargeEffectRange = 0f;
     public float chargeMaxDelay = 10f;
     public boolean chargeTurn = false;
     public Effect chargeEffect = Fx.none;
@@ -361,7 +362,7 @@ public abstract class Turret extends ReloadTurret{
                     Time.run(Mathf.random(chargeMaxDelay), () -> {
                         if(!isValid()) return;
                         tr.trns(rotation, size * tilesize / 2f);
-                        chargeEffect.at(x + tr.x, y + tr.y, rotation);
+                        chargeEffect.at(x + tr.x, y + tr.y, rotation + Mathf.range(chargeEffectRange));
                     });
                 }
             }
