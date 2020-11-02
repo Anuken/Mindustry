@@ -78,7 +78,7 @@ public class LExecutor{
     }
 
     public void load(String data, int maxInstructions){
-        load(LAssembler.assemble(data, maxInstructions));
+        load(LAssembler.assemble(processor, data, maxInstructions));
     }
 
     /** Loads with a specified assembler. Resets all variables. */
