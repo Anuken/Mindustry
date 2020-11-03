@@ -1,6 +1,7 @@
 package mindustry.ai.types;
 
 import arc.math.*;
+import arc.math.geom.Vec2;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
@@ -11,6 +12,14 @@ public class FlyingAI extends AIController{
 
     @Override
     public void updateMovement(){
+        if(unit && target instanceof Building){
+            Vec2 unitPos = new Vec2(unit.x, unit.y);
+            Vec2 targetPos = new Vec2(((Building) target).x, ((Building) target).y);
+            if(unitPos.dst(targetPos) <= (unit.type().range < (Float.MAX_VALUE * 0.96f) ? unit.type().range * 0.85f : 40f)) {
+                ((Payloadc) unit).dropLastPayload();
+            }
+        }
+
         if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
             if(unit.type().weapons.first().rotate){
                 moveTo(target, unit.range() * 0.8f);
