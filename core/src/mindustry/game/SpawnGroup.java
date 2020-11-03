@@ -94,7 +94,7 @@ public class SpawnGroup implements Serializable{
             }
         }
 
-        unit.shield(Math.max(shields + shieldScaling*(wave - begin), 0));
+        unit.shield = getShield(wave);
 
         return unit;
     }
