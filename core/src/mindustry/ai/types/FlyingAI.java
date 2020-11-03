@@ -1,9 +1,11 @@
 package mindustry.ai.types;
 
 import arc.math.*;
-import arc.math.geom.Vec2;
+import arc.math.geom.*;
+import mindustry.entities.Units;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -12,17 +14,18 @@ public class FlyingAI extends AIController{
 
     @Override
     public void updateMovement(){
-        if(unit && target instanceof Building){
+        if(unit instanceof Payloadc && ((Payloadc) unit).hasPayload() && target instanceof Building){
             Vec2 unitPos = new Vec2(unit.x, unit.y);
             Vec2 targetPos = new Vec2(((Building) target).x, ((Building) target).y);
-            if(unitPos.dst(targetPos) <= (unit.type().range < (Float.MAX_VALUE * 0.96f) ? unit.type().range * 0.85f : 40f)) {
+
+            if(unitPos.dst(targetPos) <= (unit.type().range < (Float.MAX_VALUE * 0.96f) ? unit.type().range : 40f)) {
                 ((Payloadc) unit).dropLastPayload();
             }
         }
 
-        if(target != null && unit.hasWeapons() && command() == UnitCommand.attack){
-            if(unit.type().weapons.first().rotate){
-                moveTo(target, unit.range() * 0.8f);
+        if(target != null && (unit instanceof Payloadc || unit.hasWeapons()) && command() == UnitCommand.attack){
+            if((unit.hasWeapons() && unit.type().weapons.first().rotate) || (unit instanceof Payloadc && ((Payloadc) unit).hasPayload())){
+                moveTo(target, unit.hasWeapons() ? unit.range() * 0.8f : 20f);
                 unit.lookAt(target);
             }else{
                 attack(100f);
@@ -40,16 +43,28 @@ public class FlyingAI extends AIController{
 
     @Override
     protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
-        Teamc result = target(x, y, range, air, ground);
-        if(result != null) return result;
+        if(unit.hasWeapons()){
+            Teamc result = target(x, y, range, air, ground);
+            if (result != null) return result;
 
-        if(ground) result = targetFlag(x, y, BlockFlag.producer, true);
-        if(result != null) return result;
+            if (ground) result = targetFlag(x, y, BlockFlag.producer, true);
+            if (result != null) return result;
 
-        if(ground) result = targetFlag(x, y, BlockFlag.turret, true);
-        if(result != null) return result;
+            if (ground) result = targetFlag(x, y, BlockFlag.turret, true);
+            if (result != null) return result;
+        }
 
         return null;
+    }
+
+    @Override
+    protected void updateTargeting(){
+        if(unit.hasWeapons()){
+            updateWeapons();
+        } else {
+            target = Units.findEnemyTile(unit.team, unit.x, unit.y, Math.max(unit.range(), 120f), b -> b.health > 0);
+            if(target instanceof ConstructBlock.ConstructBuild) target = null;
+        }
     }
 
     //TODO clean up

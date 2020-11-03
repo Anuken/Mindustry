@@ -1193,7 +1193,7 @@ public class UnitTypes implements ContentList{
         }};
 
         mega = new UnitType("mega"){{
-            defaultController = PayloadAI::new;
+            defaultController = RepairAI::new;
 
             mineTier = 3;
             health = 500;
@@ -1209,7 +1209,6 @@ public class UnitTypes implements ContentList{
             hitSize = 15f;
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
-            payloadHeal = true;
             buildSpeed = 2.5f;
 
             ammoType = AmmoTypes.power;
@@ -1232,8 +1231,6 @@ public class UnitTypes implements ContentList{
         }};
 
         quad = new UnitType("quad"){{
-            defaultController = PayloadAI::new;
-            
             armor = 8f;
             health = 6000;
             speed = 1.2f;
@@ -1298,8 +1295,7 @@ public class UnitTypes implements ContentList{
         }};
 
         oct = new UnitType("oct"){{
-            defaultController = PayloadAI::new;
-            
+
             armor = 16f;
             health = 24000;
             speed = 0.6f;
