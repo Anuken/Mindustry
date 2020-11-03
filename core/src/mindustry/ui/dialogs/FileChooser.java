@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -45,6 +46,12 @@ public class FileChooser extends BaseDialog{
             cont.clear();
             setupWidgets();
         });
+
+        keyDown(KeyCode.enter, () -> {
+            ok.fireClick();
+        });
+
+        addCloseListener();
     }
 
     private void setupWidgets(){

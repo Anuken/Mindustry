@@ -7,7 +7,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Stats.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -60,7 +59,7 @@ public class SStats implements SteamUserStatsCallback{
            //     active10Phantoms.complete();
             //}
 
-            if(Groups.unit.count(u -> u.type() == UnitTypes.crawler && u.team() == player.team()) >= 50){
+            if(Groups.unit.count(u -> u.type == UnitTypes.crawler && u.team() == player.team()) >= 50){
                 active50Crawlers.complete();
             }
 
@@ -128,7 +127,8 @@ public class SStats implements SteamUserStatsCallback{
                     }
 
                     if(Core.settings.getBool("meltdownp", false) && Core.settings.getBool("spectrep", false)){
-                        buildMeltdownSpectre.complete();
+                        //TODO
+                        //buildMeltdownSpectre.complete();
                     }
                 }
             }
@@ -149,7 +149,8 @@ public class SStats implements SteamUserStatsCallback{
             if(e.content == Items.titanium) obtainTitanium.complete();
 
             if(!content.sectors().contains(SectorPreset::locked)){
-                unlockAllZones.complete();
+                //TODO
+                //unlockAllZones.complete();
             }
         });
 
@@ -242,10 +243,6 @@ public class SStats implements SteamUserStatsCallback{
                 if(Vars.state.rules.attackMode){
                     SStat.attacksWon.add();
                 }
-
-                RankResult result = state.stats.calculateRank(state.getSector(), true);
-                if(result.rank == Rank.S) earnSRank.complete();
-                if(result.rank == Rank.SS) earnSSRank.complete();
             }
 
             if(state.rules.pvp){

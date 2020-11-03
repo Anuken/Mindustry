@@ -40,7 +40,7 @@ public class MessageBlock extends Block{
             int count = 0;
             for(int i = 0; i < text.length(); i++){
                 char c = text.charAt(i);
-                if(c == '\n' || c == '\r'){
+                if(c == '\n'){
                     count ++;
                     if(count <= maxNewlines){
                         tile.message.append('\n');
@@ -95,12 +95,12 @@ public class MessageBlock extends Block{
                 }else{
                     BaseDialog dialog = new BaseDialog("@editmessage");
                     dialog.setFillParent(false);
-                    TextArea a = dialog.cont.add(new TextArea(message.toString().replace("\n", "\r"))).size(380f, 160f).get();
+                    TextArea a = dialog.cont.add(new TextArea(message.toString().replace("\r", "\n"))).size(380f, 160f).get();
                     a.setFilter((textField, c) -> {
-                        if(c == '\n' || c == '\r'){
+                        if(c == '\n'){
                             int count = 0;
                             for(int i = 0; i < textField.getText().length(); i++){
-                                if(textField.getText().charAt(i) == '\n' || textField.getText().charAt(i) == '\r'){
+                                if(textField.getText().charAt(i) == '\n'){
                                     count++;
                                 }
                             }

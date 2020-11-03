@@ -26,11 +26,11 @@ public class Pump extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(BlockStat.output, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
+        stats.add(Stat.output, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
     }
 
     @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid) {
+    public void drawPlace(int x, int y, int rotation, boolean valid){
         Tile tile = world.tile(x, y);
         if(tile == null) return;
 

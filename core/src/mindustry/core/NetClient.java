@@ -194,14 +194,14 @@ public class NetClient implements ApplicationListener{
             }
 
             //server console logging
-            Log.info("&y@: &lb@", player.name, message);
+            Log.info("&fi@: @", "&lc" + player.name, "&lw" + message);
 
             //invoke event for all clients but also locally
             //this is required so other clients get the correct name even if they don't know who's sending it yet
             Call.sendMessage(message, colorizeName(player.id(), player.name), player);
         }else{
             //log command to console but with brackets
-            Log.info("<&y@: &lm@&lg>", player.name, message);
+            Log.info("<&fi@: @&fr>", "&lk" + player.name, "&lw" + message);
 
             //a command was sent, now get the output
             if(response.type != ResponseType.valid){
@@ -294,6 +294,13 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both)
+    public static void announce(String message){
+        if(message == null) return;
+
+        ui.announce(message);
+    }
+
+    @Remote(variants = Variant.both)
     public static void infoMessage(String message){
         if(message == null) return;
 
@@ -358,7 +365,6 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one)
     public static void setPosition(float x, float y){
-        player.unit().set(x, y);
         player.set(x, y);
     }
 

@@ -60,7 +60,7 @@ public class BaseGenerator{
 
         for(Tile tile : cores){
             tile.clearOverlay();
-            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? bases.ores.get((Item)coreschem.required) : Blocks.oreCopper);
+            Schematics.placeLoadout(coreschem.schematic, tile.x, tile.y, team, coreschem.required instanceof Item ? bases.ores.get((Item)coreschem.required) : Blocks.oreCopper, false);
 
             //fill core with every type of item (even non-material)
             Building entity = tile.build;

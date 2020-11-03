@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -82,7 +83,7 @@ public class Damage{
 
         furthest = null;
 
-        boolean found = world.raycast(b.tileX(), b.tileY(), world.toTile(b.x + Tmp.v1.x), world.toTile(b.y + Tmp.v1.y),
+        boolean found = world.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
         (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
 
         return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
@@ -114,10 +115,16 @@ public class Damage{
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team != team && tile.collide(hitter)){
+            boolean collide = tile != null && collidedBlocks.add(tile.pos());
+
+            if(collide && tile.team != team && tile.collide(hitter)){
                 tile.collision(hitter);
-                collidedBlocks.add(tile.pos());
                 hitter.type.hit(hitter, tile.x, tile.y);
+            }
+
+            //try to heal the tile
+            if(collide && hitter.type.collides(hitter, tile)){
+                hitter.type.hitTile(hitter, tile, 0f);
             }
         };
 

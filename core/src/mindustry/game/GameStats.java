@@ -6,7 +6,7 @@ import mindustry.type.*;
 
 //TODO more stats:
 //- units constructed
-public class Stats{
+public class GameStats{
     /** Total items delivered to global resoure counter. Campaign only. */
     public ObjectIntMap<Item> itemsDelivered = new ObjectIntMap<>();
     /** Enemy (red team) units destroyed. */
@@ -22,37 +22,12 @@ public class Stats{
     /** Friendly buildings destroyed. */
     public int buildingsDestroyed;
 
-    //TODO fix
-    public RankResult calculateRank(Sector zone, boolean launched){
+    //unused
+    public RankResult calculateRank(Sector sector){
         float score = 0;
 
-        //TODO implement wave/attack mode based score
-        /*
-        if(launched && zone.getRules().attackMode){
-            score += 3f;
-        }else if(wavesLasted >= zone.conditionWave){
-            //each new launch period adds onto the rank 'points'
-            score += (float)((wavesLasted - zone.conditionWave) / zone.launchPeriod + 1) * 1.2f;
-        }*/
-
-        //TODO implement
-        int capacity = 3000;//zone.loadout.findCore().itemCapacity;
-
-        //weigh used fractions
-        float frac = 0f;
-        Seq<Item> obtainable = zone.save == null ? new Seq<>() : zone.save.meta.secinfo.resources.select(i -> i instanceof Item).as();
-        for(Item item : obtainable){
-            frac += Mathf.clamp((float)itemsDelivered.get(item, 0) / capacity) / (float)obtainable.size;
-        }
-
-        score += frac * 1.6f;
-
-        if(!launched){
-            score *= 0.5f;
-        }
-
-        int rankIndex = Mathf.clamp((int)(score), 0, Rank.values().length - 1);
-        Rank rank = Rank.values()[rankIndex];
+        int rankIndex = Mathf.clamp((int)score, 0, Rank.all.length - 1);
+        Rank rank = Rank.all[rankIndex];
         String sign = Math.abs((rankIndex + 0.5f) - score) < 0.2f || rank.name().contains("S") ? "" : (rankIndex + 0.5f) < score ? "-" : "+";
 
         return new RankResult(rank, sign);
@@ -70,6 +45,8 @@ public class Stats{
     }
 
     public enum Rank{
-        F, D, C, B, A, S, SS
+        F, D, C, B, A, S, SS;
+
+        public static final Rank[] all = values();
     }
 }

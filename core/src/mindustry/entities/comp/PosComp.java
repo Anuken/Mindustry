@@ -2,9 +2,9 @@ package mindustry.entities.comp;
 
 import arc.math.geom.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -32,11 +32,11 @@ abstract class PosComp implements Position{
     }
 
     int tileX(){
-        return Vars.world.toTile(x);
+        return World.toTile(x);
     }
 
     int tileY(){
-        return Vars.world.toTile(y);
+        return World.toTile(y);
     }
 
     /** Returns air if this unit is on a non-air top block. */

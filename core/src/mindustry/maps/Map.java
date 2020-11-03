@@ -70,11 +70,11 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public Fi previewFile(){
-        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + ".png");
+        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + "_v2.png");
     }
 
     public Fi cacheFile(){
-        return Vars.mapPreviewDirectory.child(workshop ? file.parent().name() + "-workshop-cache.dat" : file.nameWithoutExtension() + "-cache.dat");
+        return Vars.mapPreviewDirectory.child(workshop ? file.parent().name() + "-workshop-cache.dat" : file.nameWithoutExtension() + "-cache_v2.dat");
     }
 
     public void setHighScore(int score){
@@ -98,8 +98,10 @@ public class Map implements Comparable<Map>, Publishable{
 
     public Rules rules(Rules base){
         try{
-            Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}"));
-            if(result.spawns.isEmpty()) result.spawns = Vars.defaultWaves.get();
+            //this replacement is a MASSIVE hack but it fixes some incorrect overwriting of team-specific rules.
+            //may need to be tweaked later
+            Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}").replace("teams:{2:{infiniteAmmo:true}},", ""));
+            if(result.spawns.isEmpty()) result.spawns = Vars.waves.get();
             return result;
         }catch(Exception e){
             //error reading rules. ignore?

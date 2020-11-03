@@ -367,8 +367,10 @@ public class JoinDialog extends BaseDialog{
 
         local.row();
 
-        TextButton button = local.button("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
-        .width(w).pad(5f).get();
+        TextButton button = local.button("", Styles.cleart, () -> {
+            Events.fire(new ClientPreConnectEvent(host));
+            safeConnect(host.address, host.port, host.version);
+        }).width(w).pad(5f).get();
         button.clearChildren();
         buildServer(host, button);
     }
@@ -379,8 +381,10 @@ public class JoinDialog extends BaseDialog{
 
         global.row();
 
-        TextButton button = global.button("", Styles.cleart, () -> safeConnect(host.address, host.port, host.version))
-        .width(w).pad(5f).get();
+        TextButton button = global.button("", Styles.cleart, () -> {
+            Events.fire(new ClientPreConnectEvent(host));
+            safeConnect(host.address, host.port, host.version);
+        }).width(w).pad(5f).get();
         button.clearChildren();
         buildServer(host, button);
     }

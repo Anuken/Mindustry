@@ -17,11 +17,15 @@ public class BuilderAI extends AIController{
     @Nullable Builderc following;
 
     @Override
-    public void updateUnit(){
+    public void updateMovement(){
         Builderc builder = (Builderc)unit;
 
         if(builder.moving()){
             builder.lookAt(builder.vel().angle());
+        }
+
+        if(target != null && shouldShoot()){
+            unit.lookAt(target);
         }
 
         builder.updateBuilding(true);
@@ -75,7 +79,7 @@ public class BuilderAI extends AIController{
                             float dist = Math.min(cons.dst(unit) - buildingRange, 0);
 
                             //make sure you can reach the request in time
-                            if(dist / unit.type().speed < cons.buildCost * 0.9f){
+                            if(dist / unit.type.speed < cons.buildCost * 0.9f){
                                 following = b;
                                 found = true;
                             }
@@ -95,13 +99,29 @@ public class BuilderAI extends AIController{
                 }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid.
                     //add build request.
                     builder.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
+                    //shift build plan to tail so next unit builds something else.
+                    blocks.addLast(blocks.removeFirst());
                 }else{
                     //shift head of queue to tail, try something else next time
                     blocks.removeFirst();
                     blocks.addLast(block);
                 }
             }
-
         }
+    }
+
+    @Override
+    public AIController fallback(){
+        return unit.type.flying ? new FlyingAI() : new GroundAI();
+    }
+
+    @Override
+    public boolean useFallback(){
+        return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().ai;
+    }
+    
+    @Override
+    public boolean shouldShoot(){
+        return !((Builderc)unit).isBuilding();
     }
 }

@@ -60,7 +60,7 @@ public class ResearchDialog extends BaseDialog{
                     for(Planet planet : content.planets()){
                         for(Sector sector : planet.sectors){
                             if(sector.hasSave()){
-                                ItemSeq cached = sector.calculateItems();
+                                ItemSeq cached = sector.items();
                                 add(cached);
                                 cache.put(sector, cached);
                             }
@@ -164,13 +164,10 @@ public class ResearchDialog extends BaseDialog{
 
     @Override
     public Dialog show(){
-        Core.app.post(() -> {
-            if(net.client()){
-                //TODO make this not display every time
-                //TODO rework this in the future
-                ui.showInfo("@campaign.multiplayer");
-            }
-        });
+        if(net.client()){
+            ui.showInfo("@research.multiplayer");
+            return null;
+        }
 
         return super.show();
     }
@@ -512,8 +509,7 @@ public class ResearchDialog extends BaseDialog{
                                         if(shine != null) shiny |= shine[i];
                                     }
 
-                                    int percent = (int)(used / sum * 100);
-                                    Label label = t.add(Core.bundle.format("research.progress", percent)).left().get();
+                                    Label label = t.add(Core.bundle.format("research.progress", Math.min((int)(used / sum * 100), 99))).left().get();
 
                                     if(shiny){
                                         label.setColor(Pal.accent);

@@ -9,11 +9,16 @@ public enum SAchievement{
     win10Attack(SStat.attacksWon, 10),
     win10PvP(SStat.pvpsWon, 10),
     defeatAttack5Waves,
+    //TODO
     launch30Times(SStat.timesLaunched, 30),
+    //TODO
+    captureBackground,
+    //TODO
     survive100Waves(SStat.maxWavesSurvived, 100),
     survive500Waves(SStat.maxWavesSurvived, 500),
     researchAll,
-    useAllMechs(SStat.zoneMechsUsed, 6),
+    //TODO
+    useAllUnits,
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
@@ -24,8 +29,9 @@ public enum SAchievement{
     downloadMapWorkshop,
     publishMap(SStat.mapsPublished, 1),
     defeatBoss(SStat.bossesDefeated, 1),
-    unlockAllZones,
-    configAllZones,
+    //TODO
+    captureAllSectors,
+    //configAllZones,
     drop10kitems,
     powerupImpactReactor,
     obtainThorium,
@@ -37,16 +43,25 @@ public enum SAchievement{
     active10Phantoms,
     active50Crawlers,
     build1000Units,
-    earnSRank,
-    earnSSRank,
+    //TODO
+    buildAllUnits,
+    //TODO
+    activeAllT5,
+    //TODO
+    //earnSRank,
+    //earnSSRank,
     dieExclusion,
     drown,
     fillCoreAllCampaign,
     hostServer10(SStat.maxPlayersServer, 10),
-    buildMeltdownSpectre,
+    buildMeltdownSpectreForeshadow,
     launchItemPad,
-    skipLaunching2Death,
+    //skipLaunching2Death,
     chainRouters,
+    //TODO
+    becomeRouter,
+    //TODO
+    save20Schematics,
     survive10WavesNoBlocks,
     useFlameAmmo,
     coolTurret,

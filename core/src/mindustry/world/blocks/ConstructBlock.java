@@ -42,7 +42,7 @@ public class ConstructBlock extends Block{
         consBlocks[size - 1] = this;
     }
 
-    /** Returns a BuildBlock by size. */
+    /** Returns a ConstructBlock by size. */
     public static ConstructBlock get(int size){
         if(size > maxSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxSize);
         return consBlocks[size - 1];

@@ -28,7 +28,7 @@ public class FlyingAI extends AIController{
                 moveTo(target, unit.hasWeapons() ? unit.range() * 0.8f : 20f);
                 unit.lookAt(target);
             }else{
-                attack(100f);
+                attack(120f);
             }
         }
 
@@ -81,7 +81,7 @@ public class FlyingAI extends AIController{
             vec.setAngle(Mathf.slerpDelta(unit.vel().angle(), vec.angle(), 0.6f));
         }
 
-        vec.setLength(unit.type().speed);
+        vec.setLength(unit.type.speed);
 
         unit.moveAt(vec);
     }
