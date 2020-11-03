@@ -127,9 +127,9 @@ public class OverdriveProjector extends Block{
 
             Drawf.dashCircle(x, y, realRange, baseColor.cpy().lerp(phaseColor, phaseHeat));
             
-            indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, baseColor.cpy().lerp(phaseColor, phaseHeat).a(Mathf.absin(4f, 1f))));
-            
             if(!cons().optionalValid() && hasBoost && boosterUnlocked()){
+                indexer.eachBlock(this, range + phaseRangeBoost, other -> other.block().canOverdrive, other -> Drawf.selected(other, phaseColor.cpy().a(Mathf.absin(4f, 1f))));
+                
                 float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
                 float transparency = Time.time() % 90f / 90f;
                 
@@ -147,6 +147,8 @@ public class OverdriveProjector extends Block{
                     Drawf.arrow(x + Tmp.v1.x, y + Tmp.v1.y, x + Tmp.v2.x, y + Tmp.v2.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
                 }
             }
+            
+            indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, baseColor.cpy().lerp(phaseColor, phaseHeat).a(Mathf.absin(4f, 1f))));
         }
 
         @Override
