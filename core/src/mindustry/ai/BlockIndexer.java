@@ -312,6 +312,11 @@ public class BlockIndexer{
         return null;
     }
 
+    /** Find the closest ore block relative to a position. */
+    public Tile findClosestOre(Unit unit, Item item){
+        return findClosestOre(unit.x, unit.y, item);
+    }
+
     /** @return extra unit cap of a team. This is added onto the base value. */
     public int getExtraUnits(Team team){
         return unitCaps[team.id];
@@ -457,8 +462,8 @@ public class BlockIndexer{
     }
 
     public static class TileArray implements Iterable<Tile>{
-        private Seq<Tile> tiles = new Seq<>(false, 16);
-        private IntSet contained = new IntSet();
+        Seq<Tile> tiles = new Seq<>(false, 16);
+        IntSet contained = new IntSet();
 
         public void add(Tile tile){
             if(contained.add(tile.pos())){

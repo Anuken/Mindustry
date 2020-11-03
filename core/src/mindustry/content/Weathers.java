@@ -18,6 +18,7 @@ public class Weathers implements ContentList{
     @Override
     public void load(){
         snow = new ParticleWeather("snow"){{
+            particleRegion = "particle";
             sizeMax = 13f;
             sizeMin = 2.6f;
             density = 1200f;
@@ -32,6 +33,7 @@ public class Weathers implements ContentList{
 
         sandstorm = new ParticleWeather("sandstorm"){{
             color = noiseColor = Color.valueOf("f7cba4");
+            particleRegion = "particle";
             drawNoise = true;
             useWindVector = true;
             sizeMax = 140f;
@@ -48,7 +50,7 @@ public class Weathers implements ContentList{
 
         sporestorm = new ParticleWeather("sporestorm"){{
             color = noiseColor = Color.valueOf("7457ce");
-            particleRegion = "circle";
+            particleRegion = "circle-small";
             drawNoise = true;
             statusGround = false;
             useWindVector = true;

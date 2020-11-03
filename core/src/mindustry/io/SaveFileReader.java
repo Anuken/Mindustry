@@ -2,6 +2,7 @@ package mindustry.io;
 
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.world.*;
 
@@ -23,12 +24,12 @@ public abstract class SaveFileReader{
     "spirit-factory", "legacy-unit-factory",
     "phantom-factory", "legacy-unit-factory",
     "wraith-factory", "legacy-unit-factory",
-    "ghoul-factory", "legacy-unit-factory",
-    "revenant-factory", "legacy-unit-factory",
+    "ghoul-factory", "legacy-unit-factory-air",
+    "revenant-factory", "legacy-unit-factory-air",
     "dagger-factory", "legacy-unit-factory",
     "crawler-factory", "legacy-unit-factory",
-    "titan-factory", "legacy-unit-factory",
-    "fortress-factory", "legacy-unit-factory",
+    "titan-factory", "legacy-unit-factory-ground",
+    "fortress-factory", "legacy-unit-factory-ground",
 
     "mass-conveyor", "payload-conveyor",
     "vestige", "scepter",
@@ -60,9 +61,11 @@ public abstract class SaveFileReader{
     protected final DataOutputStream dataBytesSmall = new DataOutputStream(byteOutputSmall);
 
     protected int lastRegionLength;
+    protected @Nullable CounterInputStream currCounter;
 
     protected void region(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
         counter.resetCount();
+        this.currCounter = counter;
         int length;
         try{
             length = readChunk(stream, cons);
@@ -70,8 +73,8 @@ public abstract class SaveFileReader{
             throw new IOException("Error reading region \"" + name + "\".", e);
         }
 
-        if(length != counter.count() - 4){
-            throw new IOException("Error reading region \"" + name + "\": read length mismatch. Expected: " + length + "; Actual: " + (counter.count() - 4));
+        if(length != counter.count - 4){
+            throw new IOException("Error reading region \"" + name + "\": read length mismatch. Expected: " + length + "; Actual: " + (counter.count - 4));
         }
     }
 

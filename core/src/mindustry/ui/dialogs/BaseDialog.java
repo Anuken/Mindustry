@@ -1,7 +1,6 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.input.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
@@ -54,11 +53,7 @@ public class BaseDialog extends Dialog{
     }
 
     public void addCloseListener(){
-        keyDown(key -> {
-            if(key == KeyCode.escape || key == KeyCode.back){
-                Core.app.post(this::hide);
-            }
-        });
+       closeOnBack();
     }
 
     @Override

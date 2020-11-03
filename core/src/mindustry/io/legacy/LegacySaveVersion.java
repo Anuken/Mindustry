@@ -85,6 +85,8 @@ public abstract class LegacySaveVersion extends SaveVersion{
                     }catch(Throwable e){
                         throw new IOException("Failed to read tile entity of block: " + block, e);
                     }
+
+                    context.onReadBuilding();
                 }else{
                     int consecutives = stream.readUnsignedByte();
 

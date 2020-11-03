@@ -570,7 +570,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     }).growX().top();
                 }
 
-                if(addCliffButton){
+                if(experimental){
                     mid.row();
 
                     mid.table(t -> {

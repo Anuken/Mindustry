@@ -948,7 +948,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
                 }
 
-                unit.aim(Tmp.v1.trns(unit.rotation, 1000f).add(unit));
+                //when not shooting, aim at mouse cursor
+                //this may be a bad idea, aiming for a point far in front could work better, test it out
+                unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
             }else{
                 Vec2 intercept = Predict.intercept(unit, target, bulletSpeed);
 

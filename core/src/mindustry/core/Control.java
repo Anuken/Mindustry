@@ -181,6 +181,12 @@ public class Control implements ApplicationListener, Loadable{
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effect.shake(5f, 5f, core);
+
+                if(state.isCampaign()){
+                    ui.announce("[accent]" + state.rules.sector.name() + "\n" +
+                        (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
+                            state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
+                }
             });
         });
 
@@ -264,7 +270,6 @@ public class Control implements ApplicationListener, Loadable{
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
-                    state.secinfo = state.rules.sector.info;
 
                     //if there is no base, simulate a new game and place the right loadout at the spawn position
                     if(state.rules.defaultTeam.cores().isEmpty()){
@@ -281,6 +286,9 @@ public class Control implements ApplicationListener, Loadable{
 
                         //reset wave so things are more fair
                         state.wave = 1;
+
+                        //reset win wave??
+                        state.rules.winWave = sector.preset != null ? sector.preset.captureWave : 40;
 
                         //kill all units, since they should be dead anwyay
                         Groups.unit.clear();
@@ -312,8 +320,8 @@ public class Control implements ApplicationListener, Loadable{
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching
-                state.secinfo.origin = origin;
-                state.secinfo.destination = origin;
+                sector.info.origin = origin;
+                sector.info.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
                 Events.fire(Trigger.newGame);
@@ -404,13 +412,15 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void pause(){
-        wasPaused = state.is(State.paused);
-        if(state.is(State.playing)) state.set(State.paused);
+        if(settings.getBool("backgroundpause", true)){
+            wasPaused = state.is(State.paused);
+            if(state.is(State.playing)) state.set(State.paused);
+        }
     }
 
     @Override
     public void resume(){
-        if(state.is(State.paused) && !wasPaused){
+        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true)){
             state.set(State.playing);
         }
     }

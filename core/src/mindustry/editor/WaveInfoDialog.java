@@ -34,9 +34,7 @@ public class WaveInfoDialog extends BaseDialog{
         super("@waves.title");
 
         shown(this::setup);
-        hidden(() -> {
-            state.rules.spawns = groups;
-        });
+        hidden(() -> state.rules.spawns = groups);
 
         addCloseListener();
 
@@ -66,7 +64,7 @@ public class WaveInfoDialog extends BaseDialog{
             }).disabled(b -> Core.app.getClipboardText() == null || Core.app.getClipboardText().isEmpty());
             dialog.cont.row();
             dialog.cont.button("@settings.reset", () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
-                groups = JsonIO.copy(defaultWaves.get());
+                groups = JsonIO.copy(waves.get());
                 buildGroups();
                 dialog.hide();
             }));
@@ -96,6 +94,14 @@ public class WaveInfoDialog extends BaseDialog{
                 view(1);
             }
         });
+
+        if(experimental){
+            buttons.button("Random", Icon.refresh, () -> {
+                groups.clear();
+                groups = Waves.generate(1f / 10f);
+                updateWaves();
+            }).width(200f);
+        }
     }
 
     void view(int amount){
@@ -119,7 +125,7 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     void setup(){
-        groups = JsonIO.copy(state.rules.spawns.isEmpty() ? defaultWaves.get() : state.rules.spawns);
+        groups = JsonIO.copy(state.rules.spawns.isEmpty() ? waves.get() : state.rules.spawns);
 
         cont.clear();
         cont.stack(new Table(Tex.clear, main -> {

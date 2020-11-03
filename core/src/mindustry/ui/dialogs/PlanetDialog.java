@@ -20,6 +20,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
+import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.storage.*;
@@ -48,6 +49,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         super("", Styles.fullDialog);
 
         shouldPause = true;
+
+        addCloseListener();
 
         buttons.defaults().size(200f, 56f).pad(2);
         buttons.button("@back", Icon.left, this::hide);
@@ -269,7 +272,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         //planet selection
         new Table(t -> {
             t.right();
-            if(content.planets().count(p -> p.accessible) > 1) {
+            if(content.planets().count(p -> p.accessible) > 1){
                 t.table(Styles.black6, pt -> {
                     //TODO localize
                     pt.add("[accent]Planets[]");
@@ -378,6 +381,12 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
             stable.add("[accent]" + (int)(sector.info.damage * 100) + "% damaged");
             stable.row();
+
+            if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
+                boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
+                stable.add("[accent]Will survive\n" + (sector.info.wavesSurvived - sector.info.wavesPassed) +  (plus ? "+" : "") + " waves");
+                stable.row();
+            }
         }
 
         if(sector.save != null && sector.info.resources.any()){
@@ -414,14 +423,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
+        ItemSeq items = sector.items();
+
         //stored resources
-        if(sector.hasBase() && sector.info.items.total > 0){
+        if(sector.hasBase() && items.total > 0){
+
             stable.add("@sectors.stored").row();
             stable.table(t -> {
                 t.left();
 
                 t.table(res -> {
-                    ItemSeq items = sector.items();
 
                     int i = 0;
                     for(ItemStack stack : items){
@@ -457,6 +468,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     shouldHide = false;
                     Sector from = findLauncher(sector);
                     if(from == null){
+                        //clear loadout information, so only the basic loadout gets used
+                        universe.clearLoadoutInfo();
                         //free launch.
                         control.playSector(sector);
                     }else{

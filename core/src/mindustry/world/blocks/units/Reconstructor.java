@@ -67,7 +67,7 @@ public class Reconstructor extends UnitBlock{
         stats.add(Stat.output, table -> {
             table.row();
             for(var upgrade : upgrades){
-                float size = 8*3;
+                float size = 8 * 3;
                 if(upgrade[0].unlockedNow() && upgrade[1].unlockedNow()){
                     table.image(upgrade[0].icon(Cicon.small)).size(size).padRight(4).padLeft(10).scaling(Scaling.fit).right();
                     table.add(upgrade[0].localizedName).left();

@@ -87,7 +87,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         to.addItem(item, removed);
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> Call.transferItemEffect(item, build.x, build.y, to));
+            Time.run(j * 3f, () -> transferItemEffect(item, build.x, build.y, to));
         }
     }
 
@@ -100,7 +100,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(called = Loc.server, unreliable = true)
     public static void transferItemTo(Item item, int amount, float x, float y, Building build){
         if(build == null || build.items == null) return;
-        for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
+        for(int i = 0; i < Mathf.clamp(amount / 5, 1, 8); i++){
             Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
         build.items.add(item, amount);
@@ -135,13 +135,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         //remove item for every controlling unit
         player.unit().eachGroup(unit -> {
-            int removed = Math.min(unit.maxAccepted(item), tile.removeStack(item, amount));
-
-            unit.addItem(item, removed);
-
-            for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-                Time.run(j * 3f, () -> Call.transferItemEffect(item, tile.x, tile.y, unit));
-            }
+            Call.takeItems(tile, item, unit.maxAccepted(item), unit);
 
             if(unit == player.unit()){
                 Events.fire(new WithdrawEvent(tile, player, item, amount));
@@ -165,18 +159,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.unit().eachGroup(unit -> {
             Item item = unit.item();
             int accepted = tile.acceptStack(item, unit.stack.amount, unit);
-            unit.stack.amount -= accepted;
 
-            tile.getStackOffset(item, stackTrns);
-            tile.handleStack(item, accepted, unit);
-
-            createItemTransfer(
-                item,
-                accepted,
-                unit.x + Angles.trnsx(unit.rotation + 180f, backTrns), unit.y + Angles.trnsy(unit.rotation + 180f, backTrns),
-                new Vec2(tile.x + stackTrns.x, tile.y + stackTrns.y),
-                () -> {}
-            );
+            Call.transferItemTo(unit, item, accepted, unit.x, unit.y, tile);
 
             if(unit == player.unit()){
                 Events.fire(new DepositEvent(tile, player, item, accepted));
@@ -945,10 +929,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null && player.miner().canMine(tile.drop())
+        && tile.drop() != null
+        && player.miner().validMine(tile)
         && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
         && player.unit().acceptsItem(tile.drop())
-        && tile.block() == Blocks.air && player.dst(tile.worldx(), tile.worldy()) <= miningRange;
+        && tile.block() == Blocks.air;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -1213,7 +1198,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             line.x = point.x;
             line.y = point.y;
             if(!overrideLineRotation || diagonal){
-                line.rotation = next != null ? Tile.relativeTo(point.x, point.y, next.x, next.y) : baseRotation;
+                if(next != null){
+                    line.rotation = Tile.relativeTo(point.x, point.y, next.x, next.y);
+                }else if(block.conveyorPlacement && i > 0){
+                    Point2 prev = points.get(i - 1);
+                    line.rotation = Tile.relativeTo(prev.x, prev.y, point.x, point.y);
+                }else{
+                    line.rotation = baseRotation;
+                }
             }else{
                 line.rotation = rotation;
             }

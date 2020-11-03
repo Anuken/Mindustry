@@ -21,7 +21,7 @@ public class Universe{
     private int turn;
     private float turnCounter;
 
-    private Schematic lastLoadout;
+    private @Nullable Schematic lastLoadout;
     private ItemSeq lastLaunchResources = new ItemSeq();
 
     public Universe(){
@@ -84,12 +84,21 @@ public class Universe{
         if(state.hasSector()){
             //update sector light
             float light = state.getSector().getLight();
-            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.1f, 1f));
+            float alpha = Mathf.clamp(Mathf.map(light, 0f, 0.8f, 0.2f, 1f));
 
             //assign and map so darkness is not 100% dark
             state.rules.ambientLight.a = 1f - alpha;
             state.rules.lighting = !Mathf.equal(alpha, 1f);
         }
+    }
+
+    public void clearLoadoutInfo(){
+        lastLoadout = null;
+        lastLaunchResources = new ItemSeq();
+        Core.settings.remove("launch-resources-seq");
+        Core.settings.remove("lastloadout-core-shard");
+        Core.settings.remove("lastloadout-core-nucleus");
+        Core.settings.remove("lastloadout-core-foundation");
     }
 
     public ItemSeq getLaunchResources(){
@@ -197,7 +206,7 @@ public class Universe{
                     if(!sector.isAttacked() && turn > invasionGracePeriod){
                         //invasion chance depends on # of nearby bases
                         if(Mathf.chance(baseInvasionChance * sector.near().count(Sector::hasEnemyBase))){
-                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : 0) + Mathf.random(2, 5) * 5;
+                            int waveMax = Math.max(sector.info.winWave, state.wave) + Mathf.random(2, 5) * 5;
 
                             //assign invasion-related things
                             if(sector.isBeingPlayed()){

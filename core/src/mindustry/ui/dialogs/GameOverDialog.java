@@ -2,7 +2,6 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import mindustry.game.EventType.*;
-import mindustry.game.GameStats.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -78,11 +77,6 @@ public class GameOverDialog extends BaseDialog{
                     }
                 }
 
-                if(state.hasSector()){
-                    RankResult result = state.stats.calculateRank(state.getSector(), true);
-                    t.add(Core.bundle.format("stat.rank", result.rank + result.modifier));
-                    t.row();
-                }
             }).pad(12);
 
             if(state.isCampaign()){

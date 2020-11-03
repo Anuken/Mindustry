@@ -32,12 +32,16 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
     }
 
     boolean mining(){
-        return mineTile != null && !(((Object)this) instanceof Builderc && ((Builderc)(Object)this).activelyBuilding());
+        return mineTile != null && !(((Object)this) instanceof Builderc b && b.activelyBuilding());
+    }
+
+    public boolean validMine(Tile tile, boolean checkDst){
+        return !(tile == null || tile.block() != Blocks.air || (!within(tile.worldx(), tile.worldy(), miningRange) && checkDst)
+        || tile.drop() == null || !canMine(tile.drop()));
     }
 
     public boolean validMine(Tile tile){
-        return !(tile == null || tile.block() != Blocks.air || !within(tile.worldx(), tile.worldy(), miningRange)
-        || tile.drop() == null || !canMine(tile.drop()));
+        return validMine(tile, true);
     }
 
     @Override
@@ -84,15 +88,13 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
                     mineTimer = 0f;
                 }
             }
-
-
         }
     }
 
     @Override
     public void draw(){
         if(!mining()) return;
-        float focusLen = 4f + Mathf.absin(Time.time(), 1.1f, 0.5f);
+        float focusLen = hitSize() / 2f + Mathf.absin(Time.time(), 1.1f, 0.5f);
         float swingScl = 12f, swingMag = tilesize / 8f;
         float flashScl = 0.3f;
 

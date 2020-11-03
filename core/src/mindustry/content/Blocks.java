@@ -103,6 +103,7 @@ public class Blocks implements ContentList{
                 alwaysReplace = true;
                 hasShadow = false;
                 useColor = false;
+                wall = this;
             }
 
             @Override public void drawBase(Tile tile){}
@@ -173,12 +174,14 @@ public class Blocks implements ContentList{
             isLiquid = true;
             cacheLayer = CacheLayer.water;
             albedo = 0.5f;
+            attributes.set(Attribute.spores, 0.15f);
         }};
 
         darksandTaintedWater = new ShallowLiquid("darksand-tainted-water"){{
             speedMultiplier = 0.75f;
             statusDuration = 60f;
             albedo = 0.5f;
+            attributes.set(Attribute.spores, 0.1f);
         }};
 
         sandWater = new ShallowLiquid("sand-water"){{
@@ -624,17 +627,6 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.2f);
         }};
 
-        blastMixer = new GenericCrafter("blast-mixer"){{
-            requirements(Category.crafting, with(Items.lead, 30, Items.titanium, 20));
-            hasItems = true;
-            hasPower = true;
-            outputItem = new ItemStack(Items.blastCompound, 1);
-            size = 2;
-
-            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
-            consumes.power(0.40f);
-        }};
-
         pyratiteMixer = new GenericSmelter("pyratite-mixer"){{
             requirements(Category.crafting, with(Items.copper, 50, Items.lead, 25));
             flameColor = Color.clear;
@@ -646,6 +638,17 @@ public class Blocks implements ContentList{
 
             consumes.power(0.20f);
             consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2));
+        }};
+
+        blastMixer = new GenericCrafter("blast-mixer"){{
+            requirements(Category.crafting, with(Items.lead, 30, Items.titanium, 20));
+            hasItems = true;
+            hasPower = true;
+            outputItem = new ItemStack(Items.blastCompound, 1);
+            size = 2;
+
+            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
+            consumes.power(0.40f);
         }};
 
         melter = new GenericCrafter("melter"){{
@@ -913,7 +916,7 @@ public class Blocks implements ContentList{
             size = 3;
             phaseRadiusBoost = 80f;
             radius = 101.7f;
-            breakage = 750f;
+            shieldHealth = 750f;
             cooldownNormal = 1.5f;
             cooldownLiquid = 1.2f;
             cooldownBrokenBase = 0.35f;
@@ -1190,7 +1193,7 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 75, Items.phaseFabric, 25, Items.plastanium, 75, Items.thorium, 50));
             size = 2;
             powerProduction = 4.5f;
-            itemDuration = 60 * 18f;
+            itemDuration = 60 * 15f;
         }};
 
         solarPanel = new SolarGenerator("solar-panel"){{
@@ -1327,7 +1330,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.hidden, with(Items.copper, 2000, Items.lead, 1000));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 2000, Items.lead, 1000));
             alwaysUnlocked = true;
 
             unitType = UnitTypes.alpha;
@@ -1401,7 +1404,7 @@ public class Blocks implements ContentList{
             restitution = 0.03f;
             range = 100;
             shootCone = 15f;
-            ammoUseEffect = Fx.shellEjectSmall;
+            ammoUseEffect = Fx.casing1;
             health = 250;
             inaccuracy = 2f;
             rotateSpeed = 10f;
@@ -1542,10 +1545,10 @@ public class Blocks implements ContentList{
 
             hasPower = true;
             size = 2;
-            force = 5f;
-            scaledForce = 5.5f;
-            range = 160f;
-            damage = 0.4f;
+            force = 8f;
+            scaledForce = 7f;
+            range = 230f;
+            damage = 0.3f;
             health = 160 * size * size;
             rotateSpeed = 10;
 
@@ -1590,7 +1593,7 @@ public class Blocks implements ContentList{
             shootShake = 1f;
             burstSpacing = 3f;
             shots = 4;
-            ammoUseEffect = Fx.shellEjectBig;
+            ammoUseEffect = Fx.casing2;
             health = 240 * size * size;
             shootSound = Sounds.shootBig;
         }};
@@ -1684,7 +1687,7 @@ public class Blocks implements ContentList{
             inaccuracy = 12f;
             reloadTime = 60f;
             ammoEjectBack = 5f;
-            ammoUseEffect = Fx.shellEjectBig;
+            ammoUseEffect = Fx.casing3Double;
             ammoPerShot = 2;
             cooldown = 0.03f;
             velocityInaccuracy = 0.2f;
@@ -1742,7 +1745,7 @@ public class Blocks implements ContentList{
             rotateSpeed = 2.5f;
             reloadTime = 200f;
             restitution = 0.2f;
-            ammoUseEffect = Fx.shellEjectBig;
+            ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
             restitution = 0.009f;
             cooldown = 0.009f;
@@ -1771,7 +1774,7 @@ public class Blocks implements ContentList{
             reloadTime = 6f;
             coolantMultiplier = 0.5f;
             restitution = 0.1f;
-            ammoUseEffect = Fx.shellEjectBig;
+            ammoUseEffect = Fx.casing3;
             range = 200f;
             inaccuracy = 3f;
             recoilAmount = 3f;
@@ -1990,9 +1993,9 @@ public class Blocks implements ContentList{
 
         illuminator = new LightBlock("illuminator"){{
             requirements(Category.effect, BuildVisibility.lightingOnly, with(Items.graphite, 12, Items.silicon, 8));
-            brightness = 0.67f;
-            radius = 140f;
-            consumes.power(0.06f);
+            brightness = 0.75f;
+            radius = 120f;
+            consumes.power(0.05f);
         }};
 
         //endregion
@@ -2001,6 +2004,12 @@ public class Blocks implements ContentList{
         //looked up by name, no ref needed
         new LegacyMechPad("legacy-mech-pad");
         new LegacyUnitFactory("legacy-unit-factory");
+        new LegacyUnitFactory("legacy-unit-factory-air"){{
+            replacement = Blocks.airFactory;
+        }};
+        new LegacyUnitFactory("legacy-unit-factory-ground"){{
+            replacement = Blocks.groundFactory;
+        }};
 
         //endregion
         //region campaign

@@ -15,6 +15,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 import mindustry.world.blocks.logic.MemoryBlock.*;
 import mindustry.world.blocks.logic.MessageBlock.*;
@@ -246,7 +247,7 @@ public class LExecutor{
                     switch(locate){
                         case ore -> {
                             if(exec.obj(ore) instanceof Item item){
-                                res = indexer.findClosestOre(unit.x, unit.y, item);
+                                res = indexer.findClosestOre(unit, item);
                             }
                         }
                         case building -> {
@@ -273,9 +274,9 @@ public class LExecutor{
                         cache.found = false;
                         exec.setnum(outFound, 0);
                     }
-                    exec.setobj(outBuild, res != null && res.build != null && res.build.team == exec.team ? res.build : null);
+                    exec.setobj(outBuild, res != null && res.build != null && res.build.team == exec.team ? cache.build = res.build : null);
                 }else{
-                    exec.setobj(outBuild, null);
+                    exec.setobj(outBuild, cache.build);
                     exec.setbool(outFound, cache.found);
                     exec.setnum(outX, cache.x);
                     exec.setnum(outY, cache.y);
@@ -286,6 +287,7 @@ public class LExecutor{
         static class Cache{
             float x, y;
             boolean found;
+            Building build;
         }
     }
 
@@ -465,9 +467,8 @@ public class LExecutor{
                         if(ai.itemTimer > 0) return;
 
                         Building build = exec.building(p1);
-                        int amount = exec.numi(p2);
-                        int dropped = Math.min(unit.stack.amount, amount);
-                        if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange)){
+                        int dropped = Math.min(unit.stack.amount, exec.numi(p2));
+                        if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int accepted = build.acceptStack(unit.item(), dropped, unit);
                             if(accepted > 0){
                                 Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -481,7 +482,7 @@ public class LExecutor{
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
 
-                        if(build != null && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange)){
+                        if(build != null && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){
@@ -823,9 +824,15 @@ public class LExecutor{
             //graphics on headless servers are useless.
             if(Vars.headless) return;
 
+            int num1 = exec.numi(p1);
+
+            if(type == LogicDisplay.commandImage){
+                num1 = exec.obj(p1) instanceof UnlockableContent u ? u.iconId : 0;
+            }
+
             //add graphics calls, cap graphics buffer size
             if(exec.graphicsBuffer.size < maxGraphicsBuffer){
-                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), exec.numi(p1), exec.numi(p2), exec.numi(p3), exec.numi(p4)));
+                exec.graphicsBuffer.add(DisplayCmd.get(type, exec.numi(x), exec.numi(y), num1, exec.numi(p2), exec.numi(p3), exec.numi(p4)));
             }
         }
     }

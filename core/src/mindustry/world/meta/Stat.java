@@ -18,6 +18,7 @@ public enum Stat{
     heatCapacity,
     viscosity,
     temperature,
+    flying,
     speed,
     buildSpeed,
     mineSpeed,
@@ -28,6 +29,7 @@ public enum Stat{
     lightningChance, 
     lightningDamage,
     abilities,
+    canBoost,
 
     itemCapacity(StatCat.items),
     itemsMoved(StatCat.items),

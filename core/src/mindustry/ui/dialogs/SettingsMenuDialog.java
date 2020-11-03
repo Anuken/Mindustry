@@ -121,6 +121,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.button("@settings.clearresearch", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
+                    universe.clearLoadoutInfo();
                     for(TechNode node : TechTree.all){
                         node.reset();
                     }
@@ -194,6 +195,23 @@ public class SettingsMenuDialog extends SettingsDialog{
                 t.row();
                 t.button("@data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath())).marginLeft(4);
             }
+
+            t.row();
+
+            t.button("@crash.export", Icon.upload, style, () -> {
+                if(settings.getDataDirectory().child("crashes").list().length == 0){
+                    ui.showInfo("@crash.none");
+                }else{
+                    platform.showFileChooser(false, "txt", file -> {
+                        StringBuilder out = new StringBuilder();
+                        for(Fi fi : settings.getDataDirectory().child("crashes").list()){
+                            out.append(fi.name()).append("\n\n").append(fi.readString()).append("\n");
+                        }
+                        file.writeString(out.toString());
+                        app.post(() -> ui.showInfo("@crash.exported"));
+                    });
+                }
+            }).marginLeft(4);
         });
 
         ScrollPane pane = new ScrollPane(prefs);
@@ -281,7 +299,9 @@ public class SettingsMenuDialog extends SettingsDialog{
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+
         if(!mobile){
+            game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
         }
 
@@ -379,13 +399,12 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(Shaders.shield != null){
             graphics.checkPref("animatedshields", !mobile);
         }
+
         if(!ios){
             graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
         }else{
             Core.settings.put("bloom", false);
         }
-
-
 
         graphics.checkPref("pixelate", false, val -> {
             if(val){

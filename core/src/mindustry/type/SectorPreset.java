@@ -17,10 +17,11 @@ public class SectorPreset extends UnlockableContent{
     public Cons<Rules> rules = rules -> rules.winWave = captureWave;
     /** Difficulty, 0-10. */
     public float difficulty;
+    public boolean addStartingItems = false;
 
     public SectorPreset(String name, Planet planet, int sector){
         super(name);
-        this.generator = new FileMapGenerator(name);
+        this.generator = new FileMapGenerator(name, this);
         this.planet = planet;
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);

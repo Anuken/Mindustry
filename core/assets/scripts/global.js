@@ -11,8 +11,8 @@ const readBytes = path => Vars.mods.getScripts().readBytes(path)
 const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
 const loadSound = path => Vars.mods.getScripts().loadSound(path)
 
-var scriptName = "base.js"
-var modName = "none"
+let scriptName = "base.js"
+let modName = "none"
 
 const print = text => log(modName + "/" + scriptName, text);
 
@@ -82,6 +82,7 @@ importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
 importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.type)
+importPackage(Packages.mindustry.type.weather)
 importPackage(Packages.mindustry.ui)
 importPackage(Packages.mindustry.ui.dialogs)
 importPackage(Packages.mindustry.ui.fragments)
@@ -137,6 +138,7 @@ const PlayerChatEvent = Packages.mindustry.game.EventType.PlayerChatEvent
 const ClientPreConnectEvent = Packages.mindustry.game.EventType.ClientPreConnectEvent
 const CommandIssueEvent = Packages.mindustry.game.EventType.CommandIssueEvent
 const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
+const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const WorldLoadEvent = Packages.mindustry.game.EventType.WorldLoadEvent
 const ClientLoadEvent = Packages.mindustry.game.EventType.ClientLoadEvent

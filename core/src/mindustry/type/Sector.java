@@ -39,17 +39,6 @@ public class Sector{
         this.id = tile.id;
     }
 
-    /** @return a copy of the items in this sector - may be core items, or stored data. */
-    public ItemSeq getItems(){
-        if(isBeingPlayed()){
-            ItemSeq out = new ItemSeq();
-            if(state.rules.defaultTeam.core() != null) out.add(state.rules.defaultTeam.core().items);
-            return out;
-        }else{
-            return info.items;
-        }
-    }
-
     public Seq<Sector> near(){
         tmpSeq1.clear();
         for(Ptile tile : tile.tiles){
@@ -110,7 +99,7 @@ public class Sector{
     }
 
     public String name(){
-        if(preset != null) return preset.localizedName;
+        if(preset != null && info.name == null) return preset.localizedName;
         return info.name == null ? id + "" : info.name;
     }
 
@@ -170,6 +159,7 @@ public class Sector{
             }
         }else if(hasBase()){
             items.each((item, amount) -> info.items.add(item, Math.min(info.storageCapacity - info.items.get(item), amount)));
+            info.items.checkNegative();
             saveInfo();
         }
     }
@@ -180,7 +170,7 @@ public class Sector{
 
         //for sectors being played on, add items directly
         if(isBeingPlayed()){
-            count.add(state.rules.defaultTeam.items());
+            if(state.rules.defaultTeam.core() != null) count.add(state.rules.defaultTeam.items());
         }else{
             //add items already present
             count.add(info.items);

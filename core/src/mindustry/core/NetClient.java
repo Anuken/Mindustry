@@ -294,6 +294,13 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both)
+    public static void announce(String message){
+        if(message == null) return;
+
+        ui.announce(message);
+    }
+
+    @Remote(variants = Variant.both)
     public static void infoMessage(String message){
         if(message == null) return;
 
@@ -358,7 +365,6 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one)
     public static void setPosition(float x, float y){
-        player.unit().set(x, y);
         player.set(x, y);
     }
 

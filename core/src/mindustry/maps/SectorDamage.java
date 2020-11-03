@@ -21,14 +21,30 @@ import mindustry.world.blocks.storage.*;
 import static mindustry.Vars.*;
 
 public class SectorDamage{
+    public static final int maxRetWave = 30, maxWavesSimulated = 50;
+
     //direct damage is for testing only
     private static final boolean direct = false, rubble = true;
-    private static final int maxWavesSimulated = 50;
 
     /** @return calculated capture progress of the enemy */
     public static float getDamage(SectorInfo info){
+        return getDamage(info, info.wavesPassed);
+    }
+
+    /** @return calculated capture progress of the enemy */
+    public static float getDamage(SectorInfo info, int wavesPassed){
+        return getDamage(info, wavesPassed, false);
+    }
+
+    /** @return maximum waves survived, up to maxRetWave. */
+    public static int getWavesSurvived(SectorInfo info){
+        return (int)getDamage(info, maxRetWave, true);
+    }
+
+    /** @return calculated capture progress of the enemy if retWave if false, otherwise return the maximum waves survived as int.
+     * if it survives all the waves, returns maxRetWave. */
+    public static float getDamage(SectorInfo info, int wavesPassed, boolean retWave){
         float health = info.sumHealth;
-        int wavesPassed = info.wavesPassed;
         int wave = info.wave;
         float waveSpace = info.waveSpacing;
 
@@ -39,7 +55,7 @@ public class SectorDamage{
             int waveEnd = wave + wavesPassed;
 
             //do not simulate every single wave if there's too many
-            if(wavesPassed > maxWavesSimulated){
+            if(wavesPassed > maxWavesSimulated && !retWave){
                 waveBegin = waveEnd - maxWavesSimulated;
             }
 
@@ -59,9 +75,14 @@ public class SectorDamage{
                 float timeDestroyEnemy = dps <= 0.0001f ? Float.POSITIVE_INFINITY : enemyHealth / dps; //if dps == 0, this is infinity
                 float timeDestroyBase = health / (enemyDps - rps); //if regen > enemyDps this is negative
 
+                //regenerating faster than the base can be damaged
+                if(timeDestroyBase < 0) continue;
+
                 //sector is lost, enemy took too long.
                 if(timeDestroyEnemy > timeDestroyBase){
                     health = 0f;
+                    //return current wave if simulating
+                    if(retWave) return i - waveBegin;
                     break;
                 }
 
@@ -76,19 +97,24 @@ public class SectorDamage{
             }
         }
 
+        //survived everything
+        if(retWave){
+            return maxRetWave;
+        }
+
         return 1f - Mathf.clamp(health / info.sumHealth);
     }
 
     /** Applies wave damage based on sector parameters. */
     public static void applyCalculatedDamage(){
         //calculate base damage fraction
-        float damage = getDamage(state.secinfo);
+        float damage = getDamage(state.rules.sector.info);
 
         //scaled damage has a power component to make it seem a little more realistic (as systems fail, enemy capturing gets easier and easier)
-        float scaled = Mathf.pow(damage, 1.5f);
+        float scaled = Mathf.pow(damage, 1.6f);
 
         //apply damage to units
-        float unitDamage = damage * state.secinfo.sumHealth;
+        float unitDamage = damage * state.rules.sector.info.sumHealth;
         Tile spawn = spawner.getFirstSpawn();
 
         //damage only units near the spawn point
@@ -114,7 +140,7 @@ public class SectorDamage{
             }
         }
 
-        if(state.secinfo.wavesPassed > 0){
+        if(state.rules.sector.info.wavesPassed > 0){
             //simply remove each block in the spawner range if a wave passed
             for(Tile spawner : spawner.getSpawns()){
                 spawner.circle((int)(state.rules.dropZoneRadius / tilesize), tile -> {
@@ -207,7 +233,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 7;
+        int radius = 9;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -245,7 +271,7 @@ public class SectorDamage{
                     }
 
                     if(build.block instanceof ForceProjector f){
-                        sumHealth += f.breakage * e;
+                        sumHealth += f.shieldHealth * e;
                         sumRps += 1f * e;
                     }
                 }
@@ -278,7 +304,7 @@ public class SectorDamage{
         var reg = new LinearRegression();
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
 
-        for(int wave = state.wave, i = 0; i < 3; wave += (1 + i++)){
+        for(int wave = state.wave; wave < state.wave + 10; wave ++){
             float sumWaveDps = 0f, sumWaveHealth = 0f;
 
             //first wave has to take into account current dps
@@ -314,8 +340,7 @@ public class SectorDamage{
         info.sumDps = sumDps * 1.5f;
         info.sumRps = sumRps;
 
-        //finally, find an equation to put it all together and produce a 0-1 number
-        //due to the way most defenses are structured, this number will likely need a ^4 power or so
+        info.wavesSurvived = getWavesSurvived(info);
     }
 
     public static void apply(float fraction){
@@ -408,54 +433,57 @@ public class SectorDamage{
         float falloff = (damage) / (Math.max(tiles.width, tiles.height) * Mathf.sqrt2);
         int peak = 0;
 
-        //phase two: propagate the damage
-        while(!frontier.isEmpty()){
-            peak = Math.max(peak, frontier.size);
-            Tile tile = frontier.removeFirst();
-            float currDamage = values[tile.x][tile.y] - falloff;
+        if(damage > 0.1f){
+            //phase two: propagate the damage
+            while(!frontier.isEmpty()){
+                peak = Math.max(peak, frontier.size);
+                Tile tile = frontier.removeFirst();
+                float currDamage = values[tile.x][tile.y] - falloff;
 
-            for(int i = 0; i < 4; i++){
-                int cx = tile.x + Geometry.d4x[i], cy = tile.y + Geometry.d4y[i];
+                for(int i = 0; i < 4; i++){
+                    int cx = tile.x + Geometry.d4x[i], cy = tile.y + Geometry.d4y[i];
 
-                //propagate to new tiles
-                if(tiles.in(cx, cy) && values[cx][cy] < currDamage){
-                    Tile other = tiles.getn(cx, cy);
-                    float resultDamage = currDamage;
+                    //propagate to new tiles
+                    if(tiles.in(cx, cy) && values[cx][cy] < currDamage){
+                        Tile other = tiles.getn(cx, cy);
+                        float resultDamage = currDamage;
 
-                    //damage the tile if it's not friendly
-                    if(other.build != null && other.team() != state.rules.waveTeam){
-                        resultDamage -= other.build.health();
+                        //damage the tile if it's not friendly
+                        if(other.build != null && other.team() != state.rules.waveTeam){
+                            resultDamage -= other.build.health();
 
-                        if(direct){
-                            other.build.damage(currDamage);
-                        }else{ //indirect damage happens at game load time
-                            other.build.health -= currDamage;
-                            //don't kill the core!
-                            if(other.block() instanceof CoreBlock) other.build.health = Math.max(other.build.health, 1f);
+                            if(direct){
+                                other.build.damage(currDamage);
+                            }else{ //indirect damage happens at game load time
+                                other.build.health -= currDamage;
+                                //don't kill the core!
+                                if(other.block() instanceof CoreBlock) other.build.health = Math.max(other.build.health, 1f);
 
-                            //remove the block when destroyed
-                            if(other.build.health < 0){
-                                //rubble
-                                if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
-                                    Effect.rubble(other.build.x, other.build.y, other.block().size);
+                                //remove the block when destroyed
+                                if(other.build.health < 0){
+                                    //rubble
+                                    if(rubble && !other.floor().solid && !other.floor().isLiquid && Mathf.chance(0.4)){
+                                        Effect.rubble(other.build.x, other.build.y, other.block().size);
+                                    }
+
+                                    other.build.addPlan(false);
+                                    other.remove();
                                 }
-
-                                other.build.addPlan(false);
-                                other.remove();
                             }
+
+                        }else if(other.solid() && !other.synthetic()){ //skip damage propagation through solid blocks
+                            continue;
                         }
 
-                    }else if(other.solid() && !other.synthetic()){ //skip damage propagation through solid blocks
-                        continue;
-                    }
-
-                    if(resultDamage > 0 && values[cx][cy] < resultDamage){
-                        frontier.addLast(other);
-                        values[cx][cy] = resultDamage;
+                        if(resultDamage > 0 && values[cx][cy] < resultDamage){
+                            frontier.addLast(other);
+                            values[cx][cy] = resultDamage;
+                        }
                     }
                 }
             }
         }
+
     }
 
     static float cost(Tile tile){

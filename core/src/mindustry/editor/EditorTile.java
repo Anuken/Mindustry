@@ -50,9 +50,19 @@ public class EditorTile extends Tile{
             return;
         }
 
-        op(OpType.block, block.id);
-        if(rotation != 0) op(OpType.rotation, (byte)rotation);
-        if(team != Team.derelict) op(OpType.team, (byte)team.id);
+        if(!isCenter()){
+            EditorTile cen = (EditorTile)build.tile;
+            cen.op(OpType.rotation, (byte)build.rotation);
+            cen.op(OpType.team, (byte)build.team.id);
+            cen.op(OpType.block, block.id);
+            update();
+        }else{
+            if(build != null) op(OpType.rotation, (byte)build.rotation);
+            if(build != null) op(OpType.team, (byte)build.team.id);
+            op(OpType.block, block.id);
+
+        }
+
         super.setBlock(type, team, rotation);
     }
 
