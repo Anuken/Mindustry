@@ -16,13 +16,13 @@ public class BulletDeflectAbility extends Ability{
     private static Unit paramUnit;
     private static BulletDeflectAbility paramField;
     private static final Cons<Bullet> bulletDeflector = bullet -> {
-        if(bullet.team != paramUnit.team && !(bullet.vel().len() <= 0.1f || !bullet.type.reflectable) && Mathf.chance(paramField.chanceDeflect / bullet.damage())) {
+        if(bullet.team != paramUnit.team && !(bullet.vel().len() <= 0.1f || !bullet.type.reflectable) && Mathf.chance(paramField.chanceDeflect / bullet.damage())){
             bullet.trns(-bullet.vel.x, -bullet.vel.y);
 
             float angleToUnit = Mathf.angle(bullet.x - paramUnit.x, bullet.y - paramUnit.y) + 90f;
-            float newAngle = 2 * (angleToUnit - bullet.vel.angle());
+            float rotateAngle = 2 * (angleToUnit - bullet.vel.angle());
 
-            bullet.vel.trns(newAngle, bullet.vel.x, bullet.vel.y);
+            bullet.vel.trns(rotateAngle, bullet.vel.x, bullet.vel.y);
 
             bullet.owner(paramUnit);
             bullet.team(paramUnit.team);
@@ -47,7 +47,7 @@ public class BulletDeflectAbility extends Ability{
         if(timer >= reload){
             Bullet nearestBullet = Groups.bullet.intersect(unit.x - range, unit.y - range, range*2, range*2).min(b -> b.team == unit.team || !b.type().hittable ? Float.MAX_VALUE : b.dst2(unit.x, unit.y));
 
-            if(nearestBullet != null && nearestBullet.team != unit.team) {
+            if(nearestBullet != null && nearestBullet.team != unit.team){
                 activeEffect.at(unit, range);
 
                 paramUnit = unit;
