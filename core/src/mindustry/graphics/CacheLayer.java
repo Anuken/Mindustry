@@ -51,7 +51,7 @@ public enum CacheLayer{
             endShader(Shaders.slag);
         }
     },
-    space(2){
+    space{
         @Override
         public void begin(){
             beginShader();
@@ -62,20 +62,10 @@ public enum CacheLayer{
             endShader(Shaders.space);
         }
     },
-    normal(5),
-    walls(3);
+    normal,
+    walls;
 
     public static final CacheLayer[] all = values();
-    /** Capacity multiplier. */
-    public final int capacity;
-
-    CacheLayer(){
-        this(3);
-    }
-
-    CacheLayer(int capacity){
-        this.capacity = capacity;
-    }
 
     public void begin(){
 
