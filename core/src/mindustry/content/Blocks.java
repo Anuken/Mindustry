@@ -1774,7 +1774,7 @@ public class Blocks implements ContentList{
             reloadTime = 6f;
             coolantMultiplier = 0.5f;
             restitution = 0.1f;
-            ammoUseEffect = Fx.casing3Double;
+            ammoUseEffect = Fx.casing3;
             range = 200f;
             inaccuracy = 3f;
             recoilAmount = 3f;
