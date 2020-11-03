@@ -18,7 +18,7 @@ public class FlyingAI extends AIController{
             Vec2 unitPos = new Vec2(unit.x, unit.y);
             Vec2 targetPos = new Vec2(((Building) target).x, ((Building) target).y);
 
-            if(unitPos.dst(targetPos) <= (unit.type().range < (Float.MAX_VALUE * 0.96f) ? unit.type().range : 40f)) {
+            if(unitPos.dst(targetPos) <= (unit.type().range < (Float.MAX_VALUE * 0.96f) ? unit.type().range : 40f)){
                 ((Payloadc) unit).dropLastPayload();
             }
         }
@@ -45,13 +45,13 @@ public class FlyingAI extends AIController{
     protected Teamc findTarget(float x, float y, float range, boolean air, boolean ground){
         if(unit.hasWeapons()){
             Teamc result = target(x, y, range, air, ground);
-            if (result != null) return result;
+            if(result != null) return result;
 
-            if (ground) result = targetFlag(x, y, BlockFlag.producer, true);
-            if (result != null) return result;
+            if(ground) result = targetFlag(x, y, BlockFlag.producer, true);
+            if(result != null) return result;
 
-            if (ground) result = targetFlag(x, y, BlockFlag.turret, true);
-            if (result != null) return result;
+            if(ground) result = targetFlag(x, y, BlockFlag.turret, true);
+            if(result != null) return result;
         }
 
         return null;
@@ -61,7 +61,7 @@ public class FlyingAI extends AIController{
     protected void updateTargeting(){
         if(unit.hasWeapons()){
             updateWeapons();
-        } else {
+        }else{
             target = Units.findEnemyTile(unit.team, unit.x, unit.y, Math.max(unit.range(), 120f), b -> b.health > 0);
             if(target instanceof ConstructBlock.ConstructBuild) target = null;
         }
