@@ -246,7 +246,7 @@ public class WaveInfoDialog extends BaseDialog{
                     t.check("@waves.guardian", b -> group.effect = (b ? StatusEffects.boss : null)).padTop(4).update(b -> b.setChecked(group.effect == StatusEffects.boss)).padBottom(8f);
 
 
-                    if(group.type.create(Team.sharded) instanceof Payloadc) {
+                    if(group.type.create(Team.sharded) instanceof Payloadc){
                         t.row();
                         t.button(b -> {
                             b.add("@payload.editor");
@@ -329,7 +329,7 @@ public class WaveInfoDialog extends BaseDialog{
                             payloadAmount += (unit.hitSize * unit.hitSize);
                         }
                     }
-                    if((type.hitSize * type.hitSize) + payloadAmount <= (group.type.payloadCapacity + 0.001f)) {
+                    if((type.hitSize * type.hitSize) + payloadAmount <= (group.type.payloadCapacity + 0.001f)){
                         if (group.payloads == null) {
                             group.payloads = new Seq<UnitType>();
                         }
@@ -353,7 +353,7 @@ public class WaveInfoDialog extends BaseDialog{
                         payloadTable.row();
 
                         buildGroups();
-                    } else {
+                    }else{
                         ui.showOkText("Maximum Capacity", "The maximum payload capacity in the unit " + group.type.localizedName + " has been used up.", () -> {});
                     }
                 }).pad(2).margin(12f).fillX();
