@@ -44,21 +44,13 @@ public class OverdriveProjector extends Block{
     public boolean outputsItems(){
         return false;
     }
-
+    
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         //inner circle
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
-        boolean boosterUnlocked = true;
-        for(ItemStack item : consumes.getItem().items){
-            if(!item.item.unlockedNow()){
-                boosterUnlocked = false;
-                break;
-            }
-        }
-
-        if(hasBoost && boosterUnlocked){
+        if(hasBoost && boosterUnlocked()){
             float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
             float transparency = Time.time() %90f / 90f;
 
@@ -133,12 +125,27 @@ public class OverdriveProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            if(!cons().optionalValid() || !hasBoost){
-                indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, baseColor.cpy().a(Mathf.absin(4f, 1f))));
-                Drawf.dashCircle(x, y, realRange, baseColor);
-            }else{
-                indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, phaseColor.cpy().a(Mathf.absin(4f, 1f))));
-                Drawf.dashCircle(x, y, realRange, phaseColor);
+            Drawf.dashCircle(x, y, realRange, baseColor.cpy().lerp(phaseColor, phaseHeat));
+            
+            indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, baseColor.cpy().lerp(phaseColor, phaseHeat).a(Mathf.absin(4f, 1f))));
+            
+            if(!cons().optionalValid() && hasBoost && boosterUnlocked()){
+                float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+                float transparency = Time.time() % 90f / 90f;
+                
+                //outside circle
+                Drawf.dashCircle(x, y, range + phaseRangeBoost, phaseColor, 0.25f);
+
+                //expanding circle
+                Drawf.dashCircle(x, y, range + expandProgress * phaseRangeBoost, baseColor.cpy().lerp(phaseColor, transparency), 1f - transparency);
+
+                //arrows
+                float sin = Mathf.absin(Time.time(), 6f, 1f);
+                for(int i = 0; i < 360; i += 60){
+                    Tmp.v1.trns(i, 0, range - sin);
+                    Tmp.v2.trns(i, 0, range + phaseRangeBoost);
+                    Drawf.arrow(x + Tmp.v1.x, y + Tmp.v1.y, x + Tmp.v2.x, y + Tmp.v2.y, phaseRangeBoost/2f + sin, 4f + sin, phaseColor);
+                }
             }
         }
 

@@ -212,17 +212,41 @@ public class ForceProjector extends Block{
                 Draw.reset();
             }
         }
+        
+        @Override
+        public void drawSelect(){
+            if(!cons().optionalValid() && hasBoost && boosterUnlocked()){
+                float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
+                float transparency = Time.time() % 90f / 90f;
+                
+                //outside hexagon
+                Drawf.hexagon(x, y, radius + phaseRadiusBoost, phaseColor, 0.25f);
+
+                //expanding hexagon
+                Drawf.hexagon(x, y, radius + expandProgress * phaseRadiusBoost, player.team().color.cpy().lerp(phaseColor, expandProgress), 1f - transparency);
+
+                //arrows
+                float sin = Mathf.absin(Time.time(), 6f, 1f);
+                for(int i = 0; i < 360; i += 60){
+                    Tmp.v1.trns(i, 0, radius - sin);
+                    Tmp.v2.trns(i, 0, radius + phaseRadiusBoost);
+                    Drawf.arrow(x + Tmp.v1.x, y + Tmp.v1.y, x + Tmp.v2.x, y + Tmp.v2.y, phaseRadiusBoost/4f + sin, 4f + sin, phaseColor);
+                }
+            }
+        }
 
         public void drawShield(){
             if(!broken){
                 float radius = realRadius();
 
                 Draw.z(Layer.shields);
+                
+                Draw.color(team.color.cpy().lerp(phaseColor, phaseHeat), Color.white, Mathf.clamp(hit));
 
                 if(Core.settings.getBool("animatedshields")){
                     Fill.poly(x, y, 6, radius);
                 }else{
-                    Drawf.hexagon(x * tilesize + offset, y * tilesize + offset, radius, team.color.cpy().lerp(Color.white, Mathf.clamp(hit)));
+                    Drawf.hexagon(x, y, radius, team.color.cpy().lerp(phaseColor, phaseHeat).lerp(Color.white, Mathf.clamp(hit)));
                 }
             }
 

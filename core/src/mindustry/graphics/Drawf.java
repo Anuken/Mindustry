@@ -116,7 +116,6 @@ public class Drawf{
         Lines.stroke(3f, Pal.gray);
         Draw.alpha(alpha);
         Lines.dashCircle(x, y, rad);
-        Draw.reset();
         Lines.stroke(1f, color);
         Draw.alpha(alpha);
         Lines.dashCircle(x, y, rad);
@@ -131,7 +130,6 @@ public class Drawf{
         Lines.stroke(3f, Pal.gray);
         Draw.alpha(alpha);
         Lines.poly(x, y, 6, rad);
-        Draw.reset();
         Lines.stroke(1f, color);
         Draw.alpha(alpha);
         Lines.poly(x, y, 6, rad);
