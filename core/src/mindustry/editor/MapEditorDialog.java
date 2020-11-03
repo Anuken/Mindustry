@@ -702,7 +702,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(editor.drawBlock == block));
             group.add(button);
-            content.add(button).size(50f);
+            content.add(button).size(50f).tooltip(block.localizedName);
 
             if(++i % 4 == 0){
                 content.row();
