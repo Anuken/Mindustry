@@ -1398,6 +1398,7 @@ public class Blocks implements ContentList{
             );
 
             barrelSpacing = 4f;
+            alternate = true;
             reloadTime = 20f;
             restitution = 0.03f;
             range = 100;
@@ -1591,6 +1592,7 @@ public class Blocks implements ContentList{
             shootShake = 1f;
             burstSpacing = 3f;
             shots = 4;
+            alternate = true;
             ammoUseEffect = Fx.casing2;
             health = 240 * size * size;
             shootSound = Sounds.shootBig;
@@ -1769,6 +1771,8 @@ public class Blocks implements ContentList{
             Items.pyratite, Bullets.standardIncendiaryBig,
             Items.thorium, Bullets.standardThoriumBig
             );
+            
+            alternate = true;
             reloadTime = 6f;
             coolantMultiplier = 0.5f;
             restitution = 0.1f;

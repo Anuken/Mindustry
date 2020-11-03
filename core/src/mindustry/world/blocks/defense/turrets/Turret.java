@@ -59,6 +59,7 @@ public abstract class Turret extends ReloadTurret{
     public float barrels = 1;
     public float barrelSpacing = 4f;
     public boolean shotPerBarrel = false;
+    public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
 
@@ -394,7 +395,7 @@ public abstract class Turret extends ReloadTurret{
             if(!isValid()) return;
 
             //alternate sides when using a double turret
-            float scl = (shots == 2 && alternate && shotCounter % 2 == 1 ? -1f : 1f);
+            float scl = (alternate && shotCounter % 2 == 1 ? -1f : 1f);
 
             ammoUseEffect.at(x - Angles.trnsx(rotation, ammoEjectBack), y - Angles.trnsy(rotation, ammoEjectBack), rotation * scl);
         }
