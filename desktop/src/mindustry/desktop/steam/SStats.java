@@ -127,7 +127,8 @@ public class SStats implements SteamUserStatsCallback{
                     }
 
                     if(Core.settings.getBool("meltdownp", false) && Core.settings.getBool("spectrep", false)){
-                        buildMeltdownSpectre.complete();
+                        //TODO
+                        //buildMeltdownSpectre.complete();
                     }
                 }
             }
@@ -148,7 +149,8 @@ public class SStats implements SteamUserStatsCallback{
             if(e.content == Items.titanium) obtainTitanium.complete();
 
             if(!content.sectors().contains(SectorPreset::locked)){
-                unlockAllZones.complete();
+                //TODO
+                //unlockAllZones.complete();
             }
         });
 

@@ -1330,7 +1330,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 2000, Items.lead, 1000));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1500, Items.lead, 1000));
             alwaysUnlocked = true;
 
             unitType = UnitTypes.alpha;

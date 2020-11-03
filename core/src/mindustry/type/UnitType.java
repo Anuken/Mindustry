@@ -202,7 +202,6 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
         stats.add(Stat.commandLimit, commandLimit);
-        //TODO abilities, maybe try something like DPS
 
         if(abilities.any()){
             var unique = new ObjectSet<String>();
@@ -249,7 +248,7 @@ public class UnitType extends UnlockableContent{
         singleTarget = weapons.size <= 1;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round(hitSize * 4, 10), 10);
+            itemCapacity = Math.max(Mathf.round((int)(hitSize * 4.3), 10), 10);
         }
 
         //set up default range
