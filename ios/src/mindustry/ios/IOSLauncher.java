@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
+import mindustry.net.*;
 import mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
@@ -248,7 +249,14 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     public static void main(String[] argv){
         NSAutoreleasePool pool = new NSAutoreleasePool();
-        UIApplication.main(argv, null, IOSLauncher.class);
+        try{
+            UIApplication.main(argv, null, IOSLauncher.class);
+        }catch(Throwable t){
+            //attempt to log the exception
+            CrashSender.log(t);
+            //rethrow the exception so it actually crashes
+            throw t;
+        }
         pool.close();
     }
 }

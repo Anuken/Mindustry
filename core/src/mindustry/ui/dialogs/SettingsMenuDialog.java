@@ -195,6 +195,23 @@ public class SettingsMenuDialog extends SettingsDialog{
                 t.row();
                 t.button("@data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath())).marginLeft(4);
             }
+
+            t.row();
+
+            t.button("@crash.export", Icon.upload, style, () -> {
+                if(settings.getDataDirectory().child("crashes").list().length == 0){
+                    ui.showInfo("@crash.none");
+                }else{
+                    platform.showFileChooser(false, "txt", file -> {
+                        StringBuilder out = new StringBuilder();
+                        for(Fi fi : settings.getDataDirectory().child("crashes").list()){
+                            out.append(fi.name()).append("\n\n").append(fi.readString()).append("\n");
+                        }
+                        file.writeString(out.toString());
+                        app.post(() -> ui.showInfo("@crash.exported"));
+                    });
+                }
+            }).marginLeft(4);
         });
 
         ScrollPane pane = new ScrollPane(prefs);
