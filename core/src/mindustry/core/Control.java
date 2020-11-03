@@ -301,6 +301,7 @@ public class Control implements ApplicationListener, Loadable{
                         player.set(spawn.x * tilesize, spawn.y * tilesize);
                         camera.position.set(player);
 
+                        Events.fire(new SectorLaunchEvent(sector));
                         Events.fire(Trigger.newGame);
                     }
 
@@ -324,6 +325,7 @@ public class Control implements ApplicationListener, Loadable{
                 sector.info.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
+                Events.fire(new SectorLaunchEvent(sector));
                 Events.fire(Trigger.newGame);
             }
         });

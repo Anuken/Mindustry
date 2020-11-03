@@ -96,6 +96,14 @@ public class EventType{
         }
     }
 
+    public static class SectorLaunchEvent{
+        public final Sector sector;
+
+        public SectorLaunchEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
     public static class CommandIssueEvent{
         public final Building tile;
         public final UnitCommand command;

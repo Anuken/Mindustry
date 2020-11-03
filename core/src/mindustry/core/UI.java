@@ -357,6 +357,7 @@ public class UI implements ApplicationListener, Loadable{
                 hide();
                 listener.run();
             }).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -365,6 +366,7 @@ public class UI implements ApplicationListener, Loadable{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.left);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 

@@ -8,7 +8,6 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.type.*;
 
 import static mindustry.Vars.*;
 import static mindustry.desktop.steam.SAchievement.*;
@@ -59,8 +58,9 @@ public class SStats implements SteamUserStatsCallback{
            //     active10Phantoms.complete();
             //}
 
+            //TODO
             if(Groups.unit.count(u -> u.type == UnitTypes.crawler && u.team() == player.team()) >= 50){
-                active50Crawlers.complete();
+               // active50Crawlers.complete();
             }
 
             for(Building entity : player.team().cores()){
@@ -75,22 +75,15 @@ public class SStats implements SteamUserStatsCallback{
     private void registerEvents(){
         Events.on(UnitDestroyEvent.class, e -> {
             if(ncustom()){
-                if(e.unit.team() != Vars.player.team()){
+                if(e.unit.team != Vars.player.team()){
                     SStat.unitsDestroyed.add();
 
-                    if(e.unit instanceof Unit && ((Unit)e.unit).isBoss()){
+                    if(e.unit.isBoss()){
                         SStat.bossesDefeated.add();
                     }
                 }
             }
         });
-
-        //TODO achievement invalid
-        //Events.on(ZoneConfigureCompleteEvent.class, e -> {
-            //if(!content.sectors().contains(z -> !z.canConfigure())){
-            //    configAllZones.complete();
-            //}
-        //});
 
         Events.run(Trigger.newGame, () -> Core.app.post(() -> {
             if(campaign() && player.core() != null && player.core().items.total() >= 10 * 1000){
@@ -113,16 +106,21 @@ public class SStats implements SteamUserStatsCallback{
                 }
 
                 //TODO implement
-                //if(e.tile.block() == Blocks.daggerFactory){
-                //    buildDaggerFactory.complete();
-                //}
+                if(e.tile.block() == Blocks.groundFactory){
+                    buildGroundFactory.complete();
+                }
 
-                if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre){
-                    if(e.tile.block() == Blocks.meltdown && !Core.settings.getBool("meltdownp", false)){
+                //TODO fix, cleaner impl
+                if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre || e.tile.block() == Blocks.foreshadow){
+                    if(e.tile.block() == Blocks.meltdown){
                         Core.settings.put("meltdownp", true);
                     }
 
-                    if(e.tile.block() == Blocks.spectre && !Core.settings.getBool("spectrep", false)){
+                    if(e.tile.block() == Blocks.spectre){
+                        Core.settings.put("spectrep", true);
+                    }
+
+                    if(e.tile.block() == Blocks.foreshadow){
                         Core.settings.put("spectrep", true);
                     }
 
@@ -147,11 +145,6 @@ public class SStats implements SteamUserStatsCallback{
         Events.on(UnlockEvent.class, e -> {
             if(e.content == Items.thorium) obtainThorium.complete();
             if(e.content == Items.titanium) obtainTitanium.complete();
-
-            if(!content.sectors().contains(SectorPreset::locked)){
-                //TODO
-                //unlockAllZones.complete();
-            }
         });
 
         Events.run(Trigger.openWiki, openWiki::complete);
@@ -197,14 +190,9 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        //TODO
-        //Events.on(LaunchEvent.class, e -> {
-        //    if(state.rules.tutorial){
-        //        completeTutorial.complete();
-        //    }
-//
-        //    SStat.timesLaunched.add();
-        //});
+        Events.on(SectorLaunchEvent.class, e -> {
+            SStat.timesLaunched.add();
+        });
 
         Events.on(LaunchItemEvent.class, e -> {
             SStat.itemsLaunched.add(e.stack.amount);

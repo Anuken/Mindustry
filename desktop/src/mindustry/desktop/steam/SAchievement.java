@@ -31,32 +31,28 @@ public enum SAchievement{
     defeatBoss(SStat.bossesDefeated, 1),
     //TODO
     captureAllSectors,
-    //configAllZones,
+    //TODO
+    capture10Sectors,
+    //TODO
     drop10kitems,
     powerupImpactReactor,
     obtainThorium,
     obtainTitanium,
     suicideBomb,
-    buildDaggerFactory,
+    buildGroundFactory,
     issueAttackCommand,
     active100Units(SStat.maxUnitActive, 100),
-    active10Phantoms,
-    active50Crawlers,
     build1000Units,
     //TODO
     buildAllUnits,
     //TODO
     activeAllT5,
-    //TODO
-    //earnSRank,
-    //earnSSRank,
     dieExclusion,
     drown,
     fillCoreAllCampaign,
     hostServer10(SStat.maxPlayersServer, 10),
     buildMeltdownSpectreForeshadow,
     launchItemPad,
-    //skipLaunching2Death,
     chainRouters,
     //TODO
     becomeRouter,
