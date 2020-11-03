@@ -288,7 +288,7 @@ public class Control implements ApplicationListener, Loadable{
                         state.wave = 1;
 
                         //reset win wave??
-                        state.rules.winWave = sector.preset != null ? sector.preset.captureWave : 40;
+                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
 
                         //kill all units, since they should be dead anwyay
                         Groups.unit.clear();
