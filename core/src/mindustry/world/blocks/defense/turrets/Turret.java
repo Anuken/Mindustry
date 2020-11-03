@@ -58,7 +58,7 @@ public abstract class Turret extends ReloadTurret{
     public float burstSpacing = 0;
     public float barrels = 1;
     public float barrelSpacing = 4f;
-    public boolean shotPerBarrel = false;
+    public boolean shotPerBarrel = true;
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
@@ -358,12 +358,10 @@ public abstract class Turret extends ReloadTurret{
                     recoil = recoilAmount;
                     
                     tr.trns(rotation - 90, barrelSpacing * i + Mathf.range(xRand), size * tilesize / 2f);
-                    for(int k = 0; k < shots; k++){
-                        bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (k - (int)(shots / 2f)) * spread);
-                        effects();
-                        shotCounter = !shotPerBarrel ? shotCounter : shotCounter + 1;
-                    }
+                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (j - (int)(shots / 2f)) * spread);
+                    effects();
                     useAmmo();
+                    shotCounter = !shotPerBarrel ? shotCounter : shotCounter + 1;
                 });
             }
             
