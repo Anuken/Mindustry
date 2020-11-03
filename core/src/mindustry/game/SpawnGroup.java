@@ -105,7 +105,7 @@ public class SpawnGroup implements Serializable{
         if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.name);
-        if(payloads != null && payloads.size > 0) {
+        if(payloads != null && payloads.size > 0){
             payloadStrings = new Seq<String>();
             for(UnitType unitType : payloads){
                 payloadStrings.add(unitType.name);
