@@ -1399,6 +1399,7 @@ public class Blocks implements ContentList{
 
             barrelSpacing = 4f;
             alternate = true;
+            barrels = 2;
             reloadTime = 20f;
             restitution = 0.03f;
             range = 100;
@@ -1586,13 +1587,16 @@ public class Blocks implements ContentList{
             range = 150f;
             reloadTime = 38f;
             restitution = 0.03f;
-            ammoEjectBack = 3f;
+            ammoEjectX = 1f;
+            ammoEjectY = -4f;
+            ejectRecoil = 2;
             cooldown = 0.03f;
             recoilAmount = 3f;
             shootShake = 1f;
             burstSpacing = 3f;
             shots = 4;
             alternate = true;
+            shotPerVolley = false;
             ammoUseEffect = Fx.casing2;
             health = 240 * size * size;
             shootSound = Sounds.shootBig;
@@ -1686,8 +1690,11 @@ public class Blocks implements ContentList{
             shots = 4;
             inaccuracy = 12f;
             reloadTime = 60f;
-            ammoEjectBack = 5f;
-            ammoUseEffect = Fx.casing3Double;
+            ammoEjectX = -3f;
+            ammoEjectY = -12f;
+            alternate = true;
+            shotPerVolley = true;
+            ammoUseEffect = Fx.casing3;
             ammoPerShot = 2;
             cooldown = 0.03f;
             velocityInaccuracy = 0.2f;
@@ -1745,7 +1752,10 @@ public class Blocks implements ContentList{
             rotateSpeed = 2.5f;
             reloadTime = 200f;
             restitution = 0.2f;
-            ammoUseEffect = Fx.casing3Double;
+            ammoUseEffect = Fx.casing3;
+            alternate = true;
+            ammoEjectX = -1f;
+            ammoEjectY = -12f;
             recoilAmount = 5f;
             restitution = 0.009f;
             cooldown = 0.009f;
@@ -1777,10 +1787,13 @@ public class Blocks implements ContentList{
             coolantMultiplier = 0.5f;
             restitution = 0.1f;
             ammoUseEffect = Fx.casing3;
+            ammoEjectX = 2f;
+            ammoEjectY = -4f;
             range = 200f;
             inaccuracy = 3f;
             recoilAmount = 3f;
             barrelSpacing = 8f;
+            barrels = 2;
             shootShake = 2f;
             size = 4;
             shootCone = 24f;

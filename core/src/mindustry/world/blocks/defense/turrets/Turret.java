@@ -42,23 +42,29 @@ public abstract class Turret extends ReloadTurret{
 
     public int maxAmmo = 30;
     public int ammoPerShot = 1;
-    public float ammoEjectBack = 1f;
+    public boolean ammoEjectRight = true;
+    public float ammoEjectX = -1f;
+    public float ammoEjectY = -1f;
+    public float ejectRecoil = 1f;
+    public float ejectRestitution = 0.25f;
     public float inaccuracy = 0f;
     public float velocityInaccuracy = 0f;
     public int shots = 1;
-    public float spread = 4f;
+    public float spread = 0f;
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
+    public float shootX = 0f;
+    public float shootY = 0f;
     /** Currently used for artillery only. */
     public float minRange = 0f;
-    public float burstSpacing = 0;
-    public float barrels = 1;
+    public float burstSpacing = 0f;
+    public int barrels = 1;
     public float barrelSpacing = 4f;
-    public boolean shotPerBarrel = true;
+    public boolean shotPerVolley = true;
     public boolean alternate = false;
     public boolean targetAir = true;
     public boolean targetGround = true;
@@ -70,6 +76,7 @@ public abstract class Turret extends ReloadTurret{
 
     public @Load(value = "base-@", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
+    public @Load(value = "@-eject-#1", lengths = 2) TextureRegion[] ejectRegions;
 
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
     public Cons<TurretBuild> heatDrawer = tile -> {
@@ -133,6 +140,7 @@ public abstract class Turret extends ReloadTurret{
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
         public float recoil, heat, logicControlTime = -1;
+        public float[] eRecoils = new float[2];
         public int shotCounter;
         public boolean logicShooting = false;
         public @Nullable Posc target;
@@ -224,6 +232,14 @@ public abstract class Turret extends ReloadTurret{
             if(heatRegion != Core.atlas.find("error")){
                 heatDrawer.get(this);
             }
+            
+            for(int i = 0; i < 2; i++){
+                if(ejectRegions[i] != Core.atlas.find("error")){
+                    tr.trns(rotation, -ejectRecoil * eRecoils[i]);
+                    
+                    Draw.rect(ejectRegions[i], x + tr.x + tr2.x, y + tr.y + tr2.y, rotation - 90);
+                }
+            }
         }
 
         @Override
@@ -232,6 +248,9 @@ public abstract class Turret extends ReloadTurret{
 
             recoil = Mathf.lerpDelta(recoil, 0f, restitution);
             heat = Mathf.lerpDelta(heat, 0f, cooldown);
+            for(int i = 0; i < 2; i++){
+                eRecoils[i] = Mathf.lerpDelta(eRecoils[i], 0f, ejectRestitution);
+            }
 
             unit.health(health);
             unit.rotation(rotation);
@@ -348,29 +367,31 @@ public abstract class Turret extends ReloadTurret{
         protected void shoot(BulletType type){
             recoil = recoilAmount;
             heat = 1f;
-
-            float i = (shotCounter % barrels) - (barrels-1)/2f;
-
-            for(int j = 0; j < shots; j++){
-                Time.run(burstSpacing * j, () -> {
+            
+            for(int i = 0; i < shots; i++){
+                final int rot = i;
+                Time.run(burstSpacing * i, () -> {
                     if(!isValid() || !hasAmmo()) return;
-
+                    
                     recoil = recoilAmount;
                     
-                    tr.trns(rotation - 90, barrelSpacing * i + Mathf.range(xRand), size * tilesize / 2f);
-                    bullet(type, rotation + Mathf.range(inaccuracy + type.inaccuracy) + (j - (int)(shots / 2f)) * spread);
+                    float j = (shotCounter % barrels) - (barrels - 1) / 2f;
+                    tr.trns(rotation - 90, barrelSpacing * j + Mathf.range(xRand) + shootX, size * tilesize / 2f + shootY - recoil);
+                    float scl = Mathf.sign((float)(shotCounter % 2) - 0.5f);
+                    
+                    bullet(type, rotation + (Mathf.range(inaccuracy + type.inaccuracy) + (rot - (int)(shots / 2f)) * spread) * scl);
                     effects();
                     useAmmo();
-                    shotCounter = !shotPerBarrel ? shotCounter : shotCounter + 1;
+                    shotCounter = !shotPerVolley ? shotCounter + 1 : shotCounter;
                 });
             }
             
-            shotCounter = shotPerBarrel ? shotCounter + 1 : shotCounter;
+            shotCounter = shotPerVolley ? shotCounter + 1 : shotCounter;
         }
 
         protected void bullet(BulletType type, float angle){
             float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
-
+            
             type.create(this, team, x + tr.x, y + tr.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
         }
 
@@ -392,10 +413,13 @@ public abstract class Turret extends ReloadTurret{
         protected void ejectEffects(){
             if(!isValid()) return;
 
-            //alternate sides when using a double turret
-            float scl = (alternate && shotCounter % 2 == 1 ? -1f : 1f);
-
-            ammoUseEffect.at(x - Angles.trnsx(rotation, ammoEjectBack), y - Angles.trnsy(rotation, ammoEjectBack), rotation * scl);
+            //should it alternate sides
+            float scl = (alternate ? ((shotCounter % 2) - 0.5f) * 2 : (float)Mathf.sign(ammoEjectRight));
+            eRecoils[(alternate ? (int)(shotCounter % 2) : Mathf.sign(ammoEjectRight))] = 1f;
+            
+            tr.trns(rotation - 90, ammoEjectX * scl, ammoEjectY);
+            
+            ammoUseEffect.at(x + tr.x, y + tr.y, rotation * scl);
         }
 
         @Override
