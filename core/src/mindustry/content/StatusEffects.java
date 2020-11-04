@@ -69,7 +69,7 @@ public class StatusEffects implements ContentList{
             init(() -> {
                 trans(shocked, ((unit, time, newTime, result) -> {
                     unit.damagePierce(14f);
-                    if(unit.team() == state.rules.waveTeam){
+                    if(unit.team == state.rules.waveTeam){
                         Events.fire(Trigger.shock);
                     }
                     result.set(this, time);

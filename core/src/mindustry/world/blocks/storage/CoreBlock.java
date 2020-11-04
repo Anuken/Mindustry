@@ -77,7 +77,7 @@ public class CoreBlock extends StorageBlock{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.buildTime, 0, StatUnit.seconds);
+        stats.remove(Stat.buildTime);
     }
 
     @Override

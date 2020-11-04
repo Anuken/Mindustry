@@ -1,41 +1,36 @@
 package mindustry.desktop.steam;
 
 public enum SAchievement{
-    //completeTutorial,
     kill1kEnemies(SStat.unitsDestroyed, 1000),
-    kill100kEnemies(SStat.unitsDestroyed, 1000 * 100),
-    //TODO achievements for reaching 10k/min production or something
-    launch10kItems(SStat.itemsLaunched, 1000 * 10),
-    //TODO reduce amounts required here
-    launch1milItems(SStat.itemsLaunched, 1000 * 1000),
+    kill100kEnemies(SStat.unitsDestroyed, 100_000),
+    launch10kItems(SStat.itemsLaunched, 10_000),
+    launch1milItems(SStat.itemsLaunched, 1_000_000),
+
+    produce1kMin(SStat.maxProduction, 1000),
+    produce20kMin(SStat.maxProduction, 20_000),
     win10Attack(SStat.attacksWon, 10),
     win10PvP(SStat.pvpsWon, 10),
     defeatAttack5Waves,
-    //TODO
     launch30Times(SStat.timesLaunched, 30),
-    //TODO
     captureBackground,
-    //TODO
     survive100Waves(SStat.maxWavesSurvived, 100),
-    survive500Waves(SStat.maxWavesSurvived, 500),
+    //this seems near-impossible?
+    //survive500Waves(SStat.maxWavesSurvived, 500),
     researchAll,
     //TODO
-    useAllUnits,
+    //useAllUnits,
     shockWetEnemy,
     killEnemyPhaseWall,
     researchRouter,
-    place10kBlocks(SStat.blocksBuilt, 10 * 1000),
+    place10kBlocks(SStat.blocksBuilt, 10_000),
     destroy1kBlocks(SStat.blocksDestroyed, 1000),
     overheatReactor(SStat.reactorsOverheated, 1),
     make10maps(SStat.mapsMade, 10),
     downloadMapWorkshop,
     publishMap(SStat.mapsPublished, 1),
     defeatBoss(SStat.bossesDefeated, 1),
-    //TODO
     captureAllSectors,
-    //TODO
-    capture10Sectors,
-    //TODO
+    control10Sectors,
     drop10kitems,
     powerupImpactReactor,
     obtainThorium,
@@ -44,10 +39,12 @@ public enum SAchievement{
     buildGroundFactory,
     issueAttackCommand,
     active100Units(SStat.maxUnitActive, 100),
-    build1000Units,
-    buildAllUnits(SStat.unitsBuilt, 30),
-    //TODO
+    build1000Units(SStat.unitsBuilt, 1000),
+    buildAllUnits(SStat.unitTypesBuilt, 30),
+    buildT5,
+    pickupT5,
     activeAllT5,
+    active10Polys,
     dieExclusion,
     drown,
     fillCoreAllCampaign,
@@ -55,15 +52,11 @@ public enum SAchievement{
     buildMeltdownSpectreForeshadow,
     launchItemPad,
     chainRouters,
-    //TODO
     circleConveyor,
-    //TODO
     becomeRouter,
-    //TODO
-    save20Schematics,
-    //TODO
-    destroyEnemyBase,
+    create20Schematics(SStat.schematicsCreated, 20),
     survive10WavesNoBlocks,
+    captureNoBlocksBroken,
     useFlameAmmo,
     coolTurret,
     enablePixelation,

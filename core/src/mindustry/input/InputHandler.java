@@ -326,7 +326,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //clear player unit when they possess a core
-        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreBuild)){
+        if(unit instanceof BlockUnitc block && block.tile() instanceof CoreBuild build){
             Fx.spawn.at(player);
             if(net.client()){
                 control.input.controlledType = null;
@@ -334,8 +334,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             player.clearUnit();
             player.deathTimer = 61f;
-            ((CoreBuild)((BlockUnitc)unit).tile()).requestSpawn(player);
-
+            build.requestSpawn(player);
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
@@ -349,6 +348,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 Fx.unitSpirit.at(player.x, player.y, 0f, unit);
             }
         }
+
+        Events.fire(new UnitControlEvent(player, unit));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -543,6 +544,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 schematics.add(lastSchematic);
                 ui.showInfoFade("@schematic.saved");
                 ui.schematics.showInfo(lastSchematic);
+                Events.fire(new SchematicCreateEvent(lastSchematic));
             }
         });
     }

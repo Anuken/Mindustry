@@ -5,11 +5,12 @@ public enum SStat{
     attacksWon,
     pvpsWon,
     timesLaunched,
-    zoneMechsUsed,
+    zoneMechsUsed, //TODO
     blocksDestroyed,
     itemsLaunched,
     reactorsOverheated,
     maxUnitActive,
+    unitTypesBuilt,
     unitsBuilt,
     bossesDefeated,
     maxPlayersServer,
@@ -17,6 +18,9 @@ public enum SStat{
     mapsPublished,
     maxWavesSurvived,
     blocksBuilt,
+    maxProduction,
+    sectorsControlled,
+    schematicsCreated,
     ;
 
     public int get(){
