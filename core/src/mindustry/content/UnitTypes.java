@@ -896,20 +896,28 @@ public class UnitTypes implements ContentList{
             engineOffset = 5.5f;
             range = 140f;
             targetAir = false;
+            commandLimit = 4;
 
             weapons.add(new Weapon(){{
                 y = 0f;
                 x = 2f;
                 reload = 13f;
                 ejectEffect = Fx.casing1;
-                bullet = Bullets.standardCopper;
+                bullet = new BasicBulletType(2.5f, 9){{
+                    width = 7f;
+                    height = 9f;
+                    lifetime = 45f;
+                    shootEffect = Fx.shootSmall;
+                    smokeEffect = Fx.shootSmallSmoke;
+                    ammoMultiplier = 2;
+                }};
                 shootSound = Sounds.shoot;
             }});
         }};
 
         horizon = new UnitType("horizon"){{
-            health = 350;
-            speed = 1.8f;
+            health = 340;
+            speed = 1.7f;
             accel = 0.08f;
             drag = 0.016f;
             flying = true;
@@ -920,6 +928,7 @@ public class UnitTypes implements ContentList{
             faceTarget = false;
             armor = 4f;
             targetFlag = BlockFlag.factory;
+            commandLimit = 5;
 
             weapons.add(new Weapon(){{
                 minShootVelocity = 0.75f;
@@ -1718,7 +1727,7 @@ public class UnitTypes implements ContentList{
             hitSize = 9f;
             rotateShooting = false;
             lowAltitude = true;
-            commandLimit = 5;
+            commandLimit = 4;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
@@ -1757,7 +1766,7 @@ public class UnitTypes implements ContentList{
             health = 220f;
             engineOffset = 6f;
             hitSize = 11f;
-            commandLimit = 7;
+            commandLimit = 5;
 
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;

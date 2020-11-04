@@ -46,14 +46,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static float playerSelectRange = mobile ? 17f : 11f;
     /** Maximum line length. */
     final static int maxLength = 100;
-    final static Vec2 stackTrns = new Vec2();
     final static Rect r1 = new Rect(), r2 = new Rect();
-    final static Seq<Unit> units = new Seq<>();
-    /** Distance on the back from where items originate. */
-    final static float backTrns = 3f;
 
     public final OverlayFragment frag = new OverlayFragment();
 
+    public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
     public int rotation;
@@ -419,7 +416,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead);
 
             if(unit != null){
-                Call.unitControl(player, unit);
+                //only trying controlling once a second to prevent packet spam
+                if(!net.client() || controlInterval.get(0, 70f)){
+                    Call.unitControl(player, unit);
+                }
             }
         }
     }
