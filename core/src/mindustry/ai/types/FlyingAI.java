@@ -18,10 +18,7 @@ public class FlyingAI extends AIController{
         boolean targetBuild = target instanceof Building;
         
         if(hasPayload && targetBuild){
-            Vec2 unitPos = new Vec2(unit.x, unit.y);
-            Vec2 targetPos = new Vec2(((Building) target).x, ((Building) target).y);
-
-            if(unitPos.dst(targetPos) <= (unit.type().range < (Float.MAX_VALUE * 0.96f) ? unit.type().range : 40f)){
+            if(target.within(unit, (unit.type().range < (Float.MAX_VALUE * 0.96f) ? unit.type().range : 40f))){
                 ((Payloadc) unit).dropLastPayload();
             }
         }
