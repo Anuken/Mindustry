@@ -9,7 +9,7 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.meta.values.*;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class LaserTurret extends PowerTurret{
     public float firingMoveFract = 0.25f;
@@ -33,11 +33,11 @@ public class LaserTurret extends PowerTurret{
     public void setStats(){
         super.setStats();
 
-        stats.remove(BlockStat.booster);
-        stats.add(BlockStat.input, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
-        stats.remove(BlockStat.damage);
+        stats.remove(Stat.booster);
+        stats.add(Stat.input, new BoosterListValue(reloadTime, consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount, coolantMultiplier, false, l -> consumes.liquidfilters.get(l.id)));
+        stats.remove(Stat.damage);
         //damages every 5 ticks, at least in meltdown's case
-        stats.add(BlockStat.damage, shootType.damage * 60f / 5f, StatUnit.perSecond);
+        stats.add(Stat.damage, shootType.damage * 60f / 5f, StatUnit.perSecond);
     }
 
     public class LaserTurretBuild extends PowerTurretBuild{
@@ -96,7 +96,7 @@ public class LaserTurret extends PowerTurret{
 
         @Override
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotatespeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
+            rotation = Angles.moveToward(rotation, targetRot, efficiency() * rotateSpeed * delta() * (bulletLife > 0f ? firingMoveFract : 1f));
         }
 
         @Override

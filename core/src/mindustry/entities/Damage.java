@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -77,19 +78,24 @@ public class Damage{
         }
     }
 
-    /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
-    public static float collideLaser(Bullet b, float length){
+    public static float findLaserLength(Bullet b, float length){
         Tmp.v1.trns(b.rotation(), length);
 
         furthest = null;
 
-        world.raycast(b.tileX(), b.tileY(), world.toTile(b.x + Tmp.v1.x), world.toTile(b.y + Tmp.v1.y),
+        boolean found = world.raycast(b.tileX(), b.tileY(), World.toTile(b.x + Tmp.v1.x), World.toTile(b.y + Tmp.v1.y),
         (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && furthest.block().absorbLasers);
 
-        float resultLength = furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+        return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+    }
 
-        Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength);
-        b.fdata = furthest != null ? resultLength : length;
+    /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
+    public static float collideLaser(Bullet b, float length, boolean large){
+        float resultLength = findLaserLength(b, length);
+
+        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large);
+
+        b.fdata = resultLength;
 
         return resultLength;
     }
@@ -103,14 +109,22 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
+        length = findLaserLength(hitter, length);
+
         collidedBlocks.clear();
         tr.trns(angle, length);
         Intc2 collider = (cx, cy) -> {
             Building tile = world.build(cx, cy);
-            if(tile != null && !collidedBlocks.contains(tile.pos()) && tile.team != team && tile.collide(hitter)){
+            boolean collide = tile != null && collidedBlocks.add(tile.pos());
+
+            if(collide && tile.team != team && tile.collide(hitter)){
                 tile.collision(hitter);
-                collidedBlocks.add(tile.pos());
                 hitter.type.hit(hitter, tile.x, tile.y);
+            }
+
+            //try to heal the tile
+            if(collide && hitter.type.collides(hitter, tile)){
+                hitter.type.hitTile(hitter, tile, 0f);
             }
         };
 
@@ -150,13 +164,8 @@ public class Damage{
             if(!e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
 
             e.hitbox(hitrect);
-            Rect other = hitrect;
-            other.y -= expand;
-            other.x -= expand;
-            other.width += expand * 2;
-            other.height += expand * 2;
 
-            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, other);
+            Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
 
             if(vec != null){
                 effect.at(vec.x, vec.y);
@@ -182,7 +191,6 @@ public class Damage{
                 Building tile = world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
                     tmpBuilding = tile;
-                    //TODO return tile
                     return true;
                 }
                 return false;

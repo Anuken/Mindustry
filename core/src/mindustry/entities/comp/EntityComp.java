@@ -6,7 +6,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 
-import static mindustry.Vars.player;
+import static mindustry.Vars.*;
 
 @Component
 @BaseComponent
@@ -40,7 +40,7 @@ abstract class EntityComp{
         return false;
     }
 
-    <T extends Entityc> T base(){
+    <T extends Entityc> T self(){
         return (T)this;
     }
 

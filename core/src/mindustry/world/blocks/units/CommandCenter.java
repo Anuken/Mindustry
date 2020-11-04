@@ -1,5 +1,6 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.style.*;
@@ -12,15 +13,15 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class CommandCenter extends Block{
     public TextureRegionDrawable[] commandRegions = new TextureRegionDrawable[UnitCommand.all.length];
-    public Color topColor = Pal.command, bottomColor = Color.valueOf("5e5e5e");
+    public Color topColor = null, bottomColor = Color.valueOf("5e5e5e");
     public Effect effect = Fx.commandSend;
 
     public CommandCenter(String name){
@@ -34,6 +35,7 @@ public class CommandCenter extends Block{
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
             build.team.data().command = command;
             effect.at(build);
+            Events.fire(new CommandIssueEvent(build, command));
         });
     }
 
@@ -63,7 +65,7 @@ public class CommandCenter extends Block{
 
             Draw.color(bottomColor);
             Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy() - 1, size, size);
-            Draw.color(topColor);
+            Draw.color(topColor == null ? team.color : topColor);
             Draw.rect(commandRegions[team.data().command.ordinal()].getRegion(), tile.drawx(), tile.drawy(), size, size);
             Draw.color();
         }

@@ -11,7 +11,7 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 
 public class LogicDialog extends BaseDialog{
-    LCanvas canvas;
+    public LCanvas canvas;
     Cons<String> consumer = s -> {};
 
     public LogicDialog(){
@@ -20,9 +20,12 @@ public class LogicDialog extends BaseDialog{
         clearChildren();
 
         canvas = new LCanvas();
-        addCloseButton();
+        shouldPause = true;
 
-        buttons.getCells().first().width(170f);
+        addCloseListener();
+
+        buttons.defaults().size(160f, 64f);
+        buttons.button("@back", Icon.left, this::hide).name("back");
 
         buttons.button("@edit", Icon.edit, () -> {
             BaseDialog dialog = new BaseDialog("@editor.export");
@@ -50,7 +53,7 @@ public class LogicDialog extends BaseDialog{
 
             dialog.addCloseButton();
             dialog.show();
-        }).width(170f);
+        }).name("edit");
 
         buttons.button("@add", Icon.add, () -> {
             BaseDialog dialog = new BaseDialog("@add");
@@ -59,7 +62,7 @@ public class LogicDialog extends BaseDialog{
                 int i = 0;
                 for(Prov<LStatement> prov : LogicIO.allStatements){
                     LStatement example = prov.get();
-                    if(example instanceof InvalidStatement) continue;
+                    if(example instanceof InvalidStatement || example.hidden()) continue;
 
                     TextButtonStyle style = new TextButtonStyle(Styles.cleart);
                     style.fontColor = example.category().color;
@@ -74,13 +77,13 @@ public class LogicDialog extends BaseDialog{
             });
             dialog.addCloseButton();
             dialog.show();
-        }).width(170f).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+        }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
 
-        add(canvas).grow();
+        add(canvas).grow().name("canvas");
 
         row();
 
-        add(buttons).growX();
+        add(buttons).growX().name("canvas");
 
         hidden(() -> consumer.get(canvas.save()));
 

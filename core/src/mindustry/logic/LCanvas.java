@@ -13,20 +13,22 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
+    public static final int maxJumpsDrawn = 100;
     //ew static variables
     static LCanvas canvas;
 
-    DragLayout statements;
+    public DragLayout statements;
+    public ScrollPane pane;
+    public Group jumps;
     StatementElem dragging;
-    ScrollPane pane;
-    Group jumps;
+    StatementElem hovered;
     float targetWidth;
+    int jumpCount = 0;
 
     public LCanvas(){
         canvas = this;
@@ -70,18 +72,24 @@ public class LCanvas extends Table{
         }
     }
 
-    void add(LStatement statement){
+    @Override
+    public void draw(){
+        jumpCount = 0;
+        super.draw();
+    }
+
+    public void add(LStatement statement){
         statements.addChild(new StatementElem(statement));
     }
 
-    String save(){
+    public String save(){
         Seq<LStatement> st = statements.getChildren().<StatementElem>as().map(s -> s.st);
         st.each(LStatement::saveUI);
 
         return LAssembler.write(st);
     }
 
-    void load(String asm){
+    public void load(String asm){
         jumps.clear();
 
         Seq<LStatement> statements = LAssembler.read(asm);
@@ -98,9 +106,22 @@ public class LCanvas extends Table{
         this.statements.layout();
     }
 
+    StatementElem checkHovered(){
+        Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
+        if(e != null){
+            while(e != null && !(e instanceof StatementElem)){
+                e = e.parent;
+            }
+        }
+        if(e == null || isDescendantOf(e)) return null;
+        return (StatementElem)e;
+    }
+
     @Override
     public void act(float delta){
         super.act(delta);
+
+        hovered = checkHovered();
 
         if(Core.input.isTouched()){
             float y = Core.input.mouseY();
@@ -240,7 +261,7 @@ public class LCanvas extends Table{
     }
 
     public class StatementElem extends Table{
-        LStatement st;
+        public LStatement st;
 
         public StatementElem(LStatement st){
             this.st = st;
@@ -306,7 +327,7 @@ public class LCanvas extends Table{
                         statements.finishLayout();
                     }
                 });
-            }).growX();
+            }).growX().height(38);
 
             row();
 
@@ -320,7 +341,7 @@ public class LCanvas extends Table{
             marginBottom(7);
         }
 
-        void copy(){
+        public void copy(){
             LStatement copy = st.copy();
             if(copy != null){
                 StatementElem s = new StatementElem(copy);
@@ -348,15 +369,14 @@ public class LCanvas extends Table{
     public static class JumpButton extends ImageButton{
         Color hoverColor = Pal.place;
         Color defaultColor = Color.white;
-        @NonNull Prov<StatementElem> to;
+        Prov<StatementElem> to;
         boolean selecting;
         float mx, my;
         ClickListener listener;
-        StatementElem hovered;
 
-        JumpCurve curve;
+        public JumpCurve curve;
 
-        public JumpButton(@NonNull Prov<StatementElem> getter, Cons<StatementElem> setter){
+        public JumpButton(Prov<StatementElem> getter, Cons<StatementElem> setter){
             super(Tex.logicNode, Styles.colori);
 
             to = getter;
@@ -381,7 +401,7 @@ public class LCanvas extends Table{
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode code){
                     localToStageCoordinates(Tmp.v1.set(x, y));
-                    StatementElem elem = hovered();
+                    StatementElem elem = canvas.hovered;
 
                     if(elem != null && !isDescendantOf(elem)){
                         setter.get(elem);
@@ -405,13 +425,6 @@ public class LCanvas extends Table{
         }
 
         @Override
-        public void act(float delta){
-            super.act(delta);
-
-            hovered = hovered();
-        }
-
-        @Override
         protected void setScene(Scene stage){
             super.setScene(stage);
 
@@ -421,21 +434,10 @@ public class LCanvas extends Table{
                 canvas.jumps.addChild(curve);
             }
         }
-
-        StatementElem hovered(){
-            Element e = Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true);
-            if(e != null){
-                while(e != null && !(e instanceof StatementElem)){
-                    e = e.parent;
-                }
-            }
-            if(e == null || isDescendantOf(e)) return null;
-            return (StatementElem)e;
-        }
     }
 
     public static class JumpCurve extends Element{
-        JumpButton button;
+        public JumpButton button;
 
         public JumpCurve(JumpButton button){
             this.button = button;
@@ -452,7 +454,13 @@ public class LCanvas extends Table{
 
         @Override
         public void draw(){
-            Element hover = button.to.get() == null && button.selecting ? button.hovered : button.to.get();
+            canvas.jumpCount ++;
+
+            if(canvas.jumpCount > maxJumpsDrawn && !button.selecting && !button.listener.isOver()){
+                return;
+            }
+
+            Element hover = button.to.get() == null && button.selecting ? canvas.hovered : button.to.get();
             boolean draw = false;
             Vec2 t = Tmp.v1, r = Tmp.v2;
 
@@ -484,19 +492,33 @@ public class LCanvas extends Table{
             }
         }
 
-        void drawCurve(float x, float y, float x2, float y2){
+        public void drawCurve(float x, float y, float x2, float y2){
             Lines.stroke(4f, button.color);
             Draw.alpha(parentAlpha);
 
             float dist = 100f;
+
+            //square jumps
+            if(false){
+                float len = Scl.scl(Mathf.randomSeed(hashCode(), 10, 50));
+
+                float maxX = Math.max(x, x2) + len;
+
+                Lines.beginLine();
+                Lines.linePoint(x, y);
+                Lines.linePoint(maxX, y);
+                Lines.linePoint(maxX, y2);
+                Lines.linePoint(x2, y2);
+                Lines.endLine();
+                return;
+            }
 
             Lines.curve(
             x, y,
             x + dist, y,
             x2 + dist, y2,
             x2, y2,
-            Math.max(20, (int)(Mathf.dst(x, y, x2, y2) / 6))
-            );
+            Math.max(18, (int)(Mathf.dst(x, y, x2, y2) / 6)));
         }
     }
 }

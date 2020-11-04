@@ -12,6 +12,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -23,8 +25,9 @@ public class ForceProjector extends Block{
     public float phaseUseTime = 350f;
 
     public float phaseRadiusBoost = 80f;
+    public float phaseShieldBoost = 400f;
     public float radius = 101.7f;
-    public float breakage = 550f;
+    public float shieldHealth = 700f;
     public float cooldownNormal = 1.75f;
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
@@ -32,8 +35,8 @@ public class ForceProjector extends Block{
     public @Load("@-top") TextureRegion topRegion;
 
     static ForceBuild paramEntity;
-    static final Cons<Shielderc> shieldConsumer = trait -> {
-        if(trait.team() != paramEntity.team && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
+    static final Cons<Bullet> shieldConsumer = trait -> {
+        if(trait.team != paramEntity.team && trait.type.absorbable && Intersector.isInsideHexagon(paramEntity.x, paramEntity.y, paramEntity.realRadius() * 2f, trait.x(), trait.y())){
             trait.absorb();
             Fx.absorb.at(trait);
             paramEntity.hit = 1f;
@@ -52,6 +55,12 @@ public class ForceProjector extends Block{
     }
 
     @Override
+    public void setBars(){
+        super.setBars();
+        bars.add("shield", (ForceBuild entity) -> new Bar("stat.shieldhealth", Pal.accent, () -> entity.broken ? 0f : 1f - entity.buildup / (shieldHealth + phaseShieldBoost * entity.phaseHeat)).blink(Color.white));
+    }
+
+    @Override
     public boolean outputsItems(){
         return false;
     }
@@ -59,9 +68,11 @@ public class ForceProjector extends Block{
     @Override
     public void setStats(){
         super.setStats();
-
-        stats.add(BlockStat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
-        stats.add(BlockStat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+        stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
+        stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
+        stats.add(Stat.powerUse, basePowerDraw * 60f, StatUnit.powerSecond);
+        stats.add(Stat.boostEffect, phaseRadiusBoost / tilesize, StatUnit.blocks);
+        stats.add(Stat.boostEffect, phaseShieldBoost, StatUnit.shieldHealth);
     }
 
     @Override
@@ -70,21 +81,26 @@ public class ForceProjector extends Block{
 
         Draw.color(Pal.gray);
         Lines.stroke(3f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color(player.team().color);
         Lines.stroke(1f);
-        Lines.poly(x * tilesize, y * tilesize, 6, radius);
+        Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color();
     }
 
-    public class ForceBuild extends Building{
+    public class ForceBuild extends Building implements Ranged{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
         public ForceDraw drawer;
 
         @Override
-        public void add(){
-            super.add();
+        public float range(){
+            return realRadius();
+        }
+
+        @Override
+        public void created(){
+            super.created();
             drawer = ForceDraw.create();
             drawer.build = this;
             drawer.set(x, y);
@@ -92,8 +108,8 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public void remove(){
-            super.remove();
+        public void onRemoved(){
+            super.onRemoved();
             drawer.remove();
         }
 
@@ -109,7 +125,7 @@ public class ForceProjector extends Block{
 
             radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.05f);
 
-            if(Mathf.chanceDelta(buildup / breakage * 0.1f)){
+            if(Mathf.chanceDelta(buildup / shieldHealth * 0.1f)){
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2f), y + Mathf.range(tilesize / 2f));
             }
 
@@ -130,9 +146,9 @@ public class ForceProjector extends Block{
                 broken = false;
             }
 
-            if(buildup >= breakage && !broken){
+            if(buildup >= shieldHealth + phaseShieldBoost * phaseHeat && !broken){
                 broken = true;
-                buildup = breakage;
+                buildup = shieldHealth;
                 Fx.shieldBreak.at(x, y, realRadius(), team.color);
             }
 
@@ -156,10 +172,12 @@ public class ForceProjector extends Block{
         public void draw(){
             super.draw();
 
-            drawer.set(x, y);
+            if(drawer != null){
+                drawer.set(x, y);
+            }
 
             if(buildup > 0f){
-                Draw.alpha(buildup / breakage * 0.75f);
+                Draw.alpha(buildup / shieldHealth * 0.75f);
                 Draw.blend(Blending.additive);
                 Draw.rect(topRegion, x, y);
                 Draw.blend();

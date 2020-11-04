@@ -11,8 +11,8 @@ const readBytes = path => Vars.mods.getScripts().readBytes(path)
 const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
 const loadSound = path => Vars.mods.getScripts().loadSound(path)
 
-var scriptName = "base.js"
-var modName = "none"
+let scriptName = "base.js"
+let modName = "none"
 
 const print = text => log(modName + "/" + scriptName, text);
 
@@ -74,6 +74,7 @@ importPackage(Packages.mindustry.gen)
 importPackage(Packages.mindustry.graphics)
 importPackage(Packages.mindustry.graphics.g3d)
 importPackage(Packages.mindustry.input)
+importPackage(Packages.mindustry.io)
 importPackage(Packages.mindustry.logic)
 importPackage(Packages.mindustry.maps)
 importPackage(Packages.mindustry.maps.filters)
@@ -81,6 +82,7 @@ importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
 importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.type)
+importPackage(Packages.mindustry.type.weather)
 importPackage(Packages.mindustry.ui)
 importPackage(Packages.mindustry.ui.dialogs)
 importPackage(Packages.mindustry.ui.fragments)
@@ -107,7 +109,6 @@ importPackage(Packages.mindustry.world.draw)
 importPackage(Packages.mindustry.world.meta)
 importPackage(Packages.mindustry.world.meta.values)
 importPackage(Packages.mindustry.world.modules)
-importPackage(Packages.mindustry.world.producers)
 const PlayerIpUnbanEvent = Packages.mindustry.game.EventType.PlayerIpUnbanEvent
 const PlayerIpBanEvent = Packages.mindustry.game.EventType.PlayerIpBanEvent
 const PlayerUnbanEvent = Packages.mindustry.game.EventType.PlayerUnbanEvent
@@ -117,6 +118,7 @@ const PlayerConnect = Packages.mindustry.game.EventType.PlayerConnect
 const PlayerJoin = Packages.mindustry.game.EventType.PlayerJoin
 const UnitChangeEvent = Packages.mindustry.game.EventType.UnitChangeEvent
 const UnitCreateEvent = Packages.mindustry.game.EventType.UnitCreateEvent
+const UnitDrownEvent = Packages.mindustry.game.EventType.UnitDrownEvent
 const UnitDestroyEvent = Packages.mindustry.game.EventType.UnitDestroyEvent
 const BlockDestroyEvent = Packages.mindustry.game.EventType.BlockDestroyEvent
 const BuildSelectEvent = Packages.mindustry.game.EventType.BuildSelectEvent
@@ -127,6 +129,7 @@ const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
 const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
+const TapEvent = Packages.mindustry.game.EventType.TapEvent
 const ConfigEvent = Packages.mindustry.game.EventType.ConfigEvent
 const DepositEvent = Packages.mindustry.game.EventType.DepositEvent
 const WithdrawEvent = Packages.mindustry.game.EventType.WithdrawEvent
@@ -135,6 +138,7 @@ const PlayerChatEvent = Packages.mindustry.game.EventType.PlayerChatEvent
 const ClientPreConnectEvent = Packages.mindustry.game.EventType.ClientPreConnectEvent
 const CommandIssueEvent = Packages.mindustry.game.EventType.CommandIssueEvent
 const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
+const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const WorldLoadEvent = Packages.mindustry.game.EventType.WorldLoadEvent
 const ClientLoadEvent = Packages.mindustry.game.EventType.ClientLoadEvent
@@ -153,7 +157,6 @@ const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
 const MapPublishEvent = Packages.mindustry.game.EventType.MapPublishEvent
 const MapMakeEvent = Packages.mindustry.game.EventType.MapMakeEvent
 const ResizeEvent = Packages.mindustry.game.EventType.ResizeEvent
-const LaunchEvent = Packages.mindustry.game.EventType.LaunchEvent
 const LoseEvent = Packages.mindustry.game.EventType.LoseEvent
 const WinEvent = Packages.mindustry.game.EventType.WinEvent
 const Trigger = Packages.mindustry.game.EventType.Trigger

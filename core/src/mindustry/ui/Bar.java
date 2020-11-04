@@ -21,7 +21,7 @@ public class Bar extends Element{
 
     public Bar(String name, Color color, Floatp fraction){
         this.fraction = fraction;
-        this.name = Core.bundle.get(name);
+        this.name = Core.bundle.get(name, name);
         this.blinkColor.set(color);
         lastValue = value = fraction.get();
         setColor(color);
@@ -62,7 +62,13 @@ public class Bar extends Element{
     public void draw(){
         if(fraction == null) return;
 
-        float computed = Mathf.clamp(fraction.get());
+        float computed;
+        try{
+            computed = Mathf.clamp(fraction.get());
+        }catch(Exception e){ //getting the fraction may involve referring to invalid data
+            computed = 0f;
+        }
+
         if(lastValue > computed){
             blink = 1f;
             lastValue = computed;
@@ -80,11 +86,11 @@ public class Bar extends Element{
         Drawable top = Tex.barTop;
         float topWidth = width * value;
 
-        if(topWidth > Core.atlas.find("bar-top").getWidth()){
+        if(topWidth > Core.atlas.find("bar-top").width){
             top.draw(x, y, topWidth, height);
         }else{
             if(ScissorStack.push(scissor.set(x, y, topWidth, height))){
-                top.draw(x, y, Core.atlas.find("bar-top").getWidth(), height);
+                top.draw(x, y, Core.atlas.find("bar-top").width, height);
                 ScissorStack.pop();
             }
         }

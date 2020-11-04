@@ -1,0 +1,3 @@
+- Fixed meltdowns settings themselves on fire
+- Added memory counter to FPS display
+- Added button to export crash logs

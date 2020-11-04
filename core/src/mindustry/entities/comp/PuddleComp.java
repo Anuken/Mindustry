@@ -74,7 +74,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
                         unit.apply(liquid.effect, 60 * 2);
 
                         if(unit.vel.len() > 0.1){
-                            Fx.ripple.at(unit.x, unit.y, unit.type().rippleScale, liquid.color);
+                            Fx.ripple.at(unit.x, unit.y, unit.type.rippleScale, liquid.color);
                         }
                     }
                 }
@@ -98,7 +98,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
         boolean onLiquid = tile.floor().isLiquid;
         float f = Mathf.clamp(amount / (maxLiquid / 1.5f));
         float smag = onLiquid ? 0.8f : 0f;
-        float sscl = 20f;
+        float sscl = 25f;
 
         Draw.color(tmp.set(liquid.color).shiftValue(-0.05f));
         Fill.circle(x + Mathf.sin(Time.time() + seeds * 532, sscl, smag), y + Mathf.sin(Time.time() + seeds * 53, sscl, smag), f * 8f);
@@ -128,6 +128,6 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc{
 
     @Override
     public void afterRead(){
-        Puddles.register(base());
+        Puddles.register(self());
     }
 }

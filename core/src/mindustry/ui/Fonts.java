@@ -22,7 +22,9 @@ import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 
 import java.util.*;
 
@@ -30,12 +32,18 @@ public class Fonts{
     private static final String mainFont = "fonts/font.woff";
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
+    private static TextureRegion[] iconTable;
+    private static int lastCid;
 
     public static Font def;
     public static Font outline;
     public static Font chat;
     public static Font icon;
     public static Font tech;
+
+    public static TextureRegion logicIcon(int id){
+        return iconTable[id];
+    }
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -72,7 +80,7 @@ public class Fonts{
 
     public static void loadContentIcons(){
         Seq<Font> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
-        Texture uitex = Core.atlas.find("logo").getTexture();
+        Texture uitex = Core.atlas.find("logo").texture;
         int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
         try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
@@ -84,7 +92,7 @@ public class Fonts{
                 int ch = Integer.parseInt(character);
                 TextureRegion region = Core.atlas.find(texture);
 
-                if(region.getTexture() != uitex){
+                if(region.texture != uitex){
                     continue;
                     //throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
                 }
@@ -98,10 +106,10 @@ public class Fonts{
                 glyph.srcY = 0;
                 glyph.width = size;
                 glyph.height = size;
-                glyph.u = region.getU();
-                glyph.v = region.getV2();
-                glyph.u2 = region.getU2();
-                glyph.v2 = region.getV();
+                glyph.u = region.u;
+                glyph.v = region.v2;
+                glyph.u2 = region.u2;
+                glyph.v2 = region.v;
                 glyph.xoffset = 0;
                 glyph.yoffset = -size;
                 glyph.xadvance = size;
@@ -111,11 +119,26 @@ public class Fonts{
                 fonts.each(f -> f.getData().setGlyph(ch, glyph));
             }
         }
+
+        iconTable = new TextureRegion[512];
+        iconTable[0] = Core.atlas.find("error");
+        lastCid = 1;
+
+        Vars.content.each(c -> {
+            if(c instanceof UnlockableContent u){
+                TextureRegion region = Core.atlas.find(u.name + "-icon-logic");
+                if(region.found()){
+                    iconTable[u.iconId = lastCid++] = region;
+                }
+            }
+        });
     }
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
-        UI.packer = new PixmapPacker(2048, 2048, Format.rgba8888, 2, true);
+        int max = Gl.getInt(Gl.maxTextureSize);
+
+        UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, Format.rgba8888, 2, true);
         FileHandleResolver resolver = new InternalFileHandleResolver();
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(resolver){
@@ -160,21 +183,21 @@ public class Fonts{
         //grab all textures from the ui page, remove all the regions assigned to it, then copy them over to Fonts.packer and replace the texture in this atlas.
 
         //grab old UI texture and regions...
-        Texture texture = atlas.find("logo").getTexture();
+        Texture texture = atlas.find("logo").texture;
 
         Page page = UI.packer.getPages().first();
 
-        Seq<AtlasRegion> regions = atlas.getRegions().select(t -> t.getTexture() == texture);
+        Seq<AtlasRegion> regions = atlas.getRegions().select(t -> t.texture == texture);
         for(AtlasRegion region : regions){
             //get new pack rect
             page.setDirty(false);
             Rect rect = UI.packer.pack(region.name + (region.splits != null ? ".9" : ""), atlas.getPixmap(region));
             //set new texture
-            region.setTexture(UI.packer.getPages().first().getTexture());
+            region.texture = UI.packer.getPages().first().getTexture();
             //set its new position
             region.set((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
             //add old texture
-            atlas.getTextures().add(region.getTexture());
+            atlas.getTextures().add(region.texture);
         }
 
         //remove old texture, it will no longer be used
@@ -191,7 +214,7 @@ public class Fonts{
         if(g == null) throw new IllegalArgumentException("No glyph: " + glyph + " (" + (int)glyph + ")");
 
         float size = Math.max(g.width, g.height);
-        TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().getTexture(), g.u, g.v2, g.u2, g.v)){
+        TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().texture, g.u, g.v2, g.u2, g.v)){
             @Override
             public void draw(float x, float y, float width, float height){
                 Draw.color(Tmp.c1.set(tint).mul(Draw.getColor()).toFloatBits());

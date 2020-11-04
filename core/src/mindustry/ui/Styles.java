@@ -1,7 +1,6 @@
 package mindustry.ui;
 
 import arc.*;
-import mindustry.annotations.Annotations.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
@@ -16,6 +15,7 @@ import arc.scene.ui.ScrollPane.*;
 import arc.scene.ui.Slider.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.TextField.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -23,6 +23,7 @@ import static mindustry.gen.Tex.*;
 
 @StyleDefaults
 public class Styles{
+    //TODO all these names are inconsistent and not descriptive
     public static Drawable black, black9, black8, black6, black3, black5, none, flatDown, flatOver;
     public static ButtonStyle defaultb, waveb;
     public static TextButtonStyle defaultt, squaret, nodet, cleart, discordt, infot, clearPartialt, clearTogglet, clearToggleMenut, togglet, transt, fullTogglet, logict;
@@ -54,9 +55,9 @@ public class Styles{
         }};
         
         waveb = new ButtonStyle(){{
-            up = buttonEdge4;
-            over = buttonEdgeOver4;
-            disabled = buttonEdge4;
+            up = wavepane;
+            over = wavepane; //TODO wrong
+            disabled = wavepane;
         }};
 
         defaultt = new TextButtonStyle(){{
@@ -183,6 +184,9 @@ public class Styles{
             over = buttonRightOver;
             down = buttonRightDown;
             up = buttonRight;
+            disabled = buttonRightDisabled;
+            imageDisabledColor = Color.clear;
+            imageUpColor = Color.white;
         }};
         emptyi = new ImageButtonStyle(){{
             imageDownColor = Pal.accent;

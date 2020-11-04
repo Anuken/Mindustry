@@ -1,7 +1,7 @@
 package mindustry.maps.filters;
 
-import arc.struct.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -29,14 +29,14 @@ public class OreMedianFilter extends GenerateFilter{
 
     @Override
     public void apply(){
-        if(in.ore == Blocks.spawn) return;
+        if(in.overlay == Blocks.spawn) return;
 
         int cx = (in.x / 2) * 2;
         int cy = (in.y / 2) * 2;
-        if(in.ore != Blocks.air){
-            if(!(in.tile(cx + 1, cy).overlay() == in.ore && in.tile(cx, cy).overlay() == in.ore && in.tile(cx + 1, cy + 1).overlay() == in.ore && in.tile(cx, cy + 1).overlay() == in.ore &&
+        if(in.overlay != Blocks.air){
+            if(!(in.tile(cx + 1, cy).overlay() == in.overlay && in.tile(cx, cy).overlay() == in.overlay && in.tile(cx + 1, cy + 1).overlay() == in.overlay && in.tile(cx, cy + 1).overlay() == in.overlay &&
             !in.tile(cx + 1, cy).block().isStatic() && !in.tile(cx, cy).block().isStatic() && !in.tile(cx + 1, cy + 1).block().isStatic() && !in.tile(cx, cy + 1).block().isStatic())){
-                in.ore = Blocks.air;
+                in.overlay = Blocks.air;
             }
         }
 
@@ -58,6 +58,6 @@ public class OreMedianFilter extends GenerateFilter{
         int index = Math.min((int)(blocks.size * percentile), blocks.size - 1);
         int overlay = blocks.get(index);
 
-        in.ore = Vars.content.block(overlay);
+        in.overlay = Vars.content.block(overlay);
     }
 }

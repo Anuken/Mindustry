@@ -18,7 +18,7 @@ public class MinimapFragment extends Fragment{
     private boolean shown;
     float panx, pany, zoom = 1f, lastZoom = -1;
     private float baseSize = Scl.scl(5f);
-    private Element elem;
+    public Element elem;
 
     @Override
     public void build(Group parent){
@@ -32,7 +32,7 @@ public class MinimapFragment extends Fragment{
 
             if(renderer.minimap.getTexture() != null){
                 Draw.color();
-                float ratio = (float)renderer.minimap.getTexture().getHeight() / renderer.minimap.getTexture().getWidth();
+                float ratio = (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width;
                 TextureRegion reg = Draw.wrap(renderer.minimap.getTexture());
                 Draw.rect(reg, w/2f + panx*zoom, h/2f + pany*zoom, size, size * ratio);
                 renderer.minimap.drawEntities(w/2f + panx*zoom - size/2f, h/2f + pany*zoom - size/2f * ratio, size, size * ratio, zoom, true);
@@ -111,12 +111,11 @@ public class MinimapFragment extends Fragment{
     }
 
     public void toggle(){
-        if(Core.settings.getBool("mapcenter")){
-            float size = baseSize * zoom * world.width();
-            float ratio = (float)renderer.minimap.getTexture().getHeight() / renderer.minimap.getTexture().getWidth();
-            panx = (size/2f - player.x() / (world.width() * tilesize) * size) / zoom;
-            pany = (size*ratio/2f - player.y() / (world.height() * tilesize) * size*ratio) / zoom;
-        }
+        float size = baseSize * zoom * world.width();
+        float ratio = (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width;
+        float px = player.dead() ? Core.camera.position.x : player.x, py = player.dead() ? Core.camera.position.y : player.y;
+        panx = (size/2f - px / (world.width() * tilesize) * size) / zoom;
+        pany = (size*ratio/2f - py / (world.height() * tilesize) * size*ratio) / zoom;
         shown = !shown;
     }
 }

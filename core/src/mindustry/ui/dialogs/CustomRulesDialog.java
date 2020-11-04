@@ -3,24 +3,29 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.type.Weather.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import static arc.util.Time.*;
 import static mindustry.Vars.*;
 
 public class CustomRulesDialog extends BaseDialog{
-    private Table main;
     Rules rules;
+    private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
     private BaseDialog banDialog;
@@ -129,14 +134,15 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
         check("@rules.wavetimer", b -> rules.waveTimer = b, () -> rules.waveTimer);
         check("@rules.waitForWaveToEnd", b -> rules.waitEnemies = b, () -> rules.waitEnemies);
-        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true);
+        number("@rules.wavespacing", false, f -> rules.waveSpacing = f * 60f, () -> rules.waveSpacing / 60f, () -> true, 1, Float.MAX_VALUE);
         number("@rules.dropzoneradius", false, f -> rules.dropZoneRadius = f * tilesize, () -> rules.dropZoneRadius / tilesize, () -> true);
 
         title("@rules.title.resourcesbuilding");
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
         check("@rules.reactorexplosions", b -> rules.reactorExplosions = b, () -> rules.reactorExplosions);
+        check("@rules.schematic", b-> rules.schematicsAllowed = b, () -> rules.schematicsAllowed);
         number("@rules.buildcostmultiplier", false, f -> rules.buildCostMultiplier = f, () -> rules.buildCostMultiplier, () -> !rules.infiniteResources);
-        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier);
+        number("@rules.buildspeedmultiplier", f -> rules.buildSpeedMultiplier = f, () -> rules.buildSpeedMultiplier, 0.00001f, 10000f);
         number("@rules.deconstructrefundmultiplier", false, f -> rules.deconstructRefundMultiplier = f, () -> rules.deconstructRefundMultiplier, () -> !rules.infiniteResources);
         number("@rules.blockhealthmultiplier", f -> rules.blockHealthMultiplier = f, () -> rules.blockHealthMultiplier);
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
@@ -156,14 +162,18 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.unitammo", b -> rules.unitAmmo = b, () -> rules.unitAmmo);
         number("@rules.unithealthmultiplier", f -> rules.unitHealthMultiplier = f, () -> rules.unitHealthMultiplier);
         number("@rules.unitdamagemultiplier", f -> rules.unitDamageMultiplier = f, () -> rules.unitDamageMultiplier);
-        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier);
+        number("@rules.unitbuildspeedmultiplier", f -> rules.unitBuildSpeedMultiplier = f, () -> rules.unitBuildSpeedMultiplier, 0.00001f, 100f);
 
         title("@rules.title.enemy");
         check("@rules.attack", b -> rules.attackMode = b, () -> rules.attackMode);
+        check("@rules.buildai", b -> rules.teams.get(rules.waveTeam).ai = rules.teams.get(rules.waveTeam).infiniteResources = b, () -> rules.teams.get(rules.waveTeam).ai);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200));
 
         title("@rules.title.environment");
+        check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
+        check("@rules.fire", b -> rules.fire = b, () -> rules.fire);
         check("@rules.lighting", b -> rules.lighting = b, () -> rules.lighting);
+        check("@rules.enemyLights", b -> rules.enemyLights = b, () -> rules.enemyLights);
 
         main.button(b -> {
             b.left();
@@ -173,17 +183,28 @@ public class CustomRulesDialog extends BaseDialog{
                 }}).grow();
             }).margin(4).size(50f).padRight(10);
             b.add("@rules.ambientlight");
-        }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f);
-        main.row();
+        }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
 
-        //TODO add weather patterns
+        main.button("@rules.weather", this::weatherDialog).width(250f).left().row();
     }
 
     void number(String text, Floatc cons, Floatp prov){
-        number(text, false, cons, prov, () -> true);
+        number(text, false, cons, prov, () -> true, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, Floatc cons, Floatp prov, float min, float max){
+        number(text, false, cons, prov, () -> true, min, max);
     }
 
     void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition){
+        number(text, integer, cons, prov, condition, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, Floatc cons, Floatp prov, Boolp condition){
+        number(text, false, cons, prov, condition, 0, Float.MAX_VALUE);
+    }
+
+    void number(String text, boolean integer, Floatc cons, Floatp prov, Boolp condition, float min, float max){
         main.table(t -> {
             t.left();
             t.add(text).left().padRight(5)
@@ -191,7 +212,7 @@ public class CustomRulesDialog extends BaseDialog{
             t.field((integer ? (int)prov.get() : prov.get()) + "", s -> cons.get(Strings.parseFloat(s)))
             .padRight(100f)
             .update(a -> a.setDisabled(!condition.get()))
-            .valid(Strings::canParsePositiveFloat).width(120f).left().addInputDialog();
+            .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left().addInputDialog();
         }).padTop(0);
         main.row();
     }
@@ -210,5 +231,121 @@ public class CustomRulesDialog extends BaseDialog{
         main.row();
         main.image().color(Pal.accent).height(3f).padRight(100f).padBottom(20);
         main.row();
+    }
+
+    Cell<TextField> field(Table table, float value, Floatc setter){
+        return table.field(Strings.autoFixed(value, 2), v -> setter.get(Strings.parseFloat(v)))
+            .valid(Strings::canParsePositiveFloat)
+            .size(90f, 40f).pad(2f).addInputDialog();
+    }
+
+    void weatherDialog(){
+        BaseDialog dialog = new BaseDialog("@rules.weather");
+        Runnable[] rebuild = {null};
+
+        dialog.cont.pane(base -> {
+
+            rebuild[0] = () -> {
+                base.clearChildren();
+                int cols = Math.max(1, Core.graphics.getWidth() / 460);
+                int idx = 0;
+
+                for(WeatherEntry entry : rules.weather){
+                    base.top();
+                    //main container
+                    base.table(Tex.pane, c -> {
+                        c.margin(0);
+
+                        //icons to perform actions
+                        c.table(Tex.whiteui, t -> {
+                            t.setColor(Pal.gray);
+
+                            t.top().left();
+                            t.add(entry.weather.localizedName).left().padLeft(6);
+
+                            t.add().growX();
+
+                            ImageButtonStyle style = Styles.geni;
+                            t.defaults().size(42f);
+
+                            t.button(Icon.cancel, style, () -> {
+                                rules.weather.remove(entry);
+                                rebuild[0].run();
+                            });
+                        }).growX();
+
+                        c.row();
+
+                        //all the options
+                        c.table(f -> {
+                            f.marginLeft(4);
+                            f.left().top();
+
+                            f.defaults().padRight(4).left();
+
+                            f.add("@rules.weather.duration");
+                            field(f, entry.minDuration / toMinutes, v -> entry.minDuration = v * toMinutes);
+                            f.add("@waves.to");
+                            field(f, entry.maxDuration / toMinutes, v -> entry.maxDuration = v * toMinutes);
+                            f.add("@unit.minutes");
+
+                            f.row();
+
+                            f.add("@rules.weather.frequency");
+                            field(f, entry.minFrequency / toMinutes, v -> entry.minFrequency = v * toMinutes);
+                            f.add("@waves.to");
+                            field(f, entry.maxFrequency / toMinutes, v -> entry.maxFrequency = v * toMinutes);
+                            f.add("@unit.minutes");
+
+                            //intensity can't currently be customized
+
+                        }).grow().left().pad(6).top();
+                    }).width(410f).pad(3).top().left().fillY();
+
+                    if(++idx % cols == 0){
+                        base.row();
+                    }
+                }
+            };
+
+            rebuild[0].run();
+        }).grow();
+
+        dialog.addCloseButton();
+
+        dialog.buttons.button("@add", Icon.add, () -> {
+            BaseDialog addd = new BaseDialog("@add");
+            addd.cont.pane(t -> {
+                t.background(Tex.button);
+                int i = 0;
+                for(Weather weather : content.<Weather>getBy(ContentType.weather)){
+
+                    t.button(weather.localizedName, Styles.cleart, () -> {
+                        rules.weather.add(new WeatherEntry(weather));
+                        rebuild[0].run();
+
+                        addd.hide();
+                    }).size(140f, 50f);
+                    if(++i % 2 == 0) t.row();
+                }
+            });
+            addd.addCloseButton();
+            addd.show();
+        }).width(170f);
+
+        //reset cooldown to random number
+        dialog.hidden(() -> {
+            float sum = 0;
+            Seq<WeatherEntry> sh = rules.weather.copy();
+            sh.shuffle();
+
+            for(WeatherEntry w : sh){
+                //add the previous cooldowns to the sum so weather events are staggered and don't happen all at once.
+                w.cooldown = sum + Mathf.random(w.minFrequency, w.maxFrequency);
+                sum += w.cooldown;
+            }
+        });
+
+        dialog.show();
     }
 }

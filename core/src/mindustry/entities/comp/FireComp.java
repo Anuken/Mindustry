@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 @EntityDef(value = {Firec.class}, pooled = true)
 @Component(base = true)
 abstract class FireComp implements Timedc, Posc, Firec, Syncc{
-    private static final float spreadChance = 0.05f, fireballChance = 0.07f;
+    private static final float spreadChance = 0.04f, fireballChance = 0.06f;
 
     @Import float time, lifetime, x, y;
 
@@ -97,11 +97,11 @@ abstract class FireComp implements Timedc, Posc, Firec, Syncc{
 
     @Override
     public void afterRead(){
-        Fires.register(base());
+        Fires.register(self());
     }
 
     @Override
     public void afterSync(){
-        Fires.register(base());
+        Fires.register(self());
     }
 }

@@ -2,12 +2,14 @@ package mindustry.logic;
 
 import arc.func.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.logic.LStatements.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
@@ -15,13 +17,19 @@ public class LAssembler{
 
     private int lastVar;
     /** Maps names to variable IDs. */
-    ObjectMap<String, BVar> vars = new ObjectMap<>();
+    public ObjectMap<String, BVar> vars = new ObjectMap<>();
     /** All instructions to be executed. */
-    LInstruction[] instructions;
+    public LInstruction[] instructions;
 
     public LAssembler(){
+        //instruction counter
         putVar("@counter").value = 0;
+        //unix timestamp
         putConst("@time", 0);
+        //currently controlled unit
+        putConst("@unit", null);
+        //reference to self
+        putConst("@this", null);
 
         //add default constants
         putConst("false", 0);
@@ -36,6 +44,21 @@ public class LAssembler{
 
         for(Liquid liquid : Vars.content.liquids()){
             putConst("@" + liquid.name, liquid);
+        }
+
+        for(Block block : Vars.content.blocks()){
+            if(block.synthetic()){
+                putConst("@" + block.name, block);
+            }
+        }
+
+        //used as a special value for any environmental solid block
+        putConst("@solid", Blocks.stoneWall);
+
+        putConst("@air", Blocks.air);
+
+        for(UnitType type : Vars.content.units()){
+            putConst("@" + type.name, type);
         }
 
         //store sensor constants
@@ -80,6 +103,8 @@ public class LAssembler{
             if(line.startsWith("#")) continue;
 
             if(index++ > max) break;
+
+            line = line.replace("\t", "").trim();
 
             try{
                 String[] arr;
@@ -164,14 +189,26 @@ public class LAssembler{
             return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n")).id;
         }
 
+        //remove spaces for non-strings
+        symbol = symbol.replace(' ', '_');
+
         try{
-            double value = Double.parseDouble(symbol);
+            double value = parseDouble(symbol);
+            if(Double.isNaN(value) || Double.isInfinite(value)) value = 0;
+
             //this creates a hidden const variable with the specified value
-            String key = "___" + value;
-            return putConst(key, value).id;
+            return putConst("___" + value, value).id;
         }catch(NumberFormatException e){
             return putVar(symbol).id;
         }
+    }
+
+    double parseDouble(String symbol) throws NumberFormatException{
+        //parse hex/binary syntax
+        if(symbol.startsWith("0b")) return Long.parseLong(symbol.substring(2), 2);
+        if(symbol.startsWith("0x")) return Long.parseLong(symbol.substring(2), 16);
+
+        return Double.parseDouble(symbol);
     }
 
     /** Adds a constant value by name. */
@@ -193,7 +230,8 @@ public class LAssembler{
         }
     }
 
-    public @Nullable BVar getVar(String name){
+    @Nullable
+    public BVar getVar(String name){
         return vars.get(name);
     }
 

@@ -14,9 +14,17 @@ import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import rhino.*;
 
+import java.net.*;
+
 import static mindustry.Vars.*;
 
 public interface Platform{
+
+    /** Dynamically loads a jar file. */
+    default Class<?> loadJar(Fi jar, String mainClass) throws Exception{
+        URLClassLoader classLoader = new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, ClassLoader.getSystemClassLoader());
+        return classLoader.loadClass(mainClass);
+    }
 
     /** Steam: Update lobby visibility.*/
     default void updateLobby(){}
@@ -121,7 +129,7 @@ public interface Platform{
     }
 
     /**
-     * Show a file chooser for multiple file types. Only supported on desktop.
+     * Show a file chooser for multiple file types.
      * @param cons Selection listener
      * @param extensions File extensions to filter
      */

@@ -4,15 +4,15 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.entities.EntityCollisions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.blocks.environment.*;
-
-import static mindustry.Vars.*;
 
 @Component
 abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
@@ -26,8 +26,38 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
     @Replace
     @Override
-    public void move(float cx, float cy){
-        collisions.moveCheck(this, cx, cy, !type.allowLegStep ? EntityCollisions::solid : EntityCollisions::legsSolid);
+    public SolidPred solidity(){
+        return !type.allowLegStep ? EntityCollisions::solid : EntityCollisions::legsSolid;
+    }
+
+    @Override
+    @Replace
+    public int pathType(){
+        return Pathfinder.costLegs;
+    }
+
+    @Override
+    public void add(){
+        resetLegs();
+    }
+
+    public void resetLegs(){
+        float rot = baseRotation;
+        int count = type.legCount;
+        float legLength = type.legLength;
+
+        this.legs = new Leg[count];
+
+        float spacing = 360f / count;
+
+        for(int i = 0; i < legs.length; i++){
+            Leg l = new Leg();
+
+            l.joint.trns(i * spacing + rot, legLength/2f + type.legBaseOffset).add(x, y);
+            l.base.trns(i * spacing + rot, legLength + type.legBaseOffset).add(x, y);
+
+            legs[i] = l;
+        }
     }
 
     @Override
@@ -37,23 +67,11 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
         }
 
         float rot = baseRotation;
-        int count = type.legCount;
         float legLength = type.legLength;
 
         //set up initial leg positions
         if(legs.length != type.legCount){
-            this.legs = new Leg[count];
-
-            float spacing = 360f / count;
-
-            for(int i = 0; i < legs.length; i++){
-                Leg l = new Leg();
-
-                l.joint.trns(i * spacing + rot, legLength/2f + type.legBaseOffset).add(x, y);
-                l.base.trns(i * spacing + rot, legLength + type.legBaseOffset).add(x, y);
-
-                legs[i] = l;
-            }
+            resetLegs();
         }
 
         float moveSpeed = type.legSpeed;

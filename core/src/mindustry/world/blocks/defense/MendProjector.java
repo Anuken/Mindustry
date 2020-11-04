@@ -9,6 +9,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -43,11 +44,11 @@ public class MendProjector extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
-        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
+        stats.add(Stat.range, range / tilesize, StatUnit.blocks);
 
-        stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
+        stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+        stats.add(Stat.boostEffect, (phaseBoost + healPercent) / healPercent, StatUnit.timesSpeed);
     }
 
     @Override
@@ -55,10 +56,15 @@ public class MendProjector extends Block{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, Pal.accent);
     }
 
-    public class MendBuild extends Building{
+    public class MendBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void updateTile(){
@@ -77,7 +83,7 @@ public class MendProjector extends Block{
 
                 indexer.eachBlock(this, realRange, other -> other.damaged(), other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency());
-                    Fx.healBlockFull.at(other.x, other.y, other.block().size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
+                    Fx.healBlockFull.at(other.x, other.y, other.block.size, Tmp.c1.set(baseColor).lerp(phaseColor, phaseHeat));
                 });
             }
         }
@@ -100,10 +106,9 @@ public class MendProjector extends Block{
             Draw.color(baseColor, phaseColor, phaseHeat);
             Draw.alpha(heat * Mathf.absin(Time.time(), 10f, 1f) * 0.5f);
             Draw.rect(topRegion, x, y);
-
             Draw.alpha(1f);
             Lines.stroke((2f * f + 0.2f) * heat);
-            Lines.square(x, y, ((1f - f) * 8f) * size / 2f);
+            Lines.square(x, y, Math.min(1f + (1f - f) * size * tilesize / 2f, size * tilesize/2f));
 
             Draw.reset();
         }

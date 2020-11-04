@@ -1,6 +1,6 @@
 package mindustry.world.blocks.power;
 
-import mindustry.type.Item;
+import mindustry.type.*;
 
 public class DecayGenerator extends ItemLiquidGenerator{
 

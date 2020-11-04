@@ -1,10 +1,9 @@
 package mindustry.core;
 
 import arc.files.*;
-import arc.struct.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
@@ -13,8 +12,8 @@ import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static arc.Core.files;
-import static mindustry.Vars.mods;
+import static arc.Core.*;
+import static mindustry.Vars.*;
 
 /**
  * Loads all game content.
@@ -33,6 +32,7 @@ public class ContentLoader{
         new StatusEffects(),
         new Liquids(),
         new Bullets(),
+        new AmmoTypes(),
         new UnitTypes(),
         new Blocks(),
         new Loadouts(),

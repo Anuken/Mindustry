@@ -14,7 +14,7 @@ public class LiquidJunction extends LiquidBlock{
     @Override
     public void setStats(){
         super.setStats();
-        stats.remove(BlockStat.liquidCapacity);
+        stats.remove(Stat.liquidCapacity);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class LiquidJunction extends LiquidBlock{
             int dir = source.relativeTo(tile.x, tile.y);
             dir = (dir + 4) % 4;
             Building next = nearby(dir);
-            if(next == null || (!next.acceptLiquid(this, liquid, 0f) && !(next.block() instanceof LiquidJunction))){
+            if(next == null || (!next.acceptLiquid(this, liquid) && !(next.block instanceof LiquidJunction))){
                 return this;
             }
             return next.getLiquidDestination(this, liquid);

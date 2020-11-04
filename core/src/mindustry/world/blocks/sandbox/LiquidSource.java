@@ -2,7 +2,6 @@ package mindustry.world.blocks.sandbox;
 
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -10,8 +9,9 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class LiquidSource extends Block{
 
@@ -26,6 +26,7 @@ public class LiquidSource extends Block{
         saveConfig = true;
         noUpdateDisabled = true;
         displayFlow = false;
+        group = BlockGroup.liquids;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
         configClear((LiquidSourceBuild tile) -> tile.source = null);

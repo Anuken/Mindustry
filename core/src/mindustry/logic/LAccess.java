@@ -5,6 +5,7 @@ import arc.struct.*;
 /** Setter/getter enum for logic-controlled objects. */
 public enum LAccess{
     totalItems,
+    firstItem,
     totalLiquids,
     totalPower,
     itemCapacity,
@@ -14,7 +15,10 @@ public enum LAccess{
     powerNetCapacity,
     powerNetIn,
     powerNetOut,
+    ammo,
+    ammoCapacity,
     health,
+    maxHealth,
     heat,
     efficiency,
     rotation,
@@ -24,18 +28,42 @@ public enum LAccess{
     shootY,
     shooting,
     team,
+    type,
+    flag,
+    name,
+    config,
+    payloadCount,
+    payloadType,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
-    shoot("x", "y", "shoot"),;
+    shoot("x", "y", "shoot"),
+    shootp(true, "unit", "shoot"),
+    configure(true, 30, "to");
 
-    public final String[] parameters;
+    public final String[] params;
+    public final boolean isObj;
+    /** Tick cooldown between invocations. */
+    public float cooldown = -1;
 
-    public static final LAccess[] all = values();
-    public static final LAccess[] senseable = Seq.select(all, t -> t.parameters.length <= 1).toArray(LAccess.class);
-    public static final LAccess[] controls = Seq.select(all, t -> t.parameters.length > 0).toArray(LAccess.class);
+    public static final LAccess[]
+        all = values(),
+        senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
+        controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class);
 
-    LAccess(String... parameters){
-        this.parameters = parameters;
+    LAccess(String... params){
+        this.params = params;
+        isObj = false;
+    }
+
+    LAccess(boolean obj, String... params){
+        this.params = params;
+        isObj = obj;
+    }
+
+    LAccess(boolean obj, float cooldown, String... params){
+        this.params = params;
+        this.cooldown = cooldown;
+        isObj = obj;
     }
 }

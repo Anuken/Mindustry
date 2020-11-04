@@ -4,6 +4,7 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
 import mindustry.editor.DrawOperation.*;
@@ -18,10 +19,10 @@ import static mindustry.Vars.*;
 public class MapEditor{
     public static final int[] brushSizes = {1, 2, 3, 4, 5, 9, 15, 20};
 
-    private final Context context = new Context();
-    private StringMap tags = new StringMap();
-    private MapRenderer renderer = new MapRenderer(this);
+    public StringMap tags = new StringMap();
+    public MapRenderer renderer = new MapRenderer(this);
 
+    private final Context context = new Context();
     private OperationStack stack = new OperationStack();
     private DrawOperation currentOp;
     private boolean loading;
@@ -31,8 +32,8 @@ public class MapEditor{
     public Block drawBlock = Blocks.stone;
     public Team drawTeam = Team.sharded;
 
-    public StringMap getTags(){
-        return tags;
+    public boolean isLoading(){
+        return loading;
     }
 
     public void beginEdit(int width, int height){
@@ -52,7 +53,7 @@ public class MapEditor{
         if(map.file.parent().parent().name().equals("1127400") && steam){
             tags.put("steamid",  map.file.parent().name());
         }
-        MapIO.loadMap(map, context);
+        load(() -> MapIO.loadMap(map, context));
         renderer.resize(width(), height());
         loading = false;
     }
@@ -136,7 +137,7 @@ public class MapEditor{
 
                 if(isFloor){
                     tile.setFloor(drawBlock.asFloor());
-                }else{
+                }else if(!(tile.block().isMultiblock() && !drawBlock.isMultiblock())){
                     if(drawBlock.rotate && tile.build != null && tile.build.rotation != rotation){
                         addTileOp(TileOp.get(tile.x, tile.y, (byte)OpType.rotation.ordinal(), (byte)rotation));
                     }
@@ -156,7 +157,7 @@ public class MapEditor{
     boolean hasOverlap(int x, int y){
         Tile tile = world.tile(x, y);
         //allow direct replacement of blocks of the same size
-        if(tile != null && tile.isCenter() && tile.block() != drawBlock && tile.block().size == drawBlock.size){
+        if(tile != null && tile.isCenter() && tile.block() != drawBlock && tile.block().size == drawBlock.size && tile.x == x && tile.y == y){
             return false;
         }
 
@@ -167,17 +168,61 @@ public class MapEditor{
             for(int dy = 0; dy < drawBlock.size; dy++){
                 int worldx = dx + offsetx + x;
                 int worldy = dy + offsety + y;
-                if(!(worldx == x && worldy == y)){
-                    Tile other = world.tile(worldx, worldy);
+                Tile other = world.tile(worldx, worldy);
 
-                    if(other != null && other.block().isMultiblock()){
-                        return true;
-                    }
+                if(other != null && other.block().isMultiblock()){
+                    return true;
                 }
             }
         }
 
         return false;
+    }
+
+    public void addCliffs(){
+        for(Tile tile : world.tiles){
+            if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
+
+            int rotation = 0;
+            for(int i = 0; i < 8; i++){
+                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                if(other != null && !other.block().isStatic()){
+                    rotation |= (1 << i);
+                }
+            }
+
+            if(rotation != 0){
+                tile.setBlock(Blocks.cliff);
+            }
+
+            tile.data = (byte)rotation;
+        }
+
+        for(Tile tile : world.tiles){
+            if(tile.block() != Blocks.cliff && tile.block().isStatic()){
+                tile.setBlock(Blocks.air);
+            }
+        }
+    }
+
+    public void addFloorCliffs(){
+        for(Tile tile : world.tiles){
+            if(!tile.floor().hasSurface() || tile.block() == Blocks.cliff) continue;
+
+            int rotation = 0;
+            for(int i = 0; i < 8; i++){
+                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                if(other != null && !other.floor().hasSurface()){
+                    rotation |= (1 << i);
+                }
+            }
+
+            if(rotation != 0){
+                tile.setBlock(Blocks.cliff);
+            }
+
+            tile.data = (byte)rotation;
+        }
     }
 
     public void drawCircle(int x, int y, Cons<Tile> drawer){
@@ -210,10 +255,6 @@ public class MapEditor{
         }
     }
 
-    public MapRenderer renderer(){
-        return renderer;
-    }
-
     public void resize(int width, int height){
         clearOp();
 
@@ -227,8 +268,14 @@ public class MapEditor{
                 int px = offsetX + x, py = offsetY + y;
                 if(previous.in(px, py)){
                     tiles.set(x, y, previous.getn(px, py));
-                    tiles.getn(x, y).x = (short)x;
-                    tiles.getn(x, y).y = (short)y;
+                    Tile tile = tiles.getn(x, y);
+                    tile.x = (short)x;
+                    tile.y = (short)y;
+
+                    if(tile.build != null && tile.isCenter()){
+                        tile.build.x = x * tilesize + tile.block().offset;
+                        tile.build.y = y * tilesize + tile.block().offset;
+                    }
                 }else{
                     tiles.set(x, y, new EditorTile(x, y, Blocks.stone.id, (short)0, (short)0));
                 }

@@ -1,7 +1,6 @@
 package mindustry.net;
 
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -65,9 +64,7 @@ public abstract class NetConnection{
 
         Log.info("Kicking connection @; Reason: @", address, reason.replace("\n", " "));
 
-        PlayerInfo info = netServer.admins.getInfo(uuid);
-        info.timesKicked++;
-        info.lastKicked = Math.max(Time.millis() + kickDuration, info.lastKicked);
+        netServer.admins.handleKicked(uuid, address, kickDuration);
 
         Call.kick(this, reason);
 

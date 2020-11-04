@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -47,6 +48,7 @@ public class NuclearReactor extends PowerGenerator{
         hasItems = true;
         hasLiquids = true;
         rebuildable = false;
+        flags = EnumSet.of(BlockFlag.reactor);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class NuclearReactor extends PowerGenerator{
         super.setStats();
 
         if(hasItems){
-            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+            stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
     }
 
@@ -70,7 +72,7 @@ public class NuclearReactor extends PowerGenerator{
         @Override
         public void updateTile(){
             ConsumeLiquid cliquid = consumes.get(ConsumeType.liquid);
-            Item item = consumes.<ConsumeItems>get(ConsumeType.item).items[0].item;
+            Item item = consumes.getItem().items[0].item;
 
             int fuel = items.get(item);
             float fullness = (float)fuel / itemCapacity;

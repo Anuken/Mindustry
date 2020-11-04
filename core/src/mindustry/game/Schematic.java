@@ -2,9 +2,7 @@ package mindustry.game;
 
 import arc.files.*;
 import arc.struct.*;
-import arc.struct.IntIntMap.*;
-import arc.util.ArcAnnotate.*;
-import mindustry.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
@@ -12,7 +10,6 @@ import mindustry.world.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -24,7 +21,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     /** Associated mod. If null, no mod is associated with this schematic. */
     public @Nullable LoadedMod mod;
 
-    public Schematic(Seq<Stile> tiles, @NonNull StringMap tags, int width, int height){
+    public Schematic(Seq<Stile> tiles, StringMap tags, int width, int height){
         this.tiles = tiles;
         this.tags = tags;
         this.width = width;
@@ -39,29 +36,23 @@ public class Schematic implements Publishable, Comparable<Schematic>{
         return tiles.sumf(s -> s.block.consumes.has(ConsumeType.power) ? s.block.consumes.getPower().usage : 0f);
     }
 
-    public Seq<ItemStack> requirements(){
-        IntIntMap amounts = new IntIntMap();
+    public ItemSeq requirements(){
+        ItemSeq requirements = new ItemSeq();
 
         tiles.each(t -> {
-            if(t.block.buildVisibility == BuildVisibility.hidden) return;
-
             for(ItemStack stack : t.block.requirements){
-                amounts.increment(stack.item.id, stack.amount);
+                requirements.add(stack.item, stack.amount);
             }
         });
-        Seq<ItemStack> stacks = new Seq<>();
-        for(Entry ent : amounts.entries()){
-            stacks.add(new ItemStack(Vars.content.item(ent.key), ent.value));
-        }
-        stacks.sort();
-        return stacks;
+
+        return requirements;
     }
 
     public boolean hasCore(){
         return tiles.contains(s -> s.block instanceof CoreBlock);
     }
 
-    public @NonNull CoreBlock findCore(){
+    public CoreBlock findCore(){
         Stile tile = tiles.find(s -> s.block instanceof CoreBlock);
         if(tile == null) throw new IllegalArgumentException("Schematic is missing a core!");
         return (CoreBlock)tile.block;
@@ -69,6 +60,10 @@ public class Schematic implements Publishable, Comparable<Schematic>{
 
     public String name(){
         return tags.get("name", "unknown");
+    }
+
+    public String description(){
+        return tags.get("description", "");
     }
 
     public void save(){
@@ -99,7 +94,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
 
     @Override
     public String steamDescription(){
-        return null;
+        return description();
     }
 
     @Override
@@ -127,7 +122,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     public static class Stile{
-        public @NonNull Block block;
+        public Block block;
         public short x, y;
         public Object config;
         public byte rotation;

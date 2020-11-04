@@ -5,11 +5,12 @@ import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.struct.ObjectIntMap.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -19,7 +20,6 @@ import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
 import mindustry.type.*;
-import mindustry.type.Sector.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -30,12 +30,18 @@ import static mindustry.Vars.*;
 public class World{
     public final Context context = new Context();
 
-    public @NonNull Tiles tiles = new Tiles(0, 0);
+    public Tiles tiles = new Tiles(0, 0);
 
     private boolean generating, invalidMap;
+    private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
 
+    }
+
+    /** Adds a custom handler function for loading a custom map - usually a generated one. */
+    public void addMapLoader(Map map, Runnable loader){
+        customMapLoaders.put(map, loader);
     }
 
     public boolean isInvalidMap(){
@@ -59,6 +65,11 @@ public class World{
         return tile == null || tile.block().solid;
     }
 
+    public boolean wallSolidFull(int x, int y){
+        Tile tile = tile(x, y);
+        return tile == null || (tile.block().solid && tile.block().fillsTile);
+    }
+
     public boolean isAccessible(int x, int y){
         return !wallSolid(x, y - 1) || !wallSolid(x, y + 1) || !wallSolid(x - 1, y) || !wallSolid(x + 1, y);
     }
@@ -79,13 +90,11 @@ public class World{
         return height()*tilesize;
     }
 
-    @NonNull
     public Floor floor(int x, int y){
         Tile tile = tile(x, y);
         return tile == null ? Blocks.air.asFloor() : tile.floor();
     }
 
-    @NonNull
     public Floor floorWorld(float x, float y){
         Tile tile = tileWorld(x, y);
         return tile == null ? Blocks.air.asFloor() : tile.floor();
@@ -105,7 +114,9 @@ public class World{
     public Tile tileBuilding(int x, int y){
         Tile tile = tiles.get(x, y);
         if(tile == null) return null;
-        if(tile.build != null) return tile.build.tile();
+        if(tile.build != null){
+            return tile.build.tile();
+        }
         return tile;
     }
 
@@ -123,7 +134,6 @@ public class World{
         return tile.build;
     }
 
-    @NonNull
     public Tile rawTile(int x, int y){
         return tiles.getn(x, y);
     }
@@ -138,7 +148,17 @@ public class World{
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    public int toTile(float coord){
+    /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */
+    public static float conv(float coord){
+        return coord / tilesize;
+    }
+
+    /** Convert from tile to world coordinates. */
+    public static float unconv(float coord){
+        return coord * tilesize;
+    }
+
+    public static int toTile(float coord){
         return Math.round(coord / tilesize);
     }
 
@@ -180,12 +200,10 @@ public class World{
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
-            if(tile.block() instanceof LegacyBlock){
-                tile.remove();
+            if(tile.block() instanceof LegacyBlock l){
+                l.removeSelf(tile);
                 continue;
             }
-
-            tile.updateOcclusion();
 
             if(tile.build != null){
                 tile.build.updateProximity();
@@ -245,7 +263,7 @@ public class World{
         setSectorRules(sector);
 
         if(state.rules.defaultTeam.core() != null){
-            sector.setSpawnPosition(state.rules.defaultTeam.core().pos());
+            sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
         }
     }
 
@@ -255,10 +273,67 @@ public class World{
 
         state.rules.weather.clear();
 
-        if(sector.is(SectorAttribute.rainy)) state.rules.weather.add(new WeatherEntry(Weathers.rain));
-        if(sector.is(SectorAttribute.snowy)) state.rules.weather.add(new WeatherEntry(Weathers.snow));
-        if(sector.is(SectorAttribute.desert)) state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
+        //apply weather based on terrain
+        ObjectIntMap<Block> floorc = new ObjectIntMap<>();
+        ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
+        for(Tile tile : world.tiles){
+            if(world.getDarkness(tile.x, tile.y) >= 3){
+                continue;
+            }
+
+            Liquid liquid = tile.floor().liquidDrop;
+            if(tile.floor().itemDrop != null) content.add(tile.floor().itemDrop);
+            if(tile.overlay().itemDrop != null) content.add(tile.overlay().itemDrop);
+            if(liquid != null) content.add(liquid);
+
+            if(!tile.block().isStatic()){
+                floorc.increment(tile.floor());
+                if(tile.overlay() != Blocks.air){
+                    floorc.increment(tile.overlay());
+                }
+            }
+        }
+
+        //sort counts in descending order
+        Seq<Entry<Block>> entries = floorc.entries().toArray();
+        entries.sort(e -> -e.value);
+        //remove all blocks occuring < 30 times - unimportant
+        entries.removeAll(e -> e.value < 30);
+
+        Block[] floors = new Block[entries.size];
+        int[] floorCounts = new int[entries.size];
+        for(int i = 0; i < entries.size; i++){
+            floorCounts[i] = entries.get(i).value;
+            floors[i] = entries.get(i).key;
+        }
+
+        //TODO bad code
+        boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
+        boolean hasRain = !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
+        boolean hasDesert = !hasSnow && !hasRain && floors[0].name.contains("sand");
+        boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
+
+        if(hasSnow){
+            state.rules.weather.add(new WeatherEntry(Weathers.snow));
+        }
+
+        if(hasRain){
+            state.rules.weather.add(new WeatherEntry(Weathers.rain));
+            state.rules.weather.add(new WeatherEntry(Weathers.fog));
+        }
+
+        if(hasDesert){
+            state.rules.weather.add(new WeatherEntry(Weathers.sandstorm));
+        }
+
+        if(hasSpores){
+            state.rules.weather.add(new WeatherEntry(Weathers.sporestorm));
+        }
+
+        sector.info.resources = content.asArray();
+        sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
+        sector.saveInfo();
     }
 
     public Context filterContext(Map map){
@@ -270,6 +345,12 @@ public class World{
     }
 
     public void loadMap(Map map, Rules checkRules){
+        //load using custom loader if possible
+        if(customMapLoaders.containsKey(map)){
+            customMapLoaders.get(map).run();
+            return;
+        }
+
         try{
             SaveIO.load(map.file, new FilterContext(map));
         }catch(Throwable e){
@@ -444,7 +525,7 @@ public class World{
             dark = Math.max((edgeBlend - edgeDst) * (4f / edgeBlend), dark);
         }
 
-        if(state.hasSector()){
+        if(state.hasSector() && state.getSector().preset == null){
             int circleBlend = 14;
             //quantized angle
             float offset = state.getSector().rect.rotation + 90;

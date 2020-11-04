@@ -1,9 +1,12 @@
 package mindustry.world.blocks.legacy;
 
 import arc.util.io.*;
+import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.world.*;
 
 public class LegacyUnitFactory extends LegacyBlock{
+    public Block replacement = Blocks.air;
 
     public LegacyUnitFactory(String name){
         super(name);
@@ -11,6 +14,12 @@ public class LegacyUnitFactory extends LegacyBlock{
         hasPower = true;
         hasItems = true;
         solid = false;
+    }
+
+    @Override
+    public void removeSelf(Tile tile){
+        int rot = tile.build == null ? 0 : tile.build.rotation;
+        tile.setBlock(replacement, tile.team(), rot);
     }
 
     public class LegacyUnitFactoryBuild extends Building{

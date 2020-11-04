@@ -30,19 +30,34 @@ public class Bullets implements ContentList{
     missileExplosive, missileIncendiary, missileSurge,
 
     //standard
-    standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary, standardMechSmall,
-    standardGlaive, standardDenseBig, standardThoriumBig, standardIncendiaryBig,
+    standardCopper, standardDense, standardThorium, standardHoming, standardIncendiary,
+    standardDenseBig, standardThoriumBig, standardIncendiaryBig,
 
     //liquid
-    waterShot, cryoShot, slagShot, oilShot,
+    waterShot, cryoShot, slagShot, oilShot, heavyWaterShot, heavyCryoShot, heavySlagShot, heavyOilShot,
 
     //environment, misc.
-    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig, frag;
+    damageLightning, damageLightningGround, fireball, basicFlame, pyraFlame, driverBolt, healBullet, healBulletBig;
 
     @Override
     public void load(){
 
-        artilleryDense = new ArtilleryBulletType(3f, 12, "shell"){{
+        //lightning bullets need to be initialized first.
+        damageLightning = new BulletType(0.0001f, 0f){{
+            lifetime = Fx.lightning.lifetime;
+            hitEffect = Fx.hitLancer;
+            despawnEffect = Fx.none;
+            status = StatusEffects.shocked;
+            statusDuration = 10f;
+            hittable = false;
+        }};
+
+        //this is just a copy of the damage lightning bullet that doesn't damage air units
+        damageLightningGround = new BulletType(0.0001f, 0f){};
+        JsonIO.copy(damageLightning, damageLightningGround);
+        damageLightningGround.collidesAir = false;
+
+        artilleryDense = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -63,7 +78,7 @@ public class Bullets implements ContentList{
             collidesAir = false;
         }};
 
-        artilleryPlastic = new ArtilleryBulletType(3.4f, 12, "shell"){{
+        artilleryPlastic = new ArtilleryBulletType(3.4f, 20, "shell"){{
             hitEffect = Fx.plasticExplosion;
             knockback = 1f;
             lifetime = 80f;
@@ -77,7 +92,7 @@ public class Bullets implements ContentList{
             frontColor = Pal.plastaniumFront;
         }};
 
-        artilleryHoming = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryHoming = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.flakExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -91,7 +106,7 @@ public class Bullets implements ContentList{
             homingRange = 50f;
         }};
 
-        artilleryIncendiary = new ArtilleryBulletType(3f, 12, "shell"){{
+        artilleryIncendiary = new ArtilleryBulletType(3f, 20, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -102,10 +117,11 @@ public class Bullets implements ContentList{
             status = StatusEffects.burning;
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
+            makeFire = true;
             trailEffect = Fx.incendTrail;
         }};
 
-        artilleryExplosive = new ArtilleryBulletType(2f, 12, "shell"){{
+        artilleryExplosive = new ArtilleryBulletType(2f, 20, "shell"){{
             hitEffect = Fx.blastExplosion;
             knockback = 0.8f;
             lifetime = 80f;
@@ -265,19 +281,21 @@ public class Bullets implements ContentList{
             homingPower = 0.08f;
             splashDamageRadius = 20f;
             splashDamage = 20f;
+            makeFire = true;
             hitEffect = Fx.blastExplosion;
             status = StatusEffects.burning;
         }};
 
-        missileSurge = new MissileBulletType(3.7f, 20){{
+        missileSurge = new MissileBulletType(3.7f, 18){{
             width = 8f;
             height = 8f;
             shrinkY = 0f;
             drag = -0.01f;
-            splashDamageRadius = 28f;
-            splashDamage = 35f;
+            splashDamageRadius = 25f;
+            splashDamage = 25f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
+            lightningDamage = 10;
             lightning = 2;
             lightningLength = 10;
         }};
@@ -323,25 +341,9 @@ public class Bullets implements ContentList{
             frontColor = Pal.lightishOrange;
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
+            makeFire = true;
             inaccuracy = 3f;
             lifetime = 60f;
-        }};
-
-        standardGlaive = new BasicBulletType(4f, 7.5f, "bullet"){{
-            width = 10f;
-            height = 12f;
-            frontColor = Color.valueOf("feb380");
-            backColor = Color.valueOf("ea8878");
-            status = StatusEffects.burning;
-            lifetime = 60f;
-        }};
-
-        standardMechSmall = new BasicBulletType(4f, 9, "bullet"){{
-            width = 11f;
-            height = 14f;
-            lifetime = 40f;
-            inaccuracy = 5f;
-            despawnEffect = Fx.hitBulletSmall;
         }};
 
         standardDenseBig = new BasicBulletType(7f, 55, "bullet"){{
@@ -354,6 +356,8 @@ public class Bullets implements ContentList{
             width = 16f;
             height = 23f;
             shootEffect = Fx.shootBig;
+            pierceCap = 2;
+            pierceBuilding = true;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{
@@ -363,29 +367,23 @@ public class Bullets implements ContentList{
             backColor = Pal.lightOrange;
             status = StatusEffects.burning;
             shootEffect = Fx.shootBig;
+            makeFire = true;
+            pierceCap = 2;
+            pierceBuilding = true;
         }};
 
-        damageLightning = new BulletType(0.0001f, 0f){{
-            lifetime = Fx.lightning.lifetime;
-            hitEffect = Fx.hitLancer;
-            despawnEffect = Fx.none;
-            status = StatusEffects.shocked;
-            statusDuration = 10f;
-            hittable = false;
-        }};
-
-        //this is just a copy of the damage lightning bullet that doesn't damage air units
-        damageLightningGround = new BulletType(0.0001f, 0f){{
-            collidesAir = false;
-        }};
-        JsonIO.copy(damageLightning, damageLightningGround);
-
-        healBullet = new HealBulletType(5.2f, 13){{
+        healBullet = new LaserBoltBulletType(5.2f, 13){{
             healPercent = 3f;
+            collidesTeam = true;
+            backColor = Pal.heal;
+            frontColor = Color.white;
         }};
 
-        healBulletBig = new HealBulletType(5.2f, 15){{
+        healBulletBig = new LaserBoltBulletType(5.2f, 15){{
             healPercent = 5.5f;
+            collidesTeam = true;
+            backColor = Pal.heal;
+            frontColor = Color.white;
         }};
 
         fireball = new BulletType(1f, 4){
@@ -428,11 +426,12 @@ public class Bullets implements ContentList{
             }
         };
 
-        basicFlame = new BulletType(3.35f, 15f){{
+        basicFlame = new BulletType(3.35f, 16f){{
             ammoMultiplier = 3f;
             hitSize = 7f;
             lifetime = 18f;
             pierce = true;
+            collidesAir = false;
             statusDuration = 60f * 4;
             shootEffect = Fx.shootSmallFlame;
             hitEffect = Fx.hitFlameSmall;
@@ -442,11 +441,12 @@ public class Bullets implements ContentList{
             hittable = false;
         }};
 
-        pyraFlame = new BulletType(3.35f, 22f){{
+        pyraFlame = new BulletType(3.35f, 25f){{
             ammoMultiplier = 4f;
             hitSize = 7f;
             lifetime = 18f;
             pierce = true;
+            collidesAir = false;
             statusDuration = 60f * 6;
             shootEffect = Fx.shootPyraFlame;
             hitEffect = Fx.hitFlameSmall;
@@ -472,14 +472,50 @@ public class Bullets implements ContentList{
             drag = 0.03f;
         }};
 
-        driverBolt = new MassDriverBolt();
-
-        frag = new BasicBulletType(5f, 8, "bullet"){{
-            width = 8f;
-            height = 9f;
-            shrinkY = 0.5f;
-            lifetime = 50f;
-            drag = 0.04f;
+        heavyWaterShot = new LiquidBulletType(Liquids.water){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.7f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 0.4f;
+            statusDuration = 60f * 4f;
+            damage = 0.2f;
         }};
+
+        heavyCryoShot = new LiquidBulletType(Liquids.cryofluid){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 0.4f;
+            statusDuration = 60f * 4f;
+            damage = 0.2f;
+        }};
+
+        heavySlagShot = new LiquidBulletType(Liquids.slag){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            damage = 4.75f;
+            drag = 0.001f;
+            ammoMultiplier = 0.4f;
+            statusDuration = 60f * 4f;
+        }};
+
+        heavyOilShot = new LiquidBulletType(Liquids.oil){{
+            lifetime = 49f;
+            speed = 4f;
+            knockback = 1.3f;
+            puddleSize = 8f;
+            drag = 0.001f;
+            ammoMultiplier = 0.4f;
+            statusDuration = 60f * 4f;
+            damage = 0.2f;
+        }};
+
+        driverBolt = new MassDriverBolt();
     }
 }

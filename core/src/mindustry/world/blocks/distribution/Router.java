@@ -1,9 +1,12 @@
 package mindustry.world.blocks.distribution;
 
+import arc.math.*;
+import arc.util.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 public class Router extends Block{
@@ -20,22 +23,42 @@ public class Router extends Block{
         noUpdateDisabled = true;
     }
 
-    public class RouterBuild extends Building{
+    public class RouterBuild extends Building implements ControlBlock{
         public Item lastItem;
         public Tile lastInput;
         public float time;
+        public @Nullable BlockUnitc unit;
+
+        @Override
+        public Unit unit(){
+            if(unit == null){
+                unit = (BlockUnitc)UnitTypes.block.create(team);
+                unit.tile(this);
+            }
+            return (Unit)unit;
+        }
+
+        @Override
+        public boolean canControl(){
+            return size == 1;
+        }
+
+        @Override
+        public boolean shouldAutoTarget(){
+            return false;
+        }
 
         @Override
         public void updateTile(){
             if(lastItem == null && items.any()){
-                items.clear();
+                lastItem = items.first();
             }
 
             if(lastItem != null){
                 time += 1f / speed * delta();
                 Building target = getTileTarget(lastItem, lastInput, false);
 
-                if(target != null && (time >= 1f || !(target.block() instanceof Router || target.block().instantTransfer))){
+                if(target != null && (time >= 1f || !(target.block instanceof Router || target.block.instantTransfer))){
                     getTileTarget(lastItem, lastInput, true);
                     target.handleItem(this, lastItem);
                     items.remove(lastItem, 1);
@@ -72,6 +95,24 @@ public class Router extends Block{
         }
 
         public Building getTileTarget(Item item, Tile from, boolean set){
+            if(unit != null && isControlled()){
+                unit.health(health);
+                unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
+                unit.team(team);
+                unit.set(x, y);
+
+                int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
+
+                if(unit.isShooting()){
+                    Building other = nearby(angle);
+                    if(other != null && other.acceptItem(this, item)){
+                        return other;
+                    }
+                }
+
+                return null;
+            }
+
             int counter = rotation;
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
