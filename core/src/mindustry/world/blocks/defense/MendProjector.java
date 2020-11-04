@@ -120,10 +120,16 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
+            indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, baseColor.cpy().lerp(phaseColor, phaseHeat).a(Mathf.absin(4f, 1f))));
+
             Drawf.dashCircle(x, y, realRange, baseColor.cpy().lerp(phaseColor, phaseHeat));
             
             if(!cons().optionalValid() && hasBoost && boosterUnlocked()){
-                indexer.eachBlock(this, range + phaseRangeBoost, other -> true, other -> Drawf.selected(other, phaseColor.cpy().a(Mathf.absin(4f, 1f))));
+                indexer.eachBlock(this, range + phaseRangeBoost, other -> true, other -> {
+                  if(!Mathf.within(x, y, other.x, other.y, range)){
+                      Drawf.selected(other, phaseColor.cpy().a(Mathf.absin(4f, 1f)));
+                  }
+                });
                 
                 float expandProgress = (Time.time() % 90f <= 30f ? Time.time() % 90f : 30f) / 30f;
                 float transparency = Time.time() % 90f / 90f;
