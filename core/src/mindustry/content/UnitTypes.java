@@ -271,7 +271,7 @@ public class UnitTypes implements ContentList{
             boostMultiplier = 1.5f;
             speed = 0.55f;
             hitSize = 8f;
-            health = 110f;
+            health = 120f;
             buildSpeed = 0.8f;
             armor = 1f;
             commandLimit = 8;
@@ -287,7 +287,12 @@ public class UnitTypes implements ContentList{
                 alternate = false;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                bullet = Bullets.healBullet;
+                bullet = new LaserBoltBulletType(5.2f, 14){{
+                    healPercent = 5f;
+                    collidesTeam = true;
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                }};
                 shootSound = Sounds.pew;
             }});
         }};
@@ -297,7 +302,7 @@ public class UnitTypes implements ContentList{
             boostMultiplier = 1.6f;
             speed = 0.7f;
             hitSize = 10f;
-            health = 300f;
+            health = 320f;
             buildSpeed = 0.9f;
             armor = 4f;
 
@@ -378,7 +383,7 @@ public class UnitTypes implements ContentList{
                 shootSound = Sounds.laser;
 
                 bullet = new LaserBulletType(){{
-                    damage = 40f;
+                    damage = 45f;
                     recoil = 1f;
                     sideAngle = 45f;
                     sideWidth = 1f;
@@ -429,7 +434,8 @@ public class UnitTypes implements ContentList{
                 continuous = true;
                 cooldownTime = 200f;
 
-                bullet = new ContinuousLaserBulletType(22){{
+                bullet = new ContinuousLaserBulletType(){{
+                    damage = 23f;
                     length = 160f;
                     hitEffect = Fx.hitMeltHeal;
                     drawSize = 420f;
@@ -502,7 +508,7 @@ public class UnitTypes implements ContentList{
 
                 bullet = new LaserBulletType(){{
                     length = 460f;
-                    damage = 550f;
+                    damage = 560f;
                     width = 75f;
 
                     lifetime = 65f;
@@ -605,7 +611,7 @@ public class UnitTypes implements ContentList{
             drag = 0.4f;
             hitSize = 12f;
             rotateSpeed = 3f;
-            health = 760;
+            health = 800;
             immunities = ObjectSet.with(StatusEffects.burning, StatusEffects.melting);
             legCount = 6;
             legLength = 13f;
@@ -634,9 +640,9 @@ public class UnitTypes implements ContentList{
                 y = -1.5f;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.3f;
+                    sapStrength = 0.4f;
                     length = 75f;
-                    damage = 15;
+                    damage = 18;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -653,9 +659,9 @@ public class UnitTypes implements ContentList{
                 y = 3f;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.65f;
+                    sapStrength = 0.8f;
                     length = 40f;
-                    damage = 13;
+                    damage = 15;
                     shootEffect = Fx.shootSmall;
                     hitColor = color = Color.valueOf("bf92f9");
                     despawnEffect = Fx.none;
@@ -697,9 +703,9 @@ public class UnitTypes implements ContentList{
             groundLayer = Layer.legUnit;
 
             BulletType sapper = new SapBulletType(){{
-                sapStrength = 0.83f;
+                sapStrength = 0.85f;
                 length = 55f;
-                damage = 34;
+                damage = 37;
                 shootEffect = Fx.shootSmall;
                 hitColor = color = Color.valueOf("bf92f9");
                 despawnEffect = Fx.none;
