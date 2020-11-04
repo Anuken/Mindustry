@@ -14,7 +14,10 @@ public class FlyingAI extends AIController{
 
     @Override
     public void updateMovement(){
-        if(unit instanceof Payloadc && ((Payloadc) unit).hasPayload() && target instanceof Building){
+        boolean hasPayload = unit instanceof Payloadc && ((Payloadc) unit).hasPayload();
+        boolean targetBuild = target instanceof Building;
+        
+        if(hasPayload && targetBuild){
             Vec2 unitPos = new Vec2(unit.x, unit.y);
             Vec2 targetPos = new Vec2(((Building) target).x, ((Building) target).y);
 
@@ -24,11 +27,11 @@ public class FlyingAI extends AIController{
         }
 
         if(target != null && (unit instanceof Payloadc || unit.hasWeapons()) && command() == UnitCommand.attack){
-            if((unit.hasWeapons() && unit.type().weapons.first().rotate) || (unit instanceof Payloadc && ((Payloadc) unit).hasPayload())){
+            if((unit.hasWeapons() && unit.type().weapons.first().rotate) || hasPayload){
                 moveTo(target, unit.hasWeapons() ? unit.range() * 0.8f : 20f);
                 unit.lookAt(target);
             }else{
-                attack(120f);
+                attack(100f);
             }
         }
 
