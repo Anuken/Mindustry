@@ -724,13 +724,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(editor.drawBlock == block));
             group.add(button);
-            blockSelection.add(button).size(50f).grow().top().left().tooltip(block.localizedName);
+            blockSelection.add(button).size(50f).tooltip(block.localizedName);
 
             if(++i % 4 == 0) blockSelection.row();
         }
 
         if(group.getButtons().isEmpty()){
-            blockSelection.add("@none");
+            blockSelection.add("@none").padLeft(80f).padTop(10f);
         }else{
             // Select first block
             group.getButtons().first().fireClick();
