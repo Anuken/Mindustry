@@ -1,10 +1,12 @@
 package mindustry.desktop.steam;
 
 public enum SAchievement{
-    completeTutorial,
+    //completeTutorial,
     kill1kEnemies(SStat.unitsDestroyed, 1000),
     kill100kEnemies(SStat.unitsDestroyed, 1000 * 100),
+    //TODO achievements for reaching 10k/min production or something
     launch10kItems(SStat.itemsLaunched, 1000 * 10),
+    //TODO reduce amounts required here
     launch1milItems(SStat.itemsLaunched, 1000 * 1000),
     win10Attack(SStat.attacksWon, 10),
     win10PvP(SStat.pvpsWon, 10),
@@ -43,8 +45,7 @@ public enum SAchievement{
     issueAttackCommand,
     active100Units(SStat.maxUnitActive, 100),
     build1000Units,
-    //TODO
-    buildAllUnits,
+    buildAllUnits(SStat.unitsBuilt, 30),
     //TODO
     activeAllT5,
     dieExclusion,
@@ -55,9 +56,13 @@ public enum SAchievement{
     launchItemPad,
     chainRouters,
     //TODO
+    circleConveyor,
+    //TODO
     becomeRouter,
     //TODO
     save20Schematics,
+    //TODO
+    destroyEnemyBase,
     survive10WavesNoBlocks,
     useFlameAmmo,
     coolTurret,

@@ -374,6 +374,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 
+        //TODO put most info in submenu
+
         if(sector.isAttacked()){
             //TODO localize when finalized
             //these mechanics are likely to change and as such are not added to the bundle

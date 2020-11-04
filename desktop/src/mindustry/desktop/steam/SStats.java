@@ -1,6 +1,7 @@
 package mindustry.desktop.steam;
 
 import arc.*;
+import arc.struct.*;
 import arc.util.*;
 import com.codedisaster.steamworks.*;
 import mindustry.*;
@@ -8,6 +9,8 @@ import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.world.*;
+import mindustry.world.blocks.distribution.*;
 
 import static mindustry.Vars.*;
 import static mindustry.desktop.steam.SAchievement.*;
@@ -19,6 +22,8 @@ public class SStats implements SteamUserStatsCallback{
     private boolean updated = false;
     //private ObjectSet<String> mechs = new ObjectSet<>();
     private int statSavePeriod = 4; //in minutes
+
+    private ObjectSet<String> blocksBuilt = new ObjectSet<>(), unitsBuilt = new ObjectSet<>();
 
     public SStats(){
         stats.requestCurrentStats();
@@ -51,7 +56,7 @@ public class SStats implements SteamUserStatsCallback{
 
     void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(Groups.unit.count(t -> t.team() == player.team()));
+            SStat.maxUnitActive.max(Groups.unit.count(t -> t.team == player.team()));
 
             //TODO
             //if(Groups.unit.count(u -> u.type() == UnitTypes.phantom && u.team() == player.team()) >= 10){
@@ -73,6 +78,11 @@ public class SStats implements SteamUserStatsCallback{
     }
 
     private void registerEvents(){
+        Events.on(ClientLoadEvent.class, e -> {
+            unitsBuilt = Core.settings.getJson("units-built" , ObjectSet.class, String.class, ObjectSet::new);
+            blocksBuilt = Core.settings.getJson("blocks-built" , ObjectSet.class, String.class, ObjectSet::new);
+        });
+
         Events.on(UnitDestroyEvent.class, e -> {
             if(ncustom()){
                 if(e.unit.team != Vars.player.team()){
@@ -105,29 +115,43 @@ public class SStats implements SteamUserStatsCallback{
                     chainRouters.complete();
                 }
 
-                //TODO implement
                 if(e.tile.block() == Blocks.groundFactory){
                     buildGroundFactory.complete();
                 }
 
-                //TODO fix, cleaner impl
-                if(e.tile.block() == Blocks.meltdown || e.tile.block() == Blocks.spectre || e.tile.block() == Blocks.foreshadow){
-                    if(e.tile.block() == Blocks.meltdown){
-                        Core.settings.put("meltdownp", true);
+                if(blocksBuilt.add(e.tile.block().name)){
+                    if(blocksBuilt.contains("meltdown") && blocksBuilt.contains("spectre") && blocksBuilt.contains("foreshadow")){
+                        buildMeltdownSpectreForeshadow.complete();
                     }
 
-                    if(e.tile.block() == Blocks.spectre){
-                        Core.settings.put("spectrep", true);
-                    }
+                    save();
+                }
 
-                    if(e.tile.block() == Blocks.foreshadow){
-                        Core.settings.put("spectrep", true);
-                    }
+                if(e.tile.block() instanceof Conveyor){
+                    check: {
+                        Tile current = e.tile;
+                        for(int i = 0; i < 4; i++){
+                            if(current.build == null) break check;
+                            Tile next = current.nearby(current.build.rotation);
+                            if(next != null && next.block() instanceof Conveyor){
+                                current = next;
+                            }else{
+                                break check;
+                            }
+                        }
 
-                    if(Core.settings.getBool("meltdownp", false) && Core.settings.getBool("spectrep", false)){
-                        //TODO
-                        //buildMeltdownSpectre.complete();
+                        if(current == e.tile){
+                            circleConveyor.complete();
+                        }
                     }
+                }
+            }
+        });
+
+        Events.on(UnitCreateEvent.class, e -> {
+            if(campaign()){
+                if(unitsBuilt.add(e.unit.type.name)){
+                    SStat.unitsBuilt.set(content.units().count(u -> unitsBuilt.contains(u.name) && !u.isHidden()));
                 }
             }
         });
@@ -151,7 +175,11 @@ public class SStats implements SteamUserStatsCallback{
 
         Events.run(Trigger.exclusionDeath, dieExclusion::complete);
 
-        Events.run(Trigger.drown, drown::complete);
+        Events.on(UnitDrownEvent.class, e -> {
+            if(campaign() && e.unit.isPlayer()){
+                drown.complete();
+            }
+        });
 
         trigger(Trigger.impactPower, powerupImpactReactor);
 
@@ -173,7 +201,11 @@ public class SStats implements SteamUserStatsCallback{
 
         trigger(Trigger.phaseDeflectHit, killEnemyPhaseWall);
 
-        trigger(Trigger.itemLaunch, launchItemPad);
+        Events.on(LaunchItemEvent.class, e -> {
+            if(campaign()){
+                launchItemPad.complete();
+            }
+        });
 
         Events.on(UnitCreateEvent.class, e -> {
             if(campaign() && e.unit.team() == player.team()){
@@ -214,13 +246,17 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
-        Events.on(ResearchEvent.class, e -> {
-            if(e.content == Blocks.router) researchRouter.complete();
+        Runnable checkUnlocks = () -> {
+            if(Blocks.router.unlocked()) researchRouter.complete();
 
             if(!TechTree.all.contains(t -> t.content.locked())){
                 researchAll.complete();
             }
-        });
+        };
+
+        //check unlocked stuff on load as well
+        Events.on(ResearchEvent.class, e -> checkUnlocks.run());
+        Events.on(ClientLoadEvent.class, e -> checkUnlocks.run());
 
         Events.on(WinEvent.class, e -> {
             if(state.hasSector()){
@@ -238,6 +274,8 @@ public class SStats implements SteamUserStatsCallback{
             }
         });
 
+
+
         //TODO dead achievement
         /*
         Events.on(MechChangeEvent.class, e -> {
@@ -247,6 +285,11 @@ public class SStats implements SteamUserStatsCallback{
                 }
             }
         });*/
+    }
+
+    private void save(){
+        Core.settings.putJson("units-built" , String.class, unitsBuilt);
+        Core.settings.putJson("blocks-built" , String.class, blocksBuilt);
     }
 
     private void trigger(Trigger trigger, SAchievement ach){
