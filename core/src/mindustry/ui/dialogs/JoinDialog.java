@@ -157,7 +157,7 @@ public class JoinDialog extends BaseDialog{
                 }).margin(3f).pad(2).pad(6).top().right();
 
                 button.row();
-                button.table(t -> sever.content = t).grow();
+                button.table(t -> server.content = t).grow();
 
                 remote.row();
             });
