@@ -22,15 +22,15 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class JoinDialog extends BaseDialog{
-    Seq<Server> servers = new Seq<>();
-    Dialog add;
-    Server renaming;
-    Table local = new Table();
-    Table remote = new Table();
-    Table global = new Table();
-    Table hosts = new Table();
-    int totalHosts;
-    int refreshes;
+    public Seq<Server> servers = new Seq<>();
+    public Dialog add;
+    public Server renaming;
+    public Table local = new Table(),
+        remote = new Table(),
+        global = new Table(),
+        hosts = new Table();
+    public int totalHosts;
+    public int refreshes;
 
     public JoinDialog(){
         super("@joingame");
@@ -96,7 +96,7 @@ public class JoinDialog extends BaseDialog{
     }
 
     void refreshAll(){
-        refreshes ++;
+        refreshes++;
 
         refreshLocal();
         refreshRemote();
@@ -105,64 +105,62 @@ public class JoinDialog extends BaseDialog{
 
     void setupRemote(){
         remote.clear();
+        SearchBar.add(remote, servers,
+            server -> server.lastHost != null ? server.lastHost.name : server.displayIP(),
+            (remote, server) -> {
+                //why are java lambdas this bad
+                TextButton[] buttons = {null};
 
-        for(Server server : servers){
-            //why are java lambdas this bad
-            TextButton[] buttons = {null};
-
-            TextButton button = buttons[0] = remote.button("[accent]" + server.displayIP(), Styles.cleart, () -> {
-                if(!buttons[0].childrenPressed()){
-                    if(server.lastHost != null){
-                        Events.fire(new ClientPreConnectEvent(server.lastHost));
-                        safeConnect(server.ip, server.port, server.lastHost.version);
-                    }else{
-                        connect(server.ip, server.port);
+                TextButton button = buttons[0] = remote.button("[accent]" + server.displayIP(), Styles.cleart, () -> {
+                    if(!buttons[0].childrenPressed()){
+                        if(server.lastHost != null){
+                            Events.fire(new ClientPreConnectEvent(server.lastHost));
+                            safeConnect(server.ip, server.port, server.lastHost.version);
+                        }else{
+                            connect(server.ip, server.port);
+                        }
                     }
-                }
-            }).width(targetWidth()).pad(4f).get();
+                }).width(targetWidth()).pad(4f).get();
 
-            button.getLabel().setWrap(true);
+                button.getLabel().setWrap(true);
 
-            Table inner = new Table();
-            button.clearChildren();
-            button.add(inner).growX();
+                Table inner = new Table();
+                button.clearChildren();
+                button.add(inner).growX();
 
-            inner.add(button.getLabel()).growX();
+                inner.add(button.getLabel()).growX();
 
-            inner.button(Icon.upOpen, Styles.emptyi, () -> {
-                moveRemote(server, -1);
+                inner.button(Icon.upOpen, Styles.emptyi, () -> {
+                    moveRemote(server, -1);
+                }).margin(3f).padTop(6f).top().right();
 
-            }).margin(3f).padTop(6f).top().right();
+                inner.button(Icon.downOpen, Styles.emptyi, () -> {
+                    moveRemote(server, +1);
+                }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.button(Icon.downOpen, Styles.emptyi, () -> {
-                moveRemote(server, +1);
+                inner.button(Icon.refresh, Styles.emptyi, () -> {
+                    refreshServer(server);
+                }).margin(3f).pad(2).padTop(6f).top().right();
 
-            }).margin(3f).pad(2).padTop(6f).top().right();
+                inner.button(Icon.pencil, Styles.emptyi, () -> {
+                    renaming = server;
+                    add.show();
+                }).margin(3f).pad(2).padTop(6f).top().right();
 
-            inner.button(Icon.refresh, Styles.emptyi, () -> {
-                refreshServer(server);
-            }).margin(3f).pad(2).padTop(6f).top().right();
+                inner.button(Icon.trash, Styles.emptyi, () -> {
+                    ui.showConfirm("@confirm", "@server.delete", () -> {
+                        servers.remove(server, true);
+                        saveServers();
+                        setupRemote();
+                        refreshRemote();
+                    });
+                }).margin(3f).pad(2).pad(6).top().right();
 
-            inner.button(Icon.pencil, Styles.emptyi, () -> {
-                renaming = server;
-                add.show();
-            }).margin(3f).pad(2).padTop(6f).top().right();
+                button.row();
+                button.table(t -> sever.content = t).grow();
 
-            inner.button(Icon.trash, Styles.emptyi, () -> {
-                ui.showConfirm("@confirm", "@server.delete", () -> {
-                    servers.remove(server, true);
-                    saveServers();
-                    setupRemote();
-                    refreshRemote();
-                });
-            }).margin(3f).pad(2).pad(6).top().right();
-
-            button.row();
-
-            server.content = button.table(t -> {}).grow().get();
-
-            remote.row();
-        }
+                remote.row();
+            });
     }
 
     void moveRemote(Server server, int sign){

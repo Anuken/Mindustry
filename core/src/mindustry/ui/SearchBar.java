@@ -6,7 +6,6 @@ import arc.struct.*;
 import mindustry.gen.*;
 
 public class SearchBar{
-
     public static <T> Table add(Table parent, Seq<T> list, Func<String, String> queryf,
             Func<T, String> namef, Cons2<Table, T> itemf){
         Cons<String>[] rebuild = new Cons[] {null};
@@ -26,7 +25,7 @@ public class SearchBar{
 
             search.image(Icon.zoom).padRight(8f);
             search.field("", rebuild[0]).growX();
-        });
+        }).fillX().padBottom(4);
 
         parent.row();
         parent.pane(table -> {
@@ -47,5 +46,4 @@ public class SearchBar{
         }
         return name.toLowerCase().contains(query);
     }
-
 }
