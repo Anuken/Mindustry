@@ -42,6 +42,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private MapGenerateDialog generateDialog;
     private ScrollPane pane;
     private BaseDialog menu;
+    private Table blockSelection;
     private Rules lastSavedRules;
     private boolean saved = false;
     private boolean shownWithMap = false;
@@ -666,8 +667,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void addBlockSelection(Table table){
-        Table content = new Table();
-        pane = new ScrollPane(content);
+        blockSelection = new Table();
+        pane = new ScrollPane(blockSelection);
         pane.setFadeScrollBars(false);
         pane.setOverscroll(true, false);
         pane.exited(() -> {
@@ -675,9 +676,25 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 Core.scene.setScrollFocus(view);
             }
         });
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
-        int i = 0;
+        Table searchBar = new Table();
+        searchBar.image(Icon.zoom);
+        searchBar.field(null, this::rebuildBlockSelection)
+        .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
+
+        table.add(searchBar).pad(10);
+        table.row();
+        table.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
+        table.row();
+        table.add(pane).expandY().top().left();
+
+        rebuildBlockSelection("");
+    }
+
+    private void rebuildBlockSelection(String searchText){
+        blockSelection.clear();
+
+        ButtonGroup<ImageButton> group = new ButtonGroup<>();
 
         blocksOut.clear();
         blocksOut.addAll(Vars.content.blocks());
@@ -691,10 +708,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
             return Integer.compare(b1.id, b2.id);
         });
 
+        int i = 0;
+
         for(Block block : blocksOut){
             TextureRegion region = block.icon(Cicon.medium);
 
-            if(!Core.atlas.isFound(region) || !block.inEditor || (block.buildVisibility == BuildVisibility.debugOnly)) continue;
+            if(!Core.atlas.isFound(region) || !block.inEditor
+                    || block.buildVisibility == BuildVisibility.debugOnly
+                    || (!block.localizedName.toLowerCase().contains(searchText.toLowerCase()) && !searchText.isEmpty())
+            ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
@@ -702,17 +724,16 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(editor.drawBlock == block));
             group.add(button);
-            content.add(button).size(50f).tooltip(block.localizedName);
+            blockSelection.add(button).size(50f).grow().top().left().tooltip(block.localizedName);
 
-            if(++i % 4 == 0){
-                content.row();
-            }
+            if(++i % 4 == 0) blockSelection.row();
         }
 
-        group.getButtons().get(2).setChecked(true);
-
-        table.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
-        table.row();
-        table.add(pane).growY().fillX();
+        if(group.getButtons().isEmpty()){
+            blockSelection.add("@none");
+        }else{
+            // Select first block
+            group.getButtons().first().fireClick();
+        }
     }
 }
