@@ -679,7 +679,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         Table searchBar = new Table();
         searchBar.image(Icon.zoom);
-        searchBar.field(null, this::rebuildBlockSelection)
+        searchBar.field("", this::rebuildBlockSelection)
         .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
 
         table.add(searchBar).pad(10);
