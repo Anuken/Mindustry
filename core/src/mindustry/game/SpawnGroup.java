@@ -25,8 +25,7 @@ public class SpawnGroup implements Serializable{
     /** The unit type spawned */
     public UnitType type = UnitTypes.dagger;
     /** Payload Seq, by default one dagger */
-    public Seq<UnitType> payloads = new Seq<UnitType>();
-    public Seq payloadStrings = new Seq<String>();
+    public @Nullable Seq<UnitType> payloads;
     /** When this spawn should end */
     public int end = never;
     /** When this spawn should start */
@@ -113,7 +112,7 @@ public class SpawnGroup implements Serializable{
         if(unitAmount != 1) json.writeValue("amount", unitAmount);
         if(effect != null) json.writeValue("effect", effect.name);
         if(payloads != null && payloads.size > 0){
-            payloadStrings = new Seq<String>();
+            Seq<String> payloadStrings = new Seq<String>();
             for(UnitType unitType : payloads){
                 payloadStrings.add(unitType.name);
             }
@@ -137,12 +136,11 @@ public class SpawnGroup implements Serializable{
         unitAmount = data.getInt("amount", 1);
         if(data.has("payloads")){
             payloads = new Seq<UnitType>();
-            payloadStrings = json.readValue(Seq.class, String.class, data.get("payloads"));
+            Seq<String> payloadStrings = json.readValue(Seq.class, String.class, data.get("payloads"));
 
-            for(String name : (Seq<String>) payloadStrings){
+            for(String name : payloadStrings){
                 payloads.add(content.getByName(ContentType.unit, name));
             }
-            /*payloads = (Seq<UnitType>) json.readValue(Seq.class, UnitType.class, data.get("payloads"));*/
         }
 
 
