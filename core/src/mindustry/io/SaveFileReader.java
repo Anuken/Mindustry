@@ -156,7 +156,7 @@ public abstract class SaveFileReader{
 
     public abstract void write(DataOutputStream stream) throws IOException;
 
-    protected interface IORunner<T>{
+    public interface IORunner<T>{
         void accept(T stream) throws IOException;
     }
 }
