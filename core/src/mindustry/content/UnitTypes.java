@@ -1713,6 +1713,11 @@ public class UnitTypes implements ContentList{
                     tileDamageMultiplier = 0.03f;
                 }};
             }});
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
         }};
 
         beta = new UnitType("beta"){{
@@ -1754,6 +1759,11 @@ public class UnitTypes implements ContentList{
                     tileDamageMultiplier = 0.03f;
                 }};
             }});
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
         }};
 
         gamma = new UnitType("gamma"){{
@@ -1794,6 +1804,11 @@ public class UnitTypes implements ContentList{
                     homingPower = 0.04f;
                 }};
             }});
+
+            @Override
+            public boolean isHidden(){
+                return true;
+            }
         }};
 
         //endregion
