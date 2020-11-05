@@ -1744,7 +1744,6 @@ public class Blocks implements ContentList{
 
             rotateSpeed = 2.5f;
             reloadTime = 200f;
-            restitution = 0.2f;
             ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
             restitution = 0.009f;
