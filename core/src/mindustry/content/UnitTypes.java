@@ -1697,6 +1697,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 6f;
             hitSize = 8f;
             commandLimit = 3;
+            alwaysUnlocked = true;
 
             weapons.add(new Weapon("small-basic-weapon"){{
                 reload = 17f;

@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -70,6 +71,10 @@ public class CoreBlock extends StorageBlock{
             unit.controller(player);
             unit.spawnedByCore(true);
             unit.add();
+        }
+
+        if(state.isCampaign() && player == Vars.player){
+            block.unitType.unlock();
         }
     }
 
