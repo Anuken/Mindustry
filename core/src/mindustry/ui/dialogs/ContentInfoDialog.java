@@ -75,7 +75,6 @@ public class ContentInfoDialog extends BaseDialog{
             }
         }
 
-
         if(content.details != null){
             table.add("[gray]" + content.details).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
