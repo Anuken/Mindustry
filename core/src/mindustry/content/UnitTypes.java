@@ -1680,7 +1680,8 @@ public class UnitTypes implements ContentList{
         //endregion
         //region core
 
-        alpha = new UnitType("alpha"){{
+        alpha = new UnitType("alpha"){
+            {
             defaultController = BuilderAI::new;
             isCounted = false;
 
@@ -1713,14 +1714,16 @@ public class UnitTypes implements ContentList{
                     tileDamageMultiplier = 0.03f;
                 }};
             }});
+            }
 
             @Override
             public boolean isHidden(){
                 return true;
             }
-        }};
+        };
 
-        beta = new UnitType("beta"){{
+        beta = new UnitType("beta"){
+            {
             defaultController = BuilderAI::new;
             isCounted = false;
 
@@ -1759,14 +1762,16 @@ public class UnitTypes implements ContentList{
                     tileDamageMultiplier = 0.03f;
                 }};
             }});
+            }
 
             @Override
             public boolean isHidden(){
                 return true;
             }
-        }};
+        };
 
-        gamma = new UnitType("gamma"){{
+        gamma = new UnitType("gamma"){
+            {
             defaultController = BuilderAI::new;
             isCounted = false;
 
@@ -1804,12 +1809,13 @@ public class UnitTypes implements ContentList{
                     homingPower = 0.04f;
                 }};
             }});
+            }
 
             @Override
             public boolean isHidden(){
                 return true;
             }
-        }};
+        };
 
         //endregion
         //region internal
