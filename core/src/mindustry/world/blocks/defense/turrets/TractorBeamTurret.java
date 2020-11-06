@@ -30,6 +30,8 @@ public class TractorBeamTurret extends BaseTurret{
     public float damage = 0f;
     public boolean targetAir = true, targetGround = false;
     public Color laserColor = Color.white;
+    public StatusEffect status = StatusEffects.none;
+    public float statusDuration = 300;
 
     public TractorBeamTurret(String name){
         super(name);
@@ -97,6 +99,10 @@ public class TractorBeamTurret extends BaseTurret{
 
                 if(damage > 0){
                     target.damageContinuous(damage * efficiency());
+                }
+                
+                if(status != StatusEffects.none){
+                    target.apply(status, statusDuration)
                 }
 
                 //shoot when possible
