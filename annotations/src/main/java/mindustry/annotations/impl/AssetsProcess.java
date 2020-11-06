@@ -49,8 +49,13 @@ public class AssetsProcess extends BaseProcessor{
         ictype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectMap.class, String.class, TextureRegionDrawable.class),
                 "icons", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectMap<>()").build());
 
+        ObjectSet<String> used = new ObjectSet<>();
+
         for(Jval val : icons.get("glyphs").asArray()){
             String name = capitalize(val.getString("css", ""));
+
+            if(!val.getBool("selected", true) || !used.add(name)) continue;
+
             int code = val.getInt("code", 0);
             ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + code).build());
 
