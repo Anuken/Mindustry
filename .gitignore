@@ -24,6 +24,8 @@ logs/
 changelog
 saves/
 /core/assets-raw/fontgen/out/
+/core/assets-raw/fontgen/icons/
+/core/assets-raw/fontgen/icon_parts/
 core/assets/saves/
 /core/assets/saves/
 steam_appid.txt

@@ -46,7 +46,13 @@ public class FontGenerator{
 
         Log.info("Merge...");
 
-        OS.exec("fontforge", "-script", "core/assets-raw/fontgen/merge.pe");
+        //TODO this is broken
+
+        Log.info(OS.exec("fontforge", "-script",
+            Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
+            Fi.get("core/assets/fonts/font.woff").absolutePath(),
+            Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
+        );
 
         Log.info("Done.");
     }
