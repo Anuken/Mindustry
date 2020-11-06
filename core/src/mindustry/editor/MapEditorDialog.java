@@ -666,7 +666,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         ui.showConfirm("@confirm", "@editor.unsaved", this::hide);
     }
 
-    private void addBlockSelection(Table table){
+    private void addBlockSelection(Table cont){
         blockSelection = new Table();
         pane = new ScrollPane(blockSelection);
         pane.setFadeScrollBars(false);
@@ -677,16 +677,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         });
 
-        Table searchBar = new Table();
-        searchBar.image(Icon.zoom);
-        searchBar.field("", this::rebuildBlockSelection)
-        .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
-
-        table.add(searchBar).pad(10);
-        table.row();
-        table.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
-        table.row();
-        table.add(pane).expandY().top().left();
+        cont.table(search -> {
+            search.image(Icon.zoom).padRight(8);
+            search.field("", this::rebuildBlockSelection)
+            .name("editor/search").maxTextLength(maxNameLength).get().setMessageText("@players.search");
+        }).pad(5);
+        cont.row();
+        cont.table(Tex.underline, extra -> extra.labelWrap(() -> editor.drawBlock.localizedName).width(200f).center()).growX();
+        cont.row();
+        cont.add(pane).expandY().top().left();
 
         rebuildBlockSelection("");
     }
@@ -694,7 +693,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private void rebuildBlockSelection(String searchText){
         blockSelection.clear();
 
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
+        Seq<Block> filteredBlocks = new Seq<>();
 
         blocksOut.clear();
         blocksOut.addAll(Vars.content.blocks());
@@ -718,22 +717,22 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     || (!block.localizedName.toLowerCase().contains(searchText.toLowerCase()) && !searchText.isEmpty())
             ) continue;
 
+            filteredBlocks.add(block);
+
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
             button.clicked(() -> editor.drawBlock = block);
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(editor.drawBlock == block));
-            group.add(button);
             blockSelection.add(button).size(50f).tooltip(block.localizedName);
 
             if(++i % 4 == 0) blockSelection.row();
         }
 
-        if(group.getButtons().isEmpty()){
+        if(filteredBlocks.isEmpty()){
             blockSelection.add("@none").padLeft(80f).padTop(10f);
         }else{
-            // Select first block
-            group.getButtons().first().fireClick();
+            editor.drawBlock = filteredBlocks.first();
         }
     }
 }
