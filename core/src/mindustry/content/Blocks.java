@@ -1762,7 +1762,7 @@ public class Blocks implements ContentList{
             shots = 2;
             size = 4;
             shootCone = 24f;
-            shootSound = Sounds.shootBig;
+            shootSound = Sounds.shoot;
 
             health = 160 * size * size;
             consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
