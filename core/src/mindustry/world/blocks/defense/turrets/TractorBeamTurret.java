@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -102,7 +103,7 @@ public class TractorBeamTurret extends BaseTurret{
                 }
                 
                 if(status != StatusEffects.none){
-                    target.apply(status, statusDuration)
+                    target.apply(status, statusDuration);
                 }
 
                 //shoot when possible
