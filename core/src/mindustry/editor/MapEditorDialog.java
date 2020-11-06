@@ -693,8 +693,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
     private void rebuildBlockSelection(String searchText){
         blockSelection.clear();
 
-        Seq<Block> filteredBlocks = new Seq<>();
-
         blocksOut.clear();
         blocksOut.addAll(Vars.content.blocks());
         blocksOut.sort((b1, b2) -> {
@@ -714,10 +712,8 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             if(!Core.atlas.isFound(region) || !block.inEditor
                     || block.buildVisibility == BuildVisibility.debugOnly
-                    || (!block.localizedName.toLowerCase().contains(searchText.toLowerCase()) && !searchText.isEmpty())
+                    || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.toLowerCase()))
             ) continue;
-
-            filteredBlocks.add(block);
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
@@ -726,13 +722,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.update(() -> button.setChecked(editor.drawBlock == block));
             blockSelection.add(button).size(50f).tooltip(block.localizedName);
 
-            if(++i % 4 == 0) blockSelection.row();
+            if(i == 0) editor.drawBlock = block;
+
+            if(++i % 4 == 0){
+                blockSelection.row();
+            }
         }
 
-        if(filteredBlocks.isEmpty()){
+        if(i == 0){
             blockSelection.add("@none").padLeft(80f).padTop(10f);
-        }else{
-            editor.drawBlock = filteredBlocks.first();
         }
     }
 }
