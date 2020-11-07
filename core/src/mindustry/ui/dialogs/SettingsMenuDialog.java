@@ -203,10 +203,17 @@ public class SettingsMenuDialog extends SettingsDialog{
                     ui.showInfo("@crash.none");
                 }else{
                     platform.showFileChooser(false, "txt", file -> {
+                        Fi log = settings.getDataDirectory().child("last_log.txt");
+
                         StringBuilder out = new StringBuilder();
                         for(Fi fi : settings.getDataDirectory().child("crashes").list()){
                             out.append(fi.name()).append("\n\n").append(fi.readString()).append("\n");
                         }
+
+                        if(log.exists()){
+                            out.append("\nlast log:\n").append(log.readString());
+                        }
+
                         file.writeString(out.toString());
                         app.post(() -> ui.showInfo("@crash.exported"));
                     });
