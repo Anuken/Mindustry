@@ -67,9 +67,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.hasWeapons();
     }
 
+    public float speed(){
+        //limit speed to minimum formation speed to preserve formation
+        return isCommanding() ? minFormationSpeed * 0.98f : type.speed;
+    }
+
     /** @return speed with boost multipliers factored in. */
     public float realSpeed(){
-        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
+        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * speed();
     }
 
     /** Iterates through this unit and everything it is controlling. */
