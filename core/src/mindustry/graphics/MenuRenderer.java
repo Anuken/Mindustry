@@ -42,7 +42,7 @@ public class MenuRenderer implements Disposable{
     private void generate(){
         world.beginMapLoad();
         Tiles tiles = world.resize(width, height);
-        Seq<Block> ores = content.blocks().select(b -> b instanceof OreBlock);
+        Seq<Block> ores = content.blocks().select(OreBlock.class::isInstance);
         shadows = new FrameBuffer(width, height);
         int offset = Mathf.random(100000);
         Simplex s1 = new Simplex(offset);

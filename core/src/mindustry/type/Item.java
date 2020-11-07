@@ -53,6 +53,6 @@ public class Item extends UnlockableContent{
 
     /** Allocates a new array containing all items that generate ores. */
     public static Seq<Item> getAllOres(){
-        return content.blocks().select(b -> b instanceof OreBlock).map(b -> ((Floor)b).itemDrop);
+        return content.blocks().select(OreBlock.class::isInstance).map(b -> ((Floor)b).itemDrop);
     }
 }

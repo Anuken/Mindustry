@@ -256,8 +256,7 @@ public class Administration{
     public boolean unbanPlayerID(String id){
         PlayerInfo info = getCreateInfo(id);
 
-        if(!info.banned)
-            return false;
+        if(!info.banned) return false;
 
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
@@ -551,8 +550,8 @@ public class Administration{
             }
 
             return info != null || ips != null || whitelist != null || subnet != null;
-        }catch(Throwable e){
-            e.printStackTrace();
+        }catch(Throwable t){
+            Log.err(t);
         }
         return false;
     }

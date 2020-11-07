@@ -327,7 +327,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void drawTop(){
-
         //draw schematic selection
         if(mode == schematicSelect){
             drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);

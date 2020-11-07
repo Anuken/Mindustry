@@ -4,7 +4,7 @@ import arc.math.*;
 import arc.util.*;
 
 public enum LogicOp{
-    add("+", (a, b) -> a + b),
+    add("+", Double::sum),
     sub("-", (a, b) -> a - b),
     mul("*", (a, b) -> a * b),
     div("/", (a, b) -> a / b),
@@ -29,7 +29,7 @@ public enum LogicOp{
     noise("noise", LExecutor.noise::rawNoise2D),
 
     not("not", a -> ~(long)(a)),
-    abs("abs", a -> Math.abs(a)),
+    abs("abs", Math::abs),
     log("log", Math::log),
     log10("log10", Math::log10),
     sin("sin", d -> Math.sin(d * 0.017453292519943295D)),

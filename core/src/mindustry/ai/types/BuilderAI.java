@@ -71,7 +71,7 @@ public class BuilderAI extends AIController{
                 Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
                     if(found) return;
 
-                    if(u instanceof Builderc b && u != unit && ((Builderc)u).activelyBuilding()){
+                    if(u instanceof Builderc b && u != unit && b.activelyBuilding()){
                         BuildPlan plan = b.buildPlan();
 
                         Building build = world.build(plan.x, plan.y);
@@ -119,7 +119,7 @@ public class BuilderAI extends AIController{
     public boolean useFallback(){
         return state.rules.waves && unit.team == state.rules.waveTeam && !unit.team.rules().ai;
     }
-    
+
     @Override
     public boolean shouldShoot(){
         return !((Builderc)unit).isBuilding();

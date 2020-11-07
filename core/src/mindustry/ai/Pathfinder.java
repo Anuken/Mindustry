@@ -445,13 +445,12 @@ public class Pathfinder implements Runnable{
         public void getPositions(IntSeq out){
             out.add(Point2.pack(World.toTile(position.getX()), World.toTile(position.getY())));
         }
-
     }
 
     /**
      * Data for a flow field to some set of destinations.
      * Concrete subclasses must specify a way to fetch costs and destinations.
-     * */
+     */
     public static abstract class Flowfield{
         /** Refresh rate in milliseconds. Return any number <= 0 to disable. */
         protected int refreshRate;
