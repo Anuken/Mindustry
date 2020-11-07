@@ -73,6 +73,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     private transient boolean sleeping;
     private transient float sleepTime;
+    private transient float selfHealTime = 0f;
     private transient boolean initialized;
 
     /** Sets this tile entity data to this and adds it if necessary. */
@@ -1220,6 +1221,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             other.onProximityUpdate();
         }
     }
+    
+    public void selfHeal(){
+        selfHealTime += delta();
+                
+        if(damaged() && selfHealTime >= block.selfHealReload){
+            heal(maxHealth() * block.selfHealPercent / 100f * efficiency());
+            Fx.healBlockFull.at(x, y, block.size, block.selfHealColor);
+            selfHealTime = 0f;
+        }
+    }
 
     public void updateTile(){
 
@@ -1371,6 +1382,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(enabled || !block.noUpdateDisabled){
             updateTile();
+        }
+        
+        if(block.selfHealPercent > 0f && block.destructible){
+            selfHeal();
         }
 
         if(items != null){

@@ -56,6 +56,7 @@ public enum Stat{
     instructions(StatCat.crafting),
 
     speedIncrease(StatCat.function),
+    selfRepairTime(StatCat.function),
     repairTime(StatCat.function),
     range(StatCat.function),
     shootRange(StatCat.function),

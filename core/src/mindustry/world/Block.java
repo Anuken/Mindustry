@@ -104,6 +104,12 @@ public class Block extends UnlockableContent{
     public boolean useColor = true;
     /** tile entity health */
     public int health = -1;
+    /** percent self healing. -1 to disable */
+    public float selfHealPercent = -1f;
+    /** time between self healing */
+    public float selfHealReload = 60f;
+    /** flash this color when self healing */
+    public Color selfHealColor = Pal.heal;
     /** base block explosiveness */
     public float baseExplosiveness = 0f;
     /** whether this block can be placed on edges of liquids. */
@@ -342,6 +348,10 @@ public class Block extends UnlockableContent{
         //Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
         if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+        
+        if(selfHealPercent > 0 && destructible){
+            stats.add(Stat.selfRepairTime, 100f / selfHealPercent * selfHealReload / 60f, StatUnit.seconds);
+        }
     }
 
     public void setBars(){
