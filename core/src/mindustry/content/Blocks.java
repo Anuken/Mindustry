@@ -1755,10 +1755,10 @@ public class Blocks implements ContentList{
             shootSound = Sounds.shootBig;
             unitSort = (u, x, y) -> -u.maxHealth;
 
-            coolantMultiplier = 0.09f;
+            coolantMultiplier = 0.11f;
 
             health = 150 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
+            coolantUsage = 1f;
 
             consumes.powerCond(10f, TurretBuild::isActive);
         }};
@@ -1786,7 +1786,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.shootBig;
 
             health = 160 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
+            coolantUsage = 1f;
         }};
 
         meltdown = new LaserTurret("meltdown"){{
