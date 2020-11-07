@@ -612,7 +612,7 @@ public class DesktopInput extends InputHandler{
             baseSpeed = unit.minFormationSpeed * 0.95f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, unit.type.canBoost ? unit.type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = unit.realSpeed() * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
