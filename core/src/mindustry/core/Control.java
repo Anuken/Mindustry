@@ -186,7 +186,7 @@ public class Control implements ApplicationListener, Loadable{
                 if(state.isCampaign()){
                     ui.announce("[accent]" + state.rules.sector.name() + "\n" +
                         (state.rules.sector.info.resources.any() ? "[lightgray]" + bundle.get("sectors.resources") + "[white] " +
-                            state.rules.sector.info.resources.toString(" ", UnlockableContent::emoji) : ""), 5);
+                            state.rules.sector.info.resources.toString(" ", u -> u.emoji()) : ""), 5);
                 }
             });
         });
