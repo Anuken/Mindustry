@@ -463,7 +463,12 @@ public class LoadRenderer implements Disposable{
             Font font = assets.get("tech");
             font.setColor(Pal.accent);
             Draw.color(Color.black);
-            font.draw(red + "[[[[ " + key + " ]]\n"+orange+"<" + Version.modifier + " " + (Version.build == 0 ? " [init]" : Version.build == -1 ? " custom" : " " + Version.build) + ">", w/2f, h/2f + 110*s, Align.center);
+
+            String loading = red + "[[[[ " + key + " ]]";
+            String version = orange + "<" + Version.modifier + " " +
+                    (Version.build == 0 ? " [init]" : Version.build == -1 ? " custom" : " " + Version.build + (Version.revision > 0 ? Version.revision : "")) + ">";
+
+            font.draw(loading + "\n" + version, w / 2f, h / 2f + 110 * s, Align.center);
         }
 
         Draw.flush();
