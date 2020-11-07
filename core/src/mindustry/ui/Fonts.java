@@ -211,7 +211,10 @@ public class Fonts{
 
     public static TextureRegionDrawable getGlyph(Font font, char glyph){
         Glyph g = font.getData().getGlyph(glyph);
-        if(g == null) throw new IllegalArgumentException("No glyph: " + glyph + " (" + (int)glyph + ")");
+        if(g == null){
+            Log.err("No glyph: " + glyph + " (" + (int)glyph + ")");
+            return new TextureRegionDrawable(Core.atlas.find("whiteui"));
+        }
 
         float size = Math.max(g.width, g.height);
         TextureRegionDrawable draw = new TextureRegionDrawable(new TextureRegion(font.getRegion().texture, g.u, g.v2, g.u2, g.v)){
