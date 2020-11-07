@@ -55,15 +55,14 @@ public class Logic implements ApplicationListener{
             }
         });
 
-        Events.on(LaunchItemEvent.class, e -> state.secinfo.handleItemExport(e.stack));
-
         //when loading a 'damaged' sector, propagate the damage
         Events.on(SaveLoadEvent.class, e -> {
             if(state.isCampaign()){
-                state.secinfo.write();
+                SectorInfo info = state.rules.sector.info;
+                info.write();
 
                 //how much wave time has passed
-                int wavesPassed = state.secinfo.wavesPassed;
+                int wavesPassed = info.wavesPassed;
 
                 //wave has passed, remove all enemies, they are assumed to be dead
                 if(wavesPassed > 0){
@@ -84,10 +83,10 @@ public class Logic implements ApplicationListener{
                 }
 
                 //reset values
-                state.secinfo.damage = 0f;
-                state.secinfo.wavesPassed = 0;
-                state.secinfo.hasCore = true;
-                state.secinfo.secondsPassed = 0;
+                info.damage = 0f;
+                info.wavesPassed = 0;
+                info.hasCore = true;
+                info.secondsPassed = 0;
 
                 state.rules.sector.saveInfo();
             }
@@ -181,37 +180,21 @@ public class Logic implements ApplicationListener{
             //if there's a "win" wave and no enemies are present, win automatically
             if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
                 (state.rules.attackMode && state.rules.waveTeam.cores().isEmpty())){
-                //the sector has been conquered - waves get disabled
-                state.rules.waves = false;
-                //disable attack mode
-                state.rules.attackMode = false;
 
-                //fire capture event
-                Events.fire(new SectorCaptureEvent(state.rules.sector));
-
-                //save, just in case
-                if(!headless){
-                    control.saves.saveSector(state.rules.sector);
-                }
+                Call.sectorCapture();
             }
         }else{
             if(!state.rules.attackMode && state.teams.playerCores().size == 0 && !state.gameOver){
                 state.gameOver = true;
                 Events.fire(new GameOverEvent(state.rules.waveTeam));
             }else if(state.rules.attackMode){
-                Team alive = null;
+                //count # of teams alive
+                int countAlive = state.teams.getActive().count(TeamData::hasCore);
 
-                for(TeamData team : state.teams.getActive()){
-                    if(team.hasCore()){
-                        if(alive != null){
-                            return;
-                        }
-                        alive = team.team;
-                    }
-                }
-
-                if(alive != null && !state.gameOver){
-                    Events.fire(new GameOverEvent(alive));
+                if((countAlive <= 1 || (!state.rules.pvp && state.rules.defaultTeam.core() == null)) && !state.gameOver){
+                    //find team that won
+                    TeamData left = state.teams.getActive().find(TeamData::hasCore);
+                    Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
             }
@@ -234,6 +217,24 @@ public class Logic implements ApplicationListener{
         }
     }
 
+    @Remote(called = Loc.server)
+    public static void sectorCapture(){
+        //the sector has been conquered - waves get disabled
+        state.rules.waves = false;
+        //disable attack mode
+        state.rules.attackMode = false;
+
+        if(state.rules.sector == null) return;
+
+        //fire capture event
+        Events.fire(new SectorCaptureEvent(state.rules.sector));
+
+        //save, just in case
+        if(!headless){
+            control.saves.saveSector(state.rules.sector);
+        }
+    }
+
     @Remote(called = Loc.both)
     public static void updateGameOver(Team winner){
         state.gameOver = true;
@@ -252,7 +253,7 @@ public class Logic implements ApplicationListener{
         if(!(content instanceof UnlockableContent u)) return;
 
         state.rules.researched.add(u.name);
-        ui.hudfrag.showUnlock(u);
+        Events.fire(new UnlockEvent(u));
     }
 
     @Override
@@ -279,7 +280,7 @@ public class Logic implements ApplicationListener{
                 state.teams.updateTeamStats();
 
                 if(state.isCampaign()){
-                    state.secinfo.update();
+                    state.rules.sector.info.update();
                 }
 
                 if(state.isCampaign()){

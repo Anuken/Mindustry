@@ -23,7 +23,7 @@ public class BlockRenderer implements Disposable{
     public static final int crackRegions = 8, maxCrackSize = 9;
 
     private static final int initialRequests = 32 * 32;
-    private static final int expandr = 9;
+    private static final int expandr = 10;
     private static final Color shadowColor = new Color(0, 0, 0, 0.71f);
 
     public final FloorRenderer floor = new FloorRenderer();
@@ -293,7 +293,7 @@ public class BlockRenderer implements Disposable{
                     entity.drawLight();
                 }else if(tile.block().emitLight){
                     tile.block().drawEnvironmentLight(tile);
-                }else if(tile.floor().emitLight){
+                }else if(tile.floor().emitLight && !tile.block().solid && world.getDarkness(tile.x, tile.y) < 3){ //only draw floor light under non-solid blocks
                     tile.floor().drawEnvironmentLight(tile);
                 }
             }

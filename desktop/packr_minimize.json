@@ -32,7 +32,6 @@
         "sun/font",
         "sun/rmi",
         "sun/swing",
-        "java/util/stream",
         "com/sun/media",
         "sun/print",
         "sun/awt",

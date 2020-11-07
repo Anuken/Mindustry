@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.async.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -103,7 +104,7 @@ public class Pathfinder implements Runnable{
         boolean nearLiquid = false, nearSolid = false, nearGround = false;
 
         for(int i = 0; i < 4; i++){
-            Tile other = tile.getNearby(i);
+            Tile other = tile.nearby(i);
             if(other != null){
                 if(other.floor().isLiquid) nearLiquid = true;
                 if(other.solid()) nearSolid = true;
@@ -116,7 +117,7 @@ public class Pathfinder implements Runnable{
             tile.getTeamID(),
             tile.solid(),
             tile.floor().isLiquid,
-            tile.staticDarkness() >= 2,
+            tile.staticDarkness() >= 2 || (tile.floor().solid && tile.block() == Blocks.air),
             nearLiquid,
             nearGround,
             nearSolid,

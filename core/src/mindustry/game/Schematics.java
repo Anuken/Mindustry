@@ -33,6 +33,7 @@ import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.sandbox.*;
 import mindustry.world.blocks.storage.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -113,7 +114,7 @@ public class Schematics implements Loadable{
     }
 
     private void loadLoadouts(){
-        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s,false));
+        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s, false));
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){
@@ -280,7 +281,7 @@ public class Schematics implements Loadable{
     /** Creates an array of build requests from a schematic's data, centered on the provided x+y coordinates. */
     public Seq<BuildPlan> toRequests(Schematic schem, int x, int y){
         return schem.tiles.map(t -> new BuildPlan(t.x + x - schem.width/2, t.y + y - schem.height/2, t.rotation, t.block, t.config).original(t.x, t.y, schem.width, schem.height))
-            .removeAll(s -> !s.block.isVisible() || !s.block.unlockedNow());
+            .removeAll(s -> (!s.block.isVisible() && !(s.block instanceof CoreBlock)) || !s.block.unlockedNow());
     }
 
     /** @return all the valid loadouts for a specific core type. */
@@ -288,12 +289,18 @@ public class Schematics implements Loadable{
         return loadouts.get(block, Seq::new);
     }
 
+    public ObjectMap<CoreBlock, Seq<Schematic>> getLoadouts(){
+        return loadouts;
+    }
+
     /** Checks a schematic for deployment validity and adds it to the cache. */
     private void checkLoadout(Schematic s, boolean validate){
         Stile core = s.tiles.find(t -> t.block instanceof CoreBlock);
+        int cores = s.tiles.count(t -> t.block instanceof CoreBlock);
 
         //make sure a core exists, and that the schematic is small enough.
-        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2))) return;
+        if(core == null || (validate && (s.width > core.block.size + maxLoadoutSchematicPad *2 || s.height > core.block.size + maxLoadoutSchematicPad *2
+            || s.tiles.contains(t -> t.block.buildVisibility == BuildVisibility.sandboxOnly || !t.block.unlocked()) || cores > 1))) return;
 
         //place in the cache
         loadouts.get((CoreBlock)core.block, Seq::new).add(s);
@@ -347,7 +354,7 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
 
-                if(linked != null && linked.block.isVisible() && !(linked.block instanceof ConstructBlock)){
+                if(linked != null && (linked.block.isVisible() || linked.block() instanceof CoreBlock) && !(linked.block instanceof ConstructBlock)){
                     int top = linked.block.size/2;
                     int bot = linked.block.size % 2 == 1 ? -linked.block.size/2 : -(linked.block.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
@@ -376,7 +383,7 @@ public class Schematics implements Loadable{
                 Building tile = world.build(cx, cy);
 
                 if(tile != null && !counted.contains(tile.pos()) && !(tile.block instanceof ConstructBlock)
-                    && (tile.block.isVisible() || (tile.block instanceof CoreBlock))){
+                    && (tile.block.isVisible() || tile.block instanceof CoreBlock)){
                     Object config = tile.config();
 
                     tiles.add(new Stile(tile.block, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte)tile.rotation));
@@ -411,12 +418,26 @@ public class Schematics implements Loadable{
     }
 
     public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource){
+        placeLoadout(schem, x, y, team, resource, true);
+    }
+
+    public static void placeLoadout(Schematic schem, int x, int y, Team team, Block resource, boolean check){
         Stile coreTile = schem.tiles.find(s -> s.block instanceof CoreBlock);
+        Seq<Tile> seq = new Seq<>();
         if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.each(st -> {
             Tile tile = world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
+
+            //check for blocks that are in the way.
+            if(check && !(st.block instanceof CoreBlock)){
+                seq.clear();
+                tile.getLinkedTilesAs(st.block, seq);
+                if(seq.contains(t -> !t.block().alwaysReplace && !t.synthetic())){
+                    return;
+                }
+            }
 
             tile.setBlock(st.block, team, st.rotation);
 

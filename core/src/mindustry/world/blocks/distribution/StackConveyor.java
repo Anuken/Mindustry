@@ -53,21 +53,21 @@ public class StackConveyor extends Block implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
     }
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(tile.build instanceof StackConveyorBuild){
-            int state = ((StackConveyorBuild)tile.build).state;
+        if(tile.build instanceof StackConveyorBuild b){
+            int state = b.state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
             }else if(state == stateUnload){ //router mode
                 return otherblock.acceptsItems &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorBuild && ((StackConveyorBuild)world.build(otherx, othery)).state == stateUnload) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorBuild && ((StackConveyorBuild)world.build(otherx, othery)).state == stateMove &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild s && s.state == stateUnload) &&
+                    !(world.build(otherx, othery) instanceof StackConveyorBuild s2 && s2.state == stateMove &&
                         !facing(otherx, othery, otherrot, tile.x, tile.y));
             }
         }
@@ -156,11 +156,13 @@ public class StackConveyor extends Block implements Autotiler{
             if(bits[0] == 0 &&  blends(tile, rotation, 0) && !blends(tile, rotation, 2)) state = stateLoad;  // a 0 that faces into a conveyor with none behind it
             if(bits[0] == 0 && !blends(tile, rotation, 0) && blends(tile, rotation, 2)) state = stateUnload; // a 0 that faces into none with a conveyor behind it
 
-            blendprox = 0;
+            if(!headless){
+                blendprox = 0;
 
-            for(int i = 0; i < 4; i++){
-                if(blends(tile, rotation, i)){
-                    blendprox |= (1 << i);
+                for(int i = 0; i < 4; i++){
+                    if(blends(tile, rotation, i)){
+                        blendprox |= (1 << i);
+                    }
                 }
             }
 

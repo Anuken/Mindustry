@@ -464,7 +464,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      */
     public boolean movePayload(Payload todump){
         int trns = block.size/2 + 1;
-        Tile next = tile.getNearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
+        Tile next = tile.nearby(Geometry.d4(rotation).x * trns, Geometry.d4(rotation).y * trns);
 
         if(next != null && next.build != null && next.build.team == team && next.build.acceptPayload(self(), todump)){
             next.build.handlePayload(self(), todump);
@@ -547,7 +547,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public float moveLiquidForward(boolean leaks, Liquid liquid){
-        Tile next = tile.getNearby(rotation);
+        Tile next = tile.nearby(rotation);
 
         if(next == null) return 0;
 
@@ -869,7 +869,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void placed(){
         if(net.client()) return;
 
-        if((block.consumesPower && !block.outputsPower) || (!block.consumesPower && block.outputsPower)){
+        if(block.consumesPower || block.outputsPower){
             int range = 10;
             tempTiles.clear();
             Geometry.circle(tileX(), tileY(), range, (x, y) -> {
@@ -911,7 +911,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Called when arbitrary configuration is applied to a tile. */
     public void configured(@Nullable Unit builder, @Nullable Object value){
         //null is of type void.class; anonymous classes use their superclass.
-        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() ? value.getClass().getSuperclass() : value.getClass();
+        Class<?> type = value == null ? void.class : value.getClass().isAnonymousClass() || value.getClass().getSimpleName().startsWith("adapter") ? value.getClass().getSuperclass() : value.getClass();
 
         if(builder != null && builder.isPlayer()){
             lastAccessed = builder.getPlayer().name;
@@ -1277,8 +1277,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case totalItems -> items == null ? 0 : items.total();
             case totalLiquids -> liquids == null ? 0 : liquids.total();
             case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-            case itemCapacity -> block.itemCapacity;
-            case liquidCapacity -> block.liquidCapacity;
+            case itemCapacity -> block.hasItems ? block.itemCapacity : 0;
+            case liquidCapacity -> block.hasLiquids ? block.liquidCapacity : 0;
             case powerCapacity -> block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
             case powerNetIn -> power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
             case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
@@ -1319,7 +1319,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public void control(LAccess type, Object p1, double p2, double p3, double p4){
-
+        //don't execute configure instructions as the client
+        if(type == LAccess.configure && block.logicConfigurable && !net.client()){
+            //change config only if it's new
+            Object prev = senseObject(LAccess.config);
+            if(prev != p1){
+                configureAny(p1);
+            }
+        }
     }
 
     @Override

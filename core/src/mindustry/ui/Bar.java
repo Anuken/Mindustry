@@ -62,7 +62,13 @@ public class Bar extends Element{
     public void draw(){
         if(fraction == null) return;
 
-        float computed = Mathf.clamp(fraction.get());
+        float computed;
+        try{
+            computed = Mathf.clamp(fraction.get());
+        }catch(Exception e){ //getting the fraction may involve referring to invalid data
+            computed = 0f;
+        }
+
         if(lastValue > computed){
             blink = 1f;
             lastValue = computed;

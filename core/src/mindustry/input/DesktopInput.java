@@ -279,7 +279,7 @@ public class DesktopInput extends InputHandler{
 
             if(isPlacing() && mode == placing){
                 updateLine(selectX, selectY);
-            }else if(!selectRequests.isEmpty()){
+            }else if(!selectRequests.isEmpty() && !ui.chatfrag.shown()){
                 rotateRequests(selectRequests, Mathf.sign(Core.input.axisTap(Binding.rotate)));
             }
         }
@@ -345,6 +345,10 @@ public class DesktopInput extends InputHandler{
             ui.schematics.show();
         }).tooltip("@schematics");
 
+        table.button(Icon.book, Styles.clearPartiali, () -> {
+            ui.database.show();
+        }).tooltip("@database");
+
         table.button(Icon.tree, Styles.clearPartiali, () -> {
             ui.research.show();
         }).visible(() -> state.isCampaign()).tooltip("@research");
@@ -352,10 +356,6 @@ public class DesktopInput extends InputHandler{
         table.button(Icon.map, Styles.clearPartiali, () -> {
             ui.planet.show();
         }).visible(() -> state.isCampaign()).tooltip("@planetmap");
-
-        table.button(Icon.up, Styles.clearPartiali, () -> {
-            ui.planet.showLaunch(state.getSector(), player.team().core());
-        }).visible(() -> state.isCampaign()).tooltip("@launchcore").disabled(b -> player.team().core() == null);
     }
 
     void pollInput(){
@@ -612,7 +612,7 @@ public class DesktopInput extends InputHandler{
             baseSpeed = unit.minFormationSpeed * 0.95f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : unit.type.canBoost ? unit.type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = unit.realSpeed() * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
@@ -661,8 +661,8 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        //update commander inut
-        if(Core.input.keyTap(Binding.command)){
+        //update commander unit
+        if(Core.input.keyTap(Binding.command) && unit.type.commandLimit > 0){
             Call.unitCommand(player);
         }
     }

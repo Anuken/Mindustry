@@ -185,7 +185,7 @@ public class TypeIO{
             return unit == null ? Nulls.unit : unit;
         }else if(type == 1){ //block
             Building tile = world.build(id);
-            return tile instanceof ControlBlock ? ((ControlBlock)tile).unit() : Nulls.unit;
+            return tile instanceof ControlBlock cont ? cont.unit() : Nulls.unit;
         }
         return Nulls.unit;
     }
@@ -333,7 +333,7 @@ public class TypeIO{
             //1: prev controller was not a player, carry on
             //2: prev controller was a player, so replace this controller with *anything else*
             //...since AI doesn't update clientside it doesn't matter
-            return (!(prev instanceof AIController) || (prev instanceof FormationAI)) ? new GroundAI() : prev;
+            return (!(prev instanceof AIController) || (prev instanceof FormationAI) || (prev instanceof LogicAI)) ? new GroundAI() : prev;
         }
     }
 

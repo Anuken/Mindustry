@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -8,6 +9,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -52,12 +54,14 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(Vars.net.client()){
             Vars.netClient.clearRemovedEntity(unit.id);
         }
+        Events.fire(new PickupEvent(self(), unit));
     }
 
     void pickup(Building tile){
         tile.tile.remove();
         payloads.add(new BuildPayload(tile));
         Fx.unitPickup.at(tile);
+        Events.fire(new PickupEvent(self(), tile));
     }
 
     boolean dropLastPayload(){

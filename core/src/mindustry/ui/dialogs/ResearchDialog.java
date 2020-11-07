@@ -509,8 +509,7 @@ public class ResearchDialog extends BaseDialog{
                                         if(shine != null) shiny |= shine[i];
                                     }
 
-                                    int percent = (int)(used / sum * 100);
-                                    Label label = t.add(Core.bundle.format("research.progress", percent)).left().get();
+                                    Label label = t.add(Core.bundle.format("research.progress", Math.min((int)(used / sum * 100), 99))).left().get();
 
                                     if(shiny){
                                         label.setColor(Pal.accent);

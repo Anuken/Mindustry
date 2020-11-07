@@ -24,6 +24,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
@@ -204,7 +205,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             boolean arrow = block != null && block.rotate;
 
             i.getImage().setRotationOrigin(!arrow ? 0 : rotation * 90, Align.center);
-            i.getStyle().imageUp = arrow ? Icon.right : Icon.paste;
+            i.getStyle().imageUp = arrow ? Icon.right : Icon.copy;
             i.setChecked(!arrow && schematicMode);
         });
 
@@ -612,7 +613,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //reset payload target
                 payloadTarget = null;
                 //apply command on double tap when own unit is tapped
-                if(Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f)){
+                if(!player.dead() && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f) && player.unit().type.commandLimit > 0){
                     Call.unitCommand(player);
                 }else{
                     //control a unit/block
@@ -864,7 +865,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             baseSpeed = unit.minFormationSpeed * 0.98f;
         }
 
-        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = unit.realSpeed() * strafePenalty;
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
@@ -936,7 +937,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
             }else if(target == null){
                 player.shooting = false;
-                if(Core.settings.getBool("autotarget")){
+                if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
                     target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.team != Team.derelict, u -> u.team != Team.derelict);
 
                     if(allowHealing && target == null){
@@ -947,7 +948,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
                 }
 
-                unit.aim(Tmp.v1.trns(unit.rotation, 1000f).add(unit));
+                //when not shooting, aim at mouse cursor
+                //this may be a bad idea, aiming for a point far in front could work better, test it out
+                unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
             }else{
                 Vec2 intercept = Predict.intercept(unit, target, bulletSpeed);
 

@@ -2,6 +2,8 @@ package mindustry.io.legacy;
 
 import arc.*;
 import arc.struct.*;
+import mindustry.*;
+import mindustry.ctype.*;
 import mindustry.ui.dialogs.JoinDialog.*;
 
 import java.io.*;
@@ -46,6 +48,37 @@ public class LegacyIO{
             e.printStackTrace();
         }
         return arr;
+    }
+
+    public static void readResearch(){
+        try{
+            byte[] bytes = Core.settings.getBytes("unlocks");
+            DataInputStream stream = new DataInputStream(new ByteArrayInputStream(bytes));
+
+            int length = stream.readInt();
+            if(length > 0){
+                stream.readUTF(); //name of key type
+                stream.readUTF(); //name of value type
+
+                //each element is an array list
+                for(int i = 0; i < length; i++){
+                    ContentType type = ContentType.all[stream.readInt()];
+                    int arrLength = stream.readInt();
+                    if(arrLength > 0){
+                        stream.readUTF(); //type of contents (String)
+                        for(int j = 0; j < arrLength; j++){
+                            String name = stream.readUTF();
+                            Content out = Vars.content.getByName(type, name);
+                            if(out instanceof UnlockableContent u){
+                                u.quietUnlock();
+                            }
+                        }
+                    }
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

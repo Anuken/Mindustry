@@ -42,7 +42,7 @@ public class ConstructBlock extends Block{
         consBlocks[size - 1] = this;
     }
 
-    /** Returns a BuildBlock by size. */
+    /** Returns a ConstructBlock by size. */
     public static ConstructBlock get(int size){
         if(size > maxSize) throw new IllegalArgumentException("No. Don't place ConstructBlock of size greater than " + maxSize);
         return consBlocks[size - 1];
@@ -88,6 +88,7 @@ public class ConstructBlock extends Block{
         }
 
         Fx.placeBlock.at(tile.drawx(), tile.drawy(), block.size);
+        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
     static boolean shouldPlay(){
@@ -121,7 +122,6 @@ public class ConstructBlock extends Block{
         }
 
         Events.fire(new BlockBuildEndEvent(tile, builder, team, false, config));
-        if(shouldPlay()) Sounds.place.at(tile, calcPitch(true));
     }
 
     @Override

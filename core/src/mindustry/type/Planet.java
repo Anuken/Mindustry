@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -19,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 8f;
+    private static final float orbitSpacing = 9f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -257,11 +256,6 @@ public class Planet extends UnlockableContent{
     @Override
     public boolean isHidden(){
         return true;
-    }
-
-    @Override
-    public void displayInfo(Table table){
-
     }
 
     @Override

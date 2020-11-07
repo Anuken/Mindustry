@@ -200,8 +200,8 @@ public class World{
 
         for(Tile tile : tiles){
             //remove legacy blocks; they need to stop existing
-            if(tile.block() instanceof LegacyBlock){
-                tile.remove();
+            if(tile.block() instanceof LegacyBlock l){
+                l.removeSelf(tile);
                 continue;
             }
 
@@ -310,7 +310,7 @@ public class World{
 
         //TODO bad code
         boolean hasSnow = floors[0].name.contains("ice") || floors[0].name.contains("snow");
-        boolean hasRain = !hasSnow && floors[0].name.contains("water");
+        boolean hasRain = !hasSnow && content.contains(Liquids.water) && !floors[0].name.contains("sand");
         boolean hasDesert = !hasSnow && !hasRain && floors[0].name.contains("sand");
         boolean hasSpores = floors[0].name.contains("spore") || floors[0].name.contains("moss") || floors[0].name.contains("tainted");
 
@@ -320,6 +320,7 @@ public class World{
 
         if(hasRain){
             state.rules.weather.add(new WeatherEntry(Weathers.rain));
+            state.rules.weather.add(new WeatherEntry(Weathers.fog));
         }
 
         if(hasDesert){

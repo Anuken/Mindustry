@@ -46,13 +46,17 @@ public class Unloader extends Block{
     public class UnloaderBuild extends Building{
         public Item sortItem = null;
         public Building dumpingTo;
+        public int offset = 0;
 
         @Override
         public void updateTile(){
             if(timer(timerUnload, speed / timeScale())){
-                for(Building other : proximity){
+                for(int i = 0; i < proximity.size; i++){
+                    int pos = (offset + i) % proximity.size;
+                    var other = proximity.get(pos);
+
                     if(other.interactable(team) && other.block.unloadable && other.block.hasItems
-                        && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
+                    && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
                         //make sure the item can't be dumped back into this block
                         dumpingTo = other;
 
@@ -69,6 +73,11 @@ public class Unloader extends Block{
                             other.itemTaken(item);
                         }
                     }
+                }
+
+                if(proximity.size > 0){
+                    offset ++;
+                    offset %= proximity.size;
                 }
             }
         }

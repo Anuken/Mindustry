@@ -26,7 +26,7 @@ public class EditorTile extends Tile{
 
         if(type instanceof OverlayFloor){
             //don't place on liquids
-            if(floor.hasSurface()){
+            if(floor.hasSurface() || !type.needsSurface){
                 setOverlayID(type.id);
             }
             return;
@@ -50,9 +50,19 @@ public class EditorTile extends Tile{
             return;
         }
 
-        op(OpType.block, block.id);
-        if(rotation != 0) op(OpType.rotation, (byte)rotation);
-        if(team != Team.derelict) op(OpType.team, (byte)team.id);
+        if(!isCenter()){
+            EditorTile cen = (EditorTile)build.tile;
+            cen.op(OpType.rotation, (byte)build.rotation);
+            cen.op(OpType.team, (byte)build.team.id);
+            cen.op(OpType.block, block.id);
+            update();
+        }else{
+            if(build != null) op(OpType.rotation, (byte)build.rotation);
+            if(build != null) op(OpType.team, (byte)build.team.id);
+            op(OpType.block, block.id);
+
+        }
+
         super.setBlock(type, team, rotation);
     }
 
@@ -75,7 +85,7 @@ public class EditorTile extends Tile{
             return;
         }
 
-        if(floor.isLiquid) return;
+        if(!floor.hasSurface() && overlay.asFloor().needsSurface) return;
         if(overlay() == overlay) return;
         op(OpType.overlay, this.overlay.id);
         super.setOverlay(overlay);
@@ -105,9 +115,9 @@ public class EditorTile extends Tile{
     }
 
     @Override
-    protected void changeEntity(Team team, Prov<Building> entityprov, int rotation){
+    protected void changeBuild(Team team, Prov<Building> entityprov, int rotation){
         if(skip()){
-            super.changeEntity(team, entityprov, rotation);
+            super.changeBuild(team, entityprov, rotation);
             return;
         }
 

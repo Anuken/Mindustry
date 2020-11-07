@@ -277,7 +277,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             //hotrock tweaks
             if(floor == Blocks.hotrock){
-                if(rand.chance(0.3)){
+                if(Math.abs(0.5f - noise(x - 90, y, 4, 0.8, 80)) > 0.035){
                     floor = Blocks.basalt;
                 }else{
                     ore = Blocks.air;
@@ -414,13 +414,13 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             state.rules.attackMode = sector.info.attack = true;
         }else{
-            state.rules.winWave = sector.info.winWave = 15 * (int)Math.max(difficulty * 10, 1);
+            state.rules.winWave = sector.info.winWave = 10 + 5 * (int)Math.max(difficulty * 10, 1);
         }
 
         state.rules.waves = sector.info.waves = true;
 
         //TODO better waves
-        state.rules.spawns = DefaultWaves.generate(difficulty);
+        state.rules.spawns = Waves.generate(difficulty);
     }
 
     @Override

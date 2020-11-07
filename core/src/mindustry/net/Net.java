@@ -57,7 +57,7 @@ public class Net{
                 t = t.getCause();
             }
 
-            String baseError = Strings.getFinalMesage(e);
+            String baseError = Strings.getFinalMessage(e);
 
             String error = baseError == null ? "" : baseError.toLowerCase();
             String type = t.getClass().toString().toLowerCase();

@@ -12,13 +12,13 @@ import mindustry.world.meta.*;
 public class PowerGenerator extends PowerDistributor{
     /** The amount of power produced per tick in case of an efficiency of 1.0, which represents 100%. */
     public float powerProduction;
-    public BlockStat generationType = BlockStat.basePowerGeneration;
+    public Stat generationType = Stat.basePowerGeneration;
 
     public PowerGenerator(String name){
         super(name);
         sync = true;
         baseExplosiveness = 5f;
-        flags = EnumSet.of(BlockFlag.producer);
+        flags = EnumSet.of(BlockFlag.generator);
     }
 
     @Override

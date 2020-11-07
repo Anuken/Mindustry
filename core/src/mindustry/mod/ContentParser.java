@@ -7,6 +7,7 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
@@ -19,6 +20,7 @@ import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -41,7 +43,17 @@ public class ContentParser{
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
-        put(Effect.class, (type, data) -> field(Fx.class, data));
+        put(Effect.class, (type, data) -> {
+            if(data.isString()){
+                return field(Fx.class, data);
+            }
+            Class<? extends Effect> bc = data.has("type") ? resolve(data.getString("type"), "mindustry.entities.effect") : ParticleEffect.class;
+            data.remove("type");
+            Effect result = make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(Interp.class, (type, data) -> field(Interp.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
             if(result != null){
@@ -190,6 +202,7 @@ public class ContentParser{
                     "mindustry.world.blocks.defense",
                     "mindustry.world.blocks.defense.turrets",
                     "mindustry.world.blocks.distribution",
+                    "mindustry.world.blocks.environment",
                     "mindustry.world.blocks.liquid",
                     "mindustry.world.blocks.logic",
                     "mindustry.world.blocks.power",
@@ -294,13 +307,27 @@ public class ContentParser{
                         group.type = unit;
                     }
 
-                    Vars.defaultWaves.get().addAll(groups);
+                    Vars.waves.get().addAll(groups);
                 }
 
                 readFields(unit, value, true);
             });
 
             return unit;
+        },
+        ContentType.weather, (TypeParser<Weather>)(mod, name, value) -> {
+            Weather item;
+            if(locate(ContentType.weather, name) != null){
+                item = locate(ContentType.weather, name);
+                readBundle(ContentType.weather, name, value);
+            }else{
+                readBundle(ContentType.weather, name, value);
+                Class<? extends Weather> type = resolve(getType(value), "mindustry.type.weather");
+                item = make(type);
+            }
+            currentContent = item;
+            read(() -> readFields(item, value));
+            return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, parser(ContentType.liquid, Liquid::new)
@@ -554,7 +581,9 @@ public class ContentParser{
                 if(field.field.getType().isPrimitive()) return;
 
                 if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null && !implicitNullable.contains(field.field.getType())){
-                    throw new RuntimeException("'" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
+                    throw new RuntimeException("'" + field.field.getName() + "' in " +
+                        ((object.getClass().isAnonymousClass() ? object.getClass().getSuperclass() : object.getClass()).getSimpleName()) +
+                        " is missing! Object = " + object + ", field = (" + field.field.getName() + " = " + field.field.get(object) + ")");
                 }
             }catch(Exception e){
                 throw new RuntimeException(e);

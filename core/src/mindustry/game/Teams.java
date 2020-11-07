@@ -261,11 +261,12 @@ public class Teams{
         }
 
         public void updateCount(UnitType type, int amount){
+            if(type == null) return;
             unitCount = Math.max(amount + unitCount, 0);
             if(typeCounts == null || typeCounts.length <= type.id){
                 typeCounts  = new int[Vars.content.units().size];
             }
-            typeCounts [type.id] = Math.max(amount + typeCounts [type.id], 0);
+            typeCounts[type.id] = Math.max(amount + typeCounts[type.id], 0);
         }
 
         public QuadTree<Unit> tree(){

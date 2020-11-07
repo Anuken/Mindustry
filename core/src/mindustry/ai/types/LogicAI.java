@@ -14,7 +14,7 @@ import static mindustry.Vars.*;
 
 public class LogicAI extends AIController{
     /** Minimum delay between item transfers. */
-    public static final float transferDelay = 60f * 3f;
+    public static final float transferDelay = 60f * 2f;
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
     public static final float logicControlTimeout = 10f * 60f;
 
@@ -44,8 +44,8 @@ public class LogicAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(itemTimer > 0) itemTimer -= Time.delta;
-        if(payTimer > 0) payTimer -= Time.delta;
+        if(itemTimer >= 0) itemTimer -= Time.delta;
+        if(payTimer >= 0) payTimer -= Time.delta;
 
         if(targetTimer > 0f){
             targetTimer -= Time.delta;

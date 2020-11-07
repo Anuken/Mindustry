@@ -122,7 +122,7 @@ public class PlacementFragment extends Fragment{
 
         for(int i = 0; i < blockSelect.length; i++){
             if(Core.input.keyTap(blockSelect[i])){
-                if(i > 9) { //select block directionally
+                if(i > 9){ //select block directionally
                     Seq<Block> blocks = getUnlockedByCategory(currentCategory);
                     Block currentBlock = getSelectedBlock(currentCategory);
                     for(int j = 0; j < blocks.size; j++){
@@ -342,7 +342,7 @@ public class PlacementFragment extends Fragment{
                                 topTable.row();
                                 topTable.table(b -> {
                                     b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : displayBlock.unplaceableMessage()).width(190f).wrap();
+                                    b.add(!player.isBuilder() ? "@unit.nobuild" : "@banned").width(190f).wrap();
                                     b.left();
                                 }).padTop(2).left();
                             }
