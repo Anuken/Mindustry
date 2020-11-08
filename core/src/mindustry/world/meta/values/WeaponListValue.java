@@ -30,15 +30,17 @@ public class WeaponListValue implements StatValue{
     @Override
     public void display(Table table){
         table.row();
-        for(Weapon weapon : weapons){
+        for(int i = 0;i < weapons.size;i ++){
+            Weapon weapon = weapons.get(i);
+
             if(weapon.flipSprite){
                 continue;
             }
 
             if(weapon.outlineRegion.found()){
-                table.image(weapon.outlineRegion).size(10 * 8).right().top();
+                table.image(Core.atlas.find(unit.name + "-weapon" + i)).size(15 * 8).right().top();
             }else{
-                table.image(unit.icon(Cicon.full)).size(10 * 8).right().top();
+                table.image(unit.icon(Cicon.full)).size(15 * 8).right().top();
             }
 
             table.table(Tex.underline, w -> {

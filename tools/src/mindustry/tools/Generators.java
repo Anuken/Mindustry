@@ -505,6 +505,32 @@ public class Generators{
                     }
                 }
 
+                //generate weapon stat UI
+                //TODO: optimize
+                Image base = new Image(image.width, image.height);
+
+                image.each((x, y) -> {
+                    Color c = image.getColor(x, y);
+                    base.draw(x, y, c.set(c.r, c.g, c.b, c.a * 0.2f));
+                });
+
+                for(int i = 0;i < type.weapons.size;i ++){
+                    Weapon weapon = type.weapons.get(i);
+
+                    if(weapon.flipSprite){
+                        continue;
+                    }
+
+                    weapon.load();
+                    Image finalBase = base.copy();
+
+                    finalBase.draw(outline.get(ImagePacker.get(weapon.region)),
+                    (int)(weapon.x / Draw.scl + base.width / 2f - weapon.region.width / 2f),
+                    (int)(-weapon.y / Draw.scl + base.height / 2f - weapon.region.height / 2f),
+                    weapon.flipSprite, false);
+
+                    finalBase.save(type.name + "-weapon" + i);
+                }
             }catch(IllegalArgumentException e){
                 Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
             }
