@@ -604,13 +604,6 @@ public class DesktopInput extends InputHandler{
         boolean ground = unit.isGrounded();
 
         float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type.strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
-        float baseSpeed = unit.type.speed;
-
-        //limit speed to minimum formation speed to preserve formation
-        if(unit.isCommanding()){
-            //add a tiny multiplier to let units catch up just in case
-            baseSpeed = unit.minFormationSpeed * 0.95f;
-        }
 
         float speed = unit.realSpeed() * strafePenalty;
         float xa = Core.input.axis(Binding.move_x);
