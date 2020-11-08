@@ -33,7 +33,7 @@ import static mindustry.Vars.*;
 abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged{
 
     @Import boolean hovering, dead;
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed;
     @Import Team team;
     @Import int id;
 
@@ -69,7 +69,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public float speed(){
         //limit speed to minimum formation speed to preserve formation
-        return isCommanding() ? ((Commanderc)this).minFormationSpeed * 0.98f : type.speed;
+        return isCommanding() ? minFormationSpeed * 0.98f : type.speed;
     }
 
     /** @return speed with boost multipliers factored in. */
