@@ -207,7 +207,7 @@ public abstract class BulletType extends Content{
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
 
-        if(splashDamageRadius > 0){
+        if(splashDamageRadius > 0 && !b.absorbed){
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
             if(status != StatusEffects.none){

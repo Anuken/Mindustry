@@ -1163,6 +1163,9 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 25, Items.lead, 15));
             powerProduction = 1f;
             itemDuration = 120f;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.03f;
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
@@ -1171,6 +1174,8 @@ public class Blocks implements ContentList{
             generateEffect = Fx.redgeneratespark;
             size = 2;
             floating = true;
+            ambientSound = Sounds.hum;
+            ambientSoundVolume = 0.04f;
         }};
 
         steamGenerator = new BurnerGenerator("steam-generator"){{
@@ -1180,6 +1185,9 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.1f);
             hasLiquids = true;
             size = 2;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.05f;
         }};
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
@@ -1216,6 +1224,8 @@ public class Blocks implements ContentList{
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             requirements(Category.power, with(Items.lead, 300, Items.silicon, 200, Items.graphite, 150, Items.thorium, 150, Items.metaglass, 50));
+            ambientSound = Sounds.hum;
+            ambientSoundVolume = 0.16f;
             size = 3;
             health = 700;
             itemDuration = 360f;
@@ -1231,6 +1241,9 @@ public class Blocks implements ContentList{
             health = 900;
             powerProduction = 130f;
             itemDuration = 140f;
+            ambientSound = Sounds.pulse;
+            ambientSoundVolume = 0.2f;
+
             consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.25f);
@@ -1491,7 +1504,6 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
-            shootSound = Sounds.splash;
         }};
 
         lancer = new ChargeTurret("lancer"){{
@@ -1639,7 +1651,6 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 190f;
             health = 250 * size * size;
-            shootSound = Sounds.splash;
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -1759,7 +1770,7 @@ public class Blocks implements ContentList{
             shots = 1;
             size = 4;
             shootCone = 2f;
-            shootSound = Sounds.shootBig;
+            shootSound = Sounds.railgun;
             unitSort = (u, x, y) -> -u.maxHealth;
 
             coolantMultiplier = 0.11f;

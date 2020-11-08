@@ -231,7 +231,7 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return false; // has no moving parts;
         }
 

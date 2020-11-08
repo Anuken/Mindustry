@@ -287,6 +287,8 @@ public class UnitTypes implements ContentList{
                 alternate = false;
                 ejectEffect = Fx.none;
                 recoil = 2f;
+                shootSound = Sounds.lasershoot;
+
                 bullet = new LaserBoltBulletType(5.2f, 14){{
                     healPercent = 5f;
                     collidesTeam = true;
@@ -328,7 +330,7 @@ public class UnitTypes implements ContentList{
                 spacing = 0f;
                 ejectEffect = Fx.none;
                 recoil = 2.5f;
-                shootSound = Sounds.pew;
+                shootSound = Sounds.spark;
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
@@ -636,7 +638,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 rotate = true;
-                shootSound = Sounds.flame;
+                shootSound = Sounds.sap;
 
                 x = 8.5f;
                 y = -1.5f;
@@ -659,6 +661,7 @@ public class UnitTypes implements ContentList{
                 rotate = true;
                 x = 4f;
                 y = 3f;
+                shootSound = Sounds.sap;
 
                 bullet = new SapBulletType(){{
                     sapStrength = 0.8f;
@@ -723,6 +726,7 @@ public class UnitTypes implements ContentList{
                 y = 8f;
                 rotate = true;
                 bullet = sapper;
+                shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
                 reload = 15f;
@@ -730,6 +734,7 @@ public class UnitTypes implements ContentList{
                 y = 6f;
                 rotate = true;
                 bullet = sapper;
+                shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
                 reload = 23f;
@@ -737,6 +742,7 @@ public class UnitTypes implements ContentList{
                 y = 0f;
                 rotate = true;
                 bullet = sapper;
+                shootSound = Sounds.sap;
             }},
             new Weapon("large-purple-mount"){{
                 y = -7f;
@@ -746,7 +752,7 @@ public class UnitTypes implements ContentList{
                 shake = 3f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.artillery;
                 rotate = true;
                 occlusion = 8f;
                 recoil = 3f;
@@ -844,7 +850,7 @@ public class UnitTypes implements ContentList{
                 recoil = 10f;
                 rotateSpeed = 1f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.artillery;
                 rotate = true;
                 occlusion = 30f;
 
@@ -1663,6 +1669,7 @@ public class UnitTypes implements ContentList{
                 shake = 6f;
                 recoil = 10.5f;
                 occlusion = 50f;
+                shootSound = Sounds.railgun;
 
                 shots = 1;
                 ejectEffect = Fx.none;

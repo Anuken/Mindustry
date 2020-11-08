@@ -161,7 +161,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return clogHeat <= 0.5f;
         }
 

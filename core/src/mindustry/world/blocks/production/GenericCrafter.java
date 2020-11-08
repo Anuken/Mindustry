@@ -136,7 +136,7 @@ public class GenericCrafter extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return cons.valid();
         }
 

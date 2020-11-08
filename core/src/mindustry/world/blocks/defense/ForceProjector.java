@@ -110,7 +110,7 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return !broken && realRadius() > 1f;
         }
 

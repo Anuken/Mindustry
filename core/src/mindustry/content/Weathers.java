@@ -24,6 +24,12 @@ public class Weathers implements ContentList{
             sizeMin = 2.6f;
             density = 1200f;
             attrs.set(Attribute.light, -0.15f);
+
+            sound = Sounds.windhowl;
+            soundVol = 0f;
+            soundVolOscMag = 1.5f;
+            soundVolOscScl = 1100f;
+            soundVolMin = 0.02f;
         }};
 
         rain = new RainWeather("rain"){{
@@ -31,7 +37,7 @@ public class Weathers implements ContentList{
             attrs.set(Attribute.water, 0.2f);
             status = StatusEffects.wet;
             sound = Sounds.rain;
-            soundVolume = 0.25f;
+            soundVol = 0.25f;
         }};
 
         sandstorm = new ParticleWeather("sandstorm"){{
@@ -50,7 +56,7 @@ public class Weathers implements ContentList{
             opacityMultiplier = 0.8f;
             force = 0.1f;
             sound = Sounds.wind;
-            soundVolume = 0.3f;
+            soundVol = 0.3f;
         }};
 
         sporestorm = new ParticleWeather("sporestorm"){{
@@ -71,7 +77,7 @@ public class Weathers implements ContentList{
             opacityMultiplier = 0.85f;
             force = 0.1f;
             sound = Sounds.wind;
-            soundVolume = 0.3f;
+            soundVol = 0.3f;
         }};
 
         fog = new ParticleWeather("fog"){{

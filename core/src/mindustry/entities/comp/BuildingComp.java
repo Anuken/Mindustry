@@ -781,7 +781,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** @return whether this block should play its idle sound.*/
-    public boolean shouldIdleSound(){
+    public boolean shouldAmbientSound(){
         return shouldConsume();
     }
 
@@ -1226,6 +1226,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
+    /** @return ambient sound volume scale. */
+    public float ambientVolume(){
+        return efficiency();
+    }
+
     //endregion
     //region overrides
 
@@ -1367,8 +1372,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             sound.update(x, y, shouldActiveSound());
         }
 
-        if(block.ambientSound != Sounds.none && shouldIdleSound()){
-            loops.play(block.ambientSound, self(), block.ambientSoundVolume);
+        if(block.ambientSound != Sounds.none && shouldAmbientSound()){
+            loops.play(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
         }
 
         if(enabled || !block.noUpdateDisabled){

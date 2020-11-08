@@ -25,8 +25,8 @@ public abstract class Weather extends UnlockableContent{
     public float opacityMultiplier = 1f;
     public Attributes attrs = new Attributes();
     public Sound sound = Sounds.none;
-    public float soundVolume = 0.1f;
-    public float soundVolumeOscMag = 0f, soundVolumeOscScl = 20f;
+    public float soundVol = 0.1f, soundVolMin = 0f;
+    public float soundVolOscMag = 0f, soundVolOscScl = 20f;
 
     //internals
     public Rand rand = new Rand();
@@ -90,8 +90,8 @@ public abstract class Weather extends UnlockableContent{
         }
 
         if(sound != Sounds.none){
-            float noise = soundVolumeOscMag > 0 ? (float)Math.abs(Noise.rawNoise(Time.time() / soundVolumeOscScl)) * soundVolumeOscMag : 0;
-            loops.play(sound, Core.camera.position, (soundVolume + noise) * state.opacity);
+            float noise = soundVolOscMag > 0 ? (float)Math.abs(Noise.rawNoise(Time.time() / soundVolOscScl)) * soundVolOscMag : 0;
+            loops.play(sound, Core.camera.position, Math.max((soundVol + noise) * state.opacity, soundVolMin));
         }
     }
 
