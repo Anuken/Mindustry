@@ -69,7 +69,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     public float speed(){
         //limit speed to minimum formation speed to preserve formation
-        return isCommanding() ? minFormationSpeed * 0.98f : type.speed;
+        return isCommanding() ? ((Commanderc)this).minFormationSpeed * 0.98f : type.speed;
     }
 
     /** @return speed with boost multipliers factored in. */
