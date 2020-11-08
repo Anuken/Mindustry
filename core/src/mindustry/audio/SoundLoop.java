@@ -18,11 +18,12 @@ public class SoundLoop{
     }
 
     public void update(float x, float y, boolean play){
-        if(baseVolume < 0) return;
+        if(baseVolume <= 0) return;
 
         if(id < 0){
             if(play){
                 id = sound.loop(sound.calcVolume(x, y) * volume * baseVolume, 1f, sound.calcPan(x, y));
+                Log.info("playing, id = @", id);
             }
         }else{
             //fade the sound in or out
@@ -36,6 +37,7 @@ public class SoundLoop{
                     return;
                 }
             }
+
             sound.setPan(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);
         }
     }
