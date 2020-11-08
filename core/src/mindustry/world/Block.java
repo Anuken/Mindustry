@@ -174,14 +174,14 @@ public class Block extends UnlockableContent{
     public float lightRadius = 60f;
 
     /** The sound that this block makes while active. One sound loop. Do not overuse.*/
-    public Sound activeSound = Sounds.none;
+    public Sound loopSound = Sounds.none;
     /** Active sound base volume. */
-    public float activeSoundVolume = 0.5f;
+    public float loopSoundVolume = 0.5f;
 
     /** The sound that this block makes while idle. Uses one sound loop for all blocks.*/
-    public Sound idleSound = Sounds.none;
+    public Sound ambientSound = Sounds.none;
     /** Idle sound base volume. */
-    public float idleSoundVolume = 0.5f;
+    public float ambientSoundVolume = 0.05f;
 
     /** Cost of constructing this block. */
     public ItemStack[] requirements = {};

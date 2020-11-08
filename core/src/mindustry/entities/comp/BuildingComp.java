@@ -107,8 +107,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         this.block = block;
         this.team = team;
 
-        if(block.activeSound != Sounds.none){
-            sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
+        if(block.loopSound != Sounds.none){
+            sound = new SoundLoop(block.loopSound, block.loopSoundVolume);
         }
 
         health = block.health;
@@ -1367,8 +1367,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             sound.update(x, y, shouldActiveSound());
         }
 
-        if(block.idleSound != Sounds.none && shouldIdleSound()){
-            loops.play(block.idleSound, self(), block.idleSoundVolume);
+        if(block.ambientSound != Sounds.none && shouldIdleSound()){
+            loops.play(block.ambientSound, self(), block.ambientSoundVolume);
         }
 
         if(enabled || !block.noUpdateDisabled){

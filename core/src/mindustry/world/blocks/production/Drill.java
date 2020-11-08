@@ -66,8 +66,8 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-        idleSound = Sounds.drill;
-        idleSoundVolume = 0.003f;
+        ambientSound = Sounds.drill;
+        ambientSoundVolume = 0.003f;
     }
 
     @Override

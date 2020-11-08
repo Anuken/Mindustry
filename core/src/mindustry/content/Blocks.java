@@ -592,6 +592,9 @@ public class Blocks implements ContentList{
             hasPower = true;
             drawer = new DrawWeave();
 
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.05f;
+
             consumes.items(with(Items.thorium, 4, Items.sand, 10));
             consumes.power(5f);
             itemCapacity = 20;
@@ -720,6 +723,8 @@ public class Blocks implements ContentList{
             updateEffect = Fx.pulverizeSmall;
             hasItems = hasPower = true;
             drawer = new DrawRotator();
+            ambientSound = Sounds.grinding;
+            ambientSoundVolume = 0.02f;
 
             consumes.item(Items.scrap, 1);
             consumes.power(0.50f);
@@ -1184,6 +1189,8 @@ public class Blocks implements ContentList{
             hasLiquids = true;
             hasItems = true;
             size = 3;
+            ambientSound = Sounds.steam;
+            ambientSoundVolume = 0.03f;
 
             consumes.item(Items.pyratite).optional(true, false);
             consumes.liquid(Liquids.cryofluid, 0.1f);
@@ -1802,8 +1809,8 @@ public class Blocks implements ContentList{
             shootDuration = 220f;
             powerUse = 17f;
             shootSound = Sounds.laserbig;
-            activeSound = Sounds.beam;
-            activeSoundVolume = 2f;
+            loopSound = Sounds.beam;
+            loopSoundVolume = 2f;
 
             shootType = new ContinuousLaserBulletType(70){{
                 length = 200f;
