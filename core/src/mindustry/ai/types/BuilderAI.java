@@ -79,7 +79,7 @@ public class BuilderAI extends AIController{
                             float dist = Math.min(cons.dst(unit) - buildingRange, 0);
 
                             //make sure you can reach the request in time
-                            if(dist / unit.type.speed < cons.buildCost * 0.9f){
+                            if(dist / unit.speed() < cons.buildCost * 0.9f){
                                 following = b;
                                 found = true;
                             }
