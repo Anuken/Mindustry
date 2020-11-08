@@ -23,7 +23,6 @@ public class SoundLoop{
         if(id < 0){
             if(play){
                 id = sound.loop(sound.calcVolume(x, y) * volume * baseVolume, 1f, sound.calcPan(x, y));
-                Log.info("playing, id = @", id);
             }
         }else{
             //fade the sound in or out

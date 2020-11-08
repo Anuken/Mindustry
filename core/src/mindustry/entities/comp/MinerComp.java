@@ -63,7 +63,6 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc, Unitc{
             mineTimer = 0f;
         }else if(mining()){
             Item item = mineTile.drop();
-            lookAt(angleTo(mineTile.worldx(), mineTile.worldy()));
             mineTimer += Time.delta *type.mineSpeed;
 
             if(Mathf.chance(0.06 * Time.delta)){

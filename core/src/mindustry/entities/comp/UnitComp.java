@@ -79,6 +79,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         controlling().each(cons);
     }
 
+    /** @return where the unit wants to look at. */
+    public float prefRotation(){
+        if(this instanceof Builderc builder && builder.activelyBuilding()){
+            return angleTo(builder.buildPlan());
+        }else if(this instanceof Minerc miner && miner.mineTile() != null){
+            return angleTo(miner.mineTile());
+        }else{
+            return vel().angle();
+        }
+    }
+
     @Override
     public float range(){
         return type.range;
