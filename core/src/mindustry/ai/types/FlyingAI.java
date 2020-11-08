@@ -2,6 +2,7 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import mindustry.entities.units.*;
+import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
