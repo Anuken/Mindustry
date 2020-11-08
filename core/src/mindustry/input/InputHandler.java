@@ -931,11 +931,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null
-        && player.miner().validMine(tile)
-        && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
-        && player.unit().acceptsItem(tile.drop())
-        && tile.block() == Blocks.air;
+            && tile.drop() != null
+            && player.miner().validMine(tile)
+            && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
+            && player.unit().acceptsItem(tile.drop())
+            && tile.block() == Blocks.air;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -1042,7 +1042,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean canShoot(){
-        return block == null && !onConfigurable() && !isDroppingItem() && !(player.builder().updateBuilding() && player.builder().isBuilding()) &&
+        return block == null && !onConfigurable() && !isDroppingItem() && !player.builder().activelyBuilding() &&
             !(player.unit() instanceof Mechc && player.unit().isFlying());
     }
 

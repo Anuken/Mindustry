@@ -21,7 +21,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
     //mech + builder + miner
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class, Minerc.class}) UnitType nova, pulsar, quasar;
+    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova, pulsar, quasar;
 
     //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType vela;
@@ -33,16 +33,13 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
 
     //air (no special traits)
-    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
-
-    //air + mining
-    public static @EntityDef({Unitc.class, Minerc.class}) UnitType mono;
+    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra, mono;
 
     //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType poly;
+    public static @EntityDef({Unitc.class, Builderc.class}) UnitType poly;
 
     //air + building + mining + payload
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class, Payloadc.class}) UnitType mega;
+    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType mega;
 
     //air + building + payload
     public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad;
@@ -51,7 +48,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, AmmoDistributec.class}) UnitType oct;
 
     //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class, Minerc.class}) UnitType alpha, beta, gamma;
+    public static @EntityDef({Unitc.class, Builderc.class,}) UnitType alpha, beta, gamma;
 
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType risso, minke, bryde, sei, omura;
@@ -1214,7 +1211,7 @@ public class UnitTypes implements ContentList{
                 reload = 30f;
                 ejectEffect = Fx.none;
                 recoil = 2f;
-                shootSound = Sounds.pew;
+                shootSound = Sounds.missile;
                 shots = 1;
                 velocityRnd = 0.5f;
                 inaccuracy = 15f;
@@ -1230,6 +1227,7 @@ public class UnitTypes implements ContentList{
                     smokeEffect = Fx.hitLaser;
                     hitEffect = despawnEffect = Fx.hitLaser;
                     frontColor = Color.white;
+                    hitSound = Sounds.none;
 
                     healPercent = 5.5f;
                     collidesTeam = true;

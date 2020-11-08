@@ -65,9 +65,7 @@ public class AIController implements UnitController{
         if(unit.isFlying()){
             unit.wobble();
 
-            if(unit.moving()){
-                unit.lookAt(unit.vel.angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }
     }
 

@@ -866,9 +866,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(unit.moving()){
-                unit.lookAt(unit.vel.angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }
 
         if(payloadTarget != null && unit instanceof Payloadc pay){
