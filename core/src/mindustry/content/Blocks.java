@@ -288,6 +288,10 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.water, 1f);
             cacheLayer = CacheLayer.mud;
             albedo = 0.35f;
+            walkSound = Sounds.mud;
+            walkSoundVolume = 0.08f;
+            walkSoundPitchMin = 0.4f;
+            walkSoundPitchMax = 0.5f;
         }};
 
         ((ShallowLiquid)darksandTaintedWater).set(Blocks.taintedWater, Blocks.darksand);
@@ -593,7 +597,7 @@ public class Blocks implements ContentList{
             drawer = new DrawWeave();
 
             ambientSound = Sounds.techloop;
-            ambientSoundVolume = 0.05f;
+            ambientSoundVolume = 0.02f;
 
             consumes.items(with(Items.thorium, 4, Items.sand, 10));
             consumes.power(5f);
@@ -1225,7 +1229,7 @@ public class Blocks implements ContentList{
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             requirements(Category.power, with(Items.lead, 300, Items.silicon, 200, Items.graphite, 150, Items.thorium, 150, Items.metaglass, 50));
             ambientSound = Sounds.hum;
-            ambientSoundVolume = 0.16f;
+            ambientSoundVolume = 0.2f;
             size = 3;
             health = 700;
             itemDuration = 360f;

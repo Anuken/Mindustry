@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -33,6 +34,9 @@ public class TractorBeamTurret extends BaseTurret{
     public Color laserColor = Color.white;
     public StatusEffect status = StatusEffects.none;
     public float statusDuration = 300;
+
+    public Sound shootSound = Sounds.tractorbeam;
+    public float shootSoundVolume = 0.9f;
 
     public TractorBeamTurret(String name){
         super(name);
@@ -91,6 +95,8 @@ public class TractorBeamTurret extends BaseTurret{
 
             //look at target
             if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.01f){
+                loops.play(shootSound, this, shootSoundVolume);
+
                 any = true;
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
