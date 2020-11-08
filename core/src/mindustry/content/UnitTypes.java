@@ -491,6 +491,9 @@ public class UnitTypes implements ContentList{
             drawShields = false;
 
             weapons.add(new Weapon("corvus-weapon"){{
+                shootSound = Sounds.laserblast;
+                chargeSound = Sounds.lasercharge;
+                soundPitchMin = 1f;
                 top = false;
                 mirror = false;
                 shake = 14f;
@@ -498,7 +501,6 @@ public class UnitTypes implements ContentList{
                 x = y = 0;
                 reload = 350f;
                 recoil = 0f;
-                shootSound = Sounds.laser;
 
                 cooldownTime = 350f;
 

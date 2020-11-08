@@ -168,7 +168,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         float baseX = this.x, baseY = this.y;
         boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
 
-        (delay ? weapon.chargeSound : weapon.shootSound).at(x, y, Mathf.random(0.8f, 1.0f));
+        (delay ? weapon.chargeSound : weapon.shootSound).at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
 
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
@@ -195,7 +195,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
                 Effect.shake(weapon.shake, weapon.shake, x, y);
                 mount.heat = 1f;
-                weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+                weapon.shootSound.at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
             });
         }else{
             vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
