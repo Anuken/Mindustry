@@ -1471,7 +1471,7 @@ public class Blocks implements ContentList{
             inaccuracy = 1f;
             shootCone = 10f;
             health = 260;
-            shootSound = Sounds.artillery;
+            shootSound = Sounds.bang;
         }};
 
         wave = new LiquidTurret("wave"){{

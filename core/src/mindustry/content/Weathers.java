@@ -3,6 +3,7 @@ package mindustry.content;
 import arc.graphics.*;
 import arc.util.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.type.weather.*;
 import mindustry.world.meta.*;
@@ -29,6 +30,8 @@ public class Weathers implements ContentList{
             attrs.set(Attribute.light, -0.2f);
             attrs.set(Attribute.water, 0.2f);
             status = StatusEffects.wet;
+            sound = Sounds.rain;
+            soundVolume = 0.25f;
         }};
 
         sandstorm = new ParticleWeather("sandstorm"){{
@@ -46,6 +49,8 @@ public class Weathers implements ContentList{
             attrs.set(Attribute.water, -0.1f);
             opacityMultiplier = 0.8f;
             force = 0.1f;
+            sound = Sounds.wind;
+            soundVolume = 0.3f;
         }};
 
         sporestorm = new ParticleWeather("sporestorm"){{
@@ -65,6 +70,8 @@ public class Weathers implements ContentList{
             status = StatusEffects.sporeSlowed;
             opacityMultiplier = 0.85f;
             force = 0.1f;
+            sound = Sounds.wind;
+            soundVolume = 0.3f;
         }};
 
         fog = new ParticleWeather("fog"){{

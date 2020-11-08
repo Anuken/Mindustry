@@ -166,7 +166,7 @@ public class UnitTypes implements ContentList{
                 recoil = 5f;
                 shake = 2f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.bang;
                 shots = 3;
                 inaccuracy = 3f;
                 shotDelay = 4f;
@@ -226,7 +226,7 @@ public class UnitTypes implements ContentList{
                 recoil = 5f;
                 shake = 2f;
                 ejectEffect = Fx.casing4;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.bang;
 
                 bullet = new BasicBulletType(13f, 60){{
                     pierce = true;
@@ -1252,6 +1252,7 @@ public class UnitTypes implements ContentList{
 
             weapons.add(
             new Weapon("heal-weapon-mount"){{
+                shootSound = Sounds.lasershoot;
                 reload = 25f;
                 x = 8f;
                 y = -6f;
@@ -1259,6 +1260,7 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.healBulletBig;
             }},
             new Weapon("heal-weapon-mount"){{
+                shootSound = Sounds.lasershoot;
                 reload = 15f;
                 x = 4f;
                 y = 5f;
