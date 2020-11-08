@@ -55,6 +55,10 @@ public enum Stat{
     linkRange(StatCat.crafting),
     instructions(StatCat.crafting),
 
+    weapons(StatCat.function),
+    mirrored(StatCat.function),
+    bullet(StatCat.function),
+
     speedIncrease(StatCat.function),
     repairTime(StatCat.function),
     range(StatCat.function),

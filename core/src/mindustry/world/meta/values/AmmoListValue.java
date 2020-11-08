@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
@@ -28,8 +29,10 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
         table.row();
         for(T t : map.keys()){
             BulletType type = map.get(t);
-            table.image(icon(t)).size(3 * 8).padRight(4).right().top();
-            table.add(t.localizedName).padRight(10).left().top();
+            if(!(t instanceof UnitType)){
+                table.image(icon(t)).size(3 * 8).padRight(4).right().top();
+                table.add(t.localizedName).padRight(10).left().top();
+            }
             table.table(Tex.underline, bt -> {
                 bt.left().defaults().padRight(3).left();
 

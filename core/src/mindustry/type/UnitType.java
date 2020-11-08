@@ -229,6 +229,8 @@ public class UnitType extends UnlockableContent{
         if(inst instanceof Payloadc){
             stats.add(Stat.payloadCapacity, (payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared);
         }
+
+        stats.add(Stat.weapons, new WeaponListValue(this, weapons));
     }
 
     @CallSuper
