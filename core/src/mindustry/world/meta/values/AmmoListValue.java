@@ -53,8 +53,13 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.knockback", Strings.fixed(type.knockback, 1)));
                 }
 
-                if(type.pierce || type.pierceCap != -1){
+                //sap bullets don't really have pierce
+                if((type.pierce || type.pierceCap != -1) && !(type instanceof SapBulletType)){
                     sep(bt, type.pierceCap == -1 ? "@bullet.infinitepierce" : Core.bundle.format("bullet.pierce", type.pierceCap));
+                }
+
+                if((type.healPercent > 0f)){
+                    sep(bt, Core.bundle.format("bullet.healpercent", (int)type.healPercent));
                 }
 
                 if((type.status == StatusEffects.burning || type.status == StatusEffects.melting) || type.incendAmount > 0){
@@ -67,6 +72,10 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
 
                 if(type.status == StatusEffects.tarred){
                     sep(bt, "@bullet.tarred");
+                }
+
+                if(type.status == StatusEffects.sapped){
+                    sep(bt, "@bullet.sapping");
                 }
 
                 if(type.homingPower > 0.01f){

@@ -34,15 +34,11 @@ public class WeaponListValue implements StatValue{
             Weapon weapon = weapons.get(i);
 
             if(weapon.flipSprite){
+                //fliped weapons are not given stats
                 continue;
             }
 
-            if(weapon.outlineRegion.found()){
-                table.image(Core.atlas.find(unit.name + "-weapon" + i)).size(15 * 8).right().top();
-            }else{
-                table.image(unit.icon(Cicon.full)).size(15 * 8).right().top();
-            }
-
+            table.image(Core.atlas.find(unit.name + "-weapon" + i)).size(15 * 8).right().top();
             table.table(Tex.underline, w -> {
                 w.left().defaults().padRight(3).left();
 

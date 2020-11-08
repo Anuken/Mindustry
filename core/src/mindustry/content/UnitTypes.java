@@ -336,6 +336,8 @@ public class UnitTypes implements ContentList{
                     lightningLength = 7;
                     lightningLengthRand = 7;
                     shootEffect = Fx.shootHeal;
+                    //Does not actually do anything; Just here to make stats work
+                    healPercent = 2f;
 
                     lightningType = new BulletType(0.0001f, 0f){{
                         lifetime = Fx.lightning.lifetime;
