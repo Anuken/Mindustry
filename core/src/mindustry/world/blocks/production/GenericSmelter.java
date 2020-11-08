@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 
 /** A GenericCrafter with a new glowing region drawn on top. */
@@ -14,6 +15,8 @@ public class GenericSmelter extends GenericCrafter{
 
     public GenericSmelter(String name){
         super(name);
+        ambientSound = Sounds.smelter;
+        ambientSoundVolume = 0.06f;
     }
 
     public class SmelterBuild extends GenericCrafterBuild{

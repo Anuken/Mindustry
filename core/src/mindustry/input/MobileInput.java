@@ -857,15 +857,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         float attractDst = 15f;
         float strafePenalty = legs ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(unit.vel.angle(), unit.rotation) / 180f);
 
-        float baseSpeed = unit.type.speed;
-
-        //limit speed to minimum formation speed to preserve formation
-        if(unit.isCommanding()){
-            //add a tiny multiplier to let units catch up just in case
-            baseSpeed = unit.minFormationSpeed * 0.98f;
-        }
-
-        float speed = baseSpeed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = unit.realSpeed() * strafePenalty;
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
@@ -906,7 +898,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(player.within(targetPos, attractDst)){
             movement.setZero();
-            unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
+            unit.vel.approachDelta(Vec2.ZERO, unit.speed() * type.accel / 2f);
         }
 
         float expansion = 3f;

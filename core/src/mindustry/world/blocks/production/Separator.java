@@ -52,7 +52,7 @@ public class Separator extends Block{
         public float warmup;
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return cons.valid();
         }
 

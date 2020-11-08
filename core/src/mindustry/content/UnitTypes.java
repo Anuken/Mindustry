@@ -166,7 +166,7 @@ public class UnitTypes implements ContentList{
                 recoil = 5f;
                 shake = 2f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.bang;
                 shots = 3;
                 inaccuracy = 3f;
                 shotDelay = 4f;
@@ -226,7 +226,7 @@ public class UnitTypes implements ContentList{
                 recoil = 5f;
                 shake = 2f;
                 ejectEffect = Fx.casing4;
-                shootSound = Sounds.artillery;
+                shootSound = Sounds.bang;
 
                 bullet = new BasicBulletType(13f, 60){{
                     pierce = true;
@@ -287,6 +287,8 @@ public class UnitTypes implements ContentList{
                 alternate = false;
                 ejectEffect = Fx.none;
                 recoil = 2f;
+                shootSound = Sounds.lasershoot;
+
                 bullet = new LaserBoltBulletType(5.2f, 14){{
                     healPercent = 5f;
                     collidesTeam = true;
@@ -328,7 +330,7 @@ public class UnitTypes implements ContentList{
                 spacing = 0f;
                 ejectEffect = Fx.none;
                 recoil = 2.5f;
-                shootSound = Sounds.pew;
+                shootSound = Sounds.spark;
 
                 bullet = new LightningBulletType(){{
                     lightningColor = hitColor = Pal.heal;
@@ -432,7 +434,8 @@ public class UnitTypes implements ContentList{
 
                 reload = 320f;
                 recoil = 0f;
-                shootSound = Sounds.laser;
+                chargeSound = Sounds.lasercharge2;
+                shootSound = Sounds.beam;
                 continuous = true;
                 cooldownTime = 200f;
 
@@ -493,6 +496,9 @@ public class UnitTypes implements ContentList{
             drawShields = false;
 
             weapons.add(new Weapon("corvus-weapon"){{
+                shootSound = Sounds.laserblast;
+                chargeSound = Sounds.lasercharge;
+                soundPitchMin = 1f;
                 top = false;
                 mirror = false;
                 shake = 14f;
@@ -500,7 +506,6 @@ public class UnitTypes implements ContentList{
                 x = y = 0;
                 reload = 350f;
                 recoil = 0f;
-                shootSound = Sounds.laser;
 
                 cooldownTime = 350f;
 
@@ -636,7 +641,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.none;
                 recoil = 2f;
                 rotate = true;
-                shootSound = Sounds.flame;
+                shootSound = Sounds.sap;
 
                 x = 8.5f;
                 y = -1.5f;
@@ -659,6 +664,7 @@ public class UnitTypes implements ContentList{
                 rotate = true;
                 x = 4f;
                 y = 3f;
+                shootSound = Sounds.sap;
 
                 bullet = new SapBulletType(){{
                     sapStrength = 0.8f;
@@ -723,6 +729,7 @@ public class UnitTypes implements ContentList{
                 y = 8f;
                 rotate = true;
                 bullet = sapper;
+                shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
                 reload = 15f;
@@ -730,6 +737,7 @@ public class UnitTypes implements ContentList{
                 y = 6f;
                 rotate = true;
                 bullet = sapper;
+                shootSound = Sounds.sap;
             }},
             new Weapon("spiroct-weapon"){{
                 reload = 23f;
@@ -737,6 +745,7 @@ public class UnitTypes implements ContentList{
                 y = 0f;
                 rotate = true;
                 bullet = sapper;
+                shootSound = Sounds.sap;
             }},
             new Weapon("large-purple-mount"){{
                 y = -7f;
@@ -746,7 +755,7 @@ public class UnitTypes implements ContentList{
                 shake = 3f;
                 rotateSpeed = 2f;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.artillery;
                 rotate = true;
                 occlusion = 8f;
                 recoil = 3f;
@@ -844,7 +853,7 @@ public class UnitTypes implements ContentList{
                 recoil = 10f;
                 rotateSpeed = 1f;
                 ejectEffect = Fx.casing3;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.artillery;
                 rotate = true;
                 occlusion = 30f;
 
@@ -1254,6 +1263,7 @@ public class UnitTypes implements ContentList{
 
             weapons.add(
             new Weapon("heal-weapon-mount"){{
+                shootSound = Sounds.lasershoot;
                 reload = 25f;
                 x = 8f;
                 y = -6f;
@@ -1261,6 +1271,7 @@ public class UnitTypes implements ContentList{
                 bullet = Bullets.healBulletBig;
             }},
             new Weapon("heal-weapon-mount"){{
+                shootSound = Sounds.lasershoot;
                 reload = 15f;
                 x = 4f;
                 y = 5f;
@@ -1580,7 +1591,7 @@ public class UnitTypes implements ContentList{
                 inaccuracy = 7f;
                 ejectEffect = Fx.none;
                 shake = 3f;
-                shootSound = Sounds.shootBig;
+                shootSound = Sounds.missile;
                 xRand = 8f;
                 shotDelay = 1f;
 
@@ -1661,6 +1672,7 @@ public class UnitTypes implements ContentList{
                 shake = 6f;
                 recoil = 10.5f;
                 occlusion = 50f;
+                shootSound = Sounds.railgun;
 
                 shots = 1;
                 ejectEffect = Fx.none;

@@ -2,6 +2,7 @@ package mindustry.audio;
 
 import arc.*;
 import arc.audio.*;
+import arc.audio.SoloudAudio.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -24,6 +25,11 @@ public class MusicControl{
     protected @Nullable Music current;
     protected float fade;
     protected boolean silenced;
+
+    protected boolean wasPaused;
+    protected AudioFilter filter = new BiquadFilter(){{
+        set(0, 500, 1);
+    }};
 
     public MusicControl(){
         Events.on(ClientLoadEvent.class, e -> reload());
@@ -54,6 +60,13 @@ public class MusicControl{
 
     /** Update and play the right music track.*/
     public void update(){
+        boolean paused = state.isGame() && Core.scene.hasDialog();
+
+        if(paused != wasPaused){
+            Core.audio.setFilter(0, paused ? filter : null);
+            wasPaused = paused;
+        }
+
         if(state.isMenu()){
             silenced = false;
             if(ui.planet.isShown()){

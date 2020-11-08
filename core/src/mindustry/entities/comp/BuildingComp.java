@@ -29,6 +29,7 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
@@ -106,8 +107,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         this.block = block;
         this.team = team;
 
-        if(block.activeSound != Sounds.none){
-            sound = new SoundLoop(block.activeSound, block.activeSoundVolume);
+        if(block.loopSound != Sounds.none){
+            sound = new SoundLoop(block.loopSound, block.loopSoundVolume);
         }
 
         health = block.health;
@@ -780,7 +781,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     /** @return whether this block should play its idle sound.*/
-    public boolean shouldIdleSound(){
+    public boolean shouldAmbientSound(){
         return shouldConsume();
     }
 
@@ -1225,6 +1226,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
+    /** @return ambient sound volume scale. */
+    public float ambientVolume(){
+        return efficiency();
+    }
+
     //endregion
     //region overrides
 
@@ -1285,6 +1291,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
             case enabled -> enabled ? 1 : 0;
+            case controlled -> this instanceof ControlBlock c ? c.isControlled() ? 1 : 0 : 0;
             case payloadCount -> getPayload() != null ? 1 : 0;
             default -> 0;
         };
@@ -1365,8 +1372,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             sound.update(x, y, shouldActiveSound());
         }
 
-        if(block.idleSound != Sounds.none && shouldIdleSound()){
-            loops.play(block.idleSound, self(), block.idleSoundVolume);
+        if(block.ambientSound != Sounds.none && shouldAmbientSound()){
+            loops.play(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
         }
 
         if(enabled || !block.noUpdateDisabled){
