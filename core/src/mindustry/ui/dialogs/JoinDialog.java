@@ -334,15 +334,34 @@ public class JoinDialog extends BaseDialog{
 
         global.clear();
         global.background(null);
-        for(String host : defaultServers){
-            String resaddress = host.contains(":") ? host.split(":")[0] : host;
-            int resport = host.contains(":") ? Strings.parseInt(host.split(":")[1]) : port;
-            net.pingHost(resaddress, resport, res -> {
-                if(refreshes != cur) return;
-                res.port = resport;
-                addGlobalHost(res);
-            }, e -> {});
+        for(ServerGroup group : defaultServers){
+            //table containing all groups
+            global.table(g -> {
+                //TODO groups
+                for(String address : group.addresses){
+                    String resaddress = address.contains(":") ? address.split(":")[0] : address;
+                    int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
+                    net.pingHost(resaddress, resport, res -> {
+                        if(refreshes != cur) return;
+                        res.port = resport;
+                        addGlobalHost(res, g);
+
+                        g.margin(5f);
+                        g.pack();
+                    }, e -> {});
+                }
+            }).row();
         }
+    }
+
+    void addGlobalHost(Host host, Table container){
+        global.background(null);
+        float w = targetWidth();
+
+        container.button(b -> buildServer(host, b), Styles.cleart, () -> {
+            Events.fire(new ClientPreConnectEvent(host));
+            safeConnect(host.address, host.port, host.version);
+        }).width(w).row();
     }
 
     void finishLocalHosts(){
@@ -367,26 +386,10 @@ public class JoinDialog extends BaseDialog{
 
         local.row();
 
-        TextButton button = local.button("", Styles.cleart, () -> {
+        local.button(b -> buildServer(host, b), Styles.cleart, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
-        }).width(w).pad(5f).get();
-        button.clearChildren();
-        buildServer(host, button);
-    }
-
-    void addGlobalHost(Host host){
-        global.background(null);
-        float w = targetWidth();
-
-        global.row();
-
-        TextButton button = global.button("", Styles.cleart, () -> {
-            Events.fire(new ClientPreConnectEvent(host));
-            safeConnect(host.address, host.port, host.version);
-        }).width(w).pad(5f).get();
-        button.clearChildren();
-        buildServer(host, button);
+        }).width(w);
     }
 
     public void connect(String ip, int port){
@@ -443,7 +446,16 @@ public class JoinDialog extends BaseDialog{
                 Core.app.post(() -> {
                     try{
                         defaultServers.clear();
-                        val.asArray().each(child -> defaultServers.add(child.getString("address", "<invalid>")));
+                        val.asArray().each(child -> {
+                            String name = child.getString("name", "");
+                            String[] addresses;
+                            if(child.has("addresses")){
+                                addresses = child.get("addresses").asArray().map(Jval::asString).toArray(String.class);
+                            }else{
+                                addresses = new String[]{child.getString("addresses", "<invalid>")};
+                            }
+                            defaultServers.add(new ServerGroup(name, addresses));
+                        });
                         Log.info("Fetched @ global servers.", defaultServers.size);
                     }catch(Throwable ignored){
                         Log.err("Failed to parse community servers.");

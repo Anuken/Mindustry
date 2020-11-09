@@ -67,7 +67,7 @@ public class Vars implements Loadable{
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
-    public static final Seq<String> defaultServers = Seq.with();
+    public static final Seq<ServerGroup> defaultServers = Seq.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** max chat message length */
