@@ -28,7 +28,6 @@ public class StatusFieldAbility extends Ability{
         timer += Time.delta;
 
         if(timer >= reload){
-
             Units.nearby(unit.team, unit.x, unit.y, range, other -> {
                 other.apply(effect, duration);
             });

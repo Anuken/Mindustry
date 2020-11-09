@@ -134,7 +134,7 @@ public class Mods implements Loadable{
             }catch(IOException e){
                 Core.app.post(() -> {
                     Log.err("Error packing images for mod: @", mod.meta.name);
-                    e.printStackTrace();
+                    Log.err(e);
                     if(!headless) ui.showException(e);
                 });
                 break;

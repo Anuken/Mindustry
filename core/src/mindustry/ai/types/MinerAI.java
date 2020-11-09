@@ -79,5 +79,4 @@ public class MinerAI extends AIController{
     @Override
     protected void updateTargeting(){
     }
-
 }

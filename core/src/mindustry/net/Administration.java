@@ -254,8 +254,7 @@ public class Administration{
     public boolean unbanPlayerID(String id){
         PlayerInfo info = getCreateInfo(id);
 
-        if(!info.banned)
-            return false;
+        if(!info.banned) return false;
 
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
