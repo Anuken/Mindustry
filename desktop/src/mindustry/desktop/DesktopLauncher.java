@@ -265,12 +265,7 @@ public class DesktopLauncher extends ClientLauncher{
             }
         }
 
-        if(useDiscord){
-            if(!Core.settings.getBool("discordrpc")){
-                DiscordRPC.INSTANCE.Discord_ClearPresence();
-                return;
-            }
-
+        if(useDiscord && Core.settings.getBool("discordrpc")){
             DiscordRichPresence presence = new DiscordRichPresence();
 
             if(inGame){
@@ -286,6 +281,8 @@ public class DesktopLauncher extends ClientLauncher{
             presence.largeImageKey = "logo";
 
             DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
+        }else if(useDiscord){
+            DiscordRPC.INSTANCE.Discord_ClearPresence();
         }
 
         if(steam){
