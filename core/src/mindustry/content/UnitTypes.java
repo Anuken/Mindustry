@@ -33,7 +33,10 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
 
     //air (no special traits)
-    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra, mono;
+    public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
+
+    //air, legacy mining
+    public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
 
     //air + building + mining
     public static @EntityDef({Unitc.class, Builderc.class}) UnitType poly;
@@ -42,13 +45,13 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType mega;
 
     //air + building + payload
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType quad;
+    public static @EntityDef(value = {Unitc.class, Builderc.class, Payloadc.class}, legacy = true) UnitType quad;
 
     //air + building + payload
     public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, AmmoDistributec.class}) UnitType oct;
 
     //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class,}) UnitType alpha, beta, gamma;
+    public static @EntityDef({Unitc.class, Builderc.class}) UnitType alpha, beta, gamma;
 
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType risso, minke, bryde, sei, omura;
