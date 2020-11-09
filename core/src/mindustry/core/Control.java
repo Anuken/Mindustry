@@ -477,10 +477,6 @@ public class Control implements ApplicationListener, Loadable{
                 dialog.show();
             }));
         }
-
-        if(android){
-            Sounds.empty.loop(0f, 1f, 0f);
-        }
     }
 
     @Override

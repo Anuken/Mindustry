@@ -50,6 +50,7 @@ public abstract class Turret extends ReloadTurret{
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
+    public float coolantUsage = 0.2f;
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
@@ -109,7 +110,7 @@ public abstract class Turret extends ReloadTurret{
     public void init(){
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, coolantUsage)).update(false).boost();
         }
 
         super.init();

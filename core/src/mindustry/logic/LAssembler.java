@@ -96,11 +96,13 @@ public class LAssembler{
         if(data == null || data.isEmpty()) return new Seq<>();
 
         Seq<LStatement> statements = new Seq<>();
-        String[] lines = data.split("[;\n]+");
+        String[] lines = data.split("\n");
         int index = 0;
         for(String line : lines){
             //comments
             if(line.startsWith("#")) continue;
+            //remove trailing semicolons in case someone adds them in for no reason
+            if(line.endsWith(";")) line = line.substring(0, line.length() - 1);
 
             if(index++ > max) break;
 

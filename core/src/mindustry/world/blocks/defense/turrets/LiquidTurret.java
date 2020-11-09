@@ -25,7 +25,7 @@ public class LiquidTurret extends Turret{
         super(name);
         acceptCoolant = false;
         hasLiquids = true;
-        activeSound = Sounds.spray;
+        loopSound = Sounds.spray;
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */

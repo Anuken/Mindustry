@@ -112,6 +112,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                     Floor floor = Vars.world.floorWorld(l.base.x, l.base.y);
                     if(floor.isLiquid){
                         floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                        floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
                     }else{
                         Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
                     }

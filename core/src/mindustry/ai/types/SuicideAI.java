@@ -65,7 +65,7 @@ public class SuicideAI extends GroundAI{
                 if(!blocked){
                     moveToTarget = true;
                     //move towards target directly
-                    unit.moveAt(vec.set(target).sub(unit).limit(unit.type.speed));
+                    unit.moveAt(vec.set(target).sub(unit).limit(unit.speed()));
                 }
             }
         }

@@ -2,17 +2,13 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.formations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
-import mindustry.type.*;
-import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 public class FormationAI extends AIController implements FormationMember{
-    private static Seq<Tile> tiles = new Seq<>();
     public Unit leader;
 
     private Vec3 target = new Vec3();
@@ -30,9 +26,8 @@ public class FormationAI extends AIController implements FormationMember{
 
     @Override
     public void updateUnit(){
-        UnitType type = unit.type;
 
-        if(leader.dead){
+        if(leader == null || leader.dead){
             unit.resetController();
             return;
         }

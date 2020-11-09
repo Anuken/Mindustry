@@ -81,6 +81,8 @@ public class UnitType extends UnlockableContent{
     public AmmoType ammoType = AmmoTypes.copper;
     public int mineTier = -1;
     public float buildSpeed = 1f, mineSpeed = 1f;
+    public Sound mineSound = Sounds.minebeam;
+    public float mineSoundVolume = 0.6f;
 
     /** This is a VERY ROUGH estimate of unit DPS. */
     public float dpsEstimate = -1;

@@ -50,8 +50,8 @@ public class CoreBlock extends StorageBlock{
         priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core, BlockFlag.unitModifier);
         unitCapModifier = 10;
-        activeSound = Sounds.respawning;
-        activeSoundVolume = 1f;
+        loopSound = Sounds.respawning;
+        loopSoundVolume = 1f;
         group = BlockGroup.none;
     }
 

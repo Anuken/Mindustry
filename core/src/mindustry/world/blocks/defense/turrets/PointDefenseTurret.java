@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -23,6 +24,8 @@ public class PointDefenseTurret extends ReloadTurret{
     public Effect beamEffect = Fx.pointBeam;
     public Effect hitEffect = Fx.pointHit;
     public Effect shootEffect = Fx.sparkShoot;
+
+    public Sound shootSound = Sounds.lasershoot;
 
     public float shootCone = 5f;
     public float bulletDamage = 10f;
@@ -90,6 +93,7 @@ public class PointDefenseTurret extends ReloadTurret{
                     beamEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color, new Vec2().set(target));
                     shootEffect.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation, color);
                     hitEffect.at(target.x, target.y, color);
+                    shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f));
                     reload = 0;
                 }
             }else{
