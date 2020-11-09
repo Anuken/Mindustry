@@ -320,6 +320,7 @@ public class SettingsMenuDialog extends SettingsDialog{
         if(!mobile){
             game.checkPref("backgroundpause", true);
             game.checkPref("buildautopause", false);
+            game.checkPref("discordrpc", true, b -> platform.updateRPC());
         }
 
         if(steam){

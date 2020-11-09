@@ -266,6 +266,11 @@ public class DesktopLauncher extends ClientLauncher{
         }
 
         if(useDiscord){
+            if(!Core.settings.getBool("discordrpc")){
+                DiscordRPC.INSTANCE.Discord_ClearPresence();
+                return;
+            }
+
             DiscordRichPresence presence = new DiscordRichPresence();
 
             if(inGame){
