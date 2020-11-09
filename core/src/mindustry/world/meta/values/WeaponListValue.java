@@ -1,18 +1,10 @@
 package mindustry.world.meta.values;
 
-//TODO: remove unused imports
 import arc.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
-import arc.math.*;
+import arc.util.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.*;
-import mindustry.content.*;
-import mindustry.ctype.*;
-import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.ui.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
