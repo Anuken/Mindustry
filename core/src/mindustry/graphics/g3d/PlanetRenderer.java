@@ -18,10 +18,10 @@ import mindustry.type.*;
 public class PlanetRenderer implements Disposable{
     public static final float outlineRad = 1.17f, camLength = 4f;
     public static final Color
-        outlineColor = Pal.accent.cpy().a(1f),
-        hoverColor = Pal.accent.cpy().a(0.5f),
-        borderColor = Pal.accent.cpy().a(0.3f),
-        shadowColor = new Color(0, 0, 0, 0.7f);
+    outlineColor = Pal.accent.cpy().a(1f),
+    hoverColor = Pal.accent.cpy().a(0.5f),
+    borderColor = Pal.accent.cpy().a(0.3f),
+    shadowColor = new Color(0, 0, 0, 0.7f);
 
     private static final Seq<Vec3> points = new Seq<>();
 
@@ -119,7 +119,7 @@ public class PlanetRenderer implements Disposable{
 
     public void renderPlanet(Planet planet){
         if(!planet.visible()) return;
-      
+
         //render planet at offsetted position in the world
         planet.draw(cam.combined, planet.getTransform(mat));
 

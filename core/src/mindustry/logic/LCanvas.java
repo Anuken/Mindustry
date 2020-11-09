@@ -283,7 +283,7 @@ public class LCanvas extends Table{
                 t.add().growX();
 
                 t.button(Icon.copy, Styles.logici, () -> {
-                }).padRight(6).get().tapped(() -> copy());
+                }).padRight(6).get().tapped(this::copy);
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();

@@ -26,7 +26,6 @@ public abstract class LegacySaveVersion extends SaveVersion{
 
         if(!generating) context.begin();
         try{
-
             context.resize(width, height);
 
             //read floor and create tiles first

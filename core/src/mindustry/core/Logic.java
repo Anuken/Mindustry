@@ -326,5 +326,4 @@ public class Logic implements ApplicationListener{
     public boolean isWaitingWave(){
         return (state.rules.waitEnemies || (state.wave >= state.rules.winWave && state.rules.winWave > 0)) && state.enemies > 0;
     }
-
 }
