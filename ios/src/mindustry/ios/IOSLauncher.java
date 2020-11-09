@@ -16,6 +16,7 @@ import mindustry.net.*;
 import mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
+import org.robovm.apple.glkit.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
 
@@ -173,7 +174,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
         }, new IOSApplicationConfiguration(){{
-
+            stencilFormat = GLKViewDrawableStencilFormat._8;
         }});
     }
 

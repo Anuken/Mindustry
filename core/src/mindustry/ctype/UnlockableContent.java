@@ -126,7 +126,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public boolean unlocked(){
-        if(net != null && net.client()) return state.rules.researched.contains(name);
+        if(net != null && net.client()) return alwaysUnlocked || state.rules.researched.contains(name);
         return unlocked || alwaysUnlocked;
     }
 
