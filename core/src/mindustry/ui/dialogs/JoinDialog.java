@@ -377,7 +377,7 @@ public class JoinDialog extends BaseDialog{
                                    }
                                 }).size(40f).get();
                                 image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
-                            }).width(targetWidth()).padBottom(5).row();
+                            }).width(targetWidth()).padBottom(-2).row();
                         }
 
                         addGlobalHost(res, g);

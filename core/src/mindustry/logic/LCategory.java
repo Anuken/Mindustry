@@ -1,14 +1,13 @@
 package mindustry.logic;
 
 import arc.graphics.*;
-import mindustry.graphics.*;
 
 public enum LCategory{
-    blocks(Pal.accentBack),
-    control(Color.cyan.cpy().shiftSaturation(-0.6f).mul(0.7f)),
-    operations(Pal.place.cpy().shiftSaturation(-0.5f).mul(0.7f)),
-    io(Pal.remove.cpy().shiftSaturation(-0.5f).mul(0.7f)),
-    units(Pal.bulletYellowBack.cpy().shiftSaturation(-0.3f).mul(0.8f));
+    blocks(Color.valueOf("d4816b")),
+    control(Color.valueOf("6bb2b2")),
+    operations(Color.valueOf("877bad")),
+    io(Color.valueOf("a08a8a")),
+    units(Color.valueOf("c7b59d"));
 
     public final Color color;
 
