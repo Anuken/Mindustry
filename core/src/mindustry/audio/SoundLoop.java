@@ -37,7 +37,7 @@ public class SoundLoop{
                 }
             }
 
-            sound.setPan(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);
+            sound.set(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);
         }
     }
 

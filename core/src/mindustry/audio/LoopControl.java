@@ -41,7 +41,7 @@ public class LoopControl{
                     data.soundID = -1;
                     return;
                 }
-                sound.setPan(data.soundID, pan, data.curVolume);
+                sound.set(data.soundID, pan, data.curVolume);
             }
 
             data.volume = 0f;
