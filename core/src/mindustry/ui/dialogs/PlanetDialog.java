@@ -153,24 +153,21 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public void renderSectors(Planet planet){
 
         //draw all sector stuff
-        if(!debugSelect){
+        if(!debugSelect && selectAlpha > 0.01f){
             for(Sector sec : planet.sectors){
+                if(canSelect(sec) || sec.unlocked()){
 
-                if(selectAlpha > 0.01f){
-                    if(canSelect(sec) || sec.unlocked()){
+                    Color color =
+                    sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
+                    sec.preset != null ? Team.derelict.color :
+                    sec.hasEnemyBase() ? Team.crux.color :
+                    null;
 
-                        Color color =
-                        sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
-                        sec.preset != null ? Team.derelict.color :
-                        sec.hasEnemyBase() ? Team.crux.color :
-                        null;
-
-                        if(color != null){
-                            planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
-                        }
-                    }else{
-                        planets.fill(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
+                    if(color != null){
+                        planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
                     }
+                }else{
+                    planets.fill(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
                 }
             }
         }
@@ -202,11 +199,13 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
-        for(Sector sec : planet.sectors){
-            if(sec.hasBase()){
-                for(Sector enemy : sec.near()){
-                    if(enemy.hasEnemyBase()){
-                        planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color, Color.clear, 0.24f, 110f, 25);
+        if(selectAlpha > 0.001f){
+            for(Sector sec : planet.sectors){
+                if(sec.hasBase()){
+                    for(Sector enemy : sec.near()){
+                        if(enemy.hasEnemyBase()){
+                            planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(selectAlpha), Color.clear, 0.24f, 110f, 25);
+                        }
                     }
                 }
             }
@@ -225,7 +224,24 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     @Override
-    public void renderProjections(){
+    public void renderProjections(Planet planet){
+
+        for(Sector sec : planet.sectors){
+            if(sec != hovered){
+                var icon = (sec.isAttacked() ? Icon.warning : !sec.hasBase() && sec.preset != null ? Icon.terrain : null);
+                var color = sec.preset != null && !sec.hasBase() ? Team.derelict.color : Team.sharded.color;
+
+                if(icon != null){
+                    planets.drawPlane(sec, () -> {
+                        Draw.color(color, selectAlpha);
+                        Draw.rect(icon.getRegion(), 0, 0);
+                    });
+                }
+            }
+        }
+
+        Draw.reset();
+
         if(hovered != null){
             planets.drawPlane(hovered, () -> {
                 Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
@@ -239,6 +255,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 Draw.reset();
             });
         }
+
+        Draw.reset();
     }
 
     void setup(){

@@ -99,7 +99,7 @@ public class PlanetRenderer implements Disposable{
 
         Gl.enable(Gl.blend);
 
-        irenderer.renderProjections();
+        irenderer.renderProjections(planet);
 
         Gl.disable(Gl.cullFace);
         Gl.disable(Gl.depthTest);
@@ -318,6 +318,6 @@ public class PlanetRenderer implements Disposable{
 
     public interface PlanetInterfaceRenderer{
         void renderSectors(Planet planet);
-        void renderProjections();
+        void renderProjections(Planet planet);
     }
 }
