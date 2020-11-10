@@ -946,7 +946,7 @@ public class ServerControl implements ApplicationListener{
                 }
             }
 
-            if(closest != null){
+            if(closest != null && !closest.text.equals("yes")){
                 err("Command not found. Did you mean \"" + closest.text + "\"?");
                 suggested = line.replace(response.runCommand, closest.text);
             }else{

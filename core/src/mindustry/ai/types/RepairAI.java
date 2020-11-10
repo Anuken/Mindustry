@@ -36,12 +36,11 @@ public class RepairAI extends AIController{
         Building target = Units.findDamagedTile(unit.team, unit.x, unit.y);
 
         if(target instanceof ConstructBuild) target = null;
-        
+
         if(target == null){
             super.updateTargeting();
         }else{
             this.target = target;
         }
     }
-    
 }

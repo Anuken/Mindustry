@@ -240,7 +240,6 @@ public class EntityProcess extends BaseProcessor{
             //look at each definition
             for(Selement<?> type : allDefs){
                 EntityDef ann = type.annotation(EntityDef.class);
-                boolean isFinal = ann.isFinal();
 
                 //all component classes (not interfaces)
                 Seq<Stype> components = allComponents(type);
@@ -272,6 +271,10 @@ public class EntityProcess extends BaseProcessor{
                 //check for type name conflicts
                 if(!typeIsBase && baseClass != null && name.equals(baseName(baseClassType))){
                     name += "Entity";
+                }
+
+                if(ann.legacy()){
+                    name += "Legacy" + Strings.capitalize(type.name());
                 }
 
                 //skip double classes

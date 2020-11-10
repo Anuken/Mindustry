@@ -188,7 +188,6 @@ public class Placement{
      * @param maxLength maximum length of area
      */
     public static NormalizeResult normalizeArea(int tilex, int tiley, int endx, int endy, int rotation, boolean snap, int maxLength){
-
         if(snap){
             if(Math.abs(tilex - endx) > Math.abs(tiley - endy)){
                 endy = tiley;

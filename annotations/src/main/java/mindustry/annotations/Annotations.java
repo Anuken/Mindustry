@@ -98,6 +98,8 @@ public class Annotations{
         boolean serialize() default true;
         /** Whether to generate IO code. This is for advanced usage only. */
         boolean genio() default true;
+        /** Whether I made a massive mistake by merging two different class branches */
+        boolean legacy() default false;
     }
 
     /** Indicates an internal interface for entity components. */

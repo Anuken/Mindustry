@@ -61,13 +61,10 @@ public class AIController implements UnitController{
     }
 
     protected void updateVisuals(){
-
         if(unit.isFlying()){
             unit.wobble();
 
-            if(unit.moving()){
-                unit.lookAt(unit.vel.angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }
     }
 

@@ -6,6 +6,7 @@ import arc.audio.SoloudAudio.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
@@ -13,12 +14,14 @@ import static mindustry.Vars.*;
 
 /** Controls playback of multiple music tracks.*/
 public class MusicControl{
-    protected static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.5f;
+    protected static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.46f;
 
     /** normal, ambient music, plays at any time */
     public Seq<Music> ambientMusic = Seq.with();
     /** darker music, used in times of conflict  */
     public Seq<Music> darkMusic = Seq.with();
+    /** music used explicitly after boss spawns */
+    public Seq<Music> bossMusic = Seq.with();
 
     protected Music lastRandomPlayed;
     protected Interval timer = new Interval();
@@ -35,8 +38,12 @@ public class MusicControl{
         Events.on(ClientLoadEvent.class, e -> reload());
 
         //only run music 10 seconds after a wave spawns
-        Events.on(WaveEvent.class, e -> Time.run(60f * 10f, () -> {
-            if(Mathf.chance(musicWaveChance)){
+        Events.on(WaveEvent.class, e -> Time.run(Mathf.random(8f, 15f) * 60f, () -> {
+            boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
+
+            if(boss){
+                playOnce(bossMusic.random(lastRandomPlayed));
+            }else if(Mathf.chance(musicWaveChance)){
                 playRandom();
             }
         }));
@@ -45,8 +52,9 @@ public class MusicControl{
     protected void reload(){
         current = null;
         fade = 0f;
-        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game4, Musics.game6);
-        darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7);
+        ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9);
+        darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4);
+        bossMusic = Seq.with(Musics.boss1, Musics.boss2, Musics.game2, Musics.game5);
     }
 
     public void stop(){

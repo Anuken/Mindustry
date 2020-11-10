@@ -108,7 +108,6 @@ public class MenuFragment extends Fragment{
             editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
             tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-            donate = new MobileButton(Icon.link, "@website", () -> Core.app.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
@@ -195,6 +194,7 @@ public class MenuFragment extends Fragment{
     }
 
     private void checkPlay(Runnable run){
+
         if(!mods.hasContentErrors()){
             run.run();
         }else{

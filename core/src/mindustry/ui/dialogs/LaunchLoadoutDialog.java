@@ -42,6 +42,13 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         //updates sum requirements
         Runnable update = () -> {
+            int cap = selected.findCore().itemCapacity;
+
+            //cap resources based on core type
+            ItemSeq resources = universe.getLaunchResources();
+            resources.min(cap);
+            universe.updateLaunchResources(resources);
+
             total.clear();
             selected.requirements().each(total::add);
             universe.getLaunchResources().each(total::add);
@@ -79,7 +86,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq stacks = universe.getLaunchResources();
             Seq<ItemStack> out = stacks.toSeq();
 
-            loadout.show(core.itemCapacity, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+            loadout.show(selected.findCore().itemCapacity, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
                 universe.updateLaunchResources(new ItemSeq(out));
                 update.run();
                 rebuildItems.run();

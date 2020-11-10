@@ -62,17 +62,15 @@ public class SapBulletType extends BulletType{
         if(target != null){
             float result = Math.min(target.health(), damage);
 
-            if(b.owner instanceof Healthc){
-                ((Healthc)b.owner).heal(result * sapStrength);
+            if(b.owner instanceof Healthc h){
+                h.heal(result * sapStrength);
             }
         }
 
         if(target instanceof Hitboxc hit){
-
             hit.collision(b, hit.x(), hit.y());
             b.collision(hit, hit.x(), hit.y());
         }else if(target instanceof Building tile){
-
             if(tile.collide(b)){
                 tile.collision(b);
                 hit(b, tile.x, tile.y);

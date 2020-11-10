@@ -34,7 +34,6 @@ public class UnitSpawnAbility extends Ability{
         timer += Time.delta;
 
         if(timer >= spawnTime && Units.canCreate(unit.team, type)){
-
             float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
             spawnEffect.at(x, y);
             Unit u = type.create(unit.team);

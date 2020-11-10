@@ -12,6 +12,7 @@ import arc.util.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -290,7 +291,7 @@ public class Control implements ApplicationListener, Loadable{
                         //reset win wave??
                         state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
 
-                        //kill all units, since they should be dead anwyay
+                        //kill all units, since they should be dead anyway
                         Groups.unit.clear();
                         Groups.fire.clear();
 
@@ -400,8 +401,8 @@ public class Control implements ApplicationListener, Loadable{
             try{
                 SaveIO.save(control.saves.getCurrent().file);
                 Log.info("Saved on exit.");
-            }catch(Throwable e){
-                e.printStackTrace();
+            }catch(Throwable t){
+                Log.err(t);
             }
         }
 

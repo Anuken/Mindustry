@@ -47,7 +47,6 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildUI(Group group){
-
         group.fill(t -> {
             t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
             t.bottom();
@@ -482,8 +481,8 @@ public class DesktopInput extends InputHandler{
                 deleting = true;
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
-                if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && (player.builder().plans().size == 0 || !player.builder().updateBuilding()) && !droppingItem &&
-                !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
+                if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !player.builder().activelyBuilding() && !droppingItem &&
+                    !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
                     player.shooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
@@ -621,9 +620,7 @@ public class DesktopInput extends InputHandler{
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(!movement.isZero()){
-                unit.lookAt(unit.vel.isZero() ? movement.angle() : unit.vel.angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }
 
         if(omni){
@@ -644,7 +641,6 @@ public class DesktopInput extends InputHandler{
 
         //update payload input
         if(unit instanceof Payloadc){
-
             if(Core.input.keyTap(Binding.pickupCargo)){
                 tryPickupPayload();
             }
