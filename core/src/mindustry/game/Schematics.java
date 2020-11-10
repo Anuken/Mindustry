@@ -133,7 +133,7 @@ public class Schematics implements Loadable{
         try{
             write(newSchematic, target.file);
         }catch(Exception e){
-            Log.err("Failed to overwrite schematic '@' (@)", newSchematic.name, target.file);
+            Log.err("Failed to overwrite schematic '@' (@)", newSchematic.name(), target.file);
             Log.err(e);
             ui.showException(e);
         }
@@ -190,7 +190,7 @@ public class Schematics implements Loadable{
         try{
             return getBuffer(schematic).getTexture();
         }catch(Throwable t){
-            Log.err("Failed to get preview for schematic '@' (@)", schematic.name, schematic.file);
+            Log.err("Failed to get preview for schematic '@' (@)", schematic.name(), schematic.file);
             Log.err(t);
             errored.add(schematic);
             return errorTexture;
