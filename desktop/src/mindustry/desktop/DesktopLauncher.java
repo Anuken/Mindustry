@@ -265,24 +265,26 @@ public class DesktopLauncher extends ClientLauncher{
             }
         }
 
-        if(useDiscord && Core.settings.getBool("discordrpc")){
-            DiscordRichPresence presence = new DiscordRichPresence();
+        if(useDiscord){
+            if(Core.settings.getBool("discordrpc")){
+                DiscordRichPresence presence = new DiscordRichPresence();
 
-            if(inGame){
-                presence.state = gameMode + gamePlayersSuffix;
-                presence.details = gameMapWithWave;
-                if(state.rules.waves){
-                    presence.largeImageText = "Wave " + state.wave;
+                if(inGame){
+                    presence.state = gameMode + gamePlayersSuffix;
+                    presence.details = gameMapWithWave;
+                    if(state.rules.waves){
+                        presence.largeImageText = "Wave " + state.wave;
+                    }
+                }else{
+                    presence.state = uiState;
                 }
+
+                presence.largeImageKey = "logo";
+
+                DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
             }else{
-                presence.state = uiState;
+                DiscordRPC.INSTANCE.Discord_ClearPresence();
             }
-
-            presence.largeImageKey = "logo";
-
-            DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
-        }else if(useDiscord){
-            DiscordRPC.INSTANCE.Discord_ClearPresence();
         }
 
         if(steam){
