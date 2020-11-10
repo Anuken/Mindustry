@@ -146,6 +146,12 @@ public class SettingsMenuDialog extends SettingsDialog{
                             }
                         }
                     }
+                    
+                    for(var slot : control.saves.getSaveSlots().copy()){
+                        if(slot.isSector()){
+                            slot.delete();
+                        }
+                    }
                 });
             }).marginLeft(4);
 

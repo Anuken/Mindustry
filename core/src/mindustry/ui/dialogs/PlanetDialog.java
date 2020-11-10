@@ -160,7 +160,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     if(canSelect(sec) || sec.unlocked()){
 
                         Color color =
-                        sec.hasBase() ? Team.sharded.color :
+                        sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
                         sec.preset != null ? Team.derelict.color :
                         sec.hasEnemyBase() ? Team.crux.color :
                         null;
@@ -199,6 +199,16 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             Sector launchFrom = findLauncher(hovered);
             if(launchFrom != null && hovered != launchFrom && canSelect(hovered)){
                 planets.drawArc(planet, launchFrom.tile.v, hovered.tile.v);
+            }
+        }
+
+        for(Sector sec : planet.sectors){
+            if(sec.hasBase()){
+                for(Sector enemy : sec.near()){
+                    if(enemy.hasEnemyBase()){
+                        planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color, Color.clear, 0.24f, 110f, 25);
+                    }
+                }
             }
         }
 
@@ -391,6 +401,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture) + " waves");
                 stable.row();
             }
+        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){
+            stable.add("[scarlet]Vulnerable");
+            stable.row();
         }
 
         if(sector.save != null && sector.info.resources.any()){

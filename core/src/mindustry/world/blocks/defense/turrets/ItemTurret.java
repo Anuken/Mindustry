@@ -177,7 +177,7 @@ public class ItemTurret extends Turret{
                 totalAmmo += a;
 
                 //only add ammo if this is a valid ammo type
-                if(ammoTypes.containsKey(item)){
+                if(item != null && ammoTypes.containsKey(item)){
                     ammo.add(new ItemEntry(item, a));
                 }
             }

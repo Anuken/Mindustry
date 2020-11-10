@@ -12,7 +12,6 @@ import arc.util.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -404,6 +403,10 @@ public class Control implements ApplicationListener, Loadable{
             }catch(Throwable t){
                 Log.err(t);
             }
+        }
+
+        for(Music music : assets.getAll(Music.class, new Seq<>())){
+            music.stop();
         }
 
         content.dispose();
