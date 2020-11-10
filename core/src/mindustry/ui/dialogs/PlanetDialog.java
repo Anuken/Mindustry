@@ -210,17 +210,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }
         }
-
-        /*
-        //TODO render arcs
-        if(selected != null && selected.preset != null){
-            for(Objective o : selected.preset.requirements){
-                if(o instanceof SectorObjective){
-                    SectorPreset preset = ((SectorObjective)o).preset;
-                    planets.drawArc(planet, selected.tile.v, preset.sector.tile.v);
-                }
-            }
-        }*/
+        
     }
 
     @Override
@@ -228,7 +218,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         for(Sector sec : planet.sectors){
             if(sec != hovered){
-                var icon = (sec.isAttacked() ? Icon.warning : !sec.hasBase() && sec.preset != null ? Icon.terrain : null);
+                var icon = (sec.isAttacked() ? Icon.warning : !sec.hasBase() && sec.preset != null && sec.preset.unlocked() ? Icon.terrain : null);
                 var color = sec.preset != null && !sec.hasBase() ? Team.derelict.color : Team.sharded.color;
 
                 if(icon != null){
@@ -421,6 +411,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){
             stable.add("[scarlet]Vulnerable");
+            stable.row();
+        }else if(!sector.hasBase() && sector.hasEnemyBase()){
+            stable.add("[scarlet]Enemy Base");
             stable.row();
         }
 
