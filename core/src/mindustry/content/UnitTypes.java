@@ -926,7 +926,7 @@ public class UnitTypes implements ContentList{
                     smokeEffect = Fx.shootSmallSmoke;
                     ammoMultiplier = 2;
                 }};
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.pew;
             }});
         }};
 
