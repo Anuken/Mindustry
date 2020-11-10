@@ -34,7 +34,7 @@ public class MoveLightningAbility extends Ability{
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.color = color;
-        this.offset = offset.
+        this.offset = offset;
     }
     
     @Override
