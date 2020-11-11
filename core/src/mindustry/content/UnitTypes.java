@@ -1307,6 +1307,9 @@ public class UnitTypes implements ContentList{
                 reload = 55f;
                 minShootVelocity = 0.01f;
 
+                soundPitchMin = 1f;
+                shootSound = Sounds.plasmadrop;
+
                 bullet = new BasicBulletType(){{
                     sprite = "large-bomb";
                     width = height = 120/4f;
@@ -1318,9 +1321,10 @@ public class UnitTypes implements ContentList{
                     frontColor = Color.white;
                     mixColorTo = Color.white;
 
+                    hitSound = Sounds.plasmaboom;
+
                     shootCone = 180f;
                     ejectEffect = Fx.none;
-                    shootSound = Sounds.none;
                     despawnShake = 4f;
 
                     collidesAir = false;
