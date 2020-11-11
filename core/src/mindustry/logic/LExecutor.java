@@ -188,7 +188,6 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-
             //binding to `null` was previously possible, but was too powerful and exploitable
             if(exec.obj(type) instanceof UnitType type){
                 Seq<Unit> seq = exec.team.data().unitCache(type);
@@ -199,11 +198,14 @@ public class LExecutor{
                         //bind to the next unit
                         exec.setconst(varUnit, seq.get(index));
                     }
-                    index ++;
+                    index++;
                 }else{
                     //no units of this type found
                     exec.setconst(varUnit, null);
                 }
+            }else if(exec.obj(type) instanceof Unit unit && unit.team == exec.team){
+                //bind to an allied unit's variable, essentially 'set @unit unit'
+                exec.setconst(varUnit, unit);
             }else{
                 exec.setconst(varUnit, null);
             }
