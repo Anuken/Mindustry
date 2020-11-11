@@ -1,6 +1,7 @@
 package mindustry.world.meta.values;
 
 import arc.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
@@ -29,11 +30,12 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
         table.row();
         for(T t : map.keys()){
             BulletType type = map.get(t);
+            //no point in displaying unit icon twice
             if(!(t instanceof UnitType)){
                 table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                 table.add(t.localizedName).padRight(10).left().top();
             }
-            table.table(Tex.underline, bt -> {
+            Cons<Table> tableCons = bt -> {
                 bt.left().defaults().padRight(3).left();
 
                 if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
@@ -44,7 +46,8 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                 }
 
-                if(!Mathf.equal(type.ammoMultiplier, 1f))
+                //ammo multiplyers do not make sense for units
+                if(!(t instanceof UnitType) && !Mathf.equal(type.ammoMultiplier, 1f))
                     sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
                 if(!Mathf.equal(type.reloadMultiplier, 1f))
                     sep(bt, Core.bundle.format("bullet.reload", Strings.fixed(type.reloadMultiplier, 1)));
@@ -89,7 +92,12 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 if(type.fragBullet != null){
                     sep(bt, "@bullet.frag");
                 }
-            }).left().padTop(-9);
+            };
+            if(t instanceof UnitType){
+                table.table(tableCons);
+            }else{
+                table.table(Tex.underline, tableCons).left().padTop(-9);
+            }
             table.row();
         }
     }

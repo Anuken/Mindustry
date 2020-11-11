@@ -6,6 +6,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -30,15 +31,16 @@ public class WeaponListValue implements StatValue{
                 continue;
             }
 
-            table.image(Core.atlas.find(unit.name + "-weapon" + i)).size(15 * 8).right().top();
+            if(weapon.outlineRegion.found()){
+                table.image(weapon.outlineRegion).size(10 * 8).right().top();
+            }else{
+                table.image(unit.icon(Cicon.full)).size(10 * 8).right().top();
+            }
             table.table(Tex.underline, w -> {
                 w.left().defaults().padRight(3).left();
 
-                sep(w, "[lightgray]" + Stat.mirrored.localized() + ": [white]" + weapon.mirror);
                 sep(w, "[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)weapon.inaccuracy + " " + StatUnit.degrees.localized());
-                sep(w, "[lightgray]" + Stat.reload.localized() + ": [white]" + Strings.autoFixed(60f / weapon.reload * weapon.shots, 1));
-                sep(w, "[lightgray]" + Stat.targetsAir.localized() + ": [white]" + weapon.bullet.collidesAir);
-                sep(w, "[lightgray]" + Stat.targetsGround.localized() + ": [white]" + weapon.bullet.collidesGround);
+                sep(w, "[lightgray]" + Stat.reload.localized() + ": " + (weapon.mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / weapon.reload * weapon.shots, 1));
                 sep(w, "[lightgray]" + Stat.bullet.localized() + ":");
 
                 AmmoListValue bullet = new AmmoListValue(OrderedMap.of(unit, weapon.bullet));

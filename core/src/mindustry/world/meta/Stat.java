@@ -56,7 +56,6 @@ public enum Stat{
     instructions(StatCat.crafting),
 
     weapons(StatCat.function),
-    mirrored(StatCat.function),
     bullet(StatCat.function),
 
     speedIncrease(StatCat.function),

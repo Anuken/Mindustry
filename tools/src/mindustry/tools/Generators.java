@@ -504,38 +504,6 @@ public class Generators{
                         scaled.save(type.name + "-icon-logic");
                     }
                 }
-
-                //generate weapon stat UI
-
-                //largest side calculated here to prevent sprite squishing
-                int largestSide = Math.max(image.width, image.height);
-                Image base = new Image(largestSide, largestSide);
-
-                image.each((x, y) -> {
-                    int newX = x - image.width/2 + base.width/2;
-                    int newY = y - image.height/2 + base.height/2;
-                    Color c = image.getColor(x, y);
-                    base.draw(newX, newY, c.set(c.r, c.g, c.b, c.a * 0.2f));
-                });
-
-                for(int i = 0;i < type.weapons.size;i ++){
-                    Weapon weapon = type.weapons.get(i);
-
-                    if(weapon.flipSprite){
-                        //fliped weapons are not given stats
-                        continue;
-                    }
-
-                    weapon.load();
-                    Image baseWithWeapon = base.copy();
-
-                    baseWithWeapon.draw(outline.get(ImagePacker.get(weapon.region)),
-                    (int)(weapon.x / Draw.scl + base.width / 2f - weapon.region.width / 2f),
-                    (int)(-weapon.y / Draw.scl + base.height / 2f - weapon.region.height / 2f),
-                    weapon.flipSprite, false);
-
-                    baseWithWeapon.save(type.name + "-weapon" + i);
-                }
             }catch(IllegalArgumentException e){
                 Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
             }
