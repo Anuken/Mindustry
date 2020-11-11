@@ -123,7 +123,7 @@ public class AssetsProcess extends BaseProcessor{
             if(SourceVersion.isKeyword(name)) name += "s";
 
             String filepath = path.substring(path.lastIndexOf("/") + 1) + "/" + fname;
-            String filename = "arc.Core.app.getType() != arc.Application.ApplicationType.iOS ? \"" + filepath + "\" : \"" + filepath.replace(".ogg", ".mp3") + "\"";
+            String filename = "\"" + filepath + "\"";
 
             loadBegin.addStatement("arc.Core.assets.load(" + filename + ", " + rtype + ".class).loaded = a -> " + name + " = (" + rtype + ")a", filepath, filepath.replace(".ogg", ".mp3"));
 
