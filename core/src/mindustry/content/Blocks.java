@@ -1246,7 +1246,7 @@ public class Blocks implements ContentList{
             powerProduction = 130f;
             itemDuration = 140f;
             ambientSound = Sounds.pulse;
-            ambientSoundVolume = 0.2f;
+            ambientSoundVolume = 0.07f;
 
             consumes.power(25f);
             consumes.item(Items.blastCompound);
