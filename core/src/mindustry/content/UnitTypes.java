@@ -1306,6 +1306,7 @@ public class UnitTypes implements ContentList{
                 mirror = false;
                 reload = 55f;
                 minShootVelocity = 0.01f;
+                shootSound = Sounds.lasershoot;
 
                 bullet = new BasicBulletType(){{
                     sprite = "large-bomb";
@@ -1329,6 +1330,7 @@ public class UnitTypes implements ContentList{
 
                     despawnEffect = Fx.greenBomb;
                     hitEffect = Fx.massiveExplosion;
+                    hitSound = Sounds.explosionbig;
                     keepVelocity = false;
                     spin = 2f;
 
