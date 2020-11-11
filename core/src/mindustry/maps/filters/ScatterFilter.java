@@ -27,7 +27,7 @@ public class ScatterFilter extends GenerateFilter{
             if(!block.isOverlay()){
                 in.block = block;
             }else{
-                in.ore = block;
+                in.overlay = block;
             }
         }
 

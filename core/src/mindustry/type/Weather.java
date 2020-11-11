@@ -1,16 +1,20 @@
 package mindustry.type;
 
+import arc.*;
+import arc.audio.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.util.*;
+import arc.util.noise.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.*;
 import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
@@ -20,6 +24,9 @@ public abstract class Weather extends UnlockableContent{
     public float duration = 9f * Time.toMinutes;
     public float opacityMultiplier = 1f;
     public Attributes attrs = new Attributes();
+    public Sound sound = Sounds.none;
+    public float soundVol = 0.1f, soundVolMin = 0f;
+    public float soundVolOscMag = 0f, soundVolOscScl = 20f;
 
     //internals
     public Rand rand = new Rand();
@@ -81,6 +88,11 @@ public abstract class Weather extends UnlockableContent{
                 state.effectTimer -= Time.delta;
             }
         }
+
+        if(sound != Sounds.none){
+            float noise = soundVolOscMag > 0 ? (float)Math.abs(Noise.rawNoise(Time.time() / soundVolOscScl)) * soundVolOscMag : 0;
+            loops.play(sound, Core.camera.position, Math.max((soundVol + noise) * state.opacity, soundVolMin));
+        }
     }
 
     public void drawOver(WeatherState state){
@@ -91,9 +103,136 @@ public abstract class Weather extends UnlockableContent{
 
     }
 
-    @Override
-    public void displayInfo(Table table){
-        //do not
+    public void drawParticles(TextureRegion region, Color color,
+                              float sizeMin, float sizeMax,
+                              float density, float intensity, float opacity,
+                              float windx, float windy,
+                              float minAlpha, float maxAlpha,
+                              float sinSclMin, float sinSclMax, float sinMagMin, float sinMagMax){
+        rand.setSeed(0);
+        Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
+        Tmp.r1.grow(sizeMax * 1.5f);
+        Core.camera.bounds(Tmp.r2);
+        int total = (int)(Tmp.r1.area() / density * intensity);
+        Draw.color(color, opacity);
+
+        for(int i = 0; i < total; i++){
+            float scl = rand.random(0.5f, 1f);
+            float scl2 = rand.random(0.5f, 1f);
+            float size = rand.random(sizeMin, sizeMax);
+            float x = (rand.random(0f, world.unitWidth()) + Time.time() * windx * scl2);
+            float y = (rand.random(0f, world.unitHeight()) + Time.time() * windy * scl);
+            float alpha = rand.random(minAlpha, maxAlpha);
+
+            x += Mathf.sin(y, rand.random(sinSclMin, sinSclMax), rand.random(sinMagMin, sinMagMax));
+
+            x -= Tmp.r1.x;
+            y -= Tmp.r1.y;
+            x = Mathf.mod(x, Tmp.r1.width);
+            y = Mathf.mod(y, Tmp.r1.height);
+            x += Tmp.r1.x;
+            y += Tmp.r1.y;
+
+            if(Tmp.r3.setCentered(x, y, size).overlaps(Tmp.r2)){
+                Draw.alpha(alpha * opacity);
+                Draw.rect(region, x, y, size, size);
+            }
+        }
+    }
+
+    public void drawRain(float sizeMin, float sizeMax, float xspeed, float yspeed, float density, float intensity, float stroke, Color color){
+        float padding = sizeMax*0.9f;
+
+        Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
+        Tmp.r1.grow(padding);
+        Core.camera.bounds(Tmp.r2);
+        int total = (int)(Tmp.r1.area() / density * intensity);
+        Lines.stroke(stroke);
+        float alpha = Draw.getColor().a;
+        Draw.color(color);
+
+        for(int i = 0; i < total; i++){
+            float scl = rand.random(0.5f, 1f);
+            float scl2 = rand.random(0.5f, 1f);
+            float size = rand.random(sizeMin, sizeMax);
+            float x = (rand.random(0f, world.unitWidth()) + Time.time() * xspeed * scl2);
+            float y = (rand.random(0f, world.unitHeight()) - Time.time() * yspeed * scl);
+            float tint = rand.random(1f) * alpha;
+
+            x -= Tmp.r1.x;
+            y -= Tmp.r1.y;
+            x = Mathf.mod(x, Tmp.r1.width);
+            y = Mathf.mod(y, Tmp.r1.height);
+            x += Tmp.r1.x;
+            y += Tmp.r1.y;
+
+            if(Tmp.r3.setCentered(x, y, size).overlaps(Tmp.r2)){
+                Draw.alpha(tint);
+                Lines.lineAngle(x, y, Angles.angle(xspeed * scl2, - yspeed * scl), size/2f);
+            }
+        }
+    }
+
+    public void drawSplashes(TextureRegion[] splashes, float padding, float density, float intensity, float opacity, float timeScale, float stroke, Color color, Liquid splasher){
+        Tmp.r1.setCentered(Core.camera.position.x, Core.camera.position.y, Core.graphics.getWidth() / renderer.minScale(), Core.graphics.getHeight() / renderer.minScale());
+        Tmp.r1.grow(padding);
+        Core.camera.bounds(Tmp.r2);
+        int total = (int)(Tmp.r1.area() / density * intensity) / 2;
+        Lines.stroke(stroke);
+
+        float t = Time.time() / timeScale;
+
+        for(int i = 0; i < total; i++){
+            float offset = rand.random(0f, 1f);
+            float time = t + offset;
+
+            int pos = (int)((time));
+            float life = time % 1f;
+            float x = (rand.random(0f, world.unitWidth()) + pos*953);
+            float y = (rand.random(0f, world.unitHeight()) - pos*453);
+
+            x -= Tmp.r1.x;
+            y -= Tmp.r1.y;
+            x = Mathf.mod(x, Tmp.r1.width);
+            y = Mathf.mod(y, Tmp.r1.height);
+            x += Tmp.r1.x;
+            y += Tmp.r1.y;
+
+            if(Tmp.r3.setCentered(x, y, life * 4f).overlaps(Tmp.r2)){
+                Tile tile = world.tileWorld(x, y);
+
+                //only create splashes on specific liquid.
+                if(tile != null && tile.floor().liquidDrop == splasher){
+                    Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(1.5f).a(opacity));
+                    Draw.rect(splashes[(int)(life * (splashes.length - 1))], x, y);
+                }else if(tile != null && tile.floor().liquidDrop == null && !tile.floor().solid){
+                    Draw.color(color);
+                    Draw.alpha(Mathf.slope(life) * opacity);
+
+                    float space = 45f;
+                    for(int j : new int[]{-1, 1}){
+                        Tmp.v1.trns(90f + j*space, 1f + 5f * life);
+                        Lines.lineAngle(x + Tmp.v1.x, y + Tmp.v1.y, 90f + j*space, 3f * (1f - life));
+                    }
+                }
+            }
+        }
+    }
+
+    public void drawNoise(Texture noise, Color color, float noisescl, float opacity, float baseSpeed, float intensity, float vwindx, float vwindy, float offset){
+        Draw.alpha(opacity);
+        Draw.tint(color);
+
+        float speed = baseSpeed * intensity;
+        float windx = vwindx * speed, windy = vwindy * speed;
+
+        float scale = 1f / noisescl;
+        float scroll = Time.time() * scale + offset;
+        Tmp.tr1.texture = noise;
+        Core.camera.bounds(Tmp.r1);
+        Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
+        Tmp.tr1.scroll(-windx * scroll, -windy * scroll);
+        Draw.rect(Tmp.tr1, Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
     }
 
     @Override

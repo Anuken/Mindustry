@@ -17,14 +17,12 @@ public class EventType{
         phaseDeflectHit,
         impactPower,
         thoriumReactorOverheat,
-        itemLaunch,
         fireExtinguish,
         newGame,
         tutorialComplete,
         flameAmmo,
         turretCool,
         enablePixelation,
-        drown,
         exclusionDeath,
         suicideBomb,
         openWiki,
@@ -35,7 +33,13 @@ public class EventType{
         preDraw,
         postDraw,
         uiDrawBegin,
-        uiDrawEnd
+        uiDrawEnd,
+        //before/after bloom used, skybox or planets drawn
+        universeDrawBegin,
+        //skybox drawn and bloom is enabled - use Vars.renderer.planets
+        universeDraw,
+        //planets drawn and bloom disabled
+        universeDrawEnd
     }
 
     public static class WinEvent{}
@@ -73,11 +77,36 @@ public class EventType{
         }
     }
 
+    /** Called when a sector is destroyed by waves when you're not there. */
+    public static class SectorInvasionEvent{
+        public final Sector sector;
+
+        public SectorInvasionEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
     public static class LaunchItemEvent{
         public final ItemStack stack;
 
         public LaunchItemEvent(ItemStack stack){
             this.stack = stack;
+        }
+    }
+
+    public static class SectorLaunchEvent{
+        public final Sector sector;
+
+        public SectorLaunchEvent(Sector sector){
+            this.sector = sector;
+        }
+    }
+
+    public static class SchematicCreateEvent{
+        public final Schematic schematic;
+
+        public SchematicCreateEvent(Schematic schematic){
+            this.schematic = schematic;
         }
     }
 
@@ -172,6 +201,34 @@ public class EventType{
         }
     }
 
+    public static class PickupEvent{
+        public final Unit carrier;
+        public final @Nullable Unit unit;
+        public final @Nullable Building build;
+
+        public PickupEvent(Unit carrier, Unit unit){
+            this.carrier = carrier;
+            this.unit = unit;
+            this.build = null;
+        }
+
+        public PickupEvent(Unit carrier, Building build){
+            this.carrier = carrier;
+            this.build = build;
+            this.unit = null;
+        }
+    }
+
+    public static class UnitControlEvent{
+        public final Player player;
+        public final @Nullable Unit unit;
+
+        public UnitControlEvent(Player player, @Nullable Unit unit){
+            this.player = player;
+            this.unit = unit;
+        }
+    }
+
     public static class GameOverEvent{
         public final Team winner;
 
@@ -214,8 +271,8 @@ public class EventType{
     }
 
     /**
-     * Called when block building begins by placing down the BuildBlock.
-     * The tile's block will nearly always be a BuildBlock.
+     * Called when block building begins by placing down the ConstructBlock.
+     * The tile's block will nearly always be a ConstructBlock.
      */
     public static class BlockBuildBeginEvent{
         public final Tile tile;
@@ -247,7 +304,7 @@ public class EventType{
 
     /**
      * Called when a player or drone begins building something.
-     * This does not necessarily happen when a new BuildBlock is created.
+     * This does not necessarily happen when a new ConstructBlock is created.
      */
     public static class BuildSelectEvent{
         public final Tile tile;

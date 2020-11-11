@@ -2,13 +2,13 @@ package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.struct.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -23,35 +23,28 @@ public class GenericCrafter extends Block{
 
     public DrawBlock drawer = new DrawBlock();
 
-    //public Cons<GenericCrafterEntity> drawer = null;
-    //public Prov<TextureRegion[]> drawIcons = null;
-
     public GenericCrafter(String name){
         super(name);
         update = true;
         solid = true;
         hasItems = true;
-        idleSound = Sounds.machine;
+        ambientSound = Sounds.machine;
         sync = true;
-        idleSoundVolume = 0.03f;
+        ambientSoundVolume = 0.03f;
+        flags = EnumSet.of(BlockFlag.factory);
     }
 
     @Override
     public void setStats(){
-        if(consumes.has(ConsumeType.liquid)){
-            ConsumeLiquidBase cons = consumes.get(ConsumeType.liquid);
-            cons.timePeriod = craftTime;
-        }
-
         super.setStats();
-        stats.add(BlockStat.productionTime, craftTime / 60f, StatUnit.seconds);
+        stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
 
         if(outputItem != null){
-            stats.add(BlockStat.output, outputItem);
+            stats.add(Stat.output, outputItem);
         }
 
         if(outputLiquid != null){
-            stats.add(BlockStat.output, outputLiquid.liquid, outputLiquid.amount, false);
+            stats.add(Stat.output, outputLiquid.liquid, outputLiquid.amount * (60f / craftTime), true);
         }
     }
 
@@ -143,7 +136,7 @@ public class GenericCrafter extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return cons.valid();
         }
 

@@ -45,6 +45,7 @@ public class MenuFragment extends Fragment{
 
         parent.fill(c -> {
             container = c;
+            c.name = "menu container";
 
             if(!mobile){
                 buildDesktop();
@@ -57,8 +58,8 @@ public class MenuFragment extends Fragment{
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45));
-            parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45));
+            parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45).name("info"));
+            parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45).name("discord"));
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
@@ -68,7 +69,7 @@ public class MenuFragment extends Fragment{
                         ui.showInfo("@be.noupdates");
                     }
                 });
-            }).size(200, 60).update(t -> {
+            }).size(200, 60).name("becheck").update(t -> {
                 t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
             }));
         }
@@ -93,6 +94,7 @@ public class MenuFragment extends Fragment{
 
     private void buildMobile(){
         container.clear();
+        container.name = "buttons";
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
         float size = 120f;
@@ -106,7 +108,6 @@ public class MenuFragment extends Fragment{
             editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
             tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-            donate = new MobileButton(Icon.link, "@website", () -> Core.app.openURI("https://anuke.itch.io/mindustry")),
             exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
@@ -153,7 +154,6 @@ public class MenuFragment extends Fragment{
         container.clear();
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
-
         float width = 230f;
         Drawable background = Styles.black6;
 
@@ -161,6 +161,7 @@ public class MenuFragment extends Fragment{
         container.add().width(Core.graphics.getWidth()/10f);
         container.table(background, t -> {
             t.defaults().width(width).height(70f);
+            t.name = "buttons";
 
             buttons(t,
                 new Buttoni("@play", Icon.play,
@@ -171,7 +172,7 @@ public class MenuFragment extends Fragment{
                     new Buttoni("@tutorial", Icon.info, () -> checkPlay(control::playTutorial))
                 ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.book, platform::openWorkshop) : null,
-                new Buttoni(Core.bundle.get("mods"), Icon.bookOpen, ui.mods::show),
+                new Buttoni("@mods", Icon.book, ui.mods::show),
                 //not enough space for this button
                 //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
                 new Buttoni("@settings", Icon.settings, ui.settings::show),
@@ -183,6 +184,7 @@ public class MenuFragment extends Fragment{
 
         container.table(background, t -> {
             submenu = t;
+            t.name = "submenu";
             t.color.a = 0f;
             t.top();
             t.defaults().width(width).height(70f);
@@ -192,6 +194,7 @@ public class MenuFragment extends Fragment{
     }
 
     private void checkPlay(Runnable run){
+
         if(!mods.hasContentErrors()){
             run.run();
         }else{

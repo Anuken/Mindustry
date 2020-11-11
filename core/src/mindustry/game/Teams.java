@@ -23,7 +23,9 @@ public class Teams{
     /** Maps team IDs to team data. */
     private TeamData[] map = new TeamData[256];
     /** Active teams. */
-    private Seq<TeamData> active = new Seq<>();
+    public Seq<TeamData> active = new Seq<>();
+    /** Teams with block or unit presence. */
+    public Seq<TeamData> present = new Seq<>(TeamData.class);
 
     public Teams(){
         active.add(get(Team.crux));
@@ -31,7 +33,7 @@ public class Teams{
 
     @Nullable
     public CoreBuild closestEnemyCore(float x, float y, Team team){
-        for(Team enemy : team.enemies()){
+        for(Team enemy : team.data().coreEnemies){
             CoreBuild tile = Geometry.findClosest(x, y, enemy.cores());
             if(tile != null) return tile;
         }
@@ -41,10 +43,6 @@ public class Teams{
     @Nullable
     public CoreBuild closestCore(float x, float y, Team team){
         return Geometry.findClosest(x, y, get(team).cores);
-    }
-
-    public Team[] enemiesOf(Team team){
-        return get(team).enemies;
     }
 
     public boolean eachEnemyCore(Team team, Boolf<CoreBuild> ret){
@@ -133,21 +131,24 @@ public class Teams{
     }
 
     private void count(Unit unit){
-        unit.team.data().updateCount(unit.type(), 1);
+        unit.team.data().updateCount(unit.type, 1);
 
-        if(unit instanceof Payloadc){
-            ((Payloadc)unit).payloads().each(p -> {
-                if(p instanceof UnitPayload){
-                    count(((UnitPayload)p).unit);
+        if(unit instanceof Payloadc payloadc){
+            payloadc.payloads().each(p -> {
+                if(p instanceof UnitPayload payload){
+                    count(payload.unit);
                 }
             });
         }
     }
 
     public void updateTeamStats(){
+        present.clear();
+
         for(Team team : Team.all){
             TeamData data = team.data();
 
+            data.presentFlag = false;
             data.unitCount = 0;
             data.units.clear();
             if(data.tree != null){
@@ -168,22 +169,35 @@ public class Teams{
             }
         }
 
+        //update presence flag.
+        Groups.build.each( b -> b.team.data().presentFlag = true);
+
         for(Unit unit : Groups.unit){
             TeamData data = unit.team.data();
             data.tree().insert(unit);
             data.units.add(unit);
+            data.presentFlag = true;
 
-            if(data.unitsByType == null || data.unitsByType.length <= unit.type().id){
+            if(data.unitsByType == null || data.unitsByType.length <= unit.type.id){
                 data.unitsByType = new Seq[content.units().size];
             }
 
-            if(data.unitsByType[unit.type().id] == null){
-                data.unitsByType[unit.type().id] = new Seq<>();
+            if(data.unitsByType[unit.type.id] == null){
+                data.unitsByType[unit.type.id] = new Seq<>();
             }
 
-            data.unitsByType[unit.type().id].add(unit);
+            data.unitsByType[unit.type.id].add(unit);
 
             count(unit);
+        }
+
+        //update presence of each team.
+        for(Team team : Team.all){
+            TeamData data = team.data();
+
+            if(data.presentFlag || data.active()){
+                present.add(data);
+            }
         }
     }
 
@@ -201,7 +215,7 @@ public class Teams{
                 }
             }
 
-            data.enemies = enemies.toArray(Team.class);
+            data.coreEnemies = enemies.toArray(Team.class);
         }
     }
 
@@ -210,7 +224,10 @@ public class Teams{
         public final Team team;
         public final BaseAI ai;
 
-        public Team[] enemies = {};
+        private boolean presentFlag;
+
+        /** Enemies with cores or spawn points. */
+        public Team[] coreEnemies = {};
         /** Planned blocks for drones. This is usually only blocks that have been broken. */
         public Queue<BlockPlan> blocks = new Queue<>();
         /** The current command for units to follow. */
@@ -244,11 +261,12 @@ public class Teams{
         }
 
         public void updateCount(UnitType type, int amount){
+            if(type == null) return;
             unitCount = Math.max(amount + unitCount, 0);
             if(typeCounts == null || typeCounts.length <= type.id){
                 typeCounts  = new int[Vars.content.units().size];
             }
-            typeCounts [type.id] = Math.max(amount + typeCounts [type.id], 0);
+            typeCounts[type.id] = Math.max(amount + typeCounts[type.id], 0);
         }
 
         public QuadTree<Unit> tree(){

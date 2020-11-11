@@ -65,6 +65,13 @@ public class ItemStack implements Comparable<ItemStack>{
     }
 
     @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(!(o instanceof ItemStack stack)) return false;
+        return amount == stack.amount && item == stack.item;
+    }
+
+    @Override
     public String toString(){
         return "ItemStack{" +
         "item=" + item +

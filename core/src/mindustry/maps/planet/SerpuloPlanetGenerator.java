@@ -145,7 +145,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         float constraint = 1.3f;
         float radius = width / 2f / Mathf.sqrt3;
         int rooms = rand.random(2, 5);
-        Seq<Room> array = new Seq<>();
+        Seq<Room> roomseq = new Seq<>();
 
         for(int i = 0; i < rooms; i++){
             Tmp.v1.trns(rand.random(360f), rand.random(radius / constraint));
@@ -153,7 +153,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             float ry = (height/2f + Tmp.v1.y);
             float maxrad = radius - Tmp.v1.len();
             float rrad = Math.min(rand.random(9f, maxrad / 2f), 30f);
-            array.add(new Room((int)rx, (int)ry, (int)rrad));
+            roomseq.add(new Room((int)rx, (int)ry, (int)rrad));
         }
 
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
@@ -182,13 +182,13 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
 
             if(waterTiles <= 4 || (i + angleStep >= 360)){
-                array.add(spawn = new Room(cx, cy, rand.random(8, 15)));
+                roomseq.add(spawn = new Room(cx, cy, rand.random(8, 15)));
 
                 for(int j = 0; j < enemySpawns; j++){
                     float enemyOffset = rand.range(60f);
                     Tmp.v1.set(cx - width/2, cy - height/2).rotate(180f + enemyOffset).add(width/2, height/2);
                     Room espawn = new Room((int)Tmp.v1.x, (int)Tmp.v1.y, rand.random(8, 15));
-                    array.add(espawn);
+                    roomseq.add(espawn);
                     enemies.add(espawn);
                 }
 
@@ -196,16 +196,16 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        for(Room room : array){
+        for(Room room : roomseq){
             erase(room.x, room.y, room.radius);
         }
 
         int connections = rand.random(Math.max(rooms - 1, 1), rooms + 3);
         for(int i = 0; i < connections; i++){
-            array.random(rand).connect(array.random(rand));
+            roomseq.random(rand).connect(roomseq.random(rand));
         }
 
-        for(Room room : array){
+        for(Room room : roomseq){
             spawn.connect(room);
         }
 
@@ -252,10 +252,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        for(Room espawn : enemies){
-            tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
-        }
-
         trimDark();
 
         median(2);
@@ -273,7 +269,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             //tar
             if(floor == Blocks.darksand){
                 if(Math.abs(0.5f - noise(x - 40, y, 2, 0.7, 80)) > 0.25f &&
-                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f){
+                Math.abs(0.5f - noise(x, y + sector.id*10, 1, 1, 60)) > 0.41f && !(roomseq.contains(r -> Mathf.within(x, y, r.x, r.y, 15)))){
                     floor = Blocks.tar;
                     ore = Blocks.air;
                 }
@@ -281,7 +277,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             //hotrock tweaks
             if(floor == Blocks.hotrock){
-                if(rand.chance(0.3)){
+                if(Math.abs(0.5f - noise(x - 90, y, 4, 0.8, 80)) > 0.035){
                     floor = Blocks.basalt;
                 }else{
                     ore = Blocks.air;
@@ -295,6 +291,23 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     if(all){
                         floor = Blocks.magmarock;
                     }
+                }
+            }
+
+            if(rand.chance(0.0075)){
+                //random spore trees
+                boolean any = false;
+                boolean all = true;
+                for(Point2 p : Geometry.d4){
+                    Tile other = tiles.get(x + p.x, y + p.y);
+                    if(other != null && other.block() == Blocks.air){
+                        any = true;
+                    }else{
+                        all = false;
+                    }
+                }
+                if(any && ((block == Blocks.snowWall || block == Blocks.iceWall) || (all && block == Blocks.air && floor == Blocks.snow && rand.chance(0.03)))){
+                    block = rand.chance(0.5) ? Blocks.whiteTree : Blocks.whiteTreeDead;
                 }
             }
 
@@ -392,18 +405,22 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
+        for(Room espawn : enemies){
+            tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
+        }
+
         if(sector.hasEnemyBase()){
             basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);
 
-            state.rules.attackMode = true;
+            state.rules.attackMode = sector.info.attack = true;
         }else{
-            state.rules.winWave = 15 * (int)Math.max(difficulty * 10, 1);
+            state.rules.winWave = sector.info.winWave = 10 + 5 * (int)Math.max(difficulty * 10, 1);
         }
 
-        state.rules.waves = true;
+        state.rules.waves = sector.info.waves = true;
 
         //TODO better waves
-        state.rules.spawns = DefaultWaves.generate(difficulty);
+        state.rules.spawns = Waves.generate(difficulty);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package mindustry.world.blocks.environment;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
@@ -10,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
@@ -33,7 +35,11 @@ public class Floor extends Block{
     /** How many ticks it takes to drown on this. */
     public float drownTime = 0f;
     /** Effect when walking on this floor. */
-    public Effect walkEffect = Fx.ripple;
+    public Effect walkEffect = Fx.none;
+    /** Sound made when walking. */
+    public Sound walkSound = Sounds.none;
+    /** Volume of sound made when walking. */
+    public float walkSoundVolume = 0.1f, walkSoundPitchMin = 0.8f, walkSoundPitchMax = 1.2f;
     /** Effect displayed when drowning on this floor. */
     public Effect drownUpdateEffect = Fx.bubble;
     /** Status effect applied when walking on. */
@@ -64,6 +70,8 @@ public class Floor extends Block{
     public Block wall = Blocks.air;
     /** Decoration block. Usually a rock. May be air. */
     public Block decoration = Blocks.air;
+    /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
+    public boolean needsSurface = true;
 
     protected TextureRegion[][] edges;
     protected Seq<Block> blenders = new Seq<>();
@@ -112,6 +120,14 @@ public class Floor extends Block{
 
         if(decoration == Blocks.air){
             decoration = content.blocks().min(b -> b instanceof Boulder && b.breakable ? mapColor.diff(b.mapColor) : Float.POSITIVE_INFINITY);
+        }
+
+        if(isLiquid && walkEffect == Fx.none){
+            walkEffect = Fx.ripple;
+        }
+
+        if(isLiquid && walkSound == Sounds.none){
+            walkSound = Sounds.splash;
         }
     }
 
@@ -183,7 +199,7 @@ public class Floor extends Block{
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
-            Tile other = tile.getNearby(point);
+            Tile other = tile.nearby(point);
             if(other != null && other.floor().cacheLayer == layer && other.floor().edges() != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
@@ -200,7 +216,7 @@ public class Floor extends Block{
 
         for(int i = 0; i < 8; i++){
             Point2 point = Geometry.d8[i];
-            Tile other = tile.getNearby(point);
+            Tile other = tile.nearby(point);
             if(other != null && doEdge(other.floor()) && other.floor().cacheLayer == cacheLayer && other.floor().edges() != null){
                 if(!blended.getAndSet(other.floor().id)){
                     blenders.add(other.floor());
@@ -217,7 +233,7 @@ public class Floor extends Block{
         for(Block block : blenders){
             for(int i = 0; i < 8; i++){
                 Point2 point = Geometry.d8[i];
-                Tile other = tile.getNearby(point);
+                Tile other = tile.nearby(point);
                 if(other != null && other.floor() == block){
                     TextureRegion region = edge((Floor)block, 1 - point.x, 1 - point.y);
                     Draw.rect(region, tile.worldx(), tile.worldy());
@@ -229,7 +245,7 @@ public class Floor extends Block{
     //'new' style of edges with shadows instead of colors, not used currently
     protected void drawEdgesFlat(Tile tile, boolean sameLayer){
         for(int i = 0; i < 4; i++){
-            Tile other = tile.getNearby(i);
+            Tile other = tile.nearby(i);
             if(other != null && doEdge(other.floor())){
                 Color color = other.floor().mapColor;
                 Draw.color(color.r, color.g, color.b, 1f);

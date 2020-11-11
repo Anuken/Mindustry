@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
@@ -19,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 6f;
+    private static final float orbitSpacing = 9f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -46,6 +45,8 @@ public class Planet extends UnlockableContent{
     public float sectorApproxRadius;
     /** Whether this planet is tidally locked relative to its parent - see https://en.wikipedia.org/wiki/Tidal_locking */
     public boolean tidalLock = false;
+    /** Whether or not this planet is listed in the planet access UI. **/
+    public boolean accessible = true;
     /** The default starting sector displayed to the map dialog. */
     public int startSector = 0;
     /** Whether the bloom render effect is enabled. */
@@ -175,7 +176,7 @@ public class Planet extends UnlockableContent{
     public void updateBaseCoverage(){
         for(Sector sector : sectors){
             float sum = 1f;
-            for(Sector other : sector.inRange(2)){
+            for(Sector other : sector.near()){
                 if(other.generateEnemyBase){
                     sum += 1f;
                 }
@@ -185,7 +186,7 @@ public class Planet extends UnlockableContent{
                 sum += 2f;
             }
 
-            sector.baseCoverage = Mathf.clamp(sum / 5f);
+            sector.baseCoverage = sector.preset == null ? Mathf.clamp(sum / 5f) : Mathf.clamp(sector.preset.difficulty / 10f);
         }
     }
 
@@ -201,6 +202,10 @@ public class Planet extends UnlockableContent{
 
     @Override
     public void init(){
+
+        for(Sector sector : sectors){
+            sector.loadInfo();
+        }
 
         if(generator != null){
             Noise.setSeed(id + 1);
@@ -254,12 +259,15 @@ public class Planet extends UnlockableContent{
     }
 
     @Override
-    public void displayInfo(Table table){
-
-    }
-
-    @Override
     public ContentType getContentType(){
         return ContentType.planet;
+    }
+
+    public boolean visible(){
+        return true;
+    }
+
+    public void draw(Mat3D projection, Mat3D transform){
+        mesh.render(projection, transform);
     }
 }

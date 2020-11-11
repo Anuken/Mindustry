@@ -78,16 +78,6 @@ public class ModLoadingSound implements Sound{
     }
 
     @Override
-    public void pause(){
-        sound.pause();
-    }
-
-    @Override
-    public void resume(){
-        sound.resume();
-    }
-
-    @Override
     public void dispose(){
         sound.dispose();
     }
@@ -123,8 +113,8 @@ public class ModLoadingSound implements Sound{
     }
 
     @Override
-    public void setPan(int soundId, float pan, float volume){
-        sound.setPan(soundId, pan, volume);
+    public void set(int soundId, float pan, float volume){
+        sound.set(soundId, pan, volume);
     }
 
     @Override

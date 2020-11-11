@@ -19,7 +19,7 @@ abstract class StatusComp implements Posc, Flyingc{
     private Seq<StatusEntry> statuses = new Seq<>();
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
-    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, armorMultiplier = 1, reloadMultiplier = 1;
+    @ReadOnly transient float speedMultiplier = 1, damageMultiplier = 1, healthMultiplier = 1, reloadMultiplier = 1;
 
     @Import UnitType type;
 
@@ -104,7 +104,7 @@ abstract class StatusComp implements Posc, Flyingc{
         }
 
         applied.clear();
-        speedMultiplier = damageMultiplier = armorMultiplier = reloadMultiplier = 1f;
+        speedMultiplier = damageMultiplier = healthMultiplier = reloadMultiplier = 1f;
 
         if(statuses.isEmpty()) return;
 
@@ -114,15 +114,16 @@ abstract class StatusComp implements Posc, Flyingc{
             StatusEntry entry = statuses.get(index++);
 
             entry.time = Math.max(entry.time - Time.delta, 0);
-            applied.set(entry.effect.id);
 
-            if(entry.time <= 0 && !entry.effect.permanent){
+            if(entry.effect == null || (entry.time <= 0 && !entry.effect.permanent)){
                 Pools.free(entry);
                 index --;
                 statuses.remove(index);
             }else{
+                applied.set(entry.effect.id);
+
                 speedMultiplier *= entry.effect.speedMultiplier;
-                armorMultiplier *= entry.effect.armorMultiplier;
+                healthMultiplier *= entry.effect.healthMultiplier;
                 damageMultiplier *= entry.effect.damageMultiplier;
                 reloadMultiplier *= entry.effect.reloadMultiplier;
                 entry.effect.update(self(), entry.time);

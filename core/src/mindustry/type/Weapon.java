@@ -50,7 +50,7 @@ public class Weapon{
     public float x = 5f, y = 0f;
     /** random spread on the X axis */
     public float xRand = 0f;
-    /** radius of occlusion drawn under the weapon; <0 to diable */
+    /** radius of occlusion drawn under the weapon; <0 to disable */
     public float occlusion = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
@@ -62,6 +62,8 @@ public class Weapon{
     public float shootCone = 5f;
     /** ticks to cool down the heat region */
     public float cooldownTime = 20f;
+    /** random sound pitch range */
+    public float soundPitchMin = 0.8f, soundPitchMax = 1f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
     /** min velocity required for this weapon to shoot */

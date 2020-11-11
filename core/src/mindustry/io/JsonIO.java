@@ -165,6 +165,18 @@ public class JsonIO{
             }
         });
 
+        json.setSerializer(UnitType.class, new Serializer<>(){
+            @Override
+            public void write(Json json, UnitType object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public UnitType read(Json json, JsonValue jsonData, Class type){
+                return Vars.content.getByName(ContentType.unit, jsonData.asString());
+            }
+        });
+
         json.setSerializer(ItemStack.class, new Serializer<>(){
             @Override
             public void write(Json json, ItemStack object, Class knownType){

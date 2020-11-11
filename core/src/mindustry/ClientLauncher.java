@@ -45,6 +45,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         //debug GL information
         Log.info("[GL] Version: @", graphics.getGLVersion());
         Log.info("[GL] Max texture size: @", Gl.getInt(Gl.maxTextureSize));
+        Log.info("[GL] Max vert/frag shader FP precision: @ / @", Gl.getShaderPrecision(Gl.vertexShader, Gl.highFloat), Gl.getShaderPrecision(Gl.fragmentShader, Gl.highFloat));
         Log.info("[GL] Using @ context.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
         Log.info("[JAVA] Version: @", System.getProperty("java.version"));
 
@@ -74,7 +75,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadDefaultFont();
 
         //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>(Gl.getInt(Gl.maxTextureSize) >= 4096 ? "sprites/sprites.atlas" : "sprites/fallback/sprites.atlas", TextureAtlas.class)).loaded = t -> {
+        assets.load(new AssetDescriptor<>(Gl.getInt(Gl.maxTextureSize) >= 4096  ? "sprites/sprites.atlas" : "sprites/fallback/sprites.atlas", TextureAtlas.class)).loaded = t -> {
             atlas = (TextureAtlas)t;
             Fonts.mergeFontAtlas(atlas);
         };

@@ -14,6 +14,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -23,6 +24,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
@@ -85,7 +87,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             if(tile != null && player.team().isEnemy(tile.team)){
                 player.miner().mineTile(null);
                 target = tile;
-            }else if(tile != null && player.unit().type().canHeal && tile.team == player.team() && tile.damaged()){
+            }else if(tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged()){
                 player.miner().mineTile(null);
                 target = tile;
             }
@@ -203,7 +205,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             boolean arrow = block != null && block.rotate;
 
             i.getImage().setRotationOrigin(!arrow ? 0 : rotation * 90, Align.center);
-            i.getStyle().imageUp = arrow ? Icon.right : Icon.paste;
+            i.getStyle().imageUp = arrow ? Icon.right : Icon.copy;
             i.setChecked(!arrow && schematicMode);
         });
 
@@ -325,7 +327,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void drawTop(){
-
         //draw schematic selection
         if(mode == schematicSelect){
             drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
@@ -405,14 +406,14 @@ public class MobileInput extends InputHandler implements GestureListener{
     protected int schemOriginX(){
         Tmp.v1.setZero();
         selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
+        return World.toTile(Tmp.v1.scl(1f / selectRequests.size).x);
     }
 
     @Override
     protected int schemOriginY(){
         Tmp.v1.setZero();
         selectRequests.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
-        return world.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
+        return World.toTile(Tmp.v1.scl(1f / selectRequests.size).y);
     }
 
     @Override
@@ -611,7 +612,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 //reset payload target
                 payloadTarget = null;
                 //apply command on double tap when own unit is tapped
-                if(Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f)){
+                if(!player.dead() && Mathf.within(worldx, worldy, player.unit().x, player.unit().y, player.unit().hitSize * 0.6f + 8f) && player.unit().type.commandLimit > 0){
                     Call.unitCommand(player);
                 }else{
                     //control a unit/block
@@ -834,10 +835,10 @@ public class MobileInput extends InputHandler implements GestureListener{
     protected void updateMovement(Unit unit){
         Rect rect = Tmp.r3;
 
-        UnitType type = unit.type();
+        UnitType type = unit.type;
         if(type == null) return;
 
-        boolean omni = unit.type().omniMovement;
+        boolean omni = unit.type.omniMovement;
         boolean legs = unit.isGrounded();
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building && ((Building)target).isValid() && target.team() == unit.team &&
@@ -855,15 +856,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         float attractDst = 15f;
         float strafePenalty = legs ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(unit.vel.angle(), unit.rotation) / 180f);
 
-        float baseSpeed = unit.type().speed;
-
-        //limit speed to minimum formation speed to preserve formation
-        if(unit.isCommanding()){
-            //add a tiny multiplier to let units catch up just in case
-            baseSpeed = unit.minFormationSpeed * 0.98f;
-        }
-
-        float speed = baseSpeed * Mathf.lerp(1f, unit.isCommanding() ? 1f : type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = unit.realSpeed() * strafePenalty;
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
@@ -872,9 +865,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(unit.moving()){
-                unit.lookAt(unit.vel.angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }
 
         if(payloadTarget != null && unit instanceof Payloadc pay){
@@ -904,7 +895,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(player.within(targetPos, attractDst)){
             movement.setZero();
-            unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
+            unit.vel.approachDelta(Vec2.ZERO, unit.speed() * type.accel / 2f);
         }
 
         float expansion = 3f;
@@ -935,7 +926,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
             }else if(target == null){
                 player.shooting = false;
-                if(Core.settings.getBool("autotarget")){
+                if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
                     target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.team != Team.derelict, u -> u.team != Team.derelict);
 
                     if(allowHealing && target == null){
@@ -946,7 +937,9 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
                 }
 
-                unit.aim(Tmp.v1.trns(unit.rotation, 1000f).add(unit));
+                //when not shooting, aim at mouse cursor
+                //this may be a bad idea, aiming for a point far in front could work better, test it out
+                unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
             }else{
                 Vec2 intercept = Predict.intercept(unit, target, bulletSpeed);
 

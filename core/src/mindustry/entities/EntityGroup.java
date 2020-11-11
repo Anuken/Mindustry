@@ -183,8 +183,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
 
         array.each(Entityc::remove);
         array.clear();
-        if(map != null)
-            map.clear();
+        if(map != null) map.clear();
 
         clearing = false;
     }

@@ -21,6 +21,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -31,6 +32,7 @@ public class Generators{
     0x454545ff, 0x00000000,//0x32394bff,
     0x00000099, 0x00000000//0x000000ff
     );
+    static final Cicon logicIcon = Cicon.medium;
 
     public static void generate(){
         ObjectMap<Block, Image> gens = new ObjectMap<>();
@@ -153,9 +155,9 @@ public class Generators{
 
         ImagePacker.generate("cracks", () -> {
             RidgedPerlin r = new RidgedPerlin(1, 3);
-            for(int size = 1; size <= Block.maxCrackSize; size++){
+            for(int size = 1; size <= BlockRenderer.maxCrackSize; size++){
                 int dim = size * 32;
-                int steps = Block.crackRegions;
+                int steps = BlockRenderer.crackRegions;
                 for(int i = 0; i < steps; i++){
                     float fract = i / (float)steps;
 
@@ -302,6 +304,10 @@ public class Generators{
                         Image scaled = new Image(icon.size, icon.size);
                         scaled.drawScaled(image);
                         scaled.save("../ui/block-" + block.name + "-" + icon.name());
+
+                        if(icon == logicIcon && block.synthetic() && block.buildVisibility != BuildVisibility.hidden){
+                            image.save(block.name + "-icon-logic");
+                        }
                     }
 
                     boolean hasEmpty = false;
@@ -372,6 +378,10 @@ public class Generators{
 
                     if(icon == Cicon.medium){
                         image.save("../ui/" + item.getContentType() + "-" + item.name + "-icon");
+                    }
+
+                    if(icon == logicIcon){
+                        image.save(item.name + "-icon-logic");
                     }
                 }
             }
@@ -489,6 +499,10 @@ public class Generators{
 
                     scaled.drawScaled(image);
                     scaled.save("../ui/unit-" + type.name + "-" + icon.name());
+
+                    if(icon == logicIcon){
+                        scaled.save(type.name + "-icon-logic");
+                    }
                 }
 
             }catch(IllegalArgumentException e){

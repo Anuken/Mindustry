@@ -100,7 +100,6 @@ public class LightRenderer{
 
             Draw.vert(ledge.texture, vertices, 0, vertices.length);
 
-
             Vec2 v3 = Tmp.v2.trnsExact(rot, stroke);
 
             u = ledge.u;

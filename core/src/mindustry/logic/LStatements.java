@@ -8,6 +8,7 @@ import arc.scene.ui.layout.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.type.*;
@@ -29,8 +30,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
         }
 
         @Override
@@ -47,8 +48,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
         }
 
         @Override
@@ -79,8 +80,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -111,8 +112,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -142,6 +143,12 @@ public class LStatements{
                     type = t;
                     if(type == GraphicsType.color){
                         p2 = "255";
+                    }
+
+                    if(type == GraphicsType.image){
+                        p1 = "@copper";
+                        p2 = "32";
+                        p3 = "0";
                     }
                     rebuild(table);
                 }, 2, cell -> cell.size(100, 50)));
@@ -205,6 +212,15 @@ public class LStatements{
                         fields(s, "x3", p3, v -> p3 = v);
                         fields(s, "y3", p4, v -> p4 = v);
                     }
+                    case image -> {
+                        fields(s, "x", x, v -> x = v);
+                        fields(s, "y", y, v -> y = v);
+                        row(s);
+                        fields(s, "image", p1, v -> p1 = v);
+                        fields(s, "size", p2, v -> p2 = v);
+                        row(s);
+                        fields(s, "rotation", p3, v -> p3 = v);
+                    }
                 }
             }).expand().left();
         }
@@ -218,8 +234,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
 
         @Override
@@ -243,8 +259,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.io;
+        public Color color(){
+            return Pal.logicIo;
         }
     }
 
@@ -259,8 +275,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -280,8 +296,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -304,8 +320,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -357,8 +373,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -428,8 +444,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -531,8 +547,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.blocks;
+        public Color color(){
+            return Pal.logicBlocks;
         }
 
         @Override
@@ -556,8 +572,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
         }
 
         @Override
@@ -614,8 +630,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.operations;
+        public Color color(){
+            return Pal.logicOperations;
         }
     }
 
@@ -632,8 +648,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
         }
     }
 
@@ -697,14 +713,14 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.control;
+        public Color color(){
+            return Pal.logicControl;
         }
     }
 
     @RegisterStatement("ubind")
     public static class UnitBindStatement extends LStatement{
-        public String type = "@mono";
+        public String type = "@poly";
 
         @Override
         public void build(Table table){
@@ -735,8 +751,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.units;
+        public Color color(){
+            return Pal.logicUnits;
         }
 
         @Override
@@ -748,7 +764,7 @@ public class LStatements{
     @RegisterStatement("ucontrol")
     public static class UnitControlStatement extends LStatement{
         public LUnitControl type = LUnitControl.move;
-        public String p1 = "0", p2 = "0", p3 = "0", p4 = "0";
+        public String p1 = "0", p2 = "0", p3 = "0", p4 = "0", p5 = "0";
 
         @Override
         public void build(Table table){
@@ -777,20 +793,24 @@ public class LStatements{
             int c = 0;
             for(int i = 0; i < type.params.length; i++){
 
-                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v).width(110f);
+                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : i == 3 ? p4 : p5, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v).width(100f);
 
                 if(++c % 2 == 0) row(table);
+
+                if(i == 3){
+                    table.row();
+                }
             }
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.units;
+        public Color color(){
+            return Pal.logicUnits;
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
+            return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4), builder.var(p5));
         }
     }
 
@@ -804,8 +824,8 @@ public class LStatements{
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.units;
+        public Color color(){
+            return Pal.logicUnits;
         }
 
         @Override
@@ -819,7 +839,7 @@ public class LStatements{
         public LLocate locate = LLocate.building;
         public BlockFlag flag = BlockFlag.core;
         public String enemy = "true", ore = "@copper";
-        public String outX = "outx", outY = "outy", outFound = "found";
+        public String outX = "outx", outY = "outy", outFound = "found", outBuild = "building";
 
         @Override
         public void build(Table table){
@@ -861,7 +881,7 @@ public class LStatements{
                     table.table(ts -> {
                         ts.color.set(table.color);
 
-                        field(ts, ore, str -> ore = str);
+                        fields(ts, ore, str -> ore = str);
 
                         ts.button(b -> {
                             b.image(Icon.pencilSmall);
@@ -889,7 +909,7 @@ public class LStatements{
                     table.row();
                 }
 
-                case spawn -> {
+                case spawn, damaged -> {
                     table.row();
                 }
             }
@@ -905,17 +925,21 @@ public class LStatements{
             table.add(" found ").left();
             fields(table, outFound, str -> outFound = str);
 
+            if(locate != LLocate.ore){
+                table.add(" building ").left();
+                fields(table, outBuild, str -> outBuild = str);
+            }
 
         }
 
         @Override
-        public LCategory category(){
-            return LCategory.units;
+        public Color color(){
+            return Pal.logicUnits;
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound));
+            return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
         }
     }
 }

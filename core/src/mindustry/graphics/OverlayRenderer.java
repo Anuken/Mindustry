@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -35,7 +36,7 @@ public class OverlayRenderer{
 
     public void drawTop(){
 
-        if(!player.dead()){
+        if(!player.dead() && ui.hudfrag.shown){
             if(Core.settings.getBool("playerindicators")){
                 for(Player player : Groups.player){
                     if(Vars.player != player && Vars.player.team() == player.team()){
@@ -84,7 +85,7 @@ public class OverlayRenderer{
                 //special selection for block "units"
                 Fill.square(select.x, select.y, ((BlockUnitc)select).tile().block.size * tilesize/2f);
             }else{
-                Draw.rect(select.type().icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
+                Draw.rect(select.type.icon(Cicon.full), select.x(), select.y(), select.rotation() - 90);
             }
 
             Lines.stroke(unitFade);
@@ -120,10 +121,12 @@ public class OverlayRenderer{
         Lines.stroke(2f);
         Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time(), 8f, 1f));
 
-        for(Tile tile : spawner.getSpawns()){
-            if(tile.within(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
-                Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
-                Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
+        if(state.hasSpawns()){
+            for(Tile tile : spawner.getSpawns()){
+                if(tile.within(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
+                    Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
+                    Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
+                }
             }
         }
 
@@ -150,6 +153,13 @@ public class OverlayRenderer{
         }
 
         input.drawOverSelect();
+
+        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller instanceof Building build && build.isValid()){
+            Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
+            if(!unit.within(build, unit.hitSize * 2f)){
+                Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize *2f, 4f);
+            }
+        }
 
         //draw selection overlay when dropping item
         if(input.isDroppingItem()){

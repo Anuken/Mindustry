@@ -17,9 +17,9 @@ public class LAssembler{
 
     private int lastVar;
     /** Maps names to variable IDs. */
-    ObjectMap<String, BVar> vars = new ObjectMap<>();
+    public ObjectMap<String, BVar> vars = new ObjectMap<>();
     /** All instructions to be executed. */
-    LInstruction[] instructions;
+    public LInstruction[] instructions;
 
     public LAssembler(){
         //instruction counter
@@ -51,6 +51,9 @@ public class LAssembler{
                 putConst("@" + block.name, block);
             }
         }
+
+        //used as a special value for any environmental solid block
+        putConst("@solid", Blocks.stoneWall);
 
         putConst("@air", Blocks.air);
 
@@ -93,16 +96,18 @@ public class LAssembler{
         if(data == null || data.isEmpty()) return new Seq<>();
 
         Seq<LStatement> statements = new Seq<>();
-        String[] lines = data.split("[;\n]+");
+        String[] lines = data.split("\n");
         int index = 0;
         for(String line : lines){
             //comments
             if(line.startsWith("#")) continue;
+            //remove trailing semicolons in case someone adds them in for no reason
+            if(line.endsWith(";")) line = line.substring(0, line.length() - 1);
 
             if(index++ > max) break;
 
             line = line.replace("\t", "").trim();
-            
+
             try{
                 String[] arr;
 
@@ -186,14 +191,26 @@ public class LAssembler{
             return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n")).id;
         }
 
+        //remove spaces for non-strings
+        symbol = symbol.replace(' ', '_');
+
         try{
-            double value = Double.parseDouble(symbol);
+            double value = parseDouble(symbol);
+            if(Double.isNaN(value) || Double.isInfinite(value)) value = 0;
+
             //this creates a hidden const variable with the specified value
-            String key = "___" + value;
-            return putConst(key, value).id;
+            return putConst("___" + value, value).id;
         }catch(NumberFormatException e){
             return putVar(symbol).id;
         }
+    }
+
+    double parseDouble(String symbol) throws NumberFormatException{
+        //parse hex/binary syntax
+        if(symbol.startsWith("0b")) return Long.parseLong(symbol.substring(2), 2);
+        if(symbol.startsWith("0x")) return Long.parseLong(symbol.substring(2), 16);
+
+        return Double.parseDouble(symbol);
     }
 
     /** Adds a constant value by name. */

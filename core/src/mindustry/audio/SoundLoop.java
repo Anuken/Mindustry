@@ -18,7 +18,7 @@ public class SoundLoop{
     }
 
     public void update(float x, float y, boolean play){
-        if(baseVolume < 0) return;
+        if(baseVolume <= 0) return;
 
         if(id < 0){
             if(play){
@@ -36,7 +36,8 @@ public class SoundLoop{
                     return;
                 }
             }
-            sound.setPan(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);
+
+            sound.set(id, sound.calcPan(x, y), sound.calcVolume(x, y) * volume * baseVolume);
         }
     }
 

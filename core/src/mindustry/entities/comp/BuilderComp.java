@@ -27,7 +27,7 @@ abstract class BuilderComp implements Unitc{
 
     @Import float x, y, rotation;
 
-    @SyncLocal Queue<BuildPlan> plans = new Queue<>();
+    @SyncLocal Queue<BuildPlan> plans = new Queue<>(1);
     @SyncLocal transient boolean updateBuilding = true;
 
     @Override
@@ -35,7 +35,6 @@ abstract class BuilderComp implements Unitc{
         if(!updateBuilding) return;
 
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
-
         boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
 
         Iterator<BuildPlan> it = plans.iterator();
@@ -68,10 +67,6 @@ abstract class BuilderComp implements Unitc{
         if(!within(current.tile(), finalPlaceDst)) return;
 
         Tile tile = world.tile(current.x, current.y);
-
-        if(within(tile, finalPlaceDst)){
-            lookAt(angleTo(tile));
-        }
 
         if(!(tile.block() instanceof ConstructBlock)){
             if(!current.initialized && !current.breaking && Build.validPlace(current.block, team(), current.x, current.y, current.rotation)){
@@ -115,7 +110,6 @@ abstract class BuilderComp implements Unitc{
         current.stuck = Mathf.equal(current.progress, entity.progress);
         current.progress = entity.progress;
     }
-
 
     /** Draw all current build requests. Does not draw the beam effect, only the positions. */
     void drawBuildRequests(){
@@ -189,6 +183,10 @@ abstract class BuilderComp implements Unitc{
     }
 
     boolean activelyBuilding(){
+        //not actively building when not near the build plan
+        if(isBuilding() && !within(buildPlan(), state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange)){
+            return false;
+        }
         return isBuilding() && updateBuilding;
     }
 
@@ -208,7 +206,8 @@ abstract class BuilderComp implements Unitc{
         BuildPlan plan = buildPlan();
         Tile tile = world.tile(plan.x, plan.y);
 
-        if((!within(tile, buildingRange) && !state.isEditor()) || tile == null){
+
+        if(tile == null || (!within(tile, buildingRange) && !state.isEditor())){
             return;
         }
 

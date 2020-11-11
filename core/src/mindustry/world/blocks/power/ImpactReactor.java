@@ -55,7 +55,7 @@ public class ImpactReactor extends PowerGenerator{
         super.setStats();
 
         if(hasItems){
-            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+            stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
     }
 
@@ -89,6 +89,11 @@ public class ImpactReactor extends PowerGenerator{
             }
 
             productionEfficiency = Mathf.pow(warmup, 5f);
+        }
+
+        @Override
+        public float ambientVolume(){
+            return warmup;
         }
 
         @Override

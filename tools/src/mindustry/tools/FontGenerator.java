@@ -24,12 +24,12 @@ public class FontGenerator{
 
         Log.info("Session...");
 
-        OS.exec("curl", "--fail", "--output", "core/assets-raw/fontgen/out/session", "--form", "config=@core/assets-raw/fontgen/config.json", "http://fontello.com");
+        OS.exec("curl", "--fail", "--output", "core/assets-raw/fontgen/out/session", "--form", "config=@core/assets-raw/fontgen/config.json", "https://fontello.com");
 
         Log.info("Zip...");
 
         String session = folder.child("session").readString();
-        net.httpGet("http://fontello.com/" + session + "/get", result -> {
+        net.httpGet("https://fontello.com/" + session + "/get", result -> {
             try{
                 Streams.copy(result.getResultAsStream(), folder.child("font.zip").write());
             }catch(IOException e){
@@ -46,8 +46,13 @@ public class FontGenerator{
 
         Log.info("Merge...");
 
-        //don't merge since it breaks the font
-        //OS.exec("fontforge", "-script", "core/assets-raw/fontgen/merge.pe");
+        //TODO this is broken
+
+        Log.info(OS.exec("fontforge", "-script",
+            Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
+            Fi.get("core/assets/fonts/font.woff").absolutePath(),
+            Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
+        );
 
         Log.info("Done.");
     }

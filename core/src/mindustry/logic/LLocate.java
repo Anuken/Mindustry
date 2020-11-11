@@ -3,7 +3,8 @@ package mindustry.logic;
 public enum LLocate{
     ore,
     building,
-    spawn;
+    spawn,
+    damaged;
 
     public static final LLocate[] all = values();
 }

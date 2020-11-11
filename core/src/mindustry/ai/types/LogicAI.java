@@ -21,6 +21,7 @@ public class LogicAI extends AIController{
     public LUnitControl control = LUnitControl.stop;
     public float moveX, moveY, moveRad;
     public float itemTimer, payTimer, controlTimer = logicControlTimeout, targetTimer;
+    @Nullable
     public Building controller;
     public BuildPlan plan = new BuildPlan();
 
@@ -43,8 +44,8 @@ public class LogicAI extends AIController{
 
     @Override
     protected void updateMovement(){
-        if(itemTimer > 0) itemTimer -= Time.delta;
-        if(payTimer > 0) payTimer -= Time.delta;
+        if(itemTimer >= 0) itemTimer -= Time.delta;
+        if(payTimer >= 0) payTimer -= Time.delta;
 
         if(targetTimer > 0f){
             targetTimer -= Time.delta;
@@ -97,15 +98,13 @@ public class LogicAI extends AIController{
             }
         }
 
-        if(unit.type().canBoost && !unit.type().flying){
+        if(unit.type.canBoost && !unit.type.flying){
             unit.elevation = Mathf.approachDelta(unit.elevation, Mathf.num(boost || unit.onSolid()), 0.08f);
         }
 
         //look where moving if there's nothing to aim at
         if(!shoot){
-            if(unit.moving()){
-                unit.lookAt(unit.vel().angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }else if(unit.hasWeapons()){ //if there is, look at the object
             unit.lookAt(unit.mounts[0].aimX, unit.mounts[0].aimY);
         }
@@ -128,7 +127,7 @@ public class LogicAI extends AIController{
 
     @Override
     protected boolean shouldShoot(){
-        return shoot && !(unit.type().canBoost && boost);
+        return shoot && !(unit.type.canBoost && boost);
     }
 
     //always aim for the main target

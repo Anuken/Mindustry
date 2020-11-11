@@ -51,7 +51,7 @@ public class Drawf{
     }
 
     private static boolean allowLight(Team team){
-        return team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights;
+        return renderer != null && (team == Team.derelict || team == Vars.player.team() || state.rules.enemyLights);
     }
 
     public static void selected(Building tile, Color color){
@@ -136,16 +136,24 @@ public class Drawf{
         Draw.reset();
     }
 
-    public static void square(float x, float y, float radius, Color color){
+    public static void square(float x, float y, float radius, float rotation, Color color){
         Lines.stroke(3f, Pal.gray);
-        Lines.square(x, y, radius + 1f, 45);
+        Lines.square(x, y, radius + 1f, rotation);
         Lines.stroke(1f, color);
-        Lines.square(x, y, radius + 1f, 45);
+        Lines.square(x, y, radius + 1f, rotation);
         Draw.reset();
     }
 
+    public static void square(float x, float y, float radius, float rotation){
+        square(x, y, radius, rotation, Pal.accent);
+    }
+
+    public static void square(float x, float y, float radius, Color color){
+        square(x, y, radius, 45, color);
+    }
+
     public static void square(float x, float y, float radius){
-        square(x, y, radius, Pal.accent);
+        square(x, y, radius, 45);
     }
 
     public static void arrow(float x, float y, float x2, float y2, float length, float radius){

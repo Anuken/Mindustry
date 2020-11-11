@@ -9,7 +9,7 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{
-    @Import float health, hitTime, x, y;
+    @Import float health, hitTime, x, y, healthMultiplier;
     @Import boolean dead;
 
     /** Absorbs health damage. */
@@ -24,6 +24,7 @@ abstract class ShieldComp implements Healthc, Posc{
     public void damage(float amount){
         //apply armor
         amount = Math.max(amount - armor, minArmorDamage * amount);
+        amount /= healthMultiplier;
 
         hitTime = 1f;
 

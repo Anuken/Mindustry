@@ -3,15 +3,12 @@ sourceSets.main.java.srcDirs = ["src/"]
 import arc.struct.*
 import arc.graphics.*
 import arc.packer.*
-import arc.util.Tmp
+import arc.util.*
 
-import javax.imageio.ImageIO
-import java.awt.*
-import java.awt.image.BufferedImage
-import java.util.List
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import javax.imageio.*
+import java.awt.Graphics2D
+import java.awt.image.*
+import java.util.concurrent.*
 
 def genFolder = "../core/assets-raw/sprites_out/generated/"
 def doAntialias = !project.hasProperty("disableAntialias")
@@ -423,4 +420,11 @@ task fontgen(dependsOn: classes, type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../"
+}
+
+task icongen(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.IconConverter"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../core/assets-raw"
 }
