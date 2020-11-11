@@ -78,16 +78,6 @@ public class ModLoadingSound implements Sound{
     }
 
     @Override
-    public void pause(){
-        sound.pause();
-    }
-
-    @Override
-    public void resume(){
-        sound.resume();
-    }
-
-    @Override
     public void dispose(){
         sound.dispose();
     }
