@@ -114,7 +114,7 @@ public class Schematics implements Loadable{
     }
 
     private void loadLoadouts(){
-        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s,false));
+        Seq.with(Loadouts.basicShard, Loadouts.basicFoundation, Loadouts.basicNucleus).each(s -> checkLoadout(s, false));
     }
 
     public void overwrite(Schematic target, Schematic newSchematic){
@@ -133,6 +133,7 @@ public class Schematics implements Loadable{
         try{
             write(newSchematic, target.file);
         }catch(Exception e){
+            Log.err("Failed to overwrite schematic '@' (@)", newSchematic.name(), target.file);
             Log.err(e);
             ui.showException(e);
         }
@@ -153,6 +154,7 @@ public class Schematics implements Loadable{
 
             return s;
         }catch(Throwable e){
+            Log.err("Failed to read schematic from file '@'", file);
             Log.err(e);
         }
         return null;
@@ -188,6 +190,7 @@ public class Schematics implements Loadable{
         try{
             return getBuffer(schematic).getTexture();
         }catch(Throwable t){
+            Log.err("Failed to get preview for schematic '@' (@)", schematic.name(), schematic.file);
             Log.err(t);
             errored.add(schematic);
             return errorTexture;
@@ -354,7 +357,7 @@ public class Schematics implements Loadable{
             for(int cy = y; cy <= y2; cy++){
                 Building linked = world.build(cx, cy);
 
-                if(linked != null && linked.block.isVisible() && !(linked.block instanceof ConstructBlock)){
+                if(linked != null && (linked.block.isVisible() || linked.block() instanceof CoreBlock) && !(linked.block instanceof ConstructBlock)){
                     int top = linked.block.size/2;
                     int bot = linked.block.size % 2 == 1 ? -linked.block.size/2 : -(linked.block.size - 1)/2;
                     minx = Math.min(linked.tileX() + bot, minx);
@@ -434,7 +437,7 @@ public class Schematics implements Loadable{
             if(check && !(st.block instanceof CoreBlock)){
                 seq.clear();
                 tile.getLinkedTilesAs(st.block, seq);
-                if(seq.contains(t -> !t.block().alwaysReplace)){
+                if(seq.contains(t -> !t.block().alwaysReplace && !t.synthetic())){
                     return;
                 }
             }

@@ -288,9 +288,9 @@ public class Control implements ApplicationListener, Loadable{
                         state.wave = 1;
 
                         //reset win wave??
-                        state.rules.winWave = sector.preset != null ? sector.preset.captureWave : 40;
+                        state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
 
-                        //kill all units, since they should be dead anwyay
+                        //kill all units, since they should be dead anyway
                         Groups.unit.clear();
                         Groups.fire.clear();
 
@@ -301,6 +301,7 @@ public class Control implements ApplicationListener, Loadable{
                         player.set(spawn.x * tilesize, spawn.y * tilesize);
                         camera.position.set(player);
 
+                        Events.fire(new SectorLaunchEvent(sector));
                         Events.fire(Trigger.newGame);
                     }
 
@@ -324,6 +325,7 @@ public class Control implements ApplicationListener, Loadable{
                 sector.info.destination = origin;
                 logic.play();
                 control.saves.saveSector(sector);
+                Events.fire(new SectorLaunchEvent(sector));
                 Events.fire(Trigger.newGame);
             }
         });
@@ -398,9 +400,13 @@ public class Control implements ApplicationListener, Loadable{
             try{
                 SaveIO.save(control.saves.getCurrent().file);
                 Log.info("Saved on exit.");
-            }catch(Throwable e){
-                e.printStackTrace();
+            }catch(Throwable t){
+                Log.err(t);
             }
+        }
+
+        for(Music music : assets.getAll(Music.class, new Seq<>())){
+            music.stop();
         }
 
         content.dispose();
@@ -473,10 +479,6 @@ public class Control implements ApplicationListener, Loadable{
 
                 dialog.show();
             }));
-        }
-
-        if(android){
-            Sounds.empty.loop(0f, 1f, 0f);
         }
     }
 

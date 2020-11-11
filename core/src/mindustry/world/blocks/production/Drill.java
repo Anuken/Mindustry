@@ -66,8 +66,8 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-        idleSound = Sounds.drill;
-        idleSoundVolume = 0.003f;
+        ambientSound = Sounds.drill;
+        ambientSoundVolume = 0.015f;
     }
 
     @Override
@@ -205,8 +205,8 @@ public class Drill extends Block{
         }
 
         @Override
-        public boolean shouldIdleSound(){
-            return efficiency() > 0.01f;
+        public boolean shouldAmbientSound(){
+            return efficiency() > 0.01f && items.total() < itemCapacity;
         }
 
         @Override

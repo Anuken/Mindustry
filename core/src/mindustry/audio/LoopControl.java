@@ -31,17 +31,17 @@ public class LoopControl{
 
             boolean play = data.curVolume > 0.01f;
             float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
-            if(data.soundID <= 0){
+            if(data.soundID <= 0 || !sound.isPlaying(data.soundID)){
                 if(play){
                     data.soundID = sound.loop(data.curVolume, 1f, pan);
                 }
             }else{
-                if(data.curVolume <= 0.01f){
+                if(data.curVolume <= 0.001f){
                     sound.stop();
                     data.soundID = -1;
                     return;
                 }
-                sound.setPan(data.soundID, pan, data.curVolume);
+                sound.set(data.soundID, pan, data.curVolume);
             }
 
             data.volume = 0f;

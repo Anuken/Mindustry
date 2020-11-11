@@ -188,23 +188,23 @@ public class PlanetGrid{
     }
 
     static int pos(Ptile t, Ptile n){
-        for(int i = 0; i < t.edgeCount; i++)
-            if(t.tiles[i] == n)
-                return i;
+        for(int i = 0; i < t.edgeCount; i++){
+            if(t.tiles[i] == n) return i;
+        }
         return -1;
     }
 
     static int pos(Ptile t, Corner c){
-        for(int i = 0; i < t.edgeCount; i++)
-            if(t.corners[i] == c)
-                return i;
+        for(int i = 0; i < t.edgeCount; i++){
+            if(t.corners[i] == c) return i;
+        }
         return -1;
     }
 
     static int pos(Corner c, Corner n){
-        for(int i = 0; i < 3; i++)
-            if(c.corners[i] == n)
-                return i;
+        for(int i = 0; i < 3; i++){
+            if(c.corners[i] == n) return i;
+        }
         return -1;
     }
 

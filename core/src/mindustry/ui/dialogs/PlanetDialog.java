@@ -153,24 +153,21 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public void renderSectors(Planet planet){
 
         //draw all sector stuff
-        if(!debugSelect){
+        if(!debugSelect && selectAlpha > 0.01f){
             for(Sector sec : planet.sectors){
+                if(canSelect(sec) || sec.unlocked()){
 
-                if(selectAlpha > 0.01f){
-                    if(canSelect(sec) || sec.unlocked()){
+                    Color color =
+                    sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
+                    sec.preset != null ? Team.derelict.color :
+                    sec.hasEnemyBase() ? Team.crux.color :
+                    null;
 
-                        Color color =
-                        sec.hasBase() ? Team.sharded.color :
-                        sec.preset != null ? Team.derelict.color :
-                        sec.hasEnemyBase() ? Team.crux.color :
-                        null;
-
-                        if(color != null){
-                            planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
-                        }
-                    }else{
-                        planets.fill(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
+                    if(color != null){
+                        planets.drawSelection(sec, Tmp.c1.set(color).mul(0.8f).a(selectAlpha), 0.026f, -0.001f);
                     }
+                }else{
+                    planets.fill(sec, Tmp.c1.set(shadowColor).mul(1, 1, 1, selectAlpha), -0.001f);
                 }
             }
         }
@@ -202,20 +199,39 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
-        /*
-        //TODO render arcs
-        if(selected != null && selected.preset != null){
-            for(Objective o : selected.preset.requirements){
-                if(o instanceof SectorObjective){
-                    SectorPreset preset = ((SectorObjective)o).preset;
-                    planets.drawArc(planet, selected.tile.v, preset.sector.tile.v);
+        if(selectAlpha > 0.001f){
+            for(Sector sec : planet.sectors){
+                if(sec.hasBase()){
+                    for(Sector enemy : sec.near()){
+                        if(enemy.hasEnemyBase()){
+                            planets.drawArc(planet, enemy.tile.v, sec.tile.v, Team.crux.color.write(Tmp.c2).a(selectAlpha), Color.clear, 0.24f, 110f, 25);
+                        }
+                    }
                 }
             }
-        }*/
+        }
+        
     }
 
     @Override
-    public void renderProjections(){
+    public void renderProjections(Planet planet){
+
+        for(Sector sec : planet.sectors){
+            if(sec != hovered){
+                var icon = (sec.isAttacked() ? Icon.warning : !sec.hasBase() && sec.preset != null && sec.preset.unlocked() ? Icon.terrain : null);
+                var color = sec.preset != null && !sec.hasBase() ? Team.derelict.color : Team.sharded.color;
+
+                if(icon != null){
+                    planets.drawPlane(sec, () -> {
+                        Draw.color(color, selectAlpha);
+                        Draw.rect(icon.getRegion(), 0, 0);
+                    });
+                }
+            }
+        }
+
+        Draw.reset();
+
         if(hovered != null){
             planets.drawPlane(hovered, () -> {
                 Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
@@ -229,6 +245,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 Draw.reset();
             });
         }
+
+        Draw.reset();
     }
 
     void setup(){
@@ -374,6 +392,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
         }
 
+        //TODO put most info in submenu
+
         if(sector.isAttacked()){
             //TODO localize when finalized
             //these mechanics are likely to change and as such are not added to the bundle
@@ -383,10 +403,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.row();
 
             if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
+                int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
                 boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
-                stable.add("[accent]Will survive\n" + (sector.info.wavesSurvived - sector.info.wavesPassed) +  (plus ? "+" : "") + " waves");
+                stable.add("[accent]Will survive\n" + (sector.info.wavesSurvived - sector.info.wavesPassed) +
+                (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture) + " waves");
                 stable.row();
             }
+        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){
+            stable.add("[scarlet]Vulnerable");
+            stable.row();
+        }else if(!sector.hasBase() && sector.hasEnemyBase()){
+            stable.add("[scarlet]Enemy Base");
+            stable.row();
         }
 
         if(sector.save != null && sector.info.resources.any()){

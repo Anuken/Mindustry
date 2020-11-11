@@ -1,29 +1,22 @@
 [
   {
-    "address": "mindustry.pl:6000"
-  },
-  {
-    "address": "mindustry.pl:6666"
+    "name": "mindustry.pl",
+    "address": ["mindustry.pl:6000", "mindustry.pl:6666"]
   },
   {
     "address": "routerchain.ddns.net"
   },
   {
-    "address": "mindustry.atannergaming.com:13000"
-  },
-  {
     "address": "pandorum.su:8000"
   },
   {
-    "address": "mindustry.ecansol.com:6597"
-  },
-  {
-    "address": "mindustry.ecansol.com:6499"
-  },
-  {
-    "address": "mindustry.ecansol.com:6599"
+    "name": "ECAN",
+    "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
     "address": "Chaotic-Neutral.ddns.net:5555"
+  },
+  {
+    "address": "cheginde.ddns.net"
   }
 ]

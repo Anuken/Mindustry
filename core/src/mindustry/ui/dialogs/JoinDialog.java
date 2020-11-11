@@ -31,6 +31,7 @@ public class JoinDialog extends BaseDialog{
     Table hosts = new Table();
     int totalHosts;
     int refreshes;
+    boolean showHidden;
 
     public JoinDialog(){
         super("@joingame");
@@ -252,9 +253,9 @@ public class JoinDialog extends BaseDialog{
 
         hosts.clear();
 
-        section("@servers.local", local);
-        section("@servers.remote", remote);
-        section("@servers.global", global);
+        section("@servers.local", local, false);
+        section("@servers.remote", remote, false);
+        section("@servers.global", global, true);
 
         ScrollPane pane = new ScrollPane(hosts);
         pane.setFadeScrollBars(false);
@@ -302,12 +303,21 @@ public class JoinDialog extends BaseDialog{
         });
     }
 
-    void section(String label, Table servers){
+    void section(String label, Table servers, boolean eye){
         Collapser coll = new Collapser(servers, Core.settings.getBool("collapsed-" + label, false));
         coll.setDuration(0.1f);
 
         hosts.table(name -> {
             name.add(label).pad(10).growX().left().color(Pal.accent);
+
+            if(eye){
+                name.button(Icon.eyeSmall, Styles.emptyi, () -> {
+                    showHidden = !showHidden;
+                    refreshGlobal();
+                }).update(i -> i.getStyle().imageUp = (showHidden ? Icon.eyeSmall : Icon.eyeOffSmall))
+                    .size(40f).right().padRight(3).tooltip("@servers.showhidden");
+            }
+
             name.button(Icon.downOpen, Styles.emptyi, () -> {
                 coll.toggle(false);
                 Core.settings.put("collapsed-" + label, coll.isCollapsed());
@@ -334,15 +344,60 @@ public class JoinDialog extends BaseDialog{
 
         global.clear();
         global.background(null);
-        for(String host : defaultServers){
-            String resaddress = host.contains(":") ? host.split(":")[0] : host;
-            int resport = host.contains(":") ? Strings.parseInt(host.split(":")[1]) : port;
-            net.pingHost(resaddress, resport, res -> {
-                if(refreshes != cur) return;
-                res.port = resport;
-                addGlobalHost(res);
-            }, e -> {});
+        for(ServerGroup group : defaultServers){
+            boolean hidden = group.hidden();
+            if(hidden && !showHidden){
+                continue;
+            }
+
+            //table containing all groups
+            global.table(g -> {
+                for(String address : group.addresses){
+                    String resaddress = address.contains(":") ? address.split(":")[0] : address;
+                    int resport = address.contains(":") ? Strings.parseInt(address.split(":")[1]) : port;
+                    net.pingHost(resaddress, resport, res -> {
+                        if(refreshes != cur) return;
+                        res.port = resport;
+
+                        //add header
+                        if(g.getChildren().isEmpty()){
+                            g.table(head -> {
+                                if(!group.name.isEmpty()){
+                                    head.add(group.name).color(Color.lightGray).padRight(4);
+                                }
+                                head.image().height(3f).growX().color(Color.lightGray);
+
+                                //button for showing/hiding servers
+                                ImageButton[] image = {null};
+                                image[0] = head.button(hidden ? Icon.eyeOffSmall : Icon.eyeSmall, Styles.accenti, () -> {
+                                   group.setHidden(!group.hidden());
+                                   image[0].getStyle().imageUp = group.hidden() ? Icon.eyeOffSmall : Icon.eyeSmall;
+                                   if(group.hidden() && !showHidden){
+                                       g.remove();
+                                   }
+                                }).size(40f).get();
+                                image[0].addListener(new Tooltip(t -> t.background(Styles.black6).margin(4).label(() -> !group.hidden() ? "@server.shown" : "@server.hidden")));
+                            }).width(targetWidth()).padBottom(-2).row();
+                        }
+
+                        addGlobalHost(res, g);
+
+                        g.margin(5f);
+                        g.pack();
+                    }, e -> {});
+                }
+            }).row();
         }
+    }
+
+    void addGlobalHost(Host host, Table container){
+        global.background(null);
+        float w = targetWidth();
+
+        container.button(b -> buildServer(host, b), Styles.cleart, () -> {
+            Events.fire(new ClientPreConnectEvent(host));
+            safeConnect(host.address, host.port, host.version);
+        }).width(w).row();
     }
 
     void finishLocalHosts(){
@@ -367,26 +422,10 @@ public class JoinDialog extends BaseDialog{
 
         local.row();
 
-        TextButton button = local.button("", Styles.cleart, () -> {
+        local.button(b -> buildServer(host, b), Styles.cleart, () -> {
             Events.fire(new ClientPreConnectEvent(host));
             safeConnect(host.address, host.port, host.version);
-        }).width(w).pad(5f).get();
-        button.clearChildren();
-        buildServer(host, button);
-    }
-
-    void addGlobalHost(Host host){
-        global.background(null);
-        float w = targetWidth();
-
-        global.row();
-
-        TextButton button = global.button("", Styles.cleart, () -> {
-            Events.fire(new ClientPreConnectEvent(host));
-            safeConnect(host.address, host.port, host.version);
-        }).width(w).pad(5f).get();
-        button.clearChildren();
-        buildServer(host, button);
+        }).width(w);
     }
 
     public void connect(String ip, int port){
@@ -439,18 +478,28 @@ public class JoinDialog extends BaseDialog{
         //get servers
         Core.net.httpGet(becontrol.active() ? serverJsonBeURL : serverJsonV6URL, result -> {
             try{
+
                 Jval val = Jval.read(result.getResultAsString());
                 Core.app.post(() -> {
                     try{
                         defaultServers.clear();
-                        val.asArray().each(child -> defaultServers.add(child.getString("address", "<invalid>")));
+                        val.asArray().each(child -> {
+                            String name = child.getString("name", "");
+                            String[] addresses;
+                            if(child.has("addresses") || (child.has("address") && child.get("address").isArray())){
+                                addresses = (child.has("addresses") ? child.get("addresses") : child.get("address")).asArray().map(Jval::asString).toArray(String.class);
+                            }else{
+                                addresses = new String[]{child.getString("address", "<invalid>")};
+                            }
+                            defaultServers.add(new ServerGroup(name, addresses));
+                        });
                         Log.info("Fetched @ global servers.", defaultServers.size);
                     }catch(Throwable ignored){
                         Log.err("Failed to parse community servers.");
                     }
                 });
             }catch(Throwable e){
-                Log.err("Failed to fetch community servers.");
+                Log.err("Failed to fetch communitycommunity servers.");
             }
         }, t -> {});
     }

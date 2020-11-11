@@ -13,6 +13,8 @@ public class ContinuousLaserBulletType extends BulletType{
     public float length = 220f;
     public float shake = 1f;
     public float fadeTime = 16f;
+    public float lightStroke = 40f;
+    public float spaceMag = 35f;
     public Color[] colors = {Color.valueOf("ec745855"), Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
     public float[] tscales = {1f, 0.7f, 0.5f, 0.2f};
     public float[] strokes = {2f, 1.5f, 1f, 0.3f};
@@ -85,7 +87,7 @@ public class ContinuousLaserBulletType extends BulletType{
         for(int s = 0; s < colors.length; s++){
             Draw.color(Tmp.c1.set(colors[s]).mul(1f + Mathf.absin(Time.time(), 1f, 0.1f)));
             for(int i = 0; i < tscales.length; i++){
-                Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * 35f);
+                Tmp.v1.trns(b.rotation() + 180f, (lenscales[i] - 1f) * spaceMag);
                 Lines.stroke((width + Mathf.absin(Time.time(), oscScl, oscMag)) * fout * strokes[s] * tscales[i]);
                 Lines.lineAngle(b.x + Tmp.v1.x, b.y + Tmp.v1.y, b.rotation(), baseLen * lenscales[i], false);
             }
@@ -93,7 +95,7 @@ public class ContinuousLaserBulletType extends BulletType{
 
         Tmp.v1.trns(b.rotation(), baseLen * 1.1f);
 
-        Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, 40, lightColor, 0.7f);
+        Drawf.light(b.team, b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
         Draw.reset();
     }
 

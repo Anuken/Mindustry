@@ -77,7 +77,6 @@ public class Saves{
     }
 
     public void update(){
-
         if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
@@ -93,8 +92,8 @@ public class Saves{
 
                 try{
                     current.save();
-                }catch(Throwable e){
-                    e.printStackTrace();
+                }catch(Throwable t){
+                    Log.err(t);
                 }
 
                 Time.runTask(3f, () -> saving = false);
@@ -218,7 +217,7 @@ public class Saves{
                     previewFile().writePNG(renderer.minimap.getPixmap());
                     requestedPreview = false;
                 }catch(Throwable t){
-                    t.printStackTrace();
+                    Log.err(t);
                 }
             });
         }
@@ -335,6 +334,9 @@ public class Saves{
         }
 
         public void delete(){
+            if(SaveIO.backupFileFor(file).exists()){
+                SaveIO.backupFileFor(file).delete();
+            }
             file.delete();
             saves.remove(this, true);
             if(this == current){

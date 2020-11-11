@@ -62,6 +62,8 @@ public class Weapon{
     public float shootCone = 5f;
     /** ticks to cool down the heat region */
     public float cooldownTime = 20f;
+    /** random sound pitch range */
+    public float soundPitchMin = 0.8f, soundPitchMax = 1f;
     /** whether shooter rotation is ignored when shooting. */
     public boolean ignoreRotation = false;
     /** min velocity required for this weapon to shoot */

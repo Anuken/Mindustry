@@ -49,8 +49,13 @@ public class AssetsProcess extends BaseProcessor{
         ictype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectMap.class, String.class, TextureRegionDrawable.class),
                 "icons", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectMap<>()").build());
 
+        ObjectSet<String> used = new ObjectSet<>();
+
         for(Jval val : icons.get("glyphs").asArray()){
             String name = capitalize(val.getString("css", ""));
+
+            if(!val.getBool("selected", true) || !used.add(name)) continue;
+
             int code = val.getInt("code", 0);
             ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + code).build());
 
@@ -115,11 +120,10 @@ public class AssetsProcess extends BaseProcessor{
                 names.add(name);
             }
 
-            if(SourceVersion.isKeyword(name)) name += "s";           
+            if(SourceVersion.isKeyword(name)) name += "s";
 
             String filepath = path.substring(path.lastIndexOf("/") + 1) + "/" + fname;
-
-            String filename = "arc.Core.app.getType() != arc.Application.ApplicationType.iOS ? \"" + filepath + "\" : \"" + filepath.replace(".ogg", ".mp3") + "\"";
+            String filename = "\"" + filepath + "\"";
 
             loadBegin.addStatement("arc.Core.assets.load(" + filename + ", " + rtype + ".class).loaded = a -> " + name + " = (" + rtype + ")a", filepath, filepath.replace(".ogg", ".mp3"));
 

@@ -408,8 +408,7 @@ public class Damage{
     }
 
     @Struct
-    static
-    class PropCellStruct{
+    static class PropCellStruct{
         byte x;
         byte y;
         short damage;

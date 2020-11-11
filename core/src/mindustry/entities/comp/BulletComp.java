@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -9,10 +10,12 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.bullet.*;
+import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.blocks.defense.Wall.*;
 
 import static mindustry.Vars.*;
 
@@ -27,6 +30,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     Object data;
     BulletType type;
     float fdata;
+    transient boolean absorbed;
 
     @Override
     public void getCollisions(Cons<QuadTree> consumer){
@@ -64,6 +68,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void absorb(){
+        absorbed = true;
         remove();
     }
 
@@ -104,6 +109,10 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         }
 
         type.hitEntity(self(), other, health);
+
+        if(owner instanceof WallBuild && player != null && team != player.team() && other instanceof Unit unit && unit.dead){
+            Events.fire(Trigger.phaseDeflectHit);
+        }
     }
 
     @Override

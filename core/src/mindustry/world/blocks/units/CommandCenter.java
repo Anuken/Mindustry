@@ -1,5 +1,6 @@
 package mindustry.world.blocks.units;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.style.*;
@@ -12,6 +13,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -33,6 +35,7 @@ public class CommandCenter extends Block{
         config(UnitCommand.class, (CommandBuild build, UnitCommand command) -> {
             build.team.data().command = command;
             effect.at(build);
+            Events.fire(new CommandIssueEvent(build, command));
         });
     }
 
