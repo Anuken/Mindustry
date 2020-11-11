@@ -602,9 +602,7 @@ public class DesktopInput extends InputHandler{
         boolean omni = unit.type.omniMovement;
         boolean ground = unit.isGrounded();
 
-        float strafePenalty = ground ? 1f : Mathf.lerp(1f, unit.type.strafePenalty, Angles.angleDist(unit.vel().angle(), unit.rotation()) / 180f);
-
-        float speed = unit.realSpeed() * strafePenalty;
+        float speed = unit.realSpeed();
         float xa = Core.input.axis(Binding.move_x);
         float ya = Core.input.axis(Binding.move_y);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
