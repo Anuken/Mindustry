@@ -3,6 +3,7 @@ package mindustry.mod;
 import arc.audio.*;
 import arc.math.geom.*;
 import arc.mock.*;
+import arc.util.*;
 
 public class ModLoadingSound implements Sound{
     public Sound sound = new MockSound();
@@ -120,5 +121,20 @@ public class ModLoadingSound implements Sound{
     @Override
     public boolean isDisposed(){
         return sound.isDisposed();
+    }
+
+    @Override
+    public int play(float volume, float pitch, float pan, boolean loop){
+        return sound.play(volume, pitch, pan, loop);
+    }
+
+    @Override
+    public void setFilter(int index, @Nullable AudioFilter filter){
+        sound.setFilter(index, filter);
+    }
+
+    @Override
+    public boolean isPlaying(int soundId){
+        return sound.isPlaying(soundId);
     }
 }

@@ -120,10 +120,10 @@ public class AssetsProcess extends BaseProcessor{
                 names.add(name);
             }
 
-            if(SourceVersion.isKeyword(name)) name += "s";           
+            if(SourceVersion.isKeyword(name)) name += "s";
 
             String filepath = path.substring(path.lastIndexOf("/") + 1) + "/" + fname;
-            String filename = "\"" + filepath + "\"";
+            String filename = "arc.Core.app.getType() != arc.Application.ApplicationType.iOS ? \"" + filepath + "\" : \"" + filepath.replace(".ogg", ".mp3") + "\"";
 
             loadBegin.addStatement("arc.Core.assets.load(" + filename + ", " + rtype + ".class).loaded = a -> " + name + " = (" + rtype + ")a", filepath, filepath.replace(".ogg", ".mp3"));
 
