@@ -32,9 +32,9 @@ public class WeaponListValue implements StatValue{
             }
 
             if(weapon.outlineRegion.found()){
-                table.image(weapon.outlineRegion).size(10 * 8).right().top();
+                table.image(weapon.outlineRegion).size(10 * 8).scaling(Scaling.fit).right().top();
             }else{
-                table.image(unit.icon(Cicon.full)).size(10 * 8).right().top();
+                table.image(unit.icon(Cicon.full)).size(10 * 8).scaling(Scaling.fit).right().top();
             }
             table.table(Tex.underline, w -> {
                 w.left().defaults().padRight(3).left();
