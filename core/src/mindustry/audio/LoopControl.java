@@ -10,6 +10,12 @@ import mindustry.*;
 public class LoopControl{
     private ObjectMap<Sound, SoundData> sounds = new ObjectMap<>();
 
+    public void play(Sound sound, float volume){
+        if(Vars.headless) return;
+
+        play(sound, Core.camera.position, volume);
+    }
+
     public void play(Sound sound, Position pos, float volume){
         if(Vars.headless) return;
 

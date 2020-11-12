@@ -89,9 +89,9 @@ public abstract class Weather extends UnlockableContent{
             }
         }
 
-        if(sound != Sounds.none){
+        if(!headless && sound != Sounds.none){
             float noise = soundVolOscMag > 0 ? (float)Math.abs(Noise.rawNoise(Time.time() / soundVolOscScl)) * soundVolOscMag : 0;
-            loops.play(sound, Core.camera.position, Math.max((soundVol + noise) * state.opacity, soundVolMin));
+            loops.play(sound, Math.max((soundVol + noise) * state.opacity, soundVolMin));
         }
     }
 

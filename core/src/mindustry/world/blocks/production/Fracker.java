@@ -2,6 +2,7 @@ package mindustry.world.blocks.production;
 
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.meta.*;
 
@@ -15,6 +16,8 @@ public class Fracker extends SolidPump{
     public Fracker(String name){
         super(name);
         hasItems = true;
+        ambientSound = Sounds.drill;
+        ambientSoundVolume = 0.03f;
     }
 
     @Override

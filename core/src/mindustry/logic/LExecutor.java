@@ -199,11 +199,14 @@ public class LExecutor{
                         //bind to the next unit
                         exec.setconst(varUnit, seq.get(index));
                     }
-                    index ++;
+                    index++;
                 }else{
                     //no units of this type found
                     exec.setconst(varUnit, null);
                 }
+            }else if(exec.obj(type) instanceof Unit u && u.team == exec.team){
+                //bind to specific unit object
+                exec.setconst(varUnit, u);
             }else{
                 exec.setconst(varUnit, null);
             }
