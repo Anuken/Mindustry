@@ -295,7 +295,6 @@ public class UnitTypes implements ContentList{
                     backColor = Pal.heal;
                     frontColor = Color.white;
                 }};
-                shootSound = Sounds.pew;
             }});
         }};
 
