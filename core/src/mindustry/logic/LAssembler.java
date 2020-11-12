@@ -99,6 +99,8 @@ public class LAssembler{
         String[] lines = data.split("\n");
         int index = 0;
         for(String line : lines){
+            //ignore empty lines
+            if(line.isEmpty()) continue;
             //comments
             if(line.startsWith("#")) continue;
             //remove trailing semicolons in case someone adds them in for no reason
