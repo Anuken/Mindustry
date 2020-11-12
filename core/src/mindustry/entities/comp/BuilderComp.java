@@ -13,6 +13,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -22,17 +23,22 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class BuilderComp implements Unitc{
+abstract class BuilderComp implements Posc, Teamc, Rotc{
     static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
 
     @Import float x, y, rotation;
+    @Import UnitType type;
 
     @SyncLocal Queue<BuildPlan> plans = new Queue<>(1);
     @SyncLocal transient boolean updateBuilding = true;
+    
+    public boolean canBuild(){
+      return type.buildSpeed > 0;
+    }
 
     @Override
     public void update(){
-        if(!updateBuilding) return;
+        if(!updateBuilding || !canBuild()) return;
 
         float finalPlaceDst = state.rules.infiniteResources ? Float.MAX_VALUE : buildingRange;
         boolean infinite = state.rules.infiniteResources || team().rules().infiniteResources;
@@ -102,9 +108,9 @@ abstract class BuilderComp implements Unitc{
         ConstructBuild entity = tile.bc();
 
         if(current.breaking){
-            entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier);
+            entity.deconstruct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * state.rules.buildSpeedMultiplier);
         }else{
-            entity.construct(self(), core, 1f / entity.buildCost * Time.delta * type().buildSpeed * state.rules.buildSpeedMultiplier, current.config);
+            entity.construct(self(), core, 1f / entity.buildCost * Time.delta * type.buildSpeed * state.rules.buildSpeedMultiplier, current.config);
         }
 
         current.stuck = Mathf.equal(current.progress, entity.progress);
@@ -161,6 +167,8 @@ abstract class BuilderComp implements Unitc{
 
     /** Add another build requests to the queue, if it doesn't exist there yet. */
     void addBuild(BuildPlan place, boolean tail){
+        if(!canBuild()) return;
+        
         BuildPlan replace = null;
         for(BuildPlan request : plans){
             if(request.x == place.x && request.y == place.y){
@@ -196,9 +204,8 @@ abstract class BuilderComp implements Unitc{
         return plans.size == 0 ? null : plans.first();
     }
 
-    @Override
     public void draw(){
-        if(!isBuilding() || !updateBuilding) return;
+        if(!isBuilding() || !updateBuilding || !canBuild()) return;
 
         //TODO check correctness
         Draw.z(Layer.flyingUnit);

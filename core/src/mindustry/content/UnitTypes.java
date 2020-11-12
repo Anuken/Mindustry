@@ -21,7 +21,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
     //mech + builder + miner
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova, pulsar, quasar;
+    public static @EntityDef({Unitc.class, Mechc.class}) UnitType nova, pulsar, quasar;
 
     //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType vela;
@@ -30,7 +30,7 @@ public class UnitTypes implements ContentList{
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax;
 
     //legs + building
-    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
+    public static @EntityDef({Unitc.class, Legsc.class}) UnitType spiroct, arkyid, toxopid;
 
     //air (no special traits)
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
@@ -39,19 +39,19 @@ public class UnitTypes implements ContentList{
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
 
     //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class}) UnitType poly;
+    public static @EntityDef({Unitc.class}) UnitType poly;
 
     //air + building + mining + payload
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType mega;
+    public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega;
 
     //air + building + payload
-    public static @EntityDef(value = {Unitc.class, Builderc.class, Payloadc.class}, legacy = true) UnitType quad;
+    public static @EntityDef(value = {Unitc.class, Payloadc.class}, legacy = true) UnitType quad;
 
     //air + building + payload
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, AmmoDistributec.class}) UnitType oct;
+    public static @EntityDef({Unitc.class, Payloadc.class, AmmoDistributec.class}) UnitType oct;
 
     //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class}) UnitType alpha, beta, gamma;
+    public static @EntityDef({Unitc.class}) UnitType alpha, beta, gamma;
 
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType risso, minke, bryde, sei, omura;
@@ -702,6 +702,8 @@ public class UnitTypes implements ContentList{
 
             legSplashDamage = 32;
             legSplashRange = 30;
+            
+            buildSpeed = 1f;
 
             hovering = true;
             allowLegStep = true;
@@ -804,6 +806,8 @@ public class UnitTypes implements ContentList{
 
             legSplashDamage = 80;
             legSplashRange = 60;
+            
+            buildSpeed = 1f;
 
             hovering = true;
             allowLegStep = true;
