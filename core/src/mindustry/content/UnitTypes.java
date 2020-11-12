@@ -469,7 +469,6 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             hitSize = 29f;
             health = 18000f;
-            buildSpeed = 1.7f;
             armor = 9f;
             landShake = 1.5f;
             rotateSpeed = 1.5f;

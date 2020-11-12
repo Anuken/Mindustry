@@ -48,7 +48,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient float textFadeTime;
 
     public boolean isBuilder(){
-        return unit instanceof Builderc;
+        return unit.canBuild();
     }
 
     public boolean isMiner(){
