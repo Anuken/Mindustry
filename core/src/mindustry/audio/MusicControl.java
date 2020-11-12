@@ -102,7 +102,7 @@ public class MusicControl{
     }
 
     /** Plays a random track.*/
-    protected void playRandom(){
+    public void playRandom(){
         if(isDark()){
             playOnce(darkMusic.random(lastRandomPlayed));
         }else{

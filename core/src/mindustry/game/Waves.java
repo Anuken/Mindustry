@@ -316,7 +316,7 @@ public class Waves{
                 }});
 
                 i += next + 1;
-                if(curTier < 3 || rand.chance(0.05)){
+                if(curTier < 3 || (rand.chance(0.05) && difficulty > 0.8)){
                     curTier ++;
                 }
 

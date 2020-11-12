@@ -10,7 +10,7 @@ public class SectorPresets implements ContentList{
     groundZero,
     craters, frozenForest, ruinousShores, stainedMountains, tarFields, fungalPass,
     saltFlats, overgrowth,
-    desolateRift, nuclearComplex;
+    impact0078, desolateRift, nuclearComplex;
 
     @Override
     public void load(){
@@ -55,17 +55,22 @@ public class SectorPresets implements ContentList{
         }};
 
         tarFields = new SectorPreset("tarFields", serpulo, 23){{
-            captureWave = 50;
+            captureWave = 40;
             difficulty = 5;
         }};
 
+        impact0078 = new SectorPreset("impact0078", serpulo, 227){{
+            captureWave = 45;
+            difficulty = 7;
+        }};
+
         desolateRift = new SectorPreset("desolateRift", serpulo, 123){{
-            captureWave = 40;
+            captureWave = 30;
             difficulty = 8;
         }};
 
         nuclearComplex = new SectorPreset("nuclearComplex", serpulo, 130){{
-            captureWave = 60;
+            captureWave = 50;
             difficulty = 7;
         }};
     }

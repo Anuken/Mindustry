@@ -268,7 +268,7 @@ public class LCanvas extends Table{
             st.elem = this;
 
             background(Tex.whitePane);
-            setColor(st.category().color);
+            setColor(st.color());
             margin(0f);
             touchable = Touchable.enabled;
 

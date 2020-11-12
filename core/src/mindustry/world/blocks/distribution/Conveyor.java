@@ -42,7 +42,7 @@ public class Conveyor extends Block implements Autotiler{
         conveyorPlacement = true;
 
         ambientSound = Sounds.conveyor;
-        ambientSoundVolume = 0.0015f;
+        ambientSoundVolume = 0.0022f;
         unloadable = false;
         noUpdateDisabled = false;
     }

@@ -26,6 +26,7 @@ public class LiquidTurret extends Turret{
         acceptCoolant = false;
         hasLiquids = true;
         loopSound = Sounds.spray;
+        shootSound = Sounds.none;
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
@@ -75,7 +76,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public boolean shouldActiveSound(){
-            return target != null && hasAmmo();
+            return wasShooting;
         }
 
         @Override

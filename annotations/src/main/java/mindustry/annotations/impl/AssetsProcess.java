@@ -120,7 +120,7 @@ public class AssetsProcess extends BaseProcessor{
                 names.add(name);
             }
 
-            if(SourceVersion.isKeyword(name)) name += "s";           
+            if(SourceVersion.isKeyword(name)) name += "s";
 
             String filepath = path.substring(path.lastIndexOf("/") + 1) + "/" + fname;
             String filename = "\"" + filepath + "\"";

@@ -90,7 +90,7 @@ public class Scripts implements Disposable{
         if(Vars.headless) return new MockSound();
 
         String name = "sounds/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
         if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
         ModLoadingSound sound = new ModLoadingSound();
@@ -105,7 +105,7 @@ public class Scripts implements Disposable{
         if(Vars.headless) return new MockMusic();
 
         String name = "music/" + soundName;
-        String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
         if(Core.assets.contains(path, Music.class)) return Core.assets.get(path, Music.class);
         ModLoadingMusic sound = new ModLoadingMusic();
