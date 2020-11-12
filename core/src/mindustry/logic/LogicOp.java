@@ -4,7 +4,7 @@ import arc.math.*;
 import arc.util.*;
 
 public enum LogicOp{
-    //section arithmetic
+    //region arithmetic
     add("+", (a, b) -> a + b),
     sub("-", (a, b) -> a - b),
     mul("*", (a, b) -> a * b),
@@ -12,7 +12,8 @@ public enum LogicOp{
     idiv("//", (a, b) -> Math.floor(a / b)),
     mod("%", (a, b) -> a % b),
     pow("^", Math::pow),
-    //section boolean logic
+    //endregion
+    //region boolean logic
     equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> Structs.eq(a, b) ? 1 : 0),
     notEqual("!=", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> !Structs.eq(a, b) ? 1 : 0),
     lessThan("<", (a, b) -> a < b ? 1 : 0),
@@ -23,18 +24,21 @@ public enum LogicOp{
     //logical or is essentially the same as bitwise or
     land("&&", (a, b) -> a < 0.000001 && b < 0.000001 ? 1 : 0, (a, b) -> a != null && b != null ? 1 : 0),
     //lxor is just notEqual
-    //section bitwise ops
+    //endregion
+    //region bitwise ops
     shl("<<", (a, b) -> (long)a << (long)b),
     shr(">>", (a, b) -> (long)a >> (long)b),
     or("or", (a, b) -> (long)a | (long)b),
     and("and", (a, b) -> (long)a & (long)b),
     xor("xor", (a, b) -> (long)a ^ (long)b),
-    // section misc helpers
+    //endregion
+    //region misc helpers
     max("max", Math::max),
     min("min", Math::min),
     atan2("atan2", (x, y) -> Mathf.atan2((float)x, (float)y) * Mathf.radDeg),
     dst("dst", (x, y) -> Mathf.dst((float)x, (float)y)),
     noise("noise", LExecutor.noise::rawNoise2D),
+    //endregion
 
     not("not", a -> ~(long)(a)),
     abs("abs", a -> Math.abs(a)),
