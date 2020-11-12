@@ -100,7 +100,7 @@ public class LAssembler{
         int index = 0;
         for(String line : lines){
             //comments
-            if(line.startsWith("#")) continue;
+            if(line.startsWith("#") || line.isEmpty()) continue;
             //remove trailing semicolons in case someone adds them in for no reason
             if(line.endsWith(";")) line = line.substring(0, line.length() - 1);
 

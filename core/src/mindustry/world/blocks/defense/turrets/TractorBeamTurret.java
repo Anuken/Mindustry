@@ -95,7 +95,9 @@ public class TractorBeamTurret extends BaseTurret{
 
             //look at target
             if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.01f){
-                loops.play(shootSound, this, shootSoundVolume);
+                if(!headless){
+                    control.sound.loop(shootSound, this, shootSoundVolume);
+                }
 
                 any = true;
                 float dest = angleTo(target);

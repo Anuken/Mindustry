@@ -356,12 +356,12 @@ public class UnitType extends UnlockableContent{
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor && ((Reconstructor)b).upgrades.contains(u -> u[1] == this));
+        Block rec = content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
 
-        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems){
-            stacks = ((ConsumeItems)rec.consumes.get(ConsumeType.item)).items;
+        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
+            stacks = ci.items;
         }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && ((UnitFactory)u).plans.contains(p -> p.unit == this));
+            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory uf && uf.plans.contains(p -> p.unit == this));
             if(factory != null){
                 stacks = factory.plans.find(p -> p.unit == this).requirements;
             }
@@ -370,7 +370,7 @@ public class UnitType extends UnlockableContent{
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];
             for(int i = 0; i < out.length; i++){
-                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1) * 50)));
+                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * 50)));
             }
 
             return out;

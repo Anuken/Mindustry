@@ -2,18 +2,21 @@ package mindustry.audio;
 
 import arc.*;
 import arc.audio.*;
-import arc.audio.SoloudAudio.*;
+import arc.audio.Filters.*;
+import arc.files.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
 import static mindustry.Vars.*;
 
-/** Controls playback of multiple music tracks.*/
-public class MusicControl{
+/** Controls playback of multiple audio tracks.*/
+public class SoundControl{
     protected static final float finTime = 120f, foutTime = 120f, musicInterval = 60 * 60 * 3f, musicChance = 0.6f, musicWaveChance = 0.46f;
 
     /** normal, ambient music, plays at any time */
@@ -29,12 +32,15 @@ public class MusicControl{
     protected float fade;
     protected boolean silenced;
 
-    protected boolean wasPaused;
+    protected AudioBus uiBus = new AudioBus();
+    protected boolean wasPaused, wasPlaying;
     protected AudioFilter filter = new BiquadFilter(){{
         set(0, 500, 1);
     }};
 
-    public MusicControl(){
+    protected ObjectMap<Sound, SoundData> sounds = new ObjectMap<>();
+
+    public SoundControl(){
         Events.on(ClientLoadEvent.class, e -> reload());
 
         //only run music 10 seconds after a wave spawns
@@ -47,6 +53,13 @@ public class MusicControl{
                 playRandom();
             }
         }));
+
+        setupFilters();
+    }
+
+    protected void setupFilters(){
+        Core.audio.soundBus.setFilter(0, filter);
+        Core.audio.soundBus.setFilterParam(0, Filters.paramWet, 0f);
     }
 
     protected void reload(){
@@ -55,6 +68,33 @@ public class MusicControl{
         ambientMusic = Seq.with(Musics.game1, Musics.game3, Musics.game6, Musics.game8, Musics.game9);
         darkMusic = Seq.with(Musics.game2, Musics.game5, Musics.game7, Musics.game4);
         bossMusic = Seq.with(Musics.boss1, Musics.boss2, Musics.game2, Musics.game5);
+
+        //setup UI bus for all sounds that are in the UI folder
+        for(var sound : Core.assets.getAll(Sound.class, new Seq<>())){
+            var file = Fi.get(Core.assets.getAssetFileName(sound));
+            if(file.parent().name().equals("ui")){
+                sound.setBus(uiBus);
+            }
+        }
+    }
+
+    public void loop(Sound sound, float volume){
+        if(Vars.headless) return;
+
+        loop(sound, Core.camera.position, volume);
+    }
+
+    public void loop(Sound sound, Position pos, float volume){
+        if(Vars.headless) return;
+
+        float baseVol = sound.calcFalloff(pos.getX(), pos.getY());
+        float vol = baseVol * volume;
+
+        SoundData data = sounds.get(sound, SoundData::new);
+        data.volume += vol;
+        data.volume = Mathf.clamp(data.volume, 0f, 1f);
+        data.total += baseVol;
+        data.sum.add(pos.getX() * baseVol, pos.getY() * baseVol);
     }
 
     public void stop(){
@@ -69,10 +109,30 @@ public class MusicControl{
     /** Update and play the right music track.*/
     public void update(){
         boolean paused = state.isGame() && Core.scene.hasDialog();
+        boolean playing = state.isGame();
 
+        //check if current track is finished
+        if(current != null && !current.isPlaying()){
+            current = null;
+            fade = 0f;
+        }
+
+        //fade the lowpass filter in/out
         if(paused != wasPaused){
-            Core.audio.setFilter(0, paused ? filter : null);
             wasPaused = paused;
+            Core.audio.soundBus.fadeFilterParam(0, Filters.paramWet, paused ? 1f : 0f, 0.4f);
+        }
+
+        //play/stop ordinary effects
+        if(playing != wasPlaying){
+            wasPlaying = playing;
+
+            if(playing){
+                Core.audio.soundBus.play();
+                setupFilters();
+            }else{
+                Core.audio.soundBus.stop();
+            }
         }
 
         if(state.isMenu()){
@@ -99,6 +159,42 @@ public class MusicControl{
                 }
             }
         }
+
+        updateLoops();
+    }
+
+    protected void updateLoops(){
+        //clear loops when in menu
+        if(!state.isGame()){
+            sounds.clear();
+            return;
+        }
+
+        float avol = Core.settings.getInt("ambientvol", 100) / 100f;
+
+        sounds.each((sound, data) -> {
+            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.2f);
+
+            boolean play = data.curVolume > 0.01f;
+            float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
+            if(data.soundID <= 0 || !Core.audio.isPlaying(data.soundID)){
+                if(play){
+                    data.soundID = sound.loop(data.curVolume, 1f, pan);
+                    Core.audio.protect(data.soundID, true);
+                }
+            }else{
+                if(data.curVolume <= 0.001f){
+                    sound.stop();
+                    data.soundID = -1;
+                    return;
+                }
+                Core.audio.set(data.soundID, pan, data.curVolume);
+            }
+
+            data.volume = 0f;
+            data.total = 0f;
+            data.sum.setZero();
+        });
     }
 
     /** Plays a random track.*/
@@ -191,12 +287,6 @@ public class MusicControl{
         current = music;
         current.setVolume(1f);
         current.setLooping(false);
-        current.setCompletionListener(m -> {
-            if(current == m){
-                current = null;
-                fade = 0f;
-            }
-        });
         current.play();
     }
 
@@ -207,5 +297,14 @@ public class MusicControl{
     /** Fades out the current track, unless it has already been silenced. */
     protected void silence(){
         play(null);
+    }
+
+    protected static class SoundData{
+        float volume;
+        float total;
+        Vec2 sum = new Vec2();
+
+        int soundID;
+        float curVolume;
     }
 }

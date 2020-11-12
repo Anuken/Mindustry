@@ -41,7 +41,7 @@ import static mindustry.Vars.*;
  */
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
-    public MusicControl music;
+    public SoundControl sound;
     public Tutorial tutorial;
     public InputHandler input;
 
@@ -52,14 +52,11 @@ public class Control implements ApplicationListener, Loadable{
     public Control(){
         saves = new Saves();
         tutorial = new Tutorial();
-        music = new MusicControl();
+        sound = new SoundControl();
 
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
-                for(Sound sound : assets.getAll(Sound.class, new Seq<>())){
-                    sound.stop();
-                }
             }
         });
 
@@ -497,8 +494,7 @@ public class Control implements ApplicationListener, Loadable{
 
         input.updateState();
 
-        music.update();
-        loops.update();
+        sound.update();
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");

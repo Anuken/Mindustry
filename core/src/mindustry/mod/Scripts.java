@@ -2,9 +2,10 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.MusicLoader.*;
+import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
-import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
@@ -87,33 +88,31 @@ public class Scripts implements Disposable{
     }
 
     public Sound loadSound(String soundName){
-        if(Vars.headless) return new MockSound();
+        if(Vars.headless) return new Sound();
 
         String name = "sounds/" + soundName;
         String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
         if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
-        ModLoadingSound sound = new ModLoadingSound();
-        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
-        desc.loaded = result -> sound.sound = (Sound)result;
+        var sound = new Sound();
+        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
         desc.errored = Throwable::printStackTrace;
 
         return sound;
     }
 
     public Music loadMusic(String soundName){
-        if(Vars.headless) return new MockMusic();
+        if(Vars.headless) return new Music();
 
         String name = "music/" + soundName;
         String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
         if(Core.assets.contains(path, Music.class)) return Core.assets.get(path, Music.class);
-        ModLoadingMusic sound = new ModLoadingMusic();
-        AssetDescriptor<?> desc = Core.assets.load(path, Music.class);
-        desc.loaded = result -> sound.music = (Music)result;
+        var music = new Music();
+        AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
         desc.errored = Throwable::printStackTrace;
 
-        return sound;
+        return music;
     }
 
     //endregion

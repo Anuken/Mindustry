@@ -136,7 +136,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         if(to.near().contains(launchSector)) return launchSector;
 
         Sector launchFrom = launchSector;
-        if(launchFrom == null){
+        if(launchFrom == null || (to.preset == null && !to.near().contains(launchSector))){
             //TODO pick one with the most resources
             launchFrom = to.near().find(Sector::hasBase);
             if(launchFrom == null && to.preset != null){
@@ -465,7 +465,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     int i = 0;
                     for(ItemStack stack : items){
                         res.image(stack.item.icon(Cicon.small)).padRight(3);
-                        res.add(UI.formatAmount(stack.amount)).color(Color.lightGray);
+                        res.add(UI.formatAmount(Math.max(stack.amount, 0))).color(Color.lightGray);
                         if(++i % 2 == 0){
                             res.row();
                         }

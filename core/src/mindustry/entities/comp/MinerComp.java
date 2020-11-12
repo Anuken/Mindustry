@@ -89,7 +89,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
             }
 
             if(!headless){
-                loops.play(type.mineSound, this, type.mineSoundVolume);
+                control.sound.loop(type.mineSound, this, type.mineSoundVolume);
             }
         }
     }
