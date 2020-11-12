@@ -4,24 +4,32 @@ import arc.math.*;
 import arc.util.*;
 
 public enum LogicOp{
+    //section arithmetic
     add("+", (a, b) -> a + b),
     sub("-", (a, b) -> a - b),
     mul("*", (a, b) -> a * b),
     div("/", (a, b) -> a / b),
     idiv("//", (a, b) -> Math.floor(a / b)),
     mod("%", (a, b) -> a % b),
+    pow("^", Math::pow),
+    //section boolean logic
     equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> Structs.eq(a, b) ? 1 : 0),
-    notEqual("not", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> !Structs.eq(a, b) ? 1 : 0),
+    notEqual("=/=", (a, b) -> Math.abs(a - b) < 0.000001 ? 0 : 1, (a, b) -> !Structs.eq(a, b) ? 1 : 0),
     lessThan("<", (a, b) -> a < b ? 1 : 0),
     lessThanEq("<=", (a, b) -> a <= b ? 1 : 0),
     greaterThan(">", (a, b) -> a > b ? 1 : 0),
     greaterThanEq(">=", (a, b) -> a >= b ? 1 : 0),
-    pow("^", Math::pow),
+    lnot("!", (a, b) -> a < 0.000001 ? 1 : 0, (a, b) -> a == null ? 1 : 0),
+    lor("||", (a, b) -> a < 0.000001 || b < 0.000001 ? 1 : 0, (a, b) -> a != null || b != null),
+    land("&&", (a, b) -> a < 0.000001 && b < 0.000001 ? 1 : 0, (a, b) -> a != null && b != null),
+    //lxor is just notEqual
+    //section bitwise ops
     shl("<<", (a, b) -> (long)a << (long)b),
     shr(">>", (a, b) -> (long)a >> (long)b),
     or("or", (a, b) -> (long)a | (long)b),
     and("and", (a, b) -> (long)a & (long)b),
     xor("xor", (a, b) -> (long)a ^ (long)b),
+    // section misc helpers
     max("max", Math::max),
     min("min", Math::min),
     atan2("atan2", (x, y) -> Mathf.atan2((float)x, (float)y) * Mathf.radDeg),
