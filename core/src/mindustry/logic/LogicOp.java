@@ -20,7 +20,7 @@ public enum LogicOp{
     greaterThan(">", (a, b) -> a > b ? 1 : 0),
     greaterThanEq(">=", (a, b) -> a >= b ? 1 : 0),
     lnot("!", (a, b) -> a < 0.000001 ? 1 : 0, (a, b) -> a == null ? 1 : 0),
-    lor("||", (a, b) -> a < 0.000001 || b < 0.000001 ? 1 : 0, (a, b) -> a != null || b != null ? 1 : 0),
+    //logical or is essentially the same as bitwise or
     land("&&", (a, b) -> a < 0.000001 && b < 0.000001 ? 1 : 0, (a, b) -> a != null && b != null ? 1 : 0),
     //lxor is just notEqual
     //section bitwise ops
