@@ -14,7 +14,8 @@
     "address": ["mindustry.ecansol.com:6597", "mindustry.ecansol.com:6499", "mindustry.ecansol.com:6599"]
   },
   {
-    "address": "Chaotic-Neutral.ddns.net:5555"
+    "name": "Chaotic Neutral",
+    "address": ["Chaotic-Neutral.ddns.net:5555", "Chaotic-Neutral.ddns.net:6666"]
   },
   {
     "address": "cheginde.ddns.net"
