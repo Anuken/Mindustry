@@ -23,7 +23,7 @@ import static mindustry.Vars.*;
 public class BaseGenerator{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
-    private static final int range = 180;
+    private static final int range = 160;
 
     private Tiles tiles;
     private Team team;
