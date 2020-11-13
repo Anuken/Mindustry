@@ -1,15 +1,13 @@
 package mindustry.world.meta.values;
 
-import arc.*;
-import arc.util.*;
+import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
-
-import static mindustry.Vars.*;
 
 public class WeaponListValue implements StatValue{
     private final Seq<Weapon> weapons;
@@ -27,25 +25,25 @@ public class WeaponListValue implements StatValue{
             Weapon weapon = weapons.get(i);
 
             if(weapon.flipSprite){
-                //fliped weapons are not given stats
+                //flipped weapons are not given stats
                 continue;
             }
 
-            if(weapon.outlineRegion.found()){
-                table.image(weapon.outlineRegion).size(10 * 8).scaling(Scaling.fit).right().top();
-            }else{
-                table.image(unit.icon(Cicon.full)).size(10 * 8).scaling(Scaling.fit).right().top();
-            }
-            table.table(Tex.underline, w -> {
+            TextureRegion region = weapon.outlineRegion.found() ? weapon.outlineRegion : unit.icon(Cicon.full);
+
+            table.image(region).size(60).scaling(Scaling.bounded).right().top();
+
+            table.table(Tex.underline,  w -> {
                 w.left().defaults().padRight(3).left();
 
-                sep(w, "[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)weapon.inaccuracy + " " + StatUnit.degrees.localized());
+                if(weapon.inaccuracy > 0){
+                    sep(w, "[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)weapon.inaccuracy + " " + StatUnit.degrees.localized());
+                }
                 sep(w, "[lightgray]" + Stat.reload.localized() + ": " + (weapon.mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / weapon.reload * weapon.shots, 1));
-                sep(w, "[lightgray]" + Stat.bullet.localized() + ":");
 
-                AmmoListValue bullet = new AmmoListValue(OrderedMap.of(unit, weapon.bullet));
+                var bullet = new AmmoListValue<UnitType>(OrderedMap.of(unit, weapon.bullet));
                 bullet.display(w);
-            }).left().padTop(-9);
+            }).padTop(-9).left();
             table.row();
         }
     }

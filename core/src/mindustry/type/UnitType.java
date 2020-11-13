@@ -221,7 +221,7 @@ public class UnitType extends UnlockableContent{
             stats.add(Stat.canBoost, canBoost);
         }
 
-        if(inst instanceof Minerc && mineTier >= 1){
+        if(mineTier >= 1){
             stats.addPercent(Stat.mineSpeed, mineSpeed);
             stats.add(Stat.mineTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
         }
@@ -232,7 +232,9 @@ public class UnitType extends UnlockableContent{
             stats.add(Stat.payloadCapacity, (payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared);
         }
 
-        stats.add(Stat.weapons, new WeaponListValue(this, weapons));
+        if(weapons.any()){
+            stats.add(Stat.weapons, new WeaponListValue(this, weapons));
+        }
     }
 
     @CallSuper

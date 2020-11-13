@@ -1,7 +1,6 @@
 package mindustry.world.meta.values;
 
 import arc.*;
-import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
@@ -28,14 +27,19 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
     public void display(Table table){
 
         table.row();
+
         for(T t : map.keys()){
+            boolean unit = t instanceof UnitType;
+
             BulletType type = map.get(t);
+
             //no point in displaying unit icon twice
-            if(!(t instanceof UnitType)){
+            if(!unit){
                 table.image(icon(t)).size(3 * 8).padRight(4).right().top();
                 table.add(t.localizedName).padRight(10).left().top();
             }
-            Cons<Table> tableCons = bt -> {
+
+            table.table(bt -> {
                 bt.left().defaults().padRight(3).left();
 
                 if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
@@ -46,7 +50,7 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                 }
 
-                if(!(t instanceof UnitType) && !Mathf.equal(type.ammoMultiplier, 1f) && !(type instanceof LiquidBulletType)){
+                if(!unit && !Mathf.equal(type.ammoMultiplier, 1f) && !(type instanceof LiquidBulletType)){
                     sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
                 }
 
@@ -58,16 +62,15 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.knockback", Strings.fixed(type.knockback, 1)));
                 }
 
-                //sap bullets don't really have pierce
-                if((type.pierce || type.pierceCap != -1) && !(type instanceof SapBulletType)){
-                    sep(bt, type.pierceCap == -1 ? "@bullet.infinitepierce" : Core.bundle.format("bullet.pierce", type.pierceCap));
-                }
-
-                if((type.healPercent > 0f)){
+                if(type.healPercent > 0f){
                     sep(bt, Core.bundle.format("bullet.healpercent", (int)type.healPercent));
                 }
 
-                if((type.status == StatusEffects.burning || type.status == StatusEffects.melting) || type.incendAmount > 0){
+                if(type.pierce || type.pierceCap != -1){
+                    sep(bt, type.pierceCap == -1 ? "@bullet.infinitepierce" : Core.bundle.format("bullet.pierce", type.pierceCap));
+                }
+
+                if(type.status == StatusEffects.burning || type.status == StatusEffects.melting || type.incendAmount > 0){
                     sep(bt, "@bullet.incendiary");
                 }
 
@@ -94,12 +97,8 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 if(type.fragBullet != null){
                     sep(bt, "@bullet.frag");
                 }
-            };
-            if(t instanceof UnitType){
-                table.table(tableCons);
-            }else{
-                table.table(Tex.underline, tableCons).left().padTop(-9);
-            }
+            }).padTop(unit ? 0 : -9).left().get().background(unit ? null : Tex.underline);
+
             table.row();
         }
     }
