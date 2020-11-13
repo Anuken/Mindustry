@@ -270,12 +270,14 @@ public class Blocks implements ContentList{
             itemDrop = Items.sand;
             playerUnmineable = true;
             attributes.set(Attribute.oil, 0.7f);
+            attributes.set(Attribute.solar, 1.5f);
         }};
 
         darksand = new Floor("darksand"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
             attributes.set(Attribute.oil, 1.5f);
+            attributes.set(Attribute.solar, 1.0f);
         }};
 
         dirt = new Floor("dirt");
@@ -1218,12 +1220,14 @@ public class Blocks implements ContentList{
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
             powerProduction = 0.08f;
+            attribute = Attribute.solar;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 145, Items.phaseFabric, 15));
             size = 3;
             powerProduction = 1f;
+            attribute = Attribute.solar;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
