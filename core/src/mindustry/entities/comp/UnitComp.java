@@ -381,7 +381,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //remove units spawned by the core
-        if(spawnedByCore && !isPlayer()){
+        if(spawnedByCore && !isPlayer() && !dead){
             Call.unitDespawn(self());
         }
     }

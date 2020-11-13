@@ -1179,7 +1179,7 @@ public class Blocks implements ContentList{
             size = 2;
             floating = true;
             ambientSound = Sounds.hum;
-            ambientSoundVolume = 0.04f;
+            ambientSoundVolume = 0.06f;
         }};
 
         steamGenerator = new BurnerGenerator("steam-generator"){{
@@ -1217,13 +1217,13 @@ public class Blocks implements ContentList{
 
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
-            powerProduction = 0.07f;
+            powerProduction = 0.08f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 145, Items.phaseFabric, 15));
             size = 3;
-            powerProduction = 0.95f;
+            powerProduction = 1f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{

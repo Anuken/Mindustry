@@ -283,6 +283,17 @@ public class SchematicsDialog extends BaseDialog{
         Core.scene.setKeyboardFocus(searchField);
     }
 
+    @Override
+    public Dialog show(){
+        super.show();
+
+        if(Core.app.isDesktop()){
+            focusSearchField();
+        }
+
+        return this;
+    }
+
     public static class SchematicImage extends Image{
         public float scaling = 16f;
         public float thickness = 4f;

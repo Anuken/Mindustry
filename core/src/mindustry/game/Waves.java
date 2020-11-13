@@ -285,7 +285,7 @@ public class Waves{
 
             for(int i = start; i < cap;){
                 int f = i;
-                int next = rand.random(8, 16) + curTier * 4;
+                int next = rand.random(8, 16) + (int)Mathf.lerp(4f, 0f, difficulty) + curTier * 4;
 
                 float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
                 int space = start == 0 ? 1 : rand.random(1, 2);
@@ -296,8 +296,8 @@ public class Waves{
                     unitAmount = f == start ? 1 : 6 / (int)scaling[ctier];
                     begin = f;
                     end = f + next >= cap ? never : f + next;
-                    max = 14;
-                    unitScaling = (difficulty < 0.4f ? rand.random(2f, 4f) : rand.random(1f, 3f)) * scaling[ctier];
+                    max = 13;
+                    unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 4f) : rand.random(1f, 4f)) * scaling[ctier];
                     shields = shieldAmount;
                     shieldScaling = shieldsPerWave;
                     spacing = space;

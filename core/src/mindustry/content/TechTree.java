@@ -115,7 +115,7 @@ public class TechTree implements ContentList{
                             node(Items.titanium, with(Items.graphite, 3000, Items.copper, 7000, Items.lead, 7000), () -> {
                                 node(pneumaticDrill, () -> {
                                     node(Items.sporePod, with(Items.coal, 4000, Items.graphite, 4000, Items.lead, 4000), () -> {
-                                        node(cultivator, () -> {
+                                        node(cultivator, Seq.with(new SectorComplete(biomassFacility)), () -> {
 
                                         });
                                     });
@@ -524,24 +524,31 @@ public class TechTree implements ContentList{
                         });
                     });
 
-                    node(stainedMountains, Seq.with(
+                    node(biomassFacility, Seq.with(
                         new SectorComplete(frozenForest),
-                        new Research(pneumaticDrill),
                         new Research(powerNode),
-                        new Research(steamGenerator)
+                        new Research(steamGenerator),
+                        new Research(scatter),
+                        new Research(graphitePress)
                     ), () -> {
-                        node(fungalPass, Seq.with(
-                            new SectorComplete(stainedMountains),
-                            new Research(groundFactory),
-                            new Research(door),
+                        node(stainedMountains, Seq.with(
+                            new SectorComplete(biomassFacility),
+                            new Research(pneumaticDrill),
                             new Research(siliconSmelter)
                         ), () -> {
-                            node(nuclearComplex, Seq.with(
-                                new SectorComplete(fungalPass),
-                                new Research(thermalGenerator),
-                                new Research(laserDrill)
+                            node(fungalPass, Seq.with(
+                                new SectorComplete(stainedMountains),
+                                new Research(groundFactory),
+                                new Research(door),
+                                new Research(siliconSmelter)
                             ), () -> {
+                                node(nuclearComplex, Seq.with(
+                                    new SectorComplete(fungalPass),
+                                    new Research(thermalGenerator),
+                                    new Research(laserDrill)
+                                ), () -> {
 
+                                });
                             });
                         });
                     });

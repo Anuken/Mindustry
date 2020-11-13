@@ -124,7 +124,7 @@ public class SectorInfo{
 
         //assign new wave patterns when the version changes
         if(waveVersion != Waves.waveVersion && state.rules.sector.preset == null){
-            state.rules.spawns = Waves.generate(state.rules.sector.baseCoverage);
+            state.rules.spawns = Waves.generate(state.rules.sector.threat);
         }
 
         CoreBuild entity = state.rules.defaultTeam.core();

@@ -19,7 +19,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         boolean any = false;
         float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.5f);
 
-        if(noise > 0.028){
+        if(noise > 0.027){
             any = true;
         }
 

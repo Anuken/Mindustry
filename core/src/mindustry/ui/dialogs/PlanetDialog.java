@@ -153,9 +153,9 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public void renderSectors(Planet planet){
 
         //draw all sector stuff
-        if(!debugSelect && selectAlpha > 0.01f){
+        if(selectAlpha > 0.01f){
             for(Sector sec : planet.sectors){
-                if(canSelect(sec) || sec.unlocked()){
+                if(canSelect(sec) || sec.unlocked() || debugSelect){
 
                     Color color =
                     sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
@@ -389,7 +389,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.add(sector.save != null ? sector.save.getPlayTime() : "@sectors.unexplored").row();
 
         if(sector.isAttacked() || !sector.hasBase()){
-            stable.add("[accent]Difficulty: " + (int)(sector.baseCoverage * 10)).row();
+            stable.add("[accent]Threat: " + sector.displayThreat()).row();
         }
 
         //TODO put most info in submenu

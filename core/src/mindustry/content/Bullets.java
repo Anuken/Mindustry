@@ -358,6 +358,7 @@ public class Bullets implements ContentList{
             shootEffect = Fx.shootBig;
             pierceCap = 2;
             pierceBuilding = true;
+            knockback = 0.7f;
         }};
 
         standardIncendiaryBig = new BasicBulletType(7f, 60, "bullet"){{

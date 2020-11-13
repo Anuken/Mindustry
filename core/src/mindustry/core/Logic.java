@@ -80,6 +80,13 @@ public class Logic implements ApplicationListener{
                     state.wavetime = state.rules.waveSpacing;
 
                     SectorDamage.applyCalculatedDamage();
+
+                    //make sure damaged buildings are counted
+                    for(Tile tile : world.tiles){
+                        if(tile.build != null && tile.build.damaged()){
+                            indexer.notifyTileDamaged(tile.build);
+                        }
+                    }
                 }
 
                 //reset values

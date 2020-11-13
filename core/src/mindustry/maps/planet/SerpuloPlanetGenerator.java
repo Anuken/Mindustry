@@ -232,6 +232,10 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             ores.add(Blocks.oreThorium);
         }
 
+        if(rand.chance(0.25)){
+            ores.add(Blocks.oreScrap);
+        }
+
         FloatSeq frequencies = new FloatSeq();
         for(int i = 0; i < ores.size; i++){
             frequencies.add(rand.random(-0.09f, 0.01f) - i * 0.01f);
@@ -249,6 +253,10 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     ore = entry;
                     break;
                 }
+            }
+
+            if(ore == Blocks.oreScrap && rand.chance(0.33)){
+                floor = Blocks.metalFloorDamaged;
             }
         });
 
@@ -326,7 +334,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        float difficulty = sector.baseCoverage;
+        float difficulty = sector.threat;
         ints.clear();
         ints.ensureCapacity(width * height / 4);
 
@@ -417,7 +425,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             state.rules.winWave = sector.info.winWave = 10 + 5 * (int)Math.max(difficulty * 10, 1);
         }
 
+        float waveTimeDec = 0.4f;
+
+        state.rules.waveSpacing = Mathf.lerp(60 * 65 * 2, 60f * 60f * 1f, Math.max(difficulty - waveTimeDec, 0f) / 0.8f);
         state.rules.waves = sector.info.waves = true;
+        state.rules.enemyCoreBuildRadius = 600f;
 
         //TODO better waves
         state.rules.spawns = Waves.generate(difficulty);
