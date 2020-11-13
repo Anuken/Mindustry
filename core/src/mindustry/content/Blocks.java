@@ -1416,6 +1416,7 @@ public class Blocks implements ContentList{
             requirements(Category.turret, with(Items.copper, 35), true);
             ammo(
             Items.copper, Bullets.standardCopper,
+            Items.lead, Bullets.standardLead,
             Items.graphite, Bullets.standardDense,
             Items.pyratite, Bullets.standardIncendiary,
             Items.silicon, Bullets.standardHoming
@@ -1600,9 +1601,11 @@ public class Blocks implements ContentList{
             requirements(Category.turret, with(Items.copper, 105, Items.graphite, 95, Items.titanium, 60));
             ammo(
             Items.copper, Bullets.standardCopper,
+            Items.lead, Bullets.standardLead,
             Items.graphite, Bullets.standardDense,
             Items.pyratite, Bullets.standardIncendiary,
             Items.silicon, Bullets.standardHoming,
+            Items.titanium, Bullets.standardTitanium
             Items.thorium, Bullets.standardThorium
             );
 
