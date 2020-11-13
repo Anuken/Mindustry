@@ -308,7 +308,16 @@ public class Bullets implements ContentList{
             smokeEffect = Fx.shootSmallSmoke;
             ammoMultiplier = 2;
         }};
-
+        
+        standardLead = new BasicBulletType(2.9f, 12){{
+            width = 7f;
+            height = 9f;
+            lifetime = 60f;
+            shootEffect = Fx.shootSmall;
+            smokeEffect = Fx.shootSmallSmoke;
+            ammoMultiplier = 2;
+        }};
+        
         standardDense = new BasicBulletType(3.5f, 18){{
             width = 9f;
             height = 12f;
@@ -316,7 +325,14 @@ public class Bullets implements ContentList{
             ammoMultiplier = 4;
             lifetime = 60f;
         }};
-
+        
+        standardTitanium = new BasicBulletType(3.7f, 20){{
+            width = 9f;
+            height = 12f;
+            ammoMultiplier = 4;
+            lifetime = 60f;
+        }};
+        
         standardThorium = new BasicBulletType(4f, 29, "bullet"){{
             width = 10f;
             height = 13f;
