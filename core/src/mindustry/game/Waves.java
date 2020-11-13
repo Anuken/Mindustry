@@ -10,7 +10,7 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 2;
+    public static final int waveVersion = 3;
 
     private Seq<SpawnGroup> spawns;
 
@@ -256,7 +256,8 @@ public class Waves{
     }
 
     public static Seq<SpawnGroup> generate(float difficulty){
-        return generate(new Rand(), difficulty);
+        //apply power curve to make starting sectors easier
+        return generate(new Rand(), Mathf.pow(difficulty, 1.12f));
     }
 
     public static Seq<SpawnGroup> generate(Rand rand, float difficulty){
@@ -339,7 +340,7 @@ public class Waves{
             step += (int)(rand.random(15, 30) * Mathf.lerp(1f, 0.5f, difficulty));
         }
 
-        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.6f, difficulty));
+        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.5f, difficulty));
         int bossSpacing = (int)(rand.random(25, 40) * Mathf.lerp(1f, 0.6f, difficulty));
 
         int bossTier = difficulty < 0.5 ? 3 : 4;

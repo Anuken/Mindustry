@@ -39,24 +39,22 @@ public class BaseGenerator{
 
         Mathf.rand.setSeed(sector.id);
 
-        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1 && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
-        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2 && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1 && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2 && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
 
         //sort by cost for correct fraction
         wallsSmall.sort(b -> b.buildCost);
         wallsLarge.sort(b -> b.buildCost);
 
-        //TODO proper difficulty selection
-        float bracket = difficulty;
         float bracketRange = 0.2f;
         float baseChance = Mathf.lerp(0.7f, 1.9f, difficulty);
         int wallAngle = 70; //180 for full coverage
         double resourceChance = 0.5 * baseChance;
         double nonResourceChance = 0.0005 * baseChance;
-        BasePart coreschem = bases.cores.getFrac(bracket);
+        BasePart coreschem = bases.cores.getFrac(difficulty);
         int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 2 : 3;
 
-        Block wall = wallsSmall.getFrac(bracket), wallLarge = wallsLarge.getFrac(bracket);
+        Block wall = wallsSmall.getFrac(difficulty), wallLarge = wallsLarge.getFrac(difficulty);
 
         for(Tile tile : cores){
             tile.clearOverlay();
@@ -78,10 +76,10 @@ public class BaseGenerator{
                 || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
                     Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
                     if(!parts.isEmpty()){
-                        tryPlace(parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y, team);
+                        tryPlace(parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
                     }
                 }else if(Mathf.chance(nonResourceChance)){
-                    tryPlace(bases.parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y, team);
+                    tryPlace(bases.parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
                 }
             });
         }

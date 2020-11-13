@@ -431,7 +431,6 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         state.rules.waves = sector.info.waves = true;
         state.rules.enemyCoreBuildRadius = 600f;
 
-        //TODO better waves
         state.rules.spawns = Waves.generate(difficulty);
     }
 

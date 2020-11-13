@@ -28,7 +28,7 @@ import static mindustry.Vars.*;
 @EntityDef(value = {Playerc.class}, serialize = false)
 @Component(base = true)
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
-    static final float deathDelay = 30f;
+    static final float deathDelay = 60f;
 
     @Import float x, y;
 
@@ -130,7 +130,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             }
         }else if(core != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
-            //(this is not for balance)
+            //(this is not for balance, it just looks better this way)
             deathTimer += Time.delta;
             if(deathTimer >= deathDelay){
                 //request spawn - this happens serverside only

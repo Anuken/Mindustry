@@ -9,6 +9,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.async.*;
+import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -104,6 +105,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.load(schematics);
 
         assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
+        assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
     }
 
     @Override
