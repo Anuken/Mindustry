@@ -136,6 +136,7 @@ public abstract class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = Nulls.blockUnit;
+        public boolean wasShooting;
 
         @Override
         public void created(){
@@ -176,9 +177,13 @@ public abstract class Turret extends ReloadTurret{
                 case rotation -> rotation;
                 case shootX -> World.conv(targetPos.x);
                 case shootY -> World.conv(targetPos.y);
-                case shooting -> (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+                case shooting -> isShooting() ? 1 : 0;
                 default -> super.sense(sensor);
             };
+        }
+
+        public boolean isShooting(){
+            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
         }
 
         @Override
@@ -228,6 +233,8 @@ public abstract class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
+            wasShooting = false;
+
             recoil = Mathf.lerpDelta(recoil, 0f, restitution);
             heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
@@ -269,6 +276,7 @@ public abstract class Turret extends ReloadTurret{
                     }
 
                     if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                        wasShooting = true;
                         updateShooting();
                     }
                 }

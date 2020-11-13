@@ -111,7 +111,6 @@ public class AssetsProcess extends BaseProcessor{
 
         HashSet<String> names = new HashSet<>();
         Fi.get(path).walk(p -> {
-            String fname = p.name();
             String name = p.nameWithoutExtension();
 
             if(names.contains(name)){
@@ -120,20 +119,20 @@ public class AssetsProcess extends BaseProcessor{
                 names.add(name);
             }
 
-            if(SourceVersion.isKeyword(name)) name += "s";           
+            if(SourceVersion.isKeyword(name)) name += "s";
 
-            String filepath = path.substring(path.lastIndexOf("/") + 1) + "/" + fname;
+            String filepath =  path.substring(path.lastIndexOf("/") + 1) + p.path().substring(p.path().lastIndexOf(path) + path.length());
+
             String filename = "\"" + filepath + "\"";
-
             loadBegin.addStatement("arc.Core.assets.load(" + filename + ", " + rtype + ".class).loaded = a -> " + name + " = (" + rtype + ")a", filepath, filepath.replace(".ogg", ".mp3"));
 
             dispose.addStatement("arc.Core.assets.unload(" + filename + ")");
             dispose.addStatement(name + " = null");
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio." + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
         });
 
         if(classname.equals("Sounds")){
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio." + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
         }
 
         type.addMethod(loadBegin.build());

@@ -69,8 +69,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public float speed(){
+        float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
         //limit speed to minimum formation speed to preserve formation
-        return isCommanding() ? minFormationSpeed * 0.98f : type.speed;
+        return (isCommanding() ? minFormationSpeed * 0.98f : type.speed) * strafePenalty;
     }
 
     /** @return speed with boost multipliers factored in. */

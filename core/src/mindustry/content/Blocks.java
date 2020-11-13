@@ -728,7 +728,7 @@ public class Blocks implements ContentList{
             hasItems = hasPower = true;
             drawer = new DrawRotator();
             ambientSound = Sounds.grinding;
-            ambientSoundVolume = 0.02f;
+            ambientSoundVolume = 0.025f;
 
             consumes.item(Items.scrap, 1);
             consumes.power(0.50f);
@@ -1229,7 +1229,7 @@ public class Blocks implements ContentList{
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             requirements(Category.power, with(Items.lead, 300, Items.silicon, 200, Items.graphite, 150, Items.thorium, 150, Items.metaglass, 50));
             ambientSound = Sounds.hum;
-            ambientSoundVolume = 0.2f;
+            ambientSoundVolume = 0.24f;
             size = 3;
             health = 700;
             itemDuration = 360f;
@@ -1246,7 +1246,7 @@ public class Blocks implements ContentList{
             powerProduction = 130f;
             itemDuration = 140f;
             ambientSound = Sounds.pulse;
-            ambientSoundVolume = 0.2f;
+            ambientSoundVolume = 0.07f;
 
             consumes.power(25f);
             consumes.item(Items.blastCompound);

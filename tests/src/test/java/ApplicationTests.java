@@ -69,7 +69,7 @@ public class ApplicationTests{
                 }
             };
 
-            new HeadlessApplication(core, null, throwable -> exceptionThrown[0] = throwable);
+            new HeadlessApplication(core, throwable -> exceptionThrown[0] = throwable);
 
             while(!begins[0]){
                 if(exceptionThrown[0] != null){

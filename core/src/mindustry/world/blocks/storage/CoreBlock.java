@@ -210,7 +210,7 @@ public class CoreBlock extends StorageBlock{
             super.onDestroyed();
 
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
-            if(state.isCampaign() && team == state.rules.waveTeam){
+            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1){
                 //do not recache
                 tile.setOverlayQuiet(Blocks.spawn);
 

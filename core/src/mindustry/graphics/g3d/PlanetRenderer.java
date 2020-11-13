@@ -99,7 +99,7 @@ public class PlanetRenderer implements Disposable{
 
         Gl.enable(Gl.blend);
 
-        irenderer.renderProjections();
+        irenderer.renderProjections(planet);
 
         Gl.disable(Gl.cullFace);
         Gl.disable(Gl.depthTest);
@@ -177,17 +177,23 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b){
+        drawArc(planet, a, b, Pal.accent, Color.clear, 1f);
+    }
+    public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length){
+        drawArc(planet, a, b, from, to, length, 80f, 25);
+    }
+
+    public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
         Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
-        avg.setLength(planet.radius*2f);
+        avg.setLength(planet.radius*(1f+length));
 
         points.clear();
         points.addAll(Tmp.v33.set(b).setLength(outlineRad), Tmp.v31, Tmp.v34.set(a).setLength(outlineRad));
         Tmp.bz3.set(points);
-        float points = 25;
 
-        for(int i = 0; i < points + 1; i++){
-            float f = i / points;
-            Tmp.c1.set(Pal.accent).lerp(Color.clear, (f+Time.globalTime()/80f)%1f);
+        for(int i = 0; i < pointCount + 1; i++){
+            float f = i / (float)pointCount;
+            Tmp.c1.set(from).lerp(to, (f+Time.globalTime()/timeScale)%1f);
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
 
@@ -312,6 +318,6 @@ public class PlanetRenderer implements Disposable{
 
     public interface PlanetInterfaceRenderer{
         void renderSectors(Planet planet);
-        void renderProjections();
+        void renderProjections(Planet planet);
     }
 }

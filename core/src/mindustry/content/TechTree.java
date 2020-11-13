@@ -479,19 +479,25 @@ public class TechTree implements ContentList{
                             new Research(kiln),
                             new Research(mechanicalPump)
                         ), () -> {
-
                             node(tarFields, Seq.with(
                                 new SectorComplete(ruinousShores),
                                 new Research(coalCentrifuge),
                                 new Research(conduit),
                                 new Research(wave)
                             ), () -> {
-                                node(desolateRift, Seq.with(
+                                //TODO change positions?
+                                node(impact0078, Seq.with(
                                     new SectorComplete(tarFields),
-                                    new Research(thermalGenerator),
-                                    new Research(thoriumReactor)
+                                    new Research(Items.thorium),
+                                    new Research(overdriveProjector)
                                 ), () -> {
+                                    node(desolateRift, Seq.with(
+                                        new SectorComplete(impact0078),
+                                        new Research(thermalGenerator),
+                                        new Research(thoriumReactor)
+                                    ), () -> {
 
+                                    });
                                 });
                             });
 
