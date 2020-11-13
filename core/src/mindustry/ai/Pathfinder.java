@@ -351,13 +351,7 @@ public class Pathfinder implements Runnable{
         threadList.add(path);
 
         //add to main thread's list of paths
-        Core.app.post(() -> {
-            mainList.add(path);
-            //TODO
-            //if(fieldMap[team.id] != null){
-            //    fieldMap[team.id].put(target, path);
-            //}
-        });
+        Core.app.post(() -> mainList.add(path));
 
         //fill with impassables by default
         for(int x = 0; x < world.width(); x++){

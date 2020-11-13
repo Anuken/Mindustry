@@ -208,16 +208,30 @@ public class BlockIndexer{
     public Seq<Tile> getEnemy(Team team, BlockFlag type){
         returnArray.clear();
         Seq<TeamData> data = state.teams.present;
-        for(int i = 0; i < data.size; i++){
-            Team enemy = data.items[i].team;
-            if(enemy == team) continue;
-            TileArray set = getFlagged(enemy)[type.ordinal()];
-            if(set != null){
-                for(Tile tile : set){
-                    returnArray.add(tile);
+        //when team data is not initialized, scan through every team. this is terrible
+        if(data.isEmpty()){
+            for(Team enemy : Team.all){
+                if(enemy == team) continue;
+                TileArray set = getFlagged(enemy)[type.ordinal()];
+                if(set != null){
+                    for(Tile tile : set){
+                        returnArray.add(tile);
+                    }
+                }
+            }
+        }else{
+            for(int i = 0; i < data.size; i++){
+                Team enemy = data.items[i].team;
+                if(enemy == team) continue;
+                TileArray set = getFlagged(enemy)[type.ordinal()];
+                if(set != null){
+                    for(Tile tile : set){
+                        returnArray.add(tile);
+                    }
                 }
             }
         }
+
         return returnArray;
     }
 

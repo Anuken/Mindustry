@@ -11,7 +11,7 @@ import java.io.*;
  1. take set of pre-defined icons and SVGs
  2. use Fontello API to get a font with these
  3. combine fontello font and standard font, get output font
- 4. use apache ttf API to generate a file with constants for every icon size+type (during annotation processing)
+ 4. use json to generate a file with constants for every icon size+type (during annotation processing)
  */
 public class FontGenerator{
 

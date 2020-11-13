@@ -31,7 +31,7 @@ public class SectorPresets implements ContentList{
             difficulty = 2;
         }};
 
-        biomassFacility = new SectorPreset("biomassResearchFacility", serpulo, 81){{
+        biomassFacility = new SectorPreset("biomassFacility", serpulo, 81){{
             captureWave = 20;
             difficulty = 3;
         }};
