@@ -436,7 +436,7 @@ public class TechTree implements ContentList{
                         });
                     });
 
-                    node(navalFactory, () -> {
+                    node(navalFactory, Seq.with(new SectorComplete(ruinousShores)), () -> {
                         node(risso, () -> {
                             node(minke, () -> {
                                 node(bryde, () -> {
@@ -479,36 +479,44 @@ public class TechTree implements ContentList{
                             new Research(kiln),
                             new Research(mechanicalPump)
                         ), () -> {
-                            node(tarFields, Seq.with(
+                            node(windsweptIslands, Seq.with(
                                 new SectorComplete(ruinousShores),
-                                new Research(coalCentrifuge),
-                                new Research(conduit),
-                                new Research(wave)
+                                new Research(pneumaticDrill),
+                                new Research(hail),
+                                new Research(siliconSmelter),
+                                new Research(steamGenerator)
                             ), () -> {
-                                //TODO change positions?
-                                node(impact0078, Seq.with(
-                                    new SectorComplete(tarFields),
-                                    new Research(Items.thorium),
-                                    new Research(overdriveProjector)
+                                node(tarFields, Seq.with(
+                                    new SectorComplete(windsweptIslands),
+                                    new Research(coalCentrifuge),
+                                    new Research(conduit),
+                                    new Research(wave)
                                 ), () -> {
-                                    node(desolateRift, Seq.with(
-                                        new SectorComplete(impact0078),
-                                        new Research(thermalGenerator),
-                                        new Research(thoriumReactor)
+                                    //TODO change positions?
+                                    node(impact0078, Seq.with(
+                                        new SectorComplete(tarFields),
+                                        new Research(Items.thorium),
+                                        new Research(overdriveProjector)
                                     ), () -> {
+                                        node(desolateRift, Seq.with(
+                                            new SectorComplete(impact0078),
+                                            new Research(thermalGenerator),
+                                            new Research(thoriumReactor)
+                                        ), () -> {
 
+                                        });
                                     });
                                 });
-                            });
 
-                            node(saltFlats, Seq.with(
-                                new SectorComplete(ruinousShores),
-                                new Research(groundFactory),
-                                new Research(airFactory),
-                                new Research(door),
-                                new Research(waterExtractor)
-                            ), () -> {
+                                node(saltFlats, Seq.with(
+                                    new SectorComplete(windsweptIslands),
+                                    new Research(groundFactory),
+                                    new Research(airFactory),
+                                    new Research(door),
+                                    new Research(waterExtractor)
+                                ), () -> {
 
+                                });
                             });
                         });
 

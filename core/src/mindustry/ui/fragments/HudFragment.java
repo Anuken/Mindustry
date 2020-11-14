@@ -446,7 +446,7 @@ public class HudFragment extends Fragment{
 
             Table table = new Table(Tex.button);
             table.update(() -> {
-                if(state.isMenu()){
+                if(state.isMenu() || !ui.hudfrag.shown){
                     table.remove();
                 }
             });
