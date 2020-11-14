@@ -218,7 +218,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         for(Sector sec : planet.sectors){
             if(sec != hovered){
-                var icon = (sec.isAttacked() ? Icon.warning : !sec.hasBase() && sec.preset != null && sec.preset.unlocked() ? Icon.terrain : null);
+                var preficon = sec.icon();
+                var icon = (sec.isAttacked() ? Icon.warning : !sec.hasBase() && sec.preset != null && sec.preset.unlocked() && preficon == null ? Icon.terrain : preficon);
                 var color = sec.preset != null && !sec.hasBase() ? Team.derelict.color : Team.sharded.color;
 
                 if(icon != null){
@@ -236,10 +237,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             planets.drawPlane(hovered, () -> {
                 Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
 
-                TextureRegion icon = hovered.locked() && !canSelect(hovered) ? Icon.lock.getRegion() : hovered.isAttacked() ? Icon.warning.getRegion() : null;
+                var icon = hovered.locked() && !canSelect(hovered) ? Icon.lock : hovered.isAttacked() ? Icon.warning : hovered.icon();
 
                 if(icon != null){
-                    Draw.rect(icon, 0, 0);
+                    Draw.rect(icon.getRegion(), 0, 0);
                 }
 
                 Draw.reset();
@@ -378,6 +379,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.table(title -> {
             title.add("[accent]" + sector.name());
             if(sector.preset == null){
+                title.add().growX();
+
                 title.button(Icon.pencilSmall, Styles.clearPartiali, () -> {
                    ui.showTextInput("@sectors.rename", "@name", 20, sector.name(), v -> {
                        sector.setName(v);
@@ -385,6 +388,40 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                    });
                 }).size(40f).padLeft(4);
             }
+
+            var icon = Icon.icons.get(sector.info.icon + "Small");
+
+            title.button(icon == null ? Icon.noneSmall : icon, Styles.clearPartiali, () -> {
+                new Dialog(""){{
+                    closeOnBack();
+                    setFillParent(true);
+                    cont.pane(t -> {
+                        t.defaults().size(48);
+
+                        t.button(Icon.none, Styles.clearTogglei, () -> {
+                            sector.info.icon = null;
+                            sector.saveInfo();
+                            hide();
+                            updateSelected();
+                        }).checked(sector.info.icon == null);
+
+                        int i = 1;
+                        for(var entry : Icon.icons.entries()){
+                            if(entry.key.endsWith("Small") || entry.key.contains("none")) continue;
+                            String key = entry.key;
+
+                            t.button(entry.value, Styles.cleari, () -> {
+                                sector.info.icon = key;
+                                sector.saveInfo();
+                                hide();
+                                updateSelected();
+                            }).checked(entry.key.equals(sector.info.icon));
+
+                            if(++i % 8 == 0) t.row();
+                        }
+                    });
+                }}.show();
+            }).size(40f);
         }).row();
 
         stable.image().color(Pal.accent).fillX().height(3f).pad(3f).row();

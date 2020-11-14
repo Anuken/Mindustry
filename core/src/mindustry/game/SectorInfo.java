@@ -59,6 +59,8 @@ public class SectorInfo{
     public float secondsPassed;
     /** Display name. */
     public @Nullable String name;
+    /** Displayed icon. */
+    public @Nullable String icon;
     /** Version of generated waves. When it doesn't match, new waves are generated. */
     public int waveVersion = -1;
 

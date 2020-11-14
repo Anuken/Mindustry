@@ -5,11 +5,13 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.world.modules.*;
 
@@ -117,6 +119,11 @@ public class Sector{
     public void setName(String name){
         info.name = name;
         saveInfo();
+    }
+
+    @Nullable
+    public TextureRegionDrawable icon(){
+        return info.icon == null ? null : Icon.icons.get(info.icon);
     }
 
     public boolean isCaptured(){

@@ -87,7 +87,7 @@ public class TechTree implements ContentList{
 
                                 node(bridgeConduit);
 
-                                node(pulseConduit, () -> {
+                                node(pulseConduit, Seq.with(new SectorComplete(windsweptIslands)), () -> {
                                     node(phaseConduit, () -> {
 
                                     });
@@ -114,7 +114,7 @@ public class TechTree implements ContentList{
                         });
 
                         node(laserDrill, () -> {
-                            node(blastDrill, () -> {
+                            node(blastDrill, Seq.with(new SectorComplete(nuclearComplex)), () -> {
 
                             });
 
@@ -143,8 +143,8 @@ public class TechTree implements ContentList{
                                 });
                             });
 
-                            node(plastaniumCompressor, () -> {
-                                node(phaseWeaver, () -> {
+                            node(plastaniumCompressor, Seq.with(new SectorComplete(windsweptIslands)), () -> {
+                                node(phaseWeaver, Seq.with(new SectorComplete(tarFields)), () -> {
 
                                 });
                             });
