@@ -617,7 +617,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.11f) * 20 * researchCostMultiplier, 10);
+            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.13f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
@@ -630,6 +630,19 @@ public class Block extends UnlockableContent{
         //just requires items
         for(ItemStack stack : requirements){
             cons.get(stack.item);
+        }
+
+        if(consumes.any()){
+            //also requires inputs
+            for(Consume c : consumes.all()){
+                if(c instanceof ConsumeItems i){
+                    for(ItemStack stack : i.items){
+                        cons.get(stack.item);
+                    }
+                }else if(c instanceof ConsumeLiquid i){
+                    cons.get(i.liquid);
+                }
+            }
         }
     }
 

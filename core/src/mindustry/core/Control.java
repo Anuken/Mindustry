@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.audio.*;
 import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -127,6 +128,14 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
 
+        Events.on(UnlockEvent.class, e -> {
+            checkAutoUnlocks();
+        });
+
+        Events.on(SectorCaptureEvent.class, e -> {
+            checkAutoUnlocks();
+        });
+
         Events.on(BlockBuildEndEvent.class, e -> {
             if(e.team == player.team()){
                 if(e.breaking){
@@ -177,6 +186,7 @@ public class Control implements ApplicationListener, Loadable{
             app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
             camera.position.set(core);
             player.set(core);
+
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effect.shake(5f, 5f, core);
@@ -207,6 +217,17 @@ public class Control implements ApplicationListener, Loadable{
         createPlayer();
 
         saves.load();
+    }
+
+    /** Automatically unlocks things with no requirements. */
+    void checkAutoUnlocks(){
+        if(net.client()) return;
+
+        for(TechNode node : TechTree.all){
+            if(!node.content.unlocked() && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
+                node.content.unlocked();
+            }
+        }
     }
 
     void createPlayer(){
@@ -518,6 +539,12 @@ public class Control implements ApplicationListener, Loadable{
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){
                 platform.updateRPC();
+            }
+
+            //unlock core items
+            var core = state.rules.defaultTeam.core();
+            if(!net.client() && core != null){
+                core.items.each((i, a) -> i.unlock());
             }
 
             if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){

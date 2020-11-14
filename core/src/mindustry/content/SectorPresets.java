@@ -48,7 +48,7 @@ public class SectorPresets implements ContentList{
 
         windsweptIslands = new SectorPreset("windsweptIslands", serpulo, 246){{
             captureWave = 30;
-            difficulty = 5;
+            difficulty = 4;
         }};
 
         stainedMountains = new SectorPreset("stainedMountains", serpulo, 20){{

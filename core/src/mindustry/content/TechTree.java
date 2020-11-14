@@ -11,7 +11,6 @@ import static mindustry.content.Blocks.*;
 import static mindustry.content.SectorPresets.craters;
 import static mindustry.content.SectorPresets.*;
 import static mindustry.content.UnitTypes.*;
-import static mindustry.type.ItemStack.*;
 
 public class TechTree implements ContentList{
     static ObjectMap<UnlockableContent, TechNode> map = new ObjectMap<>();
@@ -40,9 +39,9 @@ public class TechTree implements ContentList{
                                 node(underflowGate);
                             });
                         });
-                        node(container, () -> {
+                        node(container, Seq.with(new SectorComplete(biomassFacility)), () -> {
                             node(unloader);
-                            node(vault, () -> {
+                            node(vault, Seq.with(new SectorComplete(stainedMountains)), () -> {
 
                             });
                         });
@@ -108,185 +107,152 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(Items.coal, with(Items.lead, 3000), () -> {
-                    node(Items.graphite, with(Items.coal, 1000), () -> {
+                node(graphitePress, () -> {
+                    node(pneumaticDrill, () -> {
+                        node(cultivator, Seq.with(new SectorComplete(biomassFacility)), () -> {
 
-                        node(graphitePress, () -> {
-                            node(Items.titanium, with(Items.graphite, 3000, Items.copper, 7000, Items.lead, 7000), () -> {
-                                node(pneumaticDrill, () -> {
-                                    node(Items.sporePod, with(Items.coal, 4000, Items.graphite, 4000, Items.lead, 4000), () -> {
-                                        node(cultivator, Seq.with(new SectorComplete(biomassFacility)), () -> {
+                        });
 
-                                        });
-                                    });
+                        node(laserDrill, () -> {
+                            node(blastDrill, () -> {
 
-                                    node(Items.thorium, with(Items.titanium, 8000, Items.lead, 12000, Items.copper, 20000), () -> {
-                                        node(laserDrill, () -> {
-                                            node(blastDrill, () -> {
-
-                                            });
-
-                                            node(waterExtractor, () -> {
-                                                node(oilExtractor, () -> {
-
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
                             });
 
-                            node(Items.pyratite, with(Items.coal, 6000, Items.lead, 8000, Items.sand, 4000), () -> {
-                                node(pyratiteMixer, () -> {
-                                    node(Items.blastCompound, with(Items.pyratite, 3000, Items.sporePod, 3000), () -> {
-                                        node(blastMixer, () -> {
+                            node(waterExtractor, () -> {
+                                node(oilExtractor, () -> {
 
-                                        });
-                                    });
                                 });
-                            });
-
-                            node(Items.silicon, with(Items.coal, 3000, Items.sand, 4000), () -> {
-                                node(siliconSmelter, () -> {
-
-                                    node(Liquids.oil, with(Items.coal, 8000, Items.pyratite, 6000, Items.sand, 8000), () -> {
-                                        node(sporePress, () -> {
-                                            node(coalCentrifuge, () -> {
-                                                node(multiPress, () -> {
-                                                    node(siliconCrucible, () -> {
-
-                                                    });
-                                                });
-                                            });
-
-                                            node(Items.plastanium, with(Items.titanium, 8000, Items.silicon, 8000), () -> {
-                                                node(plastaniumCompressor, () -> {
-                                                    node(Items.phaseFabric, with(Items.thorium, 12000, Items.sand, 8000, Items.silicon, 5000), () -> {
-                                                        node(phaseWeaver, () -> {
-
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-
-                                    node(Items.metaglass, with(Items.sand, 4000, Items.lead, 10000), () -> {
-                                        node(kiln, () -> {
-                                            node(incinerator, () -> {
-                                                node(Items.scrap, with(Items.copper, 8000, Items.sand, 4000), () -> {
-                                                    node(Liquids.slag, with(Items.scrap, 4000), () -> {
-                                                        node(melter, () -> {
-                                                            node(Items.surgeAlloy, with(Items.thorium, 20000, Items.silicon, 20000, Items.lead, 40000), () -> {
-                                                                node(surgeSmelter, () -> {
-
-                                                                });
-                                                            });
-
-                                                            node(separator, () -> {
-                                                                node(pulverizer, () -> {
-                                                                    node(disassembler, () -> {
-
-                                                                    });
-                                                                });
-                                                            });
-
-                                                            node(Liquids.cryofluid, with(Items.titanium, 8000, Items.metaglass, 4000), () -> {
-                                                                node(cryofluidMixer, () -> {
-
-                                                                });
-                                                            });
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-
-                                    node(microProcessor, () -> {
-                                        node(switchBlock, () -> {
-                                            node(message, () -> {
-                                                node(logicDisplay, () -> {
-                                                    node(largeLogicDisplay, () -> {
-
-                                                    });
-                                                });
-
-                                                node(memoryCell, () -> {
-                                                    node(memoryBank, () -> {
-
-                                                    });
-                                                });
-                                            });
-
-                                            node(logicProcessor, () -> {
-                                                node(hyperProcessor, () -> {
-
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-
-                            node(illuminator, () -> {
                             });
                         });
                     });
 
+                    node(pyratiteMixer, () -> {
+                        node(blastMixer, () -> {
 
-                    node(combustionGenerator, () -> {
-                        node(powerNode, () -> {
-                            node(powerNodeLarge, () -> {
-                                node(diode, () -> {
-                                    node(surgeTower, () -> {
+                        });
+                    });
+
+                    node(siliconSmelter, () -> {
+
+                        node(sporePress, () -> {
+                            node(coalCentrifuge, () -> {
+                                node(multiPress, () -> {
+                                    node(siliconCrucible, () -> {
 
                                     });
                                 });
                             });
 
-                            node(battery, () -> {
-                                node(batteryLarge, () -> {
+                            node(plastaniumCompressor, () -> {
+                                node(phaseWeaver, () -> {
 
                                 });
                             });
+                        });
 
-                            node(mender, () -> {
-                                node(mendProjector, () -> {
-                                    node(forceProjector, () -> {
-                                        node(overdriveProjector, () -> {
-                                            node(overdriveDome, () -> {
+                        node(kiln, Seq.with(new SectorComplete(craters)), () -> {
+                            node(incinerator, () -> {
+                                node(melter, () -> {
+                                    node(surgeSmelter, () -> {
+
+                                    });
+
+                                    node(separator, () -> {
+                                        node(pulverizer, () -> {
+                                            node(disassembler, () -> {
 
                                             });
                                         });
                                     });
 
-                                    node(repairPoint, () -> {
+                                    node(cryofluidMixer, () -> {
 
                                     });
                                 });
                             });
+                        });
 
-                            node(steamGenerator, () -> {
-                                node(thermalGenerator, () -> {
-                                    node(differentialGenerator, () -> {
-                                        node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
-                                            node(impactReactor, () -> {
+                        node(microProcessor, () -> {
+                            node(switchBlock, () -> {
+                                node(message, () -> {
+                                    node(logicDisplay, () -> {
+                                        node(largeLogicDisplay, () -> {
 
-                                            });
+                                        });
+                                    });
 
-                                            node(rtgGenerator, () -> {
+                                    node(memoryCell, () -> {
+                                        node(memoryBank, () -> {
 
-                                            });
+                                        });
+                                    });
+                                });
+
+                                node(logicProcessor, () -> {
+                                    node(hyperProcessor, () -> {
+
+                                    });
+                                });
+                            });
+                        });
+                    });
+
+                    node(illuminator, () -> {
+                    });
+                });
+
+
+                node(combustionGenerator, Seq.with(new Research(Items.coal)), () -> {
+                    node(powerNode, () -> {
+                        node(powerNodeLarge, () -> {
+                            node(diode, () -> {
+                                node(surgeTower, () -> {
+
+                                });
+                            });
+                        });
+
+                        node(battery, () -> {
+                            node(batteryLarge, () -> {
+
+                            });
+                        });
+
+                        node(mender, () -> {
+                            node(mendProjector, () -> {
+                                node(forceProjector, Seq.with(new SectorComplete(impact0078)), () -> {
+                                    node(overdriveProjector, Seq.with(new SectorComplete(impact0078)), () -> {
+                                        node(overdriveDome, Seq.with(new SectorComplete(impact0078)), () -> {
+
+                                        });
+                                    });
+                                });
+
+                                node(repairPoint, () -> {
+
+                                });
+                            });
+                        });
+
+                        node(steamGenerator, () -> {
+                            node(thermalGenerator, () -> {
+                                node(differentialGenerator, () -> {
+                                    node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
+                                        node(impactReactor, () -> {
+
+                                        });
+
+                                        node(rtgGenerator, () -> {
+
                                         });
                                     });
                                 });
                             });
+                        });
 
-                            node(solarPanel, () -> {
-                                node(largeSolarPanel, () -> {
+                        node(solarPanel, () -> {
+                            node(largeSolarPanel, () -> {
 
-                                });
                             });
                         });
                     });
@@ -321,8 +287,7 @@ public class TechTree implements ContentList{
                 });
 
                 node(scatter, () -> {
-                    node(hail, () -> {
-
+                    node(hail, Seq.with(new SectorComplete(craters)), () -> {
                         node(salvo, () -> {
                             node(swarmer, () -> {
                                 node(cyclone, () -> {
@@ -451,7 +416,7 @@ public class TechTree implements ContentList{
                     });
                 });
 
-                node(additiveReconstructor, () -> {
+                node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
                     node(multiplicativeReconstructor, () -> {
                         node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
@@ -525,6 +490,7 @@ public class TechTree implements ContentList{
                             new SectorComplete(fungalPass),
                             new Research(cultivator),
                             new Research(sporePress),
+                            new Research(additiveReconstructor),
                             new Research(UnitTypes.mace),
                             new Research(UnitTypes.flare)
                         ), () -> {
@@ -560,6 +526,63 @@ public class TechTree implements ContentList{
                             });
                         });
                     });
+                });
+            });
+
+            nodeProduce(Items.copper, () -> {
+                nodeProduce(Items.lead, () -> {
+                    nodeProduce(Items.graphite, () -> {
+                        nodeProduce(Items.titanium, () -> {
+                            nodeProduce(Liquids.cryofluid, () -> {
+
+                            });
+
+                            nodeProduce(Items.thorium, () -> {
+                                nodeProduce(Items.surgeAlloy, () -> {
+
+                                });
+
+                                nodeProduce(Items.phaseFabric, () -> {
+
+                                });
+                            });
+                        });
+                    });
+
+                    nodeProduce(Items.metaglass, () -> {
+
+                    });
+                });
+
+                nodeProduce(Items.sand, () -> {
+                    nodeProduce(Items.scrap, () -> {
+                        nodeProduce(Liquids.slag, () -> {
+
+                        });
+                    });
+
+                    nodeProduce(Items.coal, () -> {
+                        nodeProduce(Items.silicon, () -> {
+
+                        });
+                        nodeProduce(Items.pyratite, () -> {
+                            nodeProduce(Items.blastCompound, () -> {
+
+                            });
+                        });
+
+                        nodeProduce(Items.sporePod, () -> {
+
+                        });
+
+                        nodeProduce(Liquids.oil, () -> {
+
+                        });
+                    });
+                });
+
+                nodeProduce(Liquids.water, () -> {
+
                 });
             });
         });
@@ -602,6 +625,14 @@ public class TechTree implements ContentList{
 
     static TechNode node(UnlockableContent block){
         return node(block, () -> {});
+    }
+
+    static TechNode nodeProduce(UnlockableContent content, Seq<Objective> objectives, Runnable children){
+        return node(content, content.researchRequirements(), objectives.and(new Produce(content)), children);
+    }
+
+    static TechNode nodeProduce(UnlockableContent content, Runnable children){
+        return nodeProduce(content, new Seq<>(), children);
     }
 
     @Nullable
