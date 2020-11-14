@@ -47,21 +47,21 @@ public class MenuFragment extends Fragment{
             container = c;
             c.name = "menu container";
 
-            if(!mobile){
-                buildDesktop();
-                Events.on(ResizeEvent.class, event -> buildDesktop());
-            }else{
+            if(mobile){
                 buildMobile();
                 Events.on(ResizeEvent.class, event -> buildMobile());
+            }else{
+                buildDesktop();
+                Events.on(ResizeEvent.class, event -> buildDesktop());
             }
         });
 
         //info icon
+        parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45).name("discord"));
         if(mobile){
             parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45).name("info"));
-            parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45).name("discord"));
         }else if(becontrol.active()){
-            parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
+            parent.fill(c -> c.top().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
                 becontrol.checkUpdate(result -> {
                     ui.loadfrag.hide();
