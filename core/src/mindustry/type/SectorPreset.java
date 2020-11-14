@@ -25,6 +25,7 @@ public class SectorPreset extends UnlockableContent{
         this.planet = planet;
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector);
+        inlineDescription = false;
 
         planet.preset(sector, this);
     }
@@ -36,7 +37,7 @@ public class SectorPreset extends UnlockableContent{
 
     @Override
     public boolean isHidden(){
-        return true;
+        return description == null;
     }
 
     @Override

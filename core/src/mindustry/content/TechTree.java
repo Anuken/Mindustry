@@ -530,21 +530,23 @@ public class TechTree implements ContentList{
             });
 
             nodeProduce(Items.copper, () -> {
+                nodeProduce(Liquids.water, () -> {
+
+                });
+
                 nodeProduce(Items.lead, () -> {
-                    nodeProduce(Items.graphite, () -> {
-                        nodeProduce(Items.titanium, () -> {
-                            nodeProduce(Liquids.cryofluid, () -> {
+                    nodeProduce(Items.titanium, () -> {
+                        nodeProduce(Liquids.cryofluid, () -> {
+
+                        });
+
+                        nodeProduce(Items.thorium, () -> {
+                            nodeProduce(Items.surgeAlloy, () -> {
 
                             });
 
-                            nodeProduce(Items.thorium, () -> {
-                                nodeProduce(Items.surgeAlloy, () -> {
+                            nodeProduce(Items.phaseFabric, () -> {
 
-                                });
-
-                                nodeProduce(Items.phaseFabric, () -> {
-
-                                });
                             });
                         });
                     });
@@ -562,9 +564,12 @@ public class TechTree implements ContentList{
                     });
 
                     nodeProduce(Items.coal, () -> {
-                        nodeProduce(Items.silicon, () -> {
+                        nodeProduce(Items.graphite, () -> {
+                            nodeProduce(Items.silicon, () -> {
 
+                            });
                         });
+
                         nodeProduce(Items.pyratite, () -> {
                             nodeProduce(Items.blastCompound, () -> {
 
@@ -579,10 +584,6 @@ public class TechTree implements ContentList{
 
                         });
                     });
-                });
-
-                nodeProduce(Liquids.water, () -> {
-
                 });
             });
         });

@@ -377,7 +377,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         stable.background(Styles.black6);
 
         stable.table(title -> {
-            title.add("[accent]" + sector.name());
+            title.add("[accent]" + sector.name()).padLeft(3);
             if(sector.preset == null){
                 title.add().growX();
 
@@ -396,6 +396,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     closeOnBack();
                     setFillParent(true);
                     cont.pane(t -> {
+                        t.marginRight(19f);
                         t.defaults().size(48);
 
                         t.button(Icon.none, Styles.clearTogglei, () -> {

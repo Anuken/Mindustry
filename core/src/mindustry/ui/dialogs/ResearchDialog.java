@@ -484,7 +484,7 @@ public class ResearchDialog extends BaseDialog{
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                if(selectable){
+                if(selectable && (node.content.description != null || node.content.stats.toMap().size > 0)){
                     b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
                 }
                 b.add().grow();
@@ -579,7 +579,7 @@ public class ResearchDialog extends BaseDialog{
             });
 
             infoTable.row();
-            if(node.content.description != null && selectable){
+            if(node.content.description != null && node.content.inlineDescription && selectable){
                 infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray).growX()).fillX();
             }
 
