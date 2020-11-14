@@ -606,28 +606,28 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         }
 
-        if(Core.input.keyTap(KeyCode.escape)){
+        if(Core.input.keyTap(EditorBindings.menu)){
             if(!menu.isShown()){
                 menu.show();
             }
         }
 
-        if(Core.input.keyTap(KeyCode.r)){
+        if(Core.input.keyTap(EditorBindings.rotateLeft)){
             editor.rotation = Mathf.mod(editor.rotation + 1, 4);
         }
 
-        if(Core.input.keyTap(KeyCode.e)){
+        if(Core.input.keyTap(EditorBindings.rotateRight)){
             editor.rotation = Mathf.mod(editor.rotation - 1, 4);
         }
 
         //ctrl keys (undo, redo, save)
         if(Core.input.ctrl()){
-            if(Core.input.keyTap(KeyCode.z)){
+            if(Core.input.keyTap(EditorBindings.undo)){
                 editor.undo();
             }
 
             //more undocumented features, fantastic
-            if(Core.input.keyTap(KeyCode.t)){
+            if(Core.input.keyTap(EditorBindings.clearDecorations)){
 
                 //clears all 'decoration' from the map
                 for(int x = 0; x < editor.width(); x++){
@@ -648,15 +648,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 editor.flushOp();
             }
 
-            if(Core.input.keyTap(KeyCode.y)){
+            if(Core.input.keyTap(EditorBindings.redo)){
                 editor.redo();
             }
 
-            if(Core.input.keyTap(KeyCode.s)){
+            if(Core.input.keyTap(EditorBindings.save)){
                 save();
             }
 
-            if(Core.input.keyTap(KeyCode.g)){
+            if(Core.input.keyTap(EditorBindings.grid)){
                 view.setGrid(!view.isGrid());
             }
         }
