@@ -43,6 +43,7 @@ public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
+    ObjectMap<String, AssetDescriptor> sounds = new ObjectMap<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> {
@@ -96,10 +97,11 @@ public class ContentParser{
             String name = "sounds/" + data.asString();
             String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
-            if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
+            if(sounds.containsKey(path)) return ((SoundParameter)sounds.get(path).params).sound;
             var sound = new Sound();
             AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
             desc.errored = Throwable::printStackTrace;
+            sounds.put(path, desc);
             return sound;
         });
         put(Objectives.Objective.class, (type, data) -> {

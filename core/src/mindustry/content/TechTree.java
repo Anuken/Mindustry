@@ -29,7 +29,7 @@ public class TechTree implements ContentList{
 
                 node(junction, () -> {
                     node(router, () -> {
-                        node(launchPad, () -> {
+                        node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
                         });
 
                         node(distributor);
@@ -471,6 +471,17 @@ public class TechTree implements ContentList{
 
                                         });
                                     });
+                                });
+
+                                node(extractionOutpost, Seq.with(
+                                    new SectorComplete(stainedMountains),
+                                    new SectorComplete(windsweptIslands),
+                                    new Research(groundFactory),
+                                    new Research(nova),
+                                    new Research(airFactory),
+                                    new Research(mono)
+                                ), () -> {
+
                                 });
 
                                 node(saltFlats, Seq.with(

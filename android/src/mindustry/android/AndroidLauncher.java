@@ -145,7 +145,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-                showFileChooser(true, cons, extensions);
+                showFileChooser(true, "@open", cons, extensions);
             }
 
             @Override

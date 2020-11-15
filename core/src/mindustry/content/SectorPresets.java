@@ -8,8 +8,8 @@ import static mindustry.content.Planets.*;
 public class SectorPresets implements ContentList{
     public static SectorPreset
     groundZero,
-    craters, biomassFacility, frozenForest, ruinousShores, windsweptIslands, stainedMountains, tarFields, fungalPass,
-    saltFlats, overgrowth,
+    craters, biomassFacility, frozenForest, ruinousShores, windsweptIslands, stainedMountains, tarFields,
+    fungalPass, extractionOutpost, saltFlats, overgrowth,
     impact0078, desolateRift, nuclearComplex;
 
     @Override
@@ -54,6 +54,11 @@ public class SectorPresets implements ContentList{
         stainedMountains = new SectorPreset("stainedMountains", serpulo, 20){{
             captureWave = 30;
             difficulty = 3;
+        }};
+
+        extractionOutpost = new SectorPreset("extractionOutpost", serpulo, 165){{
+            difficulty = 5;
+            useAI = false;
         }};
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
