@@ -175,8 +175,8 @@ public class ContentLoader{
         this.currentMod = mod;
     }
 
-    public String transformName(String name){
-        return currentMod == null ? name : currentMod.name + "-" + name;
+    public String getModPrefix(){
+        return currentMod == null ? "" : currentMod.name + "-";
     }
 
     public void handleMappableContent(MappableContent content){
