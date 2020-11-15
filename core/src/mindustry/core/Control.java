@@ -356,64 +356,6 @@ public class Control implements ApplicationListener, Loadable{
         });
     }
 
-    public void playTutorial(){
-        ui.showInfo("@indev.notready");
-        //TODO implement
-        //ui.showInfo("death");
-        /*
-        Zone zone = Zones.groundZero;
-        ui.loadAnd(() -> {
-            logic.reset();
-            net.reset();
-
-            world.beginMapLoad();
-
-            world.resize(zone.generator.width, zone.generator.height);
-            zone.generator.generate(world.tiles);
-
-            Tile coreb = null;
-
-            out:
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    if(world.rawTile(x, y).block() instanceof CoreBlock){
-                        coreb = world.rawTile(x, y);
-                        break out;
-                    }
-                }
-            }
-
-            Geometry.circle(coreb.x, coreb.y, 10, (cx, cy) -> {
-                Tile tile = world.ltile(cx, cy);
-                if(tile != null && tile.team() == state.rules.defaultTeam && !(tile.block() instanceof CoreBlock)){
-                    tile.remove();
-                }
-            });
-
-            Geometry.circle(coreb.x, coreb.y, 5, (cx, cy) -> world.tile(cx, cy).clearOverlay());
-
-            world.endMapLoad();
-
-            zone.rules.get(state.rules);
-            //TODO assign zone!!
-            //state.rules.zone = zone;
-            for(Building core : state.teams.playerCores()){
-                for(ItemStack stack : zone.getStartingItems()){
-                    core.items.add(stack.item, stack.amount);
-                }
-            }
-            Building core = state.teams.playerCores().first();
-            core.items.clear();
-
-            logic.play();
-            state.rules.waveTimer = false;
-            state.rules.waveSpacing = 60f * 30;
-            state.rules.buildCostMultiplier = 0.3f;
-            state.rules.tutorial = true;
-            Events.fire(Trigger.newGame);
-        });*/
-    }
-
     public boolean isHighScore(){
         return hiscore;
     }
@@ -465,12 +407,6 @@ public class Control implements ApplicationListener, Loadable{
             app.post(() -> app.post(() -> {
                 ui.showStartupInfo("@indev.popup");
             }));
-        }
-
-        //play tutorial on start
-        //TODO no tutorial right now
-        if(!settings.getBool("playedtutorial", false)){
-            //Core.app.post(() -> Core.app.post(this::playTutorial));
         }
 
         //display UI scale changed dialog

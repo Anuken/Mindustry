@@ -168,8 +168,7 @@ public class MenuFragment extends Fragment{
                     new Buttoni("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
                     new Buttoni("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
                     new Buttoni("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show)),
-                    new Buttoni("@tutorial", Icon.info, () -> checkPlay(control::playTutorial))
+                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
                 ),
                 new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.book, platform::openWorkshop) : null,
                 new Buttoni("@mods", Icon.book, ui.mods::show),

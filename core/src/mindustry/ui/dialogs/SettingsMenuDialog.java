@@ -341,19 +341,6 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         }
 
-        game.pref(new Setting(){
-            @Override
-            public void add(SettingsTable table){
-                table.button("@tutorial.retake", () -> {
-                    hide();
-                    control.playTutorial();
-                }).size(220f, 60f).pad(6).left();
-                table.add();
-                table.row();
-                hide();
-            }
-        });
-
         graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {
             if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
