@@ -15,6 +15,7 @@ public class SectorPreset extends UnlockableContent{
 
     public int captureWave = 0;
     public Cons<Rules> rules = rules -> rules.winWave = captureWave;
+    public boolean useAI = true;
     /** Difficulty, 0-10. */
     public float difficulty;
     public boolean addStartingItems = false;

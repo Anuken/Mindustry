@@ -101,9 +101,12 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
+
             if(state.isCampaign()){
-                //enable building AI
-                state.rules.waveTeam.rules().ai = true;
+                //enable building AI on campaign unless the preset disables it
+                if(!(state.getSector().preset != null && !state.getSector().preset.useAI)){
+                    state.rules.waveTeam.rules().ai = true;
+                }
                 state.rules.waveTeam.rules().infiniteResources = true;
             }
 

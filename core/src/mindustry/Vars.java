@@ -389,7 +389,6 @@ public class Vars implements Loadable{
             }
 
             Locale.setDefault(locale);
-
             Core.bundle = I18NBundle.createBundle(handle, locale);
 
             //router

@@ -58,6 +58,7 @@ public class SectorPresets implements ContentList{
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
             difficulty = 4;
+            useAI = false;
         }};
 
         overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
