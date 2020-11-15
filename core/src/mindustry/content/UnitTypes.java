@@ -1247,7 +1247,7 @@ public class UnitTypes implements ContentList{
             mineTier = 3;
             health = 500;
             armor = 5f;
-            speed = 2.4f;
+            speed = 2.5f;
             accel = 0.06f;
             drag = 0.017f;
             lowAltitude = true;
@@ -1257,7 +1257,7 @@ public class UnitTypes implements ContentList{
             hitSize = 15f;
             engineSize = 3f;
             payloadCapacity = (2 * 2) * tilePayload;
-            buildSpeed = 2.5f;
+            buildSpeed = 2.6f;
 
             ammoType = AmmoTypes.power;
 
@@ -1405,6 +1405,7 @@ public class UnitTypes implements ContentList{
                 y = -5f;
                 rotate = true;
                 ejectEffect = Fx.casing1;
+                shootSound = Sounds.missile;
                 bullet = new MissileBulletType(2.7f, 12, "missile"){{
                     width = 8f;
                     height = 8f;
@@ -1451,6 +1452,7 @@ public class UnitTypes implements ContentList{
                 rotateSpeed = 5f;
                 inaccuracy = 10f;
                 ejectEffect = Fx.casing1;
+                shootSound = Sounds.shoot;
                 bullet = Bullets.flakLead;
             }});
 
@@ -1463,6 +1465,7 @@ public class UnitTypes implements ContentList{
                 rotateSpeed = 2f;
                 shake = 1.5f;
                 ejectEffect = Fx.casing2;
+                shootSound = Sounds.bang;
                 bullet = Bullets.artilleryIncendiary;
             }});
         }};
@@ -1499,6 +1502,7 @@ public class UnitTypes implements ContentList{
                 shots = 1;
                 inaccuracy = 3f;
                 ejectEffect = Fx.casing3;
+                shootSound = Sounds.artillery;
 
                 bullet = new ArtilleryBulletType(3.2f, 12){{
                     trailMult = 0.8f;
@@ -1537,6 +1541,7 @@ public class UnitTypes implements ContentList{
                 shotDelay = 3f;
                 inaccuracy = 5f;
                 velocityRnd = 0.1f;
+                shootSound = Sounds.missile;
 
                 ejectEffect = Fx.none;
                 bullet = new MissileBulletType(2.7f, 12){{

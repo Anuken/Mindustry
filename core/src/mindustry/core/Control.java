@@ -280,6 +280,11 @@ public class Control implements ApplicationListener, Loadable{
 
     public void playSector(@Nullable Sector origin, Sector sector){
         ui.loadAnd(() -> {
+            if(saves.getCurrent() != null && state.isGame()){
+                control.saves.getCurrent().save();
+                control.saves.resetSave();
+            }
+
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
