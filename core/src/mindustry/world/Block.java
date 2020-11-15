@@ -556,17 +556,17 @@ public class Block extends UnlockableContent{
         return cacheLayer == CacheLayer.walls;
     }
 
-    protected void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
+    public void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
         requirements(cat, BuildVisibility.shown, stacks);
         this.alwaysUnlocked = unlocked;
     }
 
-    protected void requirements(Category cat, ItemStack[] stacks){
+    public void requirements(Category cat, ItemStack[] stacks){
         requirements(cat, BuildVisibility.shown, stacks);
     }
 
     /** Sets up requirements. Use only this method to set up requirements. */
-    protected void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
+    public void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
         this.category = cat;
         this.requirements = stacks;
         this.buildVisibility = visible;
