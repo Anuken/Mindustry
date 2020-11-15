@@ -1,13 +1,18 @@
 "use strict";
 
 const log = function(context, obj){
-    Vars.mods.getScripts().log(context, String(obj))
+    Vars.mods.scripts.log(context, String(obj))
 }
 
-const readString = path => Vars.mods.getScripts().readString(path)
-const readBytes = path => Vars.mods.getScripts().readBytes(path)
-const loadMusic = path => Vars.mods.getScripts().loadMusic(path)
-const loadSound = path => Vars.mods.getScripts().loadSound(path)
+const readString = path => Vars.mods.scripts.readString(path)
+const readBytes = path => Vars.mods.scripts.readBytes(path)
+const loadMusic = path => Vars.mods.scripts.loadMusic(path)
+const loadSound = path => Vars.mods.scripts.loadSound(path)
+
+const readFile = (purpose, ext, cons) => Vars.mods.scripts.readFile(purpose, ext, cons);
+const readBinFile = (purpose, ext, cons) => Vars.mods.scripts.readBinFile(purpose, ext, cons);
+const writeFile = (purpose, ext, str) => Vars.mods.scripts.writeFile(purpose, ext, str);
+const writeBinFile = (purpose, ext, bytes) => Vars.mods.scripts.writeBinFile(purpose, ext, bytes);
 
 let scriptName = "base.js"
 let modName = "none"
