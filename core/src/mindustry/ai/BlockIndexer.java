@@ -56,18 +56,7 @@ public class BlockIndexer{
 
     public BlockIndexer(){
         Events.on(TileChangeEvent.class, event -> {
-            if(typeMap.get(event.tile.pos()) != null){
-                TileIndex index = typeMap.get(event.tile.pos());
-                for(BlockFlag flag : index.flags){
-                    getFlagged(index.team)[flag.ordinal()].remove(event.tile);
-                }
-
-                if(index.flags.contains(BlockFlag.unitModifier)){
-                    updateCap(index.team);
-                }
-            }
-            process(event.tile);
-            updateQuadrant(event.tile);
+            updateIndices(event.tile);
         });
 
         Events.on(WorldLoadEvent.class, event -> {
@@ -109,6 +98,21 @@ public class BlockIndexer{
 
             scanOres();
         });
+    }
+
+    public void updateIndices(Tile tile){
+        if(typeMap.get(tile.pos()) != null){
+            TileIndex index = typeMap.get(tile.pos());
+            for(BlockFlag flag : index.flags){
+                getFlagged(index.team)[flag.ordinal()].remove(tile);
+            }
+
+            if(index.flags.contains(BlockFlag.unitModifier)){
+                updateCap(index.team);
+            }
+        }
+        process(tile);
+        updateQuadrant(tile);
     }
 
     private TileArray[] getFlagged(Team team){
