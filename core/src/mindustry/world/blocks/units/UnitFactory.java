@@ -13,6 +13,7 @@ import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
@@ -113,6 +114,7 @@ public class UnitFactory extends UnitBlock{
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
+        Draw.rect(teamRegions[Team.sharded.id], req.drawx(), req.drawy());
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
@@ -186,11 +188,12 @@ public class UnitFactory extends UnitBlock{
         @Override
         public void draw(){
             Draw.rect(region, x, y);
+            drawTeamTop();
             Draw.rect(outRegion, x, y, rotdeg());
 
             if(currentPlan != -1){
                 UnitPlan plan = plans.get(currentPlan);
-                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, plan.unit, rotdeg() - 90f, progress / plan.time, speedScl, time));
+                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, plan.unit, team.color, rotdeg() - 90f, progress / plan.time, speedScl, time));
             }
 
             Draw.z(Layer.blockOver);
