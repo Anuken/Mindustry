@@ -63,7 +63,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq launches = universe.getLaunchResources();
 
             for(ItemStack s : total){
-                table.image(s.item.icon(Cicon.small)).left();
+                table.image(s.item.icon(Cicon.small)).left().size(Cicon.small.size);
                 int as = schems.get(s.item), al = launches.get(s.item);
 
                 String amountStr = (al + as) + "[gray] (" + (al + " + " + as + ")");
@@ -127,7 +127,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
         }).growX().get().setScrollingDisabled(true, false);
 
         cont.row();
-        cont.add(items);
+        cont.pane(items);
         cont.row();
         cont.add("@sector.missingresources").visible(() -> !valid);
 

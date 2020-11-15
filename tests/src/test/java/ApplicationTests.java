@@ -235,10 +235,10 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
 
-        world.tile(0, 0).setBlock(Blocks.liquidSource);
+        world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Liquids.water);
 
-        world.tile(2, 1).setBlock(Blocks.liquidTank);
+        world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(10);
 
@@ -253,14 +253,14 @@ public class ApplicationTests{
 
         Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
 
-        source.setBlock(Blocks.liquidSource);
+        source.setBlock(Blocks.liquidSource, Team.sharded);
         source.build.configureAny(Liquids.water);
 
-        junction.setBlock(Blocks.liquidJunction);
+        junction.setBlock(Blocks.liquidJunction, Team.sharded);
 
-        conduit.setBlock(Blocks.conduit, Team.derelict, 1);
+        conduit.setBlock(Blocks.conduit, Team.sharded, 1);
 
-        tank.setBlock(Blocks.liquidTank);
+        tank.setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(10);
 
@@ -364,13 +364,13 @@ public class ApplicationTests{
         world.loadMap(testMap);
         state.set(State.playing);
         int length = 128;
-        world.tile(0, 0).setBlock(Blocks.itemSource);
+        world.tile(0, 0).setBlock(Blocks.itemSource, Team.sharded);
         world.tile(0, 0).build.configureAny(Items.copper);
 
         Seq<Building> entities = Seq.with(world.tile(0, 0).build);
 
         for(int i = 0; i < length; i++){
-            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.derelict, 0);
+            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.sharded, 0);
             entities.add(world.tile(i + 1, 0).build);
         }
 
@@ -388,7 +388,7 @@ public class ApplicationTests{
                     return true;
                 }
             };
-        }});
+        }}, Team.sharded);
 
         entities.each(Building::updateProximity);
 
@@ -603,8 +603,9 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
-        Unit unit = UnitTypes.mono.create(Team.derelict);
+        Unit unit = UnitTypes.mono.create(Team.sharded);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
+        tile.setTeam(Team.sharded);
         int capacity = tile.block().itemCapacity;
 
         assertNotNull(tile.build, "Tile should have an entity, but does not: " + tile);
