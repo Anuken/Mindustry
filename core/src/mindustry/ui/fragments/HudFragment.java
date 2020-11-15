@@ -181,7 +181,7 @@ public class HudFragment extends Fragment{
             cont.update(() -> {
                 if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
                     if(Core.settings.getBoolOnce("ui-hidden")){
-                        String key = Core.keybinds.get(Binding.toggle_menus).key.toString());
+                        String key = Core.keybinds.get(Binding.toggle_menus).key.toString();
                         ui.announce(Core.bundle.format("showui", key), 5);
                     }
                     toggleMenus();
