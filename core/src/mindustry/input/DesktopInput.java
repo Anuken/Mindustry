@@ -43,7 +43,7 @@ public class DesktopInput extends InputHandler{
     /** Whether player is currently deleting removal requests. */
     public boolean deleting = false, shouldShoot = false, panning = false;
     /** Mouse pan speed. */
-    public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 9f;
+    public float panScale = 0.005f, panSpeed = 4.5f, panBoostSpeed = 11f;
 
     @Override
     public void buildUI(Group group){
