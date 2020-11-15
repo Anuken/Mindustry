@@ -140,6 +140,10 @@ public class AIController implements UnitController{
 
             mount.shoot = shoot;
             mount.rotate = shoot;
+
+            if(shoot){
+                unit.isShooting = true;
+            }
         }
     }
 
