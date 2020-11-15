@@ -33,14 +33,14 @@ public class Reconstructor extends UnitBlock{
     @Override
     public void drawRequestRegion(BuildPlan req, Eachable<BuildPlan> list){
         Draw.rect(region, req.drawx(), req.drawy());
-        Draw.rect(teamRegions[Team.sharded.id], req.drawx(), req.drawy());
+        if(teamRegions[Team.sharded.id].found) Draw.rect(teamRegions[Team.sharded.id], req.drawx(), req.drawy());
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
         Draw.rect(topRegion, req.drawx(), req.drawy());
     }
 
     @Override
     public TextureRegion[] icons(){
-        return new TextureRegion[]{region, outRegion, topRegion};
+        return teamRegions[Team.sharded.id].found ? new TextureRegion[]{region, teamRegions[Team.sharded.id], outRegion, topRegion} : new TextureRegion[]{region, outRegion, topRegion};
     }
 
     @Override
