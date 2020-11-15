@@ -108,6 +108,7 @@ public class LoadRegionProcessor extends BaseProcessor{
         value = value.replace("#1", "\" + INDEX0 + \"");
         value = value.replace("#2", "\" + INDEX1 + \"");
         value = value.replace("#", "\" + INDEX0 + \"");
+        value = value.replace("$", "\" + (content.loadPrefix ? content.prefix : \"\") + \"");
         return value;
     }
 
