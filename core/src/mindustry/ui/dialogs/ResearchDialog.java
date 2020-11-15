@@ -59,10 +59,12 @@ public class ResearchDialog extends BaseDialog{
                     //add global counts of each sector
                     for(Planet planet : content.planets()){
                         for(Sector sector : planet.sectors){
-                            if(sector.hasSave()){
+                            if(sector.hasSave() && sector.hasBase()){
                                 ItemSeq cached = sector.items();
-                                add(cached);
-                                cache.put(sector, cached);
+                                cached.each((item, amount) -> {
+                                    values[item.id] += amount;
+                                    total += amount;
+                                });
                             }
                         }
                     }

@@ -247,7 +247,7 @@ public class BlockIndexer{
         for(int i = 0; i < activeTeams.size; i++){
             Team enemy = activeTeams.items[i];
 
-            if(enemy == team) continue;
+            if(enemy == team || team == Team.derelict) continue;
 
             Building entity = indexer.findTile(enemy, x, y, range, pred, true);
             if(entity != null){
@@ -276,10 +276,7 @@ public class BlockIndexer{
                     for(int ty = ry * quadrantSize; ty < (ry + 1) * quadrantSize && ty < world.height(); ty++){
                         Building e = world.build(tx, ty);
 
-                        if(e == null) continue;
-
-                        if(e.team != team || !pred.get(e) || !e.block.targetable)
-                            continue;
+                        if(e == null || e.team != team || !pred.get(e) || !e.block.targetable || e.team == Team.derelict) continue;
 
                         float ndst = e.dst2(x, y);
                         if(ndst < range2 && (closest == null ||

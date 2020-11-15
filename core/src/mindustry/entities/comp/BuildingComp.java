@@ -1371,6 +1371,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
+        if(team == Team.derelict){
+            enabled = false;
+        }
+
         if(!headless){
             if(sound != null){
                 sound.update(x, y, shouldActiveSound());

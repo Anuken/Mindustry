@@ -486,12 +486,17 @@ public class SettingsMenuDialog extends SettingsDialog{
             throw new IllegalArgumentException("Not valid save data.");
         }
 
+        //delete old saves so they don't interfere
+        saveDirectory.deleteDirectory();
+
         //purge existing tmp data, keep everything else
         tmpDirectory.deleteDirectory();
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
         dest.delete();
 
+        //clear old data
+        settings.clear();
         //load data so it's saved on exit
         settings.load();
     }

@@ -203,15 +203,13 @@ public class HudFragment extends Fragment{
                     }else{
                         logic.skipWave();
                     }
-                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave())
-                .visible(() -> state.rules.waves).name("skip");
+                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).name("skip");
             }).width(dsize * 5 + 4f);
 
             wavesMain.row();
 
             wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
-            .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get()
-            .name = "boss";
+            .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).name("boss");
 
             wavesMain.row();
 
@@ -244,7 +242,6 @@ public class HudFragment extends Fragment{
                 info.name = "fps/ping";
                 info.touchable = Touchable.disabled;
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
-                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
                 IntFormat mem = new IntFormat("memory");
@@ -600,7 +597,7 @@ public class HudFragment extends Fragment{
     }
 
     private Table makeStatusTable(){
-        Button table = new Button(Styles.waveb);
+        Table table = new Table(Tex.wavepane);
 
         StringBuilder ibuild = new StringBuilder();
 
@@ -608,6 +605,8 @@ public class HudFragment extends Fragment{
         IntFormat wavefc = new IntFormat("wave.cap");
         IntFormat enemyf = new IntFormat("wave.enemy");
         IntFormat enemiesf = new IntFormat("wave.enemies");
+        IntFormat enemycf = new IntFormat("wave.enemycore");
+        IntFormat enemycsf = new IntFormat("wave.enemycores");
         IntFormat waitingf = new IntFormat("wave.waiting", i -> {
             ibuild.setLength(0);
             int m = i/60;
@@ -623,7 +622,6 @@ public class HudFragment extends Fragment{
             return ibuild.toString();
         });
 
-        table.clearChildren();
         table.touchable = Touchable.enabled;
 
         StringBuilder builder = new StringBuilder();
@@ -745,6 +743,13 @@ public class HudFragment extends Fragment{
 
         table.labelWrap(() -> {
             builder.setLength(0);
+
+            if(!state.rules.waves && state.rules.attackMode){
+                int sum = Math.max(state.teams.present.sum(t -> t.team != player.team() ? t.cores.size : 0), 1);
+                builder.append(sum > 1 ? enemycsf.get(sum) : enemycf.get(sum));
+                return builder;
+            }
+
             if(state.rules.winWave > 1 && state.rules.winWave >= state.wave && state.isCampaign()){
                 builder.append(wavefc.get(state.wave, state.rules.winWave));
             }else{
@@ -770,8 +775,10 @@ public class HudFragment extends Fragment{
             return builder;
         }).growX().pad(8f);
 
-        table.setDisabled(true);
-        table.visible(() -> state.rules.waves);
+        table.update(() -> {
+            //table.background(state.rules.waves ? Tex.wavepane : null);
+        });
+        table.touchable(() -> state.rules.waves ? Touchable.enabled : Touchable.disabled);
 
         return table;
     }

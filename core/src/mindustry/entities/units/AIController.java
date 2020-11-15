@@ -109,6 +109,8 @@ public class AIController implements UnitController{
             target = null;
         }
 
+        unit.isShooting = false;
+
         for(int i = 0; i < targets.length; i++){
             WeaponMount mount = unit.mounts[i];
             Weapon weapon = mount.weapon;
@@ -140,6 +142,8 @@ public class AIController implements UnitController{
 
             mount.shoot = shoot;
             mount.rotate = shoot;
+
+            unit.isShooting |= shoot;
         }
     }
 
