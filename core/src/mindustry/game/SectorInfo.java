@@ -63,6 +63,8 @@ public class SectorInfo{
     public @Nullable String icon;
     /** Version of generated waves. When it doesn't match, new waves are generated. */
     public int waveVersion = -1;
+    /** Whether this sector was indicated to the player or not. */
+    public boolean shown = false;
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;

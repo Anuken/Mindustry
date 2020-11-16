@@ -94,7 +94,6 @@ public class Scripts implements Disposable{
         String name = "sounds/" + soundName;
         String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
-        if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
         var sound = new Sound();
         AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
         desc.errored = Throwable::printStackTrace;
@@ -108,7 +107,6 @@ public class Scripts implements Disposable{
         String name = "music/" + soundName;
         String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
-        if(Core.assets.contains(path, Music.class)) return Core.assets.get(path, Music.class);
         var music = new Music();
         AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
         desc.errored = Throwable::printStackTrace;
