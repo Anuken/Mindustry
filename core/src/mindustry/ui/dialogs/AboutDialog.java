@@ -16,6 +16,7 @@ import static mindustry.Vars.*;
 
 public class AboutDialog extends BaseDialog{
     Seq<String> contributors = new Seq<>();
+    Seq<String> translators = new Seq<>();
     static ObjectSet<String> bannedItems = ObjectSet.with("google-play", "itch.io", "dev-builds", "f-droid");
 
     public AboutDialog(){
@@ -23,6 +24,7 @@ public class AboutDialog extends BaseDialog{
 
         shown(() -> {
             contributors = Seq.with(Core.files.internal("contributors").readString("UTF-8").split("\n"));
+            translators = Seq.with(Core.files.internal("translators").readString("UTF-8").split("\n"));
             Core.app.post(this::setup);
         });
 
@@ -100,13 +102,23 @@ public class AboutDialog extends BaseDialog{
         if(!contributors.isEmpty()){
             dialog.cont.image().color(Pal.accent).fillX().height(3f).pad(3f);
             dialog.cont.row();
-            dialog.cont.add("@contributors");
-            dialog.cont.row();
             dialog.cont.pane(new Table(){{
                 int i = 0;
                 left();
+                add("@contributors");
+                row();
                 for(String c : contributors){
                     add("[lightgray]" + c).left().pad(3).padLeft(6).padRight(6);
+                    if(++i % 3 == 0){
+                        row();
+                    }
+                }
+                row();
+                add("@translators");
+                row();
+                i = 0;
+                for(String t : translators){
+                    add("[lightgray]" + t).left().pad(3).padLeft(6).padRight(6);
                     if(++i % 3 == 0){
                         row();
                     }
