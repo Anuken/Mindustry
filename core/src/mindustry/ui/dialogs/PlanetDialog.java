@@ -326,18 +326,18 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
     @Override
     public void renderProjections(Planet planet){
-        float isize = 38f/4f;
+        float iw = 48f/4f;
 
         for(Sector sec : planet.sectors){
             if(sec != hovered){
                 var preficon = sec.icon();
-                var icon = (sec.isAttacked() ? Icon.warning : !sec.hasBase() && sec.preset != null && sec.preset.unlocked() && preficon == null ? Icon.terrain : preficon);
+                var icon = (sec.isAttacked() ? Fonts.getLargeIcon("warning") : !sec.hasBase() && sec.preset != null && sec.preset.unlocked() && preficon == null ? Fonts.getLargeIcon("terrain") : preficon);
                 var color = sec.preset != null && !sec.hasBase() ? Team.derelict.color : Team.sharded.color;
 
                 if(icon != null){
                     planets.drawPlane(sec, () -> {
                         Draw.color(color, selectAlpha);
-                        Draw.rect(icon.getRegion(), 0, 0, isize, isize);
+                        Draw.rect(icon, 0, 0, iw, iw * icon.height / icon.width);
                     });
                 }
             }
@@ -349,10 +349,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             planets.drawPlane(hovered, () -> {
                 Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
 
-                var icon = hovered.locked() && !canSelect(hovered) ? Icon.lock : hovered.isAttacked() ? Icon.warning : hovered.icon();
+                var icon = hovered.locked() && !canSelect(hovered) ? Fonts.getLargeIcon("lock") : hovered.isAttacked() ? Fonts.getLargeIcon("warning") : hovered.icon();
 
                 if(icon != null){
-                    Draw.rect(icon.getRegion(), 0, 0, isize, isize);
+                    Draw.rect(icon, 0, 0, iw, iw * icon.height / icon.width);
                 }
 
                 Draw.reset();
@@ -603,7 +603,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         Table stable = sectorTop;
 
         if(sector == null){
-            //stable.remove();
             return;
         }
 
@@ -769,7 +768,6 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     float dot = planets.cam.direction.dot(Tmp.v31);
                     stable.color.a = Math.max(dot, 0f)*2f;
                     if(dot*2f <= -0.1f){
-                        //stable.remove();
                         selected = null;
                         updateSelected();
                     }

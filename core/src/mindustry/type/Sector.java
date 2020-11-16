@@ -3,16 +3,16 @@ package mindustry.type;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
+import mindustry.ui.*;
 import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
@@ -122,8 +122,8 @@ public class Sector{
     }
 
     @Nullable
-    public TextureRegionDrawable icon(){
-        return info.icon == null ? null : Icon.icons.get(info.icon);
+    public TextureRegion icon(){
+        return info.icon == null ? null : Fonts.getLargeIcon(info.icon);
     }
 
     public boolean isCaptured(){

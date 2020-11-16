@@ -25,13 +25,16 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
+import mindustry.gen.*;
 
 import java.util.*;
 
 public class Fonts{
     private static final String mainFont = "fonts/font.woff";
+    private static final ObjectSet<String> unscaled = ObjectSet.with("iconLarge");
     private static ObjectIntMap<String> unicodeIcons = new ObjectIntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
+    private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
     private static TextureRegion[] iconTable;
     private static int lastCid;
 
@@ -39,6 +42,7 @@ public class Fonts{
     public static Font outline;
     public static Font chat;
     public static Font icon;
+    public static Font iconLarge;
     public static Font tech;
 
     public static TextureRegion logicIcon(int id){
@@ -67,6 +71,7 @@ public class Fonts{
     }
 
     public static void loadFonts(){
+        largeIcons.clear();
         FreeTypeFontParameter param = fontParameter();
 
         Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = (Font)f;
@@ -76,6 +81,25 @@ public class Fonts{
             incremental = true;
             characters = "\0";
         }})).loaded = f -> Fonts.icon = (Font)f;
+        Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+            size = 48;
+            incremental = false;
+            characters = "\0" + Iconc.all;
+            borderWidth = Scl.scl(5f);
+            borderColor = Color.darkGray;
+
+        }})).loaded = f -> Fonts.iconLarge = (Font)f;
+    }
+
+    public static TextureRegion getLargeIcon(String name){
+        return largeIcons.get(name, () -> {
+            var region = new TextureRegion();
+            int code = Iconc.codes.get(name, '\uF8D4');
+            var glyph = iconLarge.getData().getGlyph((char)code);
+            region.set(iconLarge.getRegion().texture);
+            region.set(glyph.u, glyph.v2, glyph.u2, glyph.v);
+            return region;
+        });
     }
 
     public static void loadContentIcons(){
@@ -150,7 +174,8 @@ public class Fonts{
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
                 }
-                if(!scaled.contains(parameter.fontParameters)){
+
+                if(!scaled.contains(parameter.fontParameters) && !unscaled.contains(fileName)){
                     parameter.fontParameters.size = (int)(Scl.scl(parameter.fontParameters.size));
                     scaled.add(parameter.fontParameters);
                 }
