@@ -107,6 +107,7 @@ public class Logic implements ApplicationListener{
                 if(!(state.getSector().preset != null && !state.getSector().preset.useAI)){
                     state.rules.waveTeam.rules().ai = true;
                 }
+                state.rules.waveTeam.rules().aiTier = state.getSector().threat;
                 state.rules.waveTeam.rules().infiniteResources = true;
             }
 

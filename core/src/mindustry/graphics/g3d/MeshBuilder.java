@@ -105,6 +105,7 @@ public class MeshBuilder{
 
     private static Mesh end(){
         Mesh last = mesh;
+        last.getVerticesBuffer().limit(last.getVerticesBuffer().position());
         mesh = null;
         return last;
     }

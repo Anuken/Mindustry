@@ -69,20 +69,16 @@ public class HudFragment extends Fragment{
             }
         });
 
-        //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
-            //TODO localize
-            showToast("Sector [accent]" + (e.sector.isBeingPlayed() ? "" : e.sector.name() + " ") + "[white]captured!");
+            showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
         });
 
-        //TODO localize
         Events.on(SectorLoseEvent.class, e -> {
-            showToast(Icon.warning, "Sector [accent]" + e.sector.name() + "[white] lost!");
+            showToast(Icon.warning, Core.bundle.format("sector.lost", e.sector.name()));
         });
 
-        //TODO localize
         Events.on(SectorInvasionEvent.class, e -> {
-            showToast(Icon.warning, "Sector [accent]" + e.sector.name() + "[white] under attack!");
+            showToast(Icon.warning, Core.bundle.format("sector.attacked", e.sector.name()));
         });
 
         Events.on(ResetEvent.class, e -> {
