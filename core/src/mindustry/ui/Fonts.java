@@ -85,9 +85,8 @@ public class Fonts{
             size = 48;
             incremental = false;
             characters = "\0" + Iconc.all;
-            borderWidth = Scl.scl(5f);
+            borderWidth = 5f;
             borderColor = Color.darkGray;
-
         }})).loaded = f -> Fonts.iconLarge = (Font)f;
     }
 
