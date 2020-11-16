@@ -485,6 +485,10 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             hoverLabel.remove();
         }
 
+        if(launching && selected != null){
+            lookAt(selected, 0.1f);
+        }
+
         if(showing()){
             Sector to = newPresets.peek();
 
