@@ -30,10 +30,10 @@ public class ServerLauncher implements ApplicationListener{
             Vars.net = new Net(platform.getNet());
 
             logger = (level1, text) -> {
-                    String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level1.ordinal()] + " " + text + "&fr");
-                    System.out.println(result);
-                };
-            new HeadlessApplication(new ServerLauncher(), null, throwable -> CrashSender.send(throwable, f -> {}));
+                String result = "[" + dateTime.format(LocalDateTime.now()) + "] " + format(tags[level1.ordinal()] + " " + text + "&fr");
+                System.out.println(result);
+            };
+            new HeadlessApplication(new ServerLauncher(), throwable -> CrashSender.send(throwable, f -> {}));
         }catch(Throwable t){
             CrashSender.send(t, f -> {});
         }
@@ -47,7 +47,7 @@ public class ServerLauncher implements ApplicationListener{
 
         Fi plugins = Core.settings.getDataDirectory().child("plugins");
         if(plugins.isDirectory() && plugins.list().length > 0 && !plugins.sibling("mods").exists()){
-            Log.warn("[IMPORTANT NOTICE] &lrPlugins have been detected.&ly Automatically moving all contents of the plugin folder into the 'mods' folder. The original folder will not be removed; please do so manually.");
+            warn("[IMPORTANT NOTICE] &lrPlugins have been detected.&ly Automatically moving all contents of the plugin folder into the 'mods' folder. The original folder will not be removed; please do so manually.");
             plugins.sibling("mods").mkdirs();
             for(Fi file : plugins.list()){
                 file.copyTo(plugins.sibling("mods"));
@@ -61,16 +61,16 @@ public class ServerLauncher implements ApplicationListener{
         content.createModContent();
         content.init();
         if(mods.hasContentErrors()){
-            Log.err("Error occurred loading mod content:");
+            err("Error occurred loading mod content:");
             for(LoadedMod mod : mods.list()){
                 if(mod.hasContentErrors()){
-                    Log.err("| &ly[@]", mod.name);
+                    err("| &ly[@]", mod.name);
                     for(Content cont : mod.erroredContent){
-                        Log.err("| | &y@: &c@", cont.minfo.sourceFile.name(), Strings.getSimpleMessage(cont.minfo.baseError).replace("\n", " "));
+                        err("| | &y@: &c@", cont.minfo.sourceFile.name(), Strings.getSimpleMessage(cont.minfo.baseError).replace("\n", " "));
                     }
                 }
             }
-            Log.err("The server will now exit.");
+            err("The server will now exit.");
             System.exit(1);
         }
 

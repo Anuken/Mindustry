@@ -44,8 +44,8 @@ public class StackConveyor extends Block implements Autotiler{
         itemCapacity = 10;
         conveyorPlacement = true;
 
-        idleSound = Sounds.conveyor;
-        idleSoundVolume = 0.004f;
+        ambientSound = Sounds.conveyor;
+        ambientSoundVolume = 0.004f;
         unloadable = false;
     }
 
@@ -231,7 +231,7 @@ public class StackConveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return false; // has no moving parts;
         }
 

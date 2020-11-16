@@ -77,11 +77,11 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-                showFileChooser(open, cons, extension);
+            public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+                showFileChooser(open, title, cons, extension);
             }
 
-            void showFileChooser(boolean open, Cons<Fi> cons, String... extensions){
+            void showFileChooser(boolean open, String title, Cons<Fi> cons, String... extensions){
                 String extension = extensions[0];
 
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
@@ -118,7 +118,7 @@ public class AndroidLauncher extends AndroidApplication{
                     });
                 }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    chooser = new FileChooser(open ? "@open" : "@save", file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
+                    chooser = new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
                         if(!open){
                             cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
                         }else{
@@ -136,7 +136,7 @@ public class AndroidLauncher extends AndroidApplication{
                     requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }else{
                     if(open){
-                        new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+                        new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
                     }else{
                         super.showFileChooser(open, extension, cons);
                     }
@@ -145,7 +145,7 @@ public class AndroidLauncher extends AndroidApplication{
 
             @Override
             public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-                showFileChooser(true, cons, extensions);
+                showFileChooser(true, "@open", cons, extensions);
             }
 
             @Override

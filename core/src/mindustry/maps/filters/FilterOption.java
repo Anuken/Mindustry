@@ -90,14 +90,14 @@ public abstract class FilterOption{
         @Override
         public void build(Table table){
             table.button(b -> b.image(supplier.get().icon(Cicon.small)).update(i -> ((TextureRegionDrawable)i.getDrawable())
-                .setRegion(supplier.get() == Blocks.air ? Icon.block.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
+                .setRegion(supplier.get() == Blocks.air ? Icon.none.getRegion() : supplier.get().icon(Cicon.small))).size(8 * 3), () -> {
                 BaseDialog dialog = new BaseDialog("");
                 dialog.setFillParent(false);
                 int i = 0;
                 for(Block block : Vars.content.blocks()){
                     if(!filter.get(block)) continue;
 
-                    dialog.cont.image(block == Blocks.air ? Icon.block.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
+                    dialog.cont.image(block == Blocks.air ? Icon.none.getRegion() : block.icon(Cicon.medium)).size(8 * 4).pad(3).get().clicked(() -> {
                         consumer.get(block);
                         dialog.hide();
                         changed.run();

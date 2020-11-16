@@ -15,9 +15,7 @@ import static mindustry.Vars.*;
 
 public class AIController implements UnitController{
     protected static final Vec2 vec = new Vec2();
-    protected static final int timerTarget = 0;
-    protected static final int timerTarget2 = 1;
-    protected static final int timerTarget3 = 2;
+    protected static final int timerTarget = 0, timerTarget2 = 1, timerTarget3 = 2;
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
@@ -61,13 +59,10 @@ public class AIController implements UnitController{
     }
 
     protected void updateVisuals(){
-
         if(unit.isFlying()){
             unit.wobble();
 
-            if(unit.moving()){
-                unit.lookAt(unit.vel.angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }
     }
 
@@ -95,7 +90,7 @@ public class AIController implements UnitController{
 
         if(tile == targetTile || (costType == Pathfinder.costWater && !targetTile.floor().isLiquid)) return;
 
-        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.type.speed));
+        unit.moveAt(vec.trns(unit.angleTo(targetTile), unit.speed()));
     }
 
     protected void updateWeapons(){
@@ -111,6 +106,8 @@ public class AIController implements UnitController{
         if(invalid(target)){
             target = null;
         }
+
+        unit.isShooting = false;
 
         for(int i = 0; i < targets.length; i++){
             WeaponMount mount = unit.mounts[i];
@@ -143,6 +140,8 @@ public class AIController implements UnitController{
 
             mount.shoot = shoot;
             mount.rotate = shoot;
+
+            unit.isShooting |= shoot;
         }
     }
 
@@ -176,7 +175,7 @@ public class AIController implements UnitController{
     }
 
     protected void circle(Position target, float circleLength){
-        circle(target, circleLength, unit.type.speed);
+        circle(target, circleLength, unit.speed());
     }
 
     protected void circle(Position target, float circleLength, float speed){

@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 public class NetClient implements ApplicationListener{
     private static final float dataTimeout = 60 * 18;
     private static final float playerSyncTime = 2;
-    public final static float viewScale = 2f;
+    public static final float viewScale = 2f;
 
     private long ping;
     private Interval timer = new Interval(5);
@@ -234,7 +234,7 @@ public class NetClient implements ApplicationListener{
 
         ui.join.connect(ip, port);
     }
-    
+
     @Remote(targets = Loc.client)
     public static void ping(Player player, long time){
         Call.pingResponse(player.con, time);
@@ -322,15 +322,15 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both, unreliable = true)
-    public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
+    public static void effect(Effect effect, float x, float y, float rotation, Color color){
         if(effect == null) return;
 
         effect.at(x, y, rotation, color);
     }
 
     @Remote(variants = Variant.both)
-    public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
-        onEffect(effect, x, y, rotation, color);
+    public static void effectReliable(Effect effect, float x, float y, float rotation, Color color){
+        effect(effect, x, y, rotation, color);
     }
 
     @Remote(variants = Variant.both)
@@ -365,6 +365,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.one)
     public static void setPosition(float x, float y){
+        player.unit().set(x, y);
         player.set(x, y);
     }
 
@@ -439,7 +440,7 @@ public class NetClient implements ApplicationListener{
                 tile.build.readAll(Reads.get(input), tile.build.version());
             }
         }catch(Exception e){
-            e.printStackTrace();
+            Log.err(e);
         }
     }
 
@@ -577,8 +578,8 @@ public class NetClient implements ApplicationListener{
                 //prevent buffer overflow by checking config length
                 for(int i = 0; i < usedRequests; i++){
                     BuildPlan plan = player.builder().plans().get(i);
-                    if(plan.config instanceof byte[]){
-                        int length = ((byte[])plan.config).length;
+                    if(plan.config instanceof byte[] b){
+                        int length = b.length;
                         totalLength += length;
                     }
 
@@ -604,7 +605,7 @@ public class NetClient implements ApplicationListener{
             unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
             unit.rotation,
-            unit instanceof Mechc ? ((Mechc)unit).baseRotation() : 0,
+            unit instanceof Mechc m ? m.baseRotation() : 0,
             unit.vel.x, unit.vel.y,
             player.miner().mineTile(),
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,

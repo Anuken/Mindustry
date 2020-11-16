@@ -105,7 +105,7 @@ public class Rules{
         /** Whether to use building AI. */
         public boolean ai;
         /** TODO Tier of blocks/designs that the AI uses for building. [0, 1]*/
-        public float aiTier = 0f;
+        public float aiTier = 1f;
         /** Whether, when AI is enabled, ships should be spawned from the core. */
         public boolean aiCoreSpawn = true;
         /** If true, blocks don't require power or resources. */

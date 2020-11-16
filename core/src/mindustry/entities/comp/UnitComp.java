@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -30,12 +31,13 @@ import mindustry.world.blocks.payloads.*;
 import static mindustry.Vars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc{
 
     @Import boolean hovering, dead;
-    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo;
+    @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed;
     @Import Team team;
     @Import int id;
+    @Import @Nullable Tile mineTile;
 
     private UnitController controller;
     UnitType type;
@@ -67,15 +69,33 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return type.hasWeapons();
     }
 
+    public float speed(){
+        float strafePenalty = isGrounded() || !isPlayer() ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(vel().angle(), rotation) / 180f);
+        //limit speed to minimum formation speed to preserve formation
+        return (isCommanding() ? minFormationSpeed * 0.98f : type.speed) * strafePenalty;
+    }
+
     /** @return speed with boost multipliers factored in. */
     public float realSpeed(){
-        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * type.speed;
+        return Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, elevation) * speed();
     }
 
     /** Iterates through this unit and everything it is controlling. */
     public void eachGroup(Cons<Unit> cons){
         cons.get(self());
         controlling().each(cons);
+    }
+
+    /** @return where the unit wants to look at. */
+    public float prefRotation(){
+        if(this instanceof Builderc builder && builder.activelyBuilding()){
+            return angleTo(builder.buildPlan());
+        }else if(mineTile() != null){
+            return angleTo(mineTile());
+        }else if(moving()){
+            return vel().angle();
+        }
+        return rotation;
     }
 
     @Override
@@ -104,7 +124,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case shooting -> isShooting() ? 1 : 0;
             case shootX -> World.conv(aimX());
             case shootY -> World.conv(aimY());
+            case mining -> mining() ? 1 : 0;
+            case mineX -> mining() ? mineTile.x : -1;
+            case mineY -> mining() ? mineTile.y : -1;
             case flag -> flag;
+            case controlled -> controller instanceof LogicAI || controller instanceof Player ? 1 : 0;
             case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
             default -> 0;
         };
@@ -361,7 +385,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         //remove units spawned by the core
-        if(spawnedByCore && !isPlayer()){
+        if(spawnedByCore && !isPlayer() && !dead){
             Call.unitDespawn(self());
         }
     }

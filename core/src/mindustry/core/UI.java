@@ -104,7 +104,7 @@ public class UI implements ApplicationListener, Loadable{
         Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black5).margin(4f).add(text));
 
         Core.settings.setErrorHandler(e -> {
-            e.printStackTrace();
+            Log.err(e);
             Core.app.post(() -> showErrorMessage("Failed to access local storage.\nSettings will not be saved."));
         });
 
@@ -508,6 +508,7 @@ public class UI implements ApplicationListener, Loadable{
         t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
         t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
         t.pack();
+        t.act(0.1f);
         Core.scene.add(t);
     }
 

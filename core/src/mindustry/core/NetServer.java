@@ -164,7 +164,7 @@ public class NetServer implements ApplicationListener{
                 info.id = packet.uuid;
                 admins.save();
                 Call.infoMessage(con, "You are not whitelisted here.");
-                Log.info("&lcDo &lywhitelist-add @&lc to whitelist the player &lb'@'", packet.uuid, packet.name);
+                info("&lcDo &lywhitelist-add @&lc to whitelist the player &lb'@'", packet.uuid, packet.name);
                 con.kick(KickReason.whitelist);
                 return;
             }
@@ -226,8 +226,8 @@ public class NetServer implements ApplicationListener{
                 writeBuffer.reset();
                 player.write(outputBuffer);
             }catch(Throwable t){
-                t.printStackTrace();
                 con.kick(KickReason.nameEmpty);
+                err(t);
                 return;
             }
 
@@ -248,10 +248,10 @@ public class NetServer implements ApplicationListener{
             try{
                 RemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
             }catch(ValidateException e){
-                Log.debug("Validation failed for '@': @", e.player, e.getMessage());
+                debug("Validation failed for '@': @", e.player, e.getMessage());
             }catch(RuntimeException e){
                 if(e.getCause() instanceof ValidateException v){
-                    Log.debug("Validation failed for '@': @", v.player, v.getMessage());
+                    debug("Validation failed for '@': @", v.player, v.getMessage());
                 }else{
                     throw e;
                 }
@@ -305,7 +305,7 @@ public class NetServer implements ApplicationListener{
                 player.sendMessage("[scarlet]You must be admin to use this command.");
                 return;
             }
-			
+
             Groups.player.each(Player::admin, a -> a.sendMessage(args[0], player, "[#" + Pal.adminChat.toString() + "]<A>" + NetClient.colorizeName(player.id, player.name)));
         });
 
@@ -418,7 +418,7 @@ public class NetServer implements ApplicationListener{
 
                         VoteSession session = new VoteSession(currentlyKicking, found);
                         session.vote(player, 1);
-                        vtime.reset();                  
+                        vtime.reset();
                         currentlyKicking[0] = session;
                     }
                 }else{
@@ -493,7 +493,7 @@ public class NetServer implements ApplicationListener{
         data.stream = new ByteArrayInputStream(stream.toByteArray());
         player.con.sendStream(data);
 
-        Log.debug("Packed @ bytes of world data.", stream.size());
+        debug("Packed @ bytes of world data.", stream.size());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -505,7 +505,7 @@ public class NetServer implements ApplicationListener{
     }
 
     public static void onDisconnect(Player player, String reason){
-        //singleplayer multiplayer wierdness
+        //singleplayer multiplayer weirdness
         if(player.con == null){
             player.remove();
             return;
@@ -519,7 +519,7 @@ public class NetServer implements ApplicationListener{
             }
 
             String message = Strings.format("&lb@&fi&lk has disconnected. &fi&lk[&lb@&fi&lk] (@)", player.name, player.uuid(), reason);
-            if(Config.showConnectMessages.bool()) Log.info(message);
+            if(Config.showConnectMessages.bool()) info(message);
         }
 
         player.remove();
@@ -539,7 +539,7 @@ public class NetServer implements ApplicationListener{
     public static void serverPacketUnreliable(Player player, String type, String contents){
         serverPacketReliable(player, type, contents);
     }
-    
+
     private static boolean invalid(float f){
         return Float.isInfinite(f) || Float.isNaN(f);
     }
@@ -640,7 +640,7 @@ public class NetServer implements ApplicationListener{
             Unit unit = player.unit();
 
             long elapsed = Time.timeSinceMillis(con.lastReceivedClientTime);
-            float maxSpeed = ((player.unit().type.canBoost && player.unit().isFlying()) ? player.unit().type.boostMultiplier : 1f) * player.unit().type.speed;
+            float maxSpeed = ((player.unit().type.canBoost && player.unit().isFlying()) ? player.unit().type.boostMultiplier : 1f) * player.unit().speed();
             if(unit.isGrounded()){
                 maxSpeed *= unit.floorSpeedMultiplier();
             }
@@ -702,15 +702,14 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client, called = Loc.server)
     public static void adminRequest(Player player, Player other, AdminAction action){
-
         if(!player.admin){
-            Log.warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
+            warn("ACCESS DENIED: Player @ / @ attempted to perform admin action '@' on '@' without proper security access.",
             player.name, player.con.address, action.name(), other == null ? null : other.name);
             return;
         }
 
         if(other == null || ((other.admin && !player.isLocal()) && other != player)){
-            Log.warn("@ attempted to perform admin action on nonexistant or admin player.", player.name);
+            warn("@ attempted to perform admin action on nonexistant or admin player.", player.name);
             return;
         }
 
@@ -722,10 +721,10 @@ public class NetServer implements ApplicationListener{
             netServer.admins.banPlayerIP(other.con.address);
             netServer.admins.banPlayerID(other.con.uuid);
             other.kick(KickReason.banned);
-            Log.info("&lc@ has banned @.", player.name, other.name);
+            info("&lc@ has banned @.", player.name, other.name);
         }else if(action == AdminAction.kick){
             other.kick(KickReason.kick);
-            Log.info("&lc@ has kicked @.", player.name, other.name);
+            info("&lc@ has kicked @.", player.name, other.name);
         }else if(action == AdminAction.trace){
             TraceInfo info = new TraceInfo(other.con.address, other.uuid(), other.con.modclient, other.con.mobile);
             if(player.con != null){
@@ -733,7 +732,7 @@ public class NetServer implements ApplicationListener{
             }else{
                 NetClient.traceInfo(other, info);
             }
-            Log.info("&lc@ has requested trace info of @.", player.name, other.name);
+            info("&lc@ has requested trace info of @.", player.name, other.name);
         }
     }
 
@@ -748,7 +747,7 @@ public class NetServer implements ApplicationListener{
         if(Config.showConnectMessages.bool()){
             Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
             String message = Strings.format("&lb@&fi&lk has connected. &fi&lk[&lb@&fi&lk]", player.name, player.uuid());
-            Log.info(message);
+            info(message);
         }
 
         if(!Config.motd.string().equalsIgnoreCase("off")){
@@ -773,7 +772,6 @@ public class NetServer implements ApplicationListener{
 
     @Override
     public void update(){
-
         if(!headless && !closing && net.server() && state.isMenu()){
             closing = true;
             ui.loadfrag.show("@server.closing");
@@ -799,7 +797,7 @@ public class NetServer implements ApplicationListener{
             net.host(Config.port.num());
             info("Opened a server on port @.", Config.port.num());
         }catch(BindException e){
-            Log.err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
+            err("Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.");
             state.set(State.menu);
         }catch(IOException e){
             err(e);
@@ -915,7 +913,6 @@ public class NetServer implements ApplicationListener{
     }
 
     String checkColor(String str){
-
         for(int i = 1; i < str.length(); i++){
             if(str.charAt(i) == ']'){
                 String color = str.substring(1, i);
@@ -941,7 +938,6 @@ public class NetServer implements ApplicationListener{
     }
 
     void sync(){
-
         try{
             Groups.player.each(p -> !p.isLocal(), player -> {
                 if(player.con == null || !player.con.isConnected()){
@@ -965,7 +961,7 @@ public class NetServer implements ApplicationListener{
             }
 
         }catch(IOException e){
-            e.printStackTrace();
+            Log.err(e);
         }
     }
 

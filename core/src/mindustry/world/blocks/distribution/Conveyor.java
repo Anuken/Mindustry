@@ -10,6 +10,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -32,7 +33,7 @@ public class Conveyor extends Block implements Autotiler{
     public float speed = 0f;
     public float displayedSpeed = 0f;
 
-    protected Conveyor(String name){
+    public Conveyor(String name){
         super(name);
         rotate = true;
         update = true;
@@ -41,8 +42,8 @@ public class Conveyor extends Block implements Autotiler{
         itemCapacity = 4;
         conveyorPlacement = true;
 
-        idleSound = Sounds.conveyor;
-        idleSoundVolume = 0.004f;
+        ambientSound = Sounds.conveyor;
+        ambientSoundVolume = 0.0022f;
         unloadable = false;
         noUpdateDisabled = false;
     }
@@ -161,7 +162,7 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public boolean shouldIdleSound(){
+        public boolean shouldAmbientSound(){
             return clogHeat <= 0.5f;
         }
 

@@ -42,6 +42,13 @@ public class LaunchLoadoutDialog extends BaseDialog{
 
         //updates sum requirements
         Runnable update = () -> {
+            int cap = selected.findCore().itemCapacity;
+
+            //cap resources based on core type
+            ItemSeq resources = universe.getLaunchResources();
+            resources.min(cap);
+            universe.updateLaunchResources(resources);
+
             total.clear();
             selected.requirements().each(total::add);
             universe.getLaunchResources().each(total::add);
@@ -56,7 +63,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq launches = universe.getLaunchResources();
 
             for(ItemStack s : total){
-                table.image(s.item.icon(Cicon.small)).left();
+                table.image(s.item.icon(Cicon.small)).left().size(Cicon.small.size);
                 int as = schems.get(s.item), al = launches.get(s.item);
 
                 String amountStr = (al + as) + "[gray] (" + (al + " + " + as + ")");
@@ -79,7 +86,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
             ItemSeq stacks = universe.getLaunchResources();
             Seq<ItemStack> out = stacks.toSeq();
 
-            loadout.show(core.itemCapacity, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
+            loadout.show(selected.findCore().itemCapacity, out, UnlockableContent::unlocked, out::clear, () -> {}, () -> {
                 universe.updateLaunchResources(new ItemSeq(out));
                 update.run();
                 rebuildItems.run();
@@ -120,7 +127,7 @@ public class LaunchLoadoutDialog extends BaseDialog{
         }).growX().get().setScrollingDisabled(true, false);
 
         cont.row();
-        cont.add(items);
+        cont.pane(items);
         cont.row();
         cont.add("@sector.missingresources").visible(() -> !valid);
 

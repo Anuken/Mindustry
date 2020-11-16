@@ -34,7 +34,6 @@ public class Logic implements ApplicationListener{
         Events.on(BlockDestroyEvent.class, event -> {
             //blocks that get broken are appended to the team's broken block queue
             Tile tile = event.tile;
-            Block block = tile.block();
             //skip null entities or un-rebuildables, for obvious reasons; also skip client since they can't modify these requests
             if(tile.build == null || !tile.block().rebuildable || net.client()) return;
 
@@ -80,6 +79,13 @@ public class Logic implements ApplicationListener{
                     state.wavetime = state.rules.waveSpacing;
 
                     SectorDamage.applyCalculatedDamage();
+
+                    //make sure damaged buildings are counted
+                    for(Tile tile : world.tiles){
+                        if(tile.build != null && tile.build.damaged()){
+                            indexer.notifyTileDamaged(tile.build);
+                        }
+                    }
                 }
 
                 //reset values
@@ -95,9 +101,12 @@ public class Logic implements ApplicationListener{
         Events.on(WorldLoadEvent.class, e -> {
             //enable infinite ammo for wave team by default
             state.rules.waveTeam.rules().infiniteAmmo = true;
+
             if(state.isCampaign()){
-                //enable building AI
-                state.rules.waveTeam.rules().ai = true;
+                //enable building AI on campaign unless the preset disables it
+                if(!(state.getSector().preset != null && !state.getSector().preset.useAI)){
+                    state.rules.waveTeam.rules().ai = true;
+                }
                 state.rules.waveTeam.rules().infiniteResources = true;
             }
 
@@ -109,6 +118,30 @@ public class Logic implements ApplicationListener{
         Events.on(ResearchEvent.class, e -> {
             if(net.server()){
                 Call.researched(e.content);
+            }
+        });
+
+        Events.on(SectorCaptureEvent.class, e -> {
+            if(!net.client()){
+                for(Tile tile : world.tiles){
+                    //convert all blocks to neutral, randomly killing them
+                    if(tile.isCenter() && tile.build != null && tile.build.team == state.rules.waveTeam){
+                        Building b = tile.build;
+                        Time.run(Mathf.random(0f, 60f * 6f), () -> {
+                            Call.setTeam(b, Team.derelict);
+                            if(Mathf.chance(0.25)){
+                                b.kill();
+                            }
+                        });
+                    }
+                }
+
+                //kill all units
+                Groups.unit.each(u -> {
+                    if(u.team == state.rules.waveTeam){
+                        Time.run(Mathf.random(0f, 60f * 5f), u::kill);
+                    }
+                });
             }
         });
 
@@ -326,5 +359,4 @@ public class Logic implements ApplicationListener{
     public boolean isWaitingWave(){
         return (state.rules.waitEnemies || (state.wave >= state.rules.winWave && state.rules.winWave > 0)) && state.enemies > 0;
     }
-
 }

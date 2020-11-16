@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
@@ -117,10 +118,18 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                     mount.bullet.rotation(weaponRotation + 90);
                     mount.bullet.set(shootX, shootY);
                     vel.add(Tmp.v1.trns(rotation + 180f, mount.bullet.type.recoil));
+                    if(weapon.shootSound != Sounds.none && !headless){
+                        if(mount.sound == null) mount.sound = new SoundLoop(weapon.shootSound, 1f);
+                        mount.sound.update(x, y, true);
+                    }
                 }
             }else{
                 //heat decreases when not firing
                 mount.heat = Math.max(mount.heat - Time.delta * reloadMultiplier / mount.weapon.cooldownTime, 0);
+
+                if(mount.sound != null){
+                    mount.sound.update(x, y, false);
+                }
             }
 
             //flip weapon shoot side for alternating weapons at half reload
@@ -168,7 +177,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         float baseX = this.x, baseY = this.y;
         boolean delay = weapon.firstShotDelay + weapon.shotDelay > 0f;
 
-        (delay ? weapon.chargeSound : weapon.shootSound).at(x, y, Mathf.random(0.8f, 1.0f));
+        (delay ? weapon.chargeSound : weapon.continuous ? Sounds.none : weapon.shootSound).at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
 
         BulletType ammo = weapon.bullet;
         float lifeScl = ammo.scaleVelocity ? Mathf.clamp(Mathf.dst(x, y, aimX, aimY) / ammo.range()) : 1f;
@@ -195,7 +204,9 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));
                 Effect.shake(weapon.shake, weapon.shake, x, y);
                 mount.heat = 1f;
-                weapon.shootSound.at(x, y, Mathf.random(0.8f, 1.0f));
+                if(!weapon.continuous){
+                    weapon.shootSound.at(x, y, Mathf.random(weapon.soundPitchMin, weapon.soundPitchMax));
+                }
             });
         }else{
             vel.add(Tmp.v1.trns(rotation + 180f, ammo.recoil));

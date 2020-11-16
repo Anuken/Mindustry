@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.audio.*;
 import mindustry.content.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -41,7 +42,7 @@ import static mindustry.Vars.*;
  */
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
-    public MusicControl music;
+    public SoundControl sound;
     public Tutorial tutorial;
     public InputHandler input;
 
@@ -52,14 +53,11 @@ public class Control implements ApplicationListener, Loadable{
     public Control(){
         saves = new Saves();
         tutorial = new Tutorial();
-        music = new MusicControl();
+        sound = new SoundControl();
 
         Events.on(StateChangeEvent.class, event -> {
             if((event.from == State.playing && event.to == State.menu) || (event.from == State.menu && event.to != State.menu)){
                 Time.runTask(5f, platform::updateRPC);
-                for(Sound sound : assets.getAll(Sound.class, new Seq<>())){
-                    sound.stop();
-                }
             }
         });
 
@@ -130,6 +128,14 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(UnlockEvent.class, e -> ui.hudfrag.showUnlock(e.content));
 
+        Events.on(UnlockEvent.class, e -> {
+            checkAutoUnlocks();
+        });
+
+        Events.on(SectorCaptureEvent.class, e -> {
+            checkAutoUnlocks();
+        });
+
         Events.on(BlockBuildEndEvent.class, e -> {
             if(e.team == player.team()){
                 if(e.breaking){
@@ -178,6 +184,9 @@ public class Control implements ApplicationListener, Loadable{
             app.post(() -> ui.hudfrag.showLand());
             renderer.zoomIn(Fx.coreLand.lifetime);
             app.post(() -> Fx.coreLand.at(core.getX(), core.getY(), 0, core.block));
+            camera.position.set(core);
+            player.set(core);
+
             Time.run(Fx.coreLand.lifetime, () -> {
                 Fx.launch.at(core);
                 Effect.shake(5f, 5f, core);
@@ -208,6 +217,17 @@ public class Control implements ApplicationListener, Loadable{
         createPlayer();
 
         saves.load();
+    }
+
+    /** Automatically unlocks things with no requirements. */
+    void checkAutoUnlocks(){
+        if(net.client()) return;
+
+        for(TechNode node : TechTree.all){
+            if(!node.content.unlocked() && node.requirements.length == 0 && !node.objectives.contains(o -> !o.complete())){
+                node.content.unlocked();
+            }
+        }
     }
 
     void createPlayer(){
@@ -260,6 +280,11 @@ public class Control implements ApplicationListener, Loadable{
 
     public void playSector(@Nullable Sector origin, Sector sector){
         ui.loadAnd(() -> {
+            if(saves.getCurrent() != null && state.isGame()){
+                control.saves.getCurrent().save();
+                control.saves.resetSave();
+            }
+
             ui.planet.hide();
             SaveSlot slot = sector.save;
             sector.planet.setLastSector(sector);
@@ -290,7 +315,7 @@ public class Control implements ApplicationListener, Loadable{
                         //reset win wave??
                         state.rules.winWave = state.rules.attackMode ? -1 : sector.preset != null ? sector.preset.captureWave : 40;
 
-                        //kill all units, since they should be dead anwyay
+                        //kill all units, since they should be dead anyway
                         Groups.unit.clear();
                         Groups.fire.clear();
 
@@ -331,64 +356,6 @@ public class Control implements ApplicationListener, Loadable{
         });
     }
 
-    public void playTutorial(){
-        ui.showInfo("@indev.notready");
-        //TODO implement
-        //ui.showInfo("death");
-        /*
-        Zone zone = Zones.groundZero;
-        ui.loadAnd(() -> {
-            logic.reset();
-            net.reset();
-
-            world.beginMapLoad();
-
-            world.resize(zone.generator.width, zone.generator.height);
-            zone.generator.generate(world.tiles);
-
-            Tile coreb = null;
-
-            out:
-            for(int x = 0; x < world.width(); x++){
-                for(int y = 0; y < world.height(); y++){
-                    if(world.rawTile(x, y).block() instanceof CoreBlock){
-                        coreb = world.rawTile(x, y);
-                        break out;
-                    }
-                }
-            }
-
-            Geometry.circle(coreb.x, coreb.y, 10, (cx, cy) -> {
-                Tile tile = world.ltile(cx, cy);
-                if(tile != null && tile.team() == state.rules.defaultTeam && !(tile.block() instanceof CoreBlock)){
-                    tile.remove();
-                }
-            });
-
-            Geometry.circle(coreb.x, coreb.y, 5, (cx, cy) -> world.tile(cx, cy).clearOverlay());
-
-            world.endMapLoad();
-
-            zone.rules.get(state.rules);
-            //TODO assign zone!!
-            //state.rules.zone = zone;
-            for(Building core : state.teams.playerCores()){
-                for(ItemStack stack : zone.getStartingItems()){
-                    core.items.add(stack.item, stack.amount);
-                }
-            }
-            Building core = state.teams.playerCores().first();
-            core.items.clear();
-
-            logic.play();
-            state.rules.waveTimer = false;
-            state.rules.waveSpacing = 60f * 30;
-            state.rules.buildCostMultiplier = 0.3f;
-            state.rules.tutorial = true;
-            Events.fire(Trigger.newGame);
-        });*/
-    }
-
     public boolean isHighScore(){
         return hiscore;
     }
@@ -400,9 +367,13 @@ public class Control implements ApplicationListener, Loadable{
             try{
                 SaveIO.save(control.saves.getCurrent().file);
                 Log.info("Saved on exit.");
-            }catch(Throwable e){
-                e.printStackTrace();
+            }catch(Throwable t){
+                Log.err(t);
             }
+        }
+
+        for(Music music : assets.getAll(Music.class, new Seq<>())){
+            music.stop();
         }
 
         content.dispose();
@@ -438,12 +409,6 @@ public class Control implements ApplicationListener, Loadable{
             }));
         }
 
-        //play tutorial on start
-        //TODO no tutorial right now
-        if(!settings.getBool("playedtutorial", false)){
-            //Core.app.post(() -> Core.app.post(this::playTutorial));
-        }
-
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){
             Core.app.post(() -> Core.app.post(() -> {
@@ -476,10 +441,6 @@ public class Control implements ApplicationListener, Loadable{
                 dialog.show();
             }));
         }
-
-        if(android){
-            Sounds.empty.loop(0f, 1f, 0f);
-        }
     }
 
     @Override
@@ -497,8 +458,7 @@ public class Control implements ApplicationListener, Loadable{
 
         input.updateState();
 
-        music.update();
-        loops.update();
+        sound.update();
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");
@@ -520,6 +480,12 @@ public class Control implements ApplicationListener, Loadable{
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){
                 platform.updateRPC();
+            }
+
+            //unlock core items
+            var core = state.rules.defaultTeam.core();
+            if(!net.client() && core != null){
+                core.items.each((i, a) -> i.unlock());
             }
 
             if(Core.input.keyTap(Binding.pause) && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){

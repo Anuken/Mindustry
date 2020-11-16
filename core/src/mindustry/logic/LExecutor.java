@@ -32,15 +32,15 @@ public class LExecutor{
 
     //special variables
     public static final int
-        varCounter = 0,
-        varTime = 1,
-        varUnit = 2,
-        varThis = 3;
+    varCounter = 0,
+    varTime = 1,
+    varUnit = 2,
+    varThis = 3;
 
     public static final int
-        maxGraphicsBuffer = 256,
-        maxDisplayBuffer = 1024,
-        maxTextBuffer = 256;
+    maxGraphicsBuffer = 256,
+    maxDisplayBuffer = 1024,
+    maxTextBuffer = 256;
 
     public LInstruction[] instructions = {};
     public Var[] vars = {};
@@ -61,8 +61,9 @@ public class LExecutor{
         vars[varTime].numval = Time.millis();
 
         //reset to start
-        if(vars[varCounter].numval >= instructions.length
-            || vars[varCounter].numval < 0) vars[varCounter].numval = 0;
+        if(vars[varCounter].numval >= instructions.length || vars[varCounter].numval < 0){
+            vars[varCounter].numval = 0;
+        }
 
         if(vars[varCounter].numval < instructions.length){
             instructions[(int)(vars[varCounter].numval++)].run(this);
@@ -84,9 +85,9 @@ public class LExecutor{
 
             dest.constant = var.constant;
 
-            if(var.value instanceof Number){
+            if(var.value instanceof Number number){
                 dest.isobj = false;
-                dest.numval = ((Number)var.value).doubleValue();
+                dest.numval = number.doubleValue();
             }else{
                 dest.isobj = true;
                 dest.objval = var.value;
@@ -98,7 +99,7 @@ public class LExecutor{
 
     public @Nullable Building building(int index){
         Object o = vars[index].objval;
-        return vars[index].isobj && o instanceof Building ? (Building)o : null;
+        return vars[index].isobj && o instanceof Building building ? building : null;
     }
 
     public @Nullable Object obj(int index){
@@ -198,11 +199,14 @@ public class LExecutor{
                         //bind to the next unit
                         exec.setconst(varUnit, seq.get(index));
                     }
-                    index ++;
+                    index++;
                 }else{
                     //no units of this type found
                     exec.setconst(varUnit, null);
                 }
+            }else if(exec.obj(type) instanceof Unit u && u.team == exec.team){
+                //bind to specific unit object
+                exec.setconst(varUnit, u);
             }else{
                 exec.setconst(varUnit, null);
             }
@@ -468,7 +472,7 @@ public class LExecutor{
 
                         Building build = exec.building(p1);
                         int dropped = Math.min(unit.stack.amount, exec.numi(p2));
-                        if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                        if(build != null && build.isValid() && dropped > 0 && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int accepted = build.acceptStack(unit.item(), dropped, unit);
                             if(accepted > 0){
                                 Call.transferItemTo(unit, unit.item(), accepted, unit.x, unit.y, build);
@@ -482,7 +486,7 @@ public class LExecutor{
                         Building build = exec.building(p1);
                         int amount = exec.numi(p3);
 
-                        if(build != null && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
+                        if(build != null && build.isValid() && build.items != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange + build.block.size * tilesize/2f)){
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){

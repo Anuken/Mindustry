@@ -1,0 +1,1 @@
+- Fixed many various sound-related bugs, such as music playing after application exit

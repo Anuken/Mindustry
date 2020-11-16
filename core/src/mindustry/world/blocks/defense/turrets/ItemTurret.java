@@ -27,7 +27,7 @@ public class ItemTurret extends Turret{
     }
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
-    protected void ammo(Object... objects){
+    public void ammo(Object... objects){
         ammoTypes = OrderedMap.of(objects);
     }
 
@@ -177,7 +177,7 @@ public class ItemTurret extends Turret{
                 totalAmmo += a;
 
                 //only add ammo if this is a valid ammo type
-                if(ammoTypes.containsKey(item)){
+                if(item != null && ammoTypes.containsKey(item)){
                     ammo.add(new ItemEntry(item, a));
                 }
             }

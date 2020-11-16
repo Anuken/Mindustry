@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -49,8 +50,8 @@ public class CoreBlock extends StorageBlock{
         priority = TargetPriority.core;
         flags = EnumSet.of(BlockFlag.core, BlockFlag.unitModifier);
         unitCapModifier = 10;
-        activeSound = Sounds.respawning;
-        activeSoundVolume = 1f;
+        loopSound = Sounds.respawning;
+        loopSoundVolume = 1f;
         group = BlockGroup.none;
     }
 
@@ -70,6 +71,10 @@ public class CoreBlock extends StorageBlock{
             unit.controller(player);
             unit.spawnedByCore(true);
             unit.add();
+        }
+
+        if(state.isCampaign() && player == Vars.player){
+            block.unitType.unlock();
         }
     }
 
@@ -205,7 +210,7 @@ public class CoreBlock extends StorageBlock{
             super.onDestroyed();
 
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
-            if(state.isCampaign() && team == state.rules.waveTeam){
+            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1){
                 //do not recache
                 tile.setOverlayQuiet(Blocks.spawn);
 

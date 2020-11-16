@@ -2,12 +2,16 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
+import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.world.modules.*;
 
@@ -28,7 +32,7 @@ public class Sector{
     public SectorInfo info = new SectorInfo();
 
     /** Number 0-1 indicating the difficulty based on nearby bases. */
-    public float baseCoverage;
+    public float threat;
     public boolean generateEnemyBase;
 
     public Sector(Planet planet, Ptile tile){
@@ -52,6 +56,15 @@ public class Sector{
         for(Ptile tile : tile.tiles){
             cons.get(planet.getSector(tile));
         }
+    }
+
+    /** Displays threat as a formatted string. */
+    public String displayThreat(){
+        float step = 0.25f;
+        String color = Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.round(threat, step)).toString();
+        String[] threats = {"low", "medium", "high", "extreme", "eradication"};
+        int index = Math.min((int)(threat / step), threats.length - 1);
+        return "[#" + color + "]" + Core.bundle.get("threat." + threats[index]);
     }
 
     /** @return whether this sector can be landed on at all.
@@ -90,7 +103,7 @@ public class Sector{
 
     /** @return whether the enemy has a generated base here. */
     public boolean hasEnemyBase(){
-        return generateEnemyBase && (save == null || info.waves);
+        return generateEnemyBase && (save == null || info.attack);
     }
 
     public boolean isBeingPlayed(){
@@ -106,6 +119,11 @@ public class Sector{
     public void setName(String name){
         info.name = name;
         saveInfo();
+    }
+
+    @Nullable
+    public TextureRegionDrawable icon(){
+        return info.icon == null ? null : Icon.icons.get(info.icon);
     }
 
     public boolean isCaptured(){

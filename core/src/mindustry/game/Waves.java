@@ -10,7 +10,7 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 2;
+    public static final int waveVersion = 3;
 
     private Seq<SpawnGroup> spawns;
 
@@ -256,7 +256,8 @@ public class Waves{
     }
 
     public static Seq<SpawnGroup> generate(float difficulty){
-        return generate(new Rand(), difficulty);
+        //apply power curve to make starting sectors easier
+        return generate(new Rand(), Mathf.pow(difficulty, 1.12f));
     }
 
     public static Seq<SpawnGroup> generate(Rand rand, float difficulty){
@@ -285,7 +286,7 @@ public class Waves{
 
             for(int i = start; i < cap;){
                 int f = i;
-                int next = rand.random(8, 16) + curTier * 4;
+                int next = rand.random(8, 16) + (int)Mathf.lerp(4f, 0f, difficulty) + curTier * 4;
 
                 float shieldAmount = Math.max((i - shieldStart) * shieldsPerWave, 0);
                 int space = start == 0 ? 1 : rand.random(1, 2);
@@ -296,8 +297,8 @@ public class Waves{
                     unitAmount = f == start ? 1 : 6 / (int)scaling[ctier];
                     begin = f;
                     end = f + next >= cap ? never : f + next;
-                    max = 14;
-                    unitScaling = (difficulty < 0.4f ? rand.random(2f, 4f) : rand.random(1f, 3f)) * scaling[ctier];
+                    max = 13;
+                    unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 4f) : rand.random(1f, 4f)) * scaling[ctier];
                     shields = shieldAmount;
                     shieldScaling = shieldsPerWave;
                     spacing = space;
@@ -316,7 +317,7 @@ public class Waves{
                 }});
 
                 i += next + 1;
-                if(curTier < 3 || rand.chance(0.05)){
+                if(curTier < 3 || (rand.chance(0.05) && difficulty > 0.8)){
                     curTier ++;
                 }
 
@@ -339,7 +340,7 @@ public class Waves{
             step += (int)(rand.random(15, 30) * Mathf.lerp(1f, 0.5f, difficulty));
         }
 
-        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.6f, difficulty));
+        int bossWave = (int)(rand.random(50, 70) * Mathf.lerp(1f, 0.5f, difficulty));
         int bossSpacing = (int)(rand.random(25, 40) * Mathf.lerp(1f, 0.6f, difficulty));
 
         int bossTier = difficulty < 0.5 ? 3 : 4;

@@ -229,7 +229,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         try{
             process(roundEnv);
         }catch(Throwable e){
-            e.printStackTrace();
+            Log.err(e);
             throw new RuntimeException(e);
         }
         return true;

@@ -421,3 +421,10 @@ task fontgen(dependsOn: classes, type: JavaExec){
     standardInput = System.in
     workingDir = "../"
 }
+
+task icongen(dependsOn: classes, type: JavaExec){
+    main = "mindustry.tools.IconConverter"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../core/assets-raw"
+}

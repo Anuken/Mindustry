@@ -128,7 +128,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
             action.item = item;
             action.itemAmount = amount;
-        }))) throw new ValidateException(player, "Player cannot request items.");
+        }))){
+            throw new ValidateException(player, "Player cannot request items.");
+        }
 
         //remove item for every controlling unit
         player.unit().eachGroup(unit -> {
@@ -931,11 +933,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null
-        && player.miner().validMine(tile)
-        && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
-        && player.unit().acceptsItem(tile.drop())
-        && tile.block() == Blocks.air;
+            && tile.drop() != null
+            && player.miner().validMine(tile)
+            && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
+            && player.unit().acceptsItem(tile.drop())
+            && tile.block() == Blocks.air;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -984,7 +986,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI());
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unitc::isAI);
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
@@ -1042,7 +1044,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean canShoot(){
-        return block == null && !onConfigurable() && !isDroppingItem() && !(player.builder().updateBuilding() && player.builder().isBuilding()) &&
+        return block == null && !onConfigurable() && !isDroppingItem() && !player.builder().activelyBuilding() &&
             !(player.unit() instanceof Mechc && player.unit().isFlying());
     }
 
@@ -1160,7 +1162,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(block instanceof PowerNode){
             Seq<Point2> skip = new Seq<>();
-            
+
             for(int i = 1; i < points.size; i++){
                 int overlaps = 0;
                 Point2 point = points.get(i);

@@ -111,7 +111,7 @@ public class ServerControl implements ApplicationListener{
                         state.set(State.playing);
                         netServer.openServer();
                     }catch(Throwable e){
-                        Log.err(e);
+                        err(e);
                     }
                 }
             }
@@ -237,7 +237,7 @@ public class ServerControl implements ApplicationListener{
                 JsonValue value = JsonIO.json().fromJson(null, Core.settings.getString("globalrules"));
                 JsonIO.json().readFields(state.rules, value);
             }catch(Throwable t){
-                Log.err("Error applying custom rules, proceeding without them.", t);
+                err("Error applying custom rules, proceeding without them.", t);
             }
         });
 
@@ -298,7 +298,7 @@ public class ServerControl implements ApplicationListener{
                     return;
                 }
             }
-            
+
             Map result;
             if(arg.length > 0){
                 result = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
@@ -326,7 +326,7 @@ public class ServerControl implements ApplicationListener{
 
                 netServer.openServer();
             }catch(MapException e){
-                Log.err(e.map.name() + ": " + e.getMessage());
+                err(e.map.name() + ": " + e.getMessage());
             }
         });
 
@@ -431,27 +431,27 @@ public class ServerControl implements ApplicationListener{
             JsonValue base = JsonIO.json().fromJson(null, rules);
 
             if(arg.length == 0){
-                Log.info("Rules:\n@", JsonIO.print(rules));
+                info("Rules:\n@", JsonIO.print(rules));
             }else if(arg.length == 1){
-                Log.err("Invalid usage. Specify which rule to remove or add.");
+                err("Invalid usage. Specify which rule to remove or add.");
             }else{
                 if(!(arg[0].equals("remove") || arg[0].equals("add"))){
-                    Log.err("Invalid usage. Either add or remove rules.");
+                    err("Invalid usage. Either add or remove rules.");
                     return;
                 }
 
                 boolean remove = arg[0].equals("remove");
                 if(remove){
                     if(base.has(arg[1])){
-                        Log.info("Rule '@' removed.", arg[1]);
+                        info("Rule '@' removed.", arg[1]);
                         base.remove(arg[1]);
                     }else{
-                        Log.err("Rule not defined, so not removed.");
+                        err("Rule not defined, so not removed.");
                         return;
                     }
                 }else{
                     if(arg.length < 3){
-                        Log.err("Missing last argument. Specify which value to set the rule to.");
+                        err("Missing last argument. Specify which value to set the rule to.");
                         return;
                     }
 
@@ -467,9 +467,9 @@ public class ServerControl implements ApplicationListener{
                             base.remove(value.name);
                         }
                         base.addChild(arg[1], value);
-                        Log.info("Changed rule: @", value.toString().replace("\n", " "));
+                        info("Changed rule: @", value.toString().replace("\n", " "));
                     }catch(Throwable e){
-                        Log.err("Error parsing rule JSON: @", e.getMessage());
+                        err("Error parsing rule JSON: @", e.getMessage());
                     }
                 }
 
@@ -501,7 +501,6 @@ public class ServerControl implements ApplicationListener{
             }
 
             info("Core filled.");
-
         });
 
         handler.register("playerlimit", "[off/somenumber]", "Set the server player limit.", arg -> {
@@ -528,9 +527,9 @@ public class ServerControl implements ApplicationListener{
             if(arg.length == 0){
                 info("All config values:");
                 for(Config c : Config.all){
-                    Log.info("&lk| @: @", c.name(), "&lc&fi" + c.get());
-                    Log.info("&lk| | &lw" + c.description);
-                    Log.info("&lk|");
+                    info("&lk| @: @", c.name(), "&lc&fi" + c.get());
+                    info("&lk| | &lw" + c.description);
+                    info("&lk|");
                 }
                 return;
             }
@@ -538,7 +537,7 @@ public class ServerControl implements ApplicationListener{
             try{
                 Config c = Config.valueOf(arg[0]);
                 if(arg.length == 1){
-                    Log.info("'@' is currently @.", c.name(), c.get());
+                    info("'@' is currently @.", c.name(), c.get());
                 }else{
                     if(c.isBool()){
                         c.set(arg[1].equals("on") || arg[1].equals("true"));
@@ -546,14 +545,14 @@ public class ServerControl implements ApplicationListener{
                         try{
                             c.set(Integer.parseInt(arg[1]));
                         }catch(NumberFormatException e){
-                            Log.err("Not a valid number: @", arg[1]);
+                            err("Not a valid number: @", arg[1]);
                             return;
                         }
                     }else if(c.isString()){
                         c.set(arg[1]);
                     }
 
-                    Log.info("@ set to @.", c.name(), c.get());
+                    info("@ set to @.", c.name(), c.get());
                     Core.settings.forceSave();
                 }
             }catch(IllegalArgumentException e){
@@ -563,9 +562,9 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("subnet-ban", "[add/remove] [address]", "Ban a subnet. This simply rejects all connections with IPs starting with some string.", arg -> {
             if(arg.length == 0){
-                Log.info("Subnets banned: @", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
+                info("Subnets banned: @", netServer.admins.getSubnetBans().isEmpty() ? "<none>" : "");
                 for(String subnet : netServer.admins.getSubnetBans()){
-                    Log.info("&lw  " + subnet + "");
+                    info("&lw  " + subnet);
                 }
             }else if(arg.length == 1){
                 err("You must provide a subnet to add or remove.");
@@ -577,7 +576,7 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     netServer.admins.addSubnetBan(arg[1]);
-                    Log.info("Banned @**", arg[1]);
+                    info("Banned @**", arg[1]);
                 }else if(arg[0].equals("remove")){
                     if(!netServer.admins.getSubnetBans().contains(arg[1])){
                         err("That subnet isn't banned.");
@@ -585,7 +584,7 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     netServer.admins.removeSubnetBan(arg[1]);
-                    Log.info("Unbanned @**", arg[1]);
+                    info("Unbanned @**", arg[1]);
                 }else{
                     err("Incorrect usage. You must provide add/remove as the second argument.");
                 }
@@ -643,9 +642,9 @@ public class ServerControl implements ApplicationListener{
             Map res = maps.all().find(map -> map.name().equalsIgnoreCase(arg[0].replace('_', ' ')) || map.name().equalsIgnoreCase(arg[0]));
             if(res != null){
                 nextMapOverride = res;
-                Log.info("Next map set to '@'.", res.name());
+                info("Next map set to '@'.", res.name());
             }else{
-                Log.err("No map '@' found.", arg[0]);
+                err("No map '@' found.", arg[0]);
             }
         });
 
@@ -729,10 +728,10 @@ public class ServerControl implements ApplicationListener{
                 err("That IP/ID is not banned!");
             }
         });
-        
+
         handler.register("pardon", "<ID>", "Pardons a votekicked player by ID and allows them to join again.", arg -> {
             PlayerInfo info = netServer.admins.getInfoOptional(arg[0]);
-            
+
             if(info != null){
                 info.lastKicked = 0;
                 info("Pardoned player: @", info.lastName);
@@ -871,7 +870,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("info", "<IP/UUID/name...>", "Find player info(s). Can optionally check for all names or IPs a player has had.", arg -> {
-
             ObjectSet<PlayerInfo> infos = netServer.admins.findByName(arg[0]);
 
             if(infos.size > 0){
@@ -892,7 +890,6 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("search", "<name...>", "Search players who have used part of a name.", arg -> {
-
             ObjectSet<PlayerInfo> infos = netServer.admins.searchNames(arg[0]);
 
             if(infos.size > 0){
@@ -926,7 +923,6 @@ public class ServerControl implements ApplicationListener{
     }
 
     private void readCommands(){
-
         Scanner scan = new Scanner(System.in);
         while(scan.hasNext()){
             String line = scan.nextLine();
@@ -950,7 +946,7 @@ public class ServerControl implements ApplicationListener{
                 }
             }
 
-            if(closest != null){
+            if(closest != null && !closest.text.equals("yes")){
                 err("Command not found. Did you mean \"" + closest.text + "\"?");
                 suggested = line.replace(response.runCommand, closest.text);
             }else{
@@ -1002,7 +998,7 @@ public class ServerControl implements ApplicationListener{
                     try{
                         r.run();
                     }catch(MapException e){
-                        Log.err(e.map.name() + ": " + e.getMessage());
+                        err(e.map.name() + ": " + e.getMessage());
                         net.closeServer();
                     }
                 }
@@ -1057,7 +1053,7 @@ public class ServerControl implements ApplicationListener{
                 }catch(IOException e){
                     if(!e.getMessage().equals("Socket closed")){
                         err("Terminating socket server.");
-                        e.printStackTrace();
+                        err(e);
                     }
                 }
             });
@@ -1068,7 +1064,7 @@ public class ServerControl implements ApplicationListener{
             try{
                 serverSocket.close();
             }catch(IOException e){
-                e.printStackTrace();
+                err(e);
             }
             socketThread = null;
             socketOutput = null;

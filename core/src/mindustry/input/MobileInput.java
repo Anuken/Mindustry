@@ -79,16 +79,13 @@ public class MobileInput extends InputHandler implements GestureListener{
         Unit unit = Units.closestEnemy(player.team(), x, y, 20f, u -> !u.dead);
 
         if(unit != null){
-            player.miner().mineTile(null);
+            player.unit().mineTile = null;
             target = unit;
         }else{
             Building tile = world.buildWorld(x, y);
 
-            if(tile != null && player.team().isEnemy(tile.team)){
-                player.miner().mineTile(null);
-                target = tile;
-            }else if(tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged()){
-                player.miner().mineTile(null);
+            if((tile != null && player.team().isEnemy(tile.team) && tile.team != Team.derelict) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
+                player.unit().mineTile = null;
                 target = tile;
             }
         }
@@ -205,7 +202,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             boolean arrow = block != null && block.rotate;
 
             i.getImage().setRotationOrigin(!arrow ? 0 : rotation * 90, Align.center);
-            i.getStyle().imageUp = arrow ? Icon.right : Icon.paste;
+            i.getStyle().imageUp = arrow ? Icon.right : Icon.copy;
             i.setChecked(!arrow && schematicMode);
         });
 
@@ -327,7 +324,6 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public void drawTop(){
-
         //draw schematic selection
         if(mode == schematicSelect){
             drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
@@ -855,17 +851,8 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         targetPos.set(Core.camera.position);
         float attractDst = 15f;
-        float strafePenalty = legs ? 1f : Mathf.lerp(1f, type.strafePenalty, Angles.angleDist(unit.vel.angle(), unit.rotation) / 180f);
 
-        float baseSpeed = unit.type.speed;
-
-        //limit speed to minimum formation speed to preserve formation
-        if(unit.isCommanding()){
-            //add a tiny multiplier to let units catch up just in case
-            baseSpeed = unit.minFormationSpeed * 0.98f;
-        }
-
-        float speed = baseSpeed * Mathf.lerp(1f, type.canBoost ? type.boostMultiplier : 1f, unit.elevation) * strafePenalty;
+        float speed = unit.realSpeed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
@@ -874,9 +861,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(aimCursor){
             unit.lookAt(mouseAngle);
         }else{
-            if(unit.moving()){
-                unit.lookAt(unit.vel.angle());
-            }
+            unit.lookAt(unit.prefRotation());
         }
 
         if(payloadTarget != null && unit instanceof Payloadc pay){
@@ -906,7 +891,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(player.within(targetPos, attractDst)){
             movement.setZero();
-            unit.vel.approachDelta(Vec2.ZERO, type.speed * type.accel / 2f);
+            unit.vel.approachDelta(Vec2.ZERO, unit.speed() * type.accel / 2f);
         }
 
         float expansion = 3f;

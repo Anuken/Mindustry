@@ -36,6 +36,7 @@ public class LogicBlock extends Block{
         update = true;
         solid = true;
         configurable = true;
+        group = BlockGroup.logic;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> build.readCompressed(data, true));
 
@@ -147,7 +148,11 @@ public class LogicBlock extends Block{
                     String name = stream.readUTF();
                     short x = stream.readShort(), y = stream.readShort();
 
-                    transformer.get(Tmp.p1.set(x, y));
+                    Tmp.p2.set((int)(offset / (tilesize/2)), (int)(offset / (tilesize/2)));
+                    transformer.get(Tmp.p1.set(x * 2, y * 2).sub(Tmp.p2));
+                    Tmp.p1.add(Tmp.p2);
+                    Tmp.p1.x /= 2;
+                    Tmp.p1.y /= 2;
                     links.add(new LogicLink(Tmp.p1.x, Tmp.p1.y, name, true));
                 }
 

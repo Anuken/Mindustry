@@ -59,8 +59,12 @@ public class SectorInfo{
     public float secondsPassed;
     /** Display name. */
     public @Nullable String name;
+    /** Displayed icon. */
+    public @Nullable String icon;
     /** Version of generated waves. When it doesn't match, new waves are generated. */
     public int waveVersion = -1;
+    /** Whether this sector was indicated to the player or not. */
+    public boolean shown = false;
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;
@@ -124,7 +128,7 @@ public class SectorInfo{
 
         //assign new wave patterns when the version changes
         if(waveVersion != Waves.waveVersion && state.rules.sector.preset == null){
-            state.rules.spawns = Waves.generate(state.rules.sector.baseCoverage);
+            state.rules.spawns = Waves.generate(state.rules.sector.threat);
         }
 
         CoreBuild entity = state.rules.defaultTeam.core();
