@@ -490,7 +490,7 @@ public class Control implements ApplicationListener, Loadable{
 
             //unlock core items
             var core = state.rules.defaultTeam.core();
-            if(!net.client() && core != null){
+            if(!net.client() && core != null && state.isCampaign()){
                 core.items.each((i, a) -> i.unlock());
             }
 

@@ -198,7 +198,7 @@ public class Sector{
     }
 
     public String toString(){
-        return planet.name + "#" + id;
+        return planet.name + "#" + id + " (" + name() + ")";
     }
 
     /** Projects this sector onto a 4-corner square for use in map gen.
