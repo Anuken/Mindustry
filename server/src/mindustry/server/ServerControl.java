@@ -964,7 +964,7 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-            var reloader = new WorldReloader();
+            WorldReloader reloader = new WorldReloader();
 
             reloader.begin();
 
