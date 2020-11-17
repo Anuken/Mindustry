@@ -1358,6 +1358,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Final
     @Override
     public void update(){
+        if(state.isEditor()) return;
+
         timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;

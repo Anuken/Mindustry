@@ -77,8 +77,6 @@ public class MeshBuilder{
 
                 if(c.length > 5){
                     verts(c[0].v, c[4].v, c[5].v, nor, color);
-                }else{
-                    verts(c[0].v, c[3].v, c[4].v, nor, color);
                 }
             }
 

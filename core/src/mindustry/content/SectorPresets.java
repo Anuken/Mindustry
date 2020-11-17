@@ -41,7 +41,7 @@ public class SectorPresets implements ContentList{
             difficulty = 2;
         }};
 
-        ruinousShores = new SectorPreset("ruinousShores", serpulo, 19){{
+        ruinousShores = new SectorPreset("ruinousShores", serpulo, 213){{
             captureWave = 30;
             difficulty = 3;
         }};

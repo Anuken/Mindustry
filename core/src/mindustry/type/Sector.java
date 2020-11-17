@@ -103,7 +103,7 @@ public class Sector{
 
     /** @return whether the enemy has a generated base here. */
     public boolean hasEnemyBase(){
-        return generateEnemyBase && (save == null || info.attack);
+        return ((generateEnemyBase && preset == null) || (preset != null && preset.captureWave == 0)) && (save == null || info.attack);
     }
 
     public boolean isBeingPlayed(){

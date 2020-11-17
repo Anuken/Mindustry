@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 10f;
+    private static final float orbitSpacing = 9f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -33,6 +33,8 @@ public class Planet extends UnlockableContent{
     public Seq<Sector> sectors;
     /** Radius of this planet's sphere. Does not take into account sattelites. */
     public float radius;
+    /** Atmosphere radius adjustment parameters. */
+    public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
     public float orbitRadius;
     /** Total radius of this planet and all its children. */

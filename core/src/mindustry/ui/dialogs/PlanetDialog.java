@@ -283,7 +283,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
         }
 
-        Sector current = state.getSector() != null && state.getSector().isBeingPlayed() ? state.getSector() : null;
+        Sector current = state.getSector() != null && state.getSector().isBeingPlayed() && state.getSector().planet == planets.planet ? state.getSector() : null;
 
         if(current != null){
             planets.fill(current, hoverColor, -0.001f);
@@ -418,6 +418,8 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                         Planet planet = content.planets().get(i);
                         if(planet.accessible){
                             pt.button(planet.localizedName, Styles.clearTogglet, () -> {
+                                selected = null;
+                                launchSector = null;
                                 renderer.planets.planet = planet;
                             }).width(200).height(40).growX().update(bb -> bb.setChecked(renderer.planets.planet == planet));
                             pt.row();

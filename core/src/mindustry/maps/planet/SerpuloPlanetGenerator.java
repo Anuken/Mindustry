@@ -16,7 +16,6 @@ import mindustry.world.*;
 import static mindustry.Vars.*;
 
 public class SerpuloPlanetGenerator extends PlanetGenerator{
-    Simplex noise = new Simplex();
     RidgedPerlin rid = new RidgedPerlin(1, 2);
     BaseGenerator basegen = new BaseGenerator();
     float scl = 5f;

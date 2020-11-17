@@ -138,7 +138,7 @@ public class AndroidLauncher extends AndroidApplication{
                     if(open){
                         new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
                     }else{
-                        super.showFileChooser(open, extension, cons);
+                        super.showFileChooser(open, "@open", extension, cons);
                     }
                 }
             }
