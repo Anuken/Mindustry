@@ -51,10 +51,6 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         return unit instanceof Builderc;
     }
 
-    public boolean isMiner(){
-        return unit instanceof Minerc;
-    }
-
     public @Nullable CoreBuild closestCore(){
         return state.teams.closestCore(x, y, team);
     }
@@ -162,10 +158,6 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public Unit unit(){
         return unit;
-    }
-
-    public Minerc miner(){
-        return !(unit instanceof Minerc) ? Nulls.miner : (Minerc)unit;
     }
 
     public Builderc builder(){

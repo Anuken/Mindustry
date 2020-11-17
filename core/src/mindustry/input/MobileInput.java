@@ -914,7 +914,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //update shooting if not building + not mining
-        if(!player.builder().isBuilding() && player.miner().mineTile() == null){
+        if(!player.builder().isBuilding() && player.unit().mineTile() == null){
 
             //autofire targeting
             if(manualShooting){

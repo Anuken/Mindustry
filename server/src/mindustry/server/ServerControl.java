@@ -58,6 +58,10 @@ public class ServerControl implements ApplicationListener{
     private String suggested;
 
     public ServerControl(String[] args){
+        setup(args);
+    }
+
+    protected void setup(String[] args){
         Core.settings.defaults(
             "bans", "",
             "admins", "",
@@ -254,7 +258,7 @@ public class ServerControl implements ApplicationListener{
         info("Server loaded. Type @ for help.", "'help'");
     }
 
-    private void registerCommands(){
+    protected void registerCommands(){
         handler.register("help", "Displays this command list.", arg -> {
             info("Commands:");
             for(Command command : handler.getCommandList()){
@@ -272,6 +276,7 @@ public class ServerControl implements ApplicationListener{
             net.dispose();
             Core.app.exit();
         });
+
 
         handler.register("stop", "Stop hosting the server.", arg -> {
             net.closeServer();

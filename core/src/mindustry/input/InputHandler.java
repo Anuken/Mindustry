@@ -925,7 +925,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     boolean tryBeginMine(Tile tile){
         if(canMine(tile)){
             //if a block is clicked twice, reset it
-            player.miner().mineTile(player.miner().mineTile() == tile ? null : tile);
+            player.unit().mineTile = player.unit().mineTile == tile ? null : tile;
             return true;
         }
         return false;
@@ -934,7 +934,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
             && tile.drop() != null
-            && player.miner().validMine(tile)
+            && player.unit().validMine(tile)
             && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
             && player.unit().acceptsItem(tile.drop())
             && tile.block() == Blocks.air;

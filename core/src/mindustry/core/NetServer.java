@@ -630,9 +630,7 @@ public class NetServer implements ApplicationListener{
             }
         }
 
-        if(player.isMiner()){
-            player.miner().mineTile(mining);
-        }
+        player.unit().mineTile = mining;
 
         con.rejectedRequests.clear();
 

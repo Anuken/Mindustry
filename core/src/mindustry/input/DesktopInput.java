@@ -383,8 +383,8 @@ public class DesktopInput extends InputHandler{
             schematicY += shiftY;
         }
 
-        if(Core.input.keyTap(Binding.deselect)){
-            player.miner().mineTile(null);
+        if(Core.input.keyTap(Binding.deselect) && !isPlacing()){
+            player.unit().mineTile = null;
         }
 
         if(Core.input.keyTap(Binding.clear_building)){
@@ -481,7 +481,7 @@ public class DesktopInput extends InputHandler{
             }else if(selected != null){
                 //only begin shooting if there's no cursor event
                 if(!tileTapped(selected.build) && !tryTapPlayer(Core.input.mouseWorld().x, Core.input.mouseWorld().y) && !player.builder().activelyBuilding() && !droppingItem &&
-                    !tryBeginMine(selected) && player.miner().mineTile() == null && !Core.scene.hasKeyboard()){
+                    !tryBeginMine(selected) && player.unit().mineTile() == null && !Core.scene.hasKeyboard()){
                     player.shooting = shouldShoot;
                 }
             }else if(!Core.scene.hasKeyboard()){ //if it's out of bounds, shooting is just fine
