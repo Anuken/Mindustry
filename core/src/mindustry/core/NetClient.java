@@ -583,7 +583,7 @@ public class NetClient implements ApplicationListener{
                         totalLength += length;
                     }
 
-                    if(totalLength > 2048){
+                    if(totalLength > 1024){
                         usedRequests = i + 1;
                         break;
                     }

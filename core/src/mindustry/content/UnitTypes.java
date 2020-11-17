@@ -111,7 +111,7 @@ public class UnitTypes implements ContentList{
         }};
 
         fortress = new UnitType("fortress"){{
-            speed = 0.38f;
+            speed = 0.39f;
             hitSize = 13f;
             rotateSpeed = 3f;
             targetAir = false;
@@ -136,7 +136,7 @@ public class UnitTypes implements ContentList{
                     collides = true;
                     collidesTiles = true;
                     splashDamageRadius = 24f;
-                    splashDamage = 38f;
+                    splashDamage = 45f;
                     backColor = Pal.bulletYellowBack;
                     frontColor = Pal.bulletYellow;
                 }};
@@ -942,7 +942,7 @@ public class UnitTypes implements ContentList{
             engineOffset = 7.8f;
             range = 140f;
             faceTarget = false;
-            armor = 4f;
+            armor = 3f;
             targetFlag = BlockFlag.factory;
             commandLimit = 5;
 
@@ -950,7 +950,7 @@ public class UnitTypes implements ContentList{
                 minShootVelocity = 0.75f;
                 x = 3f;
                 shootY = 0f;
-                reload = 11f;
+                reload = 12f;
                 shootCone = 180f;
                 ejectEffect = Fx.none;
                 inaccuracy = 15f;
@@ -1466,7 +1466,7 @@ public class UnitTypes implements ContentList{
                 shake = 1.5f;
                 ejectEffect = Fx.casing2;
                 shootSound = Sounds.bang;
-                bullet = Bullets.artilleryIncendiary;
+                bullet = Bullets.artilleryDense;
             }});
         }};
 
