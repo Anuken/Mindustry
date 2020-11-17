@@ -3,7 +3,6 @@ package mindustry.server;
 import arc.*;
 import arc.files.*;
 import arc.struct.*;
-import arc.struct.Seq.*;
 import arc.util.*;
 import arc.util.Timer;
 import arc.util.CommandHandler.*;
@@ -22,6 +21,7 @@ import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
+import mindustry.net.*;
 import mindustry.type.*;
 
 import java.io.*;
@@ -964,30 +964,16 @@ public class ServerControl implements ApplicationListener{
     private void play(boolean wait, Runnable run){
         inExtraRound = true;
         Runnable r = () -> {
-            Seq<Player> players = new Seq<>();
-            for(Player p : Groups.player){
-                players.add(p);
-                p.clearUnit();
-            }
+            var reloader = new WorldReloader();
 
-            logic.reset();
+            reloader.begin();
 
-            Call.worldDataBegin();
             run.run();
+
             state.rules = state.map.applyRules(lastMode);
             logic.play();
 
-            for(Player p : players){
-                if(p.con == null) continue;
-
-                boolean wasAdmin = p.admin;
-                p.reset();
-                p.admin = wasAdmin;
-                if(state.rules.pvp){
-                    p.team(netServer.assignTeam(p, new SeqIterable<>(players)));
-                }
-                netServer.sendWorldData(p);
-            }
+            reloader.end();
             inExtraRound = false;
         };
 

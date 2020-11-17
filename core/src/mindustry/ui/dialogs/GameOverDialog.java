@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.type.*;
@@ -15,6 +16,8 @@ public class GameOverDialog extends BaseDialog{
         super("@gameover");
         setFillParent(true);
         shown(this::rebuild);
+
+        Events.on(ResetEvent.class, e -> hide());
     }
 
     public void show(Team winner){
@@ -49,47 +52,51 @@ public class GameOverDialog extends BaseDialog{
             cont.pane(t -> {
                 t.margin(13f);
                 t.left().defaults().left();
-                t.add(Core.bundle.format("stat.wave", state.stats.wavesLasted));
-                t.row();
-                t.add(Core.bundle.format("stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed));
-                t.row();
-                t.add(Core.bundle.format("stat.built", state.stats.buildingsBuilt));
-                t.row();
-                t.add(Core.bundle.format("stat.destroyed", state.stats.buildingsDestroyed));
-                t.row();
-                t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed));
-                t.row();
+                t.add(Core.bundle.format("stat.wave", state.stats.wavesLasted)).row();
+                t.add(Core.bundle.format("stat.enemiesDestroyed", state.stats.enemyUnitsDestroyed)).row();
+                t.add(Core.bundle.format("stat.built", state.stats.buildingsBuilt)).row();
+                t.add(Core.bundle.format("stat.destroyed", state.stats.buildingsDestroyed)).row();
+                t.add(Core.bundle.format("stat.deconstructed", state.stats.buildingsDeconstructed)).row();
                 if(control.saves.getCurrent() != null){
-                    t.add(Core.bundle.format("stat.playtime", control.saves.getCurrent().getPlayTime()));
-                    t.row();
+                    t.add(Core.bundle.format("stat.playtime", control.saves.getCurrent().getPlayTime())).row();
                 }
                 if(state.isCampaign() && !state.stats.itemsDelivered.isEmpty()){
-                    t.add("@stat.delivered");
-                    t.row();
+                    t.add("@stat.delivered").row();
                     for(Item item : content.items()){
                         if(state.stats.itemsDelivered.get(item, 0) > 0){
                             t.table(items -> {
                                 items.add("    [lightgray]" + state.stats.itemsDelivered.get(item, 0));
                                 items.image(item.icon(Cicon.small)).size(8 * 3).pad(4);
-                            }).left();
-                            t.row();
+                            }).left().row();
                         }
                     }
+                }
+
+                if(state.isCampaign() && net.client()){
+                    t.add("@gameover.waiting").padTop(20f).row();
                 }
 
             }).pad(12);
 
             if(state.isCampaign()){
-                buttons.button("@continue", () -> {
-                    hide();
-                    logic.reset();
-                    ui.planet.show();
-                }).size(130f, 60f);
+                if(net.client()){
+                    buttons.button("@gameover.disconnect", () -> {
+                        logic.reset();
+                        net.reset();
+                        hide();
+                        state.set(State.menu);
+                    }).size(170f, 60f);
+                }else{
+                    buttons.button("@continue", () -> {
+                        hide();
+                        ui.planet.show();
+                    }).size(170f, 60f);
+                }
             }else{
                 buttons.button("@menu", () -> {
                     hide();
                     logic.reset();
-                }).size(130f, 60f);
+                }).size(140f, 60f);
             }
         }
     }

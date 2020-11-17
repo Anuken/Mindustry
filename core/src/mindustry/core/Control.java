@@ -22,6 +22,7 @@ import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
+import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -162,7 +163,7 @@ public class Control implements ApplicationListener, Loadable{
         Events.on(GameOverEvent.class, e -> {
             if(state.isCampaign() && !net.client() && !headless){
 
-                //delete the save, it is gone.
+                //save gameover sate immediately
                 if(saves.getCurrent() != null && !state.rules.tutorial){
                     saves.getCurrent().save();
                 }
@@ -279,6 +280,10 @@ public class Control implements ApplicationListener, Loadable{
     }
 
     public void playSector(@Nullable Sector origin, Sector sector){
+        playSector(origin, sector, new WorldReloader());
+    }
+
+    void playSector(@Nullable Sector origin, Sector sector, WorldReloader reloader){
         ui.loadAnd(() -> {
             if(saves.getCurrent() != null && state.isGame()){
                 control.saves.getCurrent().save();
@@ -291,7 +296,7 @@ public class Control implements ApplicationListener, Loadable{
             if(slot != null && !clearSectors){
 
                 try{
-                    net.reset();
+                    reloader.begin();
                     slot.load();
                     slot.setAutosave(true);
                     state.rules.sector = sector;
@@ -305,7 +310,7 @@ public class Control implements ApplicationListener, Loadable{
                             sector.save = null;
                             slot.delete();
                             //play again
-                            playSector(origin, sector);
+                            playSector(origin, sector, reloader);
                             return;
                         }
 
@@ -331,6 +336,7 @@ public class Control implements ApplicationListener, Loadable{
                     }
 
                     state.set(State.playing);
+                    reloader.end();
 
                 }catch(SaveException e){
                     Log.err(e);
@@ -341,8 +347,7 @@ public class Control implements ApplicationListener, Loadable{
                 }
                 ui.planet.hide();
             }else{
-                net.reset();
-                logic.reset();
+                reloader.begin();
                 world.loadSector(sector);
                 state.rules.sector = sector;
                 //assign origin when launching
@@ -352,6 +357,7 @@ public class Control implements ApplicationListener, Loadable{
                 control.saves.saveSector(sector);
                 Events.fire(new SectorLaunchEvent(sector));
                 Events.fire(Trigger.newGame);
+                reloader.end();
             }
         });
     }
