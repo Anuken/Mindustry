@@ -245,14 +245,11 @@ public class MenuRenderer implements Disposable{
 
         flyers((x, y) -> {
             Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90);
-        });
 
-        flyers((x, y) -> {
             Draw.rect("circle-shadow", x, y, size, size);
-        });
-        Draw.color();
 
-        flyers((x, y) -> {
+            Draw.color();
+
             float engineOffset = flyerType.engineOffset, engineSize = flyerType.engineSize, rotation = flyerRot;
 
             Draw.color(Pal.engine);
