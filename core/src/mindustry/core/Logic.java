@@ -123,7 +123,7 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(SectorCaptureEvent.class, e -> {
-            if(!net.client() && e.sector == state.getSector()){
+            if(!net.client() && e.sector == state.getSector() && e.sector.isBeingPlayed()){
                 for(Tile tile : world.tiles){
                     //convert all blocks to neutral, randomly killing them
                     if(tile.isCenter() && tile.build != null && tile.build.team == state.rules.waveTeam){
