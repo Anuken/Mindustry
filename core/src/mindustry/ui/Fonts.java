@@ -95,6 +95,7 @@ public class Fonts{
             var region = new TextureRegion();
             int code = Iconc.codes.get(name, '\uF8D4');
             var glyph = iconLarge.getData().getGlyph((char)code);
+            if(glyph == null) return Core.atlas.find("error");
             region.set(iconLarge.getRegion().texture);
             region.set(glyph.u, glyph.v2, glyph.u2, glyph.v);
             return region;
