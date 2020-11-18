@@ -89,7 +89,7 @@ public class Blocks implements ContentList{
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
-    launchPad, launchPadLarge,
+    launchPad, launchPadLarge, interplanetaryAccelerator,
 
     //misc experimental
     blockForge, blockLoader, blockUnloader;
@@ -2046,12 +2046,19 @@ public class Blocks implements ContentList{
 
         //TODO remove
         launchPadLarge = new LaunchPad("launch-pad-large"){{
-            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
             hasPower = true;
             consumes.power(6f);
+        }};
+
+        interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 9000, Items.silicon, 9000, Items.thorium, 9000, Items.titanium, 9000, Items.surgeAlloy, 5000, Items.phaseFabric, 4000));
+            researchCostMultiplier = 0.1f;
+            size = 7;
+            hasPower = true;
+            consumes.power(10f);
         }};
 
         //endregion campaign

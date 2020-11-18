@@ -161,7 +161,9 @@ public abstract class BulletType extends Content{
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
-    public void hitTile(Bullet b, Building build, float initialHealth){
+    /** If direct is false, this is an indirect hit and the tile was already damaged.
+     * TODO this is a mess. */
+    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
         if(makeFire && build.team != b.team){
             Fires.create(build.tile);
         }
@@ -169,8 +171,8 @@ public abstract class BulletType extends Content{
         if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
             Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
             build.heal(healPercent / 100f * build.maxHealth());
-        }else if(build.team != b.team){
-            hit(b, build.x, build.y);
+        }else if(build.team != b.team && direct){
+            hit(b);
         }
     }
 

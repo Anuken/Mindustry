@@ -10,7 +10,7 @@ public class SectorPresets implements ContentList{
     groundZero,
     craters, biomassFacility, frozenForest, ruinousShores, windsweptIslands, stainedMountains, tarFields,
     fungalPass, extractionOutpost, saltFlats, overgrowth,
-    impact0078, desolateRift, nuclearComplex;
+    impact0078, desolateRift, nuclearComplex, planetaryTerminal;
 
     @Override
     public void load(){
@@ -68,6 +68,7 @@ public class SectorPresets implements ContentList{
 
         overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
             difficulty = 5;
+            useAI = false;
         }};
 
         tarFields = new SectorPreset("tarFields", serpulo, 23){{
@@ -88,6 +89,10 @@ public class SectorPresets implements ContentList{
         nuclearComplex = new SectorPreset("nuclearComplex", serpulo, 130){{
             captureWave = 50;
             difficulty = 7;
+        }};
+
+        planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
+            difficulty = 10;
         }};
     }
 }

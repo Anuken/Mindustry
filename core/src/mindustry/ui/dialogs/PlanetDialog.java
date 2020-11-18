@@ -679,7 +679,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
                 int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
                 boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
-                stable.add("[accent]Survives " + Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture) +
+                stable.add("[accent]Survives " + Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : 0) +
                 (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture) + " waves");
                 stable.row();
             }

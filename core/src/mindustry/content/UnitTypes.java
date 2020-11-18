@@ -453,7 +453,7 @@ public class UnitTypes implements ContentList{
 
                     shootEffect = Fx.greenLaserChargeSmall;
 
-                    incendChance = 0.05f;
+                    incendChance = 0.075f;
                     incendSpread = 5f;
                     incendAmount = 1;
 

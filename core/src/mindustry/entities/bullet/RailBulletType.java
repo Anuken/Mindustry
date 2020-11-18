@@ -54,7 +54,7 @@ public class RailBulletType extends BulletType{
     }
 
     @Override
-    public void hitTile(Bullet b, Building build, float initialHealth){
+    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
         handle(b, build, initialHealth);
     }
 }
