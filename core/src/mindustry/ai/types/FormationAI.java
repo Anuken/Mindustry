@@ -79,7 +79,7 @@ public class FormationAI extends AIController implements FormationMember{
 
         if(unit.canBuild() && leader.canBuild() && leader.activelyBuilding()){
             unit.clearBuilding();
-            leader.addBuild(leader.buildPlan());
+            unit.addBuild(leader.buildPlan());
         }
     }
 
