@@ -123,7 +123,13 @@ public class Sector{
 
     @Nullable
     public TextureRegion icon(){
-        return info.icon == null ? null : Fonts.getLargeIcon(info.icon);
+        try{
+            return info.icon == null ? null : Fonts.getLargeIcon(info.icon);
+        }catch(Exception e){
+            Log.err("Failed to load icon '@' for sector @", info.icon, toString());
+            info.icon = null;
+            return null;
+        }
     }
 
     public boolean isCaptured(){
