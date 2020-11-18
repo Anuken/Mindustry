@@ -421,6 +421,7 @@ public class UnitTypes implements ContentList{
             armor = 7f;
             canBoost = true;
             landShake = 4f;
+            immunities = ObjectSet.with(StatusEffects.burning);
 
             commandLimit = 8;
 
