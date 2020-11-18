@@ -32,7 +32,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
     }
 
     boolean mining(){
-        return mineTile != null && !(((Object)this) instanceof Builderc b && b.activelyBuilding());
+        return mineTile != null && !this.<Unit>self().activelyBuilding();
     }
 
     public boolean validMine(Tile tile, boolean checkDst){
@@ -42,6 +42,10 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
 
     public boolean validMine(Tile tile){
         return validMine(tile, true);
+    }
+
+    public boolean canMine(){
+        return type.mineSpeed > 0;
     }
 
     @Override

@@ -1122,7 +1122,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public Cursor getCursor(){
-        return block.configurable ? SystemCursor.hand : SystemCursor.arrow;
+        return block.configurable && team == player.team() ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**

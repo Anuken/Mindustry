@@ -17,11 +17,13 @@ import static mindustry.Vars.*;
 public class UnitTypes implements ContentList{
     //region definitions
 
+    //(the wall of shame - should fix the legacy stuff eventually...)
+
     //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType mace, dagger, crawler, fortress, scepter, reign;
 
-    //mech + builder + miner
-    public static @EntityDef({Unitc.class, Mechc.class, Builderc.class}) UnitType nova, pulsar, quasar;
+    //mech
+    public static @EntityDef(value = {Unitc.class, Mechc.class}, legacy = true) UnitType nova, pulsar, quasar;
 
     //mech
     public static @EntityDef({Unitc.class, Mechc.class}) UnitType vela;
@@ -29,29 +31,29 @@ public class UnitTypes implements ContentList{
     //legs
     public static @EntityDef({Unitc.class, Legsc.class}) UnitType corvus, atrax;
 
-    //legs + building
-    public static @EntityDef({Unitc.class, Legsc.class, Builderc.class}) UnitType spiroct, arkyid, toxopid;
+    //legs
+    public static @EntityDef(value = {Unitc.class, Legsc.class}, legacy = true) UnitType spiroct, arkyid, toxopid;
 
-    //air (no special traits)
+    //air
     public static @EntityDef({Unitc.class}) UnitType flare, eclipse, horizon, zenith, antumbra;
 
-    //air, legacy mining
+    //air
     public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType mono;
 
-    //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class}) UnitType poly;
+    //air
+    public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType poly;
 
-    //air + building + mining + payload
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class}) UnitType mega;
+    //air + payload
+    public static @EntityDef({Unitc.class, Payloadc.class}) UnitType mega;
 
-    //air + building + payload
-    public static @EntityDef(value = {Unitc.class, Builderc.class, Payloadc.class}, legacy = true) UnitType quad;
+    //air + payload
+    public static @EntityDef(value = {Unitc.class, Payloadc.class}, legacy = true) UnitType quad;
 
-    //air + building + payload
-    public static @EntityDef({Unitc.class, Builderc.class, Payloadc.class, AmmoDistributec.class}) UnitType oct;
+    //air + payload + ammo distribution
+    public static @EntityDef({Unitc.class, Payloadc.class, AmmoDistributec.class}) UnitType oct;
 
-    //air + building + mining
-    public static @EntityDef({Unitc.class, Builderc.class}) UnitType alpha, beta, gamma;
+    //air
+    public static @EntityDef(value = {Unitc.class}, legacy = true) UnitType alpha, beta, gamma;
 
     //water
     public static @EntityDef({Unitc.class, WaterMovec.class}) UnitType risso, minke, bryde, sei, omura;
@@ -470,7 +472,6 @@ public class UnitTypes implements ContentList{
             mineTier = 1;
             hitSize = 29f;
             health = 18000f;
-            buildSpeed = 1.7f;
             armor = 9f;
             landShake = 1.5f;
             rotateSpeed = 1.5f;
@@ -700,6 +701,7 @@ public class UnitTypes implements ContentList{
             rippleScale = 2f;
             legSpeed = 0.2f;
             ammoType = AmmoTypes.power;
+            buildSpeed = 1f;
 
             legSplashDamage = 32;
             legSplashRange = 30;
@@ -802,6 +804,7 @@ public class UnitTypes implements ContentList{
             rippleScale = 3f;
             legSpeed = 0.19f;
             ammoType = AmmoTypes.powerHigh;
+            buildSpeed = 1f;
 
             legSplashDamage = 80;
             legSplashRange = 60;

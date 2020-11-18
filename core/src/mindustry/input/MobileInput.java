@@ -114,7 +114,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        for(BuildPlan req : player.builder().plans()){
+        for(BuildPlan req : player.unit().plans()){
             Tile other = world.tile(req.x, req.y);
 
             if(other == null || req.breaking) continue;
@@ -219,10 +219,10 @@ public class MobileInput extends InputHandler implements GestureListener{
                             BuildPlan copy = request.copy();
 
                             if(other == null){
-                                player.builder().addBuild(copy);
+                                player.unit().addBuild(copy);
                             }else if(!other.breaking && other.x == request.x && other.y == request.y && other.block.size == request.block.size){
-                                player.builder().plans().remove(other);
-                                player.builder().addBuild(copy);
+                                player.unit().plans().remove(other);
+                                player.unit().addBuild(copy);
                             }
                         }
 
@@ -245,10 +245,10 @@ public class MobileInput extends InputHandler implements GestureListener{
         Boolp schem = () -> lastSchematic != null && !selectRequests.isEmpty();
 
         group.fill(t -> {
-            t.visible(() -> (player.builder().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
+            t.visible(() -> (player.unit().isBuilding() || block != null || mode == breaking || !selectRequests.isEmpty()) && !schem.get());
             t.bottom().left();
             t.button("@cancel", Icon.cancel, () -> {
-                player.builder().clearBuilding();
+                player.unit().clearBuilding();
                 selectRequests.clear();
                 mode = none;
                 block = null;
@@ -914,7 +914,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //update shooting if not building + not mining
-        if(!player.builder().isBuilding() && player.unit().mineTile() == null){
+        if(!player.unit().isBuilding() && player.unit().mineTile == null){
 
             //autofire targeting
             if(manualShooting){

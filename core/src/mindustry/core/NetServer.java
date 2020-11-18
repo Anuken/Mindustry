@@ -600,8 +600,8 @@ public class NetServer implements ApplicationListener{
         player.unit().aim(pointerX, pointerY);
 
         if(player.isBuilder()){
-            player.builder().clearBuilding();
-            player.builder().updateBuilding(building);
+            player.unit().clearBuilding();
+            player.unit().updateBuilding(building);
 
             if(requests != null){
                 for(BuildPlan req : requests){
@@ -625,7 +625,7 @@ public class NetServer implements ApplicationListener{
                         con.rejectedRequests.add(req);
                         continue;
                     }
-                    player.builder().plans().addLast(req);
+                    player.unit().plans().addLast(req);
                 }
             }
         }

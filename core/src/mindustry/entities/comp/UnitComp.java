@@ -31,7 +31,7 @@ import mindustry.world.blocks.payloads.*;
 import static mindustry.Vars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Commanderc, Displayable, Senseable, Ranged, Minerc, Builderc{
 
     @Import boolean hovering, dead;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, minFormationSpeed;
@@ -88,8 +88,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** @return where the unit wants to look at. */
     public float prefRotation(){
-        if(this instanceof Builderc builder && builder.activelyBuilding()){
-            return angleTo(builder.buildPlan());
+        if(activelyBuilding()){
+            return angleTo(buildPlan());
         }else if(mineTile() != null){
             return angleTo(mineTile());
         }else if(moving()){

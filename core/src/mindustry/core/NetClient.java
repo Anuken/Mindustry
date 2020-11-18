@@ -571,13 +571,13 @@ public class NetClient implements ApplicationListener{
             BuildPlan[] requests = null;
             if(player.isBuilder()){
                 //limit to 10 to prevent buffer overflows
-                int usedRequests = Math.min(player.builder().plans().size, 10);
+                int usedRequests = Math.min(player.unit().plans().size, 10);
 
                 int totalLength = 0;
 
                 //prevent buffer overflow by checking config length
                 for(int i = 0; i < usedRequests; i++){
-                    BuildPlan plan = player.builder().plans().get(i);
+                    BuildPlan plan = player.unit().plans().get(i);
                     if(plan.config instanceof byte[] b){
                         int length = b.length;
                         totalLength += length;
@@ -591,7 +591,7 @@ public class NetClient implements ApplicationListener{
 
                 requests = new BuildPlan[usedRequests];
                 for(int i = 0; i < usedRequests; i++){
-                    requests[i] = player.builder().plans().get(i);
+                    requests[i] = player.unit().plans().get(i);
                 }
             }
 
@@ -607,7 +607,7 @@ public class NetClient implements ApplicationListener{
             unit.rotation,
             unit instanceof Mechc m ? m.baseRotation() : 0,
             unit.vel.x, unit.vel.y,
-            player.unit().mineTile(),
+            player.unit().mineTile,
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,

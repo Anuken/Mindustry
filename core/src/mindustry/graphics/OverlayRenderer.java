@@ -28,7 +28,7 @@ public class OverlayRenderer{
         if(player.dead()) return;
 
         if(player.isBuilder()){
-            player.builder().drawBuildRequests();
+            player.unit().drawBuildRequests();
         }
 
         input.drawBottom();
