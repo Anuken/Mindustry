@@ -87,6 +87,8 @@ public class Pathfinder implements Runnable{
                 tiles[tile.x][tile.y] = packTile(tile);
             }
 
+            preloadPath(getField(state.rules.waveTeam, costGround, fieldCore));
+
             start();
         });
 

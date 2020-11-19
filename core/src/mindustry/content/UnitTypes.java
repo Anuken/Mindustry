@@ -1731,6 +1731,7 @@ public class UnitTypes implements ContentList{
                 x = 2.75f;
                 y = 1f;
                 top = false;
+                ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(2.5f, 10){{
                     width = 7f;
@@ -1772,6 +1773,7 @@ public class UnitTypes implements ContentList{
                 shots = 2;
                 shotDelay = 4f;
                 spacing = 0f;
+                ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(3f, 10){{
                     width = 7f;
@@ -1811,6 +1813,7 @@ public class UnitTypes implements ContentList{
                 spacing = 2f;
                 inaccuracy = 3f;
                 shotDelay = 3f;
+                ejectEffect = Fx.casing1;
 
                 bullet = new BasicBulletType(3.5f, 10){{
                     width = 6.5f;
