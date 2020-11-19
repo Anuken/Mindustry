@@ -31,6 +31,7 @@ public class TechTree implements ContentList{
                     node(router, () -> {
                         node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
                             node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
+                                
                             });
                         });
 
@@ -200,6 +201,7 @@ public class TechTree implements ContentList{
                     });
 
                     node(illuminator, () -> {
+                        
                     });
                 });
 
@@ -422,6 +424,7 @@ public class TechTree implements ContentList{
                     node(multiplicativeReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
                         node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
+                                
                             });
                         });
                     });
