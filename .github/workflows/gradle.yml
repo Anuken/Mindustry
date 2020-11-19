@@ -14,6 +14,11 @@ jobs:
         java-version: 14
     - name: Run unit tests with gradle and Java 14
       run: ./gradlew compileJava
+    - name: Upload desktop jar for testing
+      uses: actions/upload-artifact@v2
+      with:
+        name: Desktop jar (zipped)
+        path: desktop/build/libs/Mindustry.jar
   buildJava15:
     runs-on: ubuntu-latest
 
