@@ -691,7 +691,7 @@ public class ServerControl implements ApplicationListener{
 
             for(Player player : Groups.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
-                    Call.sendMessage("[scarlet] " + player.name + " has been banned.");
+                    Call.sendMessage("[scarlet]" + player.name + " has been banned.");
                     player.con.kick(KickReason.banned);
                 }
             }
@@ -728,7 +728,7 @@ public class ServerControl implements ApplicationListener{
 
         handler.register("unban", "<ip/ID>", "Completely unban a person by IP or ID.", arg -> {
             if(netServer.admins.unbanPlayerIP(arg[0]) || netServer.admins.unbanPlayerID(arg[0])){
-                info("Unbanned player.", arg[0]);
+                info("Unbanned player: @", arg[0]);
             }else{
                 err("That IP/ID is not banned!");
             }
