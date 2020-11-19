@@ -305,8 +305,8 @@ public class LogicBlock extends Block{
                         }
                     }
 
-                    asm.putConst("@mapx", world.width());
-                    asm.putConst("@mapy", world.height());
+                    asm.putConst("@mapw", world.width());
+                    asm.putConst("@maph", world.height());
                     asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
