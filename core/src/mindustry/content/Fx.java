@@ -429,6 +429,16 @@ public class Fx{
         });
     }),
 
+    hitBeam = new Effect(12, e -> {
+        color(e.color);
+        stroke(e.fout() * 2f);
+
+        randLenVectors(e.id, 6, e.finpow() * 18f, e.rotation, 360f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+        });
+    }),
+
     hitMeltdown = new Effect(12, e -> {
         color(Pal.meltdownHit);
         stroke(e.fout() * 2f);

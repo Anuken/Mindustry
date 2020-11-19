@@ -25,7 +25,7 @@ public class ContinuousLaserBulletType extends BulletType{
     public ContinuousLaserBulletType(float damage){
         super(0.001f, damage);
 
-        hitEffect = Fx.hitMeltdown;
+        hitEffect = Fx.hitBeam;
         despawnEffect = Fx.none;
         hitSize = 4;
         drawSize = 420f;
