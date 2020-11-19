@@ -23,7 +23,7 @@ public class LaserBulletType extends BulletType{
     public LaserBulletType(float damage){
         super(0.01f, damage);
 
-        hitEffect = Fx.hitLaser;
+        hitEffect = Fx.hitLaserBlast;
         hitColor = colors[2];
         despawnEffect = Fx.none;
         shootEffect = Fx.hitLancer;

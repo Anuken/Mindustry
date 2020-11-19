@@ -419,7 +419,7 @@ public class Fx{
         });
     }),
     
-    hitLaser = new Effect(12, e -> {
+    hitLaserBlast = new Effect(12, e -> {
         color(e.color);
         stroke(e.fout() * 1.5f);
 
