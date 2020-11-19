@@ -601,6 +601,7 @@ public class ContentParser{
 
     void readFields(Object object, JsonValue jsonMap){
         JsonValue research = jsonMap.remove("research");
+        JsonValue after = jsonMap.remove("after");
 
         toBeParsed.remove(object);
         Class type = object.getClass();
@@ -681,6 +682,20 @@ public class ContentParser{
                 }
                 //reparent the node
                 node.parent = parent;
+            });
+        }
+        
+        if(object instanceof UnlockableContent inserted && after != null){
+
+            //add research tech node
+            String afterName = after.asString();
+            LoadedMod cur = currentMod;
+
+            postreads.add(() -> {
+                currentContent = inserted;
+                currentMod = cur;
+                currentContent.assumedId = find(currentContent.getContentType(), afterName).assumedId;
+                currentContent.assumedIteration = find(currentContent.getContentType(), afterName).assumedIteration + 1;//I need to allocate the result of find() to a variable, but I don't know what variable class I should use, sorry...
             });
         }
     }
