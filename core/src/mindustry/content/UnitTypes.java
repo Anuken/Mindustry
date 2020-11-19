@@ -1739,7 +1739,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                 }};
             }});
         }};
@@ -1781,7 +1781,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                 }};
             }});
         }};
@@ -1821,7 +1821,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                     homingPower = 0.04f;
                 }};
             }});
