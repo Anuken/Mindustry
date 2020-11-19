@@ -27,6 +27,13 @@ public class Universe{
     public Universe(){
         load();
 
+        //load legacy research
+        Events.on(ClientLoadEvent.class, e -> {
+            if(Core.settings.has("unlocks")){
+                LegacyIO.readResearch();
+            }
+        });
+
         //update base coverage on capture
         Events.on(SectorCaptureEvent.class, e -> {
             if(state.isCampaign()){
@@ -273,10 +280,6 @@ public class Universe{
     private void load(){
         seconds = Core.settings.getInt("utimei");
         turn = Core.settings.getInt("turn");
-
-        if(Core.settings.has("unlocks")){
-            LegacyIO.readResearch();
-        }
     }
 
 }
