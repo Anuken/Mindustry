@@ -1,4 +1,4 @@
-name: Test & Push BUilds
+name: Tests
 
 on: [push]
 
