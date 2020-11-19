@@ -2,6 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -47,7 +48,7 @@ public class HostDialog extends BaseDialog{
 
         Core.net.httpGet("https://icanhazip.com", res -> {
             if(res.getStatus() != Net.HttpStatus.OK) return;
-            String ip = res.resultAsString();
+            String ip = res.getResultAsString();
             //check that we're not being tricked for some reason
             var matcher = Pattern.compile("^\\d+(\\.\\d+){3}$").matcher(ip);
             if(!matcher.find()) return;
