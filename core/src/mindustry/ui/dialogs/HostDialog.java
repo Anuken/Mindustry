@@ -49,7 +49,7 @@ public class HostDialog extends BaseDialog{
             if(res.getStatus() != Net.HttpStatus.OK) return;
             String ip = res.resultAsString();
             //check that we're not being tricked for some reason
-            var matcher = Pattern.compile("^\\d+\\.{\\d+){3}$").matcher(ip);
+            var matcher = Pattern.compile("^\\d+(\\.\\d+){3}$").matcher(ip);
             if(!matcher.find()) return;
 
             ipCont.add("Your IP address: " + ip).fillX().center();
