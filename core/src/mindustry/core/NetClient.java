@@ -339,6 +339,13 @@ public class NetClient implements ApplicationListener{
 
         ui.showInfoToast(message, duration);
     }
+    
+    @Remote(variants = Variant.both)
+    public static void warningToast(int unicode, String text){
+        if(text == null || mindustry.ui.Fonts.def.getData().getGlyph((char)unicode) == null) return;
+
+        ui.hudfrag.showToast(mindustry.ui.Fonts.getGlyph(mindustry.ui.Fonts.def, (char)unicode), text);
+    }
 
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
