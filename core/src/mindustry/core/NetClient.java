@@ -345,7 +345,7 @@ public class NetClient implements ApplicationListener{
     public static void warningToast(int unicode, String text){
         if(text == null || Fonts.def.getData().getGlyph((char)unicode) == null) return;
 
-        ui.hudfrag.showToast(Fonts.getGlyph(ui.Fonts.def, (char)unicode), text);
+        ui.hudfrag.showToast(Fonts.getGlyph(Fonts.def, (char)unicode), text);
     }
 
     @Remote(variants = Variant.both)
