@@ -103,6 +103,8 @@ public class LaunchLoadoutDialog extends BaseDialog{
         ButtonGroup<Button> group = new ButtonGroup<>();
         selected = universe.getLoadout(core);
 
+        cont.add(Core.bundle.format("launch.from", sector.name())).row();
+
         cont.pane(t -> {
             int i = 0;
 

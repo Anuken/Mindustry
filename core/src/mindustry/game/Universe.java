@@ -206,7 +206,7 @@ public class Universe{
                     }
 
                     //queue random invasions
-                    if(!sector.isAttacked() && turn > invasionGracePeriod){
+                    if(!sector.isAttacked() && turn > invasionGracePeriod && sector.info.hasSpawns){
                         //invasion chance depends on # of nearby bases
                         if(Mathf.chance(baseInvasionChance * sector.near().count(Sector::hasEnemyBase))){
                             int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : sector.info.wave + sector.info.wavesPassed) + Mathf.random(2, 5) * 5;
