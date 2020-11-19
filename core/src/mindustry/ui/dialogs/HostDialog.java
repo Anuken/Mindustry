@@ -9,6 +9,7 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.util.regex.*;
 
 import static mindustry.Vars.*;
 
@@ -40,6 +41,19 @@ public class HostDialog extends BaseDialog{
         cont.row();
 
         cont.add().width(65f);
+
+        final Table ipCont = new Table();
+        cont.add(ipCont).row();
+
+        Core.net.httpGet("https://icanhazip.com", res -> {
+            if(res.getStatus() != Net.HttpStatus.OK) return;
+            String ip = res.resultAsString();
+            //check that we're not being tricked for some reason
+            var matcher = Pattern.compile("^\\d+\\.{\\d+){3}$").matcher(ip);
+            if(!matcher.find()) return;
+
+            ipCont.add("Your IP address: " + ip).fillX().center();
+        }, err -> {});
 
         cont.button("@host", () -> {
             if(Core.settings.getString("name").trim().isEmpty()){
