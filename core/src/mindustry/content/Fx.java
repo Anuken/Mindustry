@@ -418,6 +418,16 @@ public class Fx{
             Fill.circle(e.x + x, e.y + y, e.fout() * 2f);
         });
     }),
+    
+    hitLaser = new Effect(12, e -> {
+        color(e.color);
+        stroke(e.fout() * 1.5f);
+
+        randLenVectors(e.id, 8, e.finpow() * 17f, e.rotation, 360f, (x, y) -> {
+            float ang = Mathf.angle(x, y);
+            lineAngle(e.x + x, e.y + y, ang, e.fout() * 4 + 1f);
+        });
+    }),
 
     hitLancer = new Effect(12, e -> {
         color(Color.white);
