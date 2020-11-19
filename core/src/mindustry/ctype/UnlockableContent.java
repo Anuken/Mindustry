@@ -30,6 +30,7 @@ public abstract class UnlockableContent extends MappableContent{
     public int iconId = 0;
     /** Icons by Cicon ID.*/
     public int assumedId = id;
+    public int assumedIteration = 0;
     /** False ID used for UI purposes. Do not use!*/
     protected TextureRegion[] cicons = new TextureRegion[Cicon.all.length];
     /** Unlock state. Loaded from settings. Do not modify outside of the constructor. */
