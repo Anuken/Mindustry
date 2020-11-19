@@ -662,7 +662,7 @@ public class ServerControl implements ApplicationListener{
             Player target = Groups.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
-                Call.sendMessage("[scarlet] " + target.name() + "[scarlet] has been kicked by the server.");
+                Call.sendMessage("[scarlet]" + target.name() + "[scarlet] has been kicked by the server.");
                 target.kick(KickReason.kick);
                 info("It is done.");
             }else{
