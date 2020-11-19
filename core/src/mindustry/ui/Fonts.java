@@ -37,6 +37,7 @@ public class Fonts{
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
     private static TextureRegion[] iconTable;
     private static int lastCid, biggestIconId = -1;
+    private static Seq<Font> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
 
     public static Font def;
     public static Font outline;
@@ -102,7 +103,7 @@ public class Fonts{
         });
     }
 
-    public static void setLargeIcon(String name, int ch, TextureRegion region){
+    public static void setIcon(String name, int ch, TextureRegion region){
         //ensure that modded icons don't interfere with existing ones; put them arter vanilla
         if(ch > biggestIconId){
             biggestIconId = ch;
@@ -146,7 +147,6 @@ public class Fonts{
     }
 
     public static void loadContentIcons(){
-        Seq<Font> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
         Texture uitex = Core.atlas.find("logo").texture;
 
         try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
