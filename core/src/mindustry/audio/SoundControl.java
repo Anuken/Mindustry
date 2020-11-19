@@ -27,13 +27,13 @@ public class SoundControl{
     public Seq<Music> bossMusic = Seq.with();
 
     protected Music lastRandomPlayed;
-    protected Interval timer = new Interval();
+    protected Interval timer = new Interval(4);
     protected @Nullable Music current;
     protected float fade;
     protected boolean silenced;
 
     protected AudioBus uiBus = new AudioBus();
-    protected boolean wasPaused, wasPlaying;
+    protected boolean wasPlaying;
     protected AudioFilter filter = new BiquadFilter(){{
         set(0, 500, 1);
     }};
@@ -117,9 +117,8 @@ public class SoundControl{
             fade = 0f;
         }
 
-        //fade the lowpass filter in/out
-        if(paused != wasPaused){
-            wasPaused = paused;
+        //fade the lowpass filter in/out, poll every 30 ticks just in case performance is an issue
+        if(timer.get(1, 30f)){
             Core.audio.soundBus.fadeFilterParam(0, Filters.paramWet, paused ? 1f : 0f, 0.4f);
         }
 
