@@ -15,7 +15,7 @@ public class TantrosPlanetGenerator extends PlanetGenerator{
 
     @Override
     public Color getColor(Vec3 position){
-        float depth = (float)noise.octaveNoise3D(2, 0.56, 1.7f, position.x, position.y, position.z) / 1.7f;
+        float depth = (float)noise.octaveNoise3D(2, 0.56, 1.7f, position.x, position.y, position.z) / 2f;
         return c1.write(out).lerp(c2, Mathf.clamp(Mathf.round(depth, 0.15f))).a(0.6f);
     }
 }
