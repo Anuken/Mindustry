@@ -36,7 +36,7 @@ public class Fonts{
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
     private static TextureRegion[] iconTable;
-    private static int lastCid;
+    private static int lastCid, biggestIconId = -1;
 
     public static Font def;
     public static Font outline;
@@ -102,10 +102,52 @@ public class Fonts{
         });
     }
 
+    public static void setLargeIcon(String name, int ch, TextureRegion region){
+        //ensure that modded icons don't interfere with existing ones; put them arter vanilla
+        if(ch > biggestIconId){
+            biggestIconId = ch;
+        }
+
+        int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
+
+        unicodeIcons.put(name, ch);
+        stringIcons.put(name, ((char)ch) + "");
+
+        Glyph glyph = new Glyph();
+        glyph.id = ch;
+        glyph.srcX = 0;
+        glyph.srcY = 0;
+        glyph.width = size;
+        glyph.height = size;
+        glyph.u = region.u;
+        glyph.v = region.v2;
+        glyph.u2 = region.u2;
+        glyph.v2 = region.v;
+        glyph.xoffset = 0;
+        glyph.yoffset = -size;
+        glyph.xadvance = size;
+        glyph.kerning = null;
+        glyph.fixedWidth = true;
+        glyph.page = 0;
+        fonts.each(f -> f.getData().setGlyph(ch, glyph));
+    }
+
+    /** @return id of new glyph for the icon - suitable for a sector icon */
+    public static int addIcon(String name, TextureRegion region){
+        //this lets sector icon picker find this icon
+        Icon.icons.put(name, new TextureRegionDrawable(region));
+        int id = biggestIconId + 1;
+        setIcon(name, id, region);
+        return id;
+    }
+
+    public static int addIcon(String name, String region){
+        return addIcon(name, Core.atlas.find(region));
+    }
+
     public static void loadContentIcons(){
         Seq<Font> fonts = Seq.with(Fonts.chat, Fonts.def, Fonts.outline);
         Texture uitex = Core.atlas.find("logo").texture;
-        int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
         try(Scanner scan = new Scanner(Core.files.internal("icons/icons.properties").read(512))){
             while(scan.hasNextLine()){
@@ -121,26 +163,7 @@ public class Fonts{
                     //throw new IllegalArgumentException("Font icon '" + texture + "' is not in the UI texture.");
                 }
 
-                unicodeIcons.put(nametex[0], ch);
-                stringIcons.put(nametex[0], ((char)ch) + "");
-
-                Glyph glyph = new Glyph();
-                glyph.id = ch;
-                glyph.srcX = 0;
-                glyph.srcY = 0;
-                glyph.width = size;
-                glyph.height = size;
-                glyph.u = region.u;
-                glyph.v = region.v2;
-                glyph.u2 = region.u2;
-                glyph.v2 = region.v;
-                glyph.xoffset = 0;
-                glyph.yoffset = -size;
-                glyph.xadvance = size;
-                glyph.kerning = null;
-                glyph.fixedWidth = true;
-                glyph.page = 0;
-                fonts.each(f -> f.getData().setGlyph(ch, glyph));
+                setIcon(nametex[0], ch, region);
             }
         }
 
