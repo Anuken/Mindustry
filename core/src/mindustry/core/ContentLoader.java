@@ -235,7 +235,12 @@ public class ContentLoader{
     public <T extends Content> Seq<T> getBy(ContentType type){
         return (Seq<T>)contentMap[type.ordinal()];
     }
-
+    
+    //only use for UI purposes! TODO: make it cache after the first time, but my limited Java knowledge is not letting me...
+    public <T extends Content> Seq<T> getByAssumed(ContentType type){
+        return getBy(type).sort((c1, c2) -> (c1.assumedId == c2.assumedId) ? Integer.compare(c1.assumedIteration, c2.assumedIteration) : Integer.compare(c1.assumedId, c2.assumedId));
+    }
+    
     //utility methods, just makes things a bit shorter
 
     public Seq<Block> blocks(){
