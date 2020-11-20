@@ -98,7 +98,7 @@ public class Sector{
 
     /** @return whether the player has a base here. */
     public boolean hasBase(){
-        return save != null && info.hasCore;
+        return save != null && info.hasCore && !(Vars.state.isGame() && Vars.state.rules.sector == this && state.gameOver);
     }
 
     /** @return whether the enemy has a generated base here. */
