@@ -465,7 +465,8 @@ public class TechTree implements ContentList{
                                     //TODO change positions?
                                     node(impact0078, Seq.with(
                                         new SectorComplete(tarFields),
-                                        new Research(Items.thorium)
+                                        new Research(Items.thorium),
+                                        new Research(coreFoundation)
                                     ), () -> {
                                         node(desolateRift, Seq.with(
                                             new SectorComplete(impact0078),
