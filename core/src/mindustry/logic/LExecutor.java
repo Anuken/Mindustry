@@ -199,11 +199,14 @@ public class LExecutor{
                         //bind to the next unit
                         exec.setconst(varUnit, seq.get(index));
                     }
-                    index ++;
+                    index++;
                 }else{
                     //no units of this type found
                     exec.setconst(varUnit, null);
                 }
+            }else if(exec.obj(type) instanceof Unit u && u.team == exec.team){
+                //bind to specific unit object
+                exec.setconst(varUnit, u);
             }else{
                 exec.setconst(varUnit, null);
             }
@@ -318,13 +321,8 @@ public class LExecutor{
                     ((LogicAI)unit.controller()).controller = exec.building(varThis);
 
                     //clear old state
-                    if(unit instanceof Minerc miner){
-                        miner.mineTile(null);
-                    }
-
-                    if(unit instanceof Builderc builder){
-                        builder.clearBuilding();
-                    }
+                    unit.mineTile = null;
+                    unit.clearBuilding();
 
                     return (LogicAI)unit.controller();
                 }
@@ -354,12 +352,8 @@ public class LExecutor{
 
                         //stop mining/building
                         if(type == LUnitControl.stop){
-                            if(unit instanceof Minerc miner){
-                                miner.mineTile(null);
-                            }
-                            if(unit instanceof Builderc build){
-                                build.clearBuilding();
-                            }
+                            unit.mineTile = null;
+                            unit.clearBuilding();
                         }
                     }
                     case within -> {
@@ -387,8 +381,8 @@ public class LExecutor{
                     }
                     case mine -> {
                         Tile tile = world.tileWorld(x1, y1);
-                        if(unit instanceof Minerc miner){
-                            miner.mineTile(miner.validMine(tile) ? tile : null);
+                        if(unit.canMine()){
+                            unit.mineTile = unit.validMine(tile) ? tile : null;
                         }
                     }
                     case payDrop -> {
@@ -429,12 +423,12 @@ public class LExecutor{
                         }
                     }
                     case build -> {
-                        if(unit instanceof Builderc builder && exec.obj(p3) instanceof Block block){
+                        if(unit.canBuild() && exec.obj(p3) instanceof Block block){
                             int x = World.toTile(x1), y = World.toTile(y1);
                             int rot = exec.numi(p4);
 
                             //reset state of last request when necessary
-                            if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || builder.plans().isEmpty()){
+                            if(ai.plan.x != x || ai.plan.y != y || ai.plan.block != block || unit.plans.isEmpty()){
                                 ai.plan.progress = 0;
                                 ai.plan.initialized = false;
                                 ai.plan.stuck = false;
@@ -443,11 +437,11 @@ public class LExecutor{
                             ai.plan.set(x, y, rot, block);
                             ai.plan.config = exec.obj(p5) instanceof Content c ? c : null;
 
-                            builder.clearBuilding();
+                            unit.clearBuilding();
 
                             if(ai.plan.tile() != null){
-                                builder.updateBuilding(true);
-                                builder.addBuild(ai.plan);
+                                unit.updateBuilding = true;
+                                unit.addBuild(ai.plan);
                             }
                         }
                     }

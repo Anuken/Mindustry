@@ -28,7 +28,7 @@ import static mindustry.Vars.*;
 @EntityDef(value = {Playerc.class}, serialize = false)
 @Component(base = true)
 abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Drawc{
-    static final float deathDelay = 30f;
+    static final float deathDelay = 60f;
 
     @Import float x, y;
 
@@ -48,11 +48,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient float textFadeTime;
 
     public boolean isBuilder(){
-        return unit instanceof Builderc;
-    }
-
-    public boolean isMiner(){
-        return unit instanceof Minerc;
+        return unit.canBuild();
     }
 
     public @Nullable CoreBuild closestCore(){
@@ -130,7 +126,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             }
         }else if(core != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
-            //(this is not for balance)
+            //(this is not for balance, it just looks better this way)
             deathTimer += Time.delta;
             if(deathTimer >= deathDelay){
                 //request spawn - this happens serverside only
@@ -162,14 +158,6 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public Unit unit(){
         return unit;
-    }
-
-    public Minerc miner(){
-        return !(unit instanceof Minerc) ? Nulls.miner : (Minerc)unit;
-    }
-
-    public Builderc builder(){
-        return !(unit instanceof Builderc) ? Nulls.builder : (Builderc)unit;
     }
 
     public void unit(Unit unit){

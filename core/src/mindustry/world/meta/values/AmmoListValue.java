@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
@@ -26,11 +27,19 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
     public void display(Table table){
 
         table.row();
+
         for(T t : map.keys()){
+            boolean unit = t instanceof UnitType;
+
             BulletType type = map.get(t);
-            table.image(icon(t)).size(3 * 8).padRight(4).right().top();
-            table.add(t.localizedName).padRight(10).left().top();
-            table.table(Tex.underline, bt -> {
+
+            //no point in displaying unit icon twice
+            if(!unit){
+                table.image(icon(t)).size(3 * 8).padRight(4).right().top();
+                table.add(t.localizedName).padRight(10).left().top();
+            }
+
+            table.table(bt -> {
                 bt.left().defaults().padRight(3).left();
 
                 if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
@@ -41,20 +50,27 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                     sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                 }
 
-                if(!Mathf.equal(type.ammoMultiplier, 1f))
+                if(!unit && !Mathf.equal(type.ammoMultiplier, 1f) && !(type instanceof LiquidBulletType)){
                     sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
-                if(!Mathf.equal(type.reloadMultiplier, 1f))
+                }
+
+                if(!Mathf.equal(type.reloadMultiplier, 1f)){
                     sep(bt, Core.bundle.format("bullet.reload", Strings.fixed(type.reloadMultiplier, 1)));
+                }
 
                 if(type.knockback > 0){
                     sep(bt, Core.bundle.format("bullet.knockback", Strings.fixed(type.knockback, 1)));
+                }
+
+                if(type.healPercent > 0f){
+                    sep(bt, Core.bundle.format("bullet.healpercent", (int)type.healPercent));
                 }
 
                 if(type.pierce || type.pierceCap != -1){
                     sep(bt, type.pierceCap == -1 ? "@bullet.infinitepierce" : Core.bundle.format("bullet.pierce", type.pierceCap));
                 }
 
-                if((type.status == StatusEffects.burning || type.status == StatusEffects.melting) || type.incendAmount > 0){
+                if(type.status == StatusEffects.burning || type.status == StatusEffects.melting || type.incendAmount > 0){
                     sep(bt, "@bullet.incendiary");
                 }
 
@@ -64,6 +80,10 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
 
                 if(type.status == StatusEffects.tarred){
                     sep(bt, "@bullet.tarred");
+                }
+
+                if(type.status == StatusEffects.sapped){
+                    sep(bt, "@bullet.sapping");
                 }
 
                 if(type.homingPower > 0.01f){
@@ -77,7 +97,8 @@ public class AmmoListValue<T extends UnlockableContent> implements StatValue{
                 if(type.fragBullet != null){
                     sep(bt, "@bullet.frag");
                 }
-            }).left().padTop(-9);
+            }).padTop(unit ? 0 : -9).left().get().background(unit ? null : Tex.underline);
+
             table.row();
         }
     }

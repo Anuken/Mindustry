@@ -23,7 +23,7 @@ public class RepairAI extends AIController{
         }
 
         if(target != null){
-            if(!target.within(unit, unit.type.range * 0.65f) && target instanceof Building){
+            if(!target.within(unit, unit.type.range * 0.65f) && target instanceof Building b && b.team == unit.team){
                 moveTo(target, unit.type.range * 0.65f);
             }
 

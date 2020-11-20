@@ -71,8 +71,8 @@ public class Shaders{
             setUniformf("u_rcampos", Tmp.v31.set(camera.position).sub(planet.position));
             setUniformf("u_light", planet.getLightNormal());
             setUniformf("u_color", planet.atmosphereColor.r, planet.atmosphereColor.g, planet.atmosphereColor.b);
-            setUniformf("u_innerRadius", planet.radius + 0.02f);
-            setUniformf("u_outerRadius", planet.radius * 1.3f);
+            setUniformf("u_innerRadius", planet.radius + planet.atmosphereRadIn);
+            setUniformf("u_outerRadius", planet.radius + planet.atmosphereRadOut);
 
             setUniformMatrix4("u_model", planet.getTransform(mat).val);
             setUniformMatrix4("u_projection", camera.combined.val);

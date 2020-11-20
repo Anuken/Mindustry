@@ -71,7 +71,7 @@ public class PayloadRouter extends PayloadConveyor{
 
             float dst = 0.8f;
 
-            Draw.mixcol(Pal.accent, Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0));
+            Draw.mixcol(team.color, Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0));
             Draw.rect(topRegion, x, y, smoothRot);
             Draw.reset();
 

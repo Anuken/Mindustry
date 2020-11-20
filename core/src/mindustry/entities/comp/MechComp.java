@@ -39,7 +39,7 @@ abstract class MechComp implements Posc, Flyingc, Hitboxc, Unitc, Mechc, Elevati
 
         float lastExtend = walkExtension;
 
-        if(extendScl < lastExtend && base % 2f > 1f){
+        if(extendScl < lastExtend && base % 2f > 1f && !isFlying()){
             int side = -Mathf.sign(extend);
             float width = hitSize / 2f * side, length = type.mechStride * 1.35f;
 

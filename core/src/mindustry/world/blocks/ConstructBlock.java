@@ -179,7 +179,7 @@ public class ConstructBlock extends Block{
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.builder().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
+                player.unit().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
             }
         }
 
@@ -273,7 +273,7 @@ public class ConstructBlock extends Block{
                     int accumulated = (int)(accumulator[i]); //get amount
 
                     if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
-                        if(core != null){
+                        if(core != null && requirements[i].item.unlockedNow()){ //only accept items that are unlocked
                             int accepting = core.acceptStack(requirements[i].item, accumulated, builder);
                             core.handleStack(requirements[i].item, accepting, builder);
                             accumulator[i] -= accepting;

@@ -42,7 +42,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
         return new IOSApplication(new ClientLauncher(){
 
             @Override
-            public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
+            public void showFileChooser(boolean open, String titleIgn, String extension, Cons<Fi> cons){
                 if(!open){ //when exporting, just share it.
                     //ask for export name
                     Core.input.getTextInput(new TextInput(){{

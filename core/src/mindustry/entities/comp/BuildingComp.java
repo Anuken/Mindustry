@@ -519,6 +519,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void dumpLiquid(Liquid liquid){
         int dump = this.cdump;
 
+        if(!net.client() && state.isCampaign()) liquid.unlock();
+
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
             Building other = proximity.get((i + dump) % proximity.size);
@@ -618,6 +620,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      */
     public void offload(Item item){
         int dump = this.cdump;
+        if(!net.client() && state.isCampaign()) item.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -1119,7 +1122,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Returns whether or not a hand cursor should be shown over this block. */
     public Cursor getCursor(){
-        return block.configurable ? SystemCursor.hand : SystemCursor.arrow;
+        return block.configurable && team == player.team() ? SystemCursor.hand : SystemCursor.arrow;
     }
 
     /**
@@ -1355,6 +1358,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Final
     @Override
     public void update(){
+        if(state.isEditor()) return;
+
         timeScaleDuration -= Time.delta;
         if(timeScaleDuration <= 0f || !block.canOverdrive){
             timeScale = 1f;
@@ -1368,12 +1373,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             }
         }
 
-        if(sound != null){
-            sound.update(x, y, shouldActiveSound());
+        if(team == Team.derelict){
+            enabled = false;
         }
 
-        if(block.ambientSound != Sounds.none && shouldAmbientSound()){
-            loops.play(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
+        if(!headless){
+            if(sound != null){
+                sound.update(x, y, shouldActiveSound());
+            }
+
+            if(block.ambientSound != Sounds.none && shouldAmbientSound()){
+                control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
+            }
         }
 
         if(enabled || !block.noUpdateDisabled){

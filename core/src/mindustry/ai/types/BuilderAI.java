@@ -14,21 +14,20 @@ import static mindustry.Vars.*;
 public class BuilderAI extends AIController{
     float buildRadius = 1500;
     boolean found = false;
-    @Nullable Builderc following;
+    @Nullable Unit following;
 
     @Override
     public void updateMovement(){
-        Builderc builder = (Builderc)unit;
 
-        if(builder.moving()){
-            builder.lookAt(builder.vel().angle());
+        if(unit.moving()){
+            unit.lookAt(unit.vel.angle());
         }
 
         if(target != null && shouldShoot()){
             unit.lookAt(target);
         }
 
-        builder.updateBuilding(true);
+        unit.updateBuilding = true;
 
         if(following != null){
             //try to follow and mimic someone
@@ -36,18 +35,18 @@ public class BuilderAI extends AIController{
             //validate follower
             if(!following.isValid() || !following.activelyBuilding()){
                 following = null;
-                builder.plans().clear();
+                unit.plans.clear();
                 return;
             }
 
             //set to follower's first build plan, whatever that is
-            builder.plans().clear();
-            builder.plans().addFirst(following.buildPlan());
+            unit.plans.clear();
+            unit.plans.addFirst(following.buildPlan());
         }
 
-        if(builder.buildPlan() != null){
+        if(unit.buildPlan() != null){
             //approach request if building
-            BuildPlan req = builder.buildPlan();
+            BuildPlan req = unit.buildPlan();
 
             boolean valid =
                 (req.tile().build instanceof ConstructBuild && req.tile().<ConstructBuild>bc().cblock == req.block) ||
@@ -60,7 +59,7 @@ public class BuilderAI extends AIController{
                 moveTo(req.tile(), buildingRange - 20f);
             }else{
                 //discard invalid request
-                builder.plans().removeFirst();
+                unit.plans.removeFirst();
             }
         }else{
 
@@ -71,8 +70,8 @@ public class BuilderAI extends AIController{
                 Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
                     if(found) return;
 
-                    if(u instanceof Builderc b && u != unit && b.activelyBuilding()){
-                        BuildPlan plan = b.buildPlan();
+                    if(u.canBuild() && u != unit && u.activelyBuilding()){
+                        BuildPlan plan = u.buildPlan();
 
                         Building build = world.build(plan.x, plan.y);
                         if(build instanceof ConstructBuild cons){
@@ -80,7 +79,7 @@ public class BuilderAI extends AIController{
 
                             //make sure you can reach the request in time
                             if(dist / unit.speed() < cons.buildCost * 0.9f){
-                                following = b;
+                                following = u;
                                 found = true;
                             }
                         }
@@ -98,7 +97,7 @@ public class BuilderAI extends AIController{
                     blocks.removeFirst();
                 }else if(Build.validPlace(content.block(block.block), unit.team(), block.x, block.y, block.rotation)){ //it's valid.
                     //add build request.
-                    builder.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
+                    unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
                     //shift build plan to tail so next unit builds something else.
                     blocks.addLast(blocks.removeFirst());
                 }else{

@@ -124,7 +124,7 @@ public class Damage{
 
             //try to heal the tile
             if(collide && hitter.type.collides(hitter, tile)){
-                hitter.type.hitTile(hitter, tile, 0f);
+                hitter.type.hitTile(hitter, tile, 0f, false);
             }
         };
 

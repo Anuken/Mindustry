@@ -17,21 +17,21 @@ public class MinerAI extends AIController{
     protected void updateMovement(){
         Building core = unit.closestCore();
 
-        if(!(unit instanceof Minerc miner) || core == null) return;
+        if(!(unit.canMine()) || core == null) return;
 
-        if(miner.mineTile() != null && !miner.mineTile().within(unit, unit.type.range)){
-            miner.mineTile(null);
+        if(unit.mineTile != null && !unit.mineTile.within(unit, unit.type.range)){
+            unit.mineTile(null);
         }
 
         if(mining){
             if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
-                targetItem = unit.team.data().mineItems.min(i -> indexer.hasOre(i) && miner.canMine(i), i -> core.items.get(i));
+                targetItem = unit.team.data().mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
             }
 
             //core full of the target item, do nothing
             if(targetItem != null && core.acceptStack(targetItem, 1, unit) == 0){
                 unit.clearItem();
-                miner.mineTile(null);
+                unit.mineTile(null);
                 return;
             }
 
@@ -47,7 +47,7 @@ public class MinerAI extends AIController{
                     moveTo(ore, unit.type.range / 2f, 20f);
 
                     if(unit.within(ore, unit.type.range)){
-                        miner.mineTile(ore);
+                        unit.mineTile = ore;
                     }
 
                     if(ore.block() != Blocks.air){
@@ -56,7 +56,7 @@ public class MinerAI extends AIController{
                 }
             }
         }else{
-            miner.mineTile(null);
+            unit.mineTile = null;
 
             if(unit.stack.amount == 0){
                 mining = true;

@@ -16,7 +16,7 @@ public class GenericSmelter extends GenericCrafter{
     public GenericSmelter(String name){
         super(name);
         ambientSound = Sounds.smelter;
-        ambientSoundVolume = 0.06f;
+        ambientSoundVolume = 0.07f;
     }
 
     public class SmelterBuild extends GenericCrafterBuild{

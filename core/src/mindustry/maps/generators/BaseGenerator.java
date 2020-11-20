@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
+import mindustry.world.blocks.distribution.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
 import mindustry.world.meta.*;
@@ -22,7 +23,7 @@ import static mindustry.Vars.*;
 public class BaseGenerator{
     private static final Vec2 axis = new Vec2(), rotator = new Vec2();
 
-    private static final int range = 180;
+    private static final int range = 160;
 
     private Tiles tiles;
     private Team team;
@@ -38,25 +39,22 @@ public class BaseGenerator{
 
         Mathf.rand.setSeed(sector.id);
 
-        //TODO limit base size
-        float costBudget = 1000;
-
-        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1 && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
-        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2 && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsSmall = content.blocks().select(b -> b instanceof Wall && b.size == 1 && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
+        Seq<Block> wallsLarge = content.blocks().select(b -> b instanceof Wall && b.size == 2 && !b.insulated && b.buildVisibility == BuildVisibility.shown && !(b instanceof Door));
 
         //sort by cost for correct fraction
         wallsSmall.sort(b -> b.buildCost);
         wallsLarge.sort(b -> b.buildCost);
 
-        //TODO proper difficulty selection
-        float bracket = difficulty;
         float bracketRange = 0.2f;
+        float baseChance = Mathf.lerp(0.7f, 1.9f, difficulty);
         int wallAngle = 70; //180 for full coverage
-        double resourceChance = 0.5;
-        double nonResourceChance = 0.0005;
-        BasePart coreschem = bases.cores.getFrac(bracket);
+        double resourceChance = 0.5 * baseChance;
+        double nonResourceChance = 0.0005 * baseChance;
+        BasePart coreschem = bases.cores.getFrac(difficulty);
+        int passes = difficulty < 0.4 ? 1 : difficulty < 0.8 ? 2 : 3;
 
-        Block wall = wallsSmall.getFrac(bracket), wallLarge = wallsLarge.getFrac(bracket);
+        Block wall = wallsSmall.getFrac(difficulty), wallLarge = wallsLarge.getFrac(difficulty);
 
         for(Tile tile : cores){
             tile.clearOverlay();
@@ -69,20 +67,22 @@ public class BaseGenerator{
             }
         }
 
-        //random schematics
-        pass(tile -> {
-            if(!tile.block().alwaysReplace) return;
+        for(int i = 0; i < passes; i++){
+            //random schematics
+            pass(tile -> {
+                if(!tile.block().alwaysReplace) return;
 
-            if(((tile.overlay().asFloor().itemDrop != null || (tile.drop() != null && Mathf.chance(nonResourceChance)))
+                if(((tile.overlay().asFloor().itemDrop != null || (tile.drop() != null && Mathf.chance(nonResourceChance)))
                 || (tile.floor().liquidDrop != null && Mathf.chance(nonResourceChance * 2))) && Mathf.chance(resourceChance)){
-                Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
-                if(!parts.isEmpty()){
-                    tryPlace(parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y, team);
+                    Seq<BasePart> parts = bases.forResource(tile.drop() != null ? tile.drop() : tile.floor().liquidDrop);
+                    if(!parts.isEmpty()){
+                        tryPlace(parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
+                    }
+                }else if(Mathf.chance(nonResourceChance)){
+                    tryPlace(bases.parts.getFrac(difficulty + Mathf.range(bracketRange)), tile.x, tile.y, team);
                 }
-            }else if(Mathf.chance(nonResourceChance)){
-                tryPlace(bases.parts.getFrac(bracket + Mathf.range(bracketRange)), tile.x, tile.y, team);
-            }
-        });
+            });
+        }
 
         //replace walls with the correct type (disabled)
         if(false)
@@ -99,6 +99,15 @@ public class BaseGenerator{
 
                 if(tile.block().alwaysReplace){
                     boolean any = false;
+
+                    for(Point2 p : Geometry.d4){
+                        Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
+
+                        //do not block payloads
+                        if(o != null && (o.block() instanceof PayloadConveyor || o.block() instanceof PayloadAcceptor)){
+                            return;
+                        }
+                    }
 
                     for(Point2 p : Geometry.d8){
                         if(Angles.angleDist(Angles.angle(p.x, p.y), spawn.angleTo(tile)) > wallAngle){

@@ -40,7 +40,7 @@ public abstract class LStatement{
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, setter)
-            .size(144f, 40f).pad(2f).color(table.color).addInputDialog();
+            .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength).addInputDialog();
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){

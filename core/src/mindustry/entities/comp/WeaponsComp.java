@@ -24,8 +24,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
     /** weapon mount array, never null */
     @SyncLocal WeaponMount[] mounts = {};
-    @ReadOnly transient float aimX, aimY;
     @ReadOnly transient boolean isRotate;
+    transient float aimX, aimY;
     boolean isShooting;
     float ammo;
 
@@ -117,6 +117,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
                 }else{
                     mount.bullet.rotation(weaponRotation + 90);
                     mount.bullet.set(shootX, shootY);
+                    mount.reload = weapon.reload;
                     vel.add(Tmp.v1.trns(rotation + 180f, mount.bullet.type.recoil));
                     if(weapon.shootSound != Sounds.none && !headless){
                         if(mount.sound == null) mount.sound = new SoundLoop(weapon.shootSound, 1f);

@@ -59,13 +59,13 @@ public class FormationAI extends AIController implements FormationMember{
             unit.moveAt(realtarget.sub(unit).limit(speed));
         }
 
-        if(unit instanceof Minerc mine && leader instanceof Minerc com){
-            if(com.mineTile() != null && mine.validMine(com.mineTile())){
-                mine.mineTile(com.mineTile());
+        if(unit.canMine() && leader.canMine()){
+            if(leader.mineTile != null && unit.validMine(leader.mineTile)){
+                unit.mineTile(leader.mineTile);
 
                 CoreBuild core = unit.team.core();
 
-                if(core != null && com.mineTile().drop() != null && unit.within(core, unit.type.range) && !unit.acceptsItem(com.mineTile().drop())){
+                if(core != null && leader.mineTile.drop() != null && unit.within(core, unit.type.range) && !unit.acceptsItem(leader.mineTile.drop())){
                     if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
                         Call.transferItemTo(unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
 
@@ -73,13 +73,13 @@ public class FormationAI extends AIController implements FormationMember{
                     }
                 }
             }else{
-                mine.mineTile(null);
+                unit.mineTile(null);
             }
         }
 
-        if(unit instanceof Builderc build && leader instanceof Builderc com && com.activelyBuilding()){
-            build.clearBuilding();
-            build.addBuild(com.buildPlan());
+        if(unit.canBuild() && leader.canBuild() && leader.activelyBuilding()){
+            unit.clearBuilding();
+            unit.addBuild(leader.buildPlan());
         }
     }
 

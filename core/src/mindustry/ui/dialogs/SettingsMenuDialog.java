@@ -130,6 +130,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             u.clearUnlock();
                         }
                     });
+                    settings.remove("unlocks");
                 });
             }).marginLeft(4);
 
@@ -341,19 +342,6 @@ public class SettingsMenuDialog extends SettingsDialog{
             }
         }
 
-        game.pref(new Setting(){
-            @Override
-            public void add(SettingsTable table){
-                table.button("@tutorial.retake", () -> {
-                    hide();
-                    control.playTutorial();
-                }).size(220f, 60f).pad(6).left();
-                table.add();
-                table.row();
-                hide();
-            }
-        });
-
         graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {
             if(ui.settings != null){
                 Core.settings.put("uiscalechanged", true);
@@ -486,12 +474,17 @@ public class SettingsMenuDialog extends SettingsDialog{
             throw new IllegalArgumentException("Not valid save data.");
         }
 
+        //delete old saves so they don't interfere
+        saveDirectory.deleteDirectory();
+
         //purge existing tmp data, keep everything else
         tmpDirectory.deleteDirectory();
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
         dest.delete();
 
+        //clear old data
+        settings.clear();
         //load data so it's saved on exit
         settings.load();
     }
