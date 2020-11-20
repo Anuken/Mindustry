@@ -164,7 +164,7 @@ public class Control implements ApplicationListener, Loadable{
             if(state.isCampaign() && !net.client() && !headless){
 
                 //save gameover sate immediately
-                if(saves.getCurrent() != null && !state.rules.tutorial){
+                if(saves.getCurrent() != null){
                     saves.getCurrent().save();
                 }
             }
@@ -478,10 +478,6 @@ public class Control implements ApplicationListener, Loadable{
 
         if(state.isGame()){
             input.update();
-
-            if(state.rules.tutorial){
-                tutorial.update();
-            }
 
             //auto-update rpc every 5 seconds
             if(timer.get(0, 60 * 5)){

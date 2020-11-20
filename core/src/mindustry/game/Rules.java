@@ -32,8 +32,6 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
-    /** Whether the tutorial is enabled. False by default. */
-    public boolean tutorial = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
