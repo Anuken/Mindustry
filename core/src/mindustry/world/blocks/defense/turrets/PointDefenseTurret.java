@@ -96,8 +96,6 @@ public class PointDefenseTurret extends ReloadTurret{
                     shootSound.at(x + Tmp.v1.x, y + Tmp.v1.y, Mathf.random(0.9f, 1.1f));
                     reload = 0;
                 }
-            }else{
-                target = null;
             }
         }
 
