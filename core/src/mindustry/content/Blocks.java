@@ -770,25 +770,25 @@ public class Blocks implements ContentList{
 
         titaniumWall = new Wall("titanium-wall"){{
             requirements(Category.defense, with(Items.titanium, 6));
-            health = 110 * wallHealthMultiplier;
+            health = 120 * wallHealthMultiplier;
         }};
 
         titaniumWallLarge = new Wall("titanium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(titaniumWall.requirements, 4));
-            health = 110 * wallHealthMultiplier * 4;
+            health = 120 * wallHealthMultiplier * 4;
             size = 2;
         }};
 
         plastaniumWall = new Wall("plastanium-wall"){{
             requirements(Category.defense, with(Items.plastanium, 5, Items.metaglass, 2));
-            health = 130 * wallHealthMultiplier;
+            health = 140 * wallHealthMultiplier;
             insulated = true;
             absorbLasers = true;
         }};
 
         plastaniumWallLarge = new Wall("plastanium-wall-large"){{
             requirements(Category.defense, ItemStack.mult(plastaniumWall.requirements, 4));
-            health = 130 * wallHealthMultiplier * 4;
+            health = 140 * wallHealthMultiplier * 4;
             size = 2;
             insulated = true;
             absorbLasers = true;
@@ -807,14 +807,14 @@ public class Blocks implements ContentList{
 
         phaseWall = new Wall("phase-wall"){{
             requirements(Category.defense, with(Items.phaseFabric, 6));
-            health = 150 * wallHealthMultiplier;
+            health = 160 * wallHealthMultiplier;
             chanceDeflect = 10f;
             flashHit = true;
         }};
 
         phaseWallLarge = new Wall("phase-wall-large"){{
             requirements(Category.defense, ItemStack.mult(phaseWall.requirements, 4));
-            health = 150 * 4 * wallHealthMultiplier;
+            health = 160 * 4 * wallHealthMultiplier;
             size = 2;
             chanceDeflect = 10f;
             flashHit = true;
