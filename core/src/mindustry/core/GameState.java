@@ -69,7 +69,7 @@ public class GameState{
     }
 
     public boolean isPaused(){
-        return (is(State.paused) && !net.active()) || (gameOver && !net.active()) || (serverPaused && !isMenu());
+        return (is(State.paused) && !net.active()) || (gameOver && (!net.active() || isCampaign())) || (serverPaused && !isMenu());
     }
 
     public boolean isPlaying(){

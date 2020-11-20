@@ -90,7 +90,7 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.name = "paused";
             t.top().visible(() -> state.isPaused() && shown).touchable = Touchable.disabled;
-            t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
+            t.table(Styles.black5, top -> top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
         //minimap + position
