@@ -10,10 +10,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 
-import java.io.*;
-import java.net.*;
-import java.nio.charset.*;
-
 public class Links{
     private static LinkEntry[] links;
 
@@ -58,11 +54,6 @@ public class Links{
     }
 
     private static String report(){
-        String base = "https://github.com/Anuken/Mindustry/issues/new?assignees=&labels=bug";
-        try{
-            return base + "&body=" + URLEncoder.encode(Strings.format("**Platform**: `@`\n\n**Build**: `@`\n\n**Issue**: *Explain your issue in detail.*\n\n**Steps to reproduce**: *How you happened across the issue, and what exactly you did to make the bug happen.*\n\n**Link(s) to mod(s) used**: `@`\n\n**Save file**: *The (zipped) save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*\n\n**Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*\n\n---\n\n*Place an X (no spaces) between the brackets to confirm that you have read the line below.*  \n- [ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**", System.getProperty("os.name"), Version.combined(), Vars.mods.list().select(LoadedMod::enabled).map(l -> l.meta.author + "/" + l.name + ":" + l.meta.version)), StandardCharsets.UTF_8.toString());
-        }catch(UnsupportedEncodingException e){
-            return base + "&template=bug_report.md&title=";
-        }
+        return "https://github.com/Anuken/Mindustry/issues/new?assignees=&labels=bug&body=" + Strings.encode(Strings.format("**Platform**: `@`\n\n**Build**: `@`\n\n**Issue**: *Explain your issue in detail.*\n\n**Steps to reproduce**: *How you happened across the issue, and what exactly you did to make the bug happen.*\n\n**Link(s) to mod(s) used**: `@`\n\n**Save file**: *The (zipped) save file you were playing on when the bug happened. THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT DELETE OR OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME.*\n\n**Crash report**: *The contents of relevant crash report files. REQUIRED if you are reporting a crash.*\n\n---\n\n*Place an X (no spaces) between the brackets to confirm that you have read the line below.*\n- [ ] **I have searched the closed and open issues to make sure that this problem has not already been reported.**", System.getProperty("os.name"), Version.combined(), Vars.mods.list().select(LoadedMod::enabled).map(l -> l.meta.author + "/" + l.name + ":" + l.meta.version)));
     }
 }
