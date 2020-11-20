@@ -16,7 +16,9 @@ jobs:
       run: ./gradlew test
     - name: Trigger BE build
       run: |
+        echo "Cloning..."
         git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
+        echo "Done cloning."
         cd ../MindustryBuilds
         git tag ${GITHUB_RUN_NUMBER}
         git config --global user.name "Build Uploader"
