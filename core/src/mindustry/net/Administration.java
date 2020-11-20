@@ -303,8 +303,6 @@ public class Administration{
     public boolean adminPlayer(String id, String usid){
         PlayerInfo info = getCreateInfo(id);
 
-        if(info.admin && info.adminUsid != null && info.adminUsid.equals(usid)) return false;
-
         info.adminUsid = usid;
         info.admin = true;
         save();

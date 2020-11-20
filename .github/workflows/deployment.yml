@@ -28,6 +28,13 @@ jobs:
         git commit -m "Update ${GITHUB_REF:1}"
         git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/MindustryGame/docs
         cd ../Mindustry
+    - name: Add Arc release
+      run: |
+        git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
+        cd ../Arc
+        git tag ${GITHUB_REF}
+        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/Arc ${GITHUB_REF};
+        cd ../Mindustry
     - name: Update F-Droid build string
       run: |
         git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
