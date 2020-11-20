@@ -2054,7 +2054,7 @@ public class Blocks implements ContentList{
         }};
 
         interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
-            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 9000, Items.silicon, 9000, Items.thorium, 9000, Items.titanium, 9000, Items.surgeAlloy, 5000, Items.phaseFabric, 4000));
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
             researchCostMultiplier = 0.1f;
             size = 7;
             hasPower = true;
