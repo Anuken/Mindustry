@@ -76,8 +76,6 @@ public class TractorBeamTurret extends BaseTurret{
                 target = Units.closestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
             }
 
-            Log.info(target);
-
             //consume coolant
             if(target != null && acceptCoolant){
                 float maxUsed = consumes.<ConsumeLiquidBase>get(ConsumeType.liquid).amount;
