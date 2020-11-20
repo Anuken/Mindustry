@@ -995,6 +995,7 @@ public class UnitTypes implements ContentList{
                 shots = 2;
                 inaccuracy = 5f;
                 velocityRnd = 0.2f;
+                shootSound = Sounds.missile;
 
                 bullet = new MissileBulletType(3f, 12){{
                     width = 8f;
@@ -1055,7 +1056,7 @@ public class UnitTypes implements ContentList{
                 ejectEffect = Fx.casing1;
                 rotateSpeed = 8f;
                 bullet = missiles;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.missile;
                 rotate = true;
                 occlusion = 6f;
             }},
@@ -1066,7 +1067,7 @@ public class UnitTypes implements ContentList{
                 rotateSpeed = 8f;
                 ejectEffect = Fx.casing1;
                 bullet = missiles;
-                shootSound = Sounds.shoot;
+                shootSound = Sounds.missile;
                 rotate = true;
                 occlusion = 6f;
             }},
@@ -1147,7 +1148,7 @@ public class UnitTypes implements ContentList{
                 y = 27f;
                 rotateSpeed = 2f;
                 reload = 9f;
-                shootSound = Sounds.flame;
+                shootSound = Sounds.shoot;
                 occlusion = 7f;
                 rotate = true;
                 recoil = 0.5f;
@@ -1739,7 +1740,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                 }};
             }});
         }};
@@ -1781,7 +1782,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 60f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                 }};
             }});
         }};
@@ -1821,7 +1822,7 @@ public class UnitTypes implements ContentList{
                     lifetime = 70f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    tileDamageMultiplier = 0.03f;
+                    tileDamageMultiplier = 0.02f;
                     homingPower = 0.04f;
                 }};
             }});

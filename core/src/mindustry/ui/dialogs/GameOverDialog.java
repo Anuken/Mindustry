@@ -31,13 +31,13 @@ public class GameOverDialog extends BaseDialog{
     }
 
     void rebuild(){
-        title.setText("@gameover");
+        title.setText(state.isCampaign() ? "@sector.curlost" : "@gameover");
         buttons.clear();
         cont.clear();
 
         buttons.margin(10);
 
-        if(state.rules.pvp){
+        if(state.rules.pvp && winner != null){
             cont.add(Core.bundle.format("gameover.pvp", winner.localized())).pad(6);
             buttons.button("@menu", () -> {
                 hide();

@@ -139,11 +139,6 @@ public class ItemTurret extends Turret{
 
             //must not be found
             ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
-
-            //fire events for the tutorial
-            if(state.rules.tutorial){
-                Events.fire(new TurretAmmoDeliverEvent());
-            }
         }
 
         @Override

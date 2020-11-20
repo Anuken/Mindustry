@@ -119,7 +119,7 @@ public class Fonts{
         glyph.srcX = 0;
         glyph.srcY = 0;
         glyph.width = size;
-        glyph.height = size;
+        glyph.height = (int)((float)region.height / region.width * size);
         glyph.u = region.u;
         glyph.v = region.v2;
         glyph.u2 = region.u2;
