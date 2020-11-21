@@ -85,5 +85,4 @@ public class ServerLauncher implements ApplicationListener{
 
         Events.fire(new ServerLoadEvent());
     }
-
 }
