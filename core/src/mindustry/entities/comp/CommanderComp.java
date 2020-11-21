@@ -63,6 +63,8 @@ abstract class CommanderComp implements Entityc, Posc{
                 units.add(u);
             }
         });
+        
+        if(units.isEmpty()) return;
 
         //sort by hitbox size, then by distance
         units.sort(Structs.comps(Structs.comparingFloat(u -> -u.hitSize), Structs.comparingFloat(u -> u.dst2(this))));
