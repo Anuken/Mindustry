@@ -9,6 +9,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.async.*;
+import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -74,7 +75,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadDefaultFont();
 
         //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>(Gl.getInt(Gl.maxTextureSize) >= 4096 ? "sprites/sprites.atlas" : "sprites/fallback/sprites.atlas", TextureAtlas.class)).loaded = t -> {
+        assets.load(new AssetDescriptor<>(Gl.getInt(Gl.maxTextureSize) >= 4096  ? "sprites/sprites.atlas" : "sprites/fallback/sprites.atlas", TextureAtlas.class)).loaded = t -> {
             atlas = (TextureAtlas)t;
             Fonts.mergeFontAtlas(atlas);
         };
@@ -103,6 +104,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         assets.load(schematics);
 
         assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
+        assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
     }
 
     @Override

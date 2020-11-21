@@ -5,6 +5,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 public class SwitchBlock extends Block{
     public @Load("@-on") TextureRegion onRegion;
@@ -15,6 +16,7 @@ public class SwitchBlock extends Block{
         update = true;
         drawDisabled = false;
         autoResetEnabled = false;
+        group = BlockGroup.logic;
 
         config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.enabled = b);
     }

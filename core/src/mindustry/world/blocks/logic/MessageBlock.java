@@ -14,6 +14,7 @@ import mindustry.gen.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -27,6 +28,7 @@ public class MessageBlock extends Block{
         configurable = true;
         solid = true;
         destructible = true;
+        group = BlockGroup.logic;
 
         config(String.class, (MessageBuild tile, String text) -> {
             if(text.length() > maxTextLength){

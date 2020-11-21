@@ -1,6 +1,7 @@
 package mindustry.entities.units;
 
 import arc.util.*;
+import mindustry.audio.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -25,6 +26,8 @@ public class WeaponMount{
     public boolean side;
     /** current bullet for continuous weapons */
     public @Nullable Bullet bullet;
+    /** sound loop for continuous weapons */
+    public @Nullable SoundLoop sound;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

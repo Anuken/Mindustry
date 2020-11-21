@@ -50,6 +50,7 @@ public abstract class Turret extends ReloadTurret{
     public float recoilAmount = 1f;
     public float restitution = 0.02f;
     public float cooldown = 0.02f;
+    public float coolantUsage = 0.2f;
     public float shootCone = 8f;
     public float shootShake = 0f;
     public float xRand = 0f;
@@ -65,7 +66,7 @@ public abstract class Turret extends ReloadTurret{
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
 
-    public @Load("block-@size") TextureRegion baseRegion;
+    public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
 
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
@@ -100,7 +101,7 @@ public abstract class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / reloadTime * shots, StatUnit.none);
+        stats.add(Stat.reload, 60f / reloadTime * (alternate ? 1 : shots), StatUnit.none);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
     }
@@ -109,7 +110,7 @@ public abstract class Turret extends ReloadTurret{
     public void init(){
         if(acceptCoolant && !consumes.has(ConsumeType.liquid)){
             hasLiquids = true;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 0.2f)).update(false).boost();
+            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, coolantUsage)).update(false).boost();
         }
 
         super.init();
@@ -135,6 +136,7 @@ public abstract class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = Nulls.blockUnit;
+        public boolean wasShooting;
 
         @Override
         public void created(){
@@ -175,9 +177,13 @@ public abstract class Turret extends ReloadTurret{
                 case rotation -> rotation;
                 case shootX -> World.conv(targetPos.x);
                 case shootY -> World.conv(targetPos.y);
-                case shooting -> (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+                case shooting -> isShooting() ? 1 : 0;
                 default -> super.sense(sensor);
             };
+        }
+
+        public boolean isShooting(){
+            return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
         }
 
         @Override
@@ -227,6 +233,8 @@ public abstract class Turret extends ReloadTurret{
         public void updateTile(){
             if(!validateTarget()) target = null;
 
+            wasShooting = false;
+
             recoil = Mathf.lerpDelta(recoil, 0f, restitution);
             heat = Mathf.lerpDelta(heat, 0f, cooldown);
 
@@ -268,6 +276,7 @@ public abstract class Turret extends ReloadTurret{
                     }
 
                     if(Angles.angleDist(rotation, targetRot) < shootCone && canShoot){
+                        wasShooting = true;
                         updateShooting();
                     }
                 }

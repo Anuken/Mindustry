@@ -134,7 +134,7 @@ public class Mods implements Loadable{
             }catch(IOException e){
                 Core.app.post(() -> {
                     Log.err("Error packing images for mod: @", mod.meta.name);
-                    e.printStackTrace();
+                    Log.err(e);
                     if(!headless) ui.showException(e);
                 });
                 break;
@@ -629,7 +629,7 @@ public class Mods implements Loadable{
             }
 
             //make sure the main class exists before loading it; if it doesn't just don't put it there
-            if(mainFile.exists() && Core.settings.getBool("mod-" + meta.name.toLowerCase().replace(" ", "-") + "-enabled", true)){
+            if(mainFile.exists() && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
                 //mobile versions don't support class mods
                 if(ios){
                     throw new IllegalArgumentException("Java class mods are not supported on iOS.");

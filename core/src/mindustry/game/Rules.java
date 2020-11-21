@@ -32,8 +32,6 @@ public class Rules{
     public boolean attackMode = false;
     /** Whether this is the editor gamemode. */
     public boolean editor = false;
-    /** Whether the tutorial is enabled. False by default. */
-    public boolean tutorial = false;
     /** Whether a gameover can happen at all. Set this to false to implement custom gameover conditions. */
     public boolean canGameOver = true;
     /** Whether reactors can explode and damage other blocks. */
@@ -105,7 +103,7 @@ public class Rules{
         /** Whether to use building AI. */
         public boolean ai;
         /** TODO Tier of blocks/designs that the AI uses for building. [0, 1]*/
-        public float aiTier = 0f;
+        public float aiTier = 1f;
         /** Whether, when AI is enabled, ships should be spawned from the core. */
         public boolean aiCoreSpawn = true;
         /** If true, blocks don't require power or resources. */

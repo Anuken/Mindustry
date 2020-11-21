@@ -224,6 +224,18 @@ public class ItemModule extends BlockModule{
         takeRotation = item.id + 1;
     }
 
+    public void failTake(){
+        for(int i = 1; i < items.length; i++){
+            int index = (i + takeRotation);
+            if(index >= items.length) index -= items.length;
+            if(items[index] > 0){
+                takeRotation += i;
+                takeRotation %= items.length;
+                return;
+            }
+        }
+    }
+
     public int get(int id){
         return items[id];
     }

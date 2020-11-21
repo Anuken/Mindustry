@@ -2,11 +2,14 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.*;
+import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
@@ -19,6 +22,7 @@ import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -39,9 +43,20 @@ public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
+    ObjectMap<String, AssetDescriptor> sounds = new ObjectMap<>();
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
-        put(Effect.class, (type, data) -> field(Fx.class, data));
+        put(Effect.class, (type, data) -> {
+            if(data.isString()){
+                return field(Fx.class, data);
+            }
+            Class<? extends Effect> bc = data.has("type") ? resolve(data.getString("type"), "mindustry.entities.effect") : ParticleEffect.class;
+            data.remove("type");
+            Effect result = make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(Interp.class, (type, data) -> field(Interp.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
             if(result != null){
@@ -77,16 +92,16 @@ public class ContentParser{
         });
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
-            if(Vars.headless) return new MockSound();
+            if(Vars.headless) return new Sound();
 
             String name = "sounds/" + data.asString();
-            String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+            String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
-            if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
-            ModLoadingSound sound = new ModLoadingSound();
-            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
-            desc.loaded = result -> sound.sound = (Sound)result;
+            if(sounds.containsKey(path)) return ((SoundParameter)sounds.get(path).params).sound;
+            var sound = new Sound();
+            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
             desc.errored = Throwable::printStackTrace;
+            sounds.put(path, desc);
             return sound;
         });
         put(Objectives.Objective.class, (type, data) -> {

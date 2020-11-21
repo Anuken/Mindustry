@@ -21,6 +21,7 @@ import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.modules.*;
 
@@ -32,7 +33,7 @@ import static mindustry.Vars.*;
 public class NetClient implements ApplicationListener{
     private static final float dataTimeout = 60 * 18;
     private static final float playerSyncTime = 2;
-    public final static float viewScale = 2f;
+    public static final float viewScale = 2f;
 
     private long ping;
     private Interval timer = new Interval(5);
@@ -234,7 +235,7 @@ public class NetClient implements ApplicationListener{
 
         ui.join.connect(ip, port);
     }
-    
+
     @Remote(targets = Loc.client)
     public static void ping(Player player, long time){
         Call.pingResponse(player.con, time);
@@ -322,15 +323,15 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(variants = Variant.both, unreliable = true)
-    public static void onEffect(Effect effect, float x, float y, float rotation, Color color){
+    public static void effect(Effect effect, float x, float y, float rotation, Color color){
         if(effect == null) return;
 
         effect.at(x, y, rotation, color);
     }
 
     @Remote(variants = Variant.both)
-    public static void onEffectReliable(Effect effect, float x, float y, float rotation, Color color){
-        onEffect(effect, x, y, rotation, color);
+    public static void effectReliable(Effect effect, float x, float y, float rotation, Color color){
+        effect(effect, x, y, rotation, color);
     }
 
     @Remote(variants = Variant.both)
@@ -338,6 +339,13 @@ public class NetClient implements ApplicationListener{
         if(message == null) return;
 
         ui.showInfoToast(message, duration);
+    }
+    
+    @Remote(variants = Variant.both)
+    public static void warningToast(int unicode, String text){
+        if(text == null || Fonts.icon.getData().getGlyph((char)unicode) == null) return;
+
+        ui.hudfrag.showToast(Fonts.getGlyph(Fonts.icon, (char)unicode), text);
     }
 
     @Remote(variants = Variant.both)
@@ -363,7 +371,7 @@ public class NetClient implements ApplicationListener{
         });
     }
 
-    @Remote(variants = Variant.one, called = Loc.server)
+    @Remote(variants = Variant.one)
     public static void setPosition(float x, float y){
         player.unit().set(x, y);
         player.set(x, y);
@@ -440,7 +448,7 @@ public class NetClient implements ApplicationListener{
                 tile.build.readAll(Reads.get(input), tile.build.version());
             }
         }catch(Exception e){
-            e.printStackTrace();
+            Log.err(e);
         }
     }
 
@@ -571,19 +579,19 @@ public class NetClient implements ApplicationListener{
             BuildPlan[] requests = null;
             if(player.isBuilder()){
                 //limit to 10 to prevent buffer overflows
-                int usedRequests = Math.min(player.builder().plans().size, 10);
+                int usedRequests = Math.min(player.unit().plans().size, 10);
 
                 int totalLength = 0;
 
                 //prevent buffer overflow by checking config length
                 for(int i = 0; i < usedRequests; i++){
-                    BuildPlan plan = player.builder().plans().get(i);
-                    if(plan.config instanceof byte[]){
-                        int length = ((byte[])plan.config).length;
+                    BuildPlan plan = player.unit().plans().get(i);
+                    if(plan.config instanceof byte[] b){
+                        int length = b.length;
                         totalLength += length;
                     }
 
-                    if(totalLength > 2048){
+                    if(totalLength > 1024){
                         usedRequests = i + 1;
                         break;
                     }
@@ -591,7 +599,7 @@ public class NetClient implements ApplicationListener{
 
                 requests = new BuildPlan[usedRequests];
                 for(int i = 0; i < usedRequests; i++){
-                    requests[i] = player.builder().plans().get(i);
+                    requests[i] = player.unit().plans().get(i);
                 }
             }
 
@@ -605,9 +613,9 @@ public class NetClient implements ApplicationListener{
             unit.x, unit.y,
             player.unit().aimX(), player.unit().aimY(),
             unit.rotation,
-            unit instanceof Mechc ? ((Mechc)unit).baseRotation() : 0,
+            unit instanceof Mechc m ? m.baseRotation() : 0,
             unit.vel.x, unit.vel.y,
-            player.miner().mineTile(),
+            player.unit().mineTile,
             player.boosting, player.shooting, ui.chatfrag.shown(), control.input.isBuilding,
             requests,
             Core.camera.position.x, Core.camera.position.y,

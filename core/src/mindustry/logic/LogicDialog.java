@@ -11,7 +11,7 @@ import mindustry.ui.dialogs.*;
 import static mindustry.Vars.*;
 
 public class LogicDialog extends BaseDialog{
-    LCanvas canvas;
+    public LCanvas canvas;
     Cons<String> consumer = s -> {};
 
     public LogicDialog(){
@@ -25,7 +25,7 @@ public class LogicDialog extends BaseDialog{
         addCloseListener();
 
         buttons.defaults().size(160f, 64f);
-        buttons.button("@back", Icon.left, this::hide);
+        buttons.button("@back", Icon.left, this::hide).name("back");
 
         buttons.button("@edit", Icon.edit, () -> {
             BaseDialog dialog = new BaseDialog("@editor.export");
@@ -53,7 +53,7 @@ public class LogicDialog extends BaseDialog{
 
             dialog.addCloseButton();
             dialog.show();
-        });
+        }).name("edit");
 
         buttons.button("@add", Icon.add, () -> {
             BaseDialog dialog = new BaseDialog("@add");
@@ -65,7 +65,7 @@ public class LogicDialog extends BaseDialog{
                     if(example instanceof InvalidStatement || example.hidden()) continue;
 
                     TextButtonStyle style = new TextButtonStyle(Styles.cleart);
-                    style.fontColor = example.category().color;
+                    style.fontColor = example.color();
                     style.font = Fonts.outline;
 
                     t.button(example.name(), style, () -> {
@@ -79,11 +79,11 @@ public class LogicDialog extends BaseDialog{
             dialog.show();
         }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
 
-        add(canvas).grow();
+        add(canvas).grow().name("canvas");
 
         row();
 
-        add(buttons).growX();
+        add(buttons).growX().name("canvas");
 
         hidden(() -> consumer.get(canvas.save()));
 

@@ -89,7 +89,7 @@ public class Blocks implements ContentList{
     message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay, memoryCell, memoryBank,
 
     //campaign
-    launchPad, launchPadLarge,
+    launchPad, launchPadLarge, interplanetaryAccelerator,
 
     //misc experimental
     blockForge, blockLoader, blockUnloader;
@@ -288,6 +288,10 @@ public class Blocks implements ContentList{
             attributes.set(Attribute.water, 1f);
             cacheLayer = CacheLayer.mud;
             albedo = 0.35f;
+            walkSound = Sounds.mud;
+            walkSoundVolume = 0.08f;
+            walkSoundPitchMin = 0.4f;
+            walkSoundPitchMax = 0.5f;
         }};
 
         ((ShallowLiquid)darksandTaintedWater).set(Blocks.taintedWater, Blocks.darksand);
@@ -532,7 +536,7 @@ public class Blocks implements ContentList{
             hasLiquids = false;
             flameColor = Color.valueOf("ffef99");
 
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.sand, 2));
+            consumes.items(with(Items.coal, 1, Items.sand, 2));
             consumes.power(0.50f);
         }};
 
@@ -548,7 +552,7 @@ public class Blocks implements ContentList{
             itemCapacity = 30;
             boostScale = 0.15f;
 
-            consumes.items(new ItemStack(Items.coal, 4), new ItemStack(Items.sand, 6), new ItemStack(Items.pyratite, 1));
+            consumes.items(with(Items.coal, 4, Items.sand, 6, Items.pyratite, 1));
             consumes.power(4f);
         }};
 
@@ -561,7 +565,7 @@ public class Blocks implements ContentList{
             hasPower = hasItems = true;
             flameColor = Color.valueOf("ffc099");
 
-            consumes.items(new ItemStack(Items.lead, 1), new ItemStack(Items.sand, 1));
+            consumes.items(with(Items.lead, 1, Items.sand, 1));
             consumes.power(0.60f);
         }};
 
@@ -592,7 +596,10 @@ public class Blocks implements ContentList{
             hasPower = true;
             drawer = new DrawWeave();
 
-            consumes.items(new ItemStack(Items.thorium, 4), new ItemStack(Items.sand, 10));
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.02f;
+
+            consumes.items(with(Items.thorium, 4, Items.sand, 10));
             consumes.power(5f);
             itemCapacity = 20;
         }};
@@ -606,7 +613,7 @@ public class Blocks implements ContentList{
             hasPower = true;
 
             consumes.power(4f);
-            consumes.items(new ItemStack(Items.copper, 3), new ItemStack(Items.lead, 4), new ItemStack(Items.titanium, 2), new ItemStack(Items.silicon, 3));
+            consumes.items(with(Items.copper, 3, Items.lead, 4, Items.titanium, 2, Items.silicon, 3));
         }};
 
         cryofluidMixer = new LiquidConverter("cryofluid-mixer"){{
@@ -627,17 +634,6 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.2f);
         }};
 
-        blastMixer = new GenericCrafter("blast-mixer"){{
-            requirements(Category.crafting, with(Items.lead, 30, Items.titanium, 20));
-            hasItems = true;
-            hasPower = true;
-            outputItem = new ItemStack(Items.blastCompound, 1);
-            size = 2;
-
-            consumes.items(new ItemStack(Items.pyratite, 1), new ItemStack(Items.sporePod, 1));
-            consumes.power(0.40f);
-        }};
-
         pyratiteMixer = new GenericSmelter("pyratite-mixer"){{
             requirements(Category.crafting, with(Items.copper, 50, Items.lead, 25));
             flameColor = Color.clear;
@@ -648,7 +644,18 @@ public class Blocks implements ContentList{
             size = 2;
 
             consumes.power(0.20f);
-            consumes.items(new ItemStack(Items.coal, 1), new ItemStack(Items.lead, 2), new ItemStack(Items.sand, 2));
+            consumes.items(with(Items.coal, 1, Items.lead, 2, Items.sand, 2));
+        }};
+
+        blastMixer = new GenericCrafter("blast-mixer"){{
+            requirements(Category.crafting, with(Items.lead, 30, Items.titanium, 20));
+            hasItems = true;
+            hasPower = true;
+            outputItem = new ItemStack(Items.blastCompound, 1);
+            size = 2;
+
+            consumes.items(with(Items.pyratite, 1, Items.sporePod, 1));
+            consumes.power(0.40f);
         }};
 
         melter = new GenericCrafter("melter"){{
@@ -720,6 +727,8 @@ public class Blocks implements ContentList{
             updateEffect = Fx.pulverizeSmall;
             hasItems = hasPower = true;
             drawer = new DrawRotator();
+            ambientSound = Sounds.grinding;
+            ambientSoundVolume = 0.025f;
 
             consumes.item(Items.scrap, 1);
             consumes.power(0.50f);
@@ -1158,6 +1167,9 @@ public class Blocks implements ContentList{
             requirements(Category.power, with(Items.copper, 25, Items.lead, 15));
             powerProduction = 1f;
             itemDuration = 120f;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.03f;
         }};
 
         thermalGenerator = new ThermalGenerator("thermal-generator"){{
@@ -1166,6 +1178,8 @@ public class Blocks implements ContentList{
             generateEffect = Fx.redgeneratespark;
             size = 2;
             floating = true;
+            ambientSound = Sounds.hum;
+            ambientSoundVolume = 0.06f;
         }};
 
         steamGenerator = new BurnerGenerator("steam-generator"){{
@@ -1175,6 +1189,9 @@ public class Blocks implements ContentList{
             consumes.liquid(Liquids.water, 0.1f);
             hasLiquids = true;
             size = 2;
+
+            ambientSound = Sounds.smelter;
+            ambientSoundVolume = 0.05f;
         }};
 
         differentialGenerator = new SingleTypeGenerator("differential-generator"){{
@@ -1184,6 +1201,8 @@ public class Blocks implements ContentList{
             hasLiquids = true;
             hasItems = true;
             size = 3;
+            ambientSound = Sounds.steam;
+            ambientSoundVolume = 0.03f;
 
             consumes.item(Items.pyratite).optional(true, false);
             consumes.liquid(Liquids.cryofluid, 0.1f);
@@ -1198,17 +1217,19 @@ public class Blocks implements ContentList{
 
         solarPanel = new SolarGenerator("solar-panel"){{
             requirements(Category.power, with(Items.lead, 10, Items.silicon, 15));
-            powerProduction = 0.07f;
+            powerProduction = 0.08f;
         }};
 
         largeSolarPanel = new SolarGenerator("solar-panel-large"){{
             requirements(Category.power, with(Items.lead, 100, Items.silicon, 145, Items.phaseFabric, 15));
             size = 3;
-            powerProduction = 0.95f;
+            powerProduction = 1f;
         }};
 
         thoriumReactor = new NuclearReactor("thorium-reactor"){{
             requirements(Category.power, with(Items.lead, 300, Items.silicon, 200, Items.graphite, 150, Items.thorium, 150, Items.metaglass, 50));
+            ambientSound = Sounds.hum;
+            ambientSoundVolume = 0.24f;
             size = 3;
             health = 700;
             itemDuration = 360f;
@@ -1224,6 +1245,9 @@ public class Blocks implements ContentList{
             health = 900;
             powerProduction = 130f;
             itemDuration = 140f;
+            ambientSound = Sounds.pulse;
+            ambientSoundVolume = 0.07f;
+
             consumes.power(25f);
             consumes.item(Items.blastCompound);
             consumes.liquid(Liquids.cryofluid, 0.25f);
@@ -1330,7 +1354,7 @@ public class Blocks implements ContentList{
         //region storage
 
         coreShard = new CoreBlock("core-shard"){{
-            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 2000, Items.lead, 1000));
+            requirements(Category.effect, BuildVisibility.editorOnly, with(Items.copper, 1000, Items.lead, 1000));
             alwaysUnlocked = true;
 
             unitType = UnitTypes.alpha;
@@ -1464,7 +1488,7 @@ public class Blocks implements ContentList{
             inaccuracy = 1f;
             shootCone = 10f;
             health = 260;
-            shootSound = Sounds.artillery;
+            shootSound = Sounds.bang;
         }};
 
         wave = new LiquidTurret("wave"){{
@@ -1484,7 +1508,6 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 110f;
             health = 250 * size * size;
-            shootSound = Sounds.splash;
         }};
 
         lancer = new ChargeTurret("lancer"){{
@@ -1632,7 +1655,6 @@ public class Blocks implements ContentList{
             shootEffect = Fx.shootLiquid;
             range = 190f;
             health = 250 * size * size;
-            shootSound = Sounds.splash;
         }};
 
         fuse = new ItemTurret("fuse"){{
@@ -1744,7 +1766,6 @@ public class Blocks implements ContentList{
 
             rotateSpeed = 2.5f;
             reloadTime = 200f;
-            restitution = 0.2f;
             ammoUseEffect = Fx.casing3Double;
             recoilAmount = 5f;
             restitution = 0.009f;
@@ -1753,13 +1774,13 @@ public class Blocks implements ContentList{
             shots = 1;
             size = 4;
             shootCone = 2f;
-            shootSound = Sounds.shootBig;
+            shootSound = Sounds.railgun;
             unitSort = (u, x, y) -> -u.maxHealth;
 
-            coolantMultiplier = 0.09f;
+            coolantMultiplier = 0.2f;
 
             health = 150 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
+            coolantUsage = 1f;
 
             consumes.powerCond(10f, TurretBuild::isActive);
         }};
@@ -1774,7 +1795,7 @@ public class Blocks implements ContentList{
             reloadTime = 6f;
             coolantMultiplier = 0.5f;
             restitution = 0.1f;
-            ammoUseEffect = Fx.casing3Double;
+            ammoUseEffect = Fx.casing3;
             range = 200f;
             inaccuracy = 3f;
             recoilAmount = 3f;
@@ -1787,7 +1808,7 @@ public class Blocks implements ContentList{
             shootSound = Sounds.shootBig;
 
             health = 160 * size * size;
-            consumes.add(new ConsumeLiquidFilter(liquid -> liquid.temperature <= 0.5f && liquid.flammability < 0.1f, 2f)).update(false).optional(true, true);
+            coolantUsage = 1f;
         }};
 
         meltdown = new LaserTurret("meltdown"){{
@@ -1803,8 +1824,8 @@ public class Blocks implements ContentList{
             shootDuration = 220f;
             powerUse = 17f;
             shootSound = Sounds.laserbig;
-            activeSound = Sounds.beam;
-            activeSoundVolume = 2f;
+            loopSound = Sounds.beam;
+            loopSoundVolume = 2f;
 
             shootType = new ContinuousLaserBulletType(70){{
                 length = 200f;
@@ -2025,12 +2046,19 @@ public class Blocks implements ContentList{
 
         //TODO remove
         launchPadLarge = new LaunchPad("launch-pad-large"){{
-            //requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.titanium, 200, Items.silicon, 150, Items.lead, 250, Items.plastanium, 75));
             size = 4;
             itemCapacity = 300;
             launchTime = 60f * 35;
             hasPower = true;
             consumes.power(6f);
+        }};
+
+        interplanetaryAccelerator = new Accelerator("interplanetary-accelerator"){{
+            requirements(Category.effect, BuildVisibility.campaignOnly, with(Items.copper, 16000, Items.silicon, 11000, Items.thorium, 13000, Items.titanium, 12000, Items.surgeAlloy, 6000, Items.phaseFabric, 5000));
+            researchCostMultiplier = 0.1f;
+            size = 7;
+            hasPower = true;
+            consumes.power(10f);
         }};
 
         //endregion campaign

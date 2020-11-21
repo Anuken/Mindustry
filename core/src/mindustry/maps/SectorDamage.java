@@ -233,7 +233,7 @@ public class SectorDamage{
         //first, calculate the total health of blocks in the path
 
         //radius around the path that gets counted
-        int radius = 9;
+        int radius = 8;
         IntSet counted = new IntSet();
 
         for(Tile t : sparse2){
@@ -335,9 +335,9 @@ public class SectorDamage{
         info.waveDpsSlope = reg.slope;
 
         //enemy units like to aim for a lot of non-essential things, so increase resulting health slightly
-        info.sumHealth = sumHealth * 1.2f;
+        info.sumHealth = sumHealth * 1.3f;
         //players tend to have longer range units/turrets, so assume DPS is higher
-        info.sumDps = sumDps * 1.5f;
+        info.sumDps = sumDps * 1.3f;
         info.sumRps = sumRps;
 
         info.wavesSurvived = getWavesSurvived(info);

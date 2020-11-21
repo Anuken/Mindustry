@@ -18,7 +18,7 @@ import static mindustry.Vars.*;
 
 public class Planet extends UnlockableContent{
     /** Default spacing between planet orbits in world units. */
-    private static final float orbitSpacing = 8f;
+    private static final float orbitSpacing = 9f;
     /** intersect() temp var. */
     private static final Vec3 intersectResult = new Vec3();
     /** Mesh used for rendering. Created on load() - will be null on the server! */
@@ -33,6 +33,8 @@ public class Planet extends UnlockableContent{
     public Seq<Sector> sectors;
     /** Radius of this planet's sphere. Does not take into account sattelites. */
     public float radius;
+    /** Atmosphere radius adjustment parameters. */
+    public float atmosphereRadIn = 0, atmosphereRadOut = 0.3f;
     /** Orbital radius around the sun. Do not change unless you know exactly what you are doing.*/
     public float orbitRadius;
     /** Total radius of this planet and all its children. */
@@ -51,6 +53,8 @@ public class Planet extends UnlockableContent{
     public int startSector = 0;
     /** Whether the bloom render effect is enabled. */
     public boolean bloom = false;
+    /** Whether this planet is displayed. */
+    public boolean visible = true;
     /** For suns, this is the color that shines on other planets. Does nothing for children. */
     public Color lightColor = Color.white.cpy();
     /** Atmosphere tint for landable planets. */
@@ -183,10 +187,10 @@ public class Planet extends UnlockableContent{
             }
 
             if(sector.hasEnemyBase()){
-                sum += 2f;
+                sum += 2.5f;
             }
 
-            sector.baseCoverage = sector.preset == null ? Mathf.clamp(sum / 5f) : Mathf.clamp(sector.preset.difficulty / 10f);
+            sector.threat = sector.preset == null ? Math.min(sum / 5f, 1.5f) : Mathf.clamp(sector.preset.difficulty / 10f);
         }
     }
 
@@ -264,7 +268,7 @@ public class Planet extends UnlockableContent{
     }
 
     public boolean visible(){
-        return true;
+        return visible;
     }
 
     public void draw(Mat3D projection, Mat3D transform){

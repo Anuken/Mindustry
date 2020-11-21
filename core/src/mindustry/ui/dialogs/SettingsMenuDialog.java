@@ -121,6 +121,7 @@ public class SettingsMenuDialog extends SettingsDialog{
 
             t.button("@settings.clearresearch", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearresearch.confirm", () -> {
+                    universe.clearLoadoutInfo();
                     for(TechNode node : TechTree.all){
                         node.reset();
                     }
@@ -129,6 +130,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             u.clearUnlock();
                         }
                     });
+                    settings.remove("unlocks");
                 });
             }).marginLeft(4);
 
@@ -143,6 +145,12 @@ public class SettingsMenuDialog extends SettingsDialog{
                                 sec.save.delete();
                                 sec.save = null;
                             }
+                        }
+                    }
+                    
+                    for(var slot : control.saves.getSaveSlots().copy()){
+                        if(slot.isSector()){
+                            slot.delete();
                         }
                     }
                 });
@@ -194,6 +202,25 @@ public class SettingsMenuDialog extends SettingsDialog{
                 t.row();
                 t.button("@data.openfolder", Icon.folder, style, () -> Core.app.openFolder(Core.settings.getDataDirectory().absolutePath())).marginLeft(4);
             }
+
+            t.row();
+
+            t.button("@crash.export", Icon.upload, style, () -> {
+                if(settings.getDataDirectory().child("crashes").list().length == 0 && !settings.getDataDirectory().child("last_log.txt").exists()){
+                    ui.showInfo("@crash.none");
+                }else{
+                    if(ios){
+                        Fi logs = tmpDirectory.child("logs.txt");
+                        logs.writeString(getLogs());
+                        platform.shareFile(logs);
+                    }else{
+                        platform.showFileChooser(false, "txt", file -> {
+                            file.writeString(getLogs());
+                            app.post(() -> ui.showInfo("@crash.exported"));
+                        });
+                    }
+                }
+            }).marginLeft(4);
         });
 
         ScrollPane pane = new ScrollPane(prefs);
@@ -223,6 +250,21 @@ public class SettingsMenuDialog extends SettingsDialog{
         add(buttons).fillX();
 
         addSettings();
+    }
+
+    String getLogs(){
+        Fi log = settings.getDataDirectory().child("last_log.txt");
+
+        StringBuilder out = new StringBuilder();
+        for(Fi fi : settings.getDataDirectory().child("crashes").list()){
+            out.append(fi.name()).append("\n\n").append(fi.readString()).append("\n");
+        }
+
+        if(log.exists()){
+            out.append("\nlast log:\n").append(log.readString());
+        }
+
+        return out.toString();
     }
 
     void rebuildMenu(){
@@ -299,19 +341,6 @@ public class SettingsMenuDialog extends SettingsDialog{
                 });
             }
         }
-
-        game.pref(new Setting(){
-            @Override
-            public void add(SettingsTable table){
-                table.button("@tutorial.retake", () -> {
-                    hide();
-                    control.playTutorial();
-                }).size(220f, 60f).pad(6).left();
-                table.add();
-                table.row();
-                hide();
-            }
-        });
 
         graphics.sliderPref("uiscale", 100, 25, 300, 25, s -> {
             if(ui.settings != null){
@@ -445,12 +474,17 @@ public class SettingsMenuDialog extends SettingsDialog{
             throw new IllegalArgumentException("Not valid save data.");
         }
 
+        //delete old saves so they don't interfere
+        saveDirectory.deleteDirectory();
+
         //purge existing tmp data, keep everything else
         tmpDirectory.deleteDirectory();
 
         zipped.walk(f -> f.copyTo(base.child(f.path())));
         dest.delete();
 
+        //clear old data
+        settings.clear();
         //load data so it's saved on exit
         settings.load();
     }

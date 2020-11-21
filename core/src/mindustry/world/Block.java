@@ -174,14 +174,14 @@ public class Block extends UnlockableContent{
     public float lightRadius = 60f;
 
     /** The sound that this block makes while active. One sound loop. Do not overuse.*/
-    public Sound activeSound = Sounds.none;
+    public Sound loopSound = Sounds.none;
     /** Active sound base volume. */
-    public float activeSoundVolume = 0.5f;
+    public float loopSoundVolume = 0.5f;
 
     /** The sound that this block makes while idle. Uses one sound loop for all blocks.*/
-    public Sound idleSound = Sounds.none;
+    public Sound ambientSound = Sounds.none;
     /** Idle sound base volume. */
-    public float idleSoundVolume = 0.5f;
+    public float ambientSoundVolume = 0.05f;
 
     /** Cost of constructing this block. */
     public ItemStack[] requirements = {};
@@ -305,7 +305,7 @@ public class Block extends UnlockableContent{
         return hasItems;
     }
 
-    /** Returns whether ot not this block can be place on the specified  */
+    /** Returns whether or not this block can be place on the specified  */
     public boolean canPlaceOn(Tile tile, Team team){
         return true;
     }
@@ -365,7 +365,7 @@ public class Block extends UnlockableContent{
             float capacity = cons.capacity;
 
             bars.add("power", entity -> new Bar(() -> buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * capacity) ? "<ERROR>" : (int)(entity.power.status * capacity)) :
-            Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
+                Core.bundle.get("bar.power"), () -> Pal.powerBar, () -> Mathf.zero(cons.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
         }
 
         if(hasItems && configurable){
@@ -556,17 +556,17 @@ public class Block extends UnlockableContent{
         return cacheLayer == CacheLayer.walls;
     }
 
-    protected void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
+    public void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
         requirements(cat, BuildVisibility.shown, stacks);
         this.alwaysUnlocked = unlocked;
     }
 
-    protected void requirements(Category cat, ItemStack[] stacks){
+    public void requirements(Category cat, ItemStack[] stacks){
         requirements(cat, BuildVisibility.shown, stacks);
     }
 
     /** Sets up requirements. Use only this method to set up requirements. */
-    protected void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
+    public void requirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
         this.category = cat;
         this.requirements = stacks;
         this.buildVisibility = visible;
@@ -617,7 +617,7 @@ public class Block extends UnlockableContent{
     public ItemStack[] researchRequirements(){
         ItemStack[] out = new ItemStack[requirements.length];
         for(int i = 0; i < out.length; i++){
-            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.09f) * 20 * researchCostMultiplier, 10);
+            int quantity = 60 + Mathf.round(Mathf.pow(requirements[i].amount, 1.1f) * 20 * researchCostMultiplier, 10);
 
             out[i] = new ItemStack(requirements[i].item, UI.roundAmount(quantity));
         }
@@ -630,6 +630,19 @@ public class Block extends UnlockableContent{
         //just requires items
         for(ItemStack stack : requirements){
             cons.get(stack.item);
+        }
+
+        if(consumes.any()){
+            //also requires inputs
+            for(Consume c : consumes.all()){
+                if(c instanceof ConsumeItems i){
+                    for(ItemStack stack : i.items){
+                        cons.get(stack.item);
+                    }
+                }else if(c instanceof ConsumeLiquid i){
+                    cons.get(i.liquid);
+                }
+            }
         }
     }
 
