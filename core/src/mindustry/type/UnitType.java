@@ -261,8 +261,8 @@ public class UnitType extends UnlockableContent{
         if(range < 0){
             range = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
-                range = Math.min(range, weapon.bullet.range() + hitSize / 2f);
-                maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);
+                range = Math.min(range, weapon.bullet.maxRange() + hitSize / 2f);
+                maxRange = Math.max(maxRange, weapon.bullet.maxRange() + hitSize / 2f);
             }
         }
 
@@ -270,7 +270,7 @@ public class UnitType extends UnlockableContent{
             maxRange = 0f;
 
             for(Weapon weapon : weapons){
-                maxRange = Math.max(maxRange, weapon.bullet.range() + hitSize / 2f);
+                maxRange = Math.max(maxRange, weapon.bullet.maxRange() + hitSize / 2f);
             }
         }
 

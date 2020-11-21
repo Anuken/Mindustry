@@ -49,7 +49,7 @@ public class SapBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float maxRange(){
         return length;
     }
 

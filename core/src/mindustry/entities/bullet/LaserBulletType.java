@@ -53,7 +53,7 @@ public class LaserBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float maxRange(){
         return length;
     }
 

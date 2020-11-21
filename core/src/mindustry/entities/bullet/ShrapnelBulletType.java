@@ -44,7 +44,7 @@ public class ShrapnelBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float maxRange(){
         return length;
     }
 

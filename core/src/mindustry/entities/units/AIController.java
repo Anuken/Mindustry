@@ -120,10 +120,10 @@ public class AIController implements UnitController{
                 targets[i] = target;
             }else{
                 if(ret){
-                    targets[i] = findTarget(mountX, mountY, weapon.bullet.range(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
+                    targets[i] = findTarget(mountX, mountY, weapon.bullet.maxRange(), weapon.bullet.collidesAir, weapon.bullet.collidesGround);
                 }
 
-                if(Units.invalidateTarget(targets[i], unit.team, mountX, mountY, weapon.bullet.range())){
+                if(Units.invalidateTarget(targets[i], unit.team, mountX, mountY, weapon.bullet.maxRange())){
                     targets[i] = null;
                 }
             }
@@ -131,7 +131,7 @@ public class AIController implements UnitController{
             boolean shoot = false;
 
             if(targets[i] != null){
-                shoot = targets[i].within(mountX, mountY, weapon.bullet.range()) && shouldShoot();
+                shoot = targets[i].within(mountX, mountY, weapon.bullet.maxRange()) && shouldShoot();
 
                 Vec2 to = Predict.intercept(unit, targets[i], weapon.bullet.speed);
                 mount.aimX = to.x;

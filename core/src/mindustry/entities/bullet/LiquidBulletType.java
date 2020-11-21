@@ -42,7 +42,7 @@ public class LiquidBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float maxRange(){
         return speed * lifetime / 2f;
     }
 

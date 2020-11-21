@@ -22,7 +22,7 @@ public class LightningBulletType extends BulletType{
     }
 
     @Override
-    public float range(){
+    public float maxRange(){
         return (lightningLength + lightningLengthRand/2f) * 6f;
     }
 
