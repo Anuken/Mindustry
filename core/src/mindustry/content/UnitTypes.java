@@ -1694,8 +1694,8 @@ public class UnitTypes implements ContentList{
 
                 bullet = new RailBulletType(){{
                     shootEffect = Fx.railShoot;
-                    speed = 67f;
-                    lifetime = 8f;
+                    length = 500;
+                    updateEffectSeg = 60f;
                     pierceEffect = Fx.railHit;
                     updateEffect = Fx.railTrail;
                     hitEffect = Fx.massiveExplosion;

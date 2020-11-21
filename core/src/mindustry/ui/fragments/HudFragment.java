@@ -698,19 +698,15 @@ public class HudFragment extends Fragment{
             float bw = 40f;
             float pad = -20;
             t.margin(0);
-
-            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
-            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f).with(i -> {
-                if(mobile){
-                    //on mobile, cause a respawn on tap
-                    i.clicked(() -> {
-                        if(!player.unit().spawnedByCore && !player.dead()){
-                            Call.unitClear(player);
-                            control.input.controlledType = null;
-                        }
-                    });
+            t.clicked(() -> {
+                if(!player.dead() && mobile){
+                    Call.unitClear(player);
+                    control.input.controlledType = null;
                 }
             });
+
+            t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
+            t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f);
             t.add(new SideBar(() -> player.dead() ? 0f : player.displayAmmo() ? player.unit().ammof() : player.unit().healthf(), () -> !player.displayAmmo(), false)).width(bw).growY().padLeft(pad).update(b -> {
                 b.color.set(player.displayAmmo() ? player.dead() || player.unit() instanceof BlockUnitc ? Pal.ammo : player.unit().type.ammoType.color : Pal.health);
             });
@@ -759,8 +755,6 @@ public class HudFragment extends Fragment{
 
             return builder;
         }).growX().pad(8f);
-
-        table.touchable(() -> state.rules.waves ? Touchable.enabled : Touchable.disabled);
 
         return table;
     }
