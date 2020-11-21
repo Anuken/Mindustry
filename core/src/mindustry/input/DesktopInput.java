@@ -47,6 +47,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void buildUI(Group group){
+        //respawn hints
         group.fill(t -> {
             t.visible(() -> Core.settings.getBool("hints") && ui.hudfrag.shown && !player.dead() && !player.unit().spawnedByCore() && !(Core.settings.getBool("hints") && lastSchematic != null && !selectRequests.isEmpty()));
             t.bottom();
@@ -56,6 +57,7 @@ public class DesktopInput extends InputHandler{
             }).margin(6f);
         });
 
+        //building hints
         group.fill(t -> {
             t.bottom();
             t.visible(() -> {
@@ -74,6 +76,7 @@ public class DesktopInput extends InputHandler{
             }).margin(10f);
         });
 
+        //schematic controls
         group.fill(t -> {
             t.visible(() -> ui.hudfrag.shown && lastSchematic != null && !selectRequests.isEmpty());
             t.bottom();

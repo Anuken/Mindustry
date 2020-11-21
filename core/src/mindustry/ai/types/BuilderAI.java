@@ -19,10 +19,6 @@ public class BuilderAI extends AIController{
     @Override
     public void updateMovement(){
 
-        if(unit.moving()){
-            unit.lookAt(unit.vel.angle());
-        }
-
         if(target != null && shouldShoot()){
             unit.lookAt(target);
         }

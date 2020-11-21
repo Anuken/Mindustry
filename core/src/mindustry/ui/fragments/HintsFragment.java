@@ -1,0 +1,259 @@
+package mindustry.ui.fragments;
+
+import arc.*;
+import arc.func.*;
+import arc.input.*;
+import arc.math.*;
+import arc.scene.*;
+import arc.scene.actions.*;
+import arc.scene.event.*;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.content.*;
+import mindustry.game.EventType.*;
+import mindustry.input.*;
+import mindustry.ui.*;
+import mindustry.world.*;
+
+import static mindustry.Vars.*;
+
+public class HintsFragment extends Fragment{
+    private static final Boolp isTutorial = () -> Vars.state.rules.sector == SectorPresets.groundZero.sector;
+    private static final float foutTime = 0.6f;
+
+    /** All hints to be displayed in the game. */
+    public Seq<Hint> incomplete = Seq.with(DefaultHint.values());
+    @Nullable
+    public Hint current;
+
+    Group group = new WidgetGroup();
+    ObjectSet<String> events = new ObjectSet<>();
+    ObjectSet<Block> placedBlocks = new ObjectSet<>();
+    int checkIdx = 0;
+    Table last;
+
+    @Override
+    public void build(Group parent){
+        group.setFillParent(true);
+        group.touchable = Touchable.childrenOnly;
+        group.visibility = () -> Core.settings.getBool("hints", true);
+        group.update(() -> {
+            if(current != null){
+                //current got completed
+                if(current.complete()){
+                    complete();
+                }else if(!current.show()){ //current became hidden
+                    hide();
+                }
+            }else if(incomplete.size > 0){
+                //check one hint each frame to see if it should be shown.
+                checkIdx = (checkIdx + 1) % incomplete.size;
+                Hint hint = incomplete.get(checkIdx);
+                if(hint.show() && !hint.finished() & !hint.complete()){
+                    display(hint);
+                }
+            }
+        });
+        parent.addChild(group);
+
+        checkNext();
+
+        Events.on(BlockBuildEndEvent.class, event -> {
+            if(!event.breaking && event.tile.team() == Vars.state.rules.defaultTeam){
+                placedBlocks.add(event.tile.block());
+            }
+
+            if(event.breaking){
+                events.add("break");
+            }
+        });
+
+        Events.on(UnitControlEvent.class, e -> {
+            if(e.player == player){
+                events.add("unitcontrol");
+            }
+        });
+
+        Events.on(WorldLoadEvent.class, e -> Core.app.post(() -> {
+            checkNext();
+        }));
+    }
+
+    void checkNext(){
+        if(current != null) return;
+
+        incomplete.removeAll(h -> h == current || !h.valid() || h.finished() || (h.show() && h.complete()));
+        incomplete.sort(Hint::order);
+
+        Hint first = incomplete.find(Hint::show);
+        if(first != null){
+            incomplete.remove(first);
+            display(first);
+        }
+    }
+
+    void display(Hint hint){
+        if(current != null) return;
+
+        group.fill(t -> {
+            last = t;
+            t.left();
+            t.table(Styles.black5, cont -> {
+                cont.actions(Actions.alpha(0f), Actions.alpha(1f, 1f, Interp.smooth));
+                cont.margin(6f).add(hint.text()).width(Vars.mobile ? 300f : 400f).left().labelAlign(Align.left).wrap();
+            });
+            t.row();
+            t.button("@hint.skip", Styles.nonet, () -> {
+                if(current != null){
+                    complete();
+                }
+            }).size(100f, 40f).left();
+        });
+
+        this.current = hint;
+    }
+
+    /** Completes and hides the current hint. */
+    void complete(){
+        if(current == null) return;
+
+        current.finish();
+        incomplete.remove(current);
+
+        hide();
+    }
+
+    /** Hides the current hint, but does not complete it. */
+    void hide(){
+        //hide previous child if found
+        if(last != null){
+            last.actions(Actions.parallel(Actions.alpha(0f, foutTime, Interp.smooth), Actions.translateBy(0f, Scl.scl(-200f), foutTime, Interp.smooth)), Actions.remove());
+        }
+        //check for next hint to display immediately
+        current = null;
+        last = null;
+        checkNext();
+    }
+
+    public boolean shown(){
+        return current != null;
+    }
+
+    public enum DefaultHint implements Hint{
+        desktopMove(visibleDesktop, () -> Core.input.axis(Binding.move_x) != 0 || Core.input.axis(Binding.move_y) != 0),
+        zoom(visibleDesktop, () -> Core.input.axis(KeyCode.scroll) != 0),
+        mine(isTutorial, () -> player.unit().mining()),
+        placeDrill(isTutorial, () -> ui.hints.placedBlocks.contains(Blocks.mechanicalDrill)),
+        placeConveyor(isTutorial, () -> ui.hints.placedBlocks.contains(Blocks.conveyor)),
+        placeTurret(isTutorial, () -> ui.hints.placedBlocks.contains(Blocks.duo)),
+        breaking(isTutorial, () -> ui.hints.events.contains("break")),
+        desktopShoot(visibleDesktop, () -> Vars.state.enemies > 0, () -> player.shooting),
+        depositItems(() -> player.unit().hasItem(), () -> !player.unit().hasItem()),
+        desktopPause(visibleDesktop, () -> isTutorial.get() && !Vars.net.active(), () -> Core.input.keyTap(Binding.pause)),
+        research(isTutorial, () -> ui.research.isShown()),
+        unitControl(() -> state.rules.defaultTeam.data().units.size > 1 && !net.active(), () -> !player.dead() && !player.unit().spawnedByCore),
+        respawn(visibleMobile, () -> !player.dead() && !player.unit().spawnedByCore, () -> !player.dead() && player.unit().spawnedByCore),
+        launch(() -> isTutorial.get() && state.rules.sector.isCaptured(), () -> ui.planet.isShown()),
+        ;
+
+        @Nullable
+        String text;
+        int visibility = visibleAll;
+        Hint[] dependencies = {};
+        boolean finished, cached;
+        Boolp complete, shown = () -> true;
+
+        DefaultHint(Boolp complete){
+            this.complete = complete;
+        }
+
+        DefaultHint(int visiblity, Boolp complete){
+            this(complete);
+            this.visibility = visiblity;
+        }
+
+        DefaultHint(Boolp shown, Boolp complete){
+            this(complete);
+            this.shown = shown;
+        }
+
+        DefaultHint(int visiblity, Boolp shown, Boolp complete){
+            this(complete);
+            this.shown = shown;
+            this.visibility = visiblity;
+        }
+
+        @Override
+        public boolean finished(){
+            if(!cached){
+                cached = true;
+                finished = Core.settings.getBool(name() + "-hint-done", false);
+            }
+            return finished;
+        }
+
+        @Override
+        public void finish(){
+            Core.settings.put(name() + "-hint-done", finished = true);
+        }
+
+        @Override
+        public String text(){
+            if(text == null){
+                text = Vars.mobile && Core.bundle.has("hint." + name() + ".mobile") ? Core.bundle.get("hint." + name() + ".mobile") : Core.bundle.get("hint." + name());
+                if(!Vars.mobile) text = text.replace("tap", "click").replace("Tap", "Click");
+            }
+            return text;
+        }
+
+        @Override
+        public boolean complete(){
+            return complete.get();
+        }
+
+        @Override
+        public boolean show(){
+            return shown.get() && (dependencies.length == 0 || !Structs.contains(dependencies, d -> !d.finished()));
+        }
+
+        @Override
+        public int order(){
+            return ordinal();
+        }
+
+        @Override
+        public boolean valid(){
+            return (Vars.mobile && (visibility & visibleMobile) != 0) || (!Vars.mobile && (visibility & visibleDesktop) != 0);
+        }
+    }
+
+    /** Hint interface for defining any sort of message appearing at the left. */
+    public interface Hint{
+        int visibleDesktop = 1, visibleMobile = 2, visibleAll = visibleDesktop | visibleMobile;
+
+        /** Hint name for preference storage. */
+        String name();
+        /** Displayed text. */
+        String text();
+        /** @return true if hint objective is complete */
+        boolean complete();
+        /** @return whether the hint is ready to be shown */
+        boolean show();
+        /** @return order integer, determines priority */
+        int order();
+        /** @return whether this hint should be processed, used for platform splits */
+        boolean valid();
+
+        /** finishes the hint - it should not be shown again */
+        default void finish(){
+            Core.settings.put(name() + "-hint-done", true);
+        }
+
+        /** @return whether the hint is finished - if true, it should not be shown again */
+        default boolean finished(){
+            return Core.settings.getBool(name() + "-hint-done", false);
+        }
+    }
+}

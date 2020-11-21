@@ -519,7 +519,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void dumpLiquid(Liquid liquid){
         int dump = this.cdump;
 
-        if(!net.client() && state.isCampaign()) liquid.unlock();
+        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) liquid.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);
@@ -620,7 +620,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
      */
     public void offload(Item item){
         int dump = this.cdump;
-        if(!net.client() && state.isCampaign()) item.unlock();
+        if(!net.client() && state.isCampaign() && team == state.rules.defaultTeam) item.unlock();
 
         for(int i = 0; i < proximity.size; i++){
             incrementDump(proximity.size);

@@ -36,7 +36,7 @@ public class Universe{
 
         //update base coverage on capture
         Events.on(SectorCaptureEvent.class, e -> {
-            if(state.isCampaign()){
+            if(!net.client() && state.isCampaign()){
                 state.getSector().planet.updateBaseCoverage();
             }
         });

@@ -264,7 +264,7 @@ public class Logic implements ApplicationListener{
         Events.fire(new SectorCaptureEvent(state.rules.sector));
 
         //save, just in case
-        if(!headless){
+        if(!headless && !net.client()){
             control.saves.saveSector(state.rules.sector);
         }
     }
