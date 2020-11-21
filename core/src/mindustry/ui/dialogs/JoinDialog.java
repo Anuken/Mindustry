@@ -499,7 +499,7 @@ public class JoinDialog extends BaseDialog{
                     }
                 });
             }catch(Throwable e){
-                Log.err("Failed to fetch communitycommunity servers.");
+                Log.err("Failed to fetch community servers.");
             }
         }, t -> {});
     }
