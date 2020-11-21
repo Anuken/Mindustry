@@ -25,6 +25,7 @@ public class Damage{
     private static Rect rect = new Rect();
     private static Rect hitrect = new Rect();
     private static Vec2 tr = new Vec2();
+    private static Seq<Unit> units = new Seq<>();
     private static GridBits bits = new GridBits(30, 30);
     private static IntQueue propagation = new IntQueue();
     private static IntSet collidedBlocks = new IntSet();
@@ -117,14 +118,16 @@ public class Damage{
             Building tile = world.build(cx, cy);
             boolean collide = tile != null && collidedBlocks.add(tile.pos());
 
-            if(collide && tile.team != team && tile.collide(hitter)){
-                tile.collision(hitter);
-                hitter.type.hit(hitter, tile.x, tile.y);
-            }
+            if(hitter.damage > 0){
+                if(collide && tile.team != team && tile.collide(hitter)){
+                    tile.collision(hitter);
+                    hitter.type.hit(hitter, tile.x, tile.y);
+                }
 
-            //try to heal the tile
-            if(collide && hitter.type.collides(hitter, tile)){
-                hitter.type.hitTile(hitter, tile, 0f, false);
+                //try to heal the tile
+                if(collide && hitter.type.collides(hitter, tile)){
+                    hitter.type.hitTile(hitter, tile, tile.health, false);
+                }
             }
         };
 
@@ -161,20 +164,27 @@ public class Damage{
         rect.height += expand * 2;
 
         Cons<Unit> cons = e -> {
-            if(!e.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)) return;
-
             e.hitbox(hitrect);
 
             Vec2 vec = Geometry.raycastRect(x, y, x2, y2, hitrect.grow(expand * 2));
 
-            if(vec != null){
+            if(vec != null && hitter.damage > 0){
                 effect.at(vec.x, vec.y);
                 e.collision(hitter, vec.x, vec.y);
                 hitter.collision(e, vec.x, vec.y);
             }
         };
 
-        Units.nearbyEnemies(team, rect, cons);
+        units.clear();
+
+        Units.nearbyEnemies(team, rect, u -> {
+            if(u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)){
+                units.add(u);
+            }
+        });
+
+        units.sort(u -> u.dst2(hitter));
+        units.each(cons);
     }
 
     /**

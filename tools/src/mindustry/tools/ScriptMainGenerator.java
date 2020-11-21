@@ -37,7 +37,8 @@ public class ScriptMainGenerator{
             getClasses("arc.func"),
             getClasses("arc.struct"),
             getClasses("arc.scene"),
-            getClasses("arc.math")
+            getClasses("arc.math"),
+            getClasses("arc.audio")
         );
         classes.addAll(whitelist);
         classes.sort(Structs.comparing(Class::getName));
