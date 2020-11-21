@@ -40,6 +40,7 @@ public class ConstructBlock extends Block{
         consumesTap = true;
         solidifes = true;
         consBlocks[size - 1] = this;
+        sync = true;
     }
 
     /** Returns a ConstructBlock by size. */
