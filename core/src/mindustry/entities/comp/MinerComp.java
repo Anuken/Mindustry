@@ -45,7 +45,7 @@ abstract class MinerComp implements Itemsc, Posc, Teamc, Rotc, Drawc{
     }
 
     public boolean canMine(){
-        return type.mineSpeed > 0;
+        return type.mineSpeed > 0 && type.mineTier >= 0;
     }
 
     @Override

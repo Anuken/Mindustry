@@ -237,8 +237,9 @@ public class DesktopInput extends InputHandler{
             player.shooting = false;
         }
 
-        if(state.isGame() && Core.input.keyTap(Binding.minimap) && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
-            ui.minimapfrag.toggle();
+        if(state.isGame() && !scene.hasDialog() && !(scene.getKeyboardFocus() instanceof TextField)){
+            if(Core.input.keyTap(Binding.minimap)) ui.minimapfrag.toggle();
+            if(Core.input.keyTap(Binding.planet_map) && state.isCampaign()) ui.planet.toggle();
         }
 
         if(state.isMenu() || Core.scene.hasDialog()) return;
