@@ -44,7 +44,6 @@ import static mindustry.Vars.*;
 public class Control implements ApplicationListener, Loadable{
     public Saves saves;
     public SoundControl sound;
-    public Tutorial tutorial;
     public InputHandler input;
 
     private Interval timer = new Interval(2);
@@ -53,7 +52,6 @@ public class Control implements ApplicationListener, Loadable{
 
     public Control(){
         saves = new Saves();
-        tutorial = new Tutorial();
         sound = new SoundControl();
 
         Events.on(StateChangeEvent.class, event -> {
@@ -87,7 +85,6 @@ public class Control implements ApplicationListener, Loadable{
 
         Events.on(ResetEvent.class, event -> {
             player.reset();
-            tutorial.reset();
 
             hiscore = false;
             saves.resetSave();
@@ -407,13 +404,6 @@ public class Control implements ApplicationListener, Loadable{
     @Override
     public void init(){
         platform.updateRPC();
-
-        //just a regular reminder
-        if(!OS.prop("user.name").equals("anuke") && !OS.hasEnv("iknowwhatimdoing")){
-            app.post(() -> app.post(() -> {
-                ui.showStartupInfo("@indev.popup");
-            }));
-        }
 
         //display UI scale changed dialog
         if(Core.settings.getBool("uiscalechanged", false)){

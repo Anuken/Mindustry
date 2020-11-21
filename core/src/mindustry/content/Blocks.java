@@ -2059,6 +2059,7 @@ public class Blocks implements ContentList{
             size = 7;
             hasPower = true;
             consumes.power(10f);
+            buildCostMultiplier = 0.5f;
         }};
 
         //endregion campaign

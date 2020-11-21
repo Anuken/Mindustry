@@ -134,6 +134,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     /** show with no limitations, just as a map. */
     @Override
     public Dialog show(){
+        if(net.client()){
+            ui.showInfo("@map.multiplayer");
+            return this;
+        }
+
         mode = look;
         selected = hovered = launchSector = null;
         launching = false;

@@ -1250,6 +1250,7 @@ public class UnitTypes implements ContentList{
             defaultController = RepairAI::new;
 
             mineTier = 3;
+            mineSpeed = 4f;
             health = 500;
             armor = 5f;
             speed = 2.5f;
