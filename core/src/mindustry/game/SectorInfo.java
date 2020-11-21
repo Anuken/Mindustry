@@ -43,6 +43,8 @@ public class SectorInfo{
     public boolean waves = true;
     /** Whether attack mode is enabled here. */
     public boolean attack = false;
+    /** Whether this sector has any enemy spawns. */
+    public boolean hasSpawns = true;
     /** Wave # from state */
     public int wave = 1, winWave = -1;
     /** Waves this sector can survive if under attack. Based on wave in info. <0 means uncalculated. */
@@ -59,8 +61,12 @@ public class SectorInfo{
     public float secondsPassed;
     /** Display name. */
     public @Nullable String name;
+    /** Displayed icon. */
+    public @Nullable String icon;
     /** Version of generated waves. When it doesn't match, new waves are generated. */
     public int waveVersion = -1;
+    /** Whether this sector was indicated to the player or not. */
+    public boolean shown = false;
 
     /** Special variables for simulation. */
     public float sumHealth, sumRps, sumDps, waveHealthBase, waveHealthSlope, waveDpsBase, waveDpsSlope;
@@ -124,7 +130,7 @@ public class SectorInfo{
 
         //assign new wave patterns when the version changes
         if(waveVersion != Waves.waveVersion && state.rules.sector.preset == null){
-            state.rules.spawns = Waves.generate(state.rules.sector.baseCoverage);
+            state.rules.spawns = Waves.generate(state.rules.sector.threat);
         }
 
         CoreBuild entity = state.rules.defaultTeam.core();
@@ -164,6 +170,7 @@ public class SectorInfo{
         secondsPassed = 0;
         wavesPassed = 0;
         damage = 0;
+        hasSpawns = spawner.countSpawns() > 0;
 
         if(state.rules.sector != null){
             state.rules.sector.saveInfo();

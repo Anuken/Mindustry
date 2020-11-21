@@ -104,7 +104,7 @@ public class UI implements ApplicationListener, Loadable{
         Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black5).margin(4f).add(text));
 
         Core.settings.setErrorHandler(e -> {
-            e.printStackTrace();
+            Log.err(e);
             Core.app.post(() -> showErrorMessage("Failed to access local storage.\nSettings will not be saved."));
         });
 
@@ -138,12 +138,6 @@ public class UI implements ApplicationListener, Loadable{
             if(!(e instanceof TextField)){
                 Core.scene.setKeyboardFocus(null);
             }
-        }
-
-        //draw overlay for buttons
-        if(state.rules.tutorial){
-            control.tutorial.draw();
-            Draw.flush();
         }
 
         Events.fire(Trigger.uiDrawEnd);
@@ -357,6 +351,7 @@ public class UI implements ApplicationListener, Loadable{
                 hide();
                 listener.run();
             }).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -365,6 +360,7 @@ public class UI implements ApplicationListener, Loadable{
             getCell(cont).growX();
             cont.margin(15).add(info).width(400f).wrap().get().setAlignment(Align.left);
             buttons.button("@ok", this::hide).size(110, 50).pad(4);
+            closeOnBack();
         }}.show();
     }
 
@@ -506,6 +502,7 @@ public class UI implements ApplicationListener, Loadable{
         t.update(() -> t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center));
         t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
         t.pack();
+        t.act(0.1f);
         Core.scene.add(t);
     }
 

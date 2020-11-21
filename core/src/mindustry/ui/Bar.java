@@ -31,9 +31,13 @@ public class Bar extends Element{
         this.fraction = fraction;
         lastValue = value = Mathf.clamp(fraction.get());
         update(() -> {
-            this.name = name.get();
-            this.blinkColor.set(color.get());
-            setColor(color.get());
+            try{
+                this.name = name.get();
+                this.blinkColor.set(color.get());
+                setColor(color.get());
+            }catch(Exception e){ //getting the fraction may involve referring to invalid data
+                this.name = "";
+            }
         });
     }
 

@@ -46,14 +46,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static float playerSelectRange = mobile ? 17f : 11f;
     /** Maximum line length. */
     final static int maxLength = 100;
-    final static Vec2 stackTrns = new Vec2();
     final static Rect r1 = new Rect(), r2 = new Rect();
-    final static Seq<Unit> units = new Seq<>();
-    /** Distance on the back from where items originate. */
-    final static float backTrns = 3f;
 
     public final OverlayFragment frag = new OverlayFragment();
 
+    public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
     public int rotation;
@@ -131,7 +128,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         !netServer.admins.allowAction(player, ActionType.withdrawItem, tile.tile(), action -> {
             action.item = item;
             action.itemAmount = amount;
-        }))) throw new ValidateException(player, "Player cannot request items.");
+        }))){
+            throw new ValidateException(player, "Player cannot request items.");
+        }
 
         //remove item for every controlling unit
         player.unit().eachGroup(unit -> {
@@ -170,7 +169,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(variants = Variant.one)
     public static void removeQueueBlock(int x, int y, boolean breaking){
-        player.builder().removeBuild(x, y, breaking);
+        player.unit().removeBuild(x, y, breaking);
     }
 
     @Remote(targets = Loc.both, called = Loc.server)
@@ -326,7 +325,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         //clear player unit when they possess a core
-        if((unit instanceof BlockUnitc && ((BlockUnitc)unit).tile() instanceof CoreBuild)){
+        if(unit instanceof BlockUnitc block && block.tile() instanceof CoreBuild build){
             Fx.spawn.at(player);
             if(net.client()){
                 control.input.controlledType = null;
@@ -334,8 +333,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             player.clearUnit();
             player.deathTimer = 61f;
-            ((CoreBuild)((BlockUnitc)unit).tile()).requestSpawn(player);
-
+            build.requestSpawn(player);
         }else if(unit == null){ //just clear the unit (is this used?)
             player.clearUnit();
             //make sure it's AI controlled, so players can't overwrite each other
@@ -349,6 +347,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 Fx.unitSpirit.at(player.x, player.y, 0f, unit);
             }
         }
+
+        Events.fire(new UnitControlEvent(player, unit));
     }
 
     @Remote(targets = Loc.both, called = Loc.both, forward = true)
@@ -383,7 +383,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public Eachable<BuildPlan> allRequests(){
         return cons -> {
-            for(BuildPlan request : player.builder().plans()) cons.get(request);
+            for(BuildPlan request : player.unit().plans()) cons.get(request);
             for(BuildPlan request : selectRequests) cons.get(request);
             for(BuildPlan request : lineRequests) cons.get(request);
         };
@@ -401,7 +401,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         player.typing = ui.chatfrag.shown();
 
         if(player.isBuilder()){
-            player.builder().updateBuilding(isBuilding);
+            player.unit().updateBuilding(isBuilding);
         }
 
         if(player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && player.unit().ammo <= 0){
@@ -418,7 +418,10 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead);
 
             if(unit != null){
-                Call.unitControl(player, unit);
+                //only trying controlling once a second to prevent packet spam
+                if(!net.client() || controlInterval.get(0, 70f)){
+                    Call.unitControl(player, unit);
+                }
             }
         }
     }
@@ -543,6 +546,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 schematics.add(lastSchematic);
                 ui.showInfoFade("@schematic.saved");
                 ui.schematics.showInfo(lastSchematic);
+                Events.fire(new SchematicCreateEvent(lastSchematic));
             }
         });
     }
@@ -649,7 +653,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             return r2.overlaps(r1);
         };
 
-        for(BuildPlan req : player.builder().plans()){
+        for(BuildPlan req : player.unit().plans()){
             if(test.get(req)) return req;
         }
 
@@ -674,7 +678,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Draw.color(Pal.remove);
         Lines.stroke(1f);
 
-        for(BuildPlan req : player.builder().plans()){
+        for(BuildPlan req : player.unit().plans()){
             if(req.breaking) continue;
             if(req.bounds(Tmp.r2).overlaps(Tmp.r1)){
                 drawBreaking(req);
@@ -736,7 +740,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(BuildPlan req : requests){
             if(req.block != null && validPlace(req.x, req.y, req.block, req.rotation)){
                 BuildPlan copy = req.copy();
-                player.builder().addBuild(copy);
+                player.unit().addBuild(copy);
             }
         }
     }
@@ -774,7 +778,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Remove everything from the queue in a selection. */
     protected void removeSelection(int x1, int y1, int x2, int y2, boolean flush){
-        removeSelection(x1, y1, x2, y2, false, maxLength);
+        removeSelection(x1, y1, x2, y2, flush, maxLength);
     }
 
     /** Remove everything from the queue in a selection. */
@@ -800,7 +804,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         //remove build requests
         Tmp.r1.set(result.x * tilesize, result.y * tilesize, (result.x2 - result.x) * tilesize, (result.y2 - result.y) * tilesize);
 
-        Iterator<BuildPlan> it = player.builder().plans().iterator();
+        Iterator<BuildPlan> it = player.unit().plans().iterator();
         while(it.hasNext()){
             BuildPlan req = it.next();
             if(!req.breaking && req.bounds(Tmp.r2).overlaps(Tmp.r1)){
@@ -921,7 +925,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     boolean tryBeginMine(Tile tile){
         if(canMine(tile)){
             //if a block is clicked twice, reset it
-            player.miner().mineTile(player.miner().mineTile() == tile ? null : tile);
+            player.unit().mineTile = player.unit().mineTile == tile ? null : tile;
             return true;
         }
         return false;
@@ -929,11 +933,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     boolean canMine(Tile tile){
         return !Core.scene.hasMouse()
-        && tile.drop() != null
-        && player.miner().validMine(tile)
-        && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
-        && player.unit().acceptsItem(tile.drop())
-        && tile.block() == Blocks.air;
+            && tile.drop() != null
+            && player.unit().validMine(tile)
+            && !(tile.floor().playerUnmineable && tile.overlay().itemDrop == null)
+            && player.unit().acceptsItem(tile.drop())
+            && tile.block() == Blocks.air;
     }
 
     /** Returns the tile at the specified MOUSE coordinates. */
@@ -982,7 +986,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Unit selectedUnit(){
-        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, u -> u.isAI());
+        Unit unit = Units.closest(player.team(), Core.input.mouseWorld().x, Core.input.mouseWorld().y, 40f, Unitc::isAI);
         if(unit != null){
             unit.hitbox(Tmp.r1);
             Tmp.r1.grow(6f);
@@ -1040,7 +1044,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean canShoot(){
-        return block == null && !onConfigurable() && !isDroppingItem() && !(player.builder().updateBuilding() && player.builder().isBuilding()) &&
+        return block == null && !onConfigurable() && !isDroppingItem() && !player.unit().activelyBuilding() &&
             !(player.unit() instanceof Mechc && player.unit().isFlying());
     }
 
@@ -1086,7 +1090,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean validPlace(int x, int y, Block type, int rotation, BuildPlan ignore){
-        for(BuildPlan req : player.builder().plans()){
+        for(BuildPlan req : player.unit().plans()){
             if(req != ignore
                     && !req.breaking
                     && req.block.bounds(req.x, req.y, Tmp.r1).overlaps(type.bounds(x, y, Tmp.r2))
@@ -1104,15 +1108,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void placeBlock(int x, int y, Block block, int rotation){
         BuildPlan req = getRequest(x, y);
         if(req != null){
-            player.builder().plans().remove(req);
+            player.unit().plans().remove(req);
         }
-        player.builder().addBuild(new BuildPlan(x, y, rotation, block, block.nextConfig()));
+        player.unit().addBuild(new BuildPlan(x, y, rotation, block, block.nextConfig()));
     }
 
     public void breakBlock(int x, int y){
         Tile tile = world.tile(x, y);
         if(tile != null && tile.build != null) tile = tile.build.tile;
-        player.builder().addBuild(new BuildPlan(tile.x, tile.y));
+        player.unit().addBuild(new BuildPlan(tile.x, tile.y));
     }
 
     public void drawArrow(Block block, int x, int y, int rotation){
@@ -1158,7 +1162,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(block instanceof PowerNode){
             Seq<Point2> skip = new Seq<>();
-            
+
             for(int i = 1; i < points.size; i++){
                 int overlaps = 0;
                 Point2 point = points.get(i);

@@ -54,7 +54,7 @@ public class BaseAI{
         }
 
         //only schedule when there's something to build.
-        if(data.blocks.isEmpty() && timer.get(timerStep, step)){
+        if(data.blocks.isEmpty() && timer.get(timerStep, Mathf.lerp(20f, 4f, data.team.rules().aiTier))){
             if(!triedWalls){
                 tryWalls();
                 triedWalls = true;

@@ -1,0 +1,3 @@
+- Fixed server weather-related crash
+- Fixed music not loading on certain systems
+- Added sounds for quad unit

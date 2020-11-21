@@ -254,8 +254,9 @@ public class Net{
         }else if(clientListeners.get(object.getClass()) != null){
 
             if(clientLoaded || ((object instanceof Packet) && ((Packet)object).isImportant())){
-                if(clientListeners.get(object.getClass()) != null)
+                if(clientListeners.get(object.getClass()) != null){
                     clientListeners.get(object.getClass()).get(object);
+                }
                 Pools.free(object);
             }else if(!((object instanceof Packet) && ((Packet)object).isUnimportant())){
                 packetQueue.add(object);
@@ -273,8 +274,9 @@ public class Net{
     public void handleServerReceived(NetConnection connection, Object object){
 
         if(serverListeners.get(object.getClass()) != null){
-            if(serverListeners.get(object.getClass()) != null)
+            if(serverListeners.get(object.getClass()) != null){
                 serverListeners.get(object.getClass()).get(connection, object);
+            }
             Pools.free(object);
         }else{
             Log.err("Unhandled packet type: '@'!", object.getClass());

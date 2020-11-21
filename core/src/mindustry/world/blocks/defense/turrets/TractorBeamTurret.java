@@ -1,11 +1,13 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -30,6 +32,11 @@ public class TractorBeamTurret extends BaseTurret{
     public float damage = 0f;
     public boolean targetAir = true, targetGround = false;
     public Color laserColor = Color.white;
+    public StatusEffect status = StatusEffects.none;
+    public float statusDuration = 300;
+
+    public Sound shootSound = Sounds.tractorbeam;
+    public float shootSoundVolume = 0.9f;
 
     public TractorBeamTurret(String name){
         super(name);
@@ -86,25 +93,34 @@ public class TractorBeamTurret extends BaseTurret{
                 coolant = 1f + (used * liquid.heatCapacity * coolantMultiplier);
             }
 
+            any = false;
+
             //look at target
-            if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.01f){
-                any = true;
+            if(target != null && target.within(this, range) && target.team() != team && target.type.flying && efficiency() > 0.02f){
+                if(!headless){
+                    control.sound.loop(shootSound, this, shootSoundVolume);
+                }
+
                 float dest = angleTo(target);
                 rotation = Angles.moveToward(rotation, dest, rotateSpeed * edelta());
                 lastX = target.x;
                 lastY = target.y;
                 strength = Mathf.lerpDelta(strength, 1f, 0.1f);
 
-                if(damage > 0){
-                    target.damageContinuous(damage * efficiency());
-                }
-
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
+                    if(damage > 0){
+                        target.damageContinuous(damage * efficiency());
+                    }
+
+                    if(status != StatusEffects.none){
+                        target.apply(status, statusDuration);
+                    }
+
+                    any = true;
                     target.impulse(Tmp.v1.set(this).sub(target).limit((force + (1f - target.dst(this) / range) * scaledForce) * efficiency() * timeScale));
                 }
             }else{
-                target = null;
                 strength = Mathf.lerpDelta(strength, 0, 0.1f);
             }
         }

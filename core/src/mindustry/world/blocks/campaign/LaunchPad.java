@@ -1,6 +1,8 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -53,6 +55,11 @@ public class LaunchPad extends Block{
     }
 
     public class LaunchPadBuild extends Building{
+
+        @Override
+        public Cursor getCursor(){
+            return !state.isCampaign() ? SystemCursor.arrow : super.getCursor();
+        }
 
         @Override
         public void draw(){

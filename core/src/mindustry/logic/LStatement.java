@@ -2,6 +2,7 @@ package mindustry.logic;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.actions.*;
@@ -21,7 +22,7 @@ public abstract class LStatement{
     public transient @Nullable StatementElem elem;
 
     public abstract void build(Table table);
-    public abstract LCategory category();
+    public abstract Color color();
     public abstract LInstruction build(LAssembler builder);
 
     public LStatement copy(){
@@ -39,7 +40,7 @@ public abstract class LStatement{
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, setter)
-            .size(144f, 40f).pad(2f).color(table.color).addInputDialog();
+            .size(144f, 40f).pad(2f).color(table.color).maxTextLength(LAssembler.maxTokenLength).addInputDialog();
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){

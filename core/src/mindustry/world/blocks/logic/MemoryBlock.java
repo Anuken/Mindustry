@@ -12,6 +12,7 @@ public class MemoryBlock extends Block{
         super(name);
         destructible = true;
         solid = true;
+        group = BlockGroup.logic;
     }
 
     @Override

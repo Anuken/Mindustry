@@ -80,7 +80,9 @@ public class UnitType extends UnlockableContent{
     public int ammoCapacity = -1;
     public AmmoType ammoType = AmmoTypes.copper;
     public int mineTier = -1;
-    public float buildSpeed = 1f, mineSpeed = 1f;
+    public float buildSpeed = -1f, mineSpeed = 1f;
+    public Sound mineSound = Sounds.minebeam;
+    public float mineSoundVolume = 0.6f;
 
     /** This is a VERY ROUGH estimate of unit DPS. */
     public float dpsEstimate = -1;
@@ -202,7 +204,6 @@ public class UnitType extends UnlockableContent{
         stats.add(Stat.itemCapacity, itemCapacity);
         stats.add(Stat.range, (int)(maxRange / tilesize), StatUnit.blocks);
         stats.add(Stat.commandLimit, commandLimit);
-        //TODO abilities, maybe try something like DPS
 
         if(abilities.any()){
             var unique = new ObjectSet<String>();
@@ -220,15 +221,19 @@ public class UnitType extends UnlockableContent{
             stats.add(Stat.canBoost, canBoost);
         }
 
-        if(inst instanceof Minerc && mineTier >= 1){
+        if(mineTier >= 1){
             stats.addPercent(Stat.mineSpeed, mineSpeed);
             stats.add(Stat.mineTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
         }
-        if(inst instanceof Builderc){
+        if(buildSpeed > 0){
             stats.addPercent(Stat.buildSpeed, buildSpeed);
         }
         if(inst instanceof Payloadc){
             stats.add(Stat.payloadCapacity, (payloadCapacity / (tilesize * tilesize)), StatUnit.blocksSquared);
+        }
+
+        if(weapons.any()){
+            stats.add(Stat.weapons, new WeaponListValue(this, weapons));
         }
     }
 
@@ -249,7 +254,7 @@ public class UnitType extends UnlockableContent{
         singleTarget = weapons.size <= 1;
 
         if(itemCapacity < 0){
-            itemCapacity = Math.max(Mathf.round(hitSize * 4, 10), 10);
+            itemCapacity = Math.max(Mathf.round((int)(hitSize * 4.3), 10), 10);
         }
 
         //set up default range
@@ -355,12 +360,12 @@ public class UnitType extends UnlockableContent{
         ItemStack[] stacks = null;
 
         //calculate costs based on reconstructors or factories found
-        Block rec = content.blocks().find(b -> b instanceof Reconstructor && ((Reconstructor)b).upgrades.contains(u -> u[1] == this));
+        Block rec = content.blocks().find(b -> b instanceof Reconstructor re && re.upgrades.contains(u -> u[1] == this));
 
-        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems){
-            stacks = ((ConsumeItems)rec.consumes.get(ConsumeType.item)).items;
+        if(rec != null && rec.consumes.has(ConsumeType.item) && rec.consumes.get(ConsumeType.item) instanceof ConsumeItems ci){
+            stacks = ci.items;
         }else{
-            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory && ((UnitFactory)u).plans.contains(p -> p.unit == this));
+            UnitFactory factory = (UnitFactory)content.blocks().find(u -> u instanceof UnitFactory uf && uf.plans.contains(p -> p.unit == this));
             if(factory != null){
                 stacks = factory.plans.find(p -> p.unit == this).requirements;
             }
@@ -369,7 +374,7 @@ public class UnitType extends UnlockableContent{
         if(stacks != null){
             ItemStack[] out = new ItemStack[stacks.length];
             for(int i = 0; i < out.length; i++){
-                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1) * 50)));
+                out[i] = new ItemStack(stacks[i].item, UI.roundAmount((int)(Math.pow(stacks[i].amount, 1.1) * 50)));
             }
 
             return out;

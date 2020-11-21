@@ -10,11 +10,10 @@ import arc.util.*;
 import arc.util.Log.*;
 import mindustry.ai.*;
 import mindustry.async.*;
-import mindustry.audio.*;
 import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.io.*;
@@ -67,7 +66,7 @@ public class Vars implements Loadable{
     /** URL of the github issue report template.*/
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
-    public static final Seq<String> defaultServers = Seq.with();
+    public static final Seq<ServerGroup> defaultServers = Seq.with();
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
     /** max chat message length */
@@ -188,7 +187,6 @@ public class Vars implements Loadable{
     public static GameState state;
     public static EntityCollisions collisions;
     public static Waves waves;
-    public static LoopControl loops;
     public static Platform platform = new Platform(){};
     public static Mods mods;
     public static Schematics schematics;
@@ -235,6 +233,7 @@ public class Vars implements Loadable{
             }
 
             Arrays.sort(locales, Structs.comparing(l -> l.getDisplayName(l), String.CASE_INSENSITIVE_ORDER));
+            locales = Seq.with(locales).and(new Locale("router")).toArray(Locale.class);
         }
 
         Version.init();
@@ -255,7 +254,6 @@ public class Vars implements Loadable{
         if(mods == null) mods = new Mods();
 
         content = new ContentLoader();
-        loops = new LoopControl();
         waves = new Waves();
         collisions = new EntityCollisions();
         world = new World();
@@ -392,6 +390,11 @@ public class Vars implements Loadable{
 
             Locale.setDefault(locale);
             Core.bundle = I18NBundle.createBundle(handle, locale);
+
+            //router
+            if(locale.getDisplayName().equals("router")){
+                bundle.debug("router");
+            }
         }
     }
 }

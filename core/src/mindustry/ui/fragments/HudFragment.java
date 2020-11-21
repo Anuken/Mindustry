@@ -53,7 +53,7 @@ public class HudFragment extends Fragment{
             int max = 10;
             int winWave = state.isCampaign() && state.rules.winWave > 0 ? state.rules.winWave : Integer.MAX_VALUE;
             outer:
-            for(int i = state.wave - 1; i <= Math.min(state.wave + max, winWave); i++){
+            for(int i = state.wave - 1; i <= Math.min(state.wave + max, winWave - 2); i++){
                 for(SpawnGroup group : state.rules.spawns){
                     if(group.effect == StatusEffects.boss && group.getSpawned(i) > 0){
                         int diff = (i + 2) - state.wave;
@@ -69,20 +69,16 @@ public class HudFragment extends Fragment{
             }
         });
 
-        //TODO details and stuff
         Events.on(SectorCaptureEvent.class, e ->{
-            //TODO localize
-            showToast("Sector [accent]" + (e.sector.isBeingPlayed() ? "" : e.sector.name() + " ") + "[white]captured!");
+            showToast(Core.bundle.format("sector.captured", e.sector.isBeingPlayed() ? "" : e.sector.name() + " "));
         });
 
-        //TODO localize
         Events.on(SectorLoseEvent.class, e -> {
-            showToast(Icon.warning, "Sector [accent]" + e.sector.name() + "[white] lost!");
+            showToast(Icon.warning, Core.bundle.format("sector.lost", e.sector.name()));
         });
 
-        //TODO localize
         Events.on(SectorInvasionEvent.class, e -> {
-            showToast(Icon.warning, "Sector [accent]" + e.sector.name() + "[white] under attack!");
+            showToast(Icon.warning, Core.bundle.format("sector.attacked", e.sector.name()));
         });
 
         Events.on(ResetEvent.class, e -> {
@@ -94,19 +90,19 @@ public class HudFragment extends Fragment{
         parent.fill(t -> {
             t.name = "paused";
             t.top().visible(() -> state.isPaused() && shown).touchable = Touchable.disabled;
-            t.table(Styles.black5, top -> top.add("@paused").style(Styles.outlineLabel).pad(8f)).growX();
+            t.table(Styles.black5, top -> top.label(() -> state.gameOver && state.isCampaign() ? "@sector.curlost" : "@paused").style(Styles.outlineLabel).pad(8f)).growX();
         });
 
         //minimap + position
         parent.fill(t -> {
             t.name = "minimap/position";
-            t.visible(() -> Core.settings.getBool("minimap") && !state.rules.tutorial && shown);
+            t.visible(() -> Core.settings.getBool("minimap") && shown);
             //minimap
             t.add(new Minimap()).name("minimap");
             t.row();
             //position
             t.label(() -> player.tileX() + "," + player.tileY())
-            .visible(() -> Core.settings.getBool("position") && !state.rules.tutorial)
+            .visible(() -> Core.settings.getBool("position"))
             .touchable(Touchable.disabled)
             .name("position");
             t.top().right();
@@ -180,6 +176,9 @@ public class HudFragment extends Fragment{
 
             cont.update(() -> {
                 if(Core.input.keyTap(Binding.toggle_menus) && !ui.chatfrag.shown() && !Core.scene.hasDialog() && !(Core.scene.getKeyboardFocus() instanceof TextField)){
+                    Core.settings.getBoolOnce("ui-hidden", () -> {
+                        ui.announce(Core.bundle.format("showui",  Core.keybinds.get(Binding.toggle_menus).key.toString(), 11));
+                    });
                     toggleMenus();
                 }
             });
@@ -203,15 +202,13 @@ public class HudFragment extends Fragment{
                     }else{
                         logic.skipWave();
                     }
-                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave())
-                .visible(() -> state.rules.waves).name("skip");
+                }).growY().fillX().right().width(40f).disabled(b -> !canSkipWave()).name("skip");
             }).width(dsize * 5 + 4f);
 
             wavesMain.row();
 
             wavesMain.table(Tex.button, t -> t.margin(10f).add(new Bar("boss.health", Pal.health, () -> state.boss() == null ? 0f : state.boss().healthf()).blink(Color.white))
-            .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).get()
-            .name = "boss";
+            .grow()).fillX().visible(() -> state.rules.waves && state.boss() != null).height(60f).name("boss");
 
             wavesMain.row();
 
@@ -244,7 +241,6 @@ public class HudFragment extends Fragment{
                 info.name = "fps/ping";
                 info.touchable = Touchable.disabled;
                 info.top().left().margin(4).visible(() -> Core.settings.getBool("fps") && shown);
-                info.update(() -> info.setTranslation(state.rules.waves || state.isEditor() ? 0f : -Scl.scl(dsize * 4 + 3), 0));
                 IntFormat fps = new IntFormat("fps");
                 IntFormat ping = new IntFormat("ping");
                 IntFormat mem = new IntFormat("memory");
@@ -323,12 +319,12 @@ public class HudFragment extends Fragment{
             .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
         });
 
-        //tutorial text
+        //TODO tutorial text
         parent.fill(t -> {
             t.name = "tutorial";
             Runnable resize = () -> {
                 t.clearChildren();
-                t.top().right().visible(() -> state.rules.tutorial);
+                t.top().right().visible(() -> false);
                 t.stack(new Button(){{
                     marginLeft(48f);
                     labelWrap(() -> control.tutorial.stage.text() + (control.tutorial.canNext() ? "\n\n" + Core.bundle.get("tutorial.next") : "")).width(!Core.graphics.isPortrait() ? 400f : 160f).pad(2f);
@@ -446,7 +442,7 @@ public class HudFragment extends Fragment{
 
             Table table = new Table(Tex.button);
             table.update(() -> {
-                if(state.isMenu()){
+                if(state.isMenu() || !ui.hudfrag.shown){
                     table.remove();
                 }
             });
@@ -469,7 +465,7 @@ public class HudFragment extends Fragment{
     public void showUnlock(UnlockableContent content){
         //some content may not have icons... yet
         //also don't play in the tutorial to prevent confusion
-        if(state.isMenu() || state.rules.tutorial) return;
+        if(state.isMenu()) return;
 
         Sounds.message.play();
 
@@ -600,7 +596,7 @@ public class HudFragment extends Fragment{
     }
 
     private Table makeStatusTable(){
-        Button table = new Button(Styles.waveb);
+        Table table = new Table(Tex.wavepane);
 
         StringBuilder ibuild = new StringBuilder();
 
@@ -608,6 +604,8 @@ public class HudFragment extends Fragment{
         IntFormat wavefc = new IntFormat("wave.cap");
         IntFormat enemyf = new IntFormat("wave.enemy");
         IntFormat enemiesf = new IntFormat("wave.enemies");
+        IntFormat enemycf = new IntFormat("wave.enemycore");
+        IntFormat enemycsf = new IntFormat("wave.enemycores");
         IntFormat waitingf = new IntFormat("wave.waiting", i -> {
             ibuild.setLength(0);
             int m = i/60;
@@ -623,7 +621,6 @@ public class HudFragment extends Fragment{
             return ibuild.toString();
         });
 
-        table.clearChildren();
         table.touchable = Touchable.enabled;
 
         StringBuilder builder = new StringBuilder();
@@ -745,6 +742,21 @@ public class HudFragment extends Fragment{
 
         table.labelWrap(() -> {
             builder.setLength(0);
+
+            if(!state.rules.waves && state.rules.attackMode){
+                int sum = Math.max(state.teams.present.sum(t -> t.team != player.team() ? t.cores.size : 0), 1);
+                builder.append(sum > 1 ? enemycsf.get(sum) : enemycf.get(sum));
+                return builder;
+            }
+
+            if(!state.rules.waves && state.isCampaign()){
+                builder.append("[lightgray]").append(Core.bundle.get("sector.curcapture"));
+            }
+
+            if(!state.rules.waves){
+                return builder;
+            }
+
             if(state.rules.winWave > 1 && state.rules.winWave >= state.wave && state.isCampaign()){
                 builder.append(wavefc.get(state.wave, state.rules.winWave));
             }else{
@@ -770,14 +782,13 @@ public class HudFragment extends Fragment{
             return builder;
         }).growX().pad(8f);
 
-        table.setDisabled(true);
-        table.visible(() -> state.rules.waves);
+        table.touchable(() -> state.rules.waves ? Touchable.enabled : Touchable.disabled);
 
         return table;
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning() && !state.rules.tutorial;
+        return state.rules.waves && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
     }
 
 }

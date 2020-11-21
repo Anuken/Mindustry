@@ -161,15 +161,17 @@ public abstract class BulletType extends Content{
         return healPercent <= 0.001f || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
-    public void hitTile(Bullet b, Building tile, float initialHealth){
-        if(makeFire && tile.team != b.team){
-            Fires.create(tile.tile);
+    /** If direct is false, this is an indirect hit and the tile was already damaged.
+     * TODO this is a mess. */
+    public void hitTile(Bullet b, Building build, float initialHealth, boolean direct){
+        if(makeFire && build.team != b.team){
+            Fires.create(build.tile);
         }
-        
-        if(healPercent > 0f && tile.team == b.team && !(tile.block instanceof ConstructBlock)){
-            Fx.healBlockFull.at(tile.x, tile.y, tile.block.size, Pal.heal);
-            tile.heal(healPercent / 100f * tile.maxHealth());
-        }else if(tile.team != b.team){
+
+        if(healPercent > 0f && build.team == b.team && !(build.block instanceof ConstructBlock)){
+            Fx.healBlockFull.at(build.x, build.y, build.block.size, Pal.heal);
+            build.heal(healPercent / 100f * build.maxHealth());
+        }else if(build.team != b.team && direct){
             hit(b);
         }
     }
@@ -207,15 +209,15 @@ public abstract class BulletType extends Content{
             Damage.createIncend(x, y, incendSpread, incendAmount);
         }
 
-        if(splashDamageRadius > 0){
+        if(splashDamageRadius > 0 && !b.absorbed){
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), collidesAir, collidesGround);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
             }
-            
+
             if(healPercent > 0f){
-                indexer.eachBlock(b.team, x, y, splashDamageRadius, other -> other.damaged(), other -> {
+                indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, Pal.heal);
                     other.heal(healPercent / 100f * other.maxHealth());
                 });
@@ -253,8 +255,8 @@ public abstract class BulletType extends Content{
 
     public void init(Bullet b){
 
-        if(killShooter && b.owner() instanceof Healthc){
-            ((Healthc)b.owner()).kill();
+        if(killShooter && b.owner() instanceof Healthc h){
+            h.kill();
         }
 
         if(instantDisappear){

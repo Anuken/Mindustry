@@ -27,6 +27,13 @@ public class Universe{
     public Universe(){
         load();
 
+        //load legacy research
+        Events.on(ClientLoadEvent.class, e -> {
+            if(Core.settings.has("unlocks")){
+                LegacyIO.readResearch();
+            }
+        });
+
         //update base coverage on capture
         Events.on(SectorCaptureEvent.class, e -> {
             if(state.isCampaign()){
@@ -150,8 +157,11 @@ public class Universe{
 
                     //increment seconds passed for this sector by the time that just passed with this turn
                     if(!sector.isBeingPlayed()){
-                        //increment time
-                        sector.info.secondsPassed += turnDuration/60f;
+
+                        //increment time if attacked
+                        if(sector.isAttacked()){
+                            sector.info.secondsPassed += turnDuration/60f;
+                        }
 
                         int wavesPassed = (int)(sector.info.secondsPassed*60f / sector.info.waveSpacing);
                         boolean attacked = sector.info.waves;
@@ -203,10 +213,10 @@ public class Universe{
                     }
 
                     //queue random invasions
-                    if(!sector.isAttacked() && turn > invasionGracePeriod){
+                    if(!sector.isAttacked() && turn > invasionGracePeriod && sector.info.hasSpawns){
                         //invasion chance depends on # of nearby bases
                         if(Mathf.chance(baseInvasionChance * sector.near().count(Sector::hasEnemyBase))){
-                            int waveMax = Math.max(sector.info.winWave, state.wave) + Mathf.random(2, 5) * 5;
+                            int waveMax = Math.max(sector.info.winWave, sector.isBeingPlayed() ? state.wave : sector.info.wave + sector.info.wavesPassed) + Mathf.random(2, 5) * 5;
 
                             //assign invasion-related things
                             if(sector.isBeingPlayed()){
@@ -270,10 +280,6 @@ public class Universe{
     private void load(){
         seconds = Core.settings.getInt("utimei");
         turn = Core.settings.getInt("turn");
-
-        if(Core.settings.has("unlocks")){
-            LegacyIO.readResearch();
-        }
     }
 
 }

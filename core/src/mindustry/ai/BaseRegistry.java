@@ -82,7 +82,7 @@ public class BaseRegistry{
                 }
                 schem.tiles.removeAll(s -> s.block.buildVisibility == BuildVisibility.sandboxOnly);
 
-                part.tier = schem.tiles.sumf(s -> Mathf.pow(s.block.buildCost / s.block.buildCostMultiplier, 1.2f));
+                part.tier = schem.tiles.sumf(s -> Mathf.pow(s.block.buildCost / s.block.buildCostMultiplier, 1.4f));
 
                 if(part.core != null){
                     cores.add(part);
@@ -99,7 +99,9 @@ public class BaseRegistry{
                     part.centerY = part.schematic.height/2;
                 }
 
-                if(part.required != null) reqParts.get(part.required, Seq::new).add(part);
+                if(part.required != null && part.core == null){
+                    reqParts.get(part.required, Seq::new).add(part);
+                }
 
             }catch(IOException e){
                 throw new RuntimeException(e);

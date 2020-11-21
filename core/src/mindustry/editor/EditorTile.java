@@ -76,6 +76,8 @@ public class EditorTile extends Tile{
         if(getTeamID() == team.id) return;
         op(OpType.team, (byte)getTeamID());
         super.setTeam(team);
+
+        getLinkedTiles(t -> ui.editor.editor.renderer.updatePoint(t.x, t.y));
     }
 
     @Override

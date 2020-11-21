@@ -24,6 +24,8 @@ logs/
 changelog
 saves/
 /core/assets-raw/fontgen/out/
+/core/assets-raw/fontgen/icons/
+/core/assets-raw/fontgen/icon_parts/
 core/assets/saves/
 /core/assets/saves/
 steam_appid.txt
@@ -34,6 +36,7 @@ steam_appid.txt
 /annotations/src/main/resources/META-INF/services
 /core/assets/version.properties
 /core/assets/locales
+/core/assets/cache/
 /ios/src/mindustry/gen/
 /core/src/mindustry/gen/
 ios/robovm.properties

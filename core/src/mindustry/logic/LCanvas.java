@@ -268,7 +268,7 @@ public class LCanvas extends Table{
             st.elem = this;
 
             background(Tex.whitePane);
-            setColor(st.category().color);
+            setColor(st.color());
             margin(0f);
             touchable = Touchable.enabled;
 
@@ -283,7 +283,7 @@ public class LCanvas extends Table{
                 t.add().growX();
 
                 t.button(Icon.copy, Styles.logici, () -> {
-                }).padRight(6).get().tapped(() -> copy());
+                }).padRight(6).get().tapped(this::copy);
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();

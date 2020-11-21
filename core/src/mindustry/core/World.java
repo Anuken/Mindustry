@@ -445,7 +445,6 @@ public class World{
         int err = dx - dy;
         int e2;
         while(true){
-
             if(cons.accept(x0, y0)) return true;
             if(x0 == x1 && y0 == y1) return false;
 
