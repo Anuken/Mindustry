@@ -370,6 +370,11 @@ public class NetClient implements ApplicationListener{
             netClient.disconnectQuietly();
         });
     }
+    
+    @Remote(variants = Variant.both)
+    public static void endMapLoad(){
+        world.endMapLoad();
+    }
 
     @Remote(variants = Variant.one)
     public static void setPosition(float x, float y){
