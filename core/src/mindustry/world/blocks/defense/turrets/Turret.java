@@ -394,7 +394,7 @@ public abstract class Turret extends ReloadTurret{
         }
 
         protected void bullet(BulletType type, float angle){
-            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.range(), minRange / type.range(), range / type.range()) : 1f;
+            float lifeScl = type.scaleVelocity ? Mathf.clamp(Mathf.dst(x + tr.x, y + tr.y, targetPos.x, targetPos.y) / type.maxRange(), minRange / type.maxRange(), range / type.maxRange()) : 1f;
 
             type.create(this, team, x + tr.x, y + tr.y, angle, 1f + Mathf.range(velocityInaccuracy), lifeScl);
         }

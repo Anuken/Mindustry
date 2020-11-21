@@ -153,7 +153,7 @@ public abstract class BulletType extends Content{
     }
 
     /** Returns maximum distance the bullet this bullet type has can travel. */
-    public float range(){
+    public float maxRange(){
         return Math.max(speed * lifetime * (1f - drag), range);
     }
 
