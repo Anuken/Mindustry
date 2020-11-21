@@ -3,6 +3,8 @@ package mindustry.annotations.impl;
 import arc.files.*;
 import arc.scene.style.*;
 import arc.struct.*;
+import arc.util.*;
+import arc.util.io.*;
 import arc.util.serialization.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.Annotations.*;
@@ -30,16 +32,40 @@ public class AssetsProcess extends BaseProcessor{
         MethodSpec.Builder load = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder loadStyles = MethodSpec.methodBuilder("loadStyles").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        CodeBlock.Builder ichinit = CodeBlock.builder();
         String resources = rootDirectory + "/core/assets-raw/sprites/ui";
         Jval icons = Jval.read(Fi.get(rootDirectory + "/core/assets-raw/fontgen/config.json").readString());
+
+        ObjectMap<String, String> texIcons = new OrderedMap<>();
+        PropertiesUtils.load(texIcons, Fi.get(rootDirectory + "/core/assets/icons/icons.properties").reader());
+
+        StringBuilder iconcAll = new StringBuilder();
+
+        texIcons.each((key, val) -> {
+            String[] split = val.split("\\|");
+            String name = Strings.kebabToCamel(split[1]).replace("Medium", "").replace("Icon", "");
+            if(SourceVersion.isKeyword(name) || name.equals("char")) name += "i";
+
+            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + key).build());
+        });
 
         ictype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectMap.class, String.class, TextureRegionDrawable.class),
                 "icons", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectMap<>()").build());
 
+        ichtype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectIntMap.class, String.class),
+            "codes", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("new ObjectIntMap<>()").build());
+
+        ObjectSet<String> used = new ObjectSet<>();
+
         for(Jval val : icons.get("glyphs").asArray()){
             String name = capitalize(val.getString("css", ""));
+
+            if(!val.getBool("selected", true) || !used.add(name)) continue;
+
             int code = val.getInt("code", 0);
+            iconcAll.append((char)code);
             ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + code).build());
+            ichinit.addStatement("codes.put($S, $L)", name, code);
 
             ictype.addField(TextureRegionDrawable.class, name + "Small", Modifier.PUBLIC, Modifier.STATIC);
             icload.addStatement(name + "Small = mindustry.ui.Fonts.getGlyph(mindustry.ui.Fonts.def, (char)" + code + ")");
@@ -50,6 +76,9 @@ public class AssetsProcess extends BaseProcessor{
             icload.addStatement("icons.put($S, " + name + ")", name);
             icload.addStatement("icons.put($S, " + name + "Small)", name + "Small");
         }
+
+        ichtype.addField(FieldSpec.builder(String.class, "all", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("$S", iconcAll.toString()).build());
+        ichtype.addStaticBlock(ichinit.build());
 
         Fi.get(resources).walk(p -> {
             if(!p.extEquals("png")) return;
@@ -65,7 +94,7 @@ public class AssetsProcess extends BaseProcessor{
             if(SourceVersion.isKeyword(varname)) varname += "s";
 
             type.addField(ClassName.bestGuess(dtype), varname, Modifier.STATIC, Modifier.PUBLIC);
-            load.addStatement(varname + " = ("+dtype+")arc.Core.atlas.drawable($S)", sfilen);
+            load.addStatement(varname + " = (" + dtype + ")arc.Core.atlas.drawable($S)", sfilen);
         });
 
         for(Element elem : elements){
@@ -93,7 +122,6 @@ public class AssetsProcess extends BaseProcessor{
 
         HashSet<String> names = new HashSet<>();
         Fi.get(path).walk(p -> {
-            String fname = p.name();
             String name = p.nameWithoutExtension();
 
             if(names.contains(name)){
@@ -102,23 +130,20 @@ public class AssetsProcess extends BaseProcessor{
                 names.add(name);
             }
 
-            if(SourceVersion.isKeyword(name)){
-                name = name + "s";
-            }
+            if(SourceVersion.isKeyword(name)) name += "s";
 
-            String filepath = path.substring(path.lastIndexOf("/") + 1) + "/" + fname;
+            String filepath =  path.substring(path.lastIndexOf("/") + 1) + p.path().substring(p.path().lastIndexOf(path) + path.length());
 
-            String filename = "arc.Core.app.getType() != arc.Application.ApplicationType.iOS ? \"" + filepath + "\" : \"" + filepath.replace(".ogg", ".mp3")+"\"";
-
-            loadBegin.addStatement("arc.Core.assets.load("+filename +", "+rtype+".class).loaded = a -> " + name + " = ("+rtype+")a", filepath, filepath.replace(".ogg", ".mp3"));
+            String filename = "\"" + filepath + "\"";
+            loadBegin.addStatement("arc.Core.assets.load(" + filename + ", " + rtype + ".class).loaded = a -> " + name + " = (" + rtype + ")a", filepath, filepath.replace(".ogg", ".mp3"));
 
             dispose.addStatement("arc.Core.assets.unload(" + filename + ")");
             dispose.addStatement(name + " = null");
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), name, Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio." + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
         });
 
         if(classname.equals("Sounds")){
-            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.mock.Mock" + rtype.substring(rtype.lastIndexOf(".") + 1)+ "()").build());
+            type.addField(FieldSpec.builder(ClassName.bestGuess(rtype), "none", Modifier.STATIC, Modifier.PUBLIC).initializer("new arc.audio." + rtype.substring(rtype.lastIndexOf(".") + 1) + "()").build());
         }
 
         type.addMethod(loadBegin.build());

@@ -1,10 +1,13 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
+import arc.Graphics.*;
+import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -34,13 +37,14 @@ public class LaunchPad extends Block{
         hasItems = true;
         solid = true;
         update = true;
+        configurable = true;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.launchTime, launchTime / 60f, StatUnit.seconds);
+        stats.add(Stat.launchTime, launchTime / 60f, StatUnit.seconds);
     }
 
     @Override
@@ -50,7 +54,13 @@ public class LaunchPad extends Block{
         bars.add("items", entity -> new Bar(() -> Core.bundle.format("bar.items", entity.items.total()), () -> Pal.items, () -> (float)entity.items.total() / itemCapacity));
     }
 
-    public class LaunchPadEntity extends Building{
+    public class LaunchPadBuild extends Building{
+
+        @Override
+        public Cursor getCursor(){
+            return !state.isCampaign() ? SystemCursor.arrow : super.getCursor();
+        }
+
         @Override
         public void draw(){
             super.draw();
@@ -97,15 +107,48 @@ public class LaunchPad extends Block{
             //launch when full and base conditions are met
             if(items.total() >= itemCapacity && efficiency() >= 1f && timer(timerLaunch, launchTime / timeScale)){
                 LaunchPayload entity = LaunchPayload.create();
-                items.each((item, amount) -> entity.stacks().add(new ItemStack(item, amount)));
+                items.each((item, amount) -> entity.stacks.add(new ItemStack(item, amount)));
                 entity.set(this);
                 entity.lifetime(120f);
                 entity.team(team);
                 entity.add();
                 Fx.launchPod.at(this);
                 items.clear();
-                Effects.shake(3f, 3f, this);
+                Effect.shake(3f, 3f, this);
             }
+        }
+
+        @Override
+        public void display(Table table){
+            super.display(table);
+
+            if(!state.isCampaign()) return;
+
+            table.row();
+            table.label(() -> {
+                Sector dest = state.rules.sector == null ? null : state.rules.sector.info.getRealDestination();
+
+                return Core.bundle.format("launch.destination",
+                    dest == null ? Core.bundle.get("sectors.nonelaunch") :
+                    "[accent]" + dest.name());
+            }).pad(4).wrap().width(200f).left();
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            if(!state.isCampaign()){
+                deselect();
+                return;
+            }
+
+            table.button(Icon.upOpen, Styles.clearTransi, () -> {
+                ui.planet.showSelect(state.rules.sector, other -> {
+                    if(state.isCampaign()){
+                        state.rules.sector.info.destination = other;
+                    }
+                });
+                deselect();
+            }).size(40f);
         }
     }
 
@@ -142,7 +185,7 @@ public class LaunchPad extends Block{
             Draw.z(Layer.weather - 1);
 
             TextureRegion region = Core.atlas.find("launchpod");
-            float rw = region.getWidth() * Draw.scl * scale, rh = region.getHeight() * Draw.scl * scale;
+            float rw = region.width * Draw.scl * scale, rh = region.height * Draw.scl * scale;
 
             Draw.alpha(alpha);
             Draw.rect(region, cx, cy, rw, rh, rotation);
@@ -174,25 +217,25 @@ public class LaunchPad extends Block{
 
         @Override
         public void remove(){
+            if(!state.isCampaign()) return;
+
+            Sector destsec = state.rules.sector.info.getRealDestination();
 
             //actually launch the items upon removal
-            if(team() == state.rules.defaultTeam && state.secinfo.origin != null){
-                Seq<ItemStack> dest = state.secinfo.origin.getReceivedItems();
+            if(team() == state.rules.defaultTeam){
+                if(destsec != null && (destsec != state.rules.sector || net.client())){
+                    ItemSeq dest = new ItemSeq();
 
-                for(ItemStack stack : stacks){
-                    ItemStack sto = dest.find(i -> i.item == stack.item);
-                    if(sto != null){
-                        sto.amount += stack.amount;
-                    }else{
+                    for(ItemStack stack : stacks){
                         dest.add(stack);
+
+                        //update export
+                        state.rules.sector.info.handleItemExport(stack);
+                        Events.fire(new LaunchItemEvent(stack));
                     }
 
-                    //update export
-                    state.secinfo.handleItemExport(stack);
-                    Events.fire(new LaunchItemEvent(stack));
+                    destsec.addItems(dest);
                 }
-
-                state.secinfo.origin.setReceivedItems(dest);
             }
         }
     }

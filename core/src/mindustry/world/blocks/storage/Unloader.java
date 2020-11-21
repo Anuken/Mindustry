@@ -26,9 +26,10 @@ public class Unloader extends Block{
         configurable = true;
         saveConfig = true;
         itemCapacity = 0;
+        noUpdateDisabled = true;
 
-        config(Item.class, (UnloaderEntity tile, Item item) -> tile.sortItem = item);
-        configClear((UnloaderEntity tile) -> tile.sortItem = null);
+        config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
+        configClear((UnloaderBuild tile) -> tile.sortItem = null);
     }
 
     @Override
@@ -42,16 +43,20 @@ public class Unloader extends Block{
         bars.remove("items");
     }
 
-    public class UnloaderEntity extends Building{
+    public class UnloaderBuild extends Building{
         public Item sortItem = null;
         public Building dumpingTo;
+        public int offset = 0;
 
         @Override
         public void updateTile(){
             if(timer(timerUnload, speed / timeScale())){
-                for(Building other : proximity){
-                    if(other.interactable(team) && other.block().unloadable && other.block().hasItems
-                        && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
+                for(int i = 0; i < proximity.size; i++){
+                    int pos = (offset + i) % proximity.size;
+                    var other = proximity.get(pos);
+
+                    if(other.interactable(team) && other.block.unloadable && other.block.hasItems
+                    && ((sortItem == null && other.items.total() > 0) || (sortItem != null && other.items.has(sortItem)))){
                         //make sure the item can't be dumped back into this block
                         dumpingTo = other;
 
@@ -65,8 +70,16 @@ public class Unloader extends Block{
                             }else{
                                 other.items.remove(item, 1);
                             }
+                            other.itemTaken(item);
+                        }else if(sortItem == null){
+                            other.items.failTake();
                         }
                     }
+                }
+
+                if(proximity.size > 0){
+                    offset ++;
+                    offset %= proximity.size;
                 }
             }
         }
@@ -82,7 +95,7 @@ public class Unloader extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.items(), () -> tile.<UnloaderEntity>bc().sortItem, item -> configure(item));
+            ItemSelection.buildTable(table, content.items(), () -> sortItem, this::configure);
         }
 
         @Override
@@ -98,7 +111,7 @@ public class Unloader extends Block{
 
         @Override
         public boolean canDump(Building to, Item item){
-            return !(to.block() instanceof StorageBlock) && to != dumpingTo;
+            return !(to.block instanceof StorageBlock) && to != dumpingTo;
         }
 
         @Override
@@ -107,15 +120,20 @@ public class Unloader extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
-            write.b(sortItem == null ? -1 : sortItem.id);
+            write.s(sortItem == null ? -1 : sortItem.id);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte id = read.b();
+            int id = revision == 1 ? read.s() : read.b();
             sortItem = id == -1 ? null : content.items().get(id);
         }
     }

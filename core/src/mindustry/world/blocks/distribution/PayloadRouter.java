@@ -5,7 +5,9 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
+import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.blocks.payloads.*;
 
 public class PayloadRouter extends PayloadConveyor{
     public @Load("@-over") TextureRegion overRegion;
@@ -24,7 +26,7 @@ public class PayloadRouter extends PayloadConveyor{
         Draw.rect(overRegion, req.drawx(), req.drawy());
     }
 
-    public class PayloadRouterEntity extends PayloadConveyorEntity{
+    public class PayloadRouterBuild extends PayloadConveyorBuild{
         public float smoothRot;
 
         @Override
@@ -33,13 +35,27 @@ public class PayloadRouter extends PayloadConveyor{
             smoothRot = rotdeg();
         }
 
+        public void pickNext(){
+            if(item != null){
+                int rotations = 0;
+                do{
+                    rotation = (rotation + 1) % 4;
+                    onProximityUpdate();
+                    //this condition intentionally uses "accept from itself" conditions, because payload conveyors only accept during the start
+                    //"accept from self" conditions are for dropped payloads and are less restrictive
+                }while((blocked || next == null || !next.acceptPayload(next, item)) && ++rotations < 4);
+            }
+        }
+
         @Override
-        public void moved(){
-            int rotations = 0;
-            do{
-                tile.rotation((tile.rotation() + 1) % 4);
-                onProximityUpdate();
-            }while((blocked || next == null) && ++rotations < 4);
+        public void handlePayload(Building source, Payload payload){
+            super.handlePayload(source, payload);
+            pickNext();
+        }
+
+        @Override
+        public void moveFailed(){
+            pickNext();
         }
 
         @Override
@@ -55,7 +71,7 @@ public class PayloadRouter extends PayloadConveyor{
 
             float dst = 0.8f;
 
-            Draw.mixcol(Pal.accent, Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0));
+            Draw.mixcol(team.color, Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0));
             Draw.rect(topRegion, x, y, smoothRot);
             Draw.reset();
 

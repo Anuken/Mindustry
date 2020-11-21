@@ -40,7 +40,6 @@ public abstract class SaveVersion extends SaveFileReader{
             map.get("mapname"),
             map.getInt("wave"),
             JsonIO.read(Rules.class, map.get("rules", "{}")),
-            JsonIO.read(SectorInfo.class, map.get("secinfo", "{}")),
             map
         );
     }
@@ -73,7 +72,8 @@ public abstract class SaveVersion extends SaveFileReader{
     public void writeMeta(DataOutput stream, StringMap tags) throws IOException{
         //prepare campaign data for writing
         if(state.isCampaign()){
-            state.secinfo.prepare();
+            state.rules.sector.info.prepare();
+            state.rules.sector.saveInfo();
         }
 
         //flush tech node progress
@@ -89,7 +89,6 @@ public abstract class SaveVersion extends SaveFileReader{
             "wave", state.wave,
             "wavetime", state.wavetime,
             "stats", JsonIO.write(state.stats),
-            "secinfo", state.isCampaign() ? JsonIO.write(state.secinfo) : "{}",
             "rules", JsonIO.write(state.rules),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "width", world.width(),
@@ -106,16 +105,10 @@ public abstract class SaveVersion extends SaveFileReader{
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
-        state.stats = JsonIO.read(Stats.class, map.get("stats", "{}"));
-        state.secinfo = JsonIO.read(SectorInfo.class, map.get("secinfo", "{}"));
+        state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
         state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
-        if(state.rules.spawns.isEmpty()) state.rules.spawns = defaultWaves.get();
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
         lastReadBuild = map.getInt("build", -1);
-
-        //load time spent on sector into state
-        if(state.rules.sector != null){
-            state.secinfo.internalTimeSpent = state.rules.sector.getStoredTimeSpent();
-        }
 
         if(!headless){
             Tmp.v1.tryFromString(map.get("viewpos"));
@@ -168,8 +161,8 @@ public abstract class SaveVersion extends SaveFileReader{
             Tile tile = world.rawTile(i % world.width(), i / world.width());
             stream.writeShort(tile.blockID());
 
-            boolean saverot = tile.block().saveRotation;
-            byte packed = (byte)((tile.build != null ? 1 : 0) | (saverot ? 2 : 0));
+            boolean savedata = tile.block().saveData;
+            byte packed = (byte)((tile.build != null ? 1 : 0) | (savedata ? 2 : 0));
 
             //make note of whether there was an entity/rotation here
             stream.writeByte(packed);
@@ -185,8 +178,8 @@ public abstract class SaveVersion extends SaveFileReader{
                 }else{
                     stream.writeBoolean(false);
                 }
-            }else if(saverot){
-                stream.writeByte(tile.rotation());
+            }else if(savedata){
+                stream.writeByte(tile.data);
             }else{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
@@ -244,7 +237,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 boolean isCenter = true;
                 byte packedCheck = stream.readByte();
                 boolean hadEntity = (packedCheck & 1) != 0;
-                boolean hadRotation = (packedCheck & 2) != 0;
+                boolean hadData = (packedCheck & 2) != 0;
 
                 if(hadEntity){
                     isCenter = stream.readBoolean();
@@ -257,7 +250,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
                 if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
-                        if(block.hasEntity()){
+                        if(block.hasBuilding()){
                             try{
                                 readChunk(stream, true, in -> {
                                     byte revision = in.readByte();
@@ -270,10 +263,12 @@ public abstract class SaveVersion extends SaveFileReader{
                             //skip the entity region, as the entity and its IO code are now gone
                             skipChunk(stream, true);
                         }
+
+                        context.onReadBuilding();
                     }
-                }else if(hadRotation){
+                }else if(hadData){
                     tile.setBlock(block);
-                    tile.rotation(stream.readByte());
+                    tile.data = stream.readByte();
                 }else{
                     int consecutives = stream.readUnsignedByte();
 
@@ -331,6 +326,11 @@ public abstract class SaveVersion extends SaveFileReader{
         for(int j = 0; j < amount; j++){
             readChunk(stream, true, in -> {
                 byte typeid = in.readByte();
+                if(EntityMapping.map(typeid) == null){
+                    in.skipBytes(lastRegionLength - 1);
+                    return;
+                }
+
                 Entityc entity = (Entityc)EntityMapping.map(typeid).get();
                 entity.read(Reads.get(in));
                 entity.add();

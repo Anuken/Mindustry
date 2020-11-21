@@ -4,11 +4,12 @@ import arc.*;
 import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.collisions;
+import static mindustry.Vars.*;
 
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
@@ -57,8 +58,9 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         each(Entityc::update);
     }
 
-    public void copy(Seq arr){
+    public Seq<T> copy(Seq<T> arr){
         arr.addAll(array);
+        return arr;
     }
 
     public void each(Cons<T> cons){
@@ -92,6 +94,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         return map != null;
     }
 
+    @Nullable
     public T getByID(int id){
         if(map == null) throw new RuntimeException("Mapping is not enabled for group " + id + "!");
         return map.get(id);
@@ -101,7 +104,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(map == null) throw new RuntimeException("Mapping is not enabled for group " + id + "!");
         T t = map.get(id);
         if(t != null){ //remove if present in map already
-            remove(t);
+            t.remove();
         }
     }
 
@@ -182,14 +185,19 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
 
         array.each(Entityc::remove);
         array.clear();
-        if(map != null)
-            map.clear();
+        if(map != null) map.clear();
 
         clearing = false;
     }
 
+    @Nullable
     public T find(Boolf<T> pred){
         return array.find(pred);
+    }
+
+    @Nullable
+    public T first(){
+        return array.first();
     }
 
     @Override

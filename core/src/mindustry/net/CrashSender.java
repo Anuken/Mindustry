@@ -2,9 +2,9 @@ package mindustry.net;
 
 import arc.*;
 import arc.Net.*;
-import arc.struct.*;
 import arc.files.*;
 import arc.func.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
@@ -20,23 +20,32 @@ import java.util.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.net;
+import static mindustry.Vars.*;
 
 public class CrashSender{
 
+    public static String createReport(String error){
+        String report = "Mindustry has crashed. How unfortunate.\n";
+        if(mods.list().size == 0 && Version.build != -1){
+            report += "Report this at " + Vars.reportIssueURL + "\n\n";
+        }
+        return report + "Version: " + Version.combined() + (Vars.headless ? " (Server)" : "") + "\n"
+            + "OS: " + System.getProperty("os.name") + " x" + (OS.is64Bit ? "64" : "32") + "\n"
+            + "Java Version: " + System.getProperty("java.version") + "\n"
+            + "Java Architecture: " + System.getProperty("sun.arch.data.model") + "\n"
+            + mods.list().size + " Mods" + (mods.list().isEmpty() ? "" : ": " + mods.list().toString(", ", mod -> mod.name + ":" + mod.meta.version))
+            + "\n\n" + error;
+    }
+
     public static void log(Throwable exception){
         try{
-            Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt").writeString(Strings.neatError(exception));
+            Core.settings.getDataDirectory().child("crashes").child("crash_" + System.currentTimeMillis() + ".txt")
+                .writeString(createReport(Strings.neatError(exception)));
         }catch(Throwable ignored){
         }
-
-        if(exception instanceof RuntimeException){
-            throw (RuntimeException)exception;
-        }
-        throw new RuntimeException(exception);
     }
 
     public static void send(Throwable exception, Cons<File> writeListener){
-
         try{
             exception.printStackTrace();
 
@@ -75,7 +84,7 @@ public class CrashSender{
             try{
                 File file = new File(OS.getAppDataDirectoryString(Vars.appName), "crashes/crash-report-" + new SimpleDateFormat("MM_dd_yyyy_HH_mm_ss").format(new Date()) + ".txt");
                 new Fi(OS.getAppDataDirectoryString(Vars.appName)).child("crashes").mkdirs();
-                new Fi(file).writeString(parseException(exception));
+                new Fi(file).writeString(createReport(parseException(exception)));
                 writeListener.get(file);
             }catch(Throwable e){
                 Log.err("Failed to save local crash report.", e);
@@ -135,7 +144,7 @@ public class CrashSender{
             boolean[] sent = {false};
 
             Log.info("Sending crash report.");
-            //post to crash report URL
+            //post to crash report URL, exit code indicates send success
             httpPost(Vars.crashReportURL, value.toJson(OutputType.json), r -> {
                 Log.info("Crash sent successfully.");
                 sent[0] = true;
@@ -143,7 +152,7 @@ public class CrashSender{
             }, t -> {
                 t.printStackTrace();
                 sent[0] = true;
-                System.exit(1);
+                System.exit(-1);
             });
 
             //sleep until report is sent

@@ -1,17 +1,15 @@
 package mindustry.ui.dialogs;
 
-import arc.Core;
-import arc.struct.*;
+import arc.*;
 import arc.scene.ui.*;
-import arc.scene.ui.layout.Table;
-import arc.util.Log;
-import arc.util.Strings;
+import arc.scene.ui.layout.*;
+import arc.struct.*;
+import arc.util.*;
 import mindustry.ui.*;
 
-import java.util.Locale;
+import java.util.*;
 
-import static mindustry.Vars.locales;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 public class LanguageDialog extends BaseDialog{
     private Locale lastLocale;
@@ -21,7 +19,7 @@ public class LanguageDialog extends BaseDialog{
     );
 
     public LanguageDialog(){
-        super("$settings.language");
+        super("@settings.language");
         addCloseButton();
         setup();
     }
@@ -40,7 +38,7 @@ public class LanguageDialog extends BaseDialog{
                 if(getLocale().equals(loc)) return;
                 Core.settings.put("locale", loc.toString());
                 Log.info("Setting locale: @", loc.toString());
-                ui.showInfo("$language.restart");
+                ui.showInfo("@language.restart");
             });
             langs.add(button).group(group).update(t -> t.setChecked(loc.equals(getLocale()))).size(400f, 50f).row();
         }

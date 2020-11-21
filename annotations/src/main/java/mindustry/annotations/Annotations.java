@@ -98,6 +98,8 @@ public class Annotations{
         boolean serialize() default true;
         /** Whether to generate IO code. This is for advanced usage only. */
         boolean genio() default true;
+        /** Whether I made a massive mistake by merging two different class branches */
+        boolean legacy() default false;
     }
 
     /** Indicates an internal interface for entity components. */
@@ -126,6 +128,13 @@ public class Annotations{
         int[] lengths() default {};
         /** Fallback string used to replace "@" (the block name) if the region isn't found. */
         String fallback() default "error";
+    }
+
+    /** Registers a statement for auto serialization. */
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface RegisterStatement{
+        String value();
     }
 
     @Target(ElementType.TYPE)

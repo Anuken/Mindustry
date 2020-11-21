@@ -1,6 +1,10 @@
 package mindustry.mod;
 
 import arc.*;
+import arc.assets.*;
+import arc.assets.loaders.MusicLoader.*;
+import arc.assets.loaders.SoundLoader.*;
+import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
@@ -17,15 +21,14 @@ import java.net.*;
 import java.util.regex.*;
 
 public class Scripts implements Disposable{
-    private final Seq<String> blacklist = Seq.with("net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
+    private final Seq<String> blacklist = Seq.with(".net.", "java.net", "files", "reflect", "javax", "rhino", "file", "channels", "jdk",
         "runtime", "util.os", "rmi", "security", "org.", "sun.", "beans", "sql", "http", "exec", "compiler", "process", "system",
-        ".awt", "socket", "classloader", "oracle", "invoke", "arc.events", "java.util.function", "java.util.stream");
-    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.");
+        ".awt", "socket", "classloader", "oracle", "invoke", "java.util.function", "java.util.stream", "org.");
+    private final Seq<String> whitelist = Seq.with("mindustry.net", "netserver", "netclient", "com.sun.proxy.$proxy", "mindustry.gen.", "mindustry.logic.", "mindustry.async.", "saveio", "systemcursor");
     private final Context context;
     private final Scriptable scope;
     private boolean errored;
-    private LoadedMod currentMod = null;
-    private Seq<EventHandle> events = new Seq<>();
+    LoadedMod currentMod = null;
 
     public Scripts(){
         Time.mark();
@@ -58,12 +61,12 @@ public class Scripts implements Disposable{
             if(o instanceof Undefined) o = "undefined";
             return String.valueOf(o);
         }catch(Throwable t){
-            return getError(t);
+            return getError(t, false);
         }
     }
 
-    private String getError(Throwable t){
-        t.printStackTrace();
+    private String getError(Throwable t, boolean log){
+        if(log) Log.err(t);
         return t.getClass().getSimpleName() + (t.getMessage() == null ? "" : ": " + t.getMessage());
     }
 
@@ -75,10 +78,81 @@ public class Scripts implements Disposable{
         Log.log(level, "[@]: @", source, message);
     }
 
-    public <T> void onEvent(Class<T> type, Cons<T> listener){
-        Events.on(type, listener);
-        events.add(new EventHandle(type, listener));
+    //region utility mod functions
+
+    public String readString(String path){
+        return Vars.tree.get(path, true).readString();
     }
+
+    public byte[] readBytes(String path){
+        return Vars.tree.get(path, true).readBytes();
+    }
+
+    public Sound loadSound(String soundName){
+        if(Vars.headless) return new Sound();
+
+        String name = "sounds/" + soundName;
+        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
+
+        var sound = new Sound();
+        AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
+        desc.errored = Throwable::printStackTrace;
+
+        return sound;
+    }
+
+    public Music loadMusic(String soundName){
+        if(Vars.headless) return new Music();
+
+        String name = "music/" + soundName;
+        String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
+
+        var music = new Music();
+        AssetDescriptor<?> desc = Core.assets.load(path, Music.class, new MusicParameter(music));
+        desc.errored = Throwable::printStackTrace;
+
+        return music;
+    }
+
+    /** Ask the user to select a file to read for a certain purpose like "Please upload a sprite" */
+    public void readFile(String purpose, String ext, Cons<String> cons){
+        selectFile(true, purpose, ext, fi -> cons.get(fi.readString()));
+    }
+
+    /** readFile but for a byte[] */
+    public void readBinFile(String purpose, String ext, Cons<byte[]> cons){
+        selectFile(true, purpose, ext, fi -> cons.get(fi.readBytes()));
+    }
+
+    /** Ask the user to write a file. */
+    public void writeFile(String purpose, String ext, String contents){
+        if(contents == null) contents = "";
+        final String fContents = contents;
+        selectFile(false, purpose, ext, fi -> fi.writeString(fContents));
+    }
+
+    /** writeFile but for a byte[] */
+    public void writeBinFile(String purpose, String ext, byte[] contents){
+        if(contents == null) contents = new byte[0];
+        final byte[] fContents = contents;
+        selectFile(false, purpose, ext, fi -> fi.writeBytes(fContents));
+    }
+
+    private void selectFile(boolean open, String purpose, String ext, Cons<Fi> cons){
+        purpose = purpose.startsWith("@") ? Core.bundle.get(purpose.substring(1)) : purpose;
+        //add purpose and extension at the top
+        String title = Core.bundle.get(open ? "open" : "save") + " - " + purpose + " (." + ext + ")";
+        Vars.platform.showFileChooser(open, title, ext, fi -> {
+            try{
+                cons.get(fi);
+            }catch(Exception e){
+                Log.err("Failed to select file '@' for a mod", fi);
+                Log.err(e);
+            }
+        });
+    }
+
+    //endregion
 
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;
@@ -93,35 +167,21 @@ public class Scripts implements Disposable{
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1, null);
             }
             context.evaluateString(scope,
-            wrap ? "(function(){\n" + script + "\n})();" : script,
+            wrap ? "(function(){'use strict';\n" + script + "\n})();" : script,
             file, 0, null);
             return true;
         }catch(Throwable t){
             if(currentMod != null){
                 file = currentMod.name + "/" + file;
             }
-            log(LogLevel.err, file, "" + getError(t));
+            log(LogLevel.err, file, "" + getError(t, true));
             return false;
         }
     }
 
     @Override
     public void dispose(){
-        for(EventHandle e : events){
-            Events.remove(e.type, e.listener);
-        }
-        events.clear();
         Context.exit();
-    }
-
-    private static class EventHandle{
-        Class type;
-        Cons listener;
-
-        public EventHandle(Class type, Cons listener){
-            this.type = type;
-            this.listener = listener;
-        }
     }
 
     private class ScriptModuleProvider extends UrlModuleSourceProvider{
@@ -132,7 +192,7 @@ public class Scripts implements Disposable{
         }
 
         @Override
-        public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws IOException, URISyntaxException{
+        public ModuleSource loadSource(String moduleId, Scriptable paths, Object validator) throws URISyntaxException{
             if(currentMod == null) return null;
             return loadSource(moduleId, currentMod.root.child("scripts"), validator);
         }

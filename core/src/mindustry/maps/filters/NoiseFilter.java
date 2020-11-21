@@ -1,17 +1,15 @@
 package mindustry.maps.filters;
 
 import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.maps.filters.FilterOption.BlockOption;
-import mindustry.maps.filters.FilterOption.SliderOption;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.maps.filters.FilterOption.*;
+import mindustry.world.*;
 
-import static mindustry.maps.filters.FilterOption.floorsOnly;
-import static mindustry.maps.filters.FilterOption.wallsOnly;
+import static mindustry.maps.filters.FilterOption.*;
 
 public class NoiseFilter extends GenerateFilter{
     float scl = 40, threshold = 0.5f, octaves = 3f, falloff = 0.5f;
-    Block floor = Blocks.stone, block = Blocks.rocks;
+    Block floor = Blocks.stone, block = Blocks.stoneWall, target = Blocks.air;
 
     @Override
     public FilterOption[] options(){
@@ -20,8 +18,9 @@ public class NoiseFilter extends GenerateFilter{
         new SliderOption("threshold", () -> threshold, f -> threshold = f, 0f, 1f),
         new SliderOption("octaves", () -> octaves, f -> octaves = f, 1f, 10f),
         new SliderOption("falloff", () -> falloff, f -> falloff = f, 0f, 1f),
-        new BlockOption("floor", () -> floor, b -> floor = b, floorsOnly),
-        new BlockOption("wall", () -> block, b -> block = b, wallsOnly)
+        new BlockOption("target", () -> target, b -> target = b, anyOptional),
+        new BlockOption("floor", () -> floor, b -> floor = b, floorsOptional),
+        new BlockOption("wall", () -> block, b -> block = b, wallsOptional)
         );
     }
 
@@ -29,9 +28,9 @@ public class NoiseFilter extends GenerateFilter{
     public void apply(){
         float noise = noise(in.x, in.y, scl, 1f, octaves, falloff);
 
-        if(noise > threshold){
-            in.floor = floor;
-            if(wallsOnly.get(in.block)) in.block = block;
+        if(noise > threshold && (target == Blocks.air || in.floor == target || in.block == target)){
+            if(floor != Blocks.air) in.floor = floor;
+            if(block != Blocks.air && in.block != Blocks.air) in.block = block;
         }
     }
 }

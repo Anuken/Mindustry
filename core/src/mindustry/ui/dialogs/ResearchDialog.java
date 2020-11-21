@@ -25,41 +25,99 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.layout.*;
 import mindustry.ui.layout.TreeLayout.*;
-import mindustry.world.modules.*;
 
 import java.util.*;
 
 import static mindustry.Vars.*;
 
 public class ResearchDialog extends BaseDialog{
-    private final float nodeSize = Scl.scl(60f);
-    private ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
-    private TechTreeNode root = new TechTreeNode(TechTree.root, null);
-    private Rect bounds = new Rect();
-    private View view;
+    public final float nodeSize = Scl.scl(60f);
+    public ObjectSet<TechTreeNode> nodes = new ObjectSet<>();
+    public TechTreeNode root = new TechTreeNode(TechTree.root, null);
+    public Rect bounds = new Rect();
+    public ItemsDisplay itemDisplay;
+    public View view;
+
+    public ItemSeq items;
 
     public ResearchDialog(){
         super("");
 
         titleTable.remove();
         margin(0f).marginBottom(8);
-        cont.add(view = new View()).grow().get();
+        cont.stack(view = new View(), itemDisplay = new ItemsDisplay()).grow();
 
         shouldPause = true;
 
         shown(() -> {
+
+            items = new ItemSeq(){
+                //store sector item amounts for modifications
+                ObjectMap<Sector, ItemSeq> cache = new ObjectMap<>();
+
+                {
+                    //add global counts of each sector
+                    for(Planet planet : content.planets()){
+                        for(Sector sector : planet.sectors){
+                            if(sector.hasSave() && sector.hasBase()){
+                                ItemSeq cached = sector.items();
+                                cache.put(sector, cached);
+                                cached.each((item, amount) -> {
+                                    values[item.id] += amount;
+                                    total += amount;
+                                });
+                            }
+                        }
+                    }
+                }
+
+                //this is the only method that actually modifies the sequence itself.
+                @Override
+                public void add(Item item, int amount){
+                    //only have custom removal logic for when the sequence gets items taken out of it (e.g. research)
+                    if(amount < 0){
+                        //remove items from each sector's storage, one by one
+
+                        //negate amount since it's being *removed* - this makes it positive
+                        amount = -amount;
+
+                        //% that gets removed from each sector
+                        double percentage = (double)amount / get(item);
+                        int[] counter = {amount};
+                        cache.each((sector, seq) -> {
+                            if(counter[0] == 0) return;
+
+                            //amount that will be removed
+                            int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
+
+                            //actually remove it from the sector
+                            sector.removeItem(item, toRemove);
+                            seq.remove(item, toRemove);
+
+                            counter[0] -= toRemove;
+                        });
+
+                        //negate again to display correct number
+                        amount = -amount;
+                    }
+
+                    super.add(item, amount);
+                }
+            };
+
             checkNodes(root);
             treeLayout();
+
         });
 
         hidden(ui.planet::setup);
 
         addCloseButton();
 
-        buttons.button("$database", Icon.book, () -> {
+        buttons.button("@database", Icon.book, () -> {
             hide();
             ui.database.show();
-        }).size(210f, 64f);
+        }).size(210f, 64f).name("database");
 
         //scaling/drag input
         addListener(new InputListener(){
@@ -78,7 +136,9 @@ public class ResearchDialog extends BaseDialog{
             }
         });
 
-        addListener(new ElementGestureListener(){
+        touchable = Touchable.enabled;
+
+        addCaptureListener(new ElementGestureListener(){
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
                 if(view.lastZoom < 0){
@@ -105,8 +165,14 @@ public class ResearchDialog extends BaseDialog{
         });
     }
 
-    ItemModule items(){
-        return state.rules.defaultTeam.items();
+    @Override
+    public Dialog show(){
+        if(net.client()){
+            ui.showInfo("@research.multiplayer");
+            return null;
+        }
+
+        return super.show();
     }
 
     void treeLayout(){
@@ -176,13 +242,15 @@ public class ResearchDialog extends BaseDialog{
             l.visible = !locked;
             checkNodes(l);
         }
+
+        itemDisplay.rebuild(items);
     }
 
     boolean selectable(TechNode node){
-        return !node.objectives.contains(i -> !i.complete());
+        return node.content.unlocked() || !node.objectives.contains(i -> !i.complete());
     }
 
-    void showToast(String info){
+    public void showToast(String info){
         Table table = new Table();
         table.actions(Actions.fadeOut(0.5f, Interp.fade), Actions.remove());
         table.top().add(info);
@@ -211,11 +279,11 @@ public class ResearchDialog extends BaseDialog{
         }
     }
 
-    class TechTreeNode extends TreeNode<TechTreeNode>{
-        final TechNode node;
-        boolean visible = true, selectable = true;
+    public class TechTreeNode extends TreeNode<TechTreeNode>{
+        public final TechNode node;
+        public boolean visible = true, selectable = true;
 
-        TechTreeNode(TechNode node, TechTreeNode parent){
+        public TechTreeNode(TechNode node, TechTreeNode parent){
             this.node = node;
             this.parent = parent;
             this.width = this.height = nodeSize;
@@ -229,11 +297,11 @@ public class ResearchDialog extends BaseDialog{
         }
     }
 
-    class View extends Group{
-        float panX = 0, panY = -200, lastZoom = -1;
-        boolean moved = false;
-        ImageButton hoverNode;
-        Table infoTable = new Table();
+    public class View extends Group{
+        public float panX = 0, panY = -200, lastZoom = -1;
+        public boolean moved = false;
+        public ImageButton hoverNode;
+        public Table infoTable = new Table();
 
         {
             infoTable.touchable = Touchable.enabled;
@@ -262,8 +330,8 @@ public class ResearchDialog extends BaseDialog{
                                 }
                             });
                         }
-                    }else if(canUnlock(node.node) && locked(node.node)){
-                        unlock(node.node);
+                    }else if(canSpend(node.node) && locked(node.node)){
+                        spend(node.node);
                     }
                 });
                 button.hovered(() -> {
@@ -284,10 +352,11 @@ public class ResearchDialog extends BaseDialog{
                 button.update(() -> {
                     float offset = (Core.graphics.getHeight() % 2) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
-                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : selectable(node.node) && !items().has(node.node.requirements) ? Tex.buttonRed : Tex.button;
+                    button.getStyle().up = !locked(node.node) ? Tex.buttonOver : !selectable(node.node) || !canSpend(node.node) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.icon(Cicon.medium) : Icon.lock.getRegion());
                     button.getImage().setColor(!locked(node.node) ? Color.white : node.selectable ? Color.gray : Pal.gray);
+                    button.getImage().setScaling(Scaling.bounded);
                 });
                 addChild(button);
             }
@@ -319,13 +388,62 @@ public class ResearchDialog extends BaseDialog{
             panY = ry - bounds.y - oy;
         }
 
-        boolean canUnlock(TechNode node){
-            return items().has(node.requirements) && selectable(node);
+        boolean canSpend(TechNode node){
+            if(!selectable(node)) return false;
+
+            if(node.requirements.length == 0) return true;
+
+            //can spend when there's at least 1 item that can be spent (non complete)
+            for(int i = 0; i < node.requirements.length; i++){
+                if(node.finishedRequirements[i].amount < node.requirements[i].amount && items.has(node.requirements[i].item)){
+                    return true;
+                }
+            }
+
+            //can always spend when locked
+            return node.content.locked();
+        }
+
+        void spend(TechNode node){
+            boolean complete = true;
+
+            boolean[] shine = new boolean[node.requirements.length];
+            boolean[] usedShine = new boolean[content.items().size];
+
+            for(int i = 0; i < node.requirements.length; i++){
+                ItemStack req = node.requirements[i];
+                ItemStack completed = node.finishedRequirements[i];
+
+                //amount actually taken from inventory
+                int used = Math.max(Math.min(req.amount - completed.amount, items.get(req.item)), 0);
+                items.remove(req.item, used);
+                completed.amount += used;
+
+                if(used > 0){
+                    shine[i] = true;
+                    usedShine[req.item.id] = true;
+                }
+
+                //disable completion if the completed amount has not reached requirements
+                if(completed.amount < req.amount){
+                    complete = false;
+                }
+            }
+
+            if(complete){
+                unlock(node);
+            }
+
+            node.save();
+
+            //??????
+            Core.scene.act();
+            rebuild(shine);
+            itemDisplay.rebuild(items, usedShine);
         }
 
         void unlock(TechNode node){
             node.content.unlock();
-            items().remove(node.requirements);
             showToast(Core.bundle.format("researched", node.content.localizedName));
             checkNodes(root);
             hoverNode = null;
@@ -337,6 +455,11 @@ public class ResearchDialog extends BaseDialog{
         }
 
         void rebuild(){
+            rebuild(null);
+        }
+
+        //pass an array of stack indexes that should shine here
+        void rebuild(@Nullable boolean[] shine){
             ImageButton button = hoverNode;
 
             infoTable.remove();
@@ -354,7 +477,7 @@ public class ResearchDialog extends BaseDialog{
                 }
             });
 
-            infoTable.update(() -> infoTable.setPosition(button.getX() + button.getWidth(), button.getY() + button.getHeight(), Align.topLeft));
+            infoTable.update(() -> infoTable.setPosition(button.x + button.getWidth(), button.y + button.getHeight(), Align.topLeft));
 
             infoTable.left();
             infoTable.background(Tex.button).margin(8f);
@@ -364,7 +487,7 @@ public class ResearchDialog extends BaseDialog{
             infoTable.table(b -> {
                 b.margin(0).left().defaults().left();
 
-                if(selectable){
+                if(selectable && (node.content.description != null || node.content.stats.toMap().size > 0)){
                     b.button(Icon.info, Styles.cleari, () -> ui.content.show(node.content)).growY().width(50f);
                 }
                 b.add().grow();
@@ -377,19 +500,63 @@ public class ResearchDialog extends BaseDialog{
                         desc.table(t -> {
                             t.left();
                             if(selectable){
-                                for(ItemStack req : node.requirements){
+
+                                //check if there is any progress, add research progress text
+                                if(Structs.contains(node.finishedRequirements, s -> s.amount > 0)){
+                                    float sum = 0f, used = 0f;
+                                    boolean shiny = false;
+
+                                    for(int i = 0; i < node.requirements.length; i++){
+                                        sum += node.requirements[i].item.cost * node.requirements[i].amount;
+                                        used += node.finishedRequirements[i].item.cost * node.finishedRequirements[i].amount;
+                                        if(shine != null) shiny |= shine[i];
+                                    }
+
+                                    Label label = t.add(Core.bundle.format("research.progress", Math.min((int)(used / sum * 100), 99))).left().get();
+
+                                    if(shiny){
+                                        label.setColor(Pal.accent);
+                                        label.actions(Actions.color(Color.lightGray, 0.75f, Interp.fade));
+                                    }else{
+                                        label.setColor(Color.lightGray);
+                                    }
+
+                                    t.row();
+                                }
+
+                                for(int i = 0; i < node.requirements.length; i++){
+                                    ItemStack req = node.requirements[i];
+                                    ItemStack completed = node.finishedRequirements[i];
+
+                                    //skip finished stacks
+                                    if(req.amount <= completed.amount) continue;
+                                    boolean shiny = shine != null && shine[i];
+
                                     t.table(list -> {
+                                        int reqAmount = req.amount - completed.amount;
+
                                         list.left();
                                         list.image(req.item.icon(Cicon.small)).size(8 * 3).padRight(3);
                                         list.add(req.item.localizedName).color(Color.lightGray);
-                                        list.label(() -> " " + (player.team().core() != null ? UI.formatAmount(Math.min(player.team().core().items.get(req.item), req.amount)) + " / " : "") + UI.formatAmount(req.amount))
-                                        .update(l -> l.setColor(items().has(req.item, req.amount) ? Color.lightGray : Color.scarlet));//TODO
+                                        Label label = list.label(() -> " " +
+                                                UI.formatAmount(Math.min(items.get(req.item), reqAmount)) + " / "
+                                            + UI.formatAmount(reqAmount)).get();
+
+                                        Color targetColor = items.has(req.item) ? Color.lightGray : Color.scarlet;
+
+                                        if(shiny){
+                                            label.setColor(Pal.accent);
+                                            label.actions(Actions.color(targetColor, 0.75f, Interp.fade));
+                                        }else{
+                                            label.setColor(targetColor);
+                                        }
+
                                     }).fillX().left();
                                     t.row();
                                 }
                             }else if(node.objectives.size > 0){
                                 t.table(r -> {
-                                    r.add("$complete").colspan(2).left();
+                                    r.add("@complete").colspan(2).left();
                                     r.row();
                                     for(Objective o : node.objectives){
                                         if(o.complete()) continue;
@@ -403,19 +570,19 @@ public class ResearchDialog extends BaseDialog{
                             }
                         });
                     }else{
-                        desc.add("$completed");
+                        desc.add("@completed");
                     }
                 }).pad(9);
 
                 if(mobile && locked(node)){
                     b.row();
-                    b.button("$research", Icon.ok, Styles.nodet, () -> unlock(node))
-                    .disabled(i -> !canUnlock(node)).growX().height(44f).colspan(3);
+                    b.button("@research", Icon.ok, Styles.nodet, () -> spend(node))
+                    .disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
             });
 
             infoTable.row();
-            if(node.content.description != null && selectable){
+            if(node.content.description != null && node.content.inlineDescription && selectable){
                 infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray).growX()).fillX();
             }
 

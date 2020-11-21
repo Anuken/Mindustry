@@ -115,7 +115,6 @@ public class EntityCollisions{
 
     @SuppressWarnings("unchecked")
     public <T extends Hitboxc> void updatePhysics(EntityGroup<T> group){
-
         QuadTree tree = group.tree();
         tree.clear();
 
@@ -127,7 +126,7 @@ public class EntityCollisions{
 
     public static boolean legsSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || tile.staticDarkness() >= 2;
+        return tile == null || tile.staticDarkness() >= 2 || tile.floor().solid;
     }
 
     public static boolean waterSolid(int x, int y){
@@ -141,7 +140,6 @@ public class EntityCollisions{
     }
 
     private void checkCollide(Hitboxc a, Hitboxc b){
-
         a.hitbox(this.r1);
         b.hitbox(this.r2);
 
@@ -218,7 +216,6 @@ public class EntityCollisions{
 
     @SuppressWarnings("unchecked")
     public <T extends Hitboxc> void collide(EntityGroup<T> groupa){
-
         groupa.each(solid -> {
             solid.hitbox(r1);
             r1.x += (solid.lastX() - solid.getX());

@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -50,20 +51,25 @@ public class OverdriveProjector extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
-        stats.add(BlockStat.range, range / tilesize, StatUnit.blocks);
-        stats.add(BlockStat.productionTime, useTime / 60f, StatUnit.seconds);
+        stats.add(Stat.speedIncrease, (int)(100f * speedBoost), StatUnit.percent);
+        stats.add(Stat.range, range / tilesize, StatUnit.blocks);
+        stats.add(Stat.productionTime, useTime / 60f, StatUnit.seconds);
 
         if(hasBoost){
-            stats.add(BlockStat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
-            stats.add(BlockStat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
+            stats.add(Stat.boostEffect, phaseRangeBoost / tilesize, StatUnit.blocks);
+            stats.add(Stat.boostEffect, (int)((speedBoost + speedBoostPhase) * 100f), StatUnit.percent);
         }
     }
 
-    public class OverdriveEntity extends Building{
+    public class OverdriveBuild extends Building implements Ranged{
         float heat;
         float charge = Mathf.random(reload);
         float phaseHeat;
+
+        @Override
+        public float range(){
+            return range;
+        }
 
         @Override
         public void drawLight(){
@@ -76,10 +82,10 @@ public class OverdriveProjector extends Block{
             charge += heat * Time.delta;
 
             if(hasBoost){
-                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons().optionalValid()), 0.1f);
+                phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(cons.optionalValid()), 0.1f);
             }
 
-            if(timer(timerUse, useTime) && efficiency() > 0){
+            if(timer(timerUse, useTime) && efficiency() > 0 && consValid()){
                 consume();
             }
 
@@ -96,7 +102,7 @@ public class OverdriveProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            indexer.eachBlock(this, realRange, other -> other.block().canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+            indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
 
             Drawf.dashCircle(x, y, realRange, baseColor);
         }

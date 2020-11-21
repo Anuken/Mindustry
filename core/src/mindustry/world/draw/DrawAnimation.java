@@ -15,7 +15,7 @@ public class DrawAnimation extends DrawBlock{
     public TextureRegion liquid, top;
 
     @Override
-    public void draw(GenericCrafterEntity entity){
+    public void draw(GenericCrafterBuild entity){
         Draw.rect(entity.block.region, entity.x, entity.y);
         Draw.rect(
             sine ?

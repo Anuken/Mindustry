@@ -1,10 +1,10 @@
 package mindustry.net;
 
 import arc.*;
-import arc.struct.*;
 import arc.func.*;
+import arc.net.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.pooling.*;
 import mindustry.gen.*;
 import mindustry.net.Packets.*;
@@ -13,6 +13,7 @@ import net.jpountz.lz4.*;
 
 import java.io.*;
 import java.nio.*;
+import java.nio.channels.*;
 
 import static mindustry.Vars.*;
 
@@ -36,6 +37,16 @@ public class Net{
         this.provider = provider;
     }
 
+    public void handleException(Throwable e){
+        if(e instanceof ArcNetException){
+            Core.app.post(() -> showError(new IOException("mismatch")));
+        }else if(e instanceof ClosedChannelException){
+            Core.app.post(() -> showError(new IOException("alreadyconnected")));
+        }else{
+            Core.app.post(() -> showError(e));
+        }
+    }
+
     /** Display a network error. Call on the graphics thread. */
     public void showError(Throwable e){
 
@@ -46,7 +57,7 @@ public class Net{
                 t = t.getCause();
             }
 
-            String baseError = Strings.getFinalMesage(e);
+            String baseError = Strings.getFinalMessage(e);
 
             String error = baseError == null ? "" : baseError.toLowerCase();
             String type = t.getClass().toString().toLowerCase();
@@ -70,7 +81,7 @@ public class Net{
             }
 
             if(isError){
-                ui.showException("$error.any", e);
+                ui.showException("@error.any", e);
             }else{
                 ui.showText("", Core.bundle.format("connectfail", error));
             }
@@ -152,6 +163,9 @@ public class Net{
     }
 
     public void disconnect(){
+        if(active && !server){
+            Log.info("Disconnecting.");
+        }
         provider.disconnectClient();
         server = false;
         active = false;
@@ -223,12 +237,10 @@ public class Net{
      */
     public void handleClientReceived(Object object){
 
-        if(object instanceof StreamBegin){
-            StreamBegin b = (StreamBegin)object;
+        if(object instanceof StreamBegin b){
             streams.put(b.id, currentStream = new StreamBuilder(b));
 
-        }else if(object instanceof StreamChunk){
-            StreamChunk c = (StreamChunk)object;
+        }else if(object instanceof StreamChunk c){
             StreamBuilder builder = streams.get(c.id);
             if(builder == null){
                 throw new RuntimeException("Received stream chunk without a StreamBegin beforehand!");
@@ -242,8 +254,9 @@ public class Net{
         }else if(clientListeners.get(object.getClass()) != null){
 
             if(clientLoaded || ((object instanceof Packet) && ((Packet)object).isImportant())){
-                if(clientListeners.get(object.getClass()) != null)
+                if(clientListeners.get(object.getClass()) != null){
                     clientListeners.get(object.getClass()).get(object);
+                }
                 Pools.free(object);
             }else if(!((object instanceof Packet) && ((Packet)object).isUnimportant())){
                 packetQueue.add(object);
@@ -261,8 +274,9 @@ public class Net{
     public void handleServerReceived(NetConnection connection, Object object){
 
         if(serverListeners.get(object.getClass()) != null){
-            if(serverListeners.get(object.getClass()) != null)
+            if(serverListeners.get(object.getClass()) != null){
                 serverListeners.get(object.getClass()).get(connection, object);
+            }
             Pools.free(object);
         }else{
             Log.err("Unhandled packet type: '@'!", object.getClass());

@@ -8,7 +8,7 @@ buildscript{
     }
 
     dependencies{
-        //IMPORTANT NOTICE: any version of the plugin after 3.4.1 will break builds for every API level < 24, perhaps even higher.
+        //IMPORTANT NOTICE: any version of the plugin after 3.4.1 will break builds
         //it appears abstract methods don't get desugared properly (if at all)
         classpath 'com.android.tools.build:gradle:3.4.1'
     }
@@ -33,6 +33,10 @@ dependencies{
     natives "com.github.Anuken.Arc:natives-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-freetype-android:${getArcHash()}"
     natives "com.github.Anuken.Arc:natives-box2d-android:${getArcHash()}"
+
+    //android dependencies magically disappear during compilation, thanks gradle!
+    def sdkFile = new File((String)findSdkDir(), "/platforms/android-29/android.jar")
+    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 
 task deploy(type: Copy){
@@ -73,7 +77,7 @@ android{
         targetSdkVersion 29
         
         versionName versionNameResult
-        versionCode vcode
+        versionCode = (System.getenv("TRAVIS_BUILD_ID") != null ? System.getenv("TRAVIS_BUILD_ID").toInteger() : vcode)
 
         if(project.hasProperty("release")){
             props['androidBuildCode'] = (vcode + 1).toString()
@@ -95,15 +99,20 @@ android{
                 storePassword RELEASE_STORE_PASSWORD
                 keyAlias RELEASE_KEY_ALIAS
                 keyPassword RELEASE_KEY_PASSWORD
+            }else if(System.getenv("CI") == "true"){
+                storeFile = file("../../bekeystore.jks")
+                storePassword = System.getenv("keystore_password")
+                keyAlias = System.getenv("keystore_alias")
+                keyPassword = System.getenv("keystore_alias_password")
             }else{
-                println("No keystore info property found!")
+                println("No keystore property found. Releases will be unsigned.")
             }
         }
     }
 
-    if(project.hasProperty("RELEASE_STORE_FILE")) {
-        buildTypes {
-            release {
+    if(project.hasProperty("RELEASE_STORE_FILE") || System.getenv("CI") == "true"){
+        buildTypes{
+            release{
                 signingConfig signingConfigs.release
             }
         }

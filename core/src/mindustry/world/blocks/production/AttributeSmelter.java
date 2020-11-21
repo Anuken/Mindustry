@@ -37,10 +37,10 @@ public class AttributeSmelter extends GenericSmelter{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.affinities, attribute, boostScale);
+        stats.add(Stat.affinities, attribute, boostScale);
     }
 
-    public class AttributeSmelterEntity extends SmelterEntity{
+    public class AttributeSmelterBuild extends SmelterBuild{
         public float attrsum;
 
         @Override
@@ -49,8 +49,8 @@ public class AttributeSmelter extends GenericSmelter{
         }
 
         @Override
-        public void placed(){
-            super.placed();
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
 
             attrsum = sumAttribute(attribute, tile.x, tile.y);
         }

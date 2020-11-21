@@ -1,5 +1,8 @@
 package mindustry.entities.units;
 
+import arc.util.*;
+import mindustry.audio.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 
 public class WeaponMount{
@@ -11,6 +14,8 @@ public class WeaponMount{
     public float rotation;
     /** destination rotation; do not modify! */
     public float targetRotation;
+    /** current heat, 0 to 1*/
+    public float heat;
     /** aiming position in world coordinates */
     public float aimX, aimY;
     /** whether to shoot right now */
@@ -19,6 +24,10 @@ public class WeaponMount{
     public boolean rotate = false;
     /** extra state for alternating weapons */
     public boolean side;
+    /** current bullet for continuous weapons */
+    public @Nullable Bullet bullet;
+    /** sound loop for continuous weapons */
+    public @Nullable SoundLoop sound;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

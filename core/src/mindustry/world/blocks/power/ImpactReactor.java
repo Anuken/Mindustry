@@ -43,7 +43,7 @@ public class ImpactReactor extends PowerGenerator{
     public void setBars(){
         super.setBars();
 
-        bars.add("poweroutput", (GeneratorEntity entity) -> new Bar(() ->
+        bars.add("poweroutput", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
         Strings.fixed(Math.max(entity.getPowerProduction() - consumes.getPower().usage, 0) * 60 * entity.timeScale(), 1)),
         () -> Pal.powerBar,
@@ -55,7 +55,7 @@ public class ImpactReactor extends PowerGenerator{
         super.setStats();
 
         if(hasItems){
-            stats.add(BlockStat.productionTime, itemDuration / 60f, StatUnit.seconds);
+            stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
     }
 
@@ -64,9 +64,8 @@ public class ImpactReactor extends PowerGenerator{
         return new TextureRegion[]{bottomRegion, region};
     }
 
-    public class FusionReactorEntity extends GeneratorEntity{
+    public class ImpactReactorBuild extends GeneratorBuild{
         public float warmup;
-
 
         @Override
         public void updateTile(){
@@ -90,6 +89,11 @@ public class ImpactReactor extends PowerGenerator{
             }
 
             productionEfficiency = Mathf.pow(warmup, 5f);
+        }
+
+        @Override
+        public float ambientVolume(){
+            return warmup;
         }
 
         @Override
@@ -126,7 +130,7 @@ public class ImpactReactor extends PowerGenerator{
 
             Sounds.explosionbig.at(tile);
 
-            Effects.shake(6f, 16f, x, y);
+            Effect.shake(6f, 16f, x, y);
             Fx.impactShockwave.at(x, y);
             for(int i = 0; i < 6; i++){
                 Time.run(Mathf.random(80), () -> Fx.impactcloud.at(x, y));

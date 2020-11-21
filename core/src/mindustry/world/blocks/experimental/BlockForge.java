@@ -4,7 +4,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -33,16 +32,16 @@ public class BlockForge extends PayloadAcceptor{
         hasPower = true;
         rotate = true;
 
-        config(Block.class, (BlockForgeEntity tile, Block block) -> tile.recipe = block);
+        config(Block.class, (BlockForgeBuild tile, Block block) -> tile.recipe = block);
 
-        consumes.add(new ConsumeItemDynamic((BlockForgeEntity e) -> e.recipe != null ? e.recipe.requirements : ItemStack.empty));
+        consumes.add(new ConsumeItemDynamic((BlockForgeBuild e) -> e.recipe != null ? e.recipe.requirements : ItemStack.empty));
     }
 
     @Override
     public void setBars(){
         super.setBars();
 
-        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, () -> ((BlockForgeEntity)entity).progress));
+        bars.add("progress", entity -> new Bar("bar.progress", Pal.ammo, () -> ((BlockForgeBuild)entity).progress));
     }
 
     @Override
@@ -51,7 +50,7 @@ public class BlockForge extends PayloadAcceptor{
         Draw.rect(outRegion, req.drawx(), req.drawy(), req.rotation * 90);
     }
 
-    public class BlockForgeEntity extends PayloadAcceptorEntity<BlockPayload>{
+    public class BlockForgeBuild extends PayloadAcceptorBuild<BuildPayload>{
         public @Nullable Block recipe;
         public float progress, time, heat;
 
@@ -83,7 +82,7 @@ public class BlockForge extends PayloadAcceptor{
 
                 if(progress >= recipe.buildCost){
                     consume();
-                    payload = new BlockPayload(recipe, team);
+                    payload = new BuildPayload(recipe, team);
                     progress = 0f;
                 }
             }else{
@@ -100,7 +99,7 @@ public class BlockForge extends PayloadAcceptor{
         public void buildConfiguration(Table table){
             Seq<Block> blocks = Vars.content.blocks().select(b -> b.isVisible() && b.size <= 2);
 
-            ItemSelection.buildTable(table, blocks, () -> recipe, block -> recipe = block);
+            ItemSelection.buildTable(table, blocks, () -> recipe, this::configure);
         }
 
         @Override

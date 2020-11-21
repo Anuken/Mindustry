@@ -1,6 +1,7 @@
 package mindustry.editor;
 
 import arc.func.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -10,16 +11,16 @@ import mindustry.game.*;
 import mindustry.world.*;
 
 public enum EditorTool{
-    zoom,
-    pick{
+    zoom(KeyCode.v),
+    pick(KeyCode.i){
         public void touched(MapEditor editor, int x, int y){
             if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
 
             Tile tile = editor.tile(x, y);
-            editor.drawBlock = tile.block() == Blocks.air ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
+            editor.drawBlock = tile.block() == Blocks.air || !tile.block().inEditor ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
         }
     },
-    line("replace", "orthogonal"){
+    line(KeyCode.l, "replace", "orthogonal"){
 
         @Override
         public void touchedLine(MapEditor editor, int x1, int y1, int x2, int y2){
@@ -43,7 +44,7 @@ public enum EditorTool{
             });
         }
     },
-    pencil("replace", "square", "drawteams"){
+    pencil(KeyCode.b, "replace", "square", "drawteams"){
         {
             edit = true;
             draggable = true;
@@ -67,7 +68,7 @@ public enum EditorTool{
 
         }
     },
-    eraser("eraseores"){
+    eraser(KeyCode.e, "eraseores"){
         {
             edit = true;
             draggable = true;
@@ -86,7 +87,7 @@ public enum EditorTool{
             });
         }
     },
-    fill("replaceall", "fillteams"){
+    fill(KeyCode.g, "replaceall", "fillteams"){
         {
             edit = true;
         }
@@ -117,7 +118,7 @@ public enum EditorTool{
                 if(editor.drawBlock.isOverlay()){
                     Block dest = tile.overlay();
                     if(dest == editor.drawBlock) return;
-                    tester = t -> t.overlay() == dest && !t.floor().isLiquid;
+                    tester = t -> t.overlay() == dest && (t.floor().hasSurface() || !t.floor().needsSurface);
                     setter = t -> t.setOverlay(editor.drawBlock);
                 }else if(editor.drawBlock.isFloor()){
                     Block dest = tile.floor();
@@ -205,7 +206,7 @@ public enum EditorTool{
             }
         }
     },
-    spray("replace"){
+    spray(KeyCode.r, "replace"){
         final double chance = 0.012;
 
         {
@@ -231,8 +232,12 @@ public enum EditorTool{
         }
     };
 
+    public static final EditorTool[] all = values();
+
     /** All the internal alternate placement modes of this tool. */
     public final String[] altModes;
+    /** Key to activate this tool. */
+    public KeyCode key = KeyCode.unset;
     /** The current alternate placement mode. -1 is the standard mode, no changes.*/
     public int mode = -1;
     /** Whether this tool causes canvas changes when touched.*/
@@ -244,8 +249,18 @@ public enum EditorTool{
         this(new String[]{});
     }
 
+    EditorTool(KeyCode code){
+        this(new String[]{});
+        this.key = code;
+    }
+
     EditorTool(String... altModes){
         this.altModes = altModes;
+    }
+
+    EditorTool(KeyCode code, String... altModes){
+        this.altModes = altModes;
+        this.key = code;
     }
 
     public void touched(MapEditor editor, int x, int y){}

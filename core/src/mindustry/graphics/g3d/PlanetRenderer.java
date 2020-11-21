@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
@@ -17,49 +18,46 @@ import mindustry.type.*;
 public class PlanetRenderer implements Disposable{
     public static final float outlineRad = 1.17f, camLength = 4f;
     public static final Color
-        outlineColor = Pal.accent.cpy().a(1f),
-        hoverColor = Pal.accent.cpy().a(0.5f),
-        borderColor = Pal.accent.cpy().a(0.3f),
-        shadowColor = new Color(0, 0, 0, 0.7f);
+    outlineColor = Pal.accent.cpy().a(1f),
+    hoverColor = Pal.accent.cpy().a(0.5f),
+    borderColor = Pal.accent.cpy().a(0.3f),
+    shadowColor = new Color(0, 0, 0, 0.7f);
 
     private static final Seq<Vec3> points = new Seq<>();
-    private static final PlanetInterfaceRenderer emptyRenderer = new PlanetInterfaceRenderer(){
-        @Override public void renderSectors(Planet planet){}
-        @Override public void renderProjections(){}
-    };
 
     /** Camera direction relative to the planet. Length is determined by zoom. */
     public final Vec3 camPos = new Vec3();
     /** The sun/main planet of the solar system from which everything is rendered. */
     public final Planet solarSystem = Planets.sun;
     /** Planet being looked at. */
-    public Planet planet = Planets.starter;
+    public Planet planet = Planets.serpulo;
     /** Camera used for rendering. */
     public Camera3D cam = new Camera3D();
     /** Raw vertex batch. */
-    public final VertexBatch3D batch = new VertexBatch3D(10000, false, true, 0);
+    public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
 
     public float zoom = 1f;
 
     private final Mesh[] outlines = new Mesh[10];
-    private final PlaneBatch3D projector = new PlaneBatch3D();
-    private final Mat3D mat = new Mat3D();
-    private final FrameBuffer buffer = new FrameBuffer(2, 2, true);
-    private PlanetInterfaceRenderer irenderer;
+    public final PlaneBatch3D projector = new PlaneBatch3D();
+    public final Mat3D mat = new Mat3D();
+    public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    public PlanetInterfaceRenderer irenderer;
 
-    private final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
+    public final Bloom bloom = new Bloom(Core.graphics.getWidth()/4, Core.graphics.getHeight()/4, true, false){{
         setThreshold(0.8f);
         blurPasses = 6;
     }};
-    private final Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, false, 1.5f);
+    public final Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, false, 1.5f);
 
     //seed: 8kmfuix03fw
-    private final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
+    public final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
 
     public PlanetRenderer(){
         camPos.set(0, 0f, camLength);
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
+        cam.far = 150f;
     }
 
     /** Render the entire planet scene to the screen. */
@@ -86,17 +84,25 @@ public class PlanetRenderer implements Disposable{
         projector.proj(cam.combined);
         batch.proj(cam.combined);
 
+        Events.fire(Trigger.universeDrawBegin);
+
         beginBloom();
 
         skybox.render(cam.combined);
 
+        Events.fire(Trigger.universeDraw);
+
         renderPlanet(solarSystem);
+
+        renderTransparent(solarSystem);
 
         endBloom();
 
+        Events.fire(Trigger.universeDrawEnd);
+
         Gl.enable(Gl.blend);
 
-        irenderer.renderProjections();
+        irenderer.renderProjections(planet);
 
         Gl.disable(Gl.cullFace);
         Gl.disable(Gl.depthTest);
@@ -104,26 +110,39 @@ public class PlanetRenderer implements Disposable{
         cam.update();
     }
 
-    private void beginBloom(){
+    public void beginBloom(){
         bloom.resize(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4);
         bloom.capture();
     }
 
-    private void endBloom(){
+    public void endBloom(){
         bloom.render();
     }
 
-    private void renderPlanet(Planet planet){
+
+    public void renderPlanet(Planet planet){
+        if(!planet.visible()) return;
+
         //render planet at offsetted position in the world
-        planet.mesh.render(cam.combined, planet.getTransform(mat));
+        planet.draw(cam.combined, planet.getTransform(mat));
 
         renderOrbit(planet);
+
+        for(Planet child : planet.children){
+            renderPlanet(child);
+        }
+    }
+
+    public void renderTransparent(Planet planet){
+        if(!planet.visible()) return;
 
         if(planet.isLandable() && planet == this.planet){
             renderSectors(planet);
         }
 
         if(planet.parent != null && planet.hasAtmosphere && Core.settings.getBool("atmosphere")){
+            Gl.depthMask(false);
+
             Blending.additive.apply();
 
             Shaders.atmosphere.camera = cam;
@@ -134,24 +153,26 @@ public class PlanetRenderer implements Disposable{
             atmosphere.render(Shaders.atmosphere, Gl.triangles);
 
             Blending.normal.apply();
+
+            Gl.depthMask(true);
         }
 
         for(Planet child : planet.children){
-            renderPlanet(child);
+            renderTransparent(child);
         }
     }
 
-    private void renderOrbit(Planet planet){
-        if(planet.parent == null) return;
+    public void renderOrbit(Planet planet){
+        if(planet.parent == null || !planet.visible()) return;
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
-        int points = (int)(radius * 50);
+        int points = (int)(radius * 10);
         Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray));
         batch.flush(Gl.lineLoop);
     }
 
-    private void renderSectors(Planet planet){
+    public void renderSectors(Planet planet){
         //apply transformed position
         batch.proj().mul(planet.getTransform(mat));
 
@@ -171,17 +192,23 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b){
+        drawArc(planet, a, b, Pal.accent, Color.clear, 1f);
+    }
+    public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length){
+        drawArc(planet, a, b, from, to, length, 80f, 25);
+    }
+
+    public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
         Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
-        avg.setLength(planet.radius*2f);
+        avg.setLength(planet.radius*(1f+length));
 
         points.clear();
         points.addAll(Tmp.v33.set(b).setLength(outlineRad), Tmp.v31, Tmp.v34.set(a).setLength(outlineRad));
         Tmp.bz3.set(points);
-        float points = 25;
 
-        for(int i = 0; i < points + 1; i++){
-            float f = i / points;
-            Tmp.c1.set(Pal.accent).lerp(Color.clear, (f+Time.globalTime()/80f)%1f);
+        for(int i = 0; i < pointCount + 1; i++){
+            float f = i / (float)pointCount;
+            Tmp.c1.set(from).lerp(to, (f+Time.globalTime()/timeScale)%1f);
             batch.color(Tmp.c1);
             batch.vertex(Tmp.bz3.valueAt(Tmp.v32, f));
 
@@ -272,7 +299,7 @@ public class PlanetRenderer implements Disposable{
         }
     }
 
-    private Mesh outline(int size){
+    public Mesh outline(int size){
         if(outlines[size] == null){
             outlines[size] = MeshBuilder.buildHex(new HexMesher(){
                 @Override
@@ -306,6 +333,6 @@ public class PlanetRenderer implements Disposable{
 
     public interface PlanetInterfaceRenderer{
         void renderSectors(Planet planet);
-        void renderProjections();
+        void renderProjections(Planet planet);
     }
 }

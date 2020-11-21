@@ -1,9 +1,10 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.struct.*;
+import arc.func.*;
 import arc.input.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -15,13 +16,15 @@ public class LoadoutDialog extends BaseDialog{
     private Runnable hider;
     private Runnable resetter;
     private Runnable updater;
+    //TODO use itemseqs
     private Seq<ItemStack> stacks = new Seq<>();
     private Seq<ItemStack> originalStacks = new Seq<>();
+    private Boolf<Item> validator = i -> true;
     private Table items;
     private int capacity;
 
     public LoadoutDialog(){
-        super("$configure");
+        super("@configure");
         setFillParent(true);
 
         keyDown(key -> {
@@ -41,9 +44,9 @@ public class LoadoutDialog extends BaseDialog{
             }
         });
 
-        buttons.button("$back", Icon.left, this::hide).size(210f, 64f);
+        buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
 
-        buttons.button("$settings.reset", Icon.refresh, () -> {
+        buttons.button("@settings.reset", Icon.refresh, () -> {
             resetter.run();
             reseed();
             updater.run();
@@ -51,13 +54,14 @@ public class LoadoutDialog extends BaseDialog{
         }).size(210f, 64f);
     }
 
-    public void show(int capacity, Seq<ItemStack> stacks, Runnable reseter, Runnable updater, Runnable hider){
+    public void show(int capacity, Seq<ItemStack> stacks, Boolf<Item> validator, Runnable reseter, Runnable updater, Runnable hider){
         this.originalStacks = stacks;
-        reseed();
+        this.validator = validator;
         this.resetter = reseter;
         this.updater = updater;
         this.capacity = capacity;
         this.hider = hider;
+        reseed();
         show();
     }
 
@@ -81,7 +85,7 @@ public class LoadoutDialog extends BaseDialog{
                     updater.run();
                 }).size(bsize);
 
-                t.button(Icon.pencil, Styles.cleari, () -> ui.showTextInput("$configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
+                t.button(Icon.pencil, Styles.cleari, () -> ui.showTextInput("@configure", stack.item.localizedName, 10, stack.amount + "", true, str -> {
                     if(Strings.canParsePositiveInt(str)){
                         int amount = Strings.parseInt(str);
                         if(amount >= 0 && amount <= capacity){
@@ -106,7 +110,7 @@ public class LoadoutDialog extends BaseDialog{
 
     private void reseed(){
         this.stacks = originalStacks.map(ItemStack::copy);
-        this.stacks.addAll(content.items().select(i -> !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
+        this.stacks.addAll(content.items().select(i -> validator.get(i) && !stacks.contains(stack -> stack.item == i)).map(i -> new ItemStack(i, 0)));
         this.stacks.sort(Structs.comparingInt(s -> s.item.id));
     }
 

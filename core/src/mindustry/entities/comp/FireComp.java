@@ -15,14 +15,14 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Firec.class}, pooled = true)
 @Component(base = true)
-abstract class FireComp implements Timedc, Posc, Firec{
-    private static final float spreadChance = 0.05f, fireballChance = 0.07f;
+abstract class FireComp implements Timedc, Posc, Firec, Syncc{
+    private static final float spreadChance = 0.04f, fireballChance = 0.06f;
 
     @Import float time, lifetime, x, y;
 
     Tile tile;
-    private Block block;
-    private float baseFlammability = -1, puddleFlammability;
+    private transient Block block;
+    private transient float baseFlammability = -1, puddleFlammability;
 
     @Override
     public void update(){
@@ -34,8 +34,8 @@ abstract class FireComp implements Timedc, Posc, Firec{
             Fx.fireSmoke.at(x + Mathf.range(4f), y + Mathf.range(4f));
         }
 
-        if(Mathf.chance(0.001 * Time.delta)){
-            Sounds.fire.at(this);
+        if(!headless){
+            control.sound.loop(Sounds.fire, this, 0.07f);
         }
 
         time = Mathf.clamp(time + Time.delta, 0, lifetime());
@@ -97,6 +97,11 @@ abstract class FireComp implements Timedc, Posc, Firec{
 
     @Override
     public void afterRead(){
-        Fires.register(base());
+        Fires.register(self());
+    }
+
+    @Override
+    public void afterSync(){
+        Fires.register(self());
     }
 }

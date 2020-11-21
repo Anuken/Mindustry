@@ -16,12 +16,12 @@ public class HostDialog extends BaseDialog{
     float w = 300;
 
     public HostDialog(){
-        super("$hostserver");
+        super("@hostserver");
 
         addCloseButton();
 
         cont.table(t -> {
-            t.add("$name").padRight(10);
+            t.add("@name").padRight(10);
             t.field(Core.settings.getString("name"), text -> {
                 player.name(text);
                 Core.settings.put("name", text);
@@ -41,26 +41,26 @@ public class HostDialog extends BaseDialog{
 
         cont.add().width(65f);
 
-        cont.button("$host", () -> {
+        cont.button("@host", () -> {
             if(Core.settings.getString("name").trim().isEmpty()){
-                ui.showInfo("$noname");
+                ui.showInfo("@noname");
                 return;
             }
 
             runHost();
         }).width(w).height(70f);
 
-        cont.button("?", () -> ui.showInfo("$host.info")).size(65f, 70f).padLeft(6f);
+        cont.button("?", () -> ui.showInfo("@host.info")).size(65f, 70f).padLeft(6f);
 
         shown(() -> {
             if(!steam){
-                Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("$host.info")));
+                Core.app.post(() -> Core.settings.getBoolOnce("hostinfo", () -> ui.showInfo("@host.info")));
             }
         });
     }
 
     public void runHost(){
-        ui.loadfrag.show("$hosting");
+        ui.loadfrag.show("@hosting");
         Time.runTask(5f, () -> {
             try{
                 net.host(Vars.port);
@@ -68,7 +68,7 @@ public class HostDialog extends BaseDialog{
 
                 if(steam){
                     Core.app.post(() -> Core.settings.getBoolOnce("steampublic2", () -> {
-                        ui.showCustomConfirm("$setting.publichost.name", "$public.confirm", "$yes", "$no", () -> {
+                        ui.showCustomConfirm("@setting.publichost.name", "@public.confirm", "@yes", "@no", () -> {
                             Core.settings.put("publichost", true);
                             platform.updateLobby();
                         }, () -> {
@@ -76,15 +76,17 @@ public class HostDialog extends BaseDialog{
                             platform.updateLobby();
                         });
                     }));
+
+                    if(Version.modifier.contains("beta") || Version.modifier.contains("alpha")){
+                        Core.settings.put("publichost", false);
+                        platform.updateLobby();
+                        Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
+                    }
                 }
 
-                if(Version.modifier.contains("beta")){
-                    Core.settings.put("publichost", false);
-                    platform.updateLobby();
-                    Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("$public.beta"));
-                }
+
             }catch(IOException e){
-                ui.showException("$server.error", e);
+                ui.showException("@server.error", e);
             }
             ui.loadfrag.hide();
             hide();

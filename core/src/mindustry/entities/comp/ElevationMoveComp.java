@@ -1,9 +1,9 @@
 package mindustry.entities.comp;
 
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
+import mindustry.entities.EntityCollisions.*;
 import mindustry.gen.*;
-
-import static mindustry.Vars.collisions;
 
 @Component
 abstract class ElevationMoveComp implements Velc, Posc, Flyingc, Hitboxc{
@@ -11,13 +11,8 @@ abstract class ElevationMoveComp implements Velc, Posc, Flyingc, Hitboxc{
 
     @Replace
     @Override
-    public void move(float cx, float cy){
-        if(isFlying()){
-            x += cx;
-            y += cy;
-        }else{
-            collisions.move(this, cx, cy);
-        }
+    public SolidPred solidity(){
+        return isFlying() ? null : EntityCollisions::solid;
     }
 
 }

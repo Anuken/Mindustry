@@ -45,6 +45,7 @@ public class MenuFragment extends Fragment{
 
         parent.fill(c -> {
             container = c;
+            c.name = "menu container";
 
             if(!mobile){
                 buildDesktop();
@@ -57,29 +58,28 @@ public class MenuFragment extends Fragment{
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45));
-            parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45));
+            parent.fill(c -> c.bottom().left().button("", Styles.infot, ui.about::show).size(84, 45).name("info"));
+            parent.fill(c -> c.bottom().right().button("", Styles.discordt, ui.discord::show).size(84, 45).name("discord"));
         }else if(becontrol.active()){
-            parent.fill(c -> c.bottom().right().button("$be.check", Icon.refresh, () -> {
+            parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();
                 becontrol.checkUpdate(result -> {
                     ui.loadfrag.hide();
                     if(!result){
-                        ui.showInfo("$be.noupdates");
+                        ui.showInfo("@be.noupdates");
                     }
                 });
-            }).size(200, 60).update(t -> {
+            }).size(200, 60).name("becheck").update(t -> {
                 t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
             }));
         }
 
-        String versionText = "[#ffffffba]" + ((Version.build == -1) ? "[#fc8140aa]custom build" : (Version.type.equals("official") ? Version.modifier : Version.type) + " build " + Version.build + (Version.revision == 0 ? "" : "." + Version.revision));
-
+        String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
             float logoscl = Scl.scl(1);
-            float logow = Math.min(logo.getWidth() * logoscl, Core.graphics.getWidth() - Scl.scl(20));
-            float logoh = logow * (float)logo.getHeight() / logo.getWidth();
+            float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
+            float logoh = logow * (float)logo.height / logo.width;
 
             float fx = (int)(Core.graphics.getWidth() / 2f);
             float fy = (int)(Core.graphics.getHeight() - 6 - logoh) + logoh / 2 - (Core.graphics.isPortrait() ? Scl.scl(30f) : 0f);
@@ -94,21 +94,21 @@ public class MenuFragment extends Fragment{
 
     private void buildMobile(){
         container.clear();
+        container.name = "buttons";
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
         float size = 120f;
         container.defaults().size(size).pad(5).padTop(4f);
 
         MobileButton
-            play = new MobileButton(Icon.play, "$campaign", () -> checkPlay(ui.planet::show)),
-            custom = new MobileButton(Icon.rightOpenOut, "$customgame", () -> checkPlay(ui.custom::show)),
-            maps = new MobileButton(Icon.download, "$loadgame", () -> checkPlay(ui.load::show)),
-            join = new MobileButton(Icon.add, "$joingame", () -> checkPlay(ui.join::show)),
-            editor = new MobileButton(Icon.terrain, "$editor", () -> checkPlay(ui.maps::show)),
-            tools = new MobileButton(Icon.settings, "$settings", ui.settings::show),
-            mods = new MobileButton(Icon.book, "$mods", ui.mods::show),
-            donate = new MobileButton(Icon.link, "$website", () -> Core.app.openURI("https://anuke.itch.io/mindustry")),
-            exit = new MobileButton(Icon.exit, "$quit", () -> Core.app.exit());
+            play = new MobileButton(Icon.play, "@campaign", () -> checkPlay(ui.planet::show)),
+            custom = new MobileButton(Icon.rightOpenOut, "@customgame", () -> checkPlay(ui.custom::show)),
+            maps = new MobileButton(Icon.download, "@loadgame", () -> checkPlay(ui.load::show)),
+            join = new MobileButton(Icon.add, "@joingame", () -> checkPlay(ui.join::show)),
+            editor = new MobileButton(Icon.terrain, "@editor", () -> checkPlay(ui.maps::show)),
+            tools = new MobileButton(Icon.settings, "@settings", ui.settings::show),
+            mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
+            exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit());
 
         if(!Core.graphics.isPortrait()){
             container.marginTop(60f);
@@ -154,7 +154,6 @@ public class MenuFragment extends Fragment{
         container.clear();
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
 
-
         float width = 230f;
         Drawable background = Styles.black6;
 
@@ -162,28 +161,29 @@ public class MenuFragment extends Fragment{
         container.add().width(Core.graphics.getWidth()/10f);
         container.table(background, t -> {
             t.defaults().width(width).height(70f);
+            t.name = "buttons";
 
             buttons(t,
-                new Buttoni("$play", Icon.play,
-                    new Buttoni("$campaign", Icon.play, () -> checkPlay(ui.planet::show)),
-                    new Buttoni("$joingame", Icon.add, () -> checkPlay(ui.join::show)),
-                    new Buttoni("$customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
-                    new Buttoni("$loadgame", Icon.download, () -> checkPlay(ui.load::show)),
-                    new Buttoni("$tutorial", Icon.info, () -> checkPlay(control::playTutorial))
+                new Buttoni("@play", Icon.play,
+                    new Buttoni("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
+                    new Buttoni("@joingame", Icon.add, () -> checkPlay(ui.join::show)),
+                    new Buttoni("@customgame", Icon.terrain, () -> checkPlay(ui.custom::show)),
+                    new Buttoni("@loadgame", Icon.download, () -> checkPlay(ui.load::show))
                 ),
-                new Buttoni("$editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("$workshop", Icon.book, platform::openWorkshop) : null,
-                new Buttoni(Core.bundle.get("mods"), Icon.bookOpen, ui.mods::show),
+                new Buttoni("@editor", Icon.terrain, () -> checkPlay(ui.maps::show)), steam ? new Buttoni("@workshop", Icon.book, platform::openWorkshop) : null,
+                new Buttoni("@mods", Icon.book, ui.mods::show),
                 //not enough space for this button
-                //new Buttoni("$schematics", Icon.paste, ui.schematics::show),
-                new Buttoni("$settings", Icon.settings, ui.settings::show),
-                new Buttoni("$about.button", Icon.info, ui.about::show),
-                new Buttoni("$quit", Icon.exit, Core.app::exit)
+                //new Buttoni("@schematics", Icon.paste, ui.schematics::show),
+                new Buttoni("@settings", Icon.settings, ui.settings::show),
+                new Buttoni("@about.button", Icon.info, ui.about::show),
+                new Buttoni("@quit", Icon.exit, Core.app::exit)
             );
 
         }).width(width).growY();
 
         container.table(background, t -> {
             submenu = t;
+            t.name = "submenu";
             t.color.a = 0f;
             t.top();
             t.defaults().width(width).height(70f);
@@ -193,10 +193,11 @@ public class MenuFragment extends Fragment{
     }
 
     private void checkPlay(Runnable run){
+
         if(!mods.hasContentErrors()){
             run.run();
         }else{
-            ui.showInfo("$mod.noerrorplay");
+            ui.showInfo("@mod.noerrorplay");
         }
     }
 

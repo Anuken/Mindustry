@@ -1,7 +1,7 @@
 package mindustry.world.meta.values;
 
-import arc.scene.ui.layout.Table;
-import mindustry.world.meta.StatValue;
+import arc.scene.ui.layout.*;
+import mindustry.world.meta.*;
 
 public class BooleanValue implements StatValue{
     private final boolean value;
@@ -12,6 +12,6 @@ public class BooleanValue implements StatValue{
 
     @Override
     public void display(Table table){
-        table.add(!value ? "$no" : "$yes");
+        table.add(!value ? "@no" : "@yes");
     }
 }

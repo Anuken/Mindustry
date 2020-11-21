@@ -50,21 +50,21 @@ public class MenuRenderer implements Disposable{
         Simplex s3 = new Simplex(offset + 2);
         RidgedPerlin rid = new RidgedPerlin(1 + offset, 1);
         Block[] selected = Structs.select(
-            new Block[]{Blocks.sand, Blocks.sandRocks},
-            new Block[]{Blocks.shale, Blocks.shaleRocks},
-            new Block[]{Blocks.ice, Blocks.icerocks},
-            new Block[]{Blocks.sand, Blocks.sandRocks},
-            new Block[]{Blocks.shale, Blocks.shaleRocks},
-            new Block[]{Blocks.ice, Blocks.icerocks},
+            new Block[]{Blocks.sand, Blocks.sandWall},
+            new Block[]{Blocks.shale, Blocks.shaleWall},
+            new Block[]{Blocks.ice, Blocks.iceWall},
+            new Block[]{Blocks.sand, Blocks.sandWall},
+            new Block[]{Blocks.shale, Blocks.shaleWall},
+            new Block[]{Blocks.ice, Blocks.iceWall},
             new Block[]{Blocks.moss, Blocks.sporePine}
         );
         Block[] selected2 = Structs.select(
-            new Block[]{Blocks.ignarock, Blocks.duneRocks},
-            new Block[]{Blocks.ignarock, Blocks.duneRocks},
-            new Block[]{Blocks.stone, Blocks.rocks},
-            new Block[]{Blocks.stone, Blocks.rocks},
-            new Block[]{Blocks.moss, Blocks.sporerocks},
-            new Block[]{Blocks.salt, Blocks.saltRocks}
+            new Block[]{Blocks.basalt, Blocks.duneWall},
+            new Block[]{Blocks.basalt, Blocks.duneWall},
+            new Block[]{Blocks.stone, Blocks.stoneWall},
+            new Block[]{Blocks.stone, Blocks.stoneWall},
+            new Block[]{Blocks.moss, Blocks.sporeWall},
+            new Block[]{Blocks.salt, Blocks.saltWall}
         );
 
         Block ore1 = ores.random();
@@ -113,7 +113,7 @@ public class MenuRenderer implements Disposable{
                     if(heat > base){
                         ore = Blocks.air;
                         wall = Blocks.air;
-                        floor = Blocks.ignarock;
+                        floor = Blocks.basalt;
 
                         if(heat > base + 0.1){
                             floor = Blocks.hotrock;
@@ -146,7 +146,7 @@ public class MenuRenderer implements Disposable{
                         floor = Mathf.chance(0.2) ? Blocks.sporeMoss : Blocks.moss;
 
                         if(wall != Blocks.air){
-                            wall = Blocks.sporerocks;
+                            wall = Blocks.sporeWall;
                         }
                     }
                 }
@@ -237,16 +237,14 @@ public class MenuRenderer implements Disposable{
     }
 
     private void drawFlyers(){
-        //TODO fix
-        if(true) return;
         Draw.color(0f, 0f, 0f, 0.4f);
 
         TextureRegion icon = flyerType.icon(Cicon.full);
 
-        float size = Math.max(icon.getWidth(), icon.getHeight()) * Draw.scl * 1.6f;
+        float size = Math.max(icon.width, icon.height) * Draw.scl * 1.6f;
 
         flyers((x, y) -> {
-            Draw.rect(flyerType.region, x - 12f, y - 13f, flyerRot - 90);
+            Draw.rect(icon, x - 12f, y - 13f, flyerRot - 90);
         });
 
         flyers((x, y) -> {
@@ -266,7 +264,7 @@ public class MenuRenderer implements Disposable{
             (engineSize + Mathf.absin(Time.time(), 2f, engineSize / 4f)) / 2f);
             Draw.color();
 
-            Draw.rect(flyerType.region, x, y, flyerRot - 90);
+            Draw.rect(icon, x, y, flyerRot - 90);
         });
     }
 

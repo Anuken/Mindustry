@@ -4,7 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
+import arc.util.*;
 import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
@@ -31,17 +31,17 @@ public class Team implements Comparable<Team>{
             Color.valueOf("ffd37f"), Color.valueOf("eab678"), Color.valueOf("d4816b")),
         crux = new Team(2, "crux", Color.valueOf("f25555"),
             Color.valueOf("fc8e6c"), Color.valueOf("f25555"), Color.valueOf("a04553")),
-        green = new Team(3, "green", Color.valueOf("4dd98b")),
-        purple = new Team(4, "purple", Color.valueOf("9a4bdf")),
-        blue = new Team(5, "blue", Color.royal.cpy());
+        green = new Team(3, "green", Color.valueOf("54d67d")),
+        purple = new Team(4, "purple", Color.valueOf("995bb0")),
+        blue = new Team(5, "blue", Color.valueOf("5a4deb"));
 
     static{
-        Mathf.random.setSeed(8);
+        Mathf.rand.setSeed(8);
         //create the whole 256 placeholder teams
         for(int i = 6; i < all.length; i++){
             new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.6f, 1f), 100f * Mathf.random(0.8f, 1f), 1f));
         }
-        Mathf.random.setSeed(new Rand().nextLong());
+        Mathf.rand.setSeed(new Rand().nextLong());
     }
 
     public static Team get(int id){
@@ -74,7 +74,7 @@ public class Team implements Comparable<Team>{
 
     /** @return the core items for this team, or an empty item module.
      * Never add to the resulting item module, as it is mutable. */
-    public @NonNull ItemModule items(){
+    public ItemModule items(){
         return core() == null ? ItemModule.empty : core().items;
     }
 
@@ -83,15 +83,12 @@ public class Team implements Comparable<Team>{
         return state.rules.teams.get(this);
     }
 
-    public Team[] enemies(){
-        return state.teams.enemiesOf(this);
-    }
-
     public TeamData data(){
         return state.teams.get(this);
     }
 
-    public @Nullable CoreEntity core(){
+    @Nullable
+    public CoreBuild core(){
         return data().core();
     }
 
@@ -103,7 +100,7 @@ public class Team implements Comparable<Team>{
         return state.teams.areEnemies(this, other);
     }
 
-    public Seq<CoreEntity> cores(){
+    public Seq<CoreBuild> cores(){
         return state.teams.cores(this);
     }
 

@@ -8,7 +8,6 @@ import arc.graphics.g3d.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import mindustry.type.*;
 
@@ -20,15 +19,16 @@ public class Shaders{
     public static UnitBuild build;
     public static DarknessShader darkness;
     public static LightShader light;
-    public static SurfaceShader water, tar, slag;
+    public static SurfaceShader water, mud, tar, slag, space;
     public static PlanetShader planet;
     public static PlanetGridShader planetGrid;
     public static AtmosphereShader atmosphere;
-    public static MeshShader mesh = new MeshShader();
+    public static MeshShader mesh;
     public static Shader unlit;
     public static Shader screenspace;
 
     public static void init(){
+        mesh = new MeshShader();
         blockbuild = new BlockBuild();
         try{
             shield = new ShieldShader();
@@ -41,8 +41,10 @@ public class Shaders{
         darkness = new DarknessShader();
         light = new LightShader();
         water = new SurfaceShader("water");
+        mud = new SurfaceShader("mud");
         tar = new SurfaceShader("tar");
         slag = new SurfaceShader("slag");
+        space = new SpaceShader("space");
         planet = new PlanetShader();
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
@@ -69,8 +71,8 @@ public class Shaders{
             setUniformf("u_rcampos", Tmp.v31.set(camera.position).sub(planet.position));
             setUniformf("u_light", planet.getLightNormal());
             setUniformf("u_color", planet.atmosphereColor.r, planet.atmosphereColor.g, planet.atmosphereColor.b);
-            setUniformf("u_innerRadius", planet.radius + 0.02f);
-            setUniformf("u_outerRadius", planet.radius * 1.3f);
+            setUniformf("u_innerRadius", planet.radius + planet.atmosphereRadIn);
+            setUniformf("u_outerRadius", planet.radius + planet.atmosphereRadOut);
 
             setUniformMatrix4("u_model", planet.getTransform(mat).val);
             setUniformMatrix4("u_projection", camera.combined.val);
@@ -151,9 +153,9 @@ public class Shaders{
             setUniformf("u_time", time);
             setUniformf("u_color", color);
             setUniformf("u_progress", progress);
-            setUniformf("u_uv", region.getU(), region.getV());
-            setUniformf("u_uv2", region.getU2(), region.getV2());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_uv", region.u, region.v);
+            setUniformf("u_uv2", region.u2, region.v2);
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 
@@ -170,10 +172,10 @@ public class Shaders{
         public void apply(){
             setUniformf("u_progress", progress);
             setUniformf("u_color", color);
-            setUniformf("u_uv", region.getU(), region.getV());
-            setUniformf("u_uv2", region.getU2(), region.getV2());
+            setUniformf("u_uv", region.u, region.v);
+            setUniformf("u_uv2", region.u2, region.v2);
             setUniformf("u_time", Time.time());
-            setUniformf("u_texsize", region.getTexture().getWidth(), region.getTexture().getHeight());
+            setUniformf("u_texsize", region.texture.width, region.texture.height);
         }
     }
 
@@ -192,6 +194,34 @@ public class Shaders{
             Core.camera.position.y - Core.camera.height / 2);
             setUniformf("u_texsize", Core.camera.width, Core.camera.height);
             setUniformf("u_invsize", 1f/Core.camera.width, 1f/Core.camera.height);
+        }
+    }
+
+    //seed: 8kmfuix03fw
+    public static class SpaceShader extends SurfaceShader{
+        Texture texture;
+
+        public SpaceShader(String frag){
+            super(frag);
+
+            Core.assets.load("sprites/space.png", Texture.class).loaded = t -> {
+                texture = (Texture)t;
+                texture.setFilter(TextureFilter.linear);
+                texture.setWrap(TextureWrap.mirroredRepeat);
+            };
+        }
+
+        @Override
+        public void apply(){
+            setUniformf("u_campos", Core.camera.position.x, Core.camera.position.y);
+            setUniformf("u_ccampos", Core.camera.position);
+            setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
+            setUniformf("u_time", Time.time());
+
+            texture.bind(1);
+            renderer.effectBuffer.getTexture().bind(0);
+
+            setUniformi("u_stars", 1);
         }
     }
 
@@ -224,7 +254,7 @@ public class Shaders{
     public static class LoadShader extends Shader{
 
         public LoadShader(String frag, String vert){
-            super(Core.files.internal("shaders/" + vert + ".vert").readString(), Core.files.internal("shaders/" + frag + ".frag").readString());
+            super(Core.files.internal("shaders/" + vert + ".vert"), Core.files.internal("shaders/" + frag + ".frag"));
         }
     }
 }

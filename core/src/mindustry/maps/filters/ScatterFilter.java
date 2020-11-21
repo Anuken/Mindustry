@@ -1,8 +1,8 @@
 package mindustry.maps.filters;
 
 import arc.util.*;
-import mindustry.content.Blocks;
-import mindustry.world.Block;
+import mindustry.content.*;
+import mindustry.world.*;
 
 import static mindustry.maps.filters.FilterOption.*;
 
@@ -27,7 +27,7 @@ public class ScatterFilter extends GenerateFilter{
             if(!block.isOverlay()){
                 in.block = block;
             }else{
-                in.ore = block;
+                in.overlay = block;
             }
         }
 

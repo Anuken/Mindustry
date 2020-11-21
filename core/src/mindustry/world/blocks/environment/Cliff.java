@@ -2,10 +2,13 @@ package mindustry.world.blocks.environment;
 
 import arc.graphics.g2d.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
 public class Cliff extends Block{
+    public float size = 11f;
+    public @Load(value = "cliffmask#", length = 256) TextureRegion[] cliffs;
 
     public Cliff(String name){
         super(name);
@@ -18,14 +21,8 @@ public class Cliff extends Block{
 
     @Override
     public void drawBase(Tile tile){
-        int r = tile.rotation();
-        for(int i = 0; i < 8; i++){
-            if((r & (1 << i)) != 0){
-                Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(1.3f + (i >= 4 ? -0.4f : 0.3f)));
-                Draw.rect(region, tile.worldx(), tile.worldy(), 11f, 11f, i * 45f);
-            }
-        }
-
+        Draw.color(Tmp.c1.set(tile.floor().mapColor).mul(1.6f));
+        Draw.rect(cliffs[tile.data & 0xff], tile.worldx(), tile.worldy());
         Draw.color();
     }
 

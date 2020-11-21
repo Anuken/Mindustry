@@ -13,8 +13,8 @@ import mindustry.gen.*;
 public class StatusEffect extends MappableContent{
     /** Damage dealt by the unit with the effect. */
     public float damageMultiplier = 1f;
-    /** Unit armor multiplier. */
-    public float armorMultiplier = 1f;
+    /** Unit health multiplier. */
+    public float healthMultiplier = 1f;
     /** Unit speed multiplier */
     public float speedMultiplier = 1f;
     /** Unit speed multiplier */
@@ -56,7 +56,8 @@ public class StatusEffect extends MappableContent{
         }
 
         if(effect != Fx.none && Mathf.chanceDelta(effectChance)){
-            effect.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
+            Tmp.v1.rnd(unit.type.hitSize /2f);
+            effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y);
         }
     }
 

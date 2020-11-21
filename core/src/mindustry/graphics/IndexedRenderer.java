@@ -7,11 +7,10 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 
-//TODO this class is a trainwreck, remove it
 public class IndexedRenderer implements Disposable{
     private static final int vsize = 5;
 
-    private Shader program = new Shader(
+    private final Shader program = new Shader(
     "attribute vec4 a_position;\n" +
     "attribute vec4 a_color;\n" +
     "attribute vec2 a_texCoord0;\n" +
@@ -68,10 +67,10 @@ public class IndexedRenderer implements Disposable{
     public void draw(int index, TextureRegion region, float x, float y, float w, float h){
         float fx2 = x + w;
         float fy2 = y + h;
-        float u = region.getU();
-        float v = region.getV2();
-        float u2 = region.getU2();
-        float v2 = region.getV();
+        float u = region.u;
+        float v = region.v2;
+        float u2 = region.u2;
+        float v2 = region.v;
 
         float[] vertices = tmpVerts;
         float color = this.color;
@@ -96,32 +95,32 @@ public class IndexedRenderer implements Disposable{
         vertices[idx++] = v2;
 
         //tri2
-        vertices[idx++] = x;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v;
-
-        vertices[idx++] = fx2;
-        vertices[idx++] = y;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v;
-
         vertices[idx++] = fx2;
         vertices[idx++] = fy2;
         vertices[idx++] = color;
         vertices[idx++] = u2;
         vertices[idx++] = v2;
 
+        vertices[idx++] = fx2;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
+
+        vertices[idx++] = x;
+        vertices[idx++] = y;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v;
+
         mesh.updateVertices(index * vsize * 6, vertices);
     }
 
     public void draw(int index, TextureRegion region, float x, float y, float w, float h, float rotation){
-        float u = region.getU();
-        float v = region.getV2();
-        float u2 = region.getU2();
-        float v2 = region.getV();
+        float u = region.u;
+        float v = region.v2;
+        float u2 = region.u2;
+        float v2 = region.v;
 
         float originX = w / 2, originY = h / 2;
 
@@ -155,6 +154,19 @@ public class IndexedRenderer implements Disposable{
         vertices[idx++] = u;
         vertices[idx++] = v;
 
+        vertices[idx++] = x2;
+        vertices[idx++] = y2;
+        vertices[idx++] = color;
+        vertices[idx++] = u;
+        vertices[idx++] = v2;
+
+        vertices[idx++] = x3;
+        vertices[idx++] = y3;
+        vertices[idx++] = color;
+        vertices[idx++] = u2;
+        vertices[idx++] = v2;
+
+        //tri2
         vertices[idx++] = x3;
         vertices[idx++] = y3;
         vertices[idx++] = color;
@@ -164,27 +176,14 @@ public class IndexedRenderer implements Disposable{
         vertices[idx++] = x4;
         vertices[idx++] = y4;
         vertices[idx++] = color;
-        vertices[idx++] = u;
-        vertices[idx++] = v2;
+        vertices[idx++] = u2;
+        vertices[idx++] = v;
 
-        //tri2
         vertices[idx++] = x1;
         vertices[idx++] = y1;
         vertices[idx++] = color;
         vertices[idx++] = u;
         vertices[idx++] = v;
-
-        vertices[idx++] = x2;
-        vertices[idx++] = y2;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v;
-
-        vertices[idx++] = x3;
-        vertices[idx++] = y3;
-        vertices[idx++] = color;
-        vertices[idx++] = u2;
-        vertices[idx++] = v2;
 
         mesh.updateVertices(index * vsize * 6, vertices);
     }

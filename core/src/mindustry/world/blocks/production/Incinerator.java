@@ -22,7 +22,7 @@ public class Incinerator extends Block{
         solid = true;
     }
 
-    public class IncineratorEntity extends Building{
+    public class IncineratorBuild extends Building{
         public float heat;
 
         @Override
@@ -73,7 +73,7 @@ public class Incinerator extends Block{
         }
 
         @Override
-        public boolean acceptLiquid(Building source, Liquid liquid, float amount){
+        public boolean acceptLiquid(Building source, Liquid liquid){
             return heat > 0.5f;
         }
     }

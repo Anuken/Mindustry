@@ -2,7 +2,6 @@ package mindustry.game;
 
 import arc.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import mindustry.ctype.*;
 import mindustry.type.*;
 
@@ -10,7 +9,7 @@ import mindustry.type.*;
 public class Objectives{
 
     public static class Research implements Objective{
-        public @NonNull UnlockableContent content;
+        public UnlockableContent content;
 
         public Research(UnlockableContent content){
             this.content = content;
@@ -29,48 +28,48 @@ public class Objectives{
         }
     }
 
-    public static class SectorWave extends SectorObjective{
-        public int wave;
+    public static class Produce implements Objective{
+        public UnlockableContent content;
 
-        public SectorWave(SectorPreset zone, int wave){
-            this.preset = zone;
-            this.wave = wave;
+        public Produce(UnlockableContent content){
+            this.content = content;
         }
 
-        protected SectorWave(){}
+        protected Produce(){}
 
         @Override
         public boolean complete(){
-            return preset.bestWave() >= wave;
+            return content.unlocked();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.wave", wave, preset.localizedName);
+            return Core.bundle.format("requirement.produce", content.emoji() + " " + content.localizedName);
         }
     }
 
-    public static class Launched extends SectorObjective{
+    public static class SectorComplete extends SectorObjective{
 
-        public Launched(SectorPreset zone){
+        public SectorComplete(SectorPreset zone){
             this.preset = zone;
         }
 
-        protected Launched(){}
+        protected SectorComplete(){}
 
         @Override
         public boolean complete(){
-            return preset.hasLaunched();
+            return preset.sector.save != null && !preset.sector.isAttacked() && preset.sector.hasBase();
         }
 
         @Override
         public String display(){
-            return Core.bundle.format("requirement.core", preset.localizedName);
+            return Core.bundle.format("requirement.capture", preset.localizedName);
         }
     }
 
+    //TODO merge
     public abstract static class SectorObjective implements Objective{
-        public @NonNull SectorPreset preset;
+        public SectorPreset preset;
     }
 
     /** Defines a specific objective for a game. */

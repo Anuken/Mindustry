@@ -2,7 +2,6 @@ package mindustry.ui.fragments;
 
 import arc.*;
 import arc.Input.*;
-import arc.struct.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -10,8 +9,8 @@ import arc.scene.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Label.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 
@@ -24,7 +23,7 @@ public class ScriptConsoleFragment extends Table{
     private boolean open = false, shown;
     private TextField chatfield;
     private Label fieldlabel = new Label(">");
-    private BitmapFont font;
+    private Font font;
     private GlyphLayout layout = new GlyphLayout();
     private float offsetx = Scl.scl(4), offsety = Scl.scl(4), fontoffsetx = Scl.scl(2), chatspace = Scl.scl(50);
     private Color shadowColor = new Color(0, 0, 0, 0.4f);
@@ -40,12 +39,11 @@ public class ScriptConsoleFragment extends Table{
     };
 
     public ScriptConsoleFragment(){
-
         setFillParent(true);
         font = Fonts.def;
 
         visible(() -> {
-            if(input.keyTap(Binding.console)  && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
+            if(input.keyTap(Binding.console)  && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null) && !ui.chatfrag.shown()){
                 shown = !shown;
                 if(shown && !open && enableConsole){
                     toggle();
@@ -53,7 +51,7 @@ public class ScriptConsoleFragment extends Table{
                 clearChatInput();
             }
 
-            return shown && !Vars.net.active();
+            return shown;
         });
 
         update(() -> {
@@ -96,7 +94,6 @@ public class ScriptConsoleFragment extends Table{
         fieldlabel.setStyle(fieldlabel.getStyle());
 
         chatfield = new TextField("", new TextField.TextFieldStyle(scene.getStyle(TextField.TextFieldStyle.class)));
-        chatfield.setMaxLength(Vars.maxTextLength);
         chatfield.getStyle().background = null;
         chatfield.getStyle().font = Fonts.chat;
         chatfield.getStyle().fontColor = Color.white;
@@ -115,7 +112,7 @@ public class ScriptConsoleFragment extends Table{
         Draw.color(shadowColor);
 
         if(open){
-            Fill.crect(offsetx, chatfield.getY(), chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
+            Fill.crect(offsetx, chatfield.y, chatfield.getWidth() + 15f, chatfield.getHeight() - 1);
         }
 
         super.draw();
@@ -159,7 +156,7 @@ public class ScriptConsoleFragment extends Table{
         String message = chatfield.getText();
         clearChatInput();
 
-        if(message.replaceAll(" ", "").isEmpty()) return;
+        if(message.replace(" ", "").isEmpty()) return;
 
         //special case for 'clear' command
         if(message.equals("clear")){
@@ -180,7 +177,6 @@ public class ScriptConsoleFragment extends Table{
             open = !open;
             if(mobile){
                 TextInput input = new TextInput();
-                input.maxLength = maxTextLength;
                 input.accepted = text -> {
                     chatfield.setText(text);
                     sendMessage();
@@ -219,6 +215,10 @@ public class ScriptConsoleFragment extends Table{
 
     public boolean open(){
         return open;
+    }
+
+    public boolean shown(){
+        return shown;
     }
 
     public void addMessage(String message){

@@ -16,7 +16,9 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
+import mindustry.world.meta.values.*;
 
 import static mindustry.Vars.*;
 
@@ -64,8 +66,8 @@ public class Drill extends Block{
         hasLiquids = true;
         liquidCapacity = 5f;
         hasItems = true;
-        idleSound = Sounds.drill;
-        idleSoundVolume = 0.003f;
+        ambientSound = Sounds.drill;
+        ambientSoundVolume = 0.018f;
     }
 
     @Override
@@ -86,7 +88,7 @@ public class Drill extends Block{
     public void setBars(){
         super.setBars();
 
-        bars.add("drillspeed", (DrillEntity e) ->
+        bars.add("drillspeed", (DrillBuild e) ->
              new Bar(() -> Core.bundle.format("bar.drillspeed", Strings.fixed(e.lastDrillSpeed * 60 * e.timeScale(), 2)), () -> Pal.ammo, () -> e.warmup));
     }
 
@@ -135,29 +137,11 @@ public class Drill extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(BlockStat.drillTier, table -> {
-            Seq<Block> list = content.blocks().select(b -> b.isFloor() && b.asFloor().itemDrop != null && b.asFloor().itemDrop.hardness <= tier);
+        stats.add(Stat.drillTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= tier));
 
-            table.table(l -> {
-                l.left();
-
-                for(int i = 0; i < list.size; i++){
-                    Block item = list.get(i);
-
-                    l.image(item.icon(Cicon.small)).size(8 * 3).padRight(2).padLeft(2).padTop(3).padBottom(3);
-                    l.add(item.localizedName).left().padLeft(1).padRight(4);
-                    if(i % 5 == 4){
-                        l.row();
-                    }
-                }
-            });
-
-
-        });
-
-        stats.add(BlockStat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
+        stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
         if(liquidBoostIntensity != 1){
-            stats.add(BlockStat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
+            stats.add(Stat.boostEffect, liquidBoostIntensity * liquidBoostIntensity, StatUnit.timesSpeed);
         }
     }
 
@@ -205,7 +189,7 @@ public class Drill extends Block{
         return drops != null && drops.hardness <= tier;
     }
 
-    public class DrillEntity extends Building{
+    public class DrillBuild extends Building{
         public float progress;
         public int index;
         public float warmup;
@@ -217,12 +201,17 @@ public class Drill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity;
+            return items.total() < itemCapacity && enabled;
         }
 
         @Override
-        public boolean shouldIdleSound(){
-            return efficiency() > 0.01f;
+        public boolean shouldAmbientSound(){
+            return efficiency() > 0.01f && items.total() < itemCapacity;
+        }
+
+        @Override
+        public float ambientVolume(){
+            return efficiency() * (size * size) / 4f;
         }
 
         @Override
@@ -259,7 +248,7 @@ public class Drill extends Block{
 
                 float speed = 1f;
 
-                if(cons().optionalValid()){
+                if(cons.optionalValid()){
                     speed = liquidBoostIntensity;
                 }
 

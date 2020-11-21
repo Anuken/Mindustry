@@ -2,13 +2,16 @@ package mindustry.mod;
 
 import arc.*;
 import arc.assets.*;
+import arc.assets.loaders.*;
+import arc.assets.loaders.SoundLoader.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.math.*;
 import arc.mock.*;
 import arc.struct.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
@@ -19,6 +22,7 @@ import mindustry.content.TechTree.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.*;
 import mindustry.game.*;
 import mindustry.game.Objectives.*;
 import mindustry.gen.*;
@@ -26,6 +30,8 @@ import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.units.*;
+import mindustry.world.blocks.units.UnitFactory.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
@@ -35,17 +41,29 @@ import java.lang.reflect.*;
 @SuppressWarnings("unchecked")
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
-    private ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
+    ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
+    ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
+    ObjectMap<String, AssetDescriptor> sounds = new ObjectMap<>();
 
-    private ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
-        put(Effect.class, (type, data) -> field(Fx.class, data));
+    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
+        put(Effect.class, (type, data) -> {
+            if(data.isString()){
+                return field(Fx.class, data);
+            }
+            Class<? extends Effect> bc = data.has("type") ? resolve(data.getString("type"), "mindustry.entities.effect") : ParticleEffect.class;
+            data.remove("type");
+            Effect result = make(bc);
+            readFields(result, data);
+            return result;
+        });
+        put(Interp.class, (type, data) -> field(Interp.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
             if(result != null){
                 return result;
             }else{
                 String str = data.asString();
-                if(str.startsWith(Schematics.base64Header)){
+                if(str.startsWith(Vars.schematicBaseStart)){
                     return Schematics.readBase64(str);
                 }else{
                     return Schematics.read(Vars.tree.get("schematics/" + str + "." + Vars.schematicExtension));
@@ -74,20 +92,20 @@ public class ContentParser{
         });
         put(Sound.class, (type, data) -> {
             if(fieldOpt(Sounds.class, data) != null) return fieldOpt(Sounds.class, data);
-            if(Vars.headless) return new MockSound();
+            if(Vars.headless) return new Sound();
 
             String name = "sounds/" + data.asString();
-            String path = Vars.tree.get(name + ".ogg").exists() && !Vars.ios ? name + ".ogg" : name + ".mp3";
+            String path = Vars.tree.get(name + ".ogg").exists() ? name + ".ogg" : name + ".mp3";
 
-            if(Core.assets.contains(path, Sound.class)) return Core.assets.get(path, Sound.class);
-            ModLoadingSound sound = new ModLoadingSound();
-            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class);
-            desc.loaded = result -> sound.sound = (Sound)result;
+            if(sounds.containsKey(path)) return ((SoundParameter)sounds.get(path).params).sound;
+            var sound = new Sound();
+            AssetDescriptor<?> desc = Core.assets.load(path, Sound.class, new SoundParameter(sound));
             desc.errored = Throwable::printStackTrace;
+            sounds.put(path, desc);
             return sound;
         });
         put(Objectives.Objective.class, (type, data) -> {
-            Class<? extends Objectives.Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : SectorWave.class;
+            Class<? extends Objectives.Objective> oc = data.has("type") ? resolve(data.getString("type"), "mindustry.game.Objectives") : SectorComplete.class;
             data.remove("type");
             Objectives.Objective obj = make(oc);
             readFields(obj, data);
@@ -105,7 +123,7 @@ public class ContentParser{
     private Seq<Runnable> reads = new Seq<>();
     private Seq<Runnable> postreads = new Seq<>();
     private ObjectSet<Object> toBeParsed = new ObjectSet<>();
-    private LoadedMod currentMod;
+    LoadedMod currentMod;
     private Content currentContent;
 
     private Json parser = new Json(){
@@ -169,11 +187,9 @@ public class ContentParser{
             readBundle(ContentType.block, name, value);
 
             Block block;
-            boolean exists;
 
             if(locate(ContentType.block, name) != null){
                 block = locate(ContentType.block, name);
-                exists = true;
 
                 if(value.has("type")){
                     throw new IllegalArgumentException("When defining properties for an existing block, you must not re-declare its type. The original type will be used. Block: " + name);
@@ -181,7 +197,6 @@ public class ContentParser{
             }else{
                 //TODO generate dynamically instead of doing.. this
                 Class<? extends Block> type;
-                exists = false;
 
                 try{
                     type = resolve(getType(value),
@@ -190,6 +205,7 @@ public class ContentParser{
                     "mindustry.world.blocks.defense",
                     "mindustry.world.blocks.defense.turrets",
                     "mindustry.world.blocks.distribution",
+                    "mindustry.world.blocks.environment",
                     "mindustry.world.blocks.liquid",
                     "mindustry.world.blocks.logic",
                     "mindustry.world.blocks.power",
@@ -206,14 +222,6 @@ public class ContentParser{
             }
 
             currentContent = block;
-
-            String[] research = {null};
-
-            //add research tech node
-            if(value.has("research")){
-                research[0] = value.get("research").asString();
-                value.remove("research");
-            }
 
             read(() -> {
                 if(value.has("consumes")){
@@ -241,35 +249,8 @@ public class ContentParser{
 
                 readFields(block, value, true);
 
-                if(block.size > BuildBlock.maxSize){
-                    throw new IllegalArgumentException("Blocks cannot be larger than " + BuildBlock.maxSize);
-                }
-
-                //add research tech node
-                if(research[0] != null){
-                    //TODO only works with blocks
-                    Block parent = find(ContentType.block, research[0]);
-                    TechNode baseNode = exists && TechTree.all.contains(t -> t.content == block) ? TechTree.all.find(t -> t.content == block) : TechTree.create(parent, block);
-                    LoadedMod cur = currentMod;
-
-                    postreads.add(() -> {
-                        currentContent = block;
-                        currentMod = cur;
-
-                        if(baseNode.parent != null){
-                            baseNode.parent.children.remove(baseNode);
-                        }
-
-                        TechNode parnode = TechTree.all.find(t -> t.content == parent);
-                        if(parnode == null){
-                            throw new IllegalArgumentException("Block '" + parent.name + "' isn't in the tech tree, but '" + block.name + "' requires it to be researched.");
-                        }
-                        if(!parnode.children.contains(baseNode)){
-                            parnode.children.add(baseNode);
-                        }
-                        baseNode.parent = parnode;
-                    });
-
+                if(block.size > ConstructBlock.maxSize){
+                    throw new IllegalArgumentException("Blocks cannot be larger than " + ConstructBlock.maxSize);
                 }
 
                 //make block visible by default if there are requirements and no visibility set
@@ -292,9 +273,64 @@ public class ContentParser{
             }
 
             currentContent = unit;
-            read(() -> readFields(unit, value, true));
+            //TODO test this!
+            read(() -> {
+                //add reconstructor type
+                if(value.has("requirements")){
+                    JsonValue rec = value.remove("requirements");
+
+                    //intermediate class for parsing
+                    class UnitReq{
+                        public Block block;
+                        public ItemStack[] requirements = {};
+                        @Nullable
+                        public UnitType previous;
+                        public float time = 60f * 10f;
+                    }
+
+                    UnitReq req = parser.readValue(UnitReq.class, rec);
+
+                    if(req.block instanceof Reconstructor r){
+                        if(req.previous != null){
+                            r.upgrades.add(new UnitType[]{req.previous, unit});
+                        }
+                    }else if(req.block instanceof UnitFactory f){
+                        f.plans.add(new UnitPlan(unit, req.time, req.requirements));
+                    }else{
+                        throw new IllegalArgumentException("Missing a valid 'block' in 'requirements'");
+                    }
+
+                }
+
+                //read extra default waves
+                if(value.has("waves")){
+                    JsonValue waves = value.remove("waves");
+                    SpawnGroup[] groups = parser.readValue(SpawnGroup[].class, waves);
+                    for(SpawnGroup group : groups){
+                        group.type = unit;
+                    }
+
+                    Vars.waves.get().addAll(groups);
+                }
+
+                readFields(unit, value, true);
+            });
 
             return unit;
+        },
+        ContentType.weather, (TypeParser<Weather>)(mod, name, value) -> {
+            Weather item;
+            if(locate(ContentType.weather, name) != null){
+                item = locate(ContentType.weather, name);
+                readBundle(ContentType.weather, name, value);
+            }else{
+                readBundle(ContentType.weather, name, value);
+                Class<? extends Weather> type = resolve(getType(value), "mindustry.type.weather");
+                item = make(type);
+            }
+            currentContent = item;
+            read(() -> readFields(item, value));
+            return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, parser(ContentType.liquid, Liquid::new)
@@ -323,8 +359,8 @@ public class ContentParser{
     private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
             T item;
-            if(Vars.content.getByName(type, name) != null){
-                item = (T)Vars.content.getByName(type, name);
+            if(locate(type, name) != null){
+                item = (T)locate(type, name);
                 readBundle(type, name, value);
             }else{
                 readBundle(type, name, value);
@@ -440,6 +476,8 @@ public class ContentParser{
     }
 
     public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
+        Log.err("Error for @ / @:\n@\n", content, file, Strings.getStackTrace(error));
+
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
         content.minfo.error = makeError(error, file);
@@ -480,7 +518,7 @@ public class ContentParser{
         return first != null ? first : Vars.content.getByName(type, currentMod.name + "-" + name);
     }
 
-    private <T> T make(Class<T> type){
+    <T> T make(Class<T> type){
         try{
             Constructor<T> cons = type.getDeclaredConstructor();
             cons.setAccessible(true);
@@ -515,7 +553,7 @@ public class ContentParser{
         }
     }
 
-    private Object field(Class<?> type, JsonValue value){
+    Object field(Class<?> type, JsonValue value){
         return field(type, value.asString());
     }
 
@@ -530,7 +568,7 @@ public class ContentParser{
         }
     }
 
-    private Object fieldOpt(Class<?> type, JsonValue value){
+    Object fieldOpt(Class<?> type, JsonValue value){
         try{
             return type.getField(value.asString()).get(null);
         }catch(Exception e){
@@ -538,15 +576,17 @@ public class ContentParser{
         }
     }
 
-    private void checkNullFields(Object object){
-        if(object instanceof Number || object instanceof String || toBeParsed.contains(object)) return;
+    void checkNullFields(Object object){
+        if(object == null || object instanceof Number || object instanceof String || toBeParsed.contains(object) || object.getClass().getName().startsWith("arc.")) return;
 
         parser.getFields(object.getClass()).values().toSeq().each(field -> {
             try{
                 if(field.field.getType().isPrimitive()) return;
 
-                if(field.field.isAnnotationPresent(NonNull.class) && field.field.get(object) == null){
-                    throw new RuntimeException("'" + field.field.getName() + "' in " + object.getClass().getSimpleName() + " is missing!");
+                if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null && !implicitNullable.contains(field.field.getType())){
+                    throw new RuntimeException("'" + field.field.getName() + "' in " +
+                        ((object.getClass().isAnonymousClass() ? object.getClass().getSuperclass() : object.getClass()).getSimpleName()) +
+                        " is missing! Object = " + object + ", field = (" + field.field.getName() + " = " + field.field.get(object) + ")");
                 }
             }catch(Exception e){
                 throw new RuntimeException(e);
@@ -559,7 +599,9 @@ public class ContentParser{
         readFields(object, jsonMap);
     }
 
-    private void readFields(Object object, JsonValue jsonMap){
+    void readFields(Object object, JsonValue jsonMap){
+        JsonValue research = jsonMap.remove("research");
+
         toBeParsed.remove(object);
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = parser.getFields(type);
@@ -590,10 +632,61 @@ public class ContentParser{
                 throw ex;
             }
         }
+
+
+        if(object instanceof UnlockableContent unlock && research != null){
+
+            //add research tech node
+            String researchName;
+            ItemStack[] customRequirements;
+
+            //research can be a single string or an object with parent and requirements
+            if(research.isString()){
+                researchName = research.asString();
+                customRequirements = null;
+            }else{
+                researchName = research.getString("parent");
+                customRequirements = research.has("requirements") ? parser.readValue(ItemStack[].class, research.get("requirements")) : null;
+            }
+
+            //remove old node
+            TechNode lastNode = TechTree.all.find(t -> t.content == unlock);
+            if(lastNode != null){
+                lastNode.remove();
+            }
+
+            TechNode node = new TechNode(null, unlock, customRequirements == null ? unlock.researchRequirements() : customRequirements);
+            LoadedMod cur = currentMod;
+
+            postreads.add(() -> {
+                currentContent = unlock;
+                currentMod = cur;
+
+                //remove old node from parent
+                if(node.parent != null){
+                    node.parent.children.remove(node);
+                }
+
+
+                //find parent node.
+                TechNode parent = TechTree.all.find(t -> t.content.name.equals(researchName) || t.content.name.equals(currentMod.name + "-" + researchName));
+
+                if(parent == null){
+                    throw new IllegalArgumentException("Content '" + researchName + "' isn't in the tech tree, but '" + unlock.name + "' requires it to be researched.");
+                }
+
+                //add this node to the parent
+                if(!parent.children.contains(node)){
+                    parent.children.add(node);
+                }
+                //reparent the node
+                node.parent = parent;
+            });
+        }
     }
 
     /** Tries to resolve a class from a list of potential class names. */
-    private <T> Class<T> resolve(String base, String... potentials){
+    <T> Class<T> resolve(String base, String... potentials){
         if(!base.isEmpty() && Character.isLowerCase(base.charAt(0))) base = Strings.capitalize(base);
 
         for(String type : potentials){

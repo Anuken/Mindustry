@@ -1,9 +1,9 @@
 package mindustry.world.meta;
 
-import arc.struct.OrderedMap;
-import arc.func.Func;
+import arc.func.*;
+import arc.struct.*;
 import mindustry.gen.*;
-import mindustry.ui.Bar;
+import mindustry.ui.*;
 
 public class BlockBars{
     private OrderedMap<String, Func<Building, Bar>> bars = new OrderedMap<>();

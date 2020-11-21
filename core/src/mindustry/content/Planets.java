@@ -9,12 +9,14 @@ import mindustry.type.*;
 public class Planets implements ContentList{
     public static Planet
     sun,
-    starter; //TODO rename
+    //tantros,
+    serpulo;
 
     @Override
     public void load(){
         sun = new Planet("sun", null, 0, 2){{
             bloom = true;
+            accessible = false;
 
             //lightColor = Color.valueOf("f4ee8e");
 
@@ -31,11 +33,22 @@ public class Planets implements ContentList{
             );
         }};
 
-        //TODO rename
-        starter = new Planet("TODO", sun, 3, 1){{
-            generator = new TODOPlanetGenerator();
+        /*tantros = new Planet("tantros", sun, 2, 0.8f){{
+            generator = new TantrosPlanetGenerator();
+            meshLoader = () -> new HexMesh(this, 4);
+            atmosphereColor = Color.valueOf("3db899");
+            startSector = 10;
+            atmosphereRadIn = -0.01f;
+            atmosphereRadOut = 0.3f;
+        }};*/
+
+        serpulo = new Planet("serpulo", sun, 3, 1){{
+            generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             atmosphereColor = Color.valueOf("3c1b8f");
+            atmosphereRadIn = 0.02f;
+            atmosphereRadOut = 0.3f;
+            startSector = 15;
         }};
     }
 }

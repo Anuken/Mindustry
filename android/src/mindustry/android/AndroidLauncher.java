@@ -1,14 +1,12 @@
 package mindustry.android;
 
 import android.*;
-import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.content.pm.*;
 import android.net.*;
 import android.os.Build.*;
 import android.os.*;
-import android.provider.Settings.*;
 import android.telephony.*;
 import arc.*;
 import arc.backend.android.*;
@@ -16,7 +14,7 @@ import arc.files.*;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.serialization.*;
+import dalvik.system.*;
 import mindustry.*;
 import mindustry.game.Saves.*;
 import mindustry.io.*;
@@ -24,11 +22,10 @@ import mindustry.net.*;
 import mindustry.ui.dialogs.*;
 
 import java.io.*;
-import java.lang.System;
+import java.lang.Thread.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
-
 
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
@@ -38,6 +35,20 @@ public class AndroidLauncher extends AndroidApplication{
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
+
+        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
+            CrashSender.log(error);
+
+            //try to forward exception to system handler
+            if(handler != null){
+                handler.uncaughtException(thread, error);
+            }else{
+                error.printStackTrace();
+                System.exit(1);
+            }
+        });
+
         super.onCreate(savedInstanceState);
         if(doubleScaleTablets && isTablet(this.getContext())){
             Scl.setAddition(0.5f);
@@ -51,24 +62,6 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public String getUUID(){
-                try{
-                    String s = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
-                    int len = s.length();
-                    byte[] data = new byte[len / 2];
-                    for(int i = 0; i < len; i += 2){
-                        data[i / 2] = (byte)((Character.digit(s.charAt(i), 16) << 4)
-                        + Character.digit(s.charAt(i + 1), 16));
-                    }
-                    String result = new String(Base64Coder.encode(data));
-                    if(result.equals("AAAAAAAAAOA=")) throw new RuntimeException("Bad UUID.");
-                    return result;
-                }catch(Exception e){
-                    return super.getUUID();
-                }
-            }
-
-            @Override
             public rhino.Context getScriptContext(){
                 return AndroidRhinoContext.enter(getContext().getCacheDir());
             }
@@ -78,11 +71,24 @@ public class AndroidLauncher extends AndroidApplication{
             }
 
             @Override
-            public void showFileChooser(boolean open, String extension, Cons<Fi> cons){
+            public Class<?> loadJar(Fi jar, String mainClass) throws Exception{
+                DexClassLoader loader = new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, getClassLoader());
+                return Class.forName(mainClass, true, loader);
+            }
+
+            @Override
+            public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
+                showFileChooser(open, title, cons, extension);
+            }
+
+            void showFileChooser(boolean open, String title, Cons<Fi> cons, String... extensions){
+                String extension = extensions[0];
+
                 if(VERSION.SDK_INT >= VERSION_CODES.Q){
                     Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType(extension.equals("zip") && !open ? "application/zip" : "*/*");
+                    intent.setType(extension.equals("zip") && !open && extensions.length == 1 ? "application/zip" : "*/*");
+
                     addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
                         if(code == Activity.RESULT_OK && in != null && in.getData() != null){
                             Uri uri = in.getData();
@@ -112,7 +118,7 @@ public class AndroidLauncher extends AndroidApplication{
                     });
                 }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                    chooser = new FileChooser(open ? "$open" : "$save", file -> file.extension().equalsIgnoreCase(extension), open, file -> {
+                    chooser = new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
                         if(!open){
                             cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
                         }else{
@@ -129,8 +135,17 @@ public class AndroidLauncher extends AndroidApplication{
                     }
                     requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                 }else{
-                    super.showFileChooser(open, extension, cons);
+                    if(open){
+                        new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+                    }else{
+                        super.showFileChooser(open, "@open", extension, cons);
+                    }
                 }
+            }
+
+            @Override
+            public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
+                showFileChooser(true, "@open", cons, extensions);
             }
 
             @Override
@@ -146,34 +161,37 @@ public class AndroidLauncher extends AndroidApplication{
         }, new AndroidApplicationConfiguration(){{
             useImmersiveMode = true;
             hideStatusBar = true;
-            errorHandler = CrashSender::log;
             stencil = 8;
         }});
         checkFiles(getIntent());
 
+        try{
+            //new external folder
+            Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
+            Core.settings.setDataDirectory(data);
 
-        //new external folder
-        Fi data = Core.files.absolute(getContext().getExternalFilesDir(null).getAbsolutePath());
-        Core.settings.setDataDirectory(data);
+            //move to internal storage if there's no file indicating that it moved
+            if(!Core.files.local("files_moved").exists()){
+                Log.info("Moving files to external storage...");
 
-        //move to internal storage if there's no file indicating that it moved
-        if(!Core.files.local("files_moved").exists()){
-            Log.info("Moving files to external storage...");
-
-            try{
-                //current local storage folder
-                Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
-                for(Fi fi : src.list()){
-                    fi.copyTo(data);
+                try{
+                    //current local storage folder
+                    Fi src = Core.files.absolute(Core.files.getLocalStoragePath());
+                    for(Fi fi : src.list()){
+                        fi.copyTo(data);
+                    }
+                    //create marker
+                    Core.files.local("files_moved").writeString("files moved to " + data);
+                    Core.files.local("files_moved_103").writeString("files moved again");
+                    Log.info("Files moved.");
+                }catch(Throwable t){
+                    Log.err("Failed to move files!");
+                    t.printStackTrace();
                 }
-                //create marker
-                Core.files.local("files_moved").writeString("files moved to " + data);
-                Core.files.local("files_moved_103").writeString("files moved again");
-                Log.info("Files moved.");
-            }catch(Throwable t){
-                Log.err("Failed to move files!");
-                t.printStackTrace();
             }
+        }catch(Exception e){
+            //print log but don't crash
+            Log.err(e);
         }
     }
 
@@ -221,10 +239,10 @@ public class AndroidLauncher extends AndroidApplication{
                                 SaveSlot slot = control.saves.importSave(file);
                                 ui.load.runLoadSave(slot);
                             }catch(IOException e){
-                                ui.showException("$save.import.fail", e);
+                                ui.showException("@save.import.fail", e);
                             }
                         }else{
-                            ui.showErrorMessage("$save.import.invalid");
+                            ui.showErrorMessage("@save.import.invalid");
                         }
                     }else if(map){ //open map
                         Fi file = Core.files.local("temp-map." + mapExtension);

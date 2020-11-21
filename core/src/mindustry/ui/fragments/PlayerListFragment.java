@@ -16,15 +16,17 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class PlayerListFragment extends Fragment{
+    public Table content = new Table().marginRight(13f).marginLeft(13f);
     private boolean visible = false;
-    private Table content = new Table().marginRight(13f).marginLeft(13f);
     private Interval timer = new Interval();
     private TextField sField;
     private boolean found = false;
 
     @Override
     public void build(Group parent){
+        content.name = "players";
         parent.fill(cont -> {
+            cont.name = "playerlist";
             cont.visible(() -> visible);
             cont.update(() -> {
                 if(!(net.active() && state.isGame())){
@@ -36,7 +38,7 @@ public class PlayerListFragment extends Fragment{
                     rebuild();
                     content.pack();
                     content.act(Core.graphics.getDeltaTime());
-                    //TODO hack
+                    //hacky
                     Core.scene.act(0f);
                 }
             });
@@ -47,6 +49,7 @@ public class PlayerListFragment extends Fragment{
                 sField = pane.field(null, text -> {
                     rebuild();
                 }).grow().pad(8).get();
+                sField.name = "search";
                 sField.setMaxLength(maxNameLength);
                 sField.setMessageText(Core.bundle.format("players.search"));
 
@@ -56,10 +59,11 @@ public class PlayerListFragment extends Fragment{
 
                 pane.table(menu -> {
                     menu.defaults().growX().height(50f).fillY();
+                    menu.name = "menu";
 
-                    menu.button("$server.bans", ui.bans::show).disabled(b -> net.client());
-                    menu.button("$server.admins", ui.admins::show).disabled(b -> net.client());
-                    menu.button("$close", this::toggle);
+                    menu.button("@server.bans", ui.bans::show).disabled(b -> net.client());
+                    menu.button("@server.admins", ui.admins::show).disabled(b -> net.client());
+                    menu.button("@close", this::toggle);
                 }).margin(0f).pad(10f).growX();
 
             }).touchable(Touchable.enabled).margin(14f);
@@ -99,6 +103,7 @@ public class PlayerListFragment extends Fragment{
             };
             table.margin(8);
             table.add(new Image(user.icon()).setScaling(Scaling.bounded)).grow();
+            table.name = user.name();
 
             button.add(table).size(h);
             button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);
@@ -115,13 +120,9 @@ public class PlayerListFragment extends Fragment{
                     t.defaults().size(bs);
 
                     t.button(Icon.hammer, Styles.clearPartiali,
-                    () -> {
-                        ui.showConfirm("$confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban));
-                    });
+                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmban",  user.name()), () -> Call.adminRequest(user, AdminAction.ban)));
                     t.button(Icon.cancel, Styles.clearPartiali,
-                    () -> {
-                        ui.showConfirm("$confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick));
-                    });
+                    () -> ui.showConfirm("@confirm", Core.bundle.format("confirmkick",  user.name()), () -> Call.adminRequest(user, AdminAction.kick)));
 
                     t.row();
 
@@ -131,9 +132,9 @@ public class PlayerListFragment extends Fragment{
                         String id = user.uuid();
 
                         if(netServer.admins.isAdmin(id, connection.address)){
-                            ui.showConfirm("$confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> netServer.admins.unAdminPlayer(id));
+                            ui.showConfirm("@confirm", Core.bundle.format("confirmunadmin",  user.name()), () -> netServer.admins.unAdminPlayer(id));
                         }else{
-                            ui.showConfirm("$confirm", Core.bundle.format("confirmadmin",  user.name()), () -> netServer.admins.adminPlayer(id, user.usid()));
+                            ui.showConfirm("@confirm", Core.bundle.format("confirmadmin",  user.name()), () -> netServer.admins.adminPlayer(id, user.usid()));
                         }
                     }).update(b -> b.setChecked(user.admin))
                         .disabled(b -> net.client())
@@ -148,7 +149,7 @@ public class PlayerListFragment extends Fragment{
 
                 button.button(Icon.hammer, Styles.clearPartiali,
                 () -> {
-                    ui.showConfirm("$confirm", Core.bundle.format("confirmvotekick",  user.name()), () -> {
+                    ui.showConfirm("@confirm", Core.bundle.format("confirmvotekick",  user.name()), () -> {
                         Call.sendChatMessage("/votekick " + user.name());
                     });
                 }).size(h);

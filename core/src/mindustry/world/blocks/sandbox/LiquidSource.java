@@ -2,7 +2,6 @@ package mindustry.world.blocks.sandbox;
 
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.util.ArcAnnotate.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.entities.units.*;
@@ -10,8 +9,9 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
-import static mindustry.Vars.content;
+import static mindustry.Vars.*;
 
 public class LiquidSource extends Block{
 
@@ -24,9 +24,12 @@ public class LiquidSource extends Block{
         configurable = true;
         outputsLiquid = true;
         saveConfig = true;
+        noUpdateDisabled = true;
+        displayFlow = false;
+        group = BlockGroup.liquids;
 
-        config(Liquid.class, (LiquidSourceEntity tile, Liquid l) -> tile.source = l);
-        configClear((LiquidSourceEntity tile) -> tile.source = null);
+        config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l);
+        configClear((LiquidSourceBuild tile) -> tile.source = null);
     }
 
     @Override
@@ -41,7 +44,7 @@ public class LiquidSource extends Block{
         drawRequestConfigCenter(req, req.config, "center");
     }
 
-    public class LiquidSourceEntity extends Building{
+    public class LiquidSourceBuild extends Building{
         public @Nullable Liquid source = null;
 
         @Override
@@ -58,7 +61,9 @@ public class LiquidSource extends Block{
         public void draw(){
             super.draw();
 
-            if(source != null){
+            if(source == null){
+                Draw.rect("cross", x, y);
+            }else{
                 Draw.color(source.color);
                 Draw.rect("center", x, y);
                 Draw.color();
@@ -67,7 +72,7 @@ public class LiquidSource extends Block{
 
         @Override
         public void buildConfiguration(Table table){
-            ItemSelection.buildTable(table, content.liquids(), () -> source, liquid -> configure(liquid));
+            ItemSelection.buildTable(table, content.liquids(), () -> source, this::configure);
         }
 
         @Override
@@ -87,15 +92,20 @@ public class LiquidSource extends Block{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
-            write.b(source == null ? -1 : source.id);
+            write.s(source == null ? -1 : source.id);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            byte id = read.b();
+            int id = revision == 1 ? read.s() : read.b();
             source = id == -1 ? null : content.liquid(id);
         }
     }

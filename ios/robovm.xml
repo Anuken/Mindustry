@@ -22,6 +22,8 @@
         <pattern>arc.scene.**</pattern>
         <pattern>mindustry.gen.Call</pattern>
         <pattern>mindustry.net.**</pattern>
+        <pattern>mindustry.world.blocks.**</pattern>
+        <pattern>mindustry.logic.**</pattern>
         <pattern>com.android.okhttp.HttpHandler</pattern>
         <pattern>com.android.okhttp.HttpsHandler</pattern>
         <pattern>com.android.org.conscrypt.**</pattern>
@@ -37,13 +39,15 @@
     </forceLinkClasses>
     <libs>
         <lib>z</lib>
+        <lib>libs/libarc.a</lib>
+        <lib>libs/libarc-freetype.a</lib>
     </libs>
     <frameworks>
         <framework>UIKit</framework>
         <framework>OpenGLES</framework>
         <framework>QuartzCore</framework>
         <framework>CoreGraphics</framework>
-        <framework>OpenAL</framework>
+        <framework>CoreAudio</framework>
         <framework>AudioToolbox</framework>
         <framework>AVFoundation</framework>
     </frameworks>
