@@ -723,7 +723,7 @@ public class HudFragment extends Fragment{
 
             t.add(new SideBar(() -> player.unit().healthf(), () -> true, true)).width(bw).growY().padRight(pad);
             t.image(() -> player.icon()).scaling(Scaling.bounded).grow().maxWidth(54f).with(i -> {
-                if(mobile){
+                if(mobile || Core.settings.getBool("mouse")){
                     //on mobile, cause a respawn on tap
                     i.clicked(() -> {
                         if(!player.unit().spawnedByCore && !player.dead()){
