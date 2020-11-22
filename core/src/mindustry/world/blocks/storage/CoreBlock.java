@@ -366,6 +366,10 @@ public class CoreBlock extends StorageBlock{
                 }else{
                     super.handleItem(source, item);
                 }
+
+                if(state.rules.tutorial){
+                    Events.fire(new CoreItemDeliverEvent());
+                }
             }
         }
     }

@@ -140,6 +140,12 @@ public class UI implements ApplicationListener, Loadable{
             }
         }
 
+        //draw overlay for buttons
+        if(state.rules.tutorial){
+            control.tutorial.draw();
+            Draw.flush();
+        }
+
         Events.fire(Trigger.uiDrawEnd);
     }
 
