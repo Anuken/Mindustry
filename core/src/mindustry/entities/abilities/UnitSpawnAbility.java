@@ -12,6 +12,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
+import static mindustry.Vars.*;
+
 public class UnitSpawnAbility extends Ability{
     public UnitType type;
     public float spawnTime = 60f, spawnX, spawnY;
