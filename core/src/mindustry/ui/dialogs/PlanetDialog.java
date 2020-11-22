@@ -677,22 +677,23 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).row();
         }
 
-        if(sector.isAttacked()){
-            stable.add(Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100)));
+        if(sector.isAttacked()){ //TODO localize
+            //these mechanics are likely to change and as such are not added to the bundle
+            stable.add("[scarlet]Under attack! [accent]" + (int)(sector.info.damage * 100) + "% damaged");
             stable.row();
 
             if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
                 int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
                 boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
-                stable.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : 0) +
-                (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture)));
+                stable.add("[accent]Survives " + Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : 0) +
+                (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture) + " waves");
                 stable.row();
             }
-        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){
-            stable.add("@sectors.vulnerable");
+        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){ //TODO localize
+            stable.add("[scarlet]Vulnerable");
             stable.row();
-        }else if(!sector.hasBase() && sector.hasEnemyBase()){
-            stable.add("@sectors.enemybase");
+        }else if(!sector.hasBase() && sector.hasEnemyBase()){ //TODO localize
+            stable.add("[scarlet]Enemy Base");
             stable.row();
         }
 

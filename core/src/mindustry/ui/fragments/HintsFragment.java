@@ -13,11 +13,9 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -26,9 +24,10 @@ public class HintsFragment extends Fragment{
     private static final float foutTime = 0.6f;
 
     /** All hints to be displayed in the game. */
-    public Seq<Hint> hints = Seq.with(DefaultHint.values());
+    public Seq<Hint> incomplete = Seq.with(DefaultHint.values());
+    @Nullable
+    public Hint current;
 
-    @Nullable Hint current;
     Group group = new WidgetGroup();
     ObjectSet<String> events = new ObjectSet<>();
     ObjectSet<Block> placedBlocks = new ObjectSet<>();
@@ -48,10 +47,10 @@ public class HintsFragment extends Fragment{
                 }else if(!current.show()){ //current became hidden
                     hide();
                 }
-            }else if(hints.size > 0){
+            }else if(incomplete.size > 0){
                 //check one hint each frame to see if it should be shown.
-                checkIdx = (checkIdx + 1) % hints.size;
-                Hint hint = hints.get(checkIdx);
+                checkIdx = (checkIdx + 1) % incomplete.size;
+                Hint hint = incomplete.get(checkIdx);
                 if(hint.show() && !hint.finished() & !hint.complete()){
                     display(hint);
                 }
@@ -62,7 +61,7 @@ public class HintsFragment extends Fragment{
         checkNext();
 
         Events.on(BlockBuildEndEvent.class, event -> {
-            if(!event.breaking && event.unit == player.unit()){
+            if(!event.breaking && event.tile.team() == Vars.state.rules.defaultTeam){
                 placedBlocks.add(event.tile.block());
             }
 
@@ -71,22 +70,26 @@ public class HintsFragment extends Fragment{
             }
         });
 
-        Events.on(ResetEvent.class, e -> {
-            placedBlocks.clear();
-            events.clear();
+        Events.on(UnitControlEvent.class, e -> {
+            if(e.player == player){
+                events.add("unitcontrol");
+            }
         });
 
+        Events.on(WorldLoadEvent.class, e -> Core.app.post(() -> {
+            checkNext();
+        }));
     }
 
     void checkNext(){
         if(current != null) return;
 
-        hints.removeAll(h -> h == current || !h.valid() || h.finished() || (h.show() && h.complete()));
-        hints.sort(Hint::order);
+        incomplete.removeAll(h -> h == current || !h.valid() || h.finished() || (h.show() && h.complete()));
+        incomplete.sort(Hint::order);
 
-        Hint first = hints.find(Hint::show);
+        Hint first = incomplete.find(Hint::show);
         if(first != null){
-            hints.remove(first);
+            incomplete.remove(first);
             display(first);
         }
     }
@@ -117,7 +120,7 @@ public class HintsFragment extends Fragment{
         if(current == null) return;
 
         current.finish();
-        hints.remove(current);
+        incomplete.remove(current);
 
         hide();
     }
@@ -141,7 +144,7 @@ public class HintsFragment extends Fragment{
     public enum DefaultHint implements Hint{
         desktopMove(visibleDesktop, () -> Core.input.axis(Binding.move_x) != 0 || Core.input.axis(Binding.move_y) != 0),
         zoom(visibleDesktop, () -> Core.input.axis(KeyCode.scroll) != 0),
-        mine(() -> player.unit().canMine() && isTutorial.get(), () -> player.unit().mining()),
+        mine(isTutorial, () -> player.unit().mining()),
         placeDrill(isTutorial, () -> ui.hints.placedBlocks.contains(Blocks.mechanicalDrill)),
         placeConveyor(isTutorial, () -> ui.hints.placedBlocks.contains(Blocks.conveyor)),
         placeTurret(isTutorial, () -> ui.hints.placedBlocks.contains(Blocks.duo)),
@@ -153,13 +156,6 @@ public class HintsFragment extends Fragment{
         unitControl(() -> state.rules.defaultTeam.data().units.size > 1 && !net.active(), () -> !player.dead() && !player.unit().spawnedByCore),
         respawn(visibleMobile, () -> !player.dead() && !player.unit().spawnedByCore, () -> !player.dead() && player.unit().spawnedByCore),
         launch(() -> isTutorial.get() && state.rules.sector.isCaptured(), () -> ui.planet.isShown()),
-        schematicSelect(visibleDesktop, () -> ui.hints.placedBlocks.contains(Blocks.router), () -> Core.input.keyRelease(Binding.schematic_select) || Core.input.keyTap(Binding.pick)),
-        conveyorPathfind(() -> control.input.block == Blocks.titaniumConveyor, () -> Core.input.keyTap(Binding.diagonal_placement) || (mobile && Core.settings.getBool("swapdiagonal"))),
-        boost(visibleDesktop, () -> !player.dead() && player.unit().type.canBoost, () -> Core.input.keyDown(Binding.boost)),
-        command(() -> state.rules.defaultTeam.data().units.size > 3 && !net.active(), () -> player.unit().isCommanding()),
-        payloadPickup(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().isEmpty(), () -> player.unit() instanceof Payloadc p && p.payloads().any()),
-        payloadDrop(() -> !player.unit().dead && player.unit() instanceof Payloadc p && p.payloads().any(), () -> player.unit() instanceof Payloadc p && p.payloads().isEmpty()),
-        waveFire(() -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(), () -> indexer.getAllied(state.rules.defaultTeam, BlockFlag.extinguisher).size() > 0),
         ;
 
         @Nullable
