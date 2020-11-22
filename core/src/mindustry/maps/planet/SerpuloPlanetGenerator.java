@@ -76,7 +76,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         float poles = Math.abs(tile.v.y);
         float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.58f);
 
-        if(noise + poles/7 > 0.12 && poles > 0.23){
+        if(noise + poles/7.1 > 0.12 && poles > 0.23){
             any = true;
         }
 
@@ -87,7 +87,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 //no sectors near start sector!
                 if(
                     osec.id == sector.planet.startSector || //near starting sector
-                    osec.generateEnemyBase && poles < 0.84 || //near other base
+                    osec.generateEnemyBase && poles < 0.85 || //near other base
                     (sector.preset != null && noise < 0.11) //near preset
                 ){
                     return;
