@@ -2,7 +2,7 @@
 
 "use strict";
 
-function log(context, obj){
+const log = function(context, obj){
     Vars.mods.getScripts().log(context, String(obj))
 }
 
@@ -21,26 +21,13 @@ let modName = "none"
 
 const print = text => log(modName + "/" + scriptName, text);
 
-// js 'extend(Base, ..., {})' = java 'new Base(...) {}'
-function extend(/*Base, ..., def*/) {
-    const Base = arguments[0];
-    const def = arguments[arguments.length - 1];
-    // swap order from Base, def, ... to Base, ..., def
-    const args = [Base, def].concat(Array.from(arguments).splice(1, arguments.length - 2));
-
-    // forward constructor arguments to new JavaAdapter
-    const instance = JavaAdapter.apply(null, args);
-    // JavaAdapter only overrides functions; set fields too
-    for (var i in def) {
-        if (typeof(def[i]) != "function") {
-            instance[i] = def[i];
-        }
-    }
-    return instance;
+const extendContent = function(classType, name, params){
+    return new JavaAdapter(classType, params, name)
 }
 
-// For backwards compatibility, use extend instead
-const extendContent = extend;
+const extend = function(classType, params){
+    return new JavaAdapter(classType, params)
+}
 
 //these are not sctrictly necessary, but are kept for edge cases
 const run = method => new java.lang.Runnable(){run: method}
@@ -53,7 +40,7 @@ const prov = method => new Prov(){get: method}
 const func = method => new Func(){get: method}
 
 const newEffect = (lifetime, renderer) => new Effects.Effect(lifetime, new Effects.EffectRenderer({render: renderer}))
-const Call = Packages.mindustry.gen.Call
+Call = Packages.mindustry.gen.Call
 
 importPackage(Packages.arc)
 importPackage(Packages.arc.func)
