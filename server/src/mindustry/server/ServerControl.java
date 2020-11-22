@@ -1008,6 +1008,10 @@ public class ServerControl implements ApplicationListener{
             currentLogFile = null;
         }
 
+        for(String value : values){
+            text = text.replace(value, "");
+        }
+
         if(currentLogFile == null){
             int i = 0;
             while(logFolder.child("log-" + i + ".txt").length() >= maxLogLength){
