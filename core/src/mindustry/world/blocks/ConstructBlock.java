@@ -40,6 +40,7 @@ public class ConstructBlock extends Block{
         consumesTap = true;
         solidifes = true;
         consBlocks[size - 1] = this;
+        sync = true;
     }
 
     /** Returns a ConstructBlock by size. */
@@ -179,7 +180,7 @@ public class ConstructBlock extends Block{
                 if(control.input.buildWasAutoPaused && !control.input.isBuilding && player.isBuilder()){
                     control.input.isBuilding = true;
                 }
-                player.builder().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
+                player.unit().addBuild(new BuildPlan(tile.x, tile.y, rotation, cblock, lastConfig), false);
             }
         }
 

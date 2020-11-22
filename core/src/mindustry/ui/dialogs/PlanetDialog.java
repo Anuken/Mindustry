@@ -134,6 +134,11 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     /** show with no limitations, just as a map. */
     @Override
     public Dialog show(){
+        if(net.client()){
+            ui.showInfo("@map.multiplayer");
+            return this;
+        }
+
         mode = look;
         selected = hovered = launchSector = null;
         launching = false;
@@ -239,6 +244,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     }
 
     Sector findLauncher(Sector to){
+        Sector launchSector = this.launchSector != null && this.launchSector.hasBase() ? this.launchSector : null;
         //directly nearby.
         if(to.near().contains(launchSector)) return launchSector;
 
@@ -671,23 +677,22 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).row();
         }
 
-        if(sector.isAttacked()){ //TODO localize
-            //these mechanics are likely to change and as such are not added to the bundle
-            stable.add("[scarlet]Under attack! [accent]" + (int)(sector.info.damage * 100) + "% damaged");
+        if(sector.isAttacked()){
+            stable.add(Core.bundle.format("sectors.underattack", (int)(sector.info.damage * 100)));
             stable.row();
 
             if(sector.info.wavesSurvived >= 0 && sector.info.wavesSurvived - sector.info.wavesPassed >= 0 && !sector.isBeingPlayed()){
                 int toCapture = sector.info.attack || sector.info.winWave <= 1 ? -1 : sector.info.winWave - (sector.info.wave + sector.info.wavesPassed);
                 boolean plus = (sector.info.wavesSurvived - sector.info.wavesPassed) >= SectorDamage.maxRetWave - 1;
-                stable.add("[accent]Survives " + Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture) +
-                (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture) + " waves");
+                stable.add(Core.bundle.format("sectors.survives", Math.min(sector.info.wavesSurvived - sector.info.wavesPassed, toCapture <= 0 ? 200 : 0) +
+                (plus ? "+" : "") + (toCapture < 0 ? "" : "/" + toCapture)));
                 stable.row();
             }
-        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){ //TODO localize
-            stable.add("[scarlet]Vulnerable");
+        }else if(sector.hasBase() && sector.near().contains(Sector::hasEnemyBase)){
+            stable.add("@sectors.vulnerable");
             stable.row();
-        }else if(!sector.hasBase() && sector.hasEnemyBase()){ //TODO localize
-            stable.add("[scarlet]Enemy Base");
+        }else if(!sector.hasBase() && sector.hasEnemyBase()){
+            stable.add("@sectors.enemybase");
             stable.row();
         }
 
@@ -711,7 +716,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if((sector.hasBase() && mode == look) || canSelect(sector) || (sector.preset != null && sector.preset.alwaysUnlocked) || debugSelect){
             stable.button(mode == select ? "@sectors.select" : sector.hasBase() ? "@sectors.resume" : "@sectors.launch", Icon.play, () -> {
-                if(state.rules.sector == sector && !state.isMenu()){
+                if(sector.isBeingPlayed()){
                     //already at this sector
                     hide();
                     return;

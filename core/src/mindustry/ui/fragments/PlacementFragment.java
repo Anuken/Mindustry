@@ -102,7 +102,7 @@ public class PlacementFragment extends Fragment{
             Block tryRecipe = tile == null ? null : tile.block instanceof ConstructBlock ? ((ConstructBuild)tile).cblock : tile.block;
             Object tryConfig = tile == null ? null : tile.config();
 
-            for(BuildPlan req : player.builder().plans()){
+            for(BuildPlan req : player.unit().plans()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
                     tryRecipe = req.block;
                     tryConfig = req.config;

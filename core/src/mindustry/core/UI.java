@@ -42,6 +42,7 @@ public class UI implements ApplicationListener, Loadable{
     public MinimapFragment minimapfrag;
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
+    public HintsFragment hints;
 
     public WidgetGroup menuGroup, hudGroup;
 
@@ -140,12 +141,6 @@ public class UI implements ApplicationListener, Loadable{
             }
         }
 
-        //draw overlay for buttons
-        if(state.rules.tutorial){
-            control.tutorial.draw();
-            Draw.flush();
-        }
-
         Events.fire(Trigger.uiDrawEnd);
     }
 
@@ -156,6 +151,7 @@ public class UI implements ApplicationListener, Loadable{
 
         menufrag = new MenuFragment();
         hudfrag = new HudFragment();
+        hints = new HintsFragment();
         chatfrag = new ChatFragment();
         minimapfrag = new MinimapFragment();
         listfrag = new PlayerListFragment();
@@ -526,7 +522,7 @@ public class UI implements ApplicationListener, Loadable{
 
     //TODO move?
 
-    public static String formatAmount(long number){
+    public static String formatAmount(int number){
         if(number >= 1_000_000_000){
             return Strings.fixed(number / 1_000_000_000f, 1) + "[gray]" + Core.bundle.get("unit.billions") + "[]";
         }else if(number >= 1_000_000){

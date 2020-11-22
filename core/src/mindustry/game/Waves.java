@@ -257,10 +257,10 @@ public class Waves{
 
     public static Seq<SpawnGroup> generate(float difficulty){
         //apply power curve to make starting sectors easier
-        return generate(new Rand(), Mathf.pow(difficulty, 1.12f));
+        return generate(Mathf.pow(difficulty, 1.12f), new Rand(), false);
     }
 
-    public static Seq<SpawnGroup> generate(Rand rand, float difficulty){
+    public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean attack){
         UnitType[][] species = {
         {dagger, mace, fortress, scepter, reign},
         {nova, pulsar, quasar, vela, corvus},
@@ -394,6 +394,21 @@ public class Waves{
             shieldScaling = shieldsPerWave * 4;
             effect = StatusEffects.boss;
         }});
+
+        //add megas to heal the base.
+        if(attack && difficulty >= 0.5){
+            int amount = Mathf.random(1, 3 + (int)(difficulty*2));
+
+            for(int i = 0; i < amount; i++){
+                int wave = Mathf.random(3, 20);
+                out.add(new SpawnGroup(mega){{
+                    unitAmount = 1;
+                    begin = wave;
+                    end = wave;
+                    max = 16;
+                }});
+            }
+        }
 
         //shift back waves on higher difficulty for a harder start
         int shift = Math.max((int)(difficulty * 15 - 5), 0);

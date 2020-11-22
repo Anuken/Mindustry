@@ -61,6 +61,7 @@ public class ResearchDialog extends BaseDialog{
                         for(Sector sector : planet.sectors){
                             if(sector.hasSave() && sector.hasBase()){
                                 ItemSeq cached = sector.items();
+                                cache.put(sector, cached);
                                 cached.each((item, amount) -> {
                                     values[item.id] += amount;
                                     total += amount;
@@ -168,7 +169,7 @@ public class ResearchDialog extends BaseDialog{
     public Dialog show(){
         if(net.client()){
             ui.showInfo("@research.multiplayer");
-            return null;
+            return this;
         }
 
         return super.show();

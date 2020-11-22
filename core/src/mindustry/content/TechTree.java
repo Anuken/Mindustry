@@ -30,6 +30,9 @@ public class TechTree implements ContentList{
                 node(junction, () -> {
                     node(router, () -> {
                         node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
+                            node(interplanetaryAccelerator, Seq.with(new SectorComplete(planetaryTerminal)), () -> {
+                                
+                            });
                         });
 
                         node(distributor);
@@ -47,7 +50,7 @@ public class TechTree implements ContentList{
                         });
 
                         node(itemBridge, () -> {
-                            node(titaniumConveyor, () -> {
+                            node(titaniumConveyor, Seq.with(new SectorComplete(craters)), () -> {
                                 node(phaseConveyor, () -> {
                                     node(massDriver, () -> {
 
@@ -108,7 +111,7 @@ public class TechTree implements ContentList{
                 });
 
                 node(graphitePress, () -> {
-                    node(pneumaticDrill, () -> {
+                    node(pneumaticDrill, Seq.with(new SectorComplete(frozenForest)), () -> {
                         node(cultivator, Seq.with(new SectorComplete(biomassFacility)), () -> {
 
                         });
@@ -198,6 +201,7 @@ public class TechTree implements ContentList{
                     });
 
                     node(illuminator, () -> {
+                        
                     });
                 });
 
@@ -234,7 +238,7 @@ public class TechTree implements ContentList{
                             });
                         });
 
-                        node(steamGenerator, () -> {
+                        node(steamGenerator, Seq.with(new SectorComplete(craters)), () -> {
                             node(thermalGenerator, () -> {
                                 node(differentialGenerator, () -> {
                                     node(thoriumReactor, Seq.with(new Research(Liquids.cryofluid)), () -> {
@@ -291,7 +295,7 @@ public class TechTree implements ContentList{
                         node(salvo, () -> {
                             node(swarmer, () -> {
                                 node(cyclone, () -> {
-                                    node(spectre, () -> {
+                                    node(spectre, Seq.with(new SectorComplete(nuclearComplex)), () -> {
 
                                     });
                                 });
@@ -321,8 +325,8 @@ public class TechTree implements ContentList{
                         });
 
                         node(lancer, () -> {
-                            node(foreshadow, () -> {
-                                node(meltdown, () -> {
+                            node(meltdown, () -> {
+                                node(foreshadow, () -> {
 
                                 });
                             });
@@ -417,9 +421,10 @@ public class TechTree implements ContentList{
                 });
 
                 node(additiveReconstructor, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                    node(multiplicativeReconstructor, () -> {
+                    node(multiplicativeReconstructor, Seq.with(new SectorComplete(overgrowth)), () -> {
                         node(exponentialReconstructor, () -> {
                             node(tetrativeReconstructor, () -> {
+                                
                             });
                         });
                     });
@@ -461,14 +466,30 @@ public class TechTree implements ContentList{
                                     node(impact0078, Seq.with(
                                         new SectorComplete(tarFields),
                                         new Research(Items.thorium),
-                                        new Research(overdriveProjector)
+                                        new Research(coreFoundation)
                                     ), () -> {
                                         node(desolateRift, Seq.with(
                                             new SectorComplete(impact0078),
                                             new Research(thermalGenerator),
                                             new Research(thoriumReactor)
                                         ), () -> {
+                                            node(planetaryTerminal, Seq.with(
+                                                new SectorComplete(desolateRift),
+                                                new SectorComplete(nuclearComplex),
+                                                new SectorComplete(overgrowth),
+                                                new SectorComplete(extractionOutpost),
+                                                new SectorComplete(saltFlats),
+                                                new Research(risso),
+                                                new Research(minke),
+                                                new Research(bryde),
+                                                new Research(spectre),
+                                                new Research(launchPad),
+                                                new Research(impactReactor),
+                                                new Research(additiveReconstructor),
+                                                new Research(exponentialReconstructor)
+                                            ), () -> {
 
+                                            });
                                         });
                                     });
                                 });

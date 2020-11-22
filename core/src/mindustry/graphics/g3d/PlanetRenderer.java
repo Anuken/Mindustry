@@ -167,7 +167,7 @@ public class PlanetRenderer implements Disposable{
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
-        int points = (int)(radius * 50);
+        int points = (int)(radius * 10);
         Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray));
         batch.flush(Gl.lineLoop);
     }

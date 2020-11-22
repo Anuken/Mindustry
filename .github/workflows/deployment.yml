@@ -1,0 +1,59 @@
+name: Deployment
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  buildJava14:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 14
+      uses: actions/setup-java@v1
+      with:
+        java-version: 14
+    - name: Create artifacts
+      run: |
+        ./gradlew desktop:dist server:dist core:javadoc -Pbuildversion=${GITHUB_REF:1}"
+    - name: Update docs
+      run: |
+        cd ../
+        git clone --depth=1 https://github.com/MindustryGame/docs.git
+        cp -a Mindustry/core/build/docs/javadoc/. docs/
+        cd docs
+        git add .
+        git commit -m "Update ${GITHUB_REF:1}"
+        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/MindustryGame/docs
+        cd ../Mindustry
+    - name: Add Arc release
+      run: |
+        git clone --depth=1 --branch=master https://github.com/Anuken/Arc ../Arc
+        cd ../Arc
+        git tag ${GITHUB_REF}
+        git push https://Anuken:${{ secrets.API_TOKEN_GITHUB }}@github.com/Anuken/Arc ${GITHUB_REF};
+        cd ../Mindustry
+    - name: Update F-Droid build string
+      run: |
+        git clone --depth=1 --branch=master https://github.com/Anuken/MindustryBuilds ../MindustryBuilds
+        cd ../MindustryBuilds
+        echo "Updating version to ${GITHUB_REF:1}"
+        echo versionName=6-fdroid-${GITHUB_REF:1}$'\n'versionCode=${GITHUB_REF:1} > version_fdroid.txt
+        git add .
+        git commit -m "Updating to build ${GITHUB_REF:1}"
+        cd ../Mindustry
+    - name: Upload client artifacts
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: desktop/libs/Mindustry.jar
+        tag: ${{ github.ref }}
+    - name: Upload server artifacts
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: server/libs/server-release.jar
+        tag: ${{ github.ref }}
+

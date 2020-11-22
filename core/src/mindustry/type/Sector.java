@@ -98,7 +98,7 @@ public class Sector{
 
     /** @return whether the player has a base here. */
     public boolean hasBase(){
-        return save != null && info.hasCore;
+        return save != null && info.hasCore && !(Vars.state.isGame() && Vars.state.rules.sector == this && state.gameOver);
     }
 
     /** @return whether the enemy has a generated base here. */
@@ -198,7 +198,7 @@ public class Sector{
     }
 
     public String toString(){
-        return planet.name + "#" + id;
+        return planet.name + "#" + id + " (" + name() + ")";
     }
 
     /** Projects this sector onto a 4-corner square for use in map gen.

@@ -80,7 +80,7 @@ public class UnitType extends UnlockableContent{
     public int ammoCapacity = -1;
     public AmmoType ammoType = AmmoTypes.copper;
     public int mineTier = -1;
-    public float buildSpeed = 1f, mineSpeed = 1f;
+    public float buildSpeed = -1f, mineSpeed = 1f;
     public Sound mineSound = Sounds.minebeam;
     public float mineSoundVolume = 0.6f;
 
@@ -225,7 +225,7 @@ public class UnitType extends UnlockableContent{
             stats.addPercent(Stat.mineSpeed, mineSpeed);
             stats.add(Stat.mineTier, new BlockFilterValue(b -> b instanceof Floor f && f.itemDrop != null && f.itemDrop.hardness <= mineTier && !f.playerUnmineable));
         }
-        if(inst instanceof Builderc){
+        if(buildSpeed > 0){
             stats.addPercent(Stat.buildSpeed, buildSpeed);
         }
         if(inst instanceof Payloadc){

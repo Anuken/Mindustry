@@ -48,11 +48,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     transient float textFadeTime;
 
     public boolean isBuilder(){
-        return unit instanceof Builderc;
-    }
-
-    public boolean isMiner(){
-        return unit instanceof Minerc;
+        return unit.canBuild();
     }
 
     public @Nullable CoreBuild closestCore(){
@@ -162,14 +158,6 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
     public Unit unit(){
         return unit;
-    }
-
-    public Minerc miner(){
-        return !(unit instanceof Minerc) ? Nulls.miner : (Minerc)unit;
-    }
-
-    public Builderc builder(){
-        return !(unit instanceof Builderc) ? Nulls.builder : (Builderc)unit;
     }
 
     public void unit(Unit unit){

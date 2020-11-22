@@ -57,6 +57,7 @@ public interface Payload{
             return (T)payload;
         }else if(type == payloadUnit){
             byte id = read.b();
+            if(EntityMapping.map(id) == null) throw new RuntimeException("No type with ID " + id + " found.");
             Unit unit = (Unit)EntityMapping.map(id).get();
             unit.read(read);
             return (T)new UnitPayload(unit);

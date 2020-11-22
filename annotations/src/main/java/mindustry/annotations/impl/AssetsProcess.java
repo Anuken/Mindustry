@@ -46,7 +46,7 @@ public class AssetsProcess extends BaseProcessor{
             String name = Strings.kebabToCamel(split[1]).replace("Medium", "").replace("Icon", "");
             if(SourceVersion.isKeyword(name) || name.equals("char")) name += "i";
 
-            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + key).build());
+            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).addJavadoc(String.format("\\u%04x", Integer.parseInt(key))).initializer("'" + ((char)Integer.parseInt(key)) + "'").build());
         });
 
         ictype.addField(FieldSpec.builder(ParameterizedTypeName.get(ObjectMap.class, String.class, TextureRegionDrawable.class),
@@ -64,7 +64,7 @@ public class AssetsProcess extends BaseProcessor{
 
             int code = val.getInt("code", 0);
             iconcAll.append((char)code);
-            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).initializer("(char)" + code).build());
+            ichtype.addField(FieldSpec.builder(char.class, name, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL).addJavadoc(String.format("\\u%04x", code)).initializer("'" + ((char)code) + "'").build());
             ichinit.addStatement("codes.put($S, $L)", name, code);
 
             ictype.addField(TextureRegionDrawable.class, name + "Small", Modifier.PUBLIC, Modifier.STATIC);

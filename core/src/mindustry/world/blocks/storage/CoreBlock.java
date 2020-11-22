@@ -63,6 +63,8 @@ public class CoreBlock extends StorageBlock{
         CoreBlock block = (CoreBlock)tile.block();
         Fx.spawn.at(entity);
 
+        player.set(entity);
+
         if(!net.client()){
             Unit unit = block.unitType.create(tile.team());
             unit.set(entity);
@@ -363,10 +365,6 @@ public class CoreBlock extends StorageBlock{
                     noEffect = false;
                 }else{
                     super.handleItem(source, item);
-                }
-
-                if(state.rules.tutorial){
-                    Events.fire(new CoreItemDeliverEvent());
                 }
             }
         }

@@ -35,27 +35,25 @@ public class PausedDialog extends BaseDialog{
             cont.button("@back", Icon.left, this::hide).name("back");
             cont.button("@settings", Icon.settings, ui.settings::show).name("settings");
 
-            if(!state.rules.tutorial){
-                if(!state.isCampaign() && !state.isEditor()){
-                    cont.row();
-                    cont.button("@savegame", Icon.save, save::show);
-                    cont.button("@loadgame", Icon.upload, load::show).disabled(b -> net.active());
-                }
-
+            if(!state.isCampaign() && !state.isEditor()){
                 cont.row();
-
-                cont.button("@hostserver", Icon.host, () -> {
-                    if(net.server() && steam){
-                        platform.inviteFriends();
-                    }else{
-                        if(steam){
-                            ui.host.runHost();
-                        }else{
-                            ui.host.show();
-                        }
-                    }
-                }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
+                cont.button("@savegame", Icon.save, save::show);
+                cont.button("@loadgame", Icon.upload, load::show).disabled(b -> net.active());
             }
+
+            cont.row();
+
+            cont.button("@hostserver", Icon.host, () -> {
+                if(net.server() && steam){
+                    platform.inviteFriends();
+                }else{
+                    if(steam){
+                        ui.host.runHost();
+                    }else{
+                        ui.host.show();
+                    }
+                }
+            }).disabled(b -> !((steam && net.server()) || !net.active())).colspan(2).width(dw * 2 + 20f).update(e -> e.setText(net.server() && steam ? "@invitefriends" : "@hostserver"));
 
             cont.row();
 
@@ -95,10 +93,7 @@ public class PausedDialog extends BaseDialog{
     }
 
     void showQuitConfirm(){
-        ui.showConfirm("@confirm", state.rules.tutorial ? "@quit.confirm.tutorial" : "@quit.confirm", () -> {
-            if(state.rules.tutorial){
-                Core.settings.put("playedtutorial", true);
-            }
+        ui.showConfirm("@confirm", "@quit.confirm", () -> {
             wasClient = net.client();
             if(net.client()) netClient.disconnectQuietly();
             runExitSave();
@@ -112,7 +107,7 @@ public class PausedDialog extends BaseDialog{
             return;
         }
 
-        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || state.rules.tutorial || wasClient){
+        if(control.saves.getCurrent() == null || !control.saves.getCurrent().isAutosave() || wasClient){
             logic.reset();
             return;
         }

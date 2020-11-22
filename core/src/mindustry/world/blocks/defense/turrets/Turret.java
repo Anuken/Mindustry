@@ -66,7 +66,7 @@ public abstract class Turret extends ReloadTurret{
     protected Vec2 tr = new Vec2();
     protected Vec2 tr2 = new Vec2();
 
-    public @Load(value = "base-@", fallback = "block-@size") TextureRegion baseRegion;
+    public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
     public @Load("@-heat") TextureRegion heatRegion;
 
     public Cons<TurretBuild> drawer = tile -> Draw.rect(region, tile.x + tr2.x, tile.y + tr2.y, tile.rotation - 90);
@@ -101,7 +101,7 @@ public abstract class Turret extends ReloadTurret{
         super.setStats();
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / reloadTime * shots, StatUnit.none);
+        stats.add(Stat.reload, 60f / reloadTime * (alternate ? 1 : shots), StatUnit.none);
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
     }

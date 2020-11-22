@@ -130,6 +130,7 @@ public class SettingsMenuDialog extends SettingsDialog{
                             u.clearUnlock();
                         }
                     });
+                    settings.remove("unlocks");
                 });
             }).marginLeft(4);
 
