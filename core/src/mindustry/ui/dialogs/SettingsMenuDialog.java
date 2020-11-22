@@ -300,16 +300,13 @@ public class SettingsMenuDialog extends SettingsDialog{
             if(Core.settings.getBool("keyboard")){
                 control.setInput(new DesktopInput());
             }
-        }
-        //the issue with touchscreen support on desktop is that:
-        //1) I can't test it
-        //2) the SDL backend doesn't support multitouch
-        /*else{
-            game.checkPref("touchscreen", false, val -> control.setInput(!val ? new DesktopInput() : new MobileInput()));
-            if(Core.settings.getBool("touchscreen")){
+        }else{
+            game.checkPref("mouse", false, val -> control.setInput(val ? new MobileInput() : new DesktopInput()));
+            if(Core.settings.getBool("mouse")){
                 control.setInput(new MobileInput());
             }
-        }*/
+        }
+
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
 
         if(!mobile){
