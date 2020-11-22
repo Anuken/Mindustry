@@ -32,7 +32,6 @@ public class HintsFragment extends Fragment{
     Group group = new WidgetGroup();
     ObjectSet<String> events = new ObjectSet<>();
     ObjectSet<Block> placedBlocks = new ObjectSet<>();
-    int checkIdx = 0;
     Table last;
 
     @Override
@@ -50,9 +49,8 @@ public class HintsFragment extends Fragment{
                 }
             }else if(hints.size > 0){
                 //check one hint each frame to see if it should be shown.
-                checkIdx = (checkIdx + 1) % hints.size;
-                Hint hint = hints.get(checkIdx);
-                if(hint.show() && !hint.finished() & !hint.complete()){
+                Hint hint = hints.find(Hint::show);
+                if(hint != null && !hint.finished() & !hint.complete()){
                     display(hint);
                 }
             }
@@ -99,7 +97,7 @@ public class HintsFragment extends Fragment{
             t.left();
             t.table(Styles.black5, cont -> {
                 cont.actions(Actions.alpha(0f), Actions.alpha(1f, 1f, Interp.smooth));
-                cont.margin(6f).add(hint.text()).width(Vars.mobile ? 300f : 400f).left().labelAlign(Align.left).wrap();
+                cont.margin(6f).add(hint.text()).width(Vars.mobile ? 270f : 400f).left().labelAlign(Align.left).wrap();
             });
             t.row();
             t.button("@hint.skip", Styles.nonet, () -> {
