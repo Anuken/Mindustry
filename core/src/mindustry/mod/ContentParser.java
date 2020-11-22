@@ -37,7 +37,6 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
-import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class ContentParser{
@@ -268,13 +267,7 @@ public class ContentParser{
             UnitType unit;
             if(locate(ContentType.unit, name) == null){
                 unit = new UnitType(mod + "-" + name);
-                var typeVal = value.get("type");
-
-                if(typeVal != null && !typeVal.isString()){
-                    throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
-                }
-
-                unit.constructor = unitType(typeVal);
+                unit.constructor = Reflect.cons(resolve(Strings.capitalize(getType(value)), "mindustry.gen"));
             }else{
                 unit = locate(ContentType.unit, name);
             }
@@ -343,18 +336,6 @@ public class ContentParser{
         ContentType.liquid, parser(ContentType.liquid, Liquid::new)
         //ContentType.sector, parser(ContentType.sector, SectorPreset::new)
     );
-
-    private Prov<Unit> unitType(JsonValue value){
-        if(value == null) return UnitEntity::create;
-        return switch(value.asString()){
-            case "flying" -> UnitEntity::create;
-            case "mech" -> MechUnit::create;
-            case "legs" -> LegsUnit::create;
-            case "naval" -> UnitWaterMove::create;
-            case "payload" -> PayloadUnit::create;
-            default -> throw new RuntimeException("Invalid unit type: '" + value + "'. Must be 'flying/mech/legs/naval/payload'.");
-        };
-    }
 
     private String getString(JsonValue value, String key){
         if(value.has(key)){

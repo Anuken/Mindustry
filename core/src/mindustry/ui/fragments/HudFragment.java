@@ -108,8 +108,7 @@ public class HudFragment extends Fragment{
             t.top().right();
         });
 
-        ui.hints.build(parent);
-
+        //TODO tear this all down
         //menu at top left
         parent.fill(cont -> {
             cont.name = "overlaymarker";
@@ -318,6 +317,29 @@ public class HudFragment extends Fragment{
             });
             t.table(Tex.button, top -> top.add("@coreattack").pad(2)
             .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time(), 2f, 1f)))).touchable(Touchable.disabled);
+        });
+
+        //TODO tutorial text
+        parent.fill(t -> {
+            t.name = "tutorial";
+            Runnable resize = () -> {
+                t.clearChildren();
+                t.top().right().visible(() -> false);
+                t.stack(new Button(){{
+                    marginLeft(48f);
+                    labelWrap(() -> control.tutorial.stage.text() + (control.tutorial.canNext() ? "\n\n" + Core.bundle.get("tutorial.next") : "")).width(!Core.graphics.isPortrait() ? 400f : 160f).pad(2f);
+                    clicked(() -> control.tutorial.nextSentence());
+                    setDisabled(() -> !control.tutorial.canNext());
+                }},
+                new Table(f -> {
+                    f.left().button(Icon.left, Styles.emptyi, () -> {
+                        control.tutorial.prevSentence();
+                    }).width(44f).growY().visible(() -> control.tutorial.canPrev());
+                }));
+            };
+
+            resize.run();
+            Events.on(ResizeEvent.class, e -> resize.run());
         });
 
         //'saving' indicator
